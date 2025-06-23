@@ -2,13 +2,15 @@ export const enSidebar = [
   {
     text: 'Introduction',
     collapsed: true,
+    home: true,
     items: [
       { text: 'What is RustFS', link: '/en/introduction' },
       { text: 'Architecture', link: '/en/architecture' },
       { text: 'Comparison with Other Storage', link: '/en/comparison' },
       { text: 'Open Source License', link: '/en/license' },
       {
-        text: 'Core Concepts', items: [
+        text: 'Core Concepts', link: '/en/concepts/glossary',
+        items: [
           { text: 'Glossary', link: '/en/concepts/glossary' },
           { text: 'Erasure Coding', link: '/en/concepts/erasure-coding' },
           { text: 'Availability and Resiliency', link: '/en/concepts/availability-and-resiliency' },
@@ -22,6 +24,7 @@ export const enSidebar = [
   {
     text: 'Architecture Support',
     collapsed: true,
+    home: true,
     items: [
       { text: 'Bare Metal and Virtualization', link: '/en/features/baremetal' },
       { text: 'Alibaba Cloud', link: '/en/features/aliyun' },
@@ -34,6 +37,7 @@ export const enSidebar = [
   {
     text: 'Product Features',
     collapsed: true,
+    home: true,
     items: [
       { text: 'Distributed', link: '/en/features/distributed' },
       { text: 'Logging', link: '/en/features/logging' },
@@ -48,6 +52,7 @@ export const enSidebar = [
   {
     text: 'Solutions',
     collapsed: true,
+    home: true,
     items: [
       { text: 'Modern Data Lake', link: '/en/features/data-lake' },
       { text: 'AI and Machine Learning', link: '/en/features/ai' },
@@ -64,11 +69,14 @@ export const enSidebar = [
   {
     text: 'Installation and Deployment',
     collapsed: true,
+    home: true,
     items: [
       { text: 'Startup Modes', link: '/en/installation/mode/' },
       { text: 'Hardware Selection', link: '/en/installation/hardware-selection' },
       {
-        text: 'Pre-installation Checks', items: [
+        text: 'Pre-installation Checks',
+        link: '/en/installation/checklists',
+        items: [
           { text: 'Checklists', link: '/en/installation/checklists' },
           { text: 'Hardware Checklists', link: '/en/installation/hard-checklists' },
           { text: 'Software Checklists', link: '/en/installation/software-checklists' },
@@ -77,7 +85,9 @@ export const enSidebar = [
         ]
       },
       {
-        text: 'Installation Guides', items: [
+        text: 'Installation Guides',
+        link: '/en/installation/linux',
+        items: [
           { text: 'Linux Installation', link: '/en/installation/linux' },
           { text: 'macOS Installation', link: '/en/installation/macos/' },
           { text: 'Windows Installation', link: '/en/installation/windows/' },
@@ -89,6 +99,7 @@ export const enSidebar = [
   {
     text: 'Operations and Monitoring',
     collapsed: true,
+    home: true,
     items: [
       { text: 'Hardware Preparation', link: '/en/admin/industry' },
       { text: 'Software Preparation', link: '/en/admin/industry' },
@@ -98,6 +109,7 @@ export const enSidebar = [
   {
     text: 'SDK and API',
     collapsed: true,
+    home: true,
     items: [
       { text: 'SDK Overview', link: '/en/sdk/' },
       { text: 'Java SDK', link: '/en/sdk/java' },

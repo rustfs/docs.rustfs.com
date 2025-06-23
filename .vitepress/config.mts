@@ -5,6 +5,8 @@ export default defineConfig({
   title: "RustFS",
   description: "RustFS is a high-performance distributed object storage software built using Rust",
   themeConfig: {
+    siteTitle: false,
+    logo: { src: '/images/logo.svg', height: 24 },
     socialLinks: [
       { icon: 'github', link: 'https://github.com/rustfs/rustfs' },
       { icon: 'twitter', link: 'https://twitter.com/rustfs' },
@@ -36,16 +38,8 @@ export default defineConfig({
   },
   srcDir: 'docs',
   locales: {
-    root: {
-      label: '简体中文',
-      lang: 'zh-CN',
-      link: '/zh/',
-    },
-    en: {
-      label: 'English',
-      lang: 'en-US',
-      link: '/en/',
-    }
+    root: { label: 'English' },
+    zh: { label: '简体中文' },
   },
   sitemap: {
     hostname: 'https://docs.rustfs.com'

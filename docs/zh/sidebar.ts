@@ -3,6 +3,7 @@ export const zhSidebar = [
   {
     text: '介绍',
     collapsed: true,
+    home: true,
     items: [
       { text: 'RustFS 简介', link: '/zh/introduction' },
       { text: '架构组成', link: '/zh/architecture' },
@@ -23,6 +24,7 @@ export const zhSidebar = [
   {
     text: '架构支持',
     collapsed: true,
+    home: true,
     items: [
       { text: '裸金属和虚拟化', link: '/zh/features/baremetal' },
       { text: '阿里云', link: '/zh/features/aliyun' },
@@ -35,6 +37,7 @@ export const zhSidebar = [
   {
     text: '产品功能',
     collapsed: true,
+    home: true,
     items: [
       { text: '分布式', link: '/zh/features/distributed' },
       { text: '日志管理', link: '/zh/features/logging' },
@@ -49,6 +52,7 @@ export const zhSidebar = [
   {
     text: '解决方案',
     collapsed: true,
+    home: true,
     items: [
       { text: '现代数据湖', link: '/zh/features/data-lake' },
       { text: 'AI 和机器学习', link: '/zh/features/ai' },
@@ -65,11 +69,14 @@ export const zhSidebar = [
   {
     text: '安装和部署',
     collapsed: true,
+    home: true,
     items: [
       { text: '启动模式', link: '/zh/installation/mode/' },
       { text: '硬件选择', link: '/zh/installation/hardware-selection' },
       {
-        text: '安装前检查', items: [
+        text: '安装前检查',
+        link: '/zh/installation/checklists',
+        items: [
           { text: '检查清单', link: '/zh/installation/checklists' },
           { text: '硬件检查清单', link: '/zh/installation/hard-checklists' },
           { text: '软件检查清单', link: '/zh/installation/software-checklists' },
@@ -78,7 +85,9 @@ export const zhSidebar = [
         ]
       },
       {
-        text: '安装指南', items: [
+        text: '安装指南',
+        link: '/zh/installation/linux',
+        items: [
           { text: 'Linux 安装', link: '/zh/installation/linux' },
           { text: 'macOS 安装', link: '/zh/installation/macos/' },
           { text: 'Windows 安装', link: '/zh/installation/windows/' },
@@ -90,6 +99,7 @@ export const zhSidebar = [
   {
     text: '运维和监控',
     collapsed: true,
+    home: true,
     items: [
       { text: '硬件准备', link: '/zh/admin/industry' },
       { text: '软件准备', link: '/zh/admin/industry' },
@@ -99,6 +109,7 @@ export const zhSidebar = [
   {
     text: 'SDK 和 API',
     collapsed: true,
+    home: true,
     items: [
       { text: 'SDK 概述', link: '/zh/sdk/' },
       { text: 'Java SDK', link: '/zh/sdk/java' },

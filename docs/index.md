@@ -1,7 +1,9 @@
+---
+layout: page
+---
+
 <script setup>
-import VPNavBarSearch from 'vitepress/dist/client/theme-default/components/VPNavBarSearch.vue'
+import { enSidebar } from './en/sidebar.ts'
 </script>
 
-# wip
-
-<VPNavBarSearch class="search w-1/2" />
+<Home :sidebar="enSidebar" title="RustFS Documentation" />
