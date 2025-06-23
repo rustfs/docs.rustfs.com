@@ -23,7 +23,7 @@ jobs:
 
       - name: 安装依赖并构建
         run: |
-          pnpm install
+          pnpm install --no-frozen-lockfile
           pnpm run build
 
       - name: 部署到阿里云 OSS
