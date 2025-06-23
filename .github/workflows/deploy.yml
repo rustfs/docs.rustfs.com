@@ -27,9 +27,11 @@ jobs:
           pnpm run build
 
       - name: 部署到阿里云 OSS
-        uses: fangbinwei/aliyun-oss-website-action@v1
+        uses: JohnGuan/oss-upload-action@main
         with:
-          accessKeyId: ${{ secrets.ALICLOUDOSS_KEY_ID }}
-          accessKeySecret: ${{ secrets.ALICLOUDOSS_KEY_SECRET }}
+          key-id: ${{ secrets.ALICLOUDOSS_KEY_ID }}
+          key-secret: ${{ secrets.ALICLOUDOSS_KEY_SECRET }}
+          region: oss-cn-beijing
           bucket: docs.rustfs.com
-          folder: .vitepress/dist
+          assets: |
+            .vitepress/dist:/
