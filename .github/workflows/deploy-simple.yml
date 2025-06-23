@@ -29,8 +29,7 @@ jobs:
       - name: 部署到阿里云 OSS
         uses: fangbinwei/aliyun-oss-website-action@v1
         with:
-          accessKeyId: ${{ secrets.OSS_ACCESS_KEY_ID }}
-          accessKeySecret: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
-          bucket: ${{ secrets.OSS_BUCKET_NAME }}
-          endpoint: ${{ secrets.OSS_ENDPOINT }}
+          accessKeyId: ${{ secrets.ALICLOUDOSS_KEY_ID }}
+          accessKeySecret: ${{ secrets.ALICLOUDOSS_KEY_SECRET }}
+          bucket: docs.rustfs.com
           folder: .vitepress/dist
