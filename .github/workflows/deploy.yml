@@ -1,96 +1,35 @@
-name: 构建并部署到阿里云 OSS
+name: 简化版部署到阿里云 OSS
 
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 检出代码
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
 
       - name: 设置 Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "18"
-          cache: "npm"
 
       - name: 安装 pnpm
         uses: pnpm/action-setup@v4
         with:
           version: latest
 
-      - name: 安装依赖
-        run: pnpm install --frozen-lockfile
-
-      - name: 构建文档
-        run: pnpm run build
-
-      - name: 安装阿里云 OSS CLI
+      - name: 安装依赖并构建
         run: |
-          wget https://gosspublic.alicdn.com/ossutil/1.7.19/ossutil64
-          chmod +x ossutil64
-          sudo mv ossutil64 /usr/local/bin/ossutil
+          pnpm install
+          pnpm run build
 
-      - name: 配置 OSS CLI
-        run: |
-          ossutil config -i ${{ secrets.ALICLOUDOSS_KEY_ID }} -k ${{ secrets.ALICLOUDOSS_KEY_SECRET }}
-        env:
-          OSS_ENDPOINT: ${{ secrets.OSS_ENDPOINT }}
-          OSS_ACCESS_KEY_ID: ${{ secrets.ALICLOUDOSS_KEY_ID }}
-          OSS_ACCESS_KEY_SECRET: ${{ secrets.ALICLOUDOSS_KEY_SECRET }}
-
-      - name: 部署到 OSS
-        run: |
-          # 上传构建文件到 OSS，删除远程多余文件，设置缓存策略
-          ossutil sync .vitepress/dist/ oss://${{ secrets.OSS_BUCKET_NAME }}/ \
-            --delete \
-            --force \
-            --update \
-            --meta Cache-Control:max-age=31536000 \
-            --include "*.js" \
-            --include "*.css" \
-            --include "*.png" \
-            --include "*.jpg" \
-            --include "*.gif" \
-            --include "*.svg" \
-            --include "*.ico" \
-            --include "*.woff" \
-            --include "*.woff2" \
-            --include "*.ttf" \
-            --include "*.eot"
-
-          # HTML 文件设置较短的缓存时间
-          ossutil sync .vitepress/dist/ oss://${{ secrets.OSS_BUCKET_NAME }}/ \
-            --delete \
-            --force \
-            --update \
-            --meta Cache-Control:max-age=3600 \
-            --include "*.html"
-
-          # 其他文件不设置缓存
-          ossutil sync .vitepress/dist/ oss://${{ secrets.OSS_BUCKET_NAME }}/ \
-            --delete \
-            --force \
-            --update \
-            --exclude "*.js" \
-            --exclude "*.css" \
-            --exclude "*.png" \
-            --exclude "*.jpg" \
-            --exclude "*.gif" \
-            --exclude "*.svg" \
-            --exclude "*.ico" \
-            --exclude "*.woff" \
-            --exclude "*.woff2" \
-            --exclude "*.ttf" \
-            --exclude "*.eot" \
-            --exclude "*.html"
-        env:
-          OSS_BUCKET_NAME: ${{ secrets.OSS_BUCKET_NAME }}
+      - name: 部署到阿里云 OSS
+        uses: fangbinwei/aliyun-oss-website-action@v1
+        with:
+          accessKeyId: ${{ secrets.ALICLOUDOSS_KEY_ID }}
+          accessKeySecret: ${{ secrets.ALICLOUDOSS_KEY_SECRET }}
+          bucket: docs.rustfs.com
+          folder: .vitepress/dist
