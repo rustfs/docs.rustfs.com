@@ -38,8 +38,8 @@ export default defineConfig({
   },
   srcDir: 'docs',
   locales: {
-    root: { label: 'English' },
-    zh: { label: '简体中文' },
+    root: { label: 'English', link: '/en/', lang: 'en', dir: 'en' },
+    zh: { label: '简体中文', link: '/zh/', lang: 'zh', dir: 'zh' },
   },
   sitemap: {
     hostname: 'https://docs.rustfs.com'

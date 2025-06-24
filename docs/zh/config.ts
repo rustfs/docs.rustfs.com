@@ -8,7 +8,7 @@ export default defineAdditionalConfig({
   themeConfig: {
     nav: [
       { text: '首页', link: 'https://rustfs.com' },
-      { text: '安装', link: '/zh/installation' },
+      { text: '安装', link: '/zh/installation/mode' },
       { text: 'SDK', link: '/zh/sdk' },
       { text: '演示', link: 'https://play.rustfs.com:7001' },
       { text: '社区', link: 'https://github.com/rustfs/rustfs/discussions' },
