@@ -52,7 +52,5 @@ jobs:
           OSSUTIL_ACCESS_KEY_SECRET: ${{ secrets.ALICLOUDOSS_KEY_SECRET }}
           OSSUTIL_ENDPOINT: https://oss-cn-beijing.aliyuncs.com
         run: |
-          echo "::group::Uploading files to OSS"
-          # Upload the artifact file to two different paths
-          ossutil cp .vitepress/dist  "oss://rustfs-docs/" --force
+          ossutil cp -r .vitepress/dist/ oss://rustfs-docs/ --force --recursive
           echo "Successfully uploaded to OSS"
