@@ -54,5 +54,5 @@ jobs:
         run: |
           echo "::group::Uploading files to OSS"
           # Upload the artifact file to two different paths
-          ossutil cp .vitepress/dist "oss://rustfs-docs/" --force
+          ossutil cp .vitepress/dist  "oss://rustfs-docs/" --force
           echo "Successfully uploaded to OSS"
