@@ -13,7 +13,7 @@ defineProps({
 </script>
 <template>
   <div class="home-components container mx-auto flex flex-col gap-8 py-12">
-    <h1 class="text-2xl! lg:text-4xl! leading-none font-bold! tracking-tight! text-gray-900 mt-10! mb-8! sm:mt-14! sm:mb-10!">{{ title }} </h1>
+    <h1 class="text-2xl! lg:text-4xl! leading-none font-bold! tracking-tight! dark:text-slate-300 text-slate-900 mt-10! mb-8! sm:mt-14! sm:mb-10!">{{ title }} </h1>
 
     <div class="grid grid-cols-4 gap-6 items-stretch justify-items-start">
       <template v-for="group in sidebar" :key="group.text" class="flex w-full">

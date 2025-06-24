@@ -1,4 +1,4 @@
-name: 简化版部署到阿里云 OSS
+name: 
 
 on:
   push:
