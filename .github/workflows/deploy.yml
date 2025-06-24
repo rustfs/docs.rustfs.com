@@ -54,3 +54,7 @@ jobs:
         run: |
           ossutil cp -r .vitepress/dist/ oss://rustfs-docs/ --force --recursive
           echo "Successfully uploaded to OSS"
+      - name: Show OSS error log if exists
+        if: failure()
+        run: |
+          cat /home/runner/work/docs.rustfs.com/docs.rustfs.com/ossutil_output/*.report || true
