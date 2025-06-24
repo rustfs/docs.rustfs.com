@@ -25,13 +25,34 @@ jobs:
         run: |
           pnpm install --no-frozen-lockfile
           pnpm run build
+      - name: 安装阿里云 OSS CLI
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          echo "::group::Installing ossutil2"
+          curl -o ossutil.zip https://gosspublic.alicdn.com/ossutil/v2/2.1.1/ossutil-2.1.1-linux-amd64.zip
+          unzip -o ossutil.zip
+          chmod 755 ossutil-2.1.1-linux-amd64/ossutil
+          sudo mv ossutil-2.1.1-linux-amd64/ossutil /usr/local/bin/
+          rm -rf ossutil.zip ossutil-2.1.1-linux-amd64
 
-      - name: 部署到阿里云 OSS
-        uses: JohnGuan/oss-upload-action@main
-        with:
-          key-id: ${{ secrets.ALICLOUDOSS_KEY_ID }}
-          key-secret: ${{ secrets.ALICLOUDOSS_KEY_SECRET }}
-          region: oss-cn-beijing
-          bucket: rustfs-docs
-          assets: |
-            .vitepress/dist:/
+          echo "ossutil2 installation completed"
+
+          # Set the OSS configuration
+          ossutil config set Region oss-cn-beijing
+          ossutil config set endpoint oss-cn-beijing.aliyuncs.com
+          ossutil config set accessKeyID ${{ secrets.ALICLOUDOSS_KEY_ID }}
+          ossutil config set accessKeySecret ${{ secrets.ALICLOUDOSS_KEY_SECRET }}
+
+      - name: Upload to Aliyun OSS
+        # if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
+        shell: bash
+        env:
+          OSSUTIL_ACCESS_KEY_ID: ${{ secrets.ALICLOUDOSS_KEY_ID }}
+          OSSUTIL_ACCESS_KEY_SECRET: ${{ secrets.ALICLOUDOSS_KEY_SECRET }}
+          OSSUTIL_ENDPOINT: https://oss-cn-beijing.aliyuncs.com
+        run: |
+          echo "::group::Uploading files to OSS"
+          # Upload the artifact file to two different paths
+          ossutil cp .vitepress/dist "oss://rustfs-docs/" --force
+          echo "Successfully uploaded to OSS"
