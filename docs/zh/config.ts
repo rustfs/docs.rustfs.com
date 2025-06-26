@@ -10,7 +10,7 @@ export default defineAdditionalConfig({
       { text: '首页', link: 'https://rustfs.com' },
       { text: '安装', link: '/zh/installation/mode' },
       { text: 'SDK', link: '/zh/sdk' },
-      { text: '演示', link: 'https://play.rustfs.com:7001' },
+      { text: '演示', link: 'https://play.rustfs.com' },
       { text: '社区', link: 'https://github.com/rustfs/rustfs/discussions' },
       { text: '关于', link: '/zh/about' },
     ],
