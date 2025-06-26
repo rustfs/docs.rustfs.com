@@ -9,7 +9,7 @@ export default defineConfig({
     logo: { src: '/images/logo.svg', height: 24 },
     socialLinks: [
       { icon: 'github', link: 'https://github.com/rustfs/rustfs' },
-      { icon: 'twitter', link: 'https://twitter.com/rustfs' },
+      { icon: 'twitter', link: 'https://twitter.com/rustfsofficial' },
       { icon: 'weibo', link: 'https://weibo.com/rustfs' },
     ],
     search: {
