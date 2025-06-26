@@ -101,9 +101,9 @@ export const enSidebar = [
     collapsed: true,
     home: true,
     items: [
-      { text: 'Hardware Preparation', link: '/en/admin/industry' },
-      { text: 'Software Preparation', link: '/en/admin/industry' },
-      { text: 'Pre-installation Checks', link: '/en/admin/industry' },
+      { text: 'Hardware Preparation', link: '/en/installation/hardware-checklist' },
+      { text: 'Software Preparation', link: '/en/installation/software-checklist' },
+      { text: 'Pre-installation Checks', link: '/en/installation/checklists' },
     ]
   },
   {

@@ -101,9 +101,9 @@ export const zhSidebar = [
     collapsed: true,
     home: true,
     items: [
-      { text: '硬件准备', link: '/zh/admin/industry' },
-      { text: '软件准备', link: '/zh/admin/industry' },
-      { text: '安装前检查', link: '/zh/admin/industry' },
+      { text: '硬件准备', link: '/zh/installation/hardware-checklist' },
+      { text: '软件准备', link: '/zh/installation/software-checklist' },
+      { text: '安装前检查', link: '/zh/installation/checklists' },
     ]
   },
   {
