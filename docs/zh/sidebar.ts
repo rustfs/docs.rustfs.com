@@ -58,7 +58,7 @@ export const zhSidebar = [
       { text: 'AI 和机器学习', link: '/zh/features/ai' },
       { text: '云原生', link: '/zh/features/cloud-native' },
       { text: '大数据计算存储分离', link: '/zh/features/hdfs' },
-      { text: 'SQL 支持', link: '/zh/features/sql' },
+      { text: 'SQL 支持', link: '/zh/features/sql-server' },
       { text: '量化交易', link: '/zh/features/quantitative-trading' },
       { text: '制造业降本', link: '/zh/features/industry' },
       { text: '冷归档存储', link: '/zh/features/cold-archiving' },

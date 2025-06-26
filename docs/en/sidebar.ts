@@ -58,7 +58,7 @@ export const enSidebar = [
       { text: 'AI and Machine Learning', link: '/en/features/ai' },
       { text: 'Cloud Native', link: '/en/features/cloud-native' },
       { text: 'Big Data Compute-Storage Separation', link: '/en/features/hdfs' },
-      { text: 'SQL Support', link: '/en/features/sql' },
+      { text: 'SQL Support', link: '/en/features/sql-server' },
       { text: 'Quantitative Trading', link: '/en/features/quantitative-trading' },
       { text: 'Manufacturing Cost Reduction', link: '/en/features/industry' },
       { text: 'Cold Archive Storage', link: '/en/features/cold-archiving' },
