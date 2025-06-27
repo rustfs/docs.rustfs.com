@@ -1,5 +1,5 @@
-import { defineAdditionalConfig } from 'vitepress'
-import { enSidebar } from './en/sidebar'
+import { defineAdditionalConfig } from 'vitepress';
+import { enSidebar } from './en/sidebar';
 
 export default defineAdditionalConfig({
   lang: 'en-US',
@@ -21,46 +21,12 @@ export default defineAdditionalConfig({
 
     editLink: {
       pattern: 'https://github.com/rustfs/rustfs/edit/main/docs/:path',
-      text: 'Edit this page on GitHub'
+      text: 'Edit this page on GitHub',
     },
-
-     head: [
-    [
-      'script',
-      { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-TWW7WMTWL9' }
-    ],
-
-    [
-      'script',
-      {},
-      `window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-TWW7WMTWL9');`
-    ],
-    
-    ['script', {}, `
-      var _hmt = _hmt || [];
-      (function() {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?968e7103a8e28fb30f7d69e42b7c82bc";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    `]
-  ],
-
-
-    
-
 
     footer: {
       message: 'Released under the Apache License 2.0.',
-      copyright: 'Copyright © 2025 RustFS'
-    }
-  }
-})
-
-
-
- 
+      copyright: 'Copyright © 2025 RustFS',
+    },
+  },
+});
