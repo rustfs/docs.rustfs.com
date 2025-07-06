@@ -11,7 +11,7 @@ description: Comparison of RustFS with mainstream object storage products
 | Open Source License | GPL-2.0, LGPL-2.1, LGPL-3.0 | AGPL-3.0 | Apache-2.0 |
 | Metadata Center | √ | x | x |
 | Block Storage | √ | x | x |
-| File Storage | √ | x | √ |
+| File Storage | √ | x | x |
 | Architecture | Heavy architecture design | Lightweight architecture design | Lightweight architecture design |
 | Community Activity | √ | √ | √ |
 | License Friendliness | Medium | Poor | Excellent |
