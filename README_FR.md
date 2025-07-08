@@ -6,11 +6,11 @@ Bienvenue dans la communauté RustFS ! Nous apprécions votre intérêt à cont
 
 
 <p align="center">
-  <a href="https://github.com/rustfs/rustfs.com/blob/main/README_ZH.md">English </a> |
- <a href="https://github.com/rustfs/rustfs.com/blob/main/README_ZH.md">简体中文</a> |
- <a href="https://github.com/rustfs/rustfs.com/blob/main/README_JA.md">日本語</a> |
- <a href="https://github.com/rustfs/rustfs.com/blob/main/README_DA.md">(#deutsch)</a> |
- Français
+  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_ZH.md">English </a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_ZH.md">简体中文</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_JA.md">日本語</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_DA.md">(#deutsch)</a> |
+ Français 
 </p>
 
 ------

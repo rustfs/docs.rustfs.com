@@ -3,11 +3,11 @@
 
 RustFS コミュニティへようこそ！ドキュメントへの貢献にご関心をお寄せいただき、誠にありがとうございます。誤字脱字の修正からガイド全体の翻訳まで、皆様の貢献は私たちにとって大変貴重です。このガイドは、RustFS ドキュメントの共同作成にスムーズにご参加いただけるよう、明確な手順を提供することを目的としています。
 
-<a href="https://github.com/rustfs/rustfs.com/blob/main/README_ZH.md">English </a> |
- <a href="https://github.com/rustfs/rustfs.com/blob/main/README_ZH.md">简体中文</a> |
+<a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_ZH.md">English </a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_ZH.md">简体中文</a> |
  日本語 |
- <a href="https://github.com/rustfs/rustfs.com/blob/main/README_DA.md">(#deutsch)</a> |
- <a href="https://github.com/rustfs/rustfs.com/blob/main/README_FR.md">Français</a>
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_DA.md">(#deutsch)</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_FR.md">Français</a>
 
 ------
 

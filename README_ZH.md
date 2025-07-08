@@ -5,11 +5,11 @@
 欢迎来到 RustFS 社区！我们非常感谢您有兴趣为我们的文档做出贡献。您的每一份力量，无论是修正一个错字，还是翻译一整篇指南，都对我们至关重要。本指南旨在为您提供清晰的指引，帮助您顺利地参与到 RustFS 文档的共建中来。
 
 <p align="center">
-  <a href="https://github.com/rustfs/rustfs.com/blob/main/README_ZH.md">English </a> |
+  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_ZH.md">English </a> |
  简体中文 |
- <a href="https://github.com/rustfs/rustfs.com/blob/main/README_JA.md">日本語</a> |
- <a href="https://github.com/rustfs/rustfs.com/blob/main/README_DA.md">(#deutsch)</a> |
- <a href="https://github.com/rustfs/rustfs.com/blob/main/README_FR.md">Français</a>
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_JA.md">日本語</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_DA.md">(#deutsch)</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_FR.md">Français</a>
 </p>
 
 ------
