@@ -22,7 +22,7 @@ RustFS 是一款高性能、100% 兼容 S3 的开源分布式对象存储系统�
  * 本地路径 `/mnt/rustfs/data`（或自定义路径）用于挂载对象数据
 2. **网络与防火墙**
 
- * 确保宿主机 7000 端口对外开放（或自定义端口一致）
+ * 确保宿主机 9000 端口对外开放（或自定义端口一致）
 3. **配置文件准备**
 
  * 在宿主机 `/etc/rustfs/config.toml` 中，定义监听端口、管理员账号、数据路径等（详见第四节）
@@ -34,12 +34,12 @@ RustFS 是一款高性能、100% 兼容 S3 的开源分布式对象存储系统�
 使用官方 Ubuntu 基础镜像，快束拉取 RustFS 官方镜像：
 
 ```bash
-podman pull quay.io/rustfs/rustfs
+docker pull quay.io/rustfs/rustfs
 ```
 
 或者使用 docker 拉取：
 ```bash
-podman pull docker://rustfs/rustfs
+docker pull docker://rustfs/rustfs
 
 ```
 
@@ -53,11 +53,11 @@ podman pull docker://rustfs/rustfs
 RUSTFS_ROOT_USER=rustfsadmin
 RUSTFS_ROOT_PASSWORD=rustfsadmin
 RUSTFS_VOLUMES="/data/rustfs{0...3}"
-RUSTFS_ADDRESS=":7000"
+RUSTFS_ADDRESS=":9000"
 #RUSTFS_SERVER_DOMAINS="play.rustfs.com:7000"
 RUSTFS_CONSOLE_ENABLE=true
-RUSTFS_CONSOLE_ADDRESS=":7001"
-RUSTFS_OBS_CONFIG="/etc/default/obs.toml"
+RUSTFS_CONSOLE_ADDRESS=":9001"
+RUSTFS_OBS_ENDPOINT=""
 RUSTFS_TLS_PATH="/opt/tls"
 ```
 
@@ -70,23 +70,127 @@ RUSTFS_TLS_PATH="/opt/tls"
 RustFS SNSD Docker 运行方式，结合上述镜像与配置，执行：
 
 ```bash
-podman run -d \
- --name rustfs_local \
- -p 7000:7000 \
- -v /mnt/rustfs/data:/data \
- -v /etc/rustfs/rustfs:/config/rustfs:ro \
- rustfs/rustfs:latest
+ docker run -d \
+  --name rustfs_local \
+  -p 9000:9000 \
+  -p 9001:9001 \
+  -v /mnt/rustfs/data:/data \
+  rustfs/rustfs:latest \
+  /data
 ```
 
 各参数说明：
 
-* `-p 7000:7000`：映射宿主机 7000 端口到容器
+* `-p 9000:9000`：映射宿主机 9000 端口到容器
+* `-p 9001:9001`：映射宿主机 9001 端口到容器，用于 console 端访问
 * `-v /mnt/rustfs/data:/data`：挂载数据卷
-* `-v /etc/rustfs/rustfs:/config/rustfs:ro`：挂载配置文件
 * `--name rustfs_local`：容器自定义名称
-* `-d`： 后台运行
+* `-d`：后台运行
 
 ---
+
+### 完整参数配置示例
+
+```bash
+docker run -d \
+  --name rustfs_container \
+  -p 9000:9000 \
+  -p 9001:9001 \
+  -v /mnt/rustfs/data:/data \
+  -e RUSTFS_ACCESS_KEY=myaccesskey \
+  -e RUSTFS_SECRET_KEY=mysecretkey \
+  -e RUSTFS_CONSOLE_ENABLE=true \
+  -e RUSTFS_SERVER_DOMAINS=example.com \
+  rustfs/rustfs:latest \
+  ./target/debug/rustfs \
+  --address :9000 \
+  --console-address :9001 \
+  --console-enable \
+  --server-domains example.com \
+  --access-key myaccesskey \
+  --secret-key mysecretkey \
+  /data
+```
+
+### 参数说明与对应方法
+
+1. **环境变量方式** (推荐):
+   ```bash
+   -e RUSTFS_ADDRESS=:9000 \
+   -e RUSTFS_SERVER_DOMAINS=example.com \
+   -e RUSTFS_ACCESS_KEY=myaccesskey \
+   -e RUSTFS_SECRET_KEY=mysecretkey \
+   -e RUSTFS_CONSOLE_ENABLE=true \
+   -e RUSTFS_CONSOLE_ADDRESS=:9001 \
+   ```
+
+2. **命令行参数方式**:
+   ```
+   --address :9000 \
+   --server-domains example.com \
+   --access-key myaccesskey \
+   --secret-key mysecretkey \
+   --console-enable \
+   --console-address :9001 \
+   ```
+
+3. **必需参数**:
+    - `<VOLUMES>`: 在命令最后指定，如 `/data`
+
+### 常用配置组合
+
+1. **基础配置**:
+   ```bash
+   docker run -d \
+     -p 9000:9000 \
+     -v /mnt/data:/data \
+     rustfs/rustfs:latest \
+     /data
+   ```
+
+2. **启用控制台**:
+   ```bash
+   docker run -d \
+     -p 9000:9000 \
+     -p 9001:9001 \
+     -v /mnt/data:/data \
+     -e RUSTFS_CONSOLE_ENABLE=true \
+     rustfs/rustfs:latest \
+     ./target/debug/rustfs \
+     --console-enable \
+     /data
+   ```
+
+3. **自定义认证密钥**:
+   ```bash
+   docker run -d \
+     -p 9000:9000 \
+     -v /mnt/data:/data \
+     -e RUSTFS_ACCESS_KEY=admin123 \
+     -e RUSTFS_SECRET_KEY=secret123 \
+     rustfs/rustfs:latest \
+     ./target/debug/rustfs \
+     --access-key admin123 \
+     --secret-key secret123 \
+     /data
+   ```
+
+### 注意事项
+
+1. 端口映射要对应：
+    - 服务端口默认 9000 (`-p 9000:9000`)
+    - 控制台端口默认 9001 (`-p 9001:9001`)
+
+2. 数据卷要持久化：
+    - `-v /host/path:/container/path`
+
+3. 环境变量和命令行参数可以混合使用，但命令行参数优先级更高
+
+4. 如果使用 TLS，需要额外挂载证书路径：
+   ```bash
+   -v /path/to/certs:/certs \
+   -e RUSTFS_TLS_PATH=/certs \
+   ```
 
 ## 五、验证与访问
 
@@ -96,14 +200,14 @@ podman run -d \
  docker logs rustfs_local
  ```
 
- 日志应显示服务启动成功，并监听 7000 端口。
+ 日志应显示服务启动成功，并监听 9000 端口。
 
 2. **测试 S3 API：**
 
  使用 `mc` 或其他 S3 客户端：
 
  ```bash
- mc alias set rustfs http://localhost:7000 rustfsadmin ChangeMe123!
+ mc alias set rustfs http://localhost:9000 rustfsadmin ChangeMe123!
  mc mb rustfs/mybucket
  mc ls rustfs
  ```
@@ -121,7 +225,7 @@ podman run -d \
 
 2. 存储建议：
 - 使用本地 SSD/NVMe 存储
-- 避免使用网络文件系统(NFS)
+- 避免使用网络文件系统 (NFS)
 - 保证存储目录独占访问
 
 ---

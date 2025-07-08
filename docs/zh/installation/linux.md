@@ -6,17 +6,17 @@ description: "使用 Linux 操作系统安装 RustFS 的快速指导"
 # Linux 安装 RustFS
 
 
-## 一、 安装前必读
+## 一、安装前必读
 
 本页面包含了 RustFS 的三种安装模式的全部文档和说明。其中，多机多盘的模式包含了企业级可用的性能、安全性和扩展性。并且，提供了生产工作负载需要的架构图。
 请装前请阅读，我们的启动模式与检查清单，如下：
 
-1. 启动模式， 前明确您的 Linux 启动模式；
+1. 启动模式，前明确您的 Linux 启动模式；
 
-2. 检查清单， 检查各项指标是否符合生产指导特征，若不需要生产标准可不阅读此指导；
+2. 检查清单，检查各项指标是否符合生产指导特征，若不需要生产标准可不阅读此指导；
 
 
-## 二、 先决条件
+## 二、先决条件
 
 1. 操作系统版本；
 
@@ -113,7 +113,7 @@ timedatectl status
 
 RustFS 启动，我们建议您配置一个专门的无登录权限的用户进行启动 RustFS 的服务。在 rustfs.service 启动控制脚本中，默认的用户和用户组是 `rustfs-user` 和 `rustfs-user` 。
 
- 您可以使用 groupadd 和 useradd 命令创建用户和组. 以下示例创建用户、组并设置权限以访问 RustFS 指定的数据目录。
+您可以使用 groupadd 和 useradd 命令创建用户和组。以下示例创建用户、组并设置权限以访问 RustFS 指定的数据目录。
 
 ## 四、下载安装包
 
@@ -137,11 +137,11 @@ sudo tee /etc/default/rustfs <<EOF
 RUSTFS_ROOT_USER=rustfsadmin
 RUSTFS_ROOT_PASSWORD=rustfsadmin
 RUSTFS_VOLUMES="/data/rustfs{0...3}"
-RUSTFS_ADDRESS=":7000"
-#RUSTFS_SERVER_DOMAINS="play.rustfs.com:7000"
+RUSTFS_ADDRESS=":9000"
+#RUSTFS_SERVER_DOMAINS="play.rustfs.com:9000"
 RUSTFS_CONSOLE_ENABLE=true
-RUSTFS_CONSOLE_ADDRESS=":7001"
-RUSTFS_OBS_CONFIG="/etc/default/obs.toml"
+RUSTFS_CONSOLE_ADDRESS=":9001"
+RUSTFS_OBS_ENDPOINT=""
 RUSTFS_TLS_PATH="/opt/tls"
 EOF
 ```
@@ -154,43 +154,26 @@ sudo chmod -R 750 /data/rustfs* /var/logs/rustfs
 
 ### 六、配置可观测性系统
 1. 创建观测配置文件
-```bash
-sudo tee /etc/default/obs.toml <<EOF
-[observability]
-endpoint = "http://localhost:4317"
-use_stdout = false
-sample_ratio = 2.0
-meter_interval = 30
-service_name = "rustfs"
-service_version = "0.1.0"
-environments = "production" 
-logger_level = "debug"
-local_logging_enabled = true
+```
+export RUSTFS_OBS_ENDPOINT=http://localhost:4317 # OpenTelemetry Collector 的地址
+export RUSTFS_OBS_USE_STDOUT=false # 是否使用标准输出
+export RUSTFS_OBS_SAMPLE_RATIO=2.0 # 采样率，0.0-1.0之间，0.0表示不采样，1.0表示全部采样
+export RUSTFS_OBS_METER_INTERVAL=1 # 采样间隔，单位为秒
+export RUSTFS_OBS_SERVICE_NAME=rustfs # 服务名称
+export RUSTFS_OBS_SERVICE_VERSION=0.1.0 # 服务版本
+export RUSTFS_OBS_ENVIRONMENT=develop # 环境名称
+export RUSTFS_OBS_LOGGER_LEVEL=debug # 日志级别，支持 trace, debug, info, warn, error
+export RUSTFS_OBS_LOCAL_LOGGING_ENABLED=true # 是否启用本地日志记录
+# 日志目录 当 `RUSTFS_OBS_ENDPOINT` 值为空时，默认执行下面的日志处理规则
+export RUSTFS_OBS_LOG_DIRECTORY="$current_dir/deploy/logs" # Log directory
+export RUSTFS_OBS_LOG_ROTATION_TIME="minute" # Log rotation time unit, can be "second", "minute", "hour", "day"
+export RUSTFS_OBS_LOG_ROTATION_SIZE_MB=1 # Log rotation size in MB
 
-[sinks]
-[sinks.kafka]
-enabled = false
-bootstrap_servers = "localhost:9092"
-topic = "logs"
-batch_size = 100
-batch_timeout_ms = 1000
-
-[sinks.webhook]
-enabled = false
-endpoint = "http://localhost:8080/webhook"
-auth_token = ""
-batch_size = 100
-batch_timeout_ms = 1000
-
-[sinks.file]
-enabled = true
-path = "/var/logs/rustfs/app.log"
-batch_size = 10
-batch_timeout_ms = 1000
-
-[logger]
-queue_capacity = 10
-EOF
+# 配置日志记录
+export RUSTFS_SINKS_FILE_PATH="$current_dir/deploy/logs/rustfs.log"
+export RUSTFS_SINKS_FILE_BUFFER_SIZE=12
+export RUSTFS_SINKS_FILE_FLUSH_INTERVAL_MS=1000
+export RUSTFS_SINKS_FILE_FLUSH_THRESHOLD=100
 ```
 
 2. 设置日志轮转
@@ -229,7 +212,7 @@ Group=root
 
 WorkingDirectory=/usr/local
 EnvironmentFile=-/etc/default/rustfs
-ExecStart=/usr/local/bin/rustfs \$RUSTFS_VOLUMES \$RUSTFS_OPTS
+ExecStart=/usr/local/bin/rustfs \$RUSTFS_VOLUMES
 
 LimitNOFILE=1048576
 LimitNPROC=32768
@@ -256,6 +239,10 @@ ProtectControlGroups=true
 RestrictSUIDSGID=true
 RestrictRealtime=true
 
+# service log configuration
+StandardOutput=append:/var/logs/rustfs/rustfs.log
+StandardError=append:/var/logs/rustfs/rustfs-err.log
+
 [Install]
 WantedBy=multi-user.target
 EOF
@@ -279,12 +266,12 @@ systemctl status rustfs
 
 3. 检查服务端口
 ```bash
-ss -tunlp | grep -E '7000|7001'
+ss -tunlp | grep -E '9000|9001'
 ```
 
 4. 验证控制台访问
 ```bash
-curl -u rustfsadmin:rustfsadmin http://localhost:7001/metrics
+curl -u rustfsadmin:rustfsadmin http://localhost:9001/metrics
 ```
 
 5. 查看日志文件
@@ -297,7 +284,7 @@ tail -f /var/logs/rustfs/app.log
 curl -X PUT -u rustfsadmin:rustfsadmin \
 -H "Content-Type: application/octet-stream" \
 --data-binary @testfile \
-http://localhost:7000/bucket1/object1
+http://localhost:9000/bucket1/object1
 ```
 
 
