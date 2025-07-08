@@ -13,11 +13,9 @@ export default defineConfig({
       { icon: 'twitter', link: 'https://twitter.com/rustfsofficial' },
       { icon: 'weibo', link: 'https://weibo.com/rustfs' },
     ],
-    themeConfig: {
-      editLink: {
+    editLink: {
         pattern: 'https://github.com/rustfs/docs.rustfs.com/edit/main/docs/:path'
-      }
-    },
+      },
     search: {
       provider: 'local',
       options: {
