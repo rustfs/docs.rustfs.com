@@ -39,7 +39,7 @@ docker pull quay.io/rustfs/rustfs
 
 或者使用 docker 拉取：
 ```bash
-docker pull docker://rustfs/rustfs
+docker pull rustfs/rustfs
 
 ```
 
@@ -102,7 +102,6 @@ docker run -d \
   -e RUSTFS_CONSOLE_ENABLE=true \
   -e RUSTFS_SERVER_DOMAINS=example.com \
   rustfs/rustfs:latest \
-  ./target/debug/rustfs \
   --address :9000 \
   --console-address :9001 \
   --console-enable \
