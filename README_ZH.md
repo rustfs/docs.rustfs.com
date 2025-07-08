@@ -16,12 +16,6 @@
 
 
 
-(https://img.shields.io/badge/License-CC%20BY%204.0-blue.svg)](https://creativecommons.org/licenses/by/4.0/deed.zh)
-
-
-
-(https://img.shields.io/discord/YOUR_SERVER_ID?label=社区交流&logo=discord&color=5865F2)](https://discord.gg/YOUR_INVITE_LINK)
-
 
 
 ### 目录

@@ -4,9 +4,6 @@
 Willkommen in der RustFS-Community! Wir freuen uns sehr über Ihr Interesse an der Mitarbeit an unserer Dokumentation. Ihr Beitrag, sei es die Korrektur eines Tippfehlers oder die Übersetzung eines kompletten Leitfadens, ist uns wichtig. Dieser Leitfaden bietet Ihnen klare Anweisungen, damit Sie reibungslos an der gemeinsamen Erstellung der RustFS-Dokumentation mitwirken können.
 
 
-(https://img.shields.io/badge/License-CC%20BY%204.0-blue.svg)](https://creativecommons.org/licenses/by/4.0/deed.de)
-
-
 
 <p align="center">
   <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_ZH.md">English </a> |

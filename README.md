@@ -10,14 +10,8 @@ English |
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_FR.md">Français</a>
 </p>
  
+------
 
-
-
-(https://img.shields.io/badge/License-CC%20BY%204.0-blue.svg)](https://creativecommons.org/licenses/by/4.0/)
-
-(https://github.com/rustfs/rustfs/actions/workflows/docs.yml/badge.svg)](https://github.com/rustfs/rustfs/actions/workflows/docs.yml)
-
-(https://img.shields.io/discord/YOUR_SERVER_ID?label=Community%20Chat&logo=discord&color=5865F2)](https://discord.gg/YOUR_INVITE_LINK)
 
 
 

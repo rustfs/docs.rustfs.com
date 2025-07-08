@@ -13,13 +13,6 @@ RustFS コミュニティへようこそ！ドキュメントへの貢献にご�
 
 
 
-(https://img.shields.io/badge/License-CC%20BY%204.0-blue.svg)](https://creativecommons.org/licenses/by/4.0/deed.ja)
-
-
-
-(https://img.shields.io/discord/YOUR_SERVER_ID?label=コミュニティチャット&logo=discord&color=5865F2)](https://discord.gg/YOUR_INVITE_LINK)
-
-
 
 ### 目次
 

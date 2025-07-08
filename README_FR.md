@@ -2,7 +2,6 @@
 
 Bienvenue dans la communauté RustFS ! Nous apprécions votre intérêt à contribuer à notre documentation. Votre contribution, qu'il s'agisse de corriger une faute de frappe ou de traduire un guide complet, est importante pour nous. Ce guide a pour objectif de vous fournir des instructions claires pour vous aider à participer sereinement à la co-construction de la documentation RustFS.
 
-(https://img.shields.io/badge/License-CC%20BY%204.0-blue.svg)](https://creativecommons.org/licenses/by/4.0/deed.de)
 
 
 <p align="center">
@@ -15,13 +14,6 @@ Bienvenue dans la communauté RustFS ! Nous apprécions votre intérêt à cont
 
 ------
 
-
-
-(https://img.shields.io/badge/License-CC%20BY%204.0-blue.svg)](https://creativecommons.org/licenses/by/4.0/deed.fr)
-
-(https://github.com/rustfs/rustfs/actions/workflows/docs.yml/badge.svg)](https://github.com/rustfs/rustfs/actions/workflows/docs.yml)
-
-(https://img.shields.io/discord/YOUR_SERVER_ID?label=Discussion%20Communautaire&logo=discord&color=5865F2)](https://discord.gg/YOUR_INVITE_LINK)
 
 
 
