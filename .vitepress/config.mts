@@ -8,14 +8,12 @@ export default defineConfig({
     siteTitle: false,
     logo: { src: '/images/logo.svg', height: 24 },
     logoLink: { link: 'https://rustfs.com', target: '_blank' },
+    editLink: { pattern: 'https://github.com/rustfs/docs.rustfs.com/edit/main/docs/:path'},
     socialLinks: [
       { icon: 'github', link: 'https://github.com/rustfs/rustfs' },
       { icon: 'twitter', link: 'https://twitter.com/rustfsofficial' },
       { icon: 'weibo', link: 'https://weibo.com/rustfs' },
     ],
-    editLink: {
-        pattern: 'https://github.com/rustfs/docs.rustfs.com/edit/main/docs/:path'
-      },
     search: {
       provider: 'local',
       options: {
