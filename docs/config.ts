@@ -3,7 +3,7 @@ import { enSidebar } from './en/sidebar';
 
 export default defineAdditionalConfig({
   lang: 'en-US',
-  description: 'Vite & Vue powered static site generator.',
+  description: 'RustFS - MinIO alternative, high-performance distributed storage',
 
   themeConfig: {
     nav: [
@@ -16,7 +16,7 @@ export default defineAdditionalConfig({
     ],
 
     sidebar: {
-      '/en/': enSidebar,
+      '/': enSidebar,
     },
 
     editLink: {

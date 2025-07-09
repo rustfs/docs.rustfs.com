@@ -4,19 +4,19 @@ export const enSidebar = [
     collapsed: true,
     home: true,
     items: [
-      { text: 'What is RustFS', link: '/en/introduction' },
-      { text: 'Architecture', link: '/en/architecture' },
-      { text: 'Comparison with Other Storage', link: '/en/comparison' },
-      { text: 'Open Source License', link: '/en/license' },
+      { text: 'What is RustFS', link: '/introduction' },
+      { text: 'Architecture', link: '/architecture' },
+      { text: 'Comparison with Other Storage', link: '/comparison' },
+      { text: 'Open Source License', link: '/license' },
       {
-        text: 'Core Concepts', link: '/en/concepts/glossary',
+        text: 'Core Concepts', link: '/concepts/glossary',
         items: [
-          { text: 'Glossary', link: '/en/concepts/glossary' },
-          { text: 'Erasure Coding', link: '/en/concepts/erasure-coding' },
-          { text: 'Availability and Resiliency', link: '/en/concepts/availability-and-resiliency' },
-          { text: 'Object Healing and Auto Recovery', link: '/en/concepts/object-healing' },
-          { text: 'Object Scanner', link: '/en/concepts/object-scanner' },
-          { text: 'Usage Limits', link: '/en/concepts/limit' },
+          { text: 'Glossary', link: '/concepts/glossary' },
+          { text: 'Erasure Coding', link: '/concepts/erasure-coding' },
+          { text: 'Availability and Resiliency', link: '/concepts/availability-and-resiliency' },
+          { text: 'Object Healing and Auto Recovery', link: '/concepts/object-healing' },
+          { text: 'Object Scanner', link: '/concepts/object-scanner' },
+          { text: 'Usage Limits', link: '/concepts/limit' },
         ],
       },
     ],
@@ -71,27 +71,27 @@ export const enSidebar = [
     collapsed: true,
     home: true,
     items: [
-      { text: 'Startup Modes', link: '/en/installation/mode/' },
-      { text: 'Hardware Selection', link: '/en/installation/hardware-selection' },
+      { text: 'Startup Modes', link: '/installation/mode/' },
+      { text: 'Hardware Selection', link: '/installation/hardware-selection' },
       {
         text: 'Pre-installation Checks',
-        link: '/en/installation/checklists',
+        link: '/installation/checklists',
         items: [
-          { text: 'Checklists', link: '/en/installation/checklists' },
-          { text: 'Hardware Checklists', link: '/en/installation/hard-checklists' },
-          { text: 'Software Checklists', link: '/en/installation/software-checklists' },
-          { text: 'Network Checklists', link: '/en/installation/network-checklists' },
-          { text: 'Security Checklists', link: '/en/installation/security-checklists' },
+          { text: 'Checklists', link: '/installation/checklists' },
+          { text: 'Hardware Checklists', link: '/installation/hard-checklists' },
+          { text: 'Software Checklists', link: '/installation/software-checklists' },
+          { text: 'Network Checklists', link: '/installation/network-checklists' },
+          { text: 'Security Checklists', link: '/installation/security-checklists' },
         ]
       },
       {
         text: 'Installation Guides',
-        link: '/en/installation/linux',
+        link: '/installation/linux',
         items: [
-          { text: 'Linux Installation', link: '/en/installation/linux' },
-          { text: 'macOS Installation', link: '/en/installation/macos/' },
-          { text: 'Windows Installation', link: '/en/installation/windows/' },
-          { text: 'Docker Installation', link: '/en/installation/docker' },
+          { text: 'Linux Installation', link: '/installation/linux' },
+          { text: 'macOS Installation', link: '/installation/macos/' },
+          { text: 'Windows Installation', link: '/installation/windows/' },
+          { text: 'Docker Installation', link: '/installation/docker' },
         ]
       },
     ]
@@ -101,11 +101,11 @@ export const enSidebar = [
     collapsed: true,
     home: true,
     items: [
-      { text: 'SDK Overview', link: '/en/sdk/' },
-      { text: 'Java SDK', link: '/en/sdk/java' },
-      { text: 'Python SDK', link: '/en/sdk/python' },
-      { text: 'JavaScript SDK', link: '/en/sdk/js' },
-      { text: 'Other SDKs', link: '/en/sdk/other' },
+      { text: 'SDK Overview', link: '/sdk/' },
+      { text: 'Java SDK', link: '/sdk/java' },
+      { text: 'Python SDK', link: '/sdk/python' },
+      { text: 'JavaScript SDK', link: '/sdk/js' },
+      { text: 'Other SDKs', link: '/sdk/other' },
     ]
   }
 ]

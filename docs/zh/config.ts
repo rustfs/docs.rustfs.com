@@ -2,8 +2,8 @@ import { defineAdditionalConfig } from 'vitepress'
 import { zhSidebar } from './sidebar'
 
 export default defineAdditionalConfig({
-  lang: 'zh-CN',
-  description: 'Vite & Vue powered static site generator.',
+  lang: 'zh-Hans',
+  description: 'RustFS - MinIO 国产化替代方案, 高性能分布式存储',
 
   themeConfig: {
     nav: [
