@@ -50,6 +50,19 @@ export default defineConfig({
     },
   },
   head: [
+    ['meta', { key: 'twitter:card', name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'author', content: 'RustFS' }],
+    ['meta', { name: 'robots', content: 'index, follow' }],
+    ['meta', { name: 'googlebot', content: 'index, follow' }],
+    ['meta', { name: 'bingbot', content: 'index, follow' }],
+    ['meta', { name: 'yandexbot', content: 'index, follow' }],
+    ['meta', { key: 'twitter:site', name: 'twitter:site', content: '@rustfs' }],
+    ['meta', { key: 'twitter:creator', name: 'twitter:creator', content: '@rustfs' }],
+    ['meta', { key: 'og:type', property: 'og:type', content: 'article' }],
+    ['link', { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' }],
+    ['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' }],
+    ['link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' }],
+    ['link', { rel: 'manifest', href: '/site.webmanifest' }],
     ['script', { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-TWW7WMTWL9' }],
 
     [
