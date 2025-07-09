@@ -1,4 +1,4 @@
-name: 
+name:
 
 on:
   push:
@@ -38,12 +38,6 @@ jobs:
 
           echo "ossutil2 installation completed"
 
-          # Set the OSS configuration
-          ossutil config set Region oss-cn-beijing
-          ossutil config set endpoint oss-cn-beijing.aliyuncs.com
-          ossutil config set accessKeyID ${{ secrets.ALICLOUDOSS_KEY_ID }}
-          ossutil config set accessKeySecret ${{ secrets.ALICLOUDOSS_KEY_SECRET }}
-
       - name: Upload to Aliyun OSS
         # if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         shell: bash
@@ -53,6 +47,8 @@ jobs:
           OSS_REGION: cn-beijing
           OSS_ENDPOINT: https://oss-cn-beijing.aliyuncs.com
         run: |
+          # clean before
+          ossutil rm -r oss://rustfs-docs/ --force --recursive
           ossutil cp -r .vitepress/dist/ oss://rustfs-docs/ --force --recursive
           echo "Successfully uploaded to OSS"
       - name: Show OSS error log if exists
