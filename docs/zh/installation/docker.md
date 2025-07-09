@@ -50,8 +50,8 @@ docker pull rustfs/rustfs
 在宿主机创建配置文件 `/etc/rustfs/config.toml`，示例内容：
 
 ```bash
-RUSTFS_ROOT_USER=rustfsadmin
-RUSTFS_ROOT_PASSWORD=rustfsadmin
+RUSTFS_ACCESS_KEY=rustfsadmin
+RUSTFS_SECRET_KEY=rustfsadmin
 RUSTFS_VOLUMES="/data/rustfs{0...3}"
 RUSTFS_ADDRESS=":9000"
 #RUSTFS_SERVER_DOMAINS="play.rustfs.com:7000"

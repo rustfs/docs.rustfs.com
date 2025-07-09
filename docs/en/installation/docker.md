@@ -32,13 +32,13 @@ This document is based on the official RustFS Linux binary package, creating a c
 Using the official Ubuntu base image, quickly pull the official RustFS image:
 
 ```bash
-podman pull quay.io/rustfs/rustfs
+docker pull quay.io/rustfs/rustfs
 ```
 
 Or use docker to pull:
 
 ```bash
-podman pull docker://rustfs/rustfs
+docker pull rustfs/rustfs
 ```
 
 ---
@@ -48,8 +48,8 @@ podman pull docker://rustfs/rustfs
 Create configuration file `/etc/rustfs/config.toml` on the host, example content:
 
 ```bash
-RUSTFS_ROOT_USER=rustfsadmin
-RUSTFS_ROOT_PASSWORD=rustfsadmin
+RUSTFS_ACCESS_KEY=rustfsadmin
+RUSTFS_SECRET_KEY=rustfsadmin
 RUSTFS_VOLUMES="/data/rustfs{0...3}"
 RUSTFS_ADDRESS=":7000"
 #RUSTFS_SERVER_DOMAINS="play.rustfs.com:7000"
@@ -68,11 +68,10 @@ RUSTFS_TLS_PATH="/opt/tls"
 RustFS SNSD Docker runtime method, combining the above image and configuration, execute:
 
 ```bash
-podman run -d \
+docker run -d \
   --name rustfs_local \
   -p 7000:7000 \
   -v /mnt/rustfs/data:/data \
-  -v /etc/rustfs/rustfs:/config/rustfs:ro \
   rustfs/rustfs:latest
 ```
 
@@ -85,6 +84,110 @@ Parameter descriptions:
 * `-d`: Run in background
 
 ---
+
+### Complete parameter configuration example
+
+```bash
+docker run -d \
+  --name rustfs_container \
+  -p 9000:9000 \
+  -p 9001:9001 \
+  -v /mnt/rustfs/data:/data \
+  -e RUSTFS_ACCESS_KEY=myaccesskey \
+  -e RUSTFS_SECRET_KEY=mysecretkey \
+  -e RUSTFS_CONSOLE_ENABLE=true \
+  -e RUSTFS_SERVER_DOMAINS=example.com \
+  rustfs/rustfs:latest \
+  --address :9000 \
+  --console-address :9001 \
+  --console-enable \
+  --server-domains example.com \
+  --access-key myaccesskey \
+  --secret-key mysecretkey \
+  /data
+```
+
+### Parameter description and corresponding method
+
+1. **Environment variable method** (recommended):
+   ```bash
+   -e RUSTFS_ADDRESS=:9000 \
+   -e RUSTFS_SERVER_DOMAINS=example.com \
+   -e RUSTFS_ACCESS_KEY=myaccesskey \
+   -e RUSTFS_SECRET_KEY=mysecretkey \
+   -e RUSTFS_CONSOLE_ENABLE=true \
+   -e RUSTFS_CONSOLE_ADDRESS=:9001 \
+   ```
+
+2. **Command line parameter method**:
+   ```
+   --address :9000 \
+   --server-domains example.com \
+   --access-key myaccesskey \
+   --secret-key mysecretkey \
+   --console-enable \
+   --console-address :9001 \
+   ```
+
+3. **Required parameters**:
+   - `<VOLUMES>`: Specify at the end of the command, `/data`
+
+### Common configuration combinations
+
+1. **Basic Configuration**:
+   ```bash
+   docker run -d \
+     -p 9000:9000 \
+     -v /mnt/data:/data \
+     rustfs/rustfs:latest \
+     /data
+   ```
+
+2. **Enable console**:
+   ```bash
+   docker run -d \
+     -p 9000:9000 \
+     -p 9001:9001 \
+     -v /mnt/data:/data \
+     -e RUSTFS_CONSOLE_ENABLE=true \
+     rustfs/rustfs:latest \
+     ./target/debug/rustfs \
+     --console-enable \
+     /data
+   ```
+
+3. **Custom authentication key**:
+   ```bash
+   docker run -d \
+     -p 9000:9000 \
+     -v /mnt/data:/data \
+     -e RUSTFS_ACCESS_KEY=admin123 \
+     -e RUSTFS_SECRET_KEY=secret123 \
+     rustfs/rustfs:latest \
+     ./target/debug/rustfs \
+     --access-key admin123 \
+     --secret-key secret123 \
+     /data
+   ```
+
+### Things to note
+
+1. The port mapping must correspond to:
+   - Service port default 9000(`-p 9000:9000`)
+   - Console port default 9001(`-p 9001:9001`)
+
+2. Data volumes should be persisted:
+   - `-v /host/path:/container/path`
+
+3. Environment variables and command line parameters can be used in a mixed manner, but command line parameters have higher priority
+
+4. If using TLS, additional certificate paths are required:
+   ```bash
+   -v /path/to/certs:/certs \
+   -e RUSTFS_TLS_PATH=/certs \
+   ```
+
+
 
 ## 5. Verification and Access
 

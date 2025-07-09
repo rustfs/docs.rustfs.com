@@ -111,14 +111,14 @@ mv rustfs /usr/local/bin/
 
 ```bash
 sudo tee /etc/default/rustfs <<EOF
-RUSTFS_ROOT_USER=rustfsadmin
-RUSTFS_ROOT_PASSWORD=rustfsadmin
+RUSTFS_ACCESS_KEY=rustfsadmin
+RUSTFS_SECRET_KEY=rustfsadmin
 RUSTFS_VOLUMES="/data/rustfs{0...3}"
 RUSTFS_ADDRESS=":7000"
 #RUSTFS_SERVER_DOMAINS="play.rustfs.com:7000"
 RUSTFS_CONSOLE_ENABLE=true
 RUSTFS_CONSOLE_ADDRESS=":7001"
-RUSTFS_OBS_CONFIG="/etc/default/obs.toml"
+RUSTFS_OBS_ENDPOINT=""
 RUSTFS_TLS_PATH="/opt/tls"
 EOF
 ```
@@ -135,42 +135,25 @@ sudo chmod -R 750 /data/rustfs* /var/logs/rustfs
 1. Create observability configuration file
 
 ```bash
-sudo tee /etc/default/obs.toml <<EOF
-[observability]
-endpoint = "http://localhost:4317"
-use_stdout = false
-sample_ratio = 2.0
-meter_interval = 30
-service_name = "rustfs"
-service_version = "0.1.0"
-environments = "production"
-logger_level = "debug"
-local_logging_enabled = true
+export RUSTFS_OBS_ENDPOINT=http://localhost:4317 # The address of OpenTelemetry Collector
+export RUSTFS_OBS_USE_STDOUT=false # Whether to use standard output
+export RUSTFS_OBS_SAMPLE_RATIO=2.0 # Sampling rate, between 0.0-1.0, 0.0 means no sampling, 1.0 means all samples
+export RUSTFS_OBS_METER_INTERVAL=1 # Sampling interval, unit in seconds
+export RUSTFS_OBS_SERVICE_NAME=rustfs # Service name
+export RUSTFS_OBS_SERVICE_VERSION=0.1.0 # Service Version
+export RUSTFS_OBS_ENVIRONMENT=develop # Environment name
+export RUSTFS_OBS_LOGGER_LEVEL=debug # Log level, support trace, debug, info, warning, error
+export RUSTFS_OBS_LOCAL_LOGGING_ENABLED=true # Whether to enable local logging
+# Log Directory When the value `RUSTFS_OBS_ENDPOINT` is empty, the following log processing rules are executed by default.
+export RUSTFS_OBS_LOG_DIRECTORY="$current_dir/deploy/logs" # 日志目录
+export RUSTFS_OBS_LOG_ROTATION_TIME="minute" # Log rotation time unit, can be "second", "minute", "hour", "day"
+export RUSTFS_OBS_LOG_ROTATION_SIZE_MB=1 # Log rotation size in MB
 
-[sinks]
-[sinks.kafka]
-enabled = false
-bootstrap_servers = "localhost:9092"
-topic = "logs"
-batch_size = 100
-batch_timeout_ms = 1000
-
-[sinks.webhook]
-enabled = false
-endpoint = "http://localhost:8080/webhook"
-auth_token = ""
-batch_size = 100
-batch_timeout_ms = 1000
-
-[sinks.file]
-enabled = true
-path = "/var/logs/rustfs/app.log"
-batch_size = 10
-batch_timeout_ms = 1000
-
-[logger]
-queue_capacity = 10
-EOF
+# Configure logging
+export RUSTFS_SINKS_FILE_PATH="$current_dir/deploy/logs/rustfs.log"
+export RUSTFS_SINKS_FILE_BUFFER_SIZE=12
+export RUSTFS_SINKS_FILE_FLUSH_INTERVAL_MS=1000
+export RUSTFS_SINKS_FILE_FLUSH_THRESHOLD=100
 ```
 
 2. Set up log rotation
