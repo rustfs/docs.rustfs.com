@@ -13,7 +13,7 @@ export default defineConfig({
     'en/:rest*': ':rest*'
   },
   lastUpdated: true,
-  cleanUrls: true,
+  cleanUrls: false,
   metaChunk: true,
   themeConfig: {
     siteTitle: false,
