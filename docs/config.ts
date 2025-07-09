@@ -20,7 +20,7 @@ export default defineAdditionalConfig({
     },
 
     editLink: {
-      pattern: 'https://github.com/rustfs/rustfs/edit/main/docs/:path',
+      pattern: 'https://github.com/rustfs/docs.rustfs.com/edit/main/docs/:path',
       text: 'Edit this page on GitHub',
     },
 
