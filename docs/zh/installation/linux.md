@@ -40,7 +40,7 @@ description: "使用 Linux 操作系统安装 RustFS 的快速指导"
 
 我们推荐 Linux 内核为 4.x 及以上的版本，但是 5.x 及以上的版本可以获得更好的 IO 吞吐和网络性能。
 
-您可以使用 Ubuntu 20.04 和 RHEL88.x 来安装 RustFS。
+您可以使用 Ubuntu 22.04 和 RHEL8.x 来安装 RustFS。
 
 ### 2.2 防火墙
 
