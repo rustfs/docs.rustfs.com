@@ -140,7 +140,6 @@ RUSTFS_VOLUMES="/data/rustfs{0...3}"
 RUSTFS_ADDRESS=":9000"
 #RUSTFS_SERVER_DOMAINS="play.rustfs.com:9000"
 RUSTFS_CONSOLE_ENABLE=true
-RUSTFS_CONSOLE_ADDRESS=":9001"
 RUSTFS_OBS_ENDPOINT=""
 RUSTFS_TLS_PATH="/opt/tls"
 EOF
@@ -266,12 +265,11 @@ systemctl status rustfs
 
 3. 检查服务端口
 ```bash
-ss -tunlp | grep -E '9000|9001'
 ```
 
 4. 验证控制台访问
 ```bash
-curl -u rustfsadmin:rustfsadmin http://localhost:9001/metrics
+curl -u rustfsadmin:rustfsadmin http://localhost:9000/
 ```
 
 5. 查看日志文件

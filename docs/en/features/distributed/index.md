@@ -21,8 +21,7 @@ The recommended production deployment mode:
 
 ```bash
 # 4 nodes, 4 drives each (16 drives total)
-rustfs server http://node{1...4}.example.com/data{1...4} \
-  --console-address ":9001"
+rustfs server http://node{1...4}.example.com:9000/data{1...4} \
 ```
 
 **Benefits:**
@@ -37,8 +36,7 @@ Suitable for environments with external storage:
 
 ```bash
 # 4 nodes, 1 drive each
-rustfs server http://node{1...4}.example.com/data \
-  --console-address ":9001"
+rustfs server http://node{1...4}.example.com:9000/data \
 ```
 
 **Use Cases:**

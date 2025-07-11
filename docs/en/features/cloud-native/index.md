@@ -61,13 +61,12 @@ services:
     image: rustfs/rustfs:latest
     ports:
       - "9000:9000"
-      - "9001:9001"
     volumes:
       - data1:/data1
       - data2:/data2
       - data3:/data3
       - data4:/data4
-    command: server /data{1...4} --console-address ":9001"
+    command: server /data{1...4} 
     environment:
       - RUSTFS_ROOT_USER=admin
       - RUSTFS_ROOT_PASSWORD=password123
@@ -105,7 +104,7 @@ services:
           memory: 4G
         reservations:
           memory: 2G
-    command: server http://rustfs_rustfs:9000/data --console-address ":9001"
+    command: server http://rustfs_rustfs:9000/data 
     networks:
       - rustfs_network
 
@@ -166,9 +165,7 @@ spec:
   - name: api
     port: 9000
     targetPort: 9000
-  - name: console
-    port: 9001
-    targetPort: 9001
+
 ```
 
 ## Observability

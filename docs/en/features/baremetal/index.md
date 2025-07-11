@@ -28,7 +28,7 @@ Suitable for development and testing environments:
 
 ```bash
 # Single node with single drive
-rustfs server /data --console-address ":9001"
+rustfs server /data
 ```
 
 ![Bare Metal Architecture 2](./images/sec2-2.png)
@@ -40,7 +40,6 @@ Recommended for production environments:
 ```bash
 # Node 1
 rustfs server http://server{1...4}/data{1...4} \
-  --console-address ":9001"
 
 # Node 2-4 (similar configuration)
 ```

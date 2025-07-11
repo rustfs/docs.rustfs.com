@@ -56,7 +56,6 @@ RUSTFS_VOLUMES="/data/rustfs{0...3}"
 RUSTFS_ADDRESS=":9000"
 #RUSTFS_SERVER_DOMAINS="play.rustfs.com:7000"
 RUSTFS_CONSOLE_ENABLE=true
-RUSTFS_CONSOLE_ADDRESS=":9001"
 RUSTFS_OBS_ENDPOINT=""
 RUSTFS_TLS_PATH="/opt/tls"
 ```
@@ -73,7 +72,6 @@ RustFS SNSD Docker 运行方式，结合上述镜像与配置，执行：
  docker run -d \
   --name rustfs_local \
   -p 9000:9000 \
-  -p 9001:9001 \
   -v /mnt/rustfs/data:/data \
   rustfs/rustfs:latest \
   /data
@@ -82,7 +80,6 @@ RustFS SNSD Docker 运行方式，结合上述镜像与配置，执行：
 各参数说明：
 
 * `-p 9000:9000`：映射宿主机 9000 端口到容器
-* `-p 9001:9001`：映射宿主机 9001 端口到容器，用于 console 端访问
 * `-v /mnt/rustfs/data:/data`：挂载数据卷
 * `--name rustfs_local`：容器自定义名称
 * `-d`：后台运行
@@ -95,19 +92,17 @@ RustFS SNSD Docker 运行方式，结合上述镜像与配置，执行：
 docker run -d \
   --name rustfs_container \
   -p 9000:9000 \
-  -p 9001:9001 \
   -v /mnt/rustfs/data:/data \
-  -e RUSTFS_ACCESS_KEY=myaccesskey \
-  -e RUSTFS_SECRET_KEY=mysecretkey \
+  -e RUSTFS_ACCESS_KEY=rustfsadmin \
+  -e RUSTFS_SECRET_KEY=rustfsadmin \
   -e RUSTFS_CONSOLE_ENABLE=true \
   -e RUSTFS_SERVER_DOMAINS=example.com \
   rustfs/rustfs:latest \
   --address :9000 \
-  --console-address :9001 \
   --console-enable \
   --server-domains example.com \
-  --access-key myaccesskey \
-  --secret-key mysecretkey \
+  --access-key rustfsadmin \
+  --secret-key rustfsadmin \
   /data
 ```
 
@@ -117,20 +112,18 @@ docker run -d \
    ```bash
    -e RUSTFS_ADDRESS=:9000 \
    -e RUSTFS_SERVER_DOMAINS=example.com \
-   -e RUSTFS_ACCESS_KEY=myaccesskey \
-   -e RUSTFS_SECRET_KEY=mysecretkey \
+   -e RUSTFS_ACCESS_KEY=rustfsadmin \
+   -e RUSTFS_SECRET_KEY=rustfsadmin \
    -e RUSTFS_CONSOLE_ENABLE=true \
-   -e RUSTFS_CONSOLE_ADDRESS=:9001 \
    ```
 
 2. **命令行参数方式**:
    ```
    --address :9000 \
    --server-domains example.com \
-   --access-key myaccesskey \
-   --secret-key mysecretkey \
+   --access-key rustfsadmin \
+   --secret-key rustfsadmin \
    --console-enable \
-   --console-address :9001 \
    ```
 
 3. **必需参数**:
@@ -151,7 +144,6 @@ docker run -d \
    ```bash
    docker run -d \
      -p 9000:9000 \
-     -p 9001:9001 \
      -v /mnt/data:/data \
      -e RUSTFS_CONSOLE_ENABLE=true \
      rustfs/rustfs:latest \
@@ -165,12 +157,12 @@ docker run -d \
    docker run -d \
      -p 9000:9000 \
      -v /mnt/data:/data \
-     -e RUSTFS_ACCESS_KEY=admin123 \
-     -e RUSTFS_SECRET_KEY=secret123 \
+     -e RUSTFS_ACCESS_KEY=rustfsadmin \
+     -e RUSTFS_SECRET_KEY=rustfsadmin \
      rustfs/rustfs:latest \
      ./target/debug/rustfs \
-     --access-key admin123 \
-     --secret-key secret123 \
+     --access-key rustfsadmin \
+     --secret-key rustfsadmin \
      /data
    ```
 
@@ -178,7 +170,6 @@ docker run -d \
 
 1. 端口映射要对应：
     - 服务端口默认 9000 (`-p 9000:9000`)
-    - 控制台端口默认 9001 (`-p 9001:9001`)
 
 2. 数据卷要持久化：
     - `-v /host/path:/container/path`

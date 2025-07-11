@@ -91,19 +91,17 @@ Parameter descriptions:
 docker run -d \
   --name rustfs_container \
   -p 9000:9000 \
-  -p 9001:9001 \
   -v /mnt/rustfs/data:/data \
-  -e RUSTFS_ACCESS_KEY=myaccesskey \
-  -e RUSTFS_SECRET_KEY=mysecretkey \
+  -e RUSTFS_ACCESS_KEY=rustfsadmin \
+  -e RUSTFS_SECRET_KEY=rustfsadmin \
   -e RUSTFS_CONSOLE_ENABLE=true \
   -e RUSTFS_SERVER_DOMAINS=example.com \
   rustfs/rustfs:latest \
   --address :9000 \
-  --console-address :9001 \
   --console-enable \
   --server-domains example.com \
-  --access-key myaccesskey \
-  --secret-key mysecretkey \
+  --access-key rustfsadmin \
+  --secret-key rustfsadmin \
   /data
 ```
 
@@ -113,20 +111,18 @@ docker run -d \
    ```bash
    -e RUSTFS_ADDRESS=:9000 \
    -e RUSTFS_SERVER_DOMAINS=example.com \
-   -e RUSTFS_ACCESS_KEY=myaccesskey \
-   -e RUSTFS_SECRET_KEY=mysecretkey \
+   -e RUSTFS_ACCESS_KEY=rustfsadmin \
+   -e RUSTFS_SECRET_KEY=rustfsadmin \
    -e RUSTFS_CONSOLE_ENABLE=true \
-   -e RUSTFS_CONSOLE_ADDRESS=:9001 \
    ```
 
 2. **Command line parameter method**:
    ```
    --address :9000 \
    --server-domains example.com \
-   --access-key myaccesskey \
-   --secret-key mysecretkey \
+   --access-key rustfsadmin \
+   --secret-key rustfsadmin \
    --console-enable \
-   --console-address :9001 \
    ```
 
 3. **Required parameters**:
@@ -147,7 +143,6 @@ docker run -d \
    ```bash
    docker run -d \
      -p 9000:9000 \
-     -p 9001:9001 \
      -v /mnt/data:/data \
      -e RUSTFS_CONSOLE_ENABLE=true \
      rustfs/rustfs:latest \
@@ -161,12 +156,12 @@ docker run -d \
    docker run -d \
      -p 9000:9000 \
      -v /mnt/data:/data \
-     -e RUSTFS_ACCESS_KEY=admin123 \
-     -e RUSTFS_SECRET_KEY=secret123 \
+     -e RUSTFS_ACCESS_KEY=rustfsadmin \
+     -e RUSTFS_SECRET_KEY=rustfsadmin \
      rustfs/rustfs:latest \
      ./target/debug/rustfs \
-     --access-key admin123 \
-     --secret-key secret123 \
+     --access-key rustfsadmin \
+     --secret-key rustfsadmin \
      /data
    ```
 
@@ -174,7 +169,6 @@ docker run -d \
 
 1. The port mapping must correspond to:
    - Service port default 9000(`-p 9000:9000`)
-   - Console port default 9001(`-p 9001:9001`)
 
 2. Data volumes should be persisted:
    - `-v /host/path:/container/path`
