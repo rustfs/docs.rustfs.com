@@ -121,7 +121,8 @@ RustFS 启动，我们建议您配置一个专门的无登录权限的用户进�
 
 ```bash
 # 下载地址
-wget https://dl.rustfs.com/rustfs/rustfs
+wget https://dl.rustfs.com/artifacts/rustfs/release/rustfs-linux-x86_64-latest.zip
+unzip rustfs-linux-x86_64-latest.zip
 chmod +x rustfs
 mv rustfs /usr/local/bin/
 ```

@@ -100,7 +100,8 @@ Please first install wget or curl to download the rustfs installation package.
 
 ```bash
 # Download address
-wget https://dl.rustfs.com/rustfs/rustfs
+wget https://dl.rustfs.com/artifacts/rustfs/release/rustfs-linux-x86_64-latest.zip
+unzip rustfs-linux-x86_64-latest.zip
 chmod +x rustfs
 mv rustfs /usr/local/bin/
 ```
