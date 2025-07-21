@@ -13,7 +13,7 @@ RustFS supports horizontal scaling through adding new storage pools (Server Pool
 2. All nodes within a single storage pool must use **identical disk specifications** (type/capacity/quantity)
 3. New storage pools must maintain **time synchronization** and **network connectivity** with the existing cluster
 
-![RustFS Architecture](![RustFS 架构图](./images/s2-1.png))
+![RustFS Architecture](./images/s2-1.png)
 
 ---
 

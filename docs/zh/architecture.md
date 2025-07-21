@@ -11,7 +11,8 @@ RustFS 是一个对象存储系统，类似于众所周知的 AWS S3。作为 Mi
 
 架构图如下:
 
-<img src="![RustFS 架构图](./images/s2-1.png)" alt="RustFS 架构图" />
+
+![RustFS 架构图](./images/s2-1.png)
 
 这是 RustFS 的基本架构，分布式网格是一种使用多个节点执行单个任务的计算机架构。节点通过网络相互连接，这使得它们能够相互通信。
 
