@@ -11,7 +11,7 @@ Objects can be documents, videos, PDF files, etc. To store objects, MinIO provid
 
 The architecture diagram is as follows:
 
-<img src="https://rustfs.com/images/s-2/s2-1.png" alt="RustFS Architecture Diagram" />
+<img src="![RustFS 架构图](./images/s2-1.png)" alt="RustFS Architecture Diagram" />
 
 This is the basic architecture of RustFS. A distributed grid is a computer architecture that uses multiple nodes to perform a single task. Nodes are connected to each other through a network, which enables them to communicate with each other.
 
