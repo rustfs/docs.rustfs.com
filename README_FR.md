@@ -9,6 +9,7 @@ Bienvenue dans la communauté RustFS ! Nous apprécions votre intérêt à cont
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_ZH.md">简体中文</a> |
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_JA.md">日本語</a> |
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_DA.md">(#deutsch)</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_TR.md">Türkçe</a> |
  Français 
 </p>
 
