@@ -11,6 +11,7 @@ Willkommen in der RustFS-Community! Wir freuen uns sehr über Ihr Interesse an d
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_JA.md">日本語</a> |
  (#deutsch) |
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_FR.md">rançais</a>
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_TR.md">Türkçe</a> |
 </p>
 
 ------
