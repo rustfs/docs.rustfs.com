@@ -45,6 +45,22 @@ export default defineConfig({
               },
             },
           },
+          tr: {
+            translations: {
+              button: {
+                buttonText: 'Belgeleri Ara',
+                buttonAriaLabel: 'Belgeleri Ara',
+              },
+              modal: {
+                noResultsText: 'İlgili sonuç bulunamadı',
+                resetButtonTitle: 'Sorgu koşullarını temizle',
+                footer: {
+                  selectText: 'Seç',
+                  navigateText: 'Geçiş yap',
+                },
+              },
+            },
+          },
         },
       },
     },
