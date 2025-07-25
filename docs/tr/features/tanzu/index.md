@@ -1,364 +1,321 @@
-# VMware Tanzu Integration
+# VMware Tanzu Entegrasyonu
 
-RustFS provides comprehensive integration with VMware Tanzu portfolio, enabling modern application development and deployment with enterprise-grade storage capabilities.
+RustFS, VMware Tanzu portföyü ile kapsamlı bir entegrasyon sağlayarak, kurumsal sınıf depolama yetenekleriyle modern uygulama geliştirme ve dağıtımını mümkün kılar.
 
-## Overview
+## Genel Bakış
 
-![VMware Tanzu Integration](./images/sec1-1.png)
+![VMware Tanzu Entegrasyonu](./images/sec1-1.png)
 
-RustFS with VMware Tanzu offers:
+RustFS ile VMware Tanzu şunları sunar:
+- **Bulut Yerel Depolama**: Kubernetes ve modern uygulamalar için özel olarak tasarlanmıştır.
+- **Kurumsal Entegrasyon**: VMware ekosistemiyle sorunsuz entegrasyon.
+- **Çoklu Bulut Desteği**: vSphere, genel bulutlar ve kenar üzerinde dağıtım.
+- **Geliştirici Deneyimi**: Geliştirme ekipleri için basitleştirilmiş depolama.
 
-- **Cloud-Native Storage**: Purpose-built for Kubernetes and modern applications
-- **Enterprise Integration**: Seamless integration with VMware ecosystem
-- **Multi-Cloud Support**: Deploy across vSphere, public clouds, and edge
-- **Developer Experience**: Simplified storage for development teams
-
-## Tanzu Portfolio Integration
+## Tanzu Portföy Entegrasyonu
 
 ### Tanzu Kubernetes Grid (TKG)
 
-#### Kubernetes Storage
+#### Kubernetes Depolama
+- **CSI Sürücüsü**: Yerel Konteyner Depolama Arayüzü sürücüsü.
+- **Dinamik Sağlama**: Otomatik depolama sağlama.
+- **Depolama Sınıfları**: Çoklu performans katmanları ve politikaları.
+- **Hacim Yönetimi**: Tam yaşam döngüsü yönetimi.
 
-- **CSI Driver**: Native Container Storage Interface driver
-- **Dynamic Provisioning**: Automatic storage provisioning
-- **Storage Classes**: Multiple performance tiers and policies
-- **Volume Management**: Complete lifecycle management
+#### Çoklu Bulut Dağıtımı
+- **vSphere Entegrasyonu**: Yerel vSphere depolama entegrasyonu.
+- **Genel Bulut**: AWS, Azure ve Google Cloud üzerinde dağıtım.
+- **Kenar Bilgi İşlem**: Kenar ve IoT dağıtımları için destek.
+- **Hibrit Bulut**: Sorunsuz hibrit bulut depolama.
 
-#### Multi-Cloud Deployment
+### Tanzu Uygulama Platformu (TAP)
 
-- **vSphere Integration**: Native vSphere storage integration
-- **Public Cloud**: Deploy on AWS, Azure, and Google Cloud
-- **Edge Computing**: Support for edge and IoT deployments
-- **Hybrid Cloud**: Seamless hybrid cloud storage
+#### Geliştirici İş Akışları
+- **Tedarik Zinciri**: Tanzu tedarik zincirleriyle entegre.
+- **Uygulama Hızlandırıcıları**: Önceden yapılandırılmış depolama şablonları.
+- **Servis Bağlama**: Depolama için otomatik servis bağlama.
+- **GitOps**: GitOps tabanlı depolama yapılandırması.
 
-### Tanzu Application Platform (TAP)
+#### Uygulama Servisleri
+- **Veri Servisleri**: Tanzu Veri Servisleriyle entegrasyon.
+- **Mesajlaşma**: Mesajlaşma ve olay akışı desteği.
+- **Veritabanları**: Veritabanı servisleri için kalıcı depolama.
+- **Önbellekleme**: Yüksek performanslı önbellekleme çözümleri.
 
-#### Developer Workflows
+### Tanzu Misyon Kontrolü (TMC)
 
-- **Supply Chain**: Integrated with Tanzu supply chains
-- **Application Accelerators**: Pre-configured storage templates
-- **Service Binding**: Automatic service binding for storage
-- **GitOps**: GitOps-based storage configuration
+#### Çoklu Küme Yönetimi
+- **Küme Yaşam Döngüsü**: Kümeler arasında depolama yönetimi.
+- **Politika Yönetimi**: Merkezi depolama politikaları.
+- **Uyumluluk**: Ortamlar arasında depolama uyumluluğunu sağlama.
+- **İzleme**: Merkezi izleme ve uyarı.
 
-#### Application Services
+#### Güvenlik ve Yönetişim
+- **Erişim Kontrolü**: İnce taneli erişim kontrol politikaları.
+- **Veri Koruma**: Yedekleme ve felaket kurtarma politikaları.
+- **Uyumluluk Raporlama**: Otomatik uyumluluk raporlama.
+- **Denetim Günlükleme**: Kapsamlı denetim izleri.
 
-- **Data Services**: Integration with Tanzu Data Services
-- **Messaging**: Support for messaging and event streaming
-- **Databases**: Persistent storage for database services
-- **Caching**: High-performance caching solutions
-
-### Tanzu Mission Control (TMC)
-
-#### Multi-Cluster Management
-
-- **Cluster Lifecycle**: Manage storage across clusters
-- **Policy Management**: Centralized storage policies
-- **Compliance**: Ensure storage compliance across environments
-- **Monitoring**: Centralized monitoring and alerting
-
-#### Security and Governance
-
-- **Access Control**: Fine-grained access control policies
-- **Data Protection**: Backup and disaster recovery policies
-- **Compliance Reporting**: Automated compliance reporting
-- **Audit Logging**: Comprehensive audit trails
-
-## vSphere Integration
+## vSphere Entegrasyonu
 
 ### vSphere with Tanzu
 
-#### vSphere Pods
+#### vSphere Pod'ları
+- **Yerel Entegrasyon**: Pod'ları doğrudan ESXi üzerinde çalıştırma.
+- **Depolama Politikaları**: vSphere depolama politikası entegrasyonu.
+- **Kaynak Yönetimi**: CPU, bellek ve depolama tahsisi.
+- **Ağ İzolasyonu**: Güvenli ağ izolasyonu.
 
-- **Native Integration**: Run pods directly on ESXi
-- **Storage Policies**: vSphere storage policy integration
-- **Resource Management**: CPU, memory, and storage allocation
-- **Network Isolation**: Secure network isolation
+#### Denetleyici Kümeleri
+- **Kubernetes Kontrol Düzlemi**: Entegre Kubernetes kontrol düzlemi.
+- **İsim Alanı Yönetimi**: Çok kiracılı isim alanı izolasyonu.
+- **Depolama Sağlama**: Otomatik depolama sağlama.
+- **Kaynak Kota Yönetimi**: Kaynak limitleri ve kotaları uygulama.
 
-#### Supervisor Clusters
+### vSAN Entegrasyonu
 
-- **Kubernetes Control Plane**: Integrated Kubernetes control plane
-- **Namespace Management**: Multi-tenant namespace isolation
-- **Storage Provisioning**: Automated storage provisioning
-- **Resource Quotas**: Enforce resource limits and quotas
+#### Hiper-Birleşik Depolama
+- **vSAN Veri Deposu**: vSAN ile doğrudan entegrasyon.
+- **Depolama Politikaları**: Politika tabanlı depolama yönetimi.
+- **Performans Katmanları**: Çoklu performans katmanları.
+- **Veri Koruma**: Yerleşik veri koruma ve şifreleme.
 
-### vSAN Integration
+#### Depolama Optimizasyonu
+- **Yinelenen Veri Kaldırma**: Depolama ayak izini azaltma.
+- **Sıkıştırma**: Depolama verimliliğini optimize etme.
+- **Katmanlandırma**: Otomatik veri katmanlandırma.
+- **Önbellekleme**: Performans için akıllı önbellekleme.
 
-#### Hyper-Converged Storage
+## Uygulama Modernizasyonu
 
-- **vSAN Datastore**: Direct integration with vSAN
-- **Storage Policies**: Policy-based storage management
-- **Performance Tiers**: Multiple performance tiers
-- **Data Protection**: Built-in data protection and encryption
+### Konteynerleştirme
 
-#### Storage Optimization
+#### Eski Uygulama Göçü
+- **Kaldır ve Taşı**: Mevcut uygulamaları konteynerlere taşıma.
+- **Veri Göçü**: Bulut yerel depolamaya sorunsuz veri göçü.
+- **Kalıcı Hacimler**: Göç sırasında veri kalıcılığını koruma.
+- **Geri Alma Yetenekleri**: Güvenli geri alma prosedürleri.
 
-- **Deduplication**: Reduce storage footprint
-- **Compression**: Optimize storage efficiency
-- **Tiering**: Automatic data tiering
-- **Caching**: Intelligent caching for performance
+#### Mikroservis Mimarisi
+- **Servis Ayrıştırma**: Monolitikleri mikroservislere bölme.
+- **Veri Kalıpları**: Bulut yerel veri kalıplarını uygulama.
+- **API Ağ Geçidi**: Merkezi API yönetimi.
+- **Servis Ağı**: Servisler arası iletişim.
 
-## Application Modernization
+### CI/CD Entegrasyonu
 
-### Containerization
+#### Tanzu Build Servisi
+- **Görüntü Oluşturma**: Otomatik konteyner görüntüsü oluşturma.
+- **Zafiyet Tarama**: Güvenlik tarama entegrasyonu.
+- **Kayıt Defteri Entegrasyonu**: Konteyner kayıt defteri depolama.
+- **Derleme Önbellekleme**: Derleme performansını optimize etme.
 
-#### Legacy Application Migration
+#### Boru Hattı Entegrasyonu
+- **Jenkins**: CI/CD boru hattı entegrasyonu.
+- **GitLab CI**: GitLab boru hattı entegrasyonu.
+- **Azure DevOps**: Microsoft DevOps entegrasyonu.
+- **GitHub Actions**: GitHub iş akışı entegrasyonu.
 
-- **Lift and Shift**: Migrate existing applications to containers
-- **Data Migration**: Seamless data migration to cloud-native storage
-- **Persistent Volumes**: Maintain data persistence during migration
-- **Rollback Capabilities**: Safe rollback procedures
-
-#### Microservices Architecture
-
-- **Service Decomposition**: Break monoliths into microservices
-- **Data Patterns**: Implement cloud-native data patterns
-- **API Gateway**: Centralized API management
-- **Service Mesh**: Service-to-service communication
-
-### CI/CD Integration
-
-#### Tanzu Build Service
-
-- **Image Building**: Automated container image building
-- **Vulnerability Scanning**: Security scanning integration
-- **Registry Integration**: Container registry storage
-- **Build Caching**: Optimize build performance
-
-#### Pipeline Integration
-
-- **Jenkins**: CI/CD pipeline integration
-- **GitLab CI**: GitLab pipeline integration
-- **Azure DevOps**: Microsoft DevOps integration
-- **GitHub Actions**: GitHub workflow integration
-
-## Data Services Integration
+## Veri Servisleri Entegrasyonu
 
 ### Tanzu SQL
 
-#### Database Services
+#### Veritabanı Servisleri
+- **PostgreSQL**: Yönetilen PostgreSQL servisi.
+- **MySQL**: Yönetilen MySQL servisi.
+- **SQL Server**: Microsoft SQL Server entegrasyonu.
+- **Oracle**: Oracle veritabanı entegrasyonu.
 
-- **PostgreSQL**: Managed PostgreSQL service
-- **MySQL**: Managed MySQL service
-- **SQL Server**: Microsoft SQL Server integration
-- **Oracle**: Oracle database integration
-
-#### High Availability
-
-- **Clustering**: Database clustering for high availability
-- **Backup and Recovery**: Automated backup and recovery
-- **Disaster Recovery**: Multi-site disaster recovery
-- **Performance Monitoring**: Database performance monitoring
+#### Yüksek Kullanılabilirlik
+- **Kümelenme**: Yüksek kullanılabilirlik için veritabanı kümelenmesi.
+- **Yedekleme ve Kurtarma**: Otomatik yedekleme ve kurtarma.
+- **Felaket Kurtarma**: Çoklu site felaket kurtarma.
+- **Performans İzleme**: Veritabanı performans izleme.
 
 ### Tanzu RabbitMQ
 
-#### Messaging Services
+#### Mesajlaşma Servisleri
+- **Mesaj Kuyruğu**: Güvenilir mesaj kuyruğu.
+- **Olay Akışı**: Gerçek zamanlı olay akışı.
+- **Kümelenme**: Ölçeklenebilirlik için RabbitMQ kümelenmesi.
+- **İzleme**: Mesaj kuyruğu izleme ve uyarı.
 
-- **Message Queuing**: Reliable message queuing
-- **Event Streaming**: Real-time event streaming
-- **Clustering**: RabbitMQ clustering for scalability
-- **Monitoring**: Message queue monitoring and alerting
+#### Entegrasyon Kalıpları
+- **Yayın-Abonelik**: Yayın-abone mesajlaşma kalıpları.
+- **İstek-Yanıt**: Eşzamanlı iletişim kalıpları.
+- **Olay Tabanlı Mimari**: Olay tabanlı uygulama kalıpları.
+- **Saga Kalıbı**: Dağıtık işlem kalıpları.
 
-#### Integration Patterns
+## Güvenlik ve Uyumluluk
 
-- **Publish-Subscribe**: Pub-sub messaging patterns
-- **Request-Reply**: Synchronous communication patterns
-- **Event-Driven Architecture**: Event-driven application patterns
-- **Saga Pattern**: Distributed transaction patterns
+### Tanzu Güvenliği
 
-## Security and Compliance
+#### Konteyner Güvenliği
+- **Görüntü Tarama**: Konteyner görüntüleri için zafiyet tarama.
+- **Çalışma Zamanı Güvenliği**: Çalışma zamanı tehdit tespiti ve yanıtı.
+- **Uyumluluk**: Otomatik uyumluluk kontrolü.
+- **Politika Uygulama**: Güvenlik politikası uygulama.
 
-### Tanzu Security
+#### Ağ Güvenliği
+- **Mikro Segmentasyon**: Ağ mikro segmentasyonu.
+- **Servis Ağı Güvenliği**: mTLS ve servis kimliği.
+- **Giriş Güvenliği**: Güvenli giriş ve yük dengeleme.
+- **Ağ Politikaları**: Kubernetes ağ politikaları.
 
-#### Container Security
+### Veri Koruma
 
-- **Image Scanning**: Vulnerability scanning for container images
-- **Runtime Security**: Runtime threat detection and response
-- **Compliance**: Automated compliance checking
-- **Policy Enforcement**: Security policy enforcement
+#### Şifreleme
+- **Dinlenme Halinde Şifreleme**: Dinlenme halinde veri şifreleme.
+- **Aktarım Halinde Şifreleme**: Aktarım halinde veri şifreleme.
+- **Anahtar Yönetimi**: Merkezi anahtar yönetimi.
+- **Sertifika Yönetimi**: Otomatik sertifika yaşam döngüsü.
 
-#### Network Security
+#### Yedekleme ve Kurtarma
+- **Uygulama Tutarlı Yedeklemeler**: Tutarlı uygulama yedeklemeleri.
+- **Zamana Göre Kurtarma**: Granüler kurtarma yetenekleri.
+- **Çapraz Bölge Çoğaltma**: Çoklu bölge veri çoğaltma.
+- **Felaket Kurtarma**: Kapsamlı felaket kurtarma.
 
-- **Micro-segmentation**: Network micro-segmentation
-- **Service Mesh Security**: mTLS and service identity
-- **Ingress Security**: Secure ingress and load balancing
-- **Network Policies**: Kubernetes network policies
+## İzleme ve Gözlemleme
 
-### Data Protection
+### Tanzu Gözlemleme
 
-#### Encryption
+#### Uygulama İzleme
+- **Metrik Toplama**: Kapsamlı metrik toplama.
+- **Dağıtık İzleme**: Uçtan uca istek izleme.
+- **Günlük Toplama**: Merkezi günlük yönetimi.
+- **Uyarı**: Akıllı uyarı ve bildirim.
 
-- **Encryption at Rest**: Data encryption at rest
-- **Encryption in Transit**: Data encryption in transit
-- **Key Management**: Centralized key management
-- **Certificate Management**: Automated certificate lifecycle
+#### Altyapı İzleme
+- **Kaynak Kullanımı**: CPU, bellek ve depolama izleme.
+- **Performans Metrikleri**: Depolama performans izleme.
+- **Kapasite Planlama**: Tahmine dayalı kapasite planlama.
+- **Sağlık İzleme**: Sürekli sağlık izleme.
 
-#### Backup and Recovery
-
-- **Application-Consistent Backups**: Consistent application backups
-- **Point-in-Time Recovery**: Granular recovery capabilities
-- **Cross-Region Replication**: Multi-region data replication
-- **Disaster Recovery**: Comprehensive disaster recovery
-
-## Monitoring and Observability
-
-### Tanzu Observability
-
-#### Application Monitoring
-
-- **Metrics Collection**: Comprehensive metrics collection
-- **Distributed Tracing**: End-to-end request tracing
-- **Log Aggregation**: Centralized log management
-- **Alerting**: Intelligent alerting and notification
-
-#### Infrastructure Monitoring
-
-- **Resource Utilization**: Monitor CPU, memory, and storage
-- **Performance Metrics**: Storage performance monitoring
-- **Capacity Planning**: Predictive capacity planning
-- **Health Monitoring**: Continuous health monitoring
-
-### Integration with Monitoring Tools
+### İzleme Araçlarıyla Entegrasyon
 
 #### VMware vRealize
+- **vRealize Operations**: Altyapı izleme entegrasyonu.
+- **vRealize Log Insight**: Günlük analizi ve korelasyon.
+- **vRealize Network Insight**: Ağ izleme ve güvenlik.
+- **vRealize Automation**: Otomatik işlemler ve düzeltme.
 
-- **vRealize Operations**: Infrastructure monitoring integration
-- **vRealize Log Insight**: Log analysis and correlation
-- **vRealize Network Insight**: Network monitoring and security
-- **vRealize Automation**: Automated operations and remediation
+#### Üçüncü Taraf Araçlar
+- **Prometheus**: Metrik toplama ve uyarı.
+- **Grafana**: Görselleştirme ve panolar.
+- **Elasticsearch**: Günlük arama ve analiz.
+- **Datadog**: Bulut izleme ve analiz.
 
-#### Third-Party Tools
-
-- **Prometheus**: Metrics collection and alerting
-- **Grafana**: Visualization and dashboards
-- **Elasticsearch**: Log search and analysis
-- **Datadog**: Cloud monitoring and analytics
-
-## Edge Computing
+## Kenar Bilgi İşlem
 
 ### Tanzu Edge
 
-#### Edge Deployment
+#### Kenar Dağıtımı
+- **Hafif Dağıtım**: Minimum kaynak ayak izi.
+- **Çevrimdışı Yetenekler**: Bağlantısız ortamlarda çalışma.
+- **Yerel Depolama**: Yerel veri işleme ve depolama.
+- **Eşzamanlama**: Merkezi sistemlerle veri eşzamanlama.
 
-- **Lightweight Deployment**: Minimal resource footprint
-- **Offline Capabilities**: Operate in disconnected environments
-- **Local Storage**: Local data processing and storage
-- **Synchronization**: Data synchronization with central systems
+#### IoT Entegrasyonu
+- **Cihaz Yönetimi**: IoT cihazı yaşam döngüsü yönetimi.
+- **Veri Alımı**: Yüksek hacimli veri alımı.
+- **Kenar Analitiği**: Kenarda gerçek zamanlı analiz.
+- **Makine Öğrenimi**: Kenar ML çıkarım yetenekleri.
 
-#### IoT Integration
+### Kenar Kullanım Durumları
 
-- **Device Management**: IoT device lifecycle management
-- **Data Ingestion**: High-volume data ingestion
-- **Edge Analytics**: Real-time analytics at the edge
-- **Machine Learning**: Edge ML inference capabilities
+#### Endüstriyel IoT
+- **İmalat**: Akıllı imalat uygulamaları.
+- **Enerji**: Yenilenebilir enerji izleme ve kontrol.
+- **Ulaşım**: Bağlantılı araç ve lojistik.
+- **Sağlık Hizmetleri**: Uzaktan hasta izleme.
 
-### Edge Use Cases
+#### Perakende ve Konaklama
+- **Satış Noktası**: Perakende işlem işleme.
+- **Envanter Yönetimi**: Gerçek zamanlı envanter takibi.
+- **Müşteri Analitiği**: Mağaza içi müşteri davranış analizi.
+- **Dijital Tabela**: İçerik yönetimi ve teslimatı.
 
-#### Industrial IoT
+## En İyi Uygulamalar
 
-- **Manufacturing**: Smart manufacturing applications
-- **Energy**: Renewable energy monitoring and control
-- **Transportation**: Connected vehicle and logistics
-- **Healthcare**: Remote patient monitoring
+### Mimari En İyi Uygulamalar
+1. **Ölçeklenebilirlik İçin Tasarlama**: Yatay ölçeklenme planlama.
+2. **Durumsuz Uygulamalar**: Durumsuz mikroservisler tasarlama.
+3. **Veri Kalıpları**: Uygun veri kalıplarını uygulama.
+4. **Servis Sınırları**: Açık servis sınırları tanımlama.
 
-#### Retail and Hospitality
+### Güvenlik En İyi Uygulamaları
+1. **Sıfır Güven**: Sıfır güven güvenlik modeli uygulama.
+2. **En Az Ayrıcalık**: Minimum gerekli izinleri verme.
+3. **Derinlikli Savunma**: Katmanlı güvenlik uygulama.
+4. **Sürekli İzleme**: Güvenlik durumunu sürekli izleme.
 
-- **Point of Sale**: Retail transaction processing
-- **Inventory Management**: Real-time inventory tracking
-- **Customer Analytics**: In-store customer behavior analysis
-- **Digital Signage**: Content management and delivery
+### İşletimsel En İyi Uygulamalar
+1. **GitOps**: Yapılandırma yönetimi için GitOps kullanma.
+2. **Gözlemleme**: Kapsamlı gözlemleme uygulama.
+3. **Otomatikleştirme**: İşletimsel görevleri otomatikleştirme.
+4. **Felaket Kurtarma**: Felaket kurtarma senaryoları için planlama.
 
-## Best Practices
+## Göç Stratejileri
 
-### Architecture Best Practices
+### Değerlendirme Aşaması
+1. **Uygulama Portföyü**: Mevcut uygulamaları değerlendirme.
+2. **Bağımlılıklar**: Uygulama bağımlılıklarını belirleme.
+3. **Veri Analizi**: Veri gereksinimlerini ve kalıplarını analiz etme.
+4. **Risk Değerlendirmesi**: Göç risklerini ve hafifletme stratejilerini belirleme.
 
-1. **Design for Scale**: Plan for horizontal scaling
-2. **Stateless Applications**: Design stateless microservices
-3. **Data Patterns**: Implement appropriate data patterns
-4. **Service Boundaries**: Define clear service boundaries
+### Göç Yaklaşımları
 
-### Security Best Practices
+#### Yeniden Barındırma (Kaldır ve Taşı)
+- **Konteynerleştirme**: Mevcut uygulamaları konteynerleştirme.
+- **Minimum Değişiklikler**: Uygulama değişikliklerini minimize etme.
+- **Hızlı Göç**: En hızlı göç yaklaşımı.
+- **Sınırlı Faydalar**: Sınırlı bulut yerel faydalar.
 
-1. **Zero Trust**: Implement zero trust security model
-2. **Least Privilege**: Grant minimum required permissions
-3. **Defense in Depth**: Implement layered security
-4. **Continuous Monitoring**: Monitor security posture continuously
+#### Yeniden Platform
+- **Kısmi Modernizasyon**: Bazı uygulama modernizasyonu.
+- **Bulut Servisleri**: Yönetilen bulut servislerinden yararlanma.
+- **Dengeli Yaklaşım**: Hız ve faydaları dengeleme.
+- **Kademeli İyileştirme**: Zamanla kademeli iyileştirme.
 
-### Operational Best Practices
+#### Yeniden Yapılandırma
+- **Bulut Yerel**: Tam bulut yerel dönüşüm.
+- **Mikroservisler**: Mikroservislere bölme.
+- **Maksimum Faydalar**: Maksimum bulut faydaları.
+- **Yüksek Karmaşıklık**: Daha karmaşık göç.
 
-1. **GitOps**: Use GitOps for configuration management
-2. **Observability**: Implement comprehensive observability
-3. **Automation**: Automate operational tasks
-4. **Disaster Recovery**: Plan for disaster recovery scenarios
+## Destek ve Servisler
 
-## Migration Strategies
+### VMware Destek
+- **Kurumsal Destek**: 24/7 kurumsal destek.
+- **Profesyonel Servisler**: Mimari ve göç servisleri.
+- **Eğitim**: Kapsamlı eğitim programları.
+- **Sertifikasyon**: VMware sertifikasyon programları.
 
-### Assessment Phase
+### Partner Ekosistemi
+- **Sistem Entegratörleri**: Sertifikalı uygulama partnerleri.
+- **Bulut Sağlayıcıları**: Çoklu bulut dağıtım partnerleri.
+- **ISV Partnerleri**: Uygulama satıcı ortaklıkları.
+- **Teknoloji Partnerleri**: Tamamlayıcı teknoloji entegrasyonları.
 
-1. **Application Portfolio**: Assess existing applications
-2. **Dependencies**: Identify application dependencies
-3. **Data Analysis**: Analyze data requirements and patterns
-4. **Risk Assessment**: Identify migration risks and mitigation strategies
+## Başlarken
 
-### Migration Approaches
+### Önkoşullar
+1. **vSphere Ortamı**: vSphere 7.0 veya üstü.
+2. **Tanzu Lisansları**: Uygun Tanzu lisansları.
+3. **Ağ Yapılandırması**: Ağ gereksinimlerini yapılandırma.
+4. **Depolama Altyapısı**: Altta yatan depolamayı hazırlama.
 
-#### Rehost (Lift and Shift)
+### Hızlı Başlangıç
+1. **vSphere with Tanzu'yu Etkinleştir**: Denetleyici kümeyi etkinleştir.
+2. **TKG Kümelerini Dağıt**: Tanzu Kubernetes kümeleri oluştur.
+3. **RustFS Kur**: RustFS depolamayı dağıt.
+4. **Depolama Sınıflarını Yapılandır**: Depolama sınıflarını kur.
+5. **Uygulamaları Dağıt**: Test uygulamaları dağıt.
+6. **İzleme ve Optimize Etme**: İzleme ve optimizasyonu kur.
 
-- **Containerization**: Containerize existing applications
-- **Minimal Changes**: Minimize application changes
-- **Quick Migration**: Fastest migration approach
-- **Limited Benefits**: Limited cloud-native benefits
-
-#### Replatform
-
-- **Partial Modernization**: Some application modernization
-- **Cloud Services**: Leverage managed cloud services
-- **Balanced Approach**: Balance speed and benefits
-- **Incremental Improvement**: Gradual improvement over time
-
-#### Refactor
-
-- **Cloud-Native**: Full cloud-native transformation
-- **Microservices**: Break into microservices
-- **Maximum Benefits**: Maximum cloud benefits
-- **Higher Complexity**: More complex migration
-
-## Support and Services
-
-### VMware Support
-
-- **Enterprise Support**: 24/7 enterprise support
-- **Professional Services**: Architecture and migration services
-- **Training**: Comprehensive training programs
-- **Certification**: VMware certification programs
-
-### Partner Ecosystem
-
-- **System Integrators**: Certified implementation partners
-- **Cloud Providers**: Multi-cloud deployment partners
-- **ISV Partners**: Application vendor partnerships
-- **Technology Partners**: Complementary technology integrations
-
-## Getting Started
-
-### Prerequisites
-
-1. **vSphere Environment**: vSphere 7.0 or later
-2. **Tanzu Licenses**: Appropriate Tanzu licensing
-3. **Network Configuration**: Configure networking requirements
-4. **Storage Infrastructure**: Prepare underlying storage
-
-### Quick Start
-
-1. **Enable vSphere with Tanzu**: Enable supervisor cluster
-2. **Deploy TKG Clusters**: Create Tanzu Kubernetes clusters
-3. **Install RustFS**: Deploy RustFS storage
-4. **Configure Storage Classes**: Set up storage classes
-5. **Deploy Applications**: Deploy test applications
-6. **Monitor and Optimize**: Set up monitoring and optimization
-
-### Next Steps
-
-- **Application Migration**: Plan and execute application migration
-- **Security Hardening**: Implement security best practices
-- **Performance Tuning**: Optimize for specific workloads
-- **Operational Excellence**: Establish operational procedures
+### Sonraki Adımlar
+- **Uygulama Göçü**: Uygulama göçünü planla ve yürüt.
+- **Güvenlik Sağlama**: Güvenlik en iyi uygulamalarını uygula.
+- **Performans Ayarlama**: Belirli iş yükleri için optimize et.
+- **İşletimsel Mükemmellik**: İşletimsel prosedürleri oluştur.

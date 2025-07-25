@@ -1,57 +1,57 @@
-# Logging and Auditing
+# Günlükleme ve Denetim
 
-When tracking the health and performance of any system, metrics and logging are crucial. RustFS provides complete visibility into clusters through detailed storage performance monitoring, metrics, and logging of every operation. The result is a robust, transparent, and efficient answer to object storage monitoring, alerting, and observability.
+Herhangi bir sistemin sağlığını ve performansını izlerken, metrikler ve günlükleme çok önemlidir. RustFS, ayrıntılı depolama performansı izleme, metrikler ve her işlemin günlüklenmesi yoluyla kümeler hakkında tam görünürlük sağlar. Sonuç, nesne depolama izleme, uyarı ve gözlemlenebilirlik için sağlam, şeffaf ve verimli bir çözümdür.
 
-## Features
+## Özellikler
 
-### Monitoring Metrics
+### İzleme Metrikleri
 
-Provides complete system monitoring and performance metrics collection.
+Tam sistem izleme ve performans metrikleri toplama sağlar.
 
-### Logging
+### Günlükleme
 
-Records detailed log information for every operation, supporting audit trails.
+Her işlem için ayrıntılı günlük bilgilerini kaydeder, denetim izlerini destekler.
 
-## Metrics Monitoring
+## Metrik İzleme
 
-RustFS exports a wide range of fine-grained hardware and software metrics through Prometheus-compatible metrics endpoints. Prometheus is a cloud-native monitoring platform consisting of a multi-dimensional data model with time series data identified by metric names and key/value pairs. RustFS includes a storage monitoring dashboard that uses Grafana to visualize collected metrics. The Prometheus ecosystem includes multiple integrations for routing RustFS metrics to storage, messaging, and alerting services.
+RustFS, Prometheus uyumlu metrik uç noktaları aracılığıyla geniş bir ince taneli donanım ve yazılım metriği yelpazesi dışa aktarır. Prometheus, metrik adları ve anahtar/değer çiftleriyle tanımlanan zaman serisi verilerinden oluşan çok boyutlu bir veri modeline sahip bulut yerel bir izleme platformudur. RustFS, toplanan metrikleri görselleştirmek için Grafana kullanan bir depolama izleme gösterge paneli içerir. Prometheus ekosistemi, RustFS metriklerini depolama, mesajlaşma ve uyarı hizmetlerine yönlendirmek için birçok entegrasyon içerir.
 
-RustFS displays various fine-grained hardware and software metrics through Prometheus endpoints, including health information such as disk or node failures, total available storage capacity, and storage capacity per disk. By leveraging Prometheus and its growing popularity as a leading metrics collection and analysis platform, RustFS can focus on its object storage functionality rather than building countless custom data storage monitoring adapters for given third-party analysis/visualization/alerting services.
+RustFS, disk veya düğüm arızaları, toplam kullanılabilir depolama kapasitesi ve disk başına depolama kapasitesi gibi sağlık bilgileri dahil olmak üzere Prometheus uç noktaları aracılığıyla çeşitli ince taneli donanım ve yazılım metriklerini görüntüler. Prometheus'u ve metrik toplama ve analiz platformu olarak giderek artan popülerliğini kullanarak, RustFS, verilen üçüncü taraf analiz/görselleştirme/uyarı hizmetleri için sayısız özel veri depolama izleme adaptörü oluşturmak yerine nesne depolama işlevselliğine odaklanabilir.
 
-The RustFS Kubernetes Operator can automatically deploy, configure, and manage Prometheus deployments and metrics collection for each tenant. Organizations can also point their own Prometheus or Prometheus-compatible systems to each tenant for centralized monitoring across multiple vendors, data centers, and visualization/analysis tools.
+RustFS Kubernetes Operatörü, Prometheus dağıtımlarını ve her kiracı için metrik toplama işlemlerini otomatik olarak dağıtabilir, yapılandırabilir ve yönetebilir. Kuruluşlar, ayrıca kendi Prometheus veya Prometheus uyumlu sistemlerini her kiracıya işaret ederek çoklu satıcı, veri merkezleri ve görselleştirme/analiz araçları üzerinden merkezileştirilmiş izleme yapabilirler.
 
-RustFS also provides a health check endpoint for probing node and cluster liveness. A simple CURL statement can indicate whether a given node is healthy or whether the cluster has read/write quorum.
+RustFS ayrıca düğüm ve küme canlılığını kontrol etmek için bir sağlık kontrol uç noktası sağlar. Basit bir CURL ifadesi, belirli bir düğümün sağlıklı olup olmadığını veya kümenin okuma/yazma korumuna sahip olup olmadığını gösterebilir.
 
-## Audit Logs
+## Denetim Günlükleri
 
-Enabling RustFS audit logging instructs RustFS to generate logs for every operation on the cluster. Each operation generates an audit log containing a unique ID and detailed information about the client, object, bucket, and all other metadata related to the operation. RustFS writes log data to configured HTTP/HTTPS webhook endpoints. Custom adapters can be used to meet specific requirements of audit logging targets.
+RustFS denetim günlükleme özelliğini etkinleştirmek, RustFS'ye küme üzerindeki her işlem için günlükler oluşturmasını söyler. Her işlem, işlemle ilgili müşteri, nesne, kova ve diğer tüm meta veriler hakkında ayrıntılı bilgi içeren bir denetim günlüğü oluşturur. RustFS, günlük verilerini yapılandırılmış HTTP/HTTPS webhook uç noktalarına yazar. Denetim günlükleme hedeflerinin özel gereksinimlerini karşılamak için özel adaptörler kullanılabilir.
 
-RustFS supports configuring audit logs through the RustFS Console UI and the RustFS `mc` command-line tool. For Kubernetes environments, the RustFS Operator automatically configures the console with LogSearch integration for visual inspection of collected audit logs.
+RustFS, RustFS Konsol Kullanıcı Arayüzü ve RustFS `mc` komut satırı aracı aracılığıyla denetim günlüklerinin yapılandırılmasını destekler. Kubernetes ortamları için, RustFS Operatörü, toplanan denetim günlüklerinin görsel olarak incelenmesi için LogSearch entegrasyonuyla konsolu otomatik olarak yapılandırır.
 
-RustFS Lambda notifications provide additional logging support. RustFS can automatically send bucket and object events to third-party applications for event-driven processing, such as serverless or function-as-a-service computing frameworks. RustFS Lambda notifications support targets such as RabbitMQ, Kafka, Elasticsearch, and arbitrary services through webhooks.
+RustFS Lambda bildirimleri ek günlükleme desteği sağlar. RustFS, sunucusuz veya işlev olarak hizmet bilgi işlem çerçeveleri gibi olay odaklı işleme için üçüncü taraf uygulamalara kova ve nesne olaylarını otomatik olarak gönderebilir. RustFS Lambda bildirimleri, RabbitMQ, Kafka, Elasticsearch ve webhook'lar aracılığıyla keyfi hizmetler gibi hedefleri destekler.
 
-RustFS also supports real-time tracing of HTTP/S operations through the RustFS Console and RustFS mc admin trace shell commands.
+RustFS ayrıca RustFS Konsolu ve RustFS mc admin izleme kabuk komutları aracılığıyla HTTP/S işlemlerinin gerçek zamanlı izlenmesini destekler.
 
-## Architecture
+## Mimari
 
-**RustFS exposes its metrics through Prometheus-compatible HTTP(S) endpoints, where Prometheus services provide push/pull access to these metrics. The RustFS Kubernetes Operator deploys an independent Prometheus service for each pre-configured RustFS tenant to scrape tenant metrics. Organizations can also deploy or leverage their own centralized Prometheus services to scrape tenant metrics.**
+**RustFS, metriklerini Prometheus uyumlu HTTP(S) uç noktaları aracılığıyla dışa aktarır, burada Prometheus hizmetleri bu metrikler için push/pull erişimi sağlar. RustFS Kubernetes Operatörü, önceden yapılandırılmış her RustFS kiracısı için bağımsız bir Prometheus hizmeti dağıtarak kiracı metriklerini kazır. Kuruluşlar ayrıca kiracı metriklerini kazımak için kendi merkezileştirilmiş Prometheus hizmetlerini dağıtabilir veya kullanabilir.**
 
-![Architecture Diagram 1](images/s7-1.png)
+![Mimari Diyagram 1](images/s7-1.png)
 
-RustFS Lambda notifications automatically push event notifications to supported target services such as Kafka, Elasticsearch, or PostgreSQL. Administrators can define bucket-level notification rules that include fine-grained filters for S3 events and objects for which RustFS generates events. RustFS Lambda notifications are built into the RustFS object storage service and only require access to remote notification targets.
+RustFS Lambda bildirimleri, olay bildirimlerini Kafka, Elasticsearch veya PostgreSQL gibi desteklenen hedef hizmetlere otomatik olarak iter. Yöneticiler, RustFS'nin olaylar oluşturduğu S3 olayları ve nesneler için ince taneli filtreler içeren kova düzeyi bildirim kuralları tanımlayabilir. RustFS Lambda bildirimleri, RustFS nesne depolama hizmetine yerleştirilmiştir ve yalnızca uzak bildirim hedeflerine erişim gerektirir.
 
-![Architecture Diagram 2](images/s7-2.png)
+![Mimari Diyagram 2](images/s7-2.png)
 
-## Requirements
+## Gereksinimler
 
-### For Metrics
+### Metrikler İçin
 
-BYO Prometheus *or* use Kubernetes Operator to automatically deploy/configure for each tenant.
+Kendi Prometheus'unuzu getirin *veya* her kiracı için otomatik olarak dağıtmak ve yapılandırmak için Kubernetes Operatörünü kullanın.
 
-### For Log Search
+### Günlük Arama İçin
 
-BYO PostgreSQL *or* use Kubernetes Operator to automatically deploy/configure for each tenant.
+Kendi PostgreSQL'inizi getirin *veya* her kiracı için otomatik olarak dağıtmak ve yapılandırmak için Kubernetes Operatörünü kullanın.
 
-### For Logs
+### Günlükler İçin
 
-Support for third-party notification targets.
+Üçüncü taraf bildirim hedeflerini destekleyin.

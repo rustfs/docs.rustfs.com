@@ -1,99 +1,99 @@
-# Trademark Download and Usage
+# Marka Kullanım ve İndirme Politikası
 
-All images on this page are provided for your use only when representing RustFS in your product architecture diagrams or support lists. When using the images, please indicate that the image source is the official RustFS website. Images may be proportionally resized but cannot be modified in any other way.
+Bu sayfadaki tüm görseller yalnızca RustFS'i ürün mimari diyagramlarınızda veya destek listelerinizde temsil ederken kullanımınız içindir. Görselleri kullanırken lütfen kaynağın resmi RustFS web sitesi olduğunu belirtin. Görseller orantılı olarak yeniden boyutlandırılabilir ancak başka hiçbir şekilde değiştirilemez.
 
-RustFS® and the rustfs logo® are registered trademarks of Beijing Henghesa Technology Co., Ltd. in China. No one may use these images for any other purpose without written consent from RustFS.
+RustFS® ve rustfs logosu®, Çin'de Beijing Henghesa Technology Co., Ltd.'nin tescilli ticari markalarıdır. Hiç kimse bu görselleri RustFS'ten yazılı izin alınmadan başka amaçlarla kullanamaz.
 
-For any other matters not covered here, please contact us via email at <hello@rustfs.com>.
+Burada belirtilmeyen diğer konular için lütfen <hello@rustfs.com> adresinden bizimle iletişime geçin.
 
-## RustFS Logo
+## RustFS Logosu
 
-### White Background Version
+### Beyaz Arka Plan Versiyonu
 
-![RustFS Logo - White Background](./images/logo-white-bg.svg)
+![RustFS Logosu - Beyaz Arka Plan](./images/logo-white-bg.svg)
 
-### Different Background Versions
+### Farklı Arka Plan Versiyonları
 
-| Black Background | Gray Background | Pink Background |
-|------------------|-----------------|-----------------|
-| ![RustFS Logo - Black Background](./images/logo-black-bg.svg) | ![RustFS Logo - Gray Background](./images/logo-gray-bg.svg) | ![RustFS Logo - Pink Background](./images/logo-pink-bg.svg) |
+| Siyah Arka Plan | Gri Arka Plan | Pembe Arka Plan |
+|-----------------|---------------|-----------------|
+| ![RustFS Logosu - Siyah Arka Plan](./images/logo-black-bg.svg) | ![RustFS Logosu - Gri Arka Plan](./images/logo-gray-bg.svg) | ![RustFS Logosu - Pembe Arka Plan](./images/logo-pink-bg.svg) |
 
-### Download Links
+### İndirme Bağlantıları
 
-🔗 [Download All](https://rustfs.com/images/trademark/logo.zip)
+🔗 [Tümünü İndir](https://rustfs.com/images/trademark/logo.zip)
 
-## Trademark Usage Guidelines
+## Marka Kullanım Kılavuzu
 
-![Trademark Usage Guidelines](./images/trademark-guidelines.svg)
+![Marka Kullanım Kılavuzu](./images/trademark-guidelines.svg)
 
-## Trademark Usage Policy Document
+## Marka Kullanım Politikası Belgesi
 
-### Version Information
+### Sürüm Bilgisi
 
 v1.0
 
-### Introduction
+### Giriş
 
-RustFS is a high-performance distributed object storage system. It is software-defined, runs on industry-standard hardware, and is 100% commercially friendly open source under the Apache Version 2.0 open source license.
+RustFS, yüksek performanslı dağıtık bir nesne depolama sistemidir. Yazılım tanımlıdır, endüstri standardı donanımlarda çalışır ve Apache 2.0 açık kaynak lisansı altında %100 ticari dostu açık kaynak olarak sunulmaktadır.
 
-This document outlines the RustFS project's policy regarding the use of its trademarks. Any use of RustFS trademarks must comply with this policy. For the purposes of this policy, "trademarks" refers to RustFS's word marks, service marks, logos, trade dress, product names, services, business and company names.
+Bu belge, RustFS projesinin ticari marka kullanım politikasını özetlemektedir. RustFS ticari markalarının herhangi bir kullanımı bu politikaya uygun olmalıdır. Bu politika kapsamında "ticari markalar", RustFS'in kelime markalarını, hizmet markalarını, logolarını, ticari görünümünü, ürün adlarını, hizmetlerini, iş ve şirket adlarını ifade eder.
 
-RustFS trademarks include RustFS and its derivative sub-products.
+RustFS ticari markaları RustFS ve türev alt ürünlerini kapsar.
 
-As firm believers in the spirit of free software and respected community members, we want users, distributors, and other community members to be able to widely use and improve our code, which is distributed under open source licenses. While our code is open source, RustFS wants to ensure that its trademarks remain reliable indicators of the quality and source that users expect from us. Strict enforcement of our trademark rights is also very important to protect our users from those who use trademarks fraudulently. This means that while you have considerable freedom to redistribute and modify our software, you must comply with trademark law and this policy, even for open source software. Balancing these two competing interests is not easy. We rely on our users, customers, and community to help us achieve this balance.
+Özgür yazılım ruhuna ve saygın topluluk üyeliğine güçlü şekilde inanan bir proje olarak, kullanıcıların, dağıtıcıların ve diğer topluluk üyelerinin açık kaynak lisansları altında dağıtılan kodumuzu yaygın olarak kullanabilmesini ve iyileştirebilmesini istiyoruz. Kodumuz açık kaynak olsa da, RustFS ticari markalarının kullanıcıların bizden beklediği kalite ve kaynağın güvenilir göstergeleri olarak kalmasını sağlamak istiyoruz. Ticari marka haklarımızın sıkı şekilde korunması, kullanıcılarımızı markaları kötü niyetle kullananlardan korumak için de çok önemlidir. Bu, yazılımımızı yeniden dağıtma ve değiştirme konusunda önemli özgürlüklere sahip olsanız da, açık kaynak yazılım için bile ticari marka hukukuna ve bu politikaya uymanız gerektiği anlamına gelir. Bu iki çelişen çıkarı dengelemek kolay değildir. Bu dengeyi sağlamak için kullanıcılarımıza, müşterilerimize ve topluluğumuza güveniyoruz.
 
-### General Guidelines
+### Genel Kurallar
 
-The fundamental basis of RustFS's trademark policy is the general law of trademarks.
+RustFS'in ticari marka politikasının temel dayanağı genel ticari marka hukukudur.
 
-RustFS is designed to be used and extended, and RustFS recognizes that community members may need some way to identify RustFS products in some way, but you must ensure that consumers are not confused about whether they are official (meaning approved by RustFS).
+RustFS kullanılmak ve genişletilmek üzere tasarlanmıştır ve RustFS, topluluk üyelerinin RustFS ürünlerini bir şekilde tanımlamak için bir yola ihtiyaç duyabileceğini kabul eder, ancak tüketicilerin ürünlerin resmi (yani RustFS tarafından onaylanmış) olup olmadığı konusunda kafalarının karışmamasını sağlamalısınız.
 
-Your use of RustFS trademarks must always avoid confusion. People should always know who they are dealing with and where the software they download comes from. Websites and software not made or officially authorized by RustFS should not directly or indirectly suggest that they are made or officially authorized by RustFS.
+RustFS ticari markalarını kullanımınız her zaman kafa karışıklığından kaçınmalıdır. İnsanlar her zaman kiminle muhatap olduklarını ve indirdikleri yazılımın nereden geldiğini bilmelidir. RustFS tarafından yapılmamış veya resmi olarak yetkilendirilmemiş web siteleri ve yazılımlar, doğrudan veya dolaylı olarak RustFS tarafından yapıldığı veya resmi olarak yetkilendirildiği izlenimini vermemelidir.
 
-If you have any doubts or need clarification, please email <hello@rustfs.com>
+Herhangi bir şüpheniz veya açıklama ihtiyacınız varsa lütfen <hello@rustfs.com> adresine e-posta gönderin.
 
-### What You Can Do
+### Yapabilecekleriniz
 
-You may distribute the unmodified official binaries downloaded from <https://rustfs.com/download> to anyone in any way, subject to the relevant terms of applicable law and licenses, without obtaining any further permission from RustFS. However, you may not remove or alter any RustFS trademarks. In your websites or other materials, you may truthfully state that the software you provide is an unmodified version of RustFS, keeping in mind the general guidelines regarding the use of RustFS trademarks detailed in this policy document. We recommend that if you choose to provide website visitors with the opportunity to download RustFS binaries, you can help ensure faster and more reliable downloads by linking to our website for downloads.
+RustFS'ten herhangi bir ek izin almadan, ilgili yasa ve lisansların şartlarına tabi olarak, <https://rustfs.com/download> adresinden indirdiğiniz değiştirilmemiş resmi binary'leri herhangi bir şekilde herkese dağıtabilirsiniz. Ancak, herhangi bir RustFS ticari markasını kaldıramaz veya değiştiremezsiniz. Web sitelerinizde veya diğer materyallerinizde, sağladığınız yazılımın değiştirilmemiş bir RustFS sürümü olduğunu doğru şekilde belirtebilirsiniz, tabii bu politika belgesinde ayrıntılı olarak açıklanan RustFS ticari markalarının kullanımına ilişkin genel kuralları aklınızda tutarak. Web siteniz ziyaretçilerine RustFS binary'lerini indirme fırsatı sunmayı seçerseniz, daha hızlı ve güvenilir indirmeler sağlamak için indirme bağlantılarında web sitemize yönlendirme yapmanızı öneririz.
 
-You may use RustFS trademarks in marketing and other promotional materials. This includes indicating that an individual or organization is shipping or selling RustFS products. Of course, any use of RustFS trademarks must comply with the fundamental requirement that its use must not cause confusion.
+RustFS ticari markalarını pazarlama ve diğer tanıtım materyallerinde kullanabilirsiniz. Bu, bir bireyin veya kuruluşun RustFS ürünlerini sevk ettiğini veya sattığını belirtmeyi de içerir. Elbette, RustFS ticari markalarının herhangi bir kullanımı, kullanımın kafa karışıklığına yol açmaması temel gereğine uygun olmalıdır.
 
-**RustFS-related services:** If you provide RustFS-related services, you may use RustFS trademarks when describing and promoting your services, as long as you do not violate the general guidelines for using RustFS trademarks or do anything that might mislead customers into believing that RustFS has any direct relationship with your organization.
+**RustFS ile ilgili hizmetler:** RustFS ile ilgili hizmetler sağlıyorsanız, hizmetlerinizi tanımlarken ve tanıtırken RustFS ticari markalarını kullanabilirsiniz, ancak RustFS ticari markalarını kullanmaya ilişkin genel kuralları ihlal etmemeli veya müşterilerin RustFS'in kuruluşunuzla herhangi bir doğrudan ilişkisi olduğuna inanmasına neden olabilecek herhangi bir şey yapmamalısınız.
 
-**Logos and merchandise:** You may make T-shirts, desktop wallpapers, or baseball caps with RustFS logos, but only for yourself and your friends (i.e., people from whom you will not receive any valuable return).
+**Logolar ve promosyon ürünleri:** RustFS logolarıyla tişörtler, masaüstü duvar kağıtları veya beyzap şapkalar yapabilirsiniz, ancak yalnızca kendiniz ve arkadaşlarınız için (yani herhangi bir değerli karşılık almayacağınız kişiler için).
 
-You may use RustFS trademarks to truthfully reference and/or link to unmodified RustFS programs, products, services, and technologies.
+Değiştirilmemiş RustFS programlarına, ürünlerine, hizmetlerine ve teknolojilerine doğru şekilde atıfta bulunmak ve/veya bağlantı vermek için RustFS ticari markalarını kullanabilirsiniz.
 
-### What You Cannot Do
+### Yapamayacaklarınız
 
-1. You cannot put the RustFS logo on any product you commercially produce.
-2. You may not modify RustFS trademarks, abbreviate them, or combine them with any other symbols, words, or images, or incorporate them into slogans or catchphrases.
-3. You may not create modified versions of RustFS Logos for any purpose.
-4. You may not use RustFS trademarks in a way that falsely suggests that RustFS is associated with, sponsors, endorses, or approves your product or service.
-5. You may not use RustFS trademarks for any form of commercial use unless such use is limited to truthful and descriptive references.
-6. You cannot use RustFS trademarks in the names and titles of social media accounts.
+1. RustFS logosunu ticari olarak ürettiğiniz herhangi bir ürüne koyamazsınız.
+2. RustFS ticari markalarını değiştiremez, kısaltamaz veya başka semboller, kelimeler veya görsellerle birleştiremez veya sloganlara veya catchphrase'lere dahil edemezsiniz.
+3. Herhangi bir amaçla RustFS Logolarının değiştirilmiş versiyonlarını oluşturamazsınız.
+4. RustFS ticari markalarını, RustFS'in ürün veya hizmetinizle ilişkili olduğu, sponsor olduğu, onayladığı veya desteklediği yanılsamasını yaratacak şekilde kullanamazsınız.
+5. RustFS ticari markalarını, kullanım doğru ve tanımlayıcı referanslarla sınırlı olmadıkça, herhangi bir ticari kullanım için kullanamazsınız.
+6. RustFS ticari markalarını sosyal medya hesaplarının isim ve başlıklarında kullanamazsınız.
 
-You may modify RustFS software under open source license terms, but you may not redistribute your modifications under any RustFS trademarks. For example, your product or website should not say "Based on RustFS." Instead, to be completely accurate, you should describe it as "Based on RustFS technology" or "Contains RustFS source code." You must also change the name of the product and binaries to reduce the likelihood that users of the modified software will be misled into believing it is native RustFS or affiliated with us.
+RustFS yazılımını açık kaynak lisans koşulları altında değiştirebilirsiniz, ancak değişikliklerinizi herhangi bir RustFS ticari markası altında yeniden dağıtamazsınız. Örneğin, ürününüz veya web siteniz "RustFS Tabanlı" ifadesini kullanmamalıdır. Bunun yerine, tamamen doğru olması için "RustFS teknolojisi temellidir" veya "RustFS kaynak kodu içerir" şeklinde tanımlamalısınız. Ayrıca, değiştirilmiş yazılımın kullanıcılarının bunun orijinal RustFS olduğuna veya bizimle bağlantılı olduğuna inanma olasılığını azaltmak için ürünün ve binary'lerin adını değiştirmelisiniz.
 
-### What Permissions You Need
+### Hangi İzinlere İhtiyacınız Var
 
-If you plan to use RustFS trademarks as website icons, you need to request permission.
+RustFS ticari markalarını web sitesi ikonları olarak kullanmayı planlıyorsanız, izin almanız gerekir.
 
-**Domain names:** If you want to include all or part of RustFS trademarks in domain names, you must obtain written permission from RustFS. Almost any use of RustFS trademarks in domain names can confuse consumers and therefore violates the general requirement that the use of RustFS trademarks must not cause confusion.
+**Alan adları:** Alan adlarında RustFS ticari markalarının tamamını veya bir kısmını kullanmak istiyorsanız, RustFS'ten yazılı izin almalısınız. Alan adlarında RustFS ticari markalarının neredeyse her kullanımı tüketicilerin kafasını karıştırabilir ve bu nedenle RustFS ticari markalarının kullanımının kafa karışıklığına yol açmaması genel gereğini ihlal eder.
 
-### How to Use Our Trademarks
+### Markalarımızı Nasıl Kullanmalısınız
 
-1. **Correct form** - RustFS trademarks should be used in their accurate form - neither abbreviated nor combined with any other words.
-2. **Accompanying symbols** - The first or most prominent mention of RustFS trademarks should be accompanied by a symbol indicating whether the trademark is a registered trademark ("®") or an unregistered trademark ("™");
-3. **Attribution statement** - The following statement should appear somewhere near the use of RustFS trademarks (at least on the same page): "[Trademark] is a ["registered," if applicable] trademark of RustFS Corporation";
-4. **Distinguishable** - Trademarks should be distinguished from surrounding text, which can be distinguished by capitalization, italics, bold, or underlining.
+1. **Doğru form** - RustFS ticari markaları doğru formlarında kullanılmalıdır - ne kısaltılmış ne de başka kelimelerle birleştirilmiş olarak.
+2. **Eşlik eden semboller** - RustFS ticari markalarının ilk veya en belirgin kullanımı, markanın tescilli bir marka ("®") olup olmadığını gösteren bir sembolle birlikte olmalıdır.
+3. **Atıf açıklaması** - RustFS ticari markalarının kullanıldığı yerde (en azından aynı sayfada) şu ifade yer almalıdır: "[Marka], RustFS Corporation'ın [uygulanabilirse 'tescilli'] ticari markasıdır";
+4. **Ayırt edilebilir** - Ticari markalar çevreleyen metinden ayırt edilebilir olmalıdır, bu büyük harf kullanımı, italik, kalın veya altı çizili olarak yapılabilir.
 
-You may not alter any RustFS logos except to scale them. This means you may not add decorative elements, change colors, change proportions, distort it, add elements, or combine it with other logos. However, when the context requires the use of black and white graphics and the logo is colored, you may reproduce the logo in a way that produces a black and white image.
+RustFS logolarını boyutlandırma dışında hiçbir şekilde değiştiremezsiniz. Bu, dekoratif öğeler ekleyemeyeceğiniz, renkleri değiştiremeyeceğiniz, oranları değiştiremeyeceğiniz, bozamayacağınız, öğeler ekleyemeyeceğiniz veya başka logolarla birleştiremeyeceğiniz anlamına gelir. Ancak, bağlam siyah beyaz grafikler kullanmayı gerektiriyorsa ve logo renkliyse, logoyu siyah beyaz bir görüntü oluşturacak şekilde çoğaltabilirsiniz.
 
-### Questions
+### Sorular
 
-RustFS has tried to make its trademark policy as comprehensive as possible. If you are considering using RustFS trademarks not covered by this policy and are unsure whether such use violates RustFS guidelines, please contact us at <hello@rustfs.com>.
+RustFS, ticari marka politikasını mümkün olduğunca kapsamlı hale getirmeye çalışmıştır. Bu politika kapsamında ele alınmayan RustFS ticari markalarını kullanmayı düşünüyorsanız ve böyle bir kullanımın RustFS yönergelerini ihlal edip etmediğinden emin değilseniz, lütfen <hello@rustfs.com> adresinden bizimle iletişime geçin.
 
-If RustFS determines at any time in its sole discretion that your use of any of our trademarks violates this policy, we may revoke your license to use it, and you must immediately stop all use of that trademark.
+RustFS, tek taraflı takdir yetkisiyle, ticari markalarımızdan herhangi birinin kullanımınızın bu politikayı ihlal ettiğini herhangi bir zamanda belirlerse, kullanım lisansınızı iptal edebilir ve bu ticari markanın tüm kullanımlarını derhal durdurmalısınız.
 
-This policy may be updated from time to time. Please refer to this page for all updates.
+Bu politika zaman zaman güncellenebilir. Tüm güncellemeler için lütfen bu sayfaya bakın.

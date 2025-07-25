@@ -1,35 +1,25 @@
-# Small File Optimization
+# Küçük Dosya Optimizasyonu
+> Ultra Yüksek Performanslı İş Yükleri için Bellek Nesne Depolama Oluşturma
+IOPS ve aktarım performansı gerektiren iş yükleri için sunucu DRAM'ini kullanarak dağıtılmış paylaşılan bellek havuzları oluşturun.
 
-> Creating Memory Object Storage for Ultra-High Performance Workloads
+## Arka Plan
+RustFS küçük dosya optimizasyonu, IOPS ve aktarım performansı gerektiren iş yükleri için idealdir. Modern mimarilerde, bu giderek daha fazla AI/ML iş yüklerini ifade etmektedir. Önbellekleme olmadan, G/Ç GPU'lar için bir darboğaz haline gelebilir.
+Kurumsal önbellekleme kullanarak, eğitim, doğrulama ve test veri setlerini içeren kovaları bellekte tutmak için kullanılır.
 
-Leverage server DRAM to create distributed shared memory pools for workloads requiring massive IOPS and throughput performance.
+## Özellikler
+### 🗃️ Özel Nesne Önbelleği
+RustFS küçük dosya optimizasyonu, özellikle dosya nesnelerini önbelleklemek için tasarlanmıştır.
+Mevcut nesne önbelleğinde bir nesne bulunamazsa, nesneyi otomatik olarak alacak, gelecekteki istekler için önbelleğe alacak ve nesneyi çağrıyı yapan kişiye iade edecektir.
 
-## Background
+### 💾 Tutarlı Karmalaşma Algoritması
+RustFS'nin küçük dosya optimizasyonu içeriğe öncelik verir.
+Tutarlı karma algoritmaları kullanarak önbelleğe alınmış nesne verilerini önbellek düğümleri (akranlar olarak adlandırılır) kümesi boyunca dağıtır. Tutarlı karma, nesnelerin nesnenin anahtarı temelinde kolayca bulunmasını sağlar. Bu, nesnenin anahtar değeri ile önbelleğe alınmış nesneyi tutan düğüm arasında bire bir ilişki oluşturur. Ayrıca, düğümlerin aynı miktarda veriyi içermesini sağlayarak, bir düğümün aşırı yüklenmesini ve diğerlerinin boş kalmasını önler. Daha da önemlisi, düğümler eklenirse veya çıkarılırsa, sistemi hizalamak için yalnızca minimum düzeyde yeniden düzenleme gerektirir.
 
-RustFS small file optimization is ideal for workloads requiring IOPS and throughput performance. In modern architectures, this increasingly means AI/ML workloads. Without caching, I/O can become a bottleneck for GPUs.
+### 🧹 Yuvarlak Önbellek Bellek Yönetimi
+RustFS, bellek yönetimi için yuvarlak önbellek kullanır. RustFS, toplam önbellek boyutunu küçük dosya optimizasyon yapılandırmasında belirtilen sınırlar içinde tutmak için yuvarlak önbellek kullanır. Yeni nesneler eklenmesi önbellek boyutunun belirtilen sınırı aşmasına neden olursa, bir veya daha fazla nesne, nesnenin son isteğinin zaman damgasına göre kaldırılır.
 
-Using enterprise caching, buckets containing training, validation, and test datasets can be kept in memory to provide based
+### 🔄 Otomatik Sürüm Güncellemeleri
+Yeni nesne sürümlerini otomatik olarak günceller. Önbelleğe alınmış bir nesne güncellenmişse, RustFS nesne depolama alanı otomatik olarak önbelleği yeni nesne sürümüyle günceller.
 
-## Features
-
-### 🗃️ Dedicated Object Cache
-
-RustFS small file optimization is specifically designed for caching file objects.
-If an object is not found in the existing object cache, it will automatically retrieve the object, cache it for future requests, and return the object to the caller.
-
-### 💾 Consistent Hashing Algorithm
-
-RustFS's small file optimization prioritizes content.
-Uses consistent hashing algorithms to distribute cached object data across a cluster of cache nodes (called peers). Consistent hashing ensures objects can be easily found based on the object's key. This creates a one-to-one relationship between the object's key value and the node holding the cached object. It also ensures nodes contain the same amount of data, preventing one node from being overloaded while others remain idle. More importantly, it distributes objects in such a way that if nodes are added or removed, only minimal reshuffling is needed to align the system.
-
-### 🧹 Rolling Cache Memory Management
-
-RustFS uses rolling cache for memory management. RustFS uses rolling cache to keep the total cache size within the limits specified in the small file optimization configuration. If adding new objects would cause the cache size to exceed the specified limit, one or more objects are removed based on timestamps indicating when the object was last requested.
-
-### 🔄 Automatic Version Updates
-
-Automatically updates new object versions. If a cached object has been updated, RustFS object storage automatically updates the cache with the new object version.
-
-### 🧩 Seamless API Integration
-
-RustFS small file optimization is a behind-the-scenes extension of RustFS. Since small file optimization is an extension of RustFS, developers don't need to learn new APIs. Developers use the same APIs as before. If the requested object is in cache, RustFS will automatically fetch it from cache. If an object should be cached and is being requested for the first time, RustFS will fetch it from object storage, return it to the caller, and place it in cache for subsequent requests.
+### 🧩 Sorunsuz API Entegrasyonu
+RustFS küçük dosya optimizasyonu, RustFS'nin arka planda çalışan bir uzantısıdır. Küçük dosya optimizasyonu RustFS'nin bir uzantısı olduğu için, geliştiricilerin yeni API'ler öğrenmesine gerek yoktur. Geliştiriciler, öncekiyle aynı API'leri kullanmaya devam eder. İstenen nesne önbellekteyse, RustFS otomatik olarak önbellekten alacaktır. Bir nesne önbelleğe alınmalı ve ilk kez isteniyorsa, RustFS nesneyi nesne depolama alanından alacak, çağrıyı yapan kişiye iade edecek ve sonraki istekler için önbelleğe alacaktır.

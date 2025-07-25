@@ -1,59 +1,59 @@
-# HDFS Integration
+# HDFS Entegrasyonu
 
-RustFS provides seamless integration with Hadoop Distributed File System (HDFS), enabling high-performance big data analytics and processing with object storage benefits.
+RustFS, Hadoop Dağıtık Dosya Sistemi (HDFS) ile sorunsuz entegrasyon sağlayarak, nesne depolama avantajlarıyla yüksek performanslı büyük veri analitiği ve işleme imkanı sunar.
 
-## Overview
+## Genel Bakış
 
-RustFS HDFS integration offers:
+RustFS HDFS entegrasyonu şunları sunar:
 
-- **HDFS Compatibility**: Full HDFS API compatibility for existing applications
-- **Object Storage Benefits**: Combine HDFS interface with object storage advantages
-- **Elastic Scaling**: Scale storage and compute independently
-- **Cost Optimization**: Reduce storage costs while maintaining performance
+- **HDFS Uyumluluğu**: Mevcut uygulamalar için tam HDFS API uyumluluğu
+- **Nesne Depolama Avantajları**: HDFS arayüzünü nesne depolama avantajlarıyla birleştirme
+- **Esnek Ölçeklendirme**: Depolama ve hesaplama kaynaklarını bağımsız olarak ölçeklendirme
+- **Maliyet Optimizasyonu**: Performansı korurken depolama maliyetlerini azaltma
 
-## Key Advantages
+## Ana Avantajlar
 
-### HDFS API Compatibility
+### HDFS API Uyumluluğu
 
-#### Native Integration
+#### Yerel Entegrasyon
 
-- **HDFS Protocol**: Full HDFS protocol support
-- **Existing Applications**: Run existing Hadoop applications without modification
-- **Ecosystem Support**: Compatible with entire Hadoop ecosystem
-- **Seamless Migration**: Easy migration from traditional HDFS
+- **HDFS Protokolü**: Tam HDFS protokol desteği
+- **Mevcut Uygulamalar**: Mevcut Hadoop uygulamalarını değiştirmeden çalıştırma
+- **Ekosistem Desteği**: Tüm Hadoop ekosistemiyle uyumluluk
+- **Sorunsuz Geçiş**: Geleneksel HDFS'den kolay geçiş
 
-### Object Storage Benefits
+### Nesne Depolama Avantajları
 
-#### Modern Architecture
+#### Modern Mimari
 
-- **Decoupled Storage**: Separate storage from compute
-- **Elastic Scaling**: Independent scaling of storage and compute
-- **Multi-Protocol Access**: Access data via HDFS, S3, and NFS
-- **Cloud Integration**: Seamless cloud and hybrid deployment
+- **Bağımsız Depolama**: Depolamayı hesaplamadan ayırma
+- **Esnek Ölçeklendirme**: Depolama ve hesaplamayı bağımsız olarak ölçeklendirme
+- **Çoklu Protokol Erişimi**: HDFS, S3 ve NFS üzerinden veri erişimi
+- **Bulut Entegrasyonu**: Sorunsuz bulut ve hibrit dağıtım
 
-### Performance Optimization
+### Performans Optimizasyonu
 
-#### High-Throughput Operations
+#### Yüksek Verimli İşlemler
 
-- **Parallel Processing**: Massive parallel data processing
-- **Optimized I/O**: Optimized for big data workloads
-- **Intelligent Caching**: Smart caching for frequently accessed data
-- **Network Optimization**: Optimized network protocols
+- **Paralel İşleme**: Kütle paralel veri işleme
+- **Optimize Edilmiş G/Ç**: Büyük veri iş yükleri için optimize edilmiştir
+- **Akıllı Önbellekleme**: Sık erişilen veriler için akıllı önbellekleme
+- **Ağ Optimizasyonu**: Optimize edilmiş ağ protokolleri
 
-### Cost Efficiency
+### Maliyet Verimliliği
 
-#### Storage Cost Reduction
+#### Depolama Maliyetinin Azaltılması
 
-- **Commodity Hardware**: Use commodity hardware instead of specialized storage
-- **Storage Tiering**: Automatic data tiering for cost optimization
-- **Compression**: Built-in compression to reduce storage footprint
-- **Deduplication**: Eliminate duplicate data across datasets
+- **Standart Donanım**: Özelleştirilmiş depolama yerine standart donanım kullanma
+- **Depolama Katmanlandırma**: Maliyet optimizasyonu için otomatik veri katmanlandırma
+- **Sıkıştırma**: Depolama ayak izini azaltmak için yerleşik sıkıştırma
+- **Yinelenen Veri Ortadan Kaldırma**: Veri kümeleri arasında yinelenen verileri ortadan kaldırma
 
-## Architecture
+## Mimari
 
-### Traditional HDFS vs RustFS
+### Geleneksel HDFS vs RustFS
 
-#### Traditional HDFS Architecture
+#### Geleneksel HDFS Mimarisi
 
 ```
 ┌─────────────────┐    ┌─────────────────┐
@@ -66,7 +66,7 @@ RustFS HDFS integration offers:
 └─────────────────┘    └─────────────────┘
 ```
 
-#### RustFS HDFS Architecture
+#### RustFS HDFS Mimarisi
 
 ```
 ┌─────────────────┐    ┌─────────────────┐
@@ -79,9 +79,9 @@ RustFS HDFS integration offers:
 └─────────────────┘    └─────────────────┘
 ```
 
-### Deployment Models
+### Dağıtım Modelleri
 
-#### Hybrid Deployment
+#### Hibrit Dağıtım
 
 ```
 ┌─────────────────┐    ┌─────────────────┐
@@ -95,7 +95,7 @@ RustFS HDFS integration offers:
 └─────────────────┘    └─────────────────┘
 ```
 
-#### Cloud-Native Deployment
+#### Bulut Yerel Dağıtım
 
 ```
 ┌─────────────────┐    ┌─────────────────┐
@@ -109,62 +109,62 @@ RustFS HDFS integration offers:
 └─────────────────┘    └─────────────────┘
 ```
 
-## Integration Features
+## Entegrasyon Özellikleri
 
-### HDFS Protocol Support
+### HDFS Protokol Desteği
 
-#### Core HDFS Operations
+#### Çekirdek HDFS İşlemleri
 
-- **File Operations**: Create, read, write, delete files
-- **Directory Operations**: Create, list, delete directories
-- **Metadata Operations**: Get file status, permissions, timestamps
-- **Block Operations**: Block-level read and write operations
+- **Dosya İşlemleri**: Dosya oluşturma, okuma, yazma, silme
+- **Dizin İşlemleri**: Dizin oluşturma, listeleme, silme
+- **Meta Veri İşlemleri**: Dosya durumu, izinler, zaman damgaları alma
+- **Blok İşlemleri**: Blok düzeyinde okuma ve yazma işlemleri
 
-#### Advanced Features
+#### Gelişmiş Özellikler
 
-- **Append Operations**: Append data to existing files
-- **Truncate Operations**: Truncate files to specified length
-- **Snapshot Support**: Create and manage file system snapshots
-- **Extended Attributes**: Support for extended file attributes
+- **Ekleme İşlemleri**: Mevcut dosyalara veri ekleme
+- **Kesme İşlemleri**: Dosyaları belirtilen uzunluğa kesme
+- **Anlık Görüntü Desteği**: Dosya sistemi anlık görüntülerini oluşturma ve yönetme
+- **Genişletilmiş Özellikler**: Genişletilmiş dosya özellikleri desteği
 
-### Hadoop Ecosystem Integration
+### Hadoop Ekosistemi Entegrasyonu
 
 #### Apache Spark
 
-- **DataFrames**: Read and write DataFrames to RustFS
-- **RDDs**: Support for Resilient Distributed Datasets
-- **Streaming**: Spark Streaming integration
-- **SQL**: Spark SQL queries on RustFS data
+- **DataFrames**: RustFS'den DataFrames okuma ve yazma
+- **RDD'ler**: Dayanıklı Dağıtık Veri Kümeleri desteği
+- **Akış**: Spark Akış entegrasyonu
+- **SQL**: RustFS verileri üzerinde Spark SQL sorguları
 
 #### Apache Hive
 
-- **External Tables**: Create external tables on RustFS
-- **Partitioning**: Support for partitioned tables
-- **Data Formats**: Support for Parquet, ORC, Avro formats
-- **Metastore**: Hive Metastore integration
+- **Harici Tablolar**: RustFS üzerinde harici tablolar oluşturma
+- **Bölümleme**: Bölümlendirilmiş tablolar desteği
+- **Veri Formatları**: Parquet, ORC, Avro formatları desteği
+- **Meta Depo**: Hive Meta Depo entegrasyonu
 
 #### Apache HBase
 
-- **HFiles**: Store HBase HFiles on RustFS
-- **WAL**: Write-Ahead Log storage
-- **Snapshots**: HBase snapshot storage
-- **Backup**: HBase backup and recovery
+- **HFiles**: HBase HFiles'larını RustFS'de depolama
+- **WAL**: Write-Ahead Log depolama
+- **Anlık Görüntüler**: HBase anlık görüntü depolama
+- **Yedekleme**: HBase yedekleme ve kurtarma
 
 #### Apache Kafka
 
-- **Log Segments**: Store Kafka log segments
-- **Tiered Storage**: Kafka tiered storage support
-- **Backup**: Kafka topic backup and recovery
-- **Analytics**: Stream processing analytics
+- **Log Segmentleri**: Kafka log segmentlerini depolama
+- **Katmanlı Depolama**: Kafka katmanlı depolama desteği
+- **Yedekleme**: Kafka konu yedekleme ve kurtarma
+- **Analitik**: Akış işleme analitiği
 
-## Configuration and Setup
+## Yapılandırma ve Kurulum
 
-### HDFS Gateway Configuration
+### HDFS Gateway Yapılandırması
 
-#### Gateway Deployment
+#### Gateway Dağıtımı
 
 ```yaml
-# RustFS HDFS Gateway configuration
+# RustFS HDFS Gateway yapılandırması
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -192,7 +192,7 @@ spec:
           value: "8020"
 ```
 
-#### Client Configuration
+#### İstemci Yapılandırması
 
 ```xml
 <!-- core-site.xml -->
@@ -208,9 +208,9 @@ spec:
 </configuration>
 ```
 
-### Performance Tuning
+### Performans Ayarlama
 
-#### Block Size Configuration
+#### Blok Boyutu Yapılandırması
 
 ```xml
 <!-- hdfs-site.xml -->
@@ -230,10 +230,10 @@ spec:
 </configuration>
 ```
 
-#### Network Optimization
+#### Ağ Optimizasyonu
 
 ```xml
-<!-- Configuration for network optimization -->
+<!-- Ağ optimizasyonu için yapılandırma -->
 <configuration>
   <property>
     <name>ipc.client.connect.max.retries</name>
@@ -250,33 +250,30 @@ spec:
 </configuration>
 ```
 
-## Use Cases
+## Kullanım Örnekleri
 
-### Big Data Analytics
+### Büyük Veri Analitiği
 
-#### Apache Spark Analytics
+#### Apache Spark Analitiği
 
 ```python
-# Spark DataFrame operations on RustFS
+# RustFS üzerinde Spark DataFrame işlemleri
 from pyspark.sql import SparkSession
-
 spark = SparkSession.builder \
     .appName("RustFS Analytics") \
     .config("spark.hadoop.fs.defaultFS", "hdfs://rustfs-gateway:8020") \
     .getOrCreate()
-
-# Read data from RustFS
+# RustFS'den veri oku
 df = spark.read.parquet("hdfs://rustfs-gateway:8020/data/sales")
-
-# Perform analytics
+# Analitik işlemler gerçekleştir
 result = df.groupBy("region").sum("revenue")
 result.write.parquet("hdfs://rustfs-gateway:8020/output/regional_sales")
 ```
 
-#### Hive Data Warehouse
+#### Hive Veri Ambarı
 
 ```sql
--- Create external table on RustFS
+-- RustFS üzerinde harici tablo oluştur
 CREATE TABLE sales_data (
     transaction_id STRING,
     customer_id STRING,
@@ -288,74 +285,66 @@ CREATE TABLE sales_data (
 STORED AS PARQUET
 LOCATION 'hdfs://rustfs-gateway:8020/warehouse/sales_data'
 PARTITIONED BY (year INT, month INT);
-
--- Query data
+-- Veri sorgula
 SELECT region, SUM(price * quantity) as total_revenue
 FROM sales_data
 WHERE year = 2023
 GROUP BY region;
 ```
 
-### Machine Learning
+### Makine Öğrenimi
 
-#### MLflow Integration
+#### MLflow Entegrasyonu
 
 ```python
-# MLflow with RustFS storage
+# RustFS depolama ile MLflow
 import mlflow
 import mlflow.sklearn
 from sklearn.ensemble import RandomForestClassifier
-
-# Set tracking URI to RustFS
+# İzleme URI'sini RustFS olarak ayarla
 mlflow.set_tracking_uri("hdfs://rustfs-gateway:8020/mlflow")
-
 with mlflow.start_run():
-    # Train model
+    # Modeli eğit
     model = RandomForestClassifier()
     model.fit(X_train, y_train)
-
-    # Log model to RustFS
+    # Modeli RustFS'ye kaydet
     mlflow.sklearn.log_model(model, "random_forest_model")
-
-    # Log metrics
+    # Metrikleri kaydet
     mlflow.log_metric("accuracy", accuracy_score(y_test, y_pred))
 ```
 
-#### Jupyter Notebooks
+#### Jupyter Notebook'ları
 
 ```python
-# Access RustFS data from Jupyter
+# Jupyter'dan RustFS verilerine eriş
 import pandas as pd
 import pyarrow.parquet as pq
-
-# Read data from RustFS via HDFS
+# HDFS üzerinden RustFS'den veri oku
 fs = pyarrow.hdfs.connect(host='rustfs-gateway', port=8020)
 table = pq.read_table('/data/customer_data.parquet', filesystem=fs)
 df = table.to_pandas()
-
-# Perform analysis
+# Analiz gerçekleştir
 correlation_matrix = df.corr()
 ```
 
-### Data Lake Architecture
+### Veri Gölü Mimarisi
 
-#### Multi-Format Support
+#### Çoklu Format Desteği
 
 ```bash
-# Store different data formats
+# Farklı veri formatlarını depola
 hdfs dfs -put data.csv hdfs://rustfs-gateway:8020/datalake/raw/csv/
 hdfs dfs -put data.parquet hdfs://rustfs-gateway:8020/datalake/processed/parquet/
 hdfs dfs -put data.json hdfs://rustfs-gateway:8020/datalake/raw/json/
 ```
 
-#### Data Pipeline
+#### Veri Boru Hattı
 
 ```python
-# Data pipeline using Apache Airflow
+# Apache Airflow kullanarak veri boru hattı
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from datetime import datetime, timedelta
-
 dag = DAG(
     'data_pipeline',
     default_args={
@@ -366,43 +355,39 @@ dag = DAG(
     },
     schedule_interval=timedelta(days=1),
 )
-
-# Extract data
+# Veri çıkart
 extract_task = BashOperator(
     task_id='extract_data',
     bash_command='python extract_data.py hdfs://rustfs-gateway:8020/raw/',
     dag=dag,
 )
-
-# Transform data
+# Veri dönüştür
 transform_task = BashOperator(
     task_id='transform_data',
     bash_command='spark-submit transform_data.py',
     dag=dag,
 )
-
-# Load data
+# Veri yükle
 load_task = BashOperator(
     task_id='load_data',
     bash_command='python load_data.py hdfs://rustfs-gateway:8020/processed/',
     dag=dag,
 )
-
 extract_task >> transform_task >> load_task
 ```
 
-## Performance Optimization
+## Performans Optimizasyonu
 
-### Caching Strategies
+### Önbellekleme Stratejileri
 
-#### Intelligent Caching
+#### Akıllı Önbellekleme
 
-- **Hot Data Caching**: Cache frequently accessed data
-- **Prefetching**: Predictive data prefetching
-- **Cache Eviction**: Intelligent cache eviction policies
-- **Multi-Level Caching**: Memory and SSD caching tiers
+- **Sık Kullanılan Veri Önbellekleme**: Sık erişilen verileri önbellekleme
+- **Önceden Getirme**: Tahmine dayalı veri önceden getirme
+- **Önbellek Temizleme**: Akıllı önbellek temizleme politikaları
+- **Çok Seviyeli Önbellekleme**: Bellek ve SSD önbellekleme katmanları
 
-#### Cache Configuration
+#### Önbellek Yapılandırması
 
 ```xml
 <configuration>
@@ -417,16 +402,16 @@ extract_task >> transform_task >> load_task
 </configuration>
 ```
 
-### Parallel Processing
+### Paralel İşleme
 
-#### Concurrent Operations
+#### Eşzamanlı İşlemler
 
-- **Parallel Reads**: Multiple concurrent read operations
-- **Parallel Writes**: Concurrent write operations
-- **Load Balancing**: Distribute load across nodes
-- **Connection Pooling**: Optimize connection management
+- **Paralel Okumalar**: Çoklu eşzamanlı okuma işlemleri
+- **Paralel Yazmalar**: Eşzamanlı yazma işlemleri
+- **Yük Dengeleme**: Yükü düğümler arasında dağıtma
+- **Bağlantı Havuzlama**: Bağlantı yönetimini optimize etme
 
-#### Tuning Parameters
+#### Ayarlama Parametreleri
 
 ```xml
 <configuration>
@@ -441,60 +426,56 @@ extract_task >> transform_task >> load_task
 </configuration>
 ```
 
-## Monitoring and Management
+## İzleme ve Yönetim
 
-### Metrics and Monitoring
+### Metrikler ve İzleme
 
-#### Key Metrics
+#### Ana Metrikler
 
-- **Throughput**: Read and write throughput
-- **Latency**: Operation latency metrics
-- **Error Rates**: Error and retry rates
-- **Resource Utilization**: CPU, memory, and network usage
+- **Veri Aktarım Hızı**: Okuma ve yazma veri aktarım hızı
+- **Gecikme Süresi**: İşlem gecikme süresi metrikleri
+- **Hata Oranları**: Hata ve yeniden deneme oranları
+- **Kaynak Kullanımı**: CPU, bellek ve ağ kullanımı
 
-#### Monitoring Tools
+#### İzleme Araçları
 
 ```bash
-# HDFS filesystem check
+# HDFS dosya sistemi kontrolü
 hdfs fsck hdfs://rustfs-gateway:8020/ -files -blocks
-
-# Filesystem statistics
+# Dosya sistemi istatistikleri
 hdfs dfsadmin -report
-
-# Performance metrics
+# Performans metrikleri
 hdfs dfsadmin -printTopology
 ```
 
-### Health Monitoring
+### Sağlık İzleme
 
-#### Gateway Health
+#### Gateway Sağlığı
 
 ```bash
-# Check gateway health
+# Gateway sağlığını kontrol et
 curl http://rustfs-hdfs-gateway:9870/jmx
-
-# Monitor gateway logs
+# Gateway günlüklerini izle
 kubectl logs -f deployment/rustfs-hdfs-gateway
 ```
 
-#### Storage Health
+#### Depolama Sağlığı
 
 ```bash
-# Check RustFS cluster health
+# RustFS küme sağlığını kontrol et
 rustfs admin cluster status
-
-# Monitor storage metrics
+# Depolama metriklerini izle
 rustfs admin metrics
 ```
 
-## Security
+## Güvenlik
 
-### Authentication and Authorization
+### Kimlik Doğrulama ve Yetkilendirme
 
-#### Kerberos Integration
+#### Kerberos Entegrasyonu
 
 ```xml
-<!-- core-site.xml for Kerberos -->
+<!-- Kerberos için core-site.xml -->
 <configuration>
   <property>
     <name>hadoop.security.authentication</name>
@@ -507,27 +488,26 @@ rustfs admin metrics
 </configuration>
 ```
 
-#### Access Control Lists
+#### Erişim Kontrol Listeleri
 
 ```bash
-# Set file permissions
+# Dosya izinlerini ayarla
 hdfs dfs -chmod 755 hdfs://rustfs-gateway:8020/data/
 hdfs dfs -chown user:group hdfs://rustfs-gateway:8020/data/
-
-# Set ACLs
+# ACL'leri ayarla
 hdfs dfs -setfacl -m user:alice:rwx hdfs://rustfs-gateway:8020/data/
 ```
 
-### Data Encryption
+### Veri Şifreleme
 
-#### Encryption at Rest
+#### Dinlenme Halinde Şifreleme
 
-- **Transparent Encryption**: Transparent data encryption
-- **Key Management**: Centralized key management
-- **Zone-based Encryption**: Encryption zones for different data types
-- **Hardware Acceleration**: Hardware-accelerated encryption
+- **Şeffaf Şifreleme**: Şeffaf veri şifreleme
+- **Anahtar Yönetimi**: Merkezi anahtar yönetimi
+- **Bölge Bazlı Şifreleme**: Farklı veri türleri için şifreleme bölgeleri
+- **Donanım Hızlandırma**: Donanım hızlandırmalı şifreleme
 
-#### Encryption in Transit
+#### Aktarım Halinde Şifreleme
 
 ```xml
 <configuration>
@@ -542,98 +522,97 @@ hdfs dfs -setfacl -m user:alice:rwx hdfs://rustfs-gateway:8020/data/
 </configuration>
 ```
 
-## Migration and Best Practices
+## Geçiş ve En İyi Uygulamalar
 
-### Migration from Traditional HDFS
+### Geleneksel HDFS'den Geçiş
 
-#### Assessment Phase
+#### Değerlendirme Aşaması
 
-1. **Data Inventory**: Catalog existing HDFS data
-2. **Application Analysis**: Analyze application dependencies
-3. **Performance Requirements**: Understand performance needs
-4. **Migration Planning**: Plan migration strategy and timeline
+1. **Veri Envanteri**: Mevcut HDFS verilerini kataloglama
+2. **Uygulama Analizi**: Uygulama bağımlılıklarını analiz etme
+3. **Performans Gereksinimleri**: Performans ihtiyaçlarını anlama
+4. **Geçiş Planlaması**: Geçiş stratejisi ve zaman çizelgesi planlama
 
-#### Migration Process
+#### Geçiş Süreci
 
 ```bash
-# Migrate data using DistCp
+# DistCp kullanarak veri geçişi
 hadoop distcp hdfs://old-cluster:8020/data hdfs://rustfs-gateway:8020/data
-
-# Verify data integrity
+# Veri bütünlüğünü doğrula
 hdfs dfs -checksum hdfs://old-cluster:8020/data/file.txt
 hdfs dfs -checksum hdfs://rustfs-gateway:8020/data/file.txt
 ```
 
-### Best Practices
+### En İyi Uygulamalar
 
-#### Performance Best Practices
+#### Performans En İyi Uygulamaları
 
-1. **Block Size**: Use appropriate block sizes for workloads
-2. **Parallelism**: Optimize parallel operations
-3. **Caching**: Implement intelligent caching
-4. **Network**: Optimize network configuration
+1. **Blok Boyutu**: İş yükleri için uygun blok boyutları kullanma
+2. **Paralellik**: Paralel işlemleri optimize etme
+3. **Önbellekleme**: Akıllı önbellekleme uygulama
+4. **Ağ**: Ağ yapılandırmasını optimize etme
 
-#### Security Best Practices
+#### Güvenlik En İyi Uygulamaları
 
-1. **Authentication**: Enable strong authentication
-2. **Authorization**: Implement fine-grained access control
-3. **Encryption**: Enable encryption at rest and in transit
-4. **Auditing**: Enable comprehensive audit logging
+1. **Kimlik Doğrulama**: Güçlü kimlik doğrulama etkinleştirme
+2. **Yetkilendirme**: İnce taneli erişim kontrolü uygulama
+3. **Şifreleme**: Dinlenme halinde ve aktarım halinde şifreleme etkinleştirme
+4. **Denetim**: Kapsamlı denetim günlükleme etkinleştirme
 
-#### Operational Best Practices
+#### Operasyonel En İyi Uygulamalar
 
-1. **Monitoring**: Implement comprehensive monitoring
-2. **Backup**: Regular backup and recovery testing
-3. **Capacity Planning**: Plan for future growth
-4. **Documentation**: Maintain operational documentation
+1. **İzleme**: Kapsamlı izleme uygulama
+2. **Yedekleme**: Düzenli yedekleme ve kurtarma testi
+3. **Kapasite Planlama**: Gelecekteki büyüme için planlama
+4. **Dokümantasyon**: Operasyonel dokümantasyonu sürdürme
 
-## Troubleshooting
+## Sorun Giderme
 
-### Common Issues
+### Yaygın Sorunlar
 
-#### Connectivity Issues
+#### Bağlantı Sorunları
 
-- **Network Connectivity**: Verify network connectivity
-- **Port Configuration**: Check port configuration
-- **Firewall Rules**: Verify firewall rules
-- **DNS Resolution**: Check DNS resolution
+- **Ağ Bağlantısı**: Ağ bağlantısını doğrula
+- **Port Yapılandırması**: Port yapılandırmasını kontrol et
+- **Güvenlik Duvarı Kuralları**: Güvenlik duvarı kurallarını doğrula
+- **DNS Çözümlemesi**: DNS çözümlemesini kontrol et
 
-#### Performance Issues
+#### Performans Sorunları
 
-- **Slow Operations**: Check network and storage performance
-- **High Latency**: Optimize caching and prefetching
-- **Resource Contention**: Monitor resource utilization
-- **Configuration**: Review configuration parameters
+- **Yavaş İşlemler**: Ağ ve depolama performansını kontrol et
+- **Yüksek Gecikme Süresi**: Önbellekleme ve önceden getirmeyi optimize et
+- **Kaynak Çakışması**: Kaynak kullanımını izle
+- **Yapılandırma**: Yapılandırma parametrelerini gözden geçir
 
-#### Data Issues
+#### Veri Sorunları
 
-- **Data Corruption**: Verify data integrity
-- **Missing Files**: Check file system consistency
-- **Permission Errors**: Verify access permissions
-- **Quota Issues**: Check storage quotas
+- **Veri Bozulması**: Veri bütünlüğünü doğrula
+- **Eksik Dosyalar**: Dosya sistemi tutarlılığını kontrol et
+- **İzin Hataları**: Erişim izinlerini doğrula
+- **Kota Sorunları**: Depolama kotalarını kontrol et
 
-## Getting Started
+## Başlarken
 
-### Prerequisites
+### Ön Koşullar
 
-1. **Hadoop Environment**: Hadoop 2.7+ or 3.x
-2. **RustFS Cluster**: Properly configured RustFS cluster
-3. **Network Connectivity**: Network connectivity between Hadoop and RustFS
-4. **Java Runtime**: Java 8 or later
+1. **Hadoop Ortamı**: Hadoop 2.7+ veya 3.x
+2. **RustFS Kümesi**: Uygun şekilde yapılandırılmış RustFS kümesi
+3. **Ağ Bağlantısı**: Hadoop ve RustFS arasında ağ bağlantısı
+4. **Java Çalışma Zamanı**: Java 8 veya daha yeni
 
-### Quick Start Guide
+### Hızlı Başlangıç Kılavuzu
 
-1. **Deploy HDFS Gateway**: Deploy RustFS HDFS Gateway
-2. **Configure Hadoop**: Configure Hadoop to use RustFS as default filesystem
-3. **Test Connectivity**: Test basic HDFS operations
-4. **Migrate Data**: Migrate existing data to RustFS
-5. **Run Applications**: Run Hadoop applications on RustFS
-6. **Monitor Performance**: Set up monitoring and alerting
+1. **HDFS Gateway Dağıt**: RustFS HDFS Gateway'i dağıt
+2. **Hadoop'u Yapılandır**: RustFS'i varsayılan dosya sistemi olarak kullanacak şekilde Hadoop'u yapılandır
+3. **Bağlantıyı Test Et**: Temel HDFS işlemlerini test et
+4. **Verileri Geçir**: Mevcut verileri RustFS'e geçir
+5. **Uygulamaları Çalıştır**: RustFS üzerinde Hadoop uygulamaları çalıştır
+6. **Performansı İzle**: İzleme ve uyarı sistemini kur
 
-### Next Steps
+### Sonraki Adımlar
 
-- **Optimize Performance**: Tune configuration for optimal performance
-- **Implement Security**: Configure authentication and encryption
-- **Set Up Monitoring**: Implement comprehensive monitoring
-- **Plan Scaling**: Plan for future scaling requirements
-- **Train Team**: Train team on RustFS HDFS integration
+- **Performansı Optimize Et**: Optimal performans için yapılandırmayı ayarla
+- **Güvenliği Uygula**: Kimlik doğrulama ve şifrelemeyi yapılandır
+- **İzlemeyi Kur**: Kapsamlı izleme uygula
+- **Ölçeklendirmeyi Planla**: Gelecekteki ölçeklendirme gereksinimlerini planla
+- **Ekip Eğitimi**: Ekibi RustFS HDFS entegrasyonu konusunda eğit

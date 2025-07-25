@@ -1,138 +1,138 @@
-# Distributed Deployment
+# Dağıtık Dağıtım
 
-RustFS provides enterprise-grade distributed object storage capabilities, supporting multi-node clusters for high availability and scalability.
+RustFS, yüksek kullanılabilirlik ve ölçeklenebilirlik için çok düğümlü kümeleri destekleyerek, kurumsal sınıf dağıtık nesne depolama yetenekleri sunar.
 
-## Architecture Overview
+## Mimari Genel Bakış
 
-![Distributed Architecture](./images/s2-1.png)
+![Dağıtık Mimari](./images/s2-1.png)
 
-RustFS uses a distributed architecture without single points of failure. Each node in the cluster can serve both read and write requests, providing:
+RustFS, tek arıza noktaları olmayan bir dağıtık mimari kullanır. Kümedeki her düğüm, hem okuma hem de yazma isteklerini karşılayabilir ve şunları sağlar:
 
-- **High Availability**: Automatic failover and recovery
-- **Linear Scalability**: Add nodes to increase capacity and performance
-- **Data Durability**: Configurable erasure coding for data protection
-- **Load Distribution**: Automatic load balancing across nodes
+- **Yüksek Kullanılabilirlik**: Otomatik devralma ve kurtarma
+- **Doğrusal Ölçeklenebilirlik**: Kapasite ve performansı artırmak için düğüm ekleme
+- **Veri Dayanıklılığı**: Veri koruması için yapılandırılabilir silme kodlaması
+- **Yük Dağıtımı**: Düğümler arasında otomatik yük dengeleme
 
-## Deployment Modes
+## Dağıtım Modları
 
-### Multi-Node Multi-Drive (MNMD)
+### Çok Düğümlü Çok Sürücü (MNMD)
 
-The recommended production deployment mode:
+Önerilen üretim dağıtım modu:
 
 ```bash
-# 4 nodes, 4 drives each (16 drives total)
+# 4 düğüm, her biri 4 sürücü (toplam 16 sürücü)
 rustfs server http://node{1...4}.example.com:9000/data{1...4} \
 ```
 
-**Benefits:**
+**Faydaları:**
 
-- Maximum fault tolerance
-- Best performance scaling
-- Optimal for large-scale deployments
+- Maksimum hata toleransı
+- En iyi performans ölçeklenebilirliği
+- Büyük ölçekli dağıtımlar için optimal
 
-### Multi-Node Single-Drive (MNSD)
+### Çok Düğümlü Tek Sürücü (MNSD)
 
-Suitable for environments with external storage:
+Harici depolamaya sahip ortamlar için uygun:
 
 ```bash
-# 4 nodes, 1 drive each
+# 4 düğüm, her biri 1 sürücü
 rustfs server http://node{1...4}.example.com:9000/data \
 ```
 
-**Use Cases:**
+**Kullanım Durumları:**
 
-- Cloud deployments with attached storage
-- Containerized environments
-- Testing and development
+- Bağlı depolama ile bulut dağıtımları
+- Konteynerleştirilmiş ortamlar
+- Test ve geliştirme
 
-## Cluster Configuration
+## Küme Yapılandırması
 
-### Node Requirements
+### Düğüm Gereksinimleri
 
-**Minimum Configuration:**
+**Minimum Yapılandırma:**
 
-- 4 nodes for basic redundancy
-- 8GB RAM per node
-- Gigabit network connectivity
+- Temel yedeklilik için 4 düğüm
+- Düğüm başına 8GB RAM
+- Gigabit ağ bağlantısı
 
-**Recommended Configuration:**
+**Önerilen Yapılandırma:**
 
-- 8+ nodes for production
-- 16GB+ RAM per node
-- 10Gb network connectivity
+- Üretim için 8+ düğüm
+- Düğüm başına 16GB+ RAM
+- 10Gb ağ bağlantısı
 
-### Erasure Coding
+### Silme Kodlaması
 
-RustFS automatically selects optimal erasure coding based on cluster size:
+RustFS, küme boyutuna göre optimal silme kodlamasını otomatik olarak seçer:
 
-| Nodes | EC Configuration | Fault Tolerance |
-|-------|------------------|-----------------|
-| 4     | EC:2+2          | 2 node failures |
-| 8     | EC:4+4          | 4 node failures |
-| 12    | EC:6+6          | 6 node failures |
-| 16+   | EC:8+8          | 8 node failures |
+| Düğümler | EC Yapılandırması | Hata Toleransı |
+|---------|-------------------|----------------|
+| 4 | EC:2+2 | 2 düğüm arızası |
+| 8 | EC:4+4 | 4 düğüm arızası |
+| 12 | EC:6+6 | 6 düğüm arızası |
+| 16+ | EC:8+8 | 8 düğüm arızası |
 
-## High Availability Features
+## Yüksek Kullanılabilirlik Özellikleri
 
-### Automatic Failover
+### Otomatik Devralma
 
-- Immediate detection of node failures
-- Automatic request routing to healthy nodes
-- No manual intervention required
+- Düğüm arızalarının anında tespiti
+- Sağlıklı düğümlere otomatik istek yönlendirme
+- Manuel müdahale gerektirmez
 
-### Data Healing
+### Veri Onarımı
 
-- Continuous background healing process
-- Automatic reconstruction of lost data
-- Proactive replacement of degraded objects
+- Sürekli arka plan onarım süreci
+- Kaybolan verilerin otomatik yeniden oluşturulması
+- Bozulan nesnelerin proaktif değiştirilmesi
 
-### Rolling Updates
+### Yuvarlak Güncellemeler
 
-- Zero-downtime software updates
-- Gradual node updates with health checks
-- Automatic rollback on failure
+- Sıfır kesinti süresi ile yazılım güncellemeleri
+- Sağlık kontrolleri ile kademeli düğüm güncellemeleri
+- Arızada otomatik geri alma
 
-## Performance Optimization
+## Performans Optimizasyonu
 
-### Network Optimization
+### Ağ Optimizasyonu
 
-1. **Dedicated Network**
-
-   ```bash
-   # Use dedicated network interfaces for cluster traffic
-   rustfs server http://node{1...4}.internal:9000/data{1...4}
-   ```
-
-2. **Load Balancing**
-   - Deploy load balancer in front of cluster
-   - Use health checks for automatic failover
-   - Distribute client connections evenly
-
-### Storage Optimization
-
-1. **Drive Selection**
-   - Use consistent drive types across nodes
-   - Consider NVMe for high-performance workloads
-   - Plan for drive replacement cycles
-
-2. **Capacity Planning**
-   - Monitor storage utilization trends
-   - Plan expansion before reaching 80% capacity
-   - Consider seasonal usage patterns
-
-## Monitoring and Alerting
-
-### Key Metrics
-
-- **Node Health**: CPU, memory, disk usage
-- **Network**: Bandwidth, latency, packet loss
-- **Storage**: Capacity, IOPS, healing status
-- **Cluster**: Object count, data distribution
-
-### Alert Configuration
+1. **Özel Ağ**
 
 ```bash
-# Example Prometheus alerts
+# Küme trafiği için özel ağ arayüzlerini kullanın
+rustfs server http://node{1...4}.internal:9000/data{1...4}
+```
+
+2. **Yük Dengeleme**
+- Kümenin önüne yük dengeleyici dağıtın
+- Otomatik devralma için sağlık kontrolleri kullanın
+- İstemci bağlantılarını eşit olarak dağıtın
+
+### Depolama Optimizasyonu
+
+1. **Sürücü Seçimi**
+- Düğümler arasında tutarlı sürücü türleri kullanın
+- Yüksek performanslı iş yükleri için NVMe'yi düşünün
+- Sürücü değiştirme döngülerini planlayın
+
+2. **Kapasite Planlama**
+- Depolama kullanım trendlerini izleyin
+- %80 kapasiteye ulaşmadan önce genişlemeyi planlayın
+- Mevsimsel kullanım kalıplarını düşünün
+
+## İzleme ve Uyarılar
+
+### Ana Metrikler
+
+- **Düğüm Sağlığı**: CPU, bellek, disk kullanımı
+- **Ağ**: Bant genişliği, gecikme, paket kaybı
+- **Depolama**: Kapasite, IOPS, onarım durumu
+- **Küme**: Nesne sayısı, veri dağıtımı
+
+### Uyarı Yapılandırması
+
+```bash
+# Örnek Prometheus uyarıları
 - alert: NodeDown
   expr: up{job="rustfs"} == 0
   for: 1m
@@ -142,49 +142,49 @@ RustFS automatically selects optimal erasure coding based on cluster size:
   for: 5m
 ```
 
-## Disaster Recovery
+## Felaket Kurtarma
 
-### Multi-Site Deployment
+### Çoklu Site Dağıtımı
 
-- Deploy clusters across multiple data centers
-- Configure cross-site replication
-- Implement disaster recovery procedures
+- Kümeleri birden fazla veri merkezinde dağıtın
+- Çapraz site çoğaltma yapılandırın
+- Felaket kurtarma prosedürlerini uygulayın
 
-### Backup Strategies
+### Yedekleme Stratejileri
 
-- Regular data exports to external storage
-- Point-in-time recovery capabilities
-- Automated backup verification
+- Dış depolamaya düzenli veri ihracatı
+- Zamana göre kurtarma yetenekleri
+- Otomatik yedekleme doğrulama
 
-## Security
+## Güvenlik
 
-### Cluster Security
+### Küme Güvenliği
 
-- TLS encryption for inter-node communication
-- Certificate-based node authentication
-- Network segmentation for cluster traffic
+- Düğümler arası iletişim için TLS şifreleme
+- Sertifika tabanlı düğüm kimlik doğrulama
+- Küme trafiği için ağ segmentasyonu
 
-### Access Control
+### Erişim Kontrolü
 
-- Role-based access control (RBAC)
-- Integration with external identity providers
-- Audit logging for all operations
+- Rol tabanlı erişim kontrolü (RBAC)
+- Harici kimlik sağlayıcıları ile entegrasyon
+- Tüm işlemler için denetim günlükleri
 
-## Troubleshooting
+## Sorun Giderme
 
-### Common Issues
+### Yaygın Sorunlar
 
-1. **Split-Brain Prevention**
-   - Ensure odd number of nodes when possible
-   - Configure proper quorum settings
-   - Monitor network connectivity
+1. **Split-Brain Önleme**
+- Mümkün olduğunda tek sayıda düğüm kullanın
+- Uygun kuorum ayarlarını yapılandırın
+- Ağ bağlantısını izleyin
 
-2. **Performance Degradation**
-   - Check for failing drives
-   - Monitor network utilization
-   - Analyze access patterns
+2. **Performans Bozulması**
+- Arızalı sürücüleri kontrol edin
+- Ağ kullanımını izleyin
+- Erişim kalıplarını analiz edin
 
-3. **Capacity Issues**
-   - Monitor storage growth trends
-   - Plan expansion proactively
-   - Implement lifecycle policies
+3. **Kapasite Sorunları**
+- Depolama büyüme trendlerini izleyin
+- Proaktif olarak genişlemeyi planlayın
+- Yaşam döngüsü politikaları uygulayın

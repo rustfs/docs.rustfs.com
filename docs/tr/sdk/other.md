@@ -1,80 +1,80 @@
 ---
-title: "Other SDKs"
-description: "This document primarily explains the usage of various language SDKs in RustFS."
+title: "Diğer SDK'lar"
+description: "Bu belge, öncelikle RustFS'ta çeşitli dil SDK'larının kullanımını açıklar."
 ---
 
-# Other SDKs
+# Diğer SDK'lar
 
-If AWS S3 officially doesn't support the language you're using, you can adopt the following strategies to integrate with RustFS:
+Eğer AWS S3, kullandığınız dili resmi olarak desteklemiyorsa, RustFS ile entegrasyon için aşağıdaki stratejileri benimseyebilirsiniz:
 
-## 1. Direct HTTP Interface Requests (Based on S3 API Protocol)
+## 1. Doğrudan HTTP Arayüzü İstekleri (S3 API Protokolüne Dayalı)
 
-The S3 protocol is a standard RESTful API. You can encapsulate access logic yourself using any language that supports HTTP requests (such as C, Rust, Lua, Erlang).
+S3 protokolü standart bir RESTful API'dir. HTTP isteklerini destekleyen herhangi bir dil (C, Rust, Lua, Erlang gibi) kullanarak erişim mantığını kendiniz oluşturabilirsiniz.
 
-### Key points include
+### Önemli noktalar şunlardır:
 
-* **Signature Algorithm**: Implement AWS Signature Version 4 signing (complex)
-* **Construct Correct Headers and Canonical Requests**
-* **Use HTTPS/HTTP clients to send requests**
+* **İmza Algoritması**: AWS Signature Version 4 imzalama uygulaması (karmaşık)
+* **Doğru Başlıkları ve Kanonik İstekleri Oluşturma**
+* **İstek göndermek için HTTPS/HTTP istemcilerini kullanma**
 
-👉 Recommend referring to signature implementations from open source projects, for example:
+👉 Açık kaynak projelerindeki imza uygulamalarına bakmanızı öneririz, örneğin:
 
 * [https://docs.aws.amazon.com/general/latest/gr/sigv4-signed-request-examples.html](https://docs.aws.amazon.com/general/latest/gr/sigv4-signed-request-examples.html)
 
 ---
 
-## 2. Call CLI Tools or Intermediate Services from Existing SDKs
+## 2. Mevcut SDK'lardan CLI Araçlarını veya Ara Hizmetleri Çağırma
 
-If you don't want to implement signing yourself, you can:
+Eğer imzalamayı kendiniz uygulamak istemiyorsanız, şunları yapabilirsiniz:
 
-### 2.1. Use AWS CLI tools supported by existing languages
+### 2.1. Mevcut diller tarafından desteklenen AWS CLI araçlarını kullanma
 
-For example, call through Shell:
+Örneğin, Shell üzerinden çağırma:
 
 ```bash
-aws s3 cp local.txt s3://mybucket/myfile.txt --endpoint-url http://rustfs.local:9000
+aws s3 cp yerel.txt s3://benim-bucket/benim-dosyam.txt --endpoint-url http://rustfs.local:9000
 ```
 
-Or write a simple relay service using Node.js/Python SDK, and your language calls this service for upload/download.
+Veya Node.js/Python SDK kullanarak basit bir röle servisi yazabilirsiniz ve diliniz bu servisi yükleme/indirme için çağırabilir.
 
-### 2.2. Set up a Proxy (e.g., Flask, FastAPI, Express)
+### 2.2. Bir Proxy Kurma (Örneğin, Flask, FastAPI, Express)
 
-Let clients that don't support S3 call your wrapped HTTP API:
+S3'ü desteklemeyen istemcilerin, sarmalanmış HTTP API'nizi çağırmasına izin verin:
 
 ```http
-POST /upload -> Service internally calls SDK to upload objects to RustFS
-GET /presigned-url -> Generate presigned URLs for frontend/client use
+POST /upload -> Servis dahili olarak SDK'yı çağırarak nesneleri RustFS'a yükler
+GET /presigned-url -> Ön uç/istemci kullanımı için önceden imzalanmış URL'ler oluşturur
 ```
 
 ---
 
-## 3. Look for Third-Party Community SDKs
+## 3. Üçüncü Taraf Topluluk SDK'larını Arama
 
-Although AWS doesn't have official SDKs, some language communities have developed unofficial S3 clients. For example:
+AWS'nin resmi SDK'ları olmasa da, bazı dil toplulukları resmi olmayan S3 istemcileri geliştirmiştir. Örneğin:
 
 * Haskell: `amazonka-s3`
-* Rust: `rusoto` (deprecated) or `aws-sdk-rust`
-* OCaml: Possibly implement through `cohttp`
-* Delphi: Commercial libraries supporting S3 protocol
+* Rust: `rusoto` (kullanım dışı) veya `aws-sdk-rust`
+* OCaml: `cohttp` aracılığıyla muhtemelen uygulama
+* Delphi: S3 protokolünü destekleyen ticari kütüphaneler
 
-Community SDK stability varies greatly; evaluate activity, documentation, and compatibility before use.
-
----
-
-## 4. Delegate Core Upload Logic to Platform Hosting
-
-For example:
-
-* Delegate frontend (Web/Mobile) upload tasks to browser or app execution (using presigned URLs)
-* Backend uses Node.js/Python/Go proxy to implement upload logic
+Topluluk SDK'larının kararlılığı büyük ölçüde değişir; kullanmadan önce aktivite, dokümantasyon ve uyumluluğu değerlendirin.
 
 ---
 
-## Summary Recommendations
+## 4. Çekirdek Yükleme Mantığını Platform Barındırmasına Devretme
 
-| Scenario | Recommended Solution |
+Örneğin:
+
+* Ön uç (Web/Mobil) yükleme görevlerini tarayıcıya veya uygulama yürütmesine devredin (önceden imzalanmış URL'ler kullanarak)
+* Arka uç, yükleme mantığını uygulamak için Node.js/Python/Go proxy kullanır
+
+---
+
+## Özet Öneriler
+
+| Senaryo | Önerilen Çözüm |
 | ------------- | ---------------------------------- |
-| Need full control/embedded environment | Implement Signature V4 self-signing |
-| Weak language support but has Shell | Call uploads through AWS CLI |
-| Can deploy relay service | Build S3 API gateway using Python/Node |
-| Frontend uploads | Use presigned URLs |
+| Tam kontrol/gömülü ortam gereksinimi | Signature V4 kendiniz uygulayın |
+| Dil desteği zayıf ama Shell var | AWS CLI üzerinden yüklemeleri çağırın |
+| Röle servisi dağıtılabilir | Python/Node kullanarak S3 API ağ geçidi oluşturun |
+| Ön uç yüklemeleri | Önceden imzalanmış URL'leri kullanın |

@@ -1,58 +1,50 @@
 ---
-title: "Installing RustFS on macOS"
-description: "This document primarily explains the quick startup method for RustFS on macOS"
+title: "macOS'ta RustFS Kurulumu"
+description: "Bu belge, RustFS'nin macOS'ta hızlı başlatma yöntemini açıklar."
 ---
+# macOS'ta RustFS Kurulumu
 
-# Installing RustFS on macOS
-
-On macOS, you can use three methods for installation:
-
+macOS'ta, kurulum için üç yöntem kullanabilirsiniz:
 1. Docker
-2. Graphical one-click startup package
-3. Binary package
+2. Grafiksel tek tıklama başlangıç paketi
+3. İkili paket
 
-> This document primarily explains using the RustFS **graphical one-click startup package** for quick RustFS startup.
+> Bu belge, RustFS **grafiksel tek tıklama başlangıç paketi** kullanarak hızlı RustFS başlatmayı açıklar.
 
-## 1. Preparation
+## 1. Hazırlık
 
-Please understand:
+Lütfen anlayın:
+> **Grafiksel başlangıç modu** yalnızca tek düğüm tek disk modunu destekler, daha çok geliştirme, hata ayıklama ve test ortamları için uygundur.
 
-> **Graphical startup mode** only supports single node single disk mode, more suitable for development, debugging and testing environments.
+1. Başlangıç modları hakkında detaylı bilgi için lütfen [Başlangıç Modları](../mode/) bölümüne bakın;
+2. Kurulum paketini indirin, izinleri değiştirin ve başlatın.
 
-1. For detailed introduction about startup modes, please refer to [Startup Modes](../mode/);
+## 2. İndirme
 
-2. Download the installation package, modify permissions, and start.
+Resmi web sitesi indirme sayfasına gidin ve en son RustFS kurulum paketini indirin.
 
-## 2. Download
+## 3. İzinleri Değiştirme
 
-Go to the official website download page and download the latest RustFS installation package.
+Lütfen bu programın macOS işletim sisteminde ilgili yürütme izinlerine sahip olduğunu doğrulayın.
 
-## 3. Modify Permissions
+## Başlatma Simgesine Çift Tıklayın
 
-Please ensure this program has relevant execution permissions in the macOS operating system.
+1. Başlatma simgesine çift tıklayın;
+2. Disk yapılandırmasını değiştirin;
+3. "Servisi Başlat"a tıklayın, RustFS servisi başarıyla başlar.
 
-## Double-click Startup Icon
+<img src="./images/macos-setup.jpg" alt="macOS başlangıç" />
 
-1. Double-click the startup icon;
+## 4. Yapılandırmayı Değiştirme
 
-2. Click configure disk;
+Sağ üst köşedeki değiştirme düğmesine (dişli şeklinde düğme) tıklayarak aşağıdakileri değiştirin:
 
-3. Click "Start Service", RustFS service starts successfully.
+1. Sunucu varsayılan portu;
+2. Varsayılan yönetici kullanıcı adı ve şifresi;
+3. Belirtilen disk dizini;
 
-<img src="./images/macos-setup.jpg" alt="macOS startup" />
+<img src="./images/setting.jpg" alt="RustFS macOS yapılandırması" />
 
-## 4. Modify Configuration
+## 5. Konsola Erişim
 
-Click the modify button (gear-shaped button) in the upper right corner to modify:
-
-1. Server default port;
-
-2. Default administrator username and password;
-
-3. Specified disk directory;
-
-<img src="./images/setting.jpg" alt="RustFS macOS configuration" />
-
-## 5. Access Console
-
-After successful startup, visit `http://127.0.0.1:7001` to access the console.
+Başarılı bir şekilde başlatıldıktan sonra, `http://127.0.0.1:7001` adresini ziyaret ederek konsola erişin.

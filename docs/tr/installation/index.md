@@ -1,45 +1,45 @@
 ---
-title: "Installation Guide"
-description: "RustFS Installation and Deployment Guide"
----
+title: "Kurulum Kılavuzu"  
+description: "RustFS Kurulum ve Dağıtım Kılavuzu"  
+---  
 
-# Installation Guide
+# Kurulum Kılavuzu  
 
-Welcome to the RustFS installation guide. This section provides comprehensive instructions for installing and deploying RustFS in various environments.
+RustFS kurulum kılavuzuna hoş geldiniz. Bu bölüm, çeşitli ortamlarda RustFS'nin kurulumu ve dağıtımı için kapsamlı talimatlar sağlar.  
 
-## Before You Begin
+## Başlamadan Önce  
 
-Please review the following checklists before proceeding with the installation:
+Kuruluma başlamadan önce lütfen aşağıdaki kontrol listelerini gözden geçirin:  
 
-1. [Hardware Checklists](./hard-checklists) - Ensure your hardware meets the requirements
-2. [Security Checklists](./security-checklists) - Configure security settings properly
-3. [Software Checklists](./software-checklists) - Verify software dependencies
-4. [Network Checklists](./network-checklists) - Configure network settings
+1. [Donanım Kontrol Listesi](./hard-checklists) - Donanım gereksinimlerini karşıladığınızdan emin olun  
+2. [Güvenlik Kontrol Listesi](./security-checklists) - Güvenlik ayarlarını doğru şekilde yapılandırın  
+3. [Yazılım Kontrol Listesi](./software-checklists) - Yazılım bağımlılıklarını doğrulayın  
+4. [Ağ Kontrol Listesi](./network-checklists) - Ağ ayarlarını yapılandırın  
 
-## Installation Options
+## Kurulum Seçenekleri  
 
-Choose the installation method that best fits your environment:
+Ortamınıza en uygun kurulum yöntemini seçin:  
 
-### Quick Start
+### Hızlı Başlangıç  
 
-- [Docker Installation](./docker) - Get started quickly with containerized deployment
+- [Docker Kurulumu](./docker) - Konteyner tabanlı dağıtımla hızlıca başlayın  
 
-### Operating System Specific
+### İşletim Sistemine Özel  
 
-- [Linux Installation](./linux) - Install on Linux systems
-- [macOS Installation](./macos/) - Install on macOS systems
-- [Windows Installation](./windows/) - Install on Windows systems
+- [Linux Kurulumu](./linux) - Linux sistemlerine kurun  
+- [macOS Kurulumu](./macos/) - macOS sistemlerine kurun  
+- [Windows Kurulumu](./windows/) - Windows sistemlerine kurun  
 
-### Advanced Configuration
+### Gelişmiş Yapılandırma  
 
-- [Startup Modes](./mode/) - Configure different startup modes
-- [Hardware Selection](./hardware-selection) - Choose appropriate hardware
+- [Başlangıç Modları](./mode/) - Farklı başlangıç modlarını yapılandırın  
+- [Donanım Seçimi](./hardware-selection) - Uygun donanımı seçin  
 
-## Support
+## Destek  
 
-For professional guidance, please contact our storage experts:
+Profesyonel rehberlik için depolama uzmanlarımızla iletişime geçin:  
 
-- Phone: 400-033-5363
-- Email: <hello@rustfs.com>
+- Telefon: 400-033-5363  
+- E-posta: <hello@rustfs.com>  
 
-For community support, you can submit issues on GitHub or join our discussion groups. Please note that we do not guarantee response quality or SLA for community support.
+Topluluk desteği için GitHub üzerinden sorun gönderebilir veya tartışma gruplarımıza katılabilirsiniz. Topluluk desteği için yanıt kalitesi veya SLA garantisi vermediğimizi lütfen unutmayın.

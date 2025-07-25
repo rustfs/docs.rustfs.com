@@ -1,41 +1,41 @@
-# Object Immutability from RustFS
+# RustFS'den Nesne Değiştirilemezliği
 
-## RustFS and S3 API - Designed for Multi-Cloud Storage
+## RustFS ve S3 API - Çoklu Bulut Depolama İçin Tasarlandı
 
-RustFS has established itself as the standard for AWS S3 compatibility from the beginning. As one of the earliest adopters of the S3 API (V2 and V4) and one of the only storage companies focused exclusively on S3, RustFS's large community ensures no other AWS alternative is more compatible. The S3 API is the de facto standard in the cloud, so AWS alternatives must be able to use the API fluently to operate and interoperate across different environments (public cloud, private cloud, data center, multi-cloud, hybrid cloud, and edge).
+RustFS, başından beri AWS S3 uyumluluğunun standardı olarak kendini kanıtlamıştır. S3 API'sinin (V2 ve V4) en erken benimseyenlerinden biri ve yalnızca S3'e odaklanan birkaç depolama şirketinden biri olarak, RustFS'in büyük topluluğu, başka bir AWS alternatifinin daha uyumlu olmadığını garanti eder. S3 API, bulutta fiili standart olduğu için, AWS alternatifleri API'yi farklı ortamlarda (genel bulut, özel bulut, veri merkezi, çoklu bulut, hibrit bulut ve kenar) çalıştırabilmek ve birlikte çalışabilmek için akıcı bir şekilde kullanabilmelidir.
 
-## Object Retention
+## Nesne Saklama
 
-Object storage retention rules ensure objects are protected by WORM for a period of time. Object storage retention policies specify the retention period set on object versions, either explicitly or through bucket default settings. Default lock configurations set at the bucket level apply to subsequently created objects and do not retroactively apply to versions of previously created objects.
+Nesne depolama saklama kuralları, nesnelerin WORM (Write Once, Read Many) tarafından bir süre korunmasını sağlar. Nesne depolama saklama politikaları, nesne sürümlerinde belirlenen saklama süresini, ya açıkça ya da kova varsayılan ayarları aracılığıyla tanımlar. Kovada belirlenen varsayılan kilitleme yapılandırmaları, sonraki olarak oluşturulan nesnelere uygulanır ve önceki oluşturulan nesnelerin sürümlerine geri dönük olarak uygulanmaz.
 
-When using bucket default settings, a duration in days or years is set to define the length of time each object version placed in the bucket should be protected. New objects placed in the bucket will inherit the protection duration set for the bucket.
+Kova varsayılan ayarlarını kullanırken, gün veya yıl cinsinden bir süre belirlenerek, kovaya yerleştirilen her nesne sürümünün ne kadar süreyle korunacağı tanımlanır. Kovaya yerleştirilen yeni nesneler, kovada belirlenen koruma süresini devralır.
 
-Retention periods can be explicitly set for object versions. Explicit retention periods specify a "retain until date" for the object version. The "retain until date" is stored in the object version's metadata and protects the object version until the retention period expires.
+Saklama süreleri, nesne sürümleri için açıkça belirlenebilir. Açık saklama süreleri, nesne sürümü için bir "şu tarihe kadar sakla" tarihi belirler. "Şu tarihe kadar sakla" tarihi, nesne sürümünün meta verilerinde saklanır ve saklama süresi dolana kadar nesne sürümünü korur.
 
-After the retention period expires, the object version can be deleted unless a legal hold is also placed on the object version.
+Saklama süresi dolduktan sonra, nesne sürümü silinebilir, ancak nesne sürümüne bir yasal tutma da uygulanmışsa silinemez.
 
-Explicit retention mode settings override default bucket settings.
+Açık saklama süresi ayarları, varsayılan kova ayarlarını geçersiz kılar.
 
-Retention periods can be easily extended by submitting a new lock request.
+Saklama süreleri, yeni bir kilitleme talebi gönderilerek kolayca uzatılabilir.
 
-Within the retention framework, there are two types of modes for setting retention periods for objects and buckets.
+Saklama çerçevesi içinde, nesneler ve kovalar için saklama sürelerini ayarlamak için iki tür mod vardır.
 
-## Governance Mode
+## Yönetim Modu
 
-Governance mode is used to prevent objects from being deleted by standard users. However, certain users need to retain the permissions required to modify retention settings or delete objects. These users will need special permissions such as s3:BypassGovernanceRetention permission and DeleteObject permission.
+Yönetim modu, nesnelerin standart kullanıcılar tarafından silinmesini önlemek için kullanılır. Ancak, bazı kullanıcıların saklama ayarlarını değiştirmek veya nesneleri silmek için gerekli izinleri koruması gerekir. Bu kullanıcılar, s3:BypassGovernanceRetention izni ve DeleteObject izni gibi özel izinlere ihtiyaç duyarlar.
 
-## Compliance Mode
+## Uyumluluk Modu
 
-Compliance mode is more restrictive and cannot be revoked during the retention period. Therefore, compliance mode ensures that no one (including the root user) can delete objects during the object retention period.
+Uyumluluk modu daha kısıtlayıcıdır ve saklama süresi boyunca geri alınamaz. Bu nedenle, uyumluluk modu, saklama süresi boyunca hiç kimsenin (kök kullanıcı dahil) nesneleri silemeyeceğini garanti eder.
 
-## Legal Hold
+## Yasal Tutma
 
-Legal hold provides the same WORM protection as retention periods but without an expiration date. This is indefinite retention that can only be removed by authorized users.
+Yasal tutma, saklama süreleri gibi aynı WORM korumasını sağlar ancak bir son kullanma tarihi olmadan. Bu, yalnızca yetkili kullanıcılar tarafından kaldırılabilen süresiz bir saklamadır.
 
-When objects have retention or legal hold policies defined, they will continue to be versioned. Replication operations performed on an object version do not transfer retention and legal hold settings from the source bucket to the destination.
+Nesnelerde saklama veya yasal tutma politikaları tanımlanmışsa, sürümlenmeye devam edeceklerdir. Bir nesne sürümü üzerinde gerçekleştirilen çoğaltma işlemleri, kaynak kovadan hedef kovaya saklama ve yasal tutma ayarlarını aktarmaz.
 
-## RustFS Data Immutability Meets or Exceeds Cohasset Certification Standards
+## RustFS Veri Değiştirilemezliği Cohasset Sertifikasyon Standartlarını Karşılar veya Aşar
 
-The gold standard for object locking, retention, and legal hold is verification by Cohasset Associates. RustFS's object storage retention and data immutability has earned positive evaluation from Cohasset Associates, particularly regarding SEC Rule 17a-4(f), FINRA Rule 4511, and CFTC Regulation 1.31. Rule 17a-4 has specific requirements for electronic data storage, including many aspects of record management such as duration, format, quality, availability, and accountability of broker-dealer record retention.
+Nesne kilitleme, saklama ve yasal tutma için altın standart, Cohasset Associates tarafından doğrulanmadır. RustFS'in nesne depolama saklama ve veri değiştirilemezliği, özellikle SEC Kuralı 17a-4(f), FINRA Kuralı 4511 ve CFTC Düzenlemesi 1.31 konusunda Cohasset Associates'tan olumlu değerlendirme almıştır. Kural 17a-4, elektronik veri depolama için belirli gereksinimlere sahiptir ve kayıt yönetiminin birçok yönünü, örneğin aracı-tüccar kayıt saklamanın süresi, formatı, kalitesi, kullanılabilirliği ve sorumluluğunu içerir.
 
-A copy of the Cohasset Associates evaluation report can be downloaded in full and shared with relevant regulatory bodies when storing data on RustFS. It details how to configure RustFS to meet requirements and the logic supporting object locking functionality.
+Cohasset Associates değerlendirme raporunun bir kopyası tam olarak indirilebilir ve RustFS üzerinde veri depolarken ilgili düzenleyici kuruluşlarla paylaşılabilir. RustFS'in gereksinimleri karşılamak için nasıl yapılandırılacağı ve nesne kilitleme işlevselliğini destekleyen mantık hakkında detaylar içerir.

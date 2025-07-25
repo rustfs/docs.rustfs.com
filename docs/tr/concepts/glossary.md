@@ -1,109 +1,108 @@
 ---
-title: "Glossary"
-description: "This article introduces commonly used vocabulary in object storage to help users quickly understand object storage"
+title: "Terimler Sözlüğü"
+description: "Bu makale, kullanıcıların nesne depolamayı hızlıca anlamalarına yardımcı olmak için nesne depolamada yaygın olarak kullanılan kelime dağarcığını tanıtır."
 ---
+# Nesne Depolama Çekirdek Terimleri Koleksiyonu (100 Terim)
 
-# Object Storage Core Vocabulary Collection (100 Terms)
-
-| No. | Term | Chinese | Description |
-|------|--------------------------|------------------------------|--------------------------------------------------------------------------|
-| 1 | Object Storage | 对象存储 | An architecture where data is stored as objects, replacing traditional file hierarchy structures |
-| 2 | Bucket | 存储桶 | A container for storing objects with globally unique namespace |
-| 3 | Object | 对象 | Basic storage unit containing data, metadata, and unique identifier (Object Key) |
-| 4 | Metadata | 元数据 | Key-value pair information describing object attributes (such as file type, creation time) |
-| 5 | S3-Compatible | S3 兼容 | Storage services compatible with Amazon S3 API standards |
-| 6 | Data Durability | 数据持久性 | Probability of data being preserved long-term in the system without loss (e.g., 99.999999999%) |
-| 7 | Replication | 多副本 | Redundancy technology that ensures data safety through multiple copies |
-| 8 | Erasure Coding | 纠删码 | Technology that fragments and encodes data for high reliability with less space |
-| 9 | Cold Storage | 冷存储 | Low-cost storage type for infrequently accessed data (such as archived data) |
-| 10 | Lifecycle Management | 生命周期管理 | Policies for automatically transitioning/deleting objects (e.g., move to cold storage after 30 days) |
-| 11 | Versioning | 版本控制 | Retaining historical versions of objects to prevent overwriting |
-| 12 | Storage Class | 存储类型 | Different performance/cost storage tiers (Standard, Infrequent Access, Archive) |
-| 13 | Access Key | 访问密钥 | Authentication keys for API requests (Access Key ID + Secret Access Key) |
-| 14 | Region | 区域 | Geographic location of storage infrastructure (e.g., East China 1, US West) |
-| 15 | Availability Zone (AZ) | 可用区 | Isolated data centers with independent power/network within the same region |
-| 16 | Endpoint | 端点 | Domain address for accessing storage service (e.g., us-east1.rustfs.com) |
-| 17 | RESTful API | RESTful API | API design specification based on HTTP protocol |
-| 18 | Multipart Upload | 分片上传 | Mechanism for splitting large files for upload and merging |
-| 19 | Pre-Signed URL | 预签名 URL | Temporary access links with time validity |
-| 20 | Server-Side Encryption (SSE) | 服务端加密 | Automatic data encryption on server side (SSE-S3/SSE-KMS/SSE-C) |
-| 21 | Client-Side Encryption (CSE) | 客户端加密 | Local encryption on client side before upload |
-| 22 | Cross-Region Replication | 跨区域复制 | Automatic object replication across geographic regions |
-| 23 | Access Control List (ACL) | 访问控制列表 | Rule list controlling access permissions for buckets/objects |
-| 24 | Bucket Policy | 存储桶策略 | JSON-based fine-grained permission control policies |
-| 25 | IAM | IAM | Identity and Access Management system for centralized user/role permission management |
-| 26 | Event Notification | 事件通知 | Sending notifications to message queues/function computing when events trigger |
-| 27 | Data Lake | 数据湖 | Repository for centralized storage of structured/unstructured data |
-| 28 | Compliance | 合规性 | Meeting data storage regulatory requirements like GDPR, HIPAA |
-| 29 | Logging & Audit | 日志审计 | Recording all API operation logs for auditing |
-| 30 | Monitoring & Alerting | 监控告警 | Real-time monitoring of storage usage/requests with alerting |
-| 31 | CORS | 跨域资源共享 | Rules controlling browser cross-origin resource access |
-| 32 | Transfer Acceleration | 传输加速 | Optimizing upload/download speed through edge nodes |
-| 33 | CDN Integration | CDN 加速 | Combining with Content Delivery Network for caching acceleration |
-| 34 | Data Export | 数据导出 | Process of migrating data to other storage systems |
-| 35 | Data Import | 数据导入 | Batch data migration from external systems to object storage |
-| 36 | Static Website Hosting | 静态网站托管 | Directly hosting HTML/CSS/JS static files through buckets |
-| 37 | Hotlink Protection | 防盗链 | Technology preventing external websites from stealing resource links |
-| 38 | Request Rate Limiting | 请求速率限制 | Controlling API request frequency per user/IP |
-| 39 | Tagging | 标签 | Adding classification tags to buckets/objects for management |
-| 40 | Inventory Report | 清单报告 | Periodically generated CSV/ORC files listing storage objects |
-| 41 | Data Restoration | 数据恢复 | Restoring data from archive storage to accessible state |
-| 42 | Storage Gateway | 存储网关 | Access layer mapping object storage as local file system |
-| 43 | Data Compression | 数据压缩 | Compressing data before upload to save storage space |
-| 44 | Data Deduplication | 数据去重 | Eliminating duplicate data to reduce storage usage |
-| 45 | Direct Read Archive | 直读归档 | Technology for directly reading archived data without restoration |
-| 46 | Bandwidth Control | 流量控制 | Limiting download bandwidth to avoid network congestion |
-| 47 | Concurrent Connections | 并发连接数 | Number of simultaneous data transfer connections |
-| 48 | Data Migration Service | 数据迁移服务 | Automated migration tools (e.g., AWS Snowball) |
-| 49 | Client SDK | 客户端 SDK | Developer toolkits for integrating storage services (e.g., Python/Java SDK) |
-| 50 | CLI | 命令行工具 | Command line management tools (e.g., aws s3 cp) |
-| 51 | Web Console | 图形化控制台 | Web-based management interface |
-| 52 | Data Integrity Check | 数据校验 | Verifying transmission integrity through MD5/SHA |
-| 53 | Resumable Upload/Download | 断点续传 | Continuing transfer from breakpoint after network interruption |
-| 54 | Mirror Back to Source | 镜像回源 | Pulling and saving from specified origin when requested object doesn't exist |
-| 55 | Canary Release | 灰度发布 | Release strategy gradually opening new features to some users |
-| 56 | Soft Delete | 软删除 | Marking objects for deletion while maintaining recovery period |
-| 57 | Object Lock | 对象锁定 | Compliance protection mechanism preventing object deletion or overwriting |
-| 58 | Watermarking | 水印 | Adding identification information to images/videos |
-| 59 | Thumbnail Generation | 缩略图生成 | Automatically creating thumbnail versions of images |
-| 60 | Image Processing | 图片处理 | Online cropping/scaling/rotation processing functions |
-| 61 | Video Transcoding | 视频转码 | Converting video formats/resolutions for different devices |
-| 62 | Content Moderation | 内容审核 | Automatically detecting inappropriate images/videos/text |
-| 63 | Cost Analysis | 成本分析 | Calculating costs by storage type/request count dimensions |
-| 64 | Usage Monitoring | 用量监控 | Real-time dashboard viewing storage/traffic/request counts |
-| 65 | Storage Analytics | 存储分析 | Tools analyzing storage patterns to optimize costs |
-| 66 | Requester Pays | 请求者付费 | Billing model where data downloader bears the cost |
-| 67 | Tiered Storage | 数据分层 | Automatically moving data to lower-cost storage tiers |
-| 68 | Intelligent Tiering | 智能分层 | Automatically selecting optimal storage type based on access patterns |
-| 69 | PrivateLink | 私有链接 | Accessing object storage through internal network avoiding public exposure |
-| 70 | VPC Endpoint | VPC 端点 | Entry point for securely accessing storage services within Virtual Private Cloud |
-| 71 | SSL/TLS | 传输加密 | Encrypting data transmission through HTTPS protocol |
-| 72 | Client-Side Encryption | 客户端加密 | Users encrypting data themselves before upload |
-| 73 | KMS | KMS | Key Management Service for centralized encryption key management |
-| 74 | Permission Boundary | 权限边界 | Limiting maximum permission scope of IAM roles/users |
-| 75 | Temporary Credentials | 临时凭证 | Short-term valid access tokens (e.g., STS Token) |
-| 76 | MFA Delete | MFA 删除保护 | Requiring multi-factor authentication to delete data |
-| 77 | Immutability | 数据不可变性 | Property preventing data tampering (combined with WORM model) |
-| 78 | Legal Hold | 法律保留 | Mandatory protection prohibiting data deletion/modification in compliance scenarios |
-| 79 | Cross-Account Sharing | 跨账户共享 | Allowing other cloud accounts to access specified storage resources |
-| 80 | Prefetch Policy | 预取策略 | Loading data into cache in advance to accelerate subsequent access |
-| 81 | Cache-Control | 缓存控制 | Specifying browser/CDN caching behavior through HTTP headers |
-| 82 | Delayed Deletion | 延迟删除 | Delaying deletion operations to prevent accidental actions |
-| 83 | Batch Operations | 批量操作 | Performing unified operations on multiple objects (delete/copy/restore) |
-| 84 | Data Lineage | 数据血缘 | Metadata records tracking data sources and change history |
-| 85 | Data Catalog | 数据目录 | Retrieval system storing metadata information |
-| 86 | Storage Gateway | 存储网关 | Hybrid cloud solution connecting local systems with cloud storage |
-| 87 | Hybrid Cloud Storage | 混合云存储 | Architecture using both local storage and cloud storage |
-| 88 | Edge Storage | 边缘存储 | Providing storage services at edge nodes close to data sources |
-| 89 | Multi-Cloud Storage | 多云存储 | Storage solutions across different cloud service providers |
-| 90 | Storage Federation | 存储联盟 | Abstraction layer for unified management of multiple storage systems |
-| 91 | Object Tag | 对象标签 | Adding custom classification tags to objects |
-| 92 | Bucket Tag | 存储桶标签 | Adding management/billing related tags to buckets |
-| 93 | Storage Quota | 存储配额 | Limiting maximum capacity of buckets |
-| 94 | Request Throttling | 请求限速 | Limiting API requests per unit time |
-| 95 | SLA | 服务等级协议 | Service Level Agreement commitments for availability/durability (e.g., 99.9% availability) |
-| 96 | Disaster Recovery | 灾难恢复 | Ensuring business continuity through cross-region backups |
-| 97 | Storage Topology | 存储拓扑 | Distribution structure of data at physical/logical levels |
-| 98 | Proximity Access | 就近访问 | Routing user requests to nearest storage nodes |
-| 99 | Global Namespace | 全球统一命名空间 | Unified view management of cross-region buckets |
-| 100 | Zero-Copy Migration | 零拷贝迁移 | Fast data migration through metadata operations |
+| No. | Terim | Çince | Açıklama |
+|-----|-----------------------|-----------------------------|--------------------------------------------------------------------------------------------|
+| 1 | Nesne Depolama | 对象存储 | Verilerin nesneler olarak depolandığı, geleneksel dosya hiyerarşi yapılarını değiştiren bir mimari |
+| 2 | Kovası | 存储桶 | Küresel olarak benzersiz ad alanıyla nesneleri depolamak için bir konteyner |
+| 3 | Nesne | 对象 | Veri, meta veri ve benzersiz tanımlayıcı (Nesne Anahtarı) içeren temel depolama birimi |
+| 4 | Meta Veri | 元数据 | Nesne özelliklerini tanımlayan anahtar-değer çifti bilgisi (örneğin, dosya türü, oluşturma zamanı) |
+| 5 | S3 Uyumlu | S3 兼容 | Amazon S3 API standartlarıyla uyumlu depolama hizmetleri |
+| 6 | Veri Kalıcılığı | 数据持久性 | Verilerin sistemde uzun süre korunma olasılığı (örneğin, %99.999999999) |
+| 7 | Çoğaltma | 多副本 | Veri güvenliğini sağlamak için verilerin çoklu kopyalarını oluşturan yedeklilik teknolojisi |
+| 8 | Silme Kodlaması | 纠删码 | Verileri parçalara ayırarak ve kodlayarak yüksek güvenilirlik sağlayan teknoloji |
+| 9 | Soğuk Depolama | 冷存储 | Nadiren erişilen veriler için düşük maliyetli depolama türü (örneğin, arşivlenmiş veri) |
+| 10 | Yaşam Döngüsü Yönetimi | 生命周期管理 | Nesneleri otomatik olarak geçiş yapmak/silmek için politikalar (örneğin, 30 gün sonra soğuk depolamaya taşımak) |
+| 11 | Sürüm Kontrolü | 版本控制 | Nesnelerin tarihsel sürümlerini saklayarak üzerine yazmayı önleme |
+| 12 | Depolama Türü | 存储类型 | Farklı performans/maliyet depolama katmanları (Standart, Seyrek Erişim, Arşiv) |
+| 13 | Erişim Anahtarı | 访问密钥 | API istekleri için kimlik doğrulama anahtarları (Erişim Anahtarı Kimliği + Gizli Erişim Anahtarı) |
+| 14 | Bölge | 区域 | Depolama altyapısının coğrafi konumu (örneğin, Doğu Çin 1, ABD Batı) |
+| 15 | Kullanılabilirlik Bölgesi (AZ) | 可用区 | Aynı bölge içinde bağımsız güç/ağa sahip izole veri merkezleri |
+| 16 | Uç Nokta | 端点 | Depolama hizmetine erişim için alan adı (örneğin, us-east1.rustfs.com) |
+| 17 | RESTful API | RESTful API | HTTP protokolüne dayalı API tasarım spesifikasyonu |
+| 18 | Çok Parçalı Yükleme | 分片上传 | Büyük dosyaları yüklemek ve birleştirmek için parçalara ayırma mekanizması |
+| 19 | Ön İmzalı URL | 预签名 URL | Geçerlilik süresi olan geçici erişim bağlantılar |
+| 20 | Sunucu Taraflı Şifreleme (SSE) | 服务端加密 | Sunucu tarafında otomatik veri şifreleme (SSE-S3/SSE-KMS/SSE-C) |
+| 21 | İstemci Taraflı Şifreleme (CSE) | 客户端加密 | Yükleme öncesi istemci tarafında yerel şifreleme |
+| 22 | Bölgeler Arası Çoğaltma | 跨区域复制 | Coğrafi bölgeler arasında nesnelerin otomatik çoğaltılması |
+| 23 | Erişim Kontrol Listesi (ACL) | 访问控制列表 | Kovası/nesneler için erişim izinlerini kontrol eden kural listesi |
+| 24 | Kovası Politikası | 存储桶策略 | JSON tabanlı ince ayarlı izin kontrol politikaları |
+| 25 | IAM | IAM | Kullanıcı/rol izinlerini merkezileştirilmiş yönetmek için Kimlik ve Erişim Yönetimi sistemi |
+| 26 | Olay Bildirimi | 事件通知 | Olaylar tetiklendiğinde mesaj kuyruklarına/işlev hesaplamasına bildirim gönderme |
+| 27 | Veri Gölü | 数据湖 | Yapılandırılmış/yapılandırılmamış verilerin merkezileştirilmiş depolandığı havuz |
+| 28 | Uyumluluk | 合规性 | GDPR, HIPAA gibi veri depolama düzenleyici gereksinimlerini karşılamak |
+| 29 | Günlük Kaydı ve Denetim | 日志审计 | Denetim için tüm API işlem günlüklerini kaydetme |
+| 30 | İzleme ve Uyarı | 监控告警 | Depolama kullanımı/isteklerini gerçek zamanlı izleme ve uyarı |
+| 31 | CORS | 跨域资源共享 | Tarayıcı çapraz kaynak erişimini kontrol eden kurallar |
+| 32 | Aktarım Hızlandırma | 传输加速 | Kenar düğümleri aracılığıyla yükleme/indirme hızını optimize etme |
+| 33 | CDN Entegrasyonu | CDN 加速 | İçerik Dağıtım Ağı ile birleştirerek önbellek hızlandırma |
+| 34 | Veri Dışa Aktarımı | 数据导出 | Verileri diğer depolama sistemlerine taşımak |
+| 35 | Veri İçe Aktarımı | 数据导入 | Harici sistemlerden nesne depolamaya toplu veri taşımak |
+| 36 | Statik Web Sitesi Barındırma | 静态网站托管 | HTML/CSS/JS statik dosyaları doğrudan kovalar aracılığıyla barındırma |
+| 37 | Hotlink Koruma | 防盗链 | Dış web sitelerinin kaynak bağlantılarını çalmasını önleyen teknoloji |
+| 38 | İstek Hız Sınırlama | 请求速率限制 | Kullanıcı/IP başına API istek sıklığını kontrol etme |
+| 39 | Etiketleme | 标签 | Kovası/nesneleri yönetim için sınıflandırma etiketleri ekleme |
+| 40 | Envanter Raporu | 清单报告 | Depolama nesnelerini listeleyen periyodik olarak oluşturulan CSV/ORC dosyaları |
+| 41 | Veri Geri Yükleme | 数据恢复 | Arşiv depolamadan erişilebilir duruma veri geri yükleme |
+| 42 | Depolama Ağ Geçidi | 存储网关 | Nesne depolamayı yerel dosya sistemi olarak eşleyen erişim katmanı |
+| 43 | Veri Sıkıştırma | 数据压缩 | Depolama alanından tasarruf etmek için yükleme öncesi verileri sıkıştırma |
+| 44 | Veri Tekilleştirme | 数据去重 | Depolama kullanımını azaltmak için yinelenen verileri ortadan kaldırma |
+| 45 | Doğrudan Okuma Arşivi | 直读归档 | Arşivlenmiş verileri geri yükleme olmadan doğrudan okuma teknolojisi |
+| 46 | Bant Genişliği Kontrolü | 流量控制 | Ağ tıkanıklığını önlemek için indirme bant genişliğini sınırlama |
+| 47 | Eşzamanlı Bağlantılar | 并发连接数 | Aynı anda veri transferi yapan bağlantıların sayısı |
+| 48 | Veri Taşıma Hizmeti | 数据迁移服务 | Otomatik taşıma araçları (örneğin, AWS Snowball) |
+| 49 | İstemci SDK | 客户端 SDK | Depolama hizmetlerini entegre etmek için geliştirici araç setleri (örneğin, Python/Java SDK) |
+| 50 | CLI | 命令行工具 | Komut satırı yönetim araçları (örneğin, aws s3 cp) |
+| 51 | Web Konsolu | 图形化控制台 | Web tabanlı yönetim arayüzü |
+| 52 | Veri Bütünlük Kontrolü | 数据校验 | MD5/SHA aracılığıyla iletim bütünlüğünü doğrulama |
+| 53 | Kesintiden Devam Eden Yükleme/İndirme | 断点续传 | Ağ kesintisinden sonra kesinti noktasından devam eden transfer |
+| 54 | Aynalama Kaynağa Geri | 镜像回源 | İstenen nesne mevcut değilse belirtilen kaynaktan çekme ve kaydetme |
+| 55 | Kanarya Yayını | 灰度发布 | Yeni özellikleri bazı kullanıcılara kademeli olarak açma yayın stratejisi |
+| 56 | Yumuşak Silme | 软删除 | Nesneleri silme için işaretlerken geri yükleme süresini koruma |
+| 57 | Nesne Kilidi | 对象锁定 | Nesne silme veya üzerine yazmayı önleyen uyumluluk koruma mekanizması |
+| 58 | Filigran Ekleme | 水印 | Görüntülere/videolara tanımlama bilgisi ekleme |
+| 59 | Küçük Resim Oluşturma | 缩略图生成 | Görüntülerin küçük resim sürümlerini otomatik olarak oluşturma |
+| 60 | Görüntü İşleme | 图片处理 | Çevrimiçi kırpma/ölçeklendirme/döndürme işleme işlevleri |
+| 61 | Video Yeniden Kodlama | 视频转码 | Farklı cihazlar için video formatlarını/çözünürlüklerini dönüştürme |
+| 62 | İçerik Denetimi | 内容审核 | Uygunsuz görüntüleri/videoları/metinleri otomatik olarak tespit etme |
+| 63 | Maliyet Analizi | 成本分析 | Depolama türü/istek sayısı boyutlarına göre maliyetleri hesaplama |
+| 64 | Kullanım İzleme | 用量监控 | Depolama/trafik/istek sayılarını gerçek zamanlı gösterge paneli ile görüntüleme |
+| 65 | Depolama Analitiği | 存储分析 | Maliyetleri optimize etmek için depolama kalıplarını analiz eden araçlar |
+| 66 | İstek Eden Öder | 请求者付费 | Veri indirenin maliyeti üstlendiği faturalandırma modeli |
+| 67 | Katmanlı Depolama | 数据分层 | Verileri otomatik olarak daha düşük maliyetli depolama katmanlarına taşımak |
+| 68 | Akıllı Katmanlandırma | 智能分层 | Erişim kalıplarına göre otomatik olarak optimal depolama türünü seçme |
+| 69 | PrivateLink | 私有链接 | Nesne depolamaya genel olarak maruz kalmadan iç ağ üzerinden erişim |
+| 70 | VPC Uç Noktası | VPC 端点 | Sanal Özel Bulut içinde depolama hizmetlerine güvenli erişim için giriş noktası |
+| 71 | SSL/TLS | 传输加密 | HTTPS protokolü aracılığıyla veri iletimini şifreleme |
+| 72 | İstemci Taraflı Şifreleme | 客户端加密 | Kullanıcıların verileri kendileri yüklemeden önce şifreleme |
+| 73 | KMS | KMS | Şifreleme anahtarlarını merkezileştirilmiş yönetmek için Anahtar Yönetim Hizmeti |
+| 74 | İzin Sınırı | 权限边界 | IAM rollerinin/kullanıcıların maksimum izin kapsamını sınırlama |
+| 75 | Geçici Kimlik Bilgileri | 临时凭证 | Kısa süreli geçerlilik süresine sahip erişim tokenları (örneğin, STS Token) |
+| 76 | MFA Silme | MFA 删除保护 | Veri silmek için çok faktörlü kimlik doğrulama gerektirme |
+| 77 | Değiştirilemezlik | 数据不可变性 | Veri tahrifini önleyen özellik (WORM modeli ile birleştirilmiş) |
+| 78 | Yasal Tutma | 法律保留 | Uyumluluk senaryolarında veri silme/düzenlemeyi yasaklayan zorunlu koruma |
+| 79 | Çapraz Hesap Paylaşımı | 跨账户共享 | Diğer bulut hesaplarının belirtilen depolama kaynaklarına erişimine izin verme |
+| 80 | Ön Alma Politikası | 预取策略 | Sonraki erişimi hızlandırmak için verileri önceden önbelleğe yükleme |
+| 81 | Önbellek Kontrolü | 缓存控制 | HTTP başlıkları aracılığıyla tarayıcı/CDN önbellek davranışını belirtme |
+| 82 | Gecikmeli Silme | 延迟删除 | Kaza ile yapılan işlemleri önlemek için silme işlemlerini geciktirme |
+| 83 | Toplu İşlemler | 批量操作 | Çoklu nesneler üzerinde birleştirilmiş işlemler yapma (silme/kopyalama/geri yükleme) |
+| 84 | Veri Soy Ağacı | 数据血缘 | Veri kaynaklarını ve değişiklik geçmişini izleyen meta veri kayıtları |
+| 85 | Veri Kataloğu | 数据目录 | Meta veri bilgilerini depolayan alma sistemi |
+| 86 | Depolama Ağ Geçidi | 存储网关 | Yerel sistemleri bulut depolama ile bağlayan hibrit bulut çözümü |
+| 87 | Hibrit Bulut Depolama | 混合云存储 | Hem yerel depolama hem de bulut depolamayı kullanan mimari |
+| 88 | Kenar Depolama | 边缘存储 | Veri kaynaklarına yakın kenar düğümlerinde depolama hizmetleri sunma |
+| 89 | Çoklu Bulut Depolama | 多云存储 | Farklı bulut hizmet sağlayıcıları arasında depolama çözümleri |
+| 90 | Depolama Federasyonu | 存储联盟 | Çoklu depolama sistemlerini birleştirilmiş yönetmek için soyutlama katmanı |
+| 91 | Nesne Etiketi | 对象标签 | Nesnelere özel sınıflandırma etiketleri ekleme |
+| 92 | Kovası Etiketi | 存储桶标签 | Kovasılarına yönetim/faturalandırma ile ilgili etiketler ekleme |
+| 93 | Depolama Kotası | 存储配额 | Kovasıların maksimum kapasitesini sınırlama |
+| 94 | İstek Kısıtlama | 请求限速 | Birim zaman başına API isteklerini sınırlama |
+| 95 | Hizmet Seviyesi Anlaşması (SLA) | 服务等级协议 | Kullanılabilirlik/kalıcılık için Hizmet Seviyesi Anlaşması taahhütleri (örneğin, %99.9 kullanılabilirlik) |
+| 96 | Felaket Kurtarma | 灾难恢复 | Bölgeler arası yedeklemeler aracılığıyla iş sürekliliğini sağlama |
+| 97 | Depolama Topolojisi | 存储拓扑 | Verilerin fiziksel/mantıksal düzeylerde dağılım yapısı |
+| 98 | Yakınlık Erişimi | 就近访问 | Kullanıcı isteklerini en yakın depolama düğümlerine yönlendirme |
+| 99 | Küresel Ad Alanı | 全球统一命名空间 | Bölgeler arası kovaları birleştirilmiş görüntüleme yönetimi |
+| 100 | Sıfır Kopyalı Taşıma | 零拷贝迁移 | Meta veri işlemleri aracılığıyla hızlı veri taşıma |

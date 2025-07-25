@@ -1,62 +1,62 @@
 ---
 title: "JavaScript SDK"
-description: "This article mainly explains the use of JavaScript SDK in RustFS."
+description: "Bu makale, RustFS'ta JavaScript SDK'nın kullanımını temel olarak açıklamaktadır."
 ---
 
 # JavaScript SDK
 
-RustFS is an object storage system compatible with the S3 protocol, supporting integration through AWS S3 JavaScript SDK. This article will explain how to use JavaScript/Node.js to integrate with RustFS and complete basic object storage operations.
+RustFS, AWS S3 JavaScript SDK ile entegrasyonu destekleyen, S3 protokolüyle uyumlu bir nesne depolama sistemidir. Bu makale, RustFS ile temel nesne depolama işlemlerini gerçekleştirmek için JavaScript/Node.js'nin nasıl kullanılacağını açıklayacaktır.
 
-## 1. Environment Setup
+## 1. Ortam Kurulumu
 
-### 1.1 Prerequisites
+### 1.1 Önkoşullar
 
-- Node.js 14+ or modern browser environment
-- npm or yarn package manager
+- Node.js 14+ veya modern tarayıcı ortamı
+- npm veya yarn paket yöneticisi
 
-### 1.2 Install AWS SDK
+### 1.2 AWS SDK Kurulumu
 
-Using npm:
+npm kullanarak:
 
 ```bash
 npm install @aws-sdk/client-s3
 ```
 
-Using yarn:
+yarn kullanarak:
 
 ```bash
 yarn add @aws-sdk/client-s3
 ```
 
-For browser environments, you can also use CDN:
+Tarayıcı ortamları için CDN de kullanılabilir:
 
 ```html
 <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>
 ```
 
-## 2. Basic Configuration
+## 2. Temel Yapılandırma
 
-### 2.1 Initialize S3 Client (Node.js)
+### 2.1 S3 İstemcisini Başlatma (Node.js)
 
 ```javascript
 import { S3Client } from '@aws-sdk/client-s3';
 
 const s3Client = new S3Client({
-  endpoint: 'http://192.168.1.100:9000', // RustFS endpoint
-  region: 'us-east-1', // Can be any value, RustFS doesn't validate region
+  endpoint: 'http://192.168.1.100:9000', // RustFS uç noktası
+  region: 'us-east-1', // Herhangi bir değer olabilir, RustFS bölgeyi doğrulamaz
   credentials: {
     accessKeyId: 'rustfsadmin',
     secretAccessKey: 'rustfssecret'
   },
-  forcePathStyle: true, // Required for RustFS
-  s3ForcePathStyle: true // For older SDK versions
+  forcePathStyle: true, // RustFS için gerekli
+  s3ForcePathStyle: true // Eski SDK sürümleri için
 });
 ```
 
-### 2.2 Browser Environment
+### 2.2 Tarayıcı Ortamı
 
 ```javascript
-// For browser environment
+// Tarayıcı ortamı için
 import { S3Client } from '@aws-sdk/client-s3';
 
 const s3Client = new S3Client({
@@ -70,9 +70,9 @@ const s3Client = new S3Client({
 });
 ```
 
-## 3. Basic Operations
+## 3. Temel İşlemler
 
-### 3.1 Create Bucket
+### 3.1 Bucket Oluşturma
 
 ```javascript
 import { CreateBucketCommand } from '@aws-sdk/client-s3';
@@ -84,23 +84,23 @@ async function createBucket(bucketName) {
     });
 
     const response = await s3Client.send(command);
-    console.log('Bucket created successfully:', response);
+    console.log('Bucket başarıyla oluşturuldu:', response);
     return response;
   } catch (error) {
     if (error.name === 'BucketAlreadyOwnedByYou') {
-      console.log('Bucket already exists');
+      console.log('Bucket zaten mevcut');
     } else {
-      console.error('Error creating bucket:', error);
+      console.error('Bucket oluşturulurken hata:', error);
       throw error;
     }
   }
 }
 
-// Usage
+// Kullanım
 await createBucket('my-bucket');
 ```
 
-### 3.2 Upload Object
+### 3.2 Nesne Yükleme
 
 ```javascript
 import { PutObjectCommand } from '@aws-sdk/client-s3';
@@ -118,19 +118,19 @@ async function uploadFile(bucketName, key, filePath) {
     });
 
     const response = await s3Client.send(command);
-    console.log('File uploaded successfully:', response);
+    console.log('Dosya başarıyla yüklendi:', response);
     return response;
   } catch (error) {
-    console.error('Error uploading file:', error);
+    console.error('Dosya yüklenirken hata:', error);
     throw error;
   }
 }
 
-// Usage
+// Kullanım
 await uploadFile('my-bucket', 'hello.txt', './hello.txt');
 ```
 
-### 3.3 Upload from String
+### 3.3 String Yükleme
 
 ```javascript
 async function uploadString(bucketName, key, content) {
@@ -143,19 +143,19 @@ async function uploadString(bucketName, key, content) {
     });
 
     const response = await s3Client.send(command);
-    console.log('String uploaded successfully:', response);
+    console.log('String başarıyla yüklendi:', response);
     return response;
   } catch (error) {
-    console.error('Error uploading string:', error);
+    console.error('String yüklenirken hata:', error);
     throw error;
   }
 }
 
-// Usage
-await uploadString('my-bucket', 'greeting.txt', 'Hello RustFS!');
+// Kullanım
+await uploadString('my-bucket', 'greeting.txt', 'Merhaba RustFS!');
 ```
 
-### 3.4 Download Object
+### 3.4 Nesne İndirme
 
 ```javascript
 import { GetObjectCommand } from '@aws-sdk/client-s3';
@@ -169,7 +169,7 @@ async function downloadFile(bucketName, key) {
 
     const response = await s3Client.send(command);
 
-    // Convert stream to buffer
+    // Akışı buffer'a dönüştür
     const chunks = [];
     for await (const chunk of response.Body) {
       chunks.push(chunk);
@@ -178,17 +178,17 @@ async function downloadFile(bucketName, key) {
     const buffer = Buffer.concat(chunks);
     return buffer;
   } catch (error) {
-    console.error('Error downloading file:', error);
+    console.error('Dosya indirilirken hata:', error);
     throw error;
   }
 }
 
-// Usage
+// Kullanım
 const fileBuffer = await downloadFile('my-bucket', 'hello.txt');
-console.log('File content:', fileBuffer.toString());
+console.log('Dosya içeriği:', fileBuffer.toString());
 ```
 
-### 3.5 List Objects
+### 3.5 Nesneleri Listeleme
 
 ```javascript
 import { ListObjectsV2Command } from '@aws-sdk/client-s3';
@@ -204,22 +204,22 @@ async function listObjects(bucketName, prefix = '') {
 
     if (response.Contents) {
       response.Contents.forEach(obj => {
-        console.log(`- ${obj.Key} (${obj.Size} bytes)`);
+        console.log(`- ${obj.Key} (${obj.Size} bayt)`);
       });
     }
 
     return response.Contents;
   } catch (error) {
-    console.error('Error listing objects:', error);
+    console.error('Nesneler listelenirken hata:', error);
     throw error;
   }
 }
 
-// Usage
+// Kullanım
 await listObjects('my-bucket');
 ```
 
-### 3.6 Delete Object
+### 3.6 Nesne Silme
 
 ```javascript
 import { DeleteObjectCommand } from '@aws-sdk/client-s3';
@@ -232,27 +232,27 @@ async function deleteObject(bucketName, key) {
     });
 
     const response = await s3Client.send(command);
-    console.log('Object deleted successfully:', response);
+    console.log('Nesne başarıyla silindi:', response);
     return response;
   } catch (error) {
-    console.error('Error deleting object:', error);
+    console.error('Nesne silinirken hata:', error);
     throw error;
   }
 }
 
-// Usage
+// Kullanım
 await deleteObject('my-bucket', 'hello.txt');
 ```
 
-## 4. Advanced Features
+## 4. Gelişmiş Özellikler
 
-### 4.1 Generate Presigned URLs
+### 4.1 Ön İmzalı URL Oluşturma
 
 ```javascript
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-// Generate download URL
+// İndirme URL'si oluştur
 async function getDownloadUrl(bucketName, key, expiresIn = 3600) {
   try {
     const command = new GetObjectCommand({
@@ -261,15 +261,15 @@ async function getDownloadUrl(bucketName, key, expiresIn = 3600) {
     });
 
     const url = await getSignedUrl(s3Client, command, { expiresIn });
-    console.log('Download URL:', url);
+    console.log('İndirme URL:', url);
     return url;
   } catch (error) {
-    console.error('Error generating download URL:', error);
+    console.error('İndirme URL oluşturulurken hata:', error);
     throw error;
   }
 }
 
-// Generate upload URL
+// Yükleme URL'si oluştur
 async function getUploadUrl(bucketName, key, expiresIn = 3600) {
   try {
     const command = new PutObjectCommand({
@@ -278,20 +278,20 @@ async function getUploadUrl(bucketName, key, expiresIn = 3600) {
     });
 
     const url = await getSignedUrl(s3Client, command, { expiresIn });
-    console.log('Upload URL:', url);
+    console.log('Yükleme URL:', url);
     return url;
   } catch (error) {
-    console.error('Error generating upload URL:', error);
+    console.error('Yükleme URL oluşturulurken hata:', error);
     throw error;
   }
 }
 
-// Usage
+// Kullanım
 const downloadUrl = await getDownloadUrl('my-bucket', 'hello.txt');
 const uploadUrl = await getUploadUrl('my-bucket', 'new-file.txt');
 ```
 
-### 4.2 Multipart Upload
+### 4.2 Çok Parçalı Yükleme
 
 ```javascript
 import {
@@ -302,16 +302,16 @@ import {
 } from '@aws-sdk/client-s3';
 
 async function multipartUpload(bucketName, key, file) {
-  const partSize = 5 * 1024 * 1024; // 5MB parts
+  const partSize = 5 * 1024 * 1024; // 5MB parçalar
   const fileSize = file.size || file.length;
 
   if (fileSize <= partSize) {
-    // Use regular upload for small files
+    // Küçük dosyalar için normal yükleme kullan
     return uploadFile(bucketName, key, file);
   }
 
   try {
-    // 1. Initiate multipart upload
+    // 1. Çok parçalı yüklemeyi başlat
     const createCommand = new CreateMultipartUploadCommand({
       Bucket: bucketName,
       Key: key
@@ -319,7 +319,7 @@ async function multipartUpload(bucketName, key, file) {
 
     const { UploadId } = await s3Client.send(createCommand);
 
-    // 2. Upload parts
+    // 2. Parçaları yükle
     const parts = [];
     const numParts = Math.ceil(fileSize / partSize);
 
@@ -345,10 +345,10 @@ async function multipartUpload(bucketName, key, file) {
         PartNumber: partNumber
       });
 
-      console.log(`Uploaded part ${partNumber}/${numParts}`);
+      console.log(`Yüklenen parça ${partNumber}/${numParts}`);
     }
 
-    // 3. Complete multipart upload
+    // 3. Çok parçalı yüklemeyi tamamla
     const completeCommand = new CompleteMultipartUploadCommand({
       Bucket: bucketName,
       Key: key,
@@ -359,13 +359,13 @@ async function multipartUpload(bucketName, key, file) {
     });
 
     const result = await s3Client.send(completeCommand);
-    console.log('Multipart upload completed:', result);
+    console.log('Çok parçalı yükleme tamamlandı:', result);
     return result;
 
   } catch (error) {
-    console.error('Multipart upload failed:', error);
+    console.error('Çok parçalı yükleme başarısız:', error);
 
-    // Abort upload on error
+    // Hata durumunda yüklemeyi iptal et
     try {
       const abortCommand = new AbortMultipartUploadCommand({
         Bucket: bucketName,
@@ -374,7 +374,7 @@ async function multipartUpload(bucketName, key, file) {
       });
       await s3Client.send(abortCommand);
     } catch (abortError) {
-      console.error('Error aborting upload:', abortError);
+      console.error('Yükleme iptal edilirken hata:', abortError);
     }
 
     throw error;
@@ -382,19 +382,19 @@ async function multipartUpload(bucketName, key, file) {
 }
 ```
 
-## 5. Browser Integration
+## 5. Tarayıcı Entegrasyonu
 
-### 5.1 File Upload from Browser
+### 5.1 Tarayıcıdan Dosya Yükleme
 
 ```html
 <!DOCTYPE html>
 <html>
 <head>
-    <title>RustFS File Upload</title>
+    <title>RustFS Dosya Yükleme</title>
 </head>
 <body>
     <input type="file" id="fileInput" />
-    <button onclick="uploadFile()">Upload</button>
+    <button onclick="uploadFile()">Yükle</button>
     <div id="progress"></div>
 
     <script type="module">
@@ -415,7 +415,7 @@ async function multipartUpload(bucketName, key, file) {
             const file = fileInput.files[0];
 
             if (!file) {
-                alert('Please select a file');
+                alert('Lütfen bir dosya seçin');
                 return;
             }
 
@@ -428,11 +428,11 @@ async function multipartUpload(bucketName, key, file) {
                 });
 
                 const response = await s3Client.send(command);
-                document.getElementById('progress').innerHTML = 'Upload successful!';
-                console.log('Upload response:', response);
+                document.getElementById('progress').innerHTML = 'Yükleme başarılı!';
+                console.log('Yükleme yanıtı:', response);
             } catch (error) {
-                document.getElementById('progress').innerHTML = 'Upload failed: ' + error.message;
-                console.error('Upload error:', error);
+                document.getElementById('progress').innerHTML = 'Yükleme başarısız: ' + error.message;
+                console.error('Yükleme hatası:', error);
             }
         };
     </script>
@@ -440,10 +440,10 @@ async function multipartUpload(bucketName, key, file) {
 </html>
 ```
 
-### 5.2 Drag and Drop Upload
+### 5.2 Sürükle Bırak Yükleme
 
 ```javascript
-// Drag and drop functionality
+// Sürükle bırak işlevselliği
 function setupDragAndDrop(dropZoneId) {
   const dropZone = document.getElementById(dropZoneId);
 
@@ -465,9 +465,9 @@ function setupDragAndDrop(dropZoneId) {
     for (const file of files) {
       try {
         await uploadFileToRustFS(file);
-        console.log(`${file.name} uploaded successfully`);
+        console.log(`${file.name} başarıyla yüklendi`);
       } catch (error) {
-        console.error(`Failed to upload ${file.name}:`, error);
+        console.error(`${file.name} yüklenirken hata:`, error);
       }
     }
   });
@@ -485,9 +485,9 @@ async function uploadFileToRustFS(file) {
 }
 ```
 
-## 6. Error Handling
+## 6. Hata Yönetimi
 
-### 6.1 Common Error Types
+### 6.1 Yaygın Hata Türleri
 
 ```javascript
 async function handleS3Operation(operation) {
@@ -496,26 +496,26 @@ async function handleS3Operation(operation) {
   } catch (error) {
     switch (error.name) {
       case 'NoSuchBucket':
-        console.error('Bucket does not exist');
+        console.error('Bucket mevcut değil');
         break;
       case 'NoSuchKey':
-        console.error('Object does not exist');
+        console.error('Nesne mevcut değil');
         break;
       case 'AccessDenied':
-        console.error('Access denied - check credentials');
+        console.error('Erişim reddedildi - kimlik bilgilerini kontrol edin');
         break;
       case 'NetworkError':
-        console.error('Network connection failed');
+        console.error('Ağ bağlantısı başarısız');
         break;
       default:
-        console.error('Unknown error:', error);
+        console.error('Bilinmeyen hata:', error);
     }
     throw error;
   }
 }
 ```
 
-### 6.2 Retry Logic
+### 6.2 Tekrar Mantığı
 
 ```javascript
 async function retryOperation(operation, maxRetries = 3, delay = 1000) {
@@ -527,29 +527,29 @@ async function retryOperation(operation, maxRetries = 3, delay = 1000) {
         throw error;
       }
 
-      console.log(`Attempt ${attempt} failed, retrying in ${delay}ms...`);
+      console.log(`Deneme ${attempt} başarısız, ${delay}ms sonra tekrar denenecek...`);
       await new Promise(resolve => setTimeout(resolve, delay));
-      delay *= 2; // Exponential backoff
+      delay *= 2; // Üstel geri çekilme
     }
   }
 }
 
-// Usage
+// Kullanım
 const result = await retryOperation(async () => {
   return await downloadFile('my-bucket', 'important-file.txt');
 });
 ```
 
-## 7. Best Practices
+## 7. En İyi Uygulamalar
 
-1. **Error Handling**: Always wrap S3 operations in try-catch blocks
-2. **Credentials Security**: Never expose credentials in frontend code; use temporary credentials or presigned URLs
-3. **File Size**: Use multipart upload for files larger than 5MB
-4. **Content Type**: Always set appropriate Content-Type for better compatibility
-5. **Progress Tracking**: Implement progress indicators for large file uploads
-6. **Connection Pooling**: Reuse S3 client instances to optimize performance
+1. **Hata Yönetimi**: S3 işlemlerini her zaman try-catch blokları içine alın
+2. **Kimlik Bilgisi Güvenliği**: Kimlik bilgilerini asla ön uç kodunda açıkta bırakmayın; geçici kimlik bilgileri veya ön imzalı URL'ler kullanın
+3. **Dosya Boyutu**: 5MB'tan büyük dosyalar için çok parçalı yükleme kullanın
+4. **İçerik Türü**: Daha iyi uyumluluk için uygun Content-Type ayarlayın
+5. **İlerleme Takibi**: Büyük dosya yüklemeleri için ilerleme göstergeleri uygulayın
+6. **Bağlantı Havuzlama**: Performansı optimize etmek için S3 istemci örneklerini yeniden kullanın
 
-## 8. Complete Example
+## 8. Tam Örnek
 
 ```javascript
 class RustFSClient {
@@ -584,10 +584,10 @@ class RustFSClient {
     return await this.s3Client.send(command);
   }
 
-  // ... other methods
+  // ... diğer metodlar
 }
 
-// Usage
+// Kullanım
 const rustfs = new RustFSClient({
   endpoint: 'http://localhost:9000',
   credentials: {
@@ -596,8 +596,7 @@ const rustfs = new RustFSClient({
   }
 });
 
-// Upload with progress tracking
+// İlerleme takibi ile yükleme
 await rustfs.uploadFile('my-bucket', 'large-file.zip', file, (progress) => {
-  console.log(`Upload progress: ${progress}%`);
+  console.log(`Yükleme ilerlemesi: ${progress}%`);
 });
-```

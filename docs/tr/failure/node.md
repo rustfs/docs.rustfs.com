@@ -1,94 +1,82 @@
 ---
-title: "Node Failure"
-description: "Complete steps for handling node failures in RustFS clusters. Includes: replacement node hardware preparation, configuration updates, service deployment, rejoining the cluster, data healing, and subsequent checks and best practices."
+title: "Düğüm Arızası (Node Failure)"
+description: "RustFS kümelerinde düğüm arızalarını ele alma adımları. Şunları içerir: yedek düğüm donanımının hazırlanması, yapılandırma güncellemeleri, servis dağıtımı, kümeye yeniden katılma, veri iyileştirme ve sonraki kontroller ve en iyi uygulamalar."
 ---
+# Düğüm Arızası
 
-# Node Failure
+Dağıtılmış RustFS kümelerinde, silme kodlama mekanizmaları, kısmi düğüm arızaları sırasında okuma/yazma erişimini sağlamak ve düğümler kümeye yeniden katıldığında otomatik veri iyileştirme yapmak için kullanılır. Bu belge, aşağıdaki süreci size rehberlik edecektir:
 
-In distributed RustFS clusters, erasure coding mechanisms are employed to ensure read/write access during partial node failures and automatic data healing when nodes rejoin. This document will guide you through the following process:
+1. Yedek düğümü başlatın ve ortamı senkronize edin
+2. DNS/ana bilgisayar adını eski düğüm kimliğini yeni düğüme yönlendirmek için güncelleyin
+3. Kümeyle uyumlu RustFS servisini indirin ve dağıtın
+4. Yeni düğümü kümeye yeniden katın ve veri iyileştirmesini tetikleyin
+5. İyileştirme ilerlemesini izleyin ve sonraki kontrolleri ve optimizasyonu gerçekleştirin
 
-1. Start replacement node and synchronize environment
-2. Update DNS/hostname to point old node identity to new node
-3. Download and deploy RustFS service consistent with cluster
-4. Rejoin new node to cluster and trigger data healing
-5. Monitor healing progress and perform subsequent checks and optimization
+## 1) Yedek Düğümü Başlatın
 
-## 1) Start Replacement Node
+* **Donanım ve Sistem Hazırlığı**
+Yedek düğümün sunucu donanımının arızalı düğümle kabaca tutarlı olduğundan emin olun; CPU, bellek, ağ yapılandırması ve disk türleri dahil; hatta daha yüksek özellikler kullanmak küme performansını etkilemez.
+Yazılım ortamının diğer düğümlerle sürüm uyumluluğunu koruması gerekir (işletim sistemi, çekirdek, bağımlılık kütüphaneleri vb.) ortam farklılıklarından dolayı küme anormal davranış göstermesin.
 
-* **Hardware and System Preparation**
- Ensure the replacement node's server hardware is roughly consistent with the failed node, including CPU, memory, network configuration, and disk types; even using higher specifications won't affect cluster performance.
- Software environment needs to maintain version consistency with other nodes (operating system, kernel, dependency libraries, etc.) to avoid cluster abnormal behavior due to environment differences.
+* **Özel Sürücü Erişimi**
+Fiziksel sürücüler üzerindeki işlemler gibi, RustFS de depolama birimlerine özel erişim gerektirir, diğer hiçbir işlem veya betiğin depolama birimleri içindeki verileri doğrudan değiştirmesine izin vermez, aksi takdirde veri bozulması veya yedeklilik kaybına kolayca neden olabilir.
 
-* **Exclusive Drive Access**
- Like operations on physical drives, RustFS requires exclusive access to storage volumes, prohibiting any other processes or scripts from directly modifying data within storage volumes, otherwise it can easily cause data corruption or redundancy loss.
+## 2) Ana Bilgisayar Adını ve Ağ Çözünürlüğünü Güncelleyin
 
-## 2) Update Hostname and Network Resolution
+* **DNS/Hosts Yapılandırması**
+Yedek düğümün IP adresi arızalı düğümden farklıysa, eski düğümün ana bilgisayar adını (örneğin, `rustfs-node-2.example.net`) yeni düğüme yeniden çözümlemeniz gerekir, böylece küme içindeki düğümler aynı adres üzerinden birbirlerini keşfedebilir.
+```bash
+# Örnek: /etc/hosts dosyasına satır ekleyin veya değiştirin
+192.168.1.12 rustfs-node-2.example.net
+```
+Doğru çözünürlükten sonra, `ping` veya `nslookup` aracılığıyla ana bilgisayar adının yeni düğüme işaret ettiğini doğrulayın.
 
-* **DNS/Hosts Configuration**
- If the replacement node's IP address differs from the failed node, you need to re-resolve the old node's hostname (e.g., `rustfs-node-2.example.net`) to the new node to ensure nodes within the cluster discover each other through the same address.
+## 3) RustFS Servisini Dağıtın ve Yapılandırın
 
- ```bash
- # Example: Add or modify line in /etc/hosts
- 192.168.1.12 rustfs-node-2.example.net
- ```
+* **İndirme ve Kurulum**
+Mevcut düğümlerle uyumlu ikili dosyaları veya kurulum paketlerini indirmek için resmi RustFS dağıtım sürecini aynı sürüm için takip edin ve birleştirilmiş dizine çıkarın. Başlangıç betiklerinin, ortam değişkenlerinin ve yapılandırma dosyalarının (örneğin `/etc/default/rustfs`) kümedeki diğer düğümlerle tamamen tutarlı olduğundan emin olun.
 
- After correct resolution, verify the hostname points to the new node via `ping` or `nslookup`.
+* **Yapılandırma Doğrulama**
+* `config.yaml` dosyasındaki küme düğüm listesinin (endpointler) yeni düğümün ana bilgisayar adını ve portunu içerdiğini kontrol edin.
+* Tüm düğümlerin aynı erişim anahtarlarına ve izin yapılandırmalarına sahip olduğundan emin olun, böylece yeni düğüm kimlik doğrulama hataları nedeniyle kümeye katılamaz.
 
-## 3) Deploy and Configure RustFS Service
+## 4) Kümeye Yeniden Katılın ve Veri İyileştirmesini Tetikleyin
 
-* **Download and Installation**
- Following the official RustFS deployment process for the same version, download binaries or installation packages consistent with existing nodes and extract to unified directory. Ensure startup scripts, environment variables, and configuration files (such as `/etc/default/rustfs`) are completely consistent with other nodes in the cluster.
+* **Servisi Başlatın**
+```bash
+systemctl start rustfs-server
+```
+Veya RustFS servisini başlatmak için özel başlangıç betiğinizi kullanın ve `journalctl -u rustfs-server -f` aracılığıyla başlangıç günlüklerini görüntüleyerek yeni düğümün diğer çevrimiçi düğümleri tespit ettiğini ve veri iyileştirme sürecini başlattığını onaylayın.
 
-* **Configuration Verification**
+* **İyileştirme Durumunun Manuel İzlenmesi**
+Küme sağlığını ve iyileştirme ilerlemesini görüntülemek için RustFS yönetim araçlarını kullanın (komutun `rustfs-admin` olduğunu varsayalım):
+```bash
+# Küme düğüm durumunu görüntüleyin
+rc cluster status
+# Yeni düğüm için veri iyileştirmesini tetikleyin
+rc heal --node rustfs-node-2.example.net
+# İyileştirme ilerlemesini gerçek zamanlı olarak takip edin
+rc heal status --follow
+```
+Burada, `heal` komutu RustFS'nin `rc admin heal` komutuna benzer, tüm eksik veya tutarsız veri parçalarının arka planda restore edilmesini sağlar.
 
-* Check if the cluster node list (endpoints) in `config.yaml` includes the new node's hostname and port.
-* Ensure all nodes have the same access keys and permission configurations to avoid new node unable to join due to authentication failures.
+* **Topluluk Deneyimi Referansı**
+Topluluk testleri, düğümler çevrimdışı olduğunda ve sonra kümeye yeniden katıldığında, RustFS'nin yalnızca yeni düğüm üzerinde iyileştirme işlemleri gerçekleştireceğini ve tam küme yeniden dengelenmesinden kaçınarak gereksiz ağ ve G/Ç piklerinin önüne geçtiğini göstermektedir.
 
-## 4) Rejoin Cluster and Trigger Data Healing
+## 5) Sonraki Kontroller ve En İyi Uygulamalar
 
-* **Start Service**
+* **İzleme ve Uyarılar**
+* İyileştirme sırasında disk ve ağ yükünü izleyin ve kümenin okuma/yazma ve ağ bant genişliği gereksinimlerini karşıladığından emin olun.
+* Düğüm iyileştirmesinin başarısız olduğu veya ilerlemenin eşiklerin ötesinde durduğu durumlarda operasyon ekiplerini zamanında bilgilendirmek için uyarılar kurun.
 
- ```bash
- systemctl start rustfs-server
- ```
+* **Tekrarlanan Arıza Tatbikatları**
+Düzenli olarak düğüm arızalarını simüle edin ve tüm kurtarma sürecini uygulayın, böylece ekip operasyon komutları ve acil durum prosedürleriyle aşina olsun.
 
- Or use your custom startup script to start the RustFS service, and view startup logs via `journalctl -u rustfs-server -f` to confirm the new node has detected other online nodes and begun the data healing process.
+* **Kök Neden Analizi**
+Sık arıza veren düğümler veya diskler için derinlemesine donanım sağlığı teşhisleri (SMART, BIOS günlükleri vb.) gerçekleştirin ve önleyici bakım planları uygulayın.
 
-* **Manual Monitoring of Healing Status**
- Use RustFS management tools (assuming command is `rustfs-admin`) to view cluster health and healing progress:
-
- ```bash
- # View cluster node status
- rc cluster status
-
- # Trigger data healing for new node
- rc heal --node rustfs-node-2.example.net
-
- # Real-time tracking of healing progress
- rc heal status --follow
- ```
-
- Here, the `heal` command is similar to RustFS's `rc admin heal`, ensuring all missing or inconsistent data shards are restored in the background.
-
-* **Community Experience Reference**
- Community testing shows that when nodes go offline and then rejoin, RustFS will only perform healing operations on the new node without full cluster rebalancing, thus avoiding unnecessary network and I/O peaks.
-
-## 5) Subsequent Checks and Best Practices
-
-* **Monitoring and Alerting**
-
-* During healing, monitor disk and network load to ensure the cluster meets read/write and network bandwidth requirements.
-* Set up alerts to notify operations teams promptly when node healing fails or progress stalls beyond thresholds.
-
-* **Repeated Failure Drills**
- Regularly simulate node failures and practice the entire recovery process to ensure team familiarity with operation commands and emergency procedures.
-
-* **Root Cause Analysis**
- Conduct in-depth hardware health diagnostics (SMART, BIOS logs, etc.) for frequently failing nodes or disks and implement preventive maintenance plans.
-
-* **Professional Support**
- For deeper failure localization and recovery guidance, contact the RustFS development team or community for assistance.
+* **Profesyonel Destek**
+Daha derin arıza lokalizasyonu ve kurtarma rehberliği için RustFS geliştirme ekibi veya toplulukla iletişime geçin.
 
 ---
-
-**Summary**: Through the above process, RustFS can quickly and safely replace nodes and complete data healing after complete node hardware failure, minimizing cluster availability interruption. Be sure to verify against your own environment and specific command-line tools to ensure configuration consistency and correct operation sequence.
+**Özet**: Yukarıdaki süreç aracılığıyla, RustFS tam düğüm donanımı arızası sonrasında hızlı ve güvenli bir şekilde düğümleri değiştirebilir ve veri iyileştirmesini tamamlayabilir, böylece küme kullanılabilirliği kesintisini en aza indirebilir. Kendi ortamınıza göre doğrulama yapmayı ve belirli komut satırı araçlarıyla yapılandırma tutarlılığını ve doğru işlem sırasını sağlamayı unutmayın.

@@ -1,256 +1,256 @@
-# Alibaba Cloud Integration
+# Alibaba Cloud Entegrasyonu
 
-RustFS provides seamless integration with Alibaba Cloud services, enabling hybrid and multi-cloud storage solutions with optimal performance and cost efficiency.
+RustFS, Alibaba Cloud hizmetleriyle sorunsuz bir şekilde bütünleşerek, optimal performans ve maliyet verimliliği ile hibrit ve çoklu bulut depolama çözümleri sunar.
 
-## Overview
+## Genel Bakış
 
-![Alibaba Cloud Integration](./images/sec1-1.png)
+![Alibaba Cloud Entegrasyonu](./images/sec1-1.png)
 
-RustFS on Alibaba Cloud offers:
+Alibaba Cloud üzerindeki RustFS şunları sunar:
 
-- **Native Integration**: Deep integration with Alibaba Cloud services
-- **Hybrid Architecture**: Seamless connection between on-premises and cloud
-- **Cost Optimization**: Intelligent tiering and lifecycle management
-- **High Performance**: Optimized for Alibaba Cloud infrastructure
+- **Yerel Entegrasyon**: Alibaba Cloud hizmetleriyle derin entegrasyon
+- **Hibrit Mimari**: Şirket içi ve bulut arasında sorunsuz bağlantı
+- **Maliyet Optimizasyonu**: Akıllı katmanlandırma ve yaşam döngüsü yönetimi
+- **Yüksek Performans**: Alibaba Cloud altyapısı için optimize edilmiştir
 
-## Key Features
+## Ana Özellikler
 
-### Seamless Cloud Integration
+### Sorunsuz Bulut Entegrasyonu
 
-- **ECS Integration**: Deploy on Elastic Compute Service instances
-- **OSS Compatibility**: Compatible with Object Storage Service APIs
-- **VPC Support**: Deploy within Virtual Private Cloud for security
-- **CDN Integration**: Accelerate content delivery with Alibaba Cloud CDN
+- **ECS Entegrasyonu**: Elastic Compute Service örneklerinde dağıtım
+- **OSS Uyumluluğu**: Object Storage Service API'leri ile uyumlu
+- **VPC Desteği**: Güvenlik için Sanal Özel Bulut içinde dağıtım
+- **CDN Entegrasyonu**: Alibaba Cloud CDN ile içerik dağıtımını hızlandırma
 
-### Storage Optimization
+### Depolama Optimizasyonu
 
-- **Intelligent Tiering**: Automatic data movement between storage tiers
-- **Lifecycle Management**: Automated data lifecycle policies
-- **Compression**: Built-in data compression to reduce storage costs
-- **Deduplication**: Eliminate duplicate data to optimize storage
+- **Akıllı Katmanlandırma**: Depolama katmanları arasında otomatik veri hareketi
+- **Yaşam Döngüsü Yönetimi**: Otomatik veri yaşam döngüsü politikaları
+- **Sıkıştırma**: Depolama maliyetlerini düşürmek için yerleşik veri sıkıştırma
+- **Yinelenen Veri Ortadan Kaldırma**: Depolamayı optimize etmek için yinelenen verileri ortadan kaldırma
 
-### Security and Compliance
+### Güvenlik ve Uyumluluk
 
-- **Encryption**: End-to-end encryption with KMS integration
-- **Access Control**: Fine-grained access control and IAM integration
-- **Audit Logging**: Comprehensive audit trails and compliance reporting
-- **Network Security**: VPC, security groups, and network ACLs
+- **Şifreleme**: KMS entegrasyonu ile uçtan uca şifreleme
+- **Erişim Kontrolü**: İnce ayarlı erişim kontrolü ve IAM entegrasyonu
+- **Denetim Kayıtları**: Kapsamlı denetim izleri ve uyumluluk raporlama
+- **Ağ Güvenliği**: VPC, güvenlik grupları ve ağ ACL'leri
 
-## Deployment Architectures
+## Dağıtım Mimarileri
 
-### Hybrid Cloud Architecture
-
-```
-┌─────────────────┐    ┌─────────────────┐
-│   On-Premises   │    │  Alibaba Cloud  │
-│     RustFS      │◄──►│     RustFS      │
-│                 │    │                 │
-│ • Primary Data  │    │ • Backup Data   │
-│ • Hot Storage   │    │ • Cold Storage  │
-│ • Low Latency   │    │ • Cost Optimized│
-└─────────────────┘    └─────────────────┘
-```
-
-### Multi-Region Deployment
+### Hibrit Bulut Mimarisi
 
 ```
 ┌─────────────────┐    ┌─────────────────┐
-│   Region A      │    │   Region B      │
-│   (Primary)     │◄──►│   (Backup)      │
-│                 │    │                 │
-│ • Active Data   │    │ • Replica Data  │
-│ • Read/Write    │    │ • Read Only     │
-│ • Low Latency   │    │ • DR Ready      │
+│   Şirket İçi     │    │  Alibaba Cloud  │
+│     RustFS       │◄──►│     RustFS       │
+│                  │    │                  │
+│ • Birincil Veri  │    │ • Yedek Veri     │
+│ • Sıcak Depolama │    │ • Soğuk Depolama │
+│ • Düşük Gecikme │    │ • Maliyet Optimize│
 └─────────────────┘    └─────────────────┘
 ```
 
-## Integration Services
+### Çok Bölgeli Dağıtım
 
-### Compute Services
+```
+┌─────────────────┐    ┌─────────────────┐
+│   Bölge A       │    │   Bölge B       │
+│   (Birincil)    │◄──►│   (Yedek)       │
+│                  │    │                  │
+│ • Aktif Veri     │    │ • Replika Veri   │
+│ • Okuma/Yazma   │    │ • Salt Okunur    │
+│ • Düşük Gecikme │    │ • DR Hazır       │
+└─────────────────┘    └─────────────────┘
+```
+
+## Entegrasyon Hizmetleri
+
+### Hesaplama Hizmetleri
 
 #### Elastic Compute Service (ECS)
 
-- **Optimized Instances**: Recommended instance types for RustFS
-- **Auto Scaling**: Automatic scaling based on workload
-- **Load Balancing**: Distribute traffic across multiple instances
-- **Health Monitoring**: Continuous health checks and alerting
+- **Optimize Edilmiş Örnekler**: RustFS için önerilen örnek türleri
+- **Oto Ölçeklendirme**: İş yüküne göre otomatik ölçeklendirme
+- **Yük Dengeleme**: Trafiği birden fazla örneğe dağıtma
+- **Sağlık İzleme**: Sürekli sağlık kontrolleri ve uyarılar
 
-#### Container Services
+#### Konteyner Hizmetleri
 
-- **ACK Integration**: Deploy on Alibaba Cloud Container Service for Kubernetes
-- **Serverless Kubernetes**: Serverless container deployment
-- **Service Mesh**: Integration with Alibaba Service Mesh
-- **DevOps**: CI/CD pipeline integration
+- **ACK Entegrasyonu**: Alibaba Cloud Container Service for Kubernetes üzerinde dağıtım
+- **Sunucusuz Kubernetes**: Sunucusuz konteyner dağıtımı
+- **Servis Ağı**: Alibaba Service Mesh entegrasyonu
+- **DevOps**: CI/CD boru hattı entegrasyonu
 
-### Storage Services
+### Depolama Hizmetleri
 
 #### Object Storage Service (OSS)
 
-- **API Compatibility**: S3-compatible API for seamless migration
-- **Tiering**: Automatic tiering to OSS IA and Archive
-- **Cross-Region Replication**: Replicate data across regions
-- **Lifecycle Policies**: Automated data lifecycle management
+- **API Uyumluluğu**: Sorunsuz geçiş için S3 uyumlu API
+- **Katmanlandırma**: OSS IA ve Arşiv'e otomatik katmanlandırma
+- **Çok Bölgeli Çoğaltma**: Bölgeler arasında veri çoğaltma
+- **Yaşam Döngüsü Politikaları**: Otomatik veri yaşam döngüsü yönetimi
 
 #### Network Attached Storage (NAS)
 
-- **File System Interface**: POSIX-compliant file system access
-- **Performance Tiers**: General Purpose and Performance tiers
-- **Backup Integration**: Automated backup to OSS
-- **Access Control**: Fine-grained file-level permissions
+- **Dosya Sistemi Arayüzü**: POSIX uyumlu dosya sistemi erişimi
+- **Performans Katmanları**: Genel Amaçlı ve Performans katmanları
+- **Yedekleme Entegrasyonu**: OSS'e otomatik yedekleme
+- **Erişim Kontrolü**: Dosya düzeyinde ince ayarlı izinler
 
-### Network Services
+### Ağ Hizmetleri
 
 #### Virtual Private Cloud (VPC)
 
-- **Isolated Network**: Deploy in isolated network environment
-- **Subnets**: Organize resources across multiple subnets
-- **Route Tables**: Custom routing for optimal performance
-- **NAT Gateway**: Secure internet access for private instances
+- **İzole Ağ**: İzole ağ ortamında dağıtım
+- **Alt Ağlar**: Kaynakları birden fazla alt ağa organize etme
+- **Yönlendirme Tabloları**: Optimal performans için özel yönlendirme
+- **NAT Ağ Geçidi**: Özel örnekler için güvenli internet erişimi
 
 #### Content Delivery Network (CDN)
 
-- **Global Acceleration**: Accelerate content delivery worldwide
-- **Cache Optimization**: Intelligent caching strategies
-- **HTTPS Support**: Secure content delivery with SSL/TLS
-- **Real-time Analytics**: Monitor CDN performance and usage
+- **Küresel Hızlandırma**: Dünya çapında içerik dağıtımını hızlandırma
+- **Önbellek Optimizasyonu**: Akıllı önbellek stratejileri
+- **HTTPS Desteği**: SSL/TLS ile güvenli içerik dağıtımı
+- **Gerçek Zamanlı Analitik**: CDN performansını ve kullanımını izleme
 
-## Security Integration
+## Güvenlik Entegrasyonu
 
 ### Key Management Service (KMS)
 
-- **Encryption Keys**: Centralized encryption key management
-- **Hardware Security Modules**: HSM-backed key protection
-- **Key Rotation**: Automatic key rotation policies
-- **Audit Logging**: Complete key usage audit trails
+- **Şifreleme Anahtarları**: Merkezi şifreleme anahtarı yönetimi
+- **Donanım Güvenlik Modülleri**: HSM destekli anahtar koruması
+- **Anahtar Döndürme**: Otomatik anahtar döndürme politikaları
+- **Denetim Kayıtları**: Tam anahtar kullanım denetim izleri
 
 ### Identity and Access Management (IAM)
 
-- **User Management**: Centralized user and role management
-- **Policy-Based Access**: Fine-grained access control policies
-- **Multi-Factor Authentication**: Enhanced security with MFA
-- **Federation**: Integration with external identity providers
+- **Kullanıcı Yönetimi**: Merkezi kullanıcı ve rol yönetimi
+- **Politika Tabanlı Erişim**: İnce ayarlı erişim kontrol politikaları
+- **Çok Faktörlü Kimlik Doğrulama**: MFA ile artırılmış güvenlik
+- **Federasyon**: Harici kimlik sağlayıcılarla entegrasyon
 
 ### Security Center
 
-- **Threat Detection**: Real-time threat detection and response
-- **Vulnerability Assessment**: Regular security assessments
-- **Compliance Monitoring**: Continuous compliance monitoring
-- **Incident Response**: Automated incident response workflows
+- **Tehdit Tespiti**: Gerçek zamanlı tehdit tespiti ve yanıt
+- **Zafiyet Değerlendirmesi**: Düzenli güvenlik değerlendirmeleri
+- **Uyumluluk İzleme**: Sürekli uyumluluk izleme
+- **Olay Yanıtı**: Otomatik olay yanıt iş akışları
 
-## Monitoring and Operations
+## İzleme ve İşlemler
 
 ### CloudMonitor
 
-- **Performance Metrics**: Monitor storage performance and usage
-- **Custom Dashboards**: Create custom monitoring dashboards
-- **Alerting**: Set up alerts for critical metrics
-- **Log Analysis**: Analyze system and application logs
+- **Performans Metrikleri**: Depolama performansını ve kullanımını izleme
+- **Özel Panolar**: Özel izleme panoları oluşturma
+- **Uyarılar**: Kritik metrikler için uyarılar ayarlama
+- **Kayıt Analizi**: Sistem ve uygulama kayıtlarını analiz etme
 
 ### Log Service
 
-- **Centralized Logging**: Collect and analyze all system logs
-- **Real-time Analysis**: Real-time log processing and analysis
-- **Search and Query**: Powerful search and query capabilities
-- **Integration**: Integration with monitoring and alerting systems
+- **Merkezi Kayıt**: Tüm sistem kayıtlarını toplama ve analiz etme
+- **Gerçek Zamanlı Analiz**: Gerçek zamanlı kayıt işleme ve analiz
+- **Arama ve Sorgulama**: Güçlü arama ve sorgulama yetenekleri
+- **Entegrasyon**: İzleme ve uyarı sistemleriyle entegrasyon
 
-## Cost Optimization
+## Maliyet Optimizasyonu
 
-### Pricing Models
+### Fiyatlandırma Modelleri
 
-- **Pay-as-you-go**: Pay only for resources used
-- **Subscription**: Reserved capacity for predictable workloads
-- **Spot Instances**: Use spot instances for cost savings
-- **Resource Packages**: Bundled resources for better pricing
+- **Kullandıkça Öde**: Kullanılan kaynaklar için ödeme
+- **Abonelik**: Öngörülebilir iş yükleri için rezerv kapasite
+- **Spot Örnekler**: Maliyet tasarrufu için spot örnekler kullanma
+- **Kayıt Paketleri**: Daha iyi fiyatlandırma için paketlenmiş kaynaklar
 
-### Cost Management
+### Maliyet Yönetimi
 
-- **Usage Monitoring**: Monitor resource usage and costs
-- **Budget Alerts**: Set up budget alerts and notifications
-- **Cost Analysis**: Detailed cost analysis and optimization recommendations
-- **Reserved Instances**: Purchase reserved instances for cost savings
+- **Kullanım İzleme**: Kaynak kullanımını ve maliyetleri izleme
+- **Bütçe Uyarıları**: Bütçe uyarıları ve bildirimleri ayarlama
+- **Maliyet Analizi**: Detaylı maliyet analizi ve optimizasyon önerileri
+- **Rezerv Örnekler**: Maliyet tasarrufu için rezerv örnekler satın alma
 
-## Best Practices
+## En İyi Uygulamalar
 
-### Performance Optimization
+### Performans Optimizasyonu
 
-1. **Instance Selection**: Choose appropriate instance types for workload
-2. **Network Optimization**: Use enhanced networking for better performance
-3. **Storage Configuration**: Optimize storage configuration for performance
-4. **Caching**: Implement caching strategies for frequently accessed data
+1. **Örnek Seçimi**: İş yükü için uygun örnek türlerini seçme
+2. **Ağ Optimizasyonu**: Daha iyi performans için gelişmiş ağ kullanma
+3. **Depolama Yapılandırması**: Performans için depolama yapılandırmasını optimize etme
+4. **Önbellekleme**: Sık erişilen veriler için önbellekleme stratejileri uygulama
 
-### Security Best Practices
+### Güvenlik En İyi Uygulamaları
 
-1. **Network Security**: Use VPC and security groups for network isolation
-2. **Encryption**: Enable encryption for data at rest and in transit
-3. **Access Control**: Implement least privilege access control
-4. **Monitoring**: Continuous security monitoring and alerting
+1. **Ağ Güvenliği**: Ağ izolasyonu için VPC ve güvenlik grupları kullanma
+2. **Şifreleme**: Dinlenme halindeki ve aktarım halindeki veriler için şifreleme etkinleştirme
+3. **Erişim Kontrolü**: En az ayrıcalık erişim kontrolü uygulama
+4. **İzleme**: Sürekli güvenlik izleme ve uyarılar
 
-### Cost Optimization
+### Maliyet Optimizasyonu
 
-1. **Right-sizing**: Regularly review and optimize instance sizes
-2. **Storage Tiering**: Use appropriate storage tiers for different data types
-3. **Reserved Capacity**: Purchase reserved instances for predictable workloads
-4. **Lifecycle Policies**: Implement automated data lifecycle policies
+1. **Doğru Boyutlandırma**: Örnek boyutlarını düzenli olarak gözden geçirme ve optimize etme
+2. **Depolama Katmanlandırma**: Farklı veri türleri için uygun depolama katmanlarını kullanma
+3. **Rezerv Kapasite**: Öngörülebilir iş yükleri için rezerv örnekler satın alma
+4. **Yaşam Döngüsü Politikaları**: Otomatik veri yaşam döngüsü politikaları uygulama
 
-## Migration Services
+## Göç Hizmetleri
 
-### Assessment and Planning
+### Değerlendirme ve Planlama
 
-- **Current State Analysis**: Assess existing infrastructure and workloads
-- **Migration Strategy**: Develop comprehensive migration strategy
-- **Risk Assessment**: Identify and mitigate migration risks
-- **Timeline Planning**: Create detailed migration timeline
+- **Mevcut Durum Analizi**: Mevcut altyapıyı ve iş yüklerini değerlendirme
+- **Göç Stratejisi**: Kapsamlı göç stratejisi geliştirme
+- **Risk Değerlendirmesi**: Göç risklerini belirleme ve azaltma
+- **Zaman Çizelgesi Planlama**: Detaylı göç zaman çizelgesi oluşturma
 
-### Data Migration
+### Veri Göçü
 
-- **Migration Tools**: Use Alibaba Cloud migration tools and services
-- **Data Transfer**: High-speed data transfer services
-- **Validation**: Data integrity validation and verification
-- **Rollback**: Safe rollback procedures if needed
+- **Göç Araçları**: Alibaba Cloud göç araçları ve hizmetlerini kullanma
+- **Veri Transferi**: Yüksek hızlı veri transferi hizmetleri
+- **Doğrulama**: Veri bütünlüğü doğrulama ve doğrulama
+- **Geri Alma**: Gerekirse güvenli geri alma prosedürleri
 
-### Application Migration
+### Uygulama Göçü
 
-- **Application Assessment**: Assess application compatibility
-- **Refactoring**: Refactor applications for cloud optimization
-- **Testing**: Comprehensive testing in cloud environment
-- **Go-live**: Coordinated go-live and cutover procedures
+- **Uygulama Değerlendirmesi**: Uygulama uyumluluğunu değerlendirme
+- **Yeniden Yapılandırma**: Bulut optimizasyonu için uygulamaları yeniden yapılandırma
+- **Test Etme**: Bulut ortamında kapsamlı test
+- **Canlıya Alma**: Koordine edilmiş canlıya alma ve devreye alma prosedürleri
 
-## Support and Services
+## Destek ve Hizmetler
 
-### Technical Support
+### Teknik Destek
 
-- **24/7 Support**: Round-the-clock technical support
-- **Dedicated Support**: Dedicated support for enterprise customers
-- **Expert Consultation**: Access to cloud architecture experts
-- **Training**: Comprehensive training programs
+- **7/24 Destek**: Kesintisiz teknik destek
+- **Özel Destek**: Kurumsal müşteriler için özel destek
+- **Uzman Danışmanlığı**: Bulut mimarisi uzmanlarına erişim
+- **Eğitim**: Kapsamlı eğitim programları
 
-### Professional Services
+### Profesyonel Hizmetler
 
-- **Architecture Design**: Design optimal cloud architecture
-- **Implementation**: Professional implementation services
-- **Migration**: End-to-end migration services
-- **Optimization**: Ongoing optimization and tuning services
+- **Mimari Tasarım**: Optimal bulut mimarisi tasarımı
+- **Uygulama**: Profesyonel uygulama hizmetleri
+- **Göç**: Baştan sona göç hizmetleri
+- **Optimizasyon**: Sürekli optimizasyon ve ayarlama hizmetleri
 
-## Getting Started
+## Başlarken
 
-### Prerequisites
+### Ön Koşullar
 
-1. **Alibaba Cloud Account**: Set up Alibaba Cloud account
-2. **VPC Setup**: Configure Virtual Private Cloud
-3. **Security Configuration**: Set up security groups and access controls
-4. **Network Configuration**: Configure network connectivity
+1. **Alibaba Cloud Hesabı**: Alibaba Cloud hesabı kurma
+2. **VPC Kurulumu**: Sanal Özel Bulut yapılandırma
+3. **Güvenlik Yapılandırması**: Güvenlik grupları ve erişim kontrollerini ayarlama
+4. **Ağ Yapılandırması**: Ağ bağlantısını yapılandırma
 
-### Quick Start
+### Hızlı Başlangıç
 
-1. **Launch ECS Instances**: Launch compute instances for RustFS
-2. **Install RustFS**: Install and configure RustFS software
-3. **Configure Storage**: Set up storage volumes and configuration
-4. **Test Connectivity**: Verify connectivity and performance
-5. **Production Deployment**: Deploy to production environment
+1. **ECS Örneklerini Başlatma**: RustFS için hesaplama örnekleri başlatma
+2. **RustFS Yükleme**: RustFS yazılımını yükleme ve yapılandırma
+3. **Depolamayı Yapılandırma**: Depolama birimlerini ve yapılandırmayı ayarlama
+4. **Bağlantıyı Test Etme**: Bağlantıyı ve performansı doğrulama
+5. **Üretim Ortamına Dağıtım**: Üretim ortamına dağıtım
 
-### Next Steps
+### Sonraki Adımlar
 
-- **Monitoring Setup**: Configure monitoring and alerting
-- **Backup Configuration**: Set up backup and disaster recovery
-- **Performance Tuning**: Optimize performance for workloads
-- **Security Hardening**: Implement additional security measures
+- **İzleme Kurulumu**: İzleme ve uyarıları yapılandırma
+- **Yedekleme Yapılandırması**: Yedekleme ve felaket kurtarmayı ayarlama
+- **Performans Ayarlama**: İş yükleri için performansı optimize etme
+- **Güvenlik Sertleştirme**: Ek güvenlik önlemleri uygulama

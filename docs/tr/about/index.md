@@ -1,47 +1,51 @@
-# About Us
+# Hakkımızda
 
-**RustFS is committed to becoming a world-leading company in data security and cost reduction.**
+**RustFS, veri güvenliği ve maliyet azaltma konusunda dünya lideri bir şirket olmaya kararlıdır.**
 
-RustFS is an open-source storage organization (Beijing Henghesa Technology Co., Ltd.) composed of excellent storage architects from companies such as Baidu, Tencent, and TAL Education Group. Beijing Henghesa is headquartered in Beijing, China. The company's core values are: Integrity, Focus, and Simplicity.
+RustFS, Baidu, Tencent ve TAL Education Group gibi şirketlerden gelen mükemmel depolama mimarlarından oluşan açık kaynaklı bir depolama organizasyonudur (Beijing Henghesa Teknoloji Co., Ltd.). Beijing Henghesa'nın merkezi Çin'in başkenti Beijing'dedir. Şirketin temel değerleri: Dürüstlük, Odaklanma ve Sadeliktir.
 
-Our vision is to provide multilingual, secure, and cost-effective distributed object storage products to the world.
+Vizyonumuz, dünyaya çok dilli, güvenli ve maliyet etkin dağıtık nesne depolama ürünleri sunmaktır.
 
-RustFS continuously ensures data security and reduces data storage costs across all aspects including artificial intelligence, big data, video, cloud computing, encrypted storage, industrial production, cloud-native, and data backup.
+RustFS, yapay zeka, büyük veri, video, bulut bilişim, şifreli depolama, endüstriyel üretim, bulut yerel ve veri yedekleme gibi tüm yönleriyle sürekli olarak veri güvenliğini sağlar ve veri depolama maliyetlerini düşürür.
 
-Helping humanity achieve global storage solutions, we are on the way...
+İnsanlığa küresel depolama çözümleri sunarak, yolda ilerliyoruz...
 
-## Our Vision and Values
+## Vizyonumuz ve Değerlerimiz
 
-### Vision
+### Vizyon
 
-Secure and cost-effective data solutions for all humanity
+Tüm insanlık için güvenli ve maliyet etkin veri çözümleri
 
-### Values
+### Değerler
 
-Integrity, Focus, Simplicity
+Dürüstlük, Odaklanma, Sadelik
 
-![Vision and Values](./images/vision-values.png)
+![Vizyon ve Değerler](./images/vision-values.png)
 
-## Office Address
+## Ofis Adresi
 
-📍 **Address**
-Building C, North Territory, Dongsheng Science Park, Zhongguancun, No. 66 Xixiaokou Road, Haidian District, Beijing
+📍 **Adres**
 
-📞 **Phone**
+Bina C, Kuzey Bölgesi, Dongsheng Bilim Parkı, Zhongguancun, No. 66 Xixiaokou Road, Haidian Bölgesi, Beijing
+
+📞 **Telefon**
+
 400-033-5363
 
-📧 **Email**
+📧 **E-posta**
+
 <hello@rustfs.com>
 
-![Office Environment](./images/office-location.png)
+![Ofis Ortamı](./images/office-location.png)
 
-## RustFS Provides Secure and Reliable Distributed Storage Solutions Globally
+## RustFS Küresel Ölçekte Güvenli ve Güvenilir Dağıtık Depolama Çözümleri Sunar
 
-![Global Data Storage Market Growth](./images/market-growth.png)
+![Küresel Veri Depolama Pazarı Büyümesi](./images/market-growth.png)
 
-> According to Fortune Business Insights, the global data storage market is expected to grow from $218.33 billion in 2024 to $774 billion in 2032, with a compound annual growth rate of 17.1% during this period.
+> Fortune Business Insights'a göre, küresel veri depolama pazarının 2024'te 218.33 milyar dolardan 2032'de 774 milyar dolara büyümesi bekleniyor ve bu dönemde bileşik yıllık büyüme oranı %17.1 olacak.
 
-### Invest in RustFS
+### RustFS'e Yatırım Yapın
 
-📧 **Contact**
+📧 **İletişim**
+
 <hello@rustfs.com>

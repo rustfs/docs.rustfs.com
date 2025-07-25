@@ -1,304 +1,278 @@
-# AWS Integration
+# AWS Entegrasyonu
 
-RustFS provides native integration with Amazon Web Services, enabling seamless hybrid cloud and multi-cloud storage solutions with enterprise-grade performance and reliability.
+RustFS, Amazon Web Services ile yerel entegrasyon sağlayarak, kurumsal sınıf performans ve güvenilirlikle sorunsuz hibrit bulut ve çoklu bulut depolama çözümleri sunar.
 
-## Overview
+## Genel Bakış
 
-![AWS Integration](./images/sec1-1.png)
+![AWS Entegrasyonu](./images/sec1-1.png)
 
-RustFS on AWS delivers:
+AWS üzerindeki RustFS şunları sunar:
 
-- **Native AWS Integration**: Deep integration with AWS services and APIs
-- **Hybrid Cloud**: Seamless bridge between on-premises and AWS cloud
-- **Cost Efficiency**: Intelligent storage tiering and lifecycle management
-- **Enterprise Scale**: Support for petabyte-scale deployments
+- **Yerel AWS Entegrasyonu**: AWS hizmetleri ve API'leri ile derin entegrasyon
+- **Hibrit Bulut**: Şirket içi ve AWS bulutu arasında sorunsuz köprü
+- **Maliyet Verimliliği**: Akıllı depolama katmanlandırma ve yaşam döngüsü yönetimi
+- **Kurumsal Ölçek**: Petabayt ölçekli dağıtımlar için destek
 
-## Core AWS Integrations
+## Temel AWS Entegrasyonları
 
-### Compute Services
+### Hesaplama Hizmetleri
 
 #### Amazon EC2
 
-- **Optimized AMIs**: Pre-configured Amazon Machine Images for RustFS
-- **Instance Types**: Recommendations for storage-optimized instances
-- **Auto Scaling**: Automatic scaling based on storage demand
-- **Placement Groups**: Optimize network performance with placement groups
+- **Optimize Edilmiş AMİ'ler**: RustFS için önceden yapılandırılmış Amazon Makine Görüntüleri
+- **Örnek Türleri**: Depolama için optimize edilmiş örnek önerileri
+- **Oto Ölçeklendirme**: Depolama talebine göre otomatik ölçeklendirme
+- **Yerleştirme Grupları**: Yerleştirme grupları ile ağ performansını optimize etme
 
 #### Amazon EKS (Elastic Kubernetes Service)
 
-- **Container Deployment**: Deploy RustFS on managed Kubernetes
-- **Persistent Volumes**: Integration with EBS and EFS for persistent storage
-- **Service Mesh**: Integration with AWS App Mesh
-- **CI/CD Integration**: Native integration with AWS CodePipeline
+- **Konteyner Dağıtımı**: Yönetilen Kubernetes üzerinde RustFS dağıtımı
+- **Kalıcı Birimler**: Kalıcı depolama için EBS ve EFS ile entegrasyon
+- **Servis Ağı**: AWS App Mesh ile entegrasyon
+- **CI/CD Entegrasyonu**: AWS CodePipeline ile yerel entegrasyon
 
-### Storage Services
+### Depolama Hizmetleri
 
-#### Amazon S3 Integration
+#### Amazon S3 Entegrasyonu
 
-- **S3 Gateway**: Transparent S3 API compatibility
-- **Intelligent Tiering**: Automatic movement to S3 IA and Glacier
-- **Cross-Region Replication**: Multi-region data replication
-- **S3 Transfer Acceleration**: Accelerated data transfer to S3
+- **S3 Ağ Geçidi**: Şeffaf S3 API uyumluluğu
+- **Akıllı Katmanlandırma**: S3 IA ve Glacier'a otomatik hareket
+- **Çok Bölgeli Çoğaltma**: Çok bölgeli veri çoğaltma
+- **S3 Transfer Hızlandırma**: S3'e hızlandırılmış veri transferi
 
 #### Amazon EBS (Elastic Block Store)
 
-- **High-Performance Storage**: GP3 and io2 volumes for optimal performance
-- **Snapshot Integration**: Automated EBS snapshot management
-- **Encryption**: EBS encryption with AWS KMS
-- **Multi-Attach**: Shared storage across multiple instances
+- **Yüksek Performanslı Depolama**: Optimal performans için GP3 ve io2 birimleri
+- **Anlık Görüntü Entegrasyonu**: Otomatik EBS anlık görüntü yönetimi
+- **Şifreleme**: AWS KMS ile EBS şifreleme
+- **Çoklu Ekleme**: Birden fazla örnek arasında paylaşılan depolama
 
 #### Amazon EFS (Elastic File System)
 
-- **NFS Compatibility**: POSIX-compliant file system interface
-- **Performance Modes**: General Purpose and Max I/O performance modes
-- **Throughput Modes**: Provisioned and Bursting throughput
-- **Backup Integration**: Automated backup to AWS Backup
+- **NFS Uyumluluğu**: POSIX uyumlu dosya sistemi arayüzü
+- **Performans Modları**: Genel Amaçlı ve Maksimum G/Ç performans modları
+- **İletim Modları**: Sağlanan ve Patlama iletim modları
+- **Yedekleme Entegrasyonu**: AWS Backup'e otomatik yedekleme
 
-### Network Services
+### Ağ Hizmetleri
 
 #### Amazon VPC (Virtual Private Cloud)
 
-- **Network Isolation**: Deploy in isolated virtual network
-- **Subnets**: Multi-AZ deployment across availability zones
-- **Security Groups**: Fine-grained network access control
-- **VPC Endpoints**: Private connectivity to AWS services
+- **Ağ İzolasyonu**: İzole sanallaştırılmış ağda dağıtım
+- **Alt Ağlar**: Kullanılabilirlik bölgeleri arasında çoklu AZ dağıtımı
+- **Güvenlik Grupları**: İnce ayarlı ağ erişim kontrolü
+- **VPC Uç Noktaları**: AWS hizmetlerine özel bağlantı
 
 #### AWS Direct Connect
 
-- **Dedicated Connectivity**: Dedicated network connection to AWS
-- **Consistent Performance**: Predictable network performance
-- **Bandwidth Options**: Multiple bandwidth options available
-- **Hybrid Connectivity**: Seamless hybrid cloud connectivity
+- **Özel Bağlantı**: AWS'ye özel ağ bağlantısı
+- **Tutarlı Performans**: Öngörülebilir ağ performansı
+- **Bant Genişliği Seçenekleri**: Kullanılabilir çoklu bant genişliği seçenekleri
+- **Hibrit Bağlantı**: Sorunsuz hibrit bulut bağlantısı
 
 #### Amazon CloudFront
 
-- **Global CDN**: Accelerate content delivery worldwide
-- **Edge Locations**: 400+ edge locations globally
-- **Origin Shield**: Additional caching layer for origin protection
-- **Real-time Metrics**: Detailed performance and usage metrics
+- **Küresel CDN**: Dünya çapında içerik dağıtımını hızlandırma
+- **Kenar Konumları**: Küresel olarak 400'den fazla kenar konumu
+- **Origin Shield**: Köken koruması için ek önbellek katmanı
+- **Gerçek Zamanlı Metrikler**: Detaylı performans ve kullanım metrikleri
 
-## Security Integration
+## Güvenlik Entegrasyonu
 
 ### AWS Identity and Access Management (IAM)
 
-- **Fine-grained Permissions**: Precise access control policies
-- **Role-based Access**: IAM roles for service-to-service access
-- **Multi-Factor Authentication**: Enhanced security with MFA
-- **Cross-Account Access**: Secure access across AWS accounts
+- **İnce Ayarlı İzinler**: Kesin erişim kontrol politikaları
+- **Rol Tabanlı Erişim**: Hizmetten hizmete erişim için IAM rolleri
+- **Çok Faktörlü Kimlik Doğrulama**: MFA ile artırılmış güvenlik
+- **Çapraz Hesap Erişimi**: AWS hesapları arasında güvenli erişim
 
 ### AWS Key Management Service (KMS)
 
-- **Encryption Key Management**: Centralized encryption key management
-- **Hardware Security Modules**: HSM-backed key protection
-- **Key Policies**: Fine-grained key usage policies
-- **Audit Trail**: Complete key usage audit logs
+- **Şifreleme Anahtarı Yönetimi**: Merkezi şifreleme anahtarı yönetimi
+- **Donanım Güvenlik Modülleri**: HSM destekli anahtar koruması
+- **Anahtar Politikaları**: İnce ayarlı anahtar kullanım politikaları
+- **Denetim İzi**: Tam anahtar kullanım denetim kayıtları
 
 ### AWS CloudTrail
 
-- **API Auditing**: Complete audit trail of all API calls
-- **Compliance**: Meet regulatory compliance requirements
-- **Security Analysis**: Analyze security events and patterns
-- **Integration**: Integration with SIEM and monitoring tools
+- **API Denetimi**: Tüm API çağrıları için tam denetim izi
+- **Uyumluluk**: Düzenleyici uyumluluk gereksinimlerini karşıla
+- **Güvenlik Analizi**: Güvenlik olaylarını ve kalıpları analiz et
+- **Entegrasyon**: SIEM ve izleme araçlarıyla entegrasyon
 
 ### AWS Config
 
-- **Configuration Compliance**: Monitor resource configuration compliance
-- **Change Tracking**: Track configuration changes over time
-- **Compliance Rules**: Automated compliance rule evaluation
-- **Remediation**: Automated remediation of compliance violations
+- **Yapılandırma Uyumluluğu**: Kaynak yapılandırma uyumluluğunu izle
+- **Değişiklik Takibi**: Zaman içinde yapılandırma değişikliklerini takip et
+- **Uyumluluk Kuralları**: Otomatik uyumluluk kuralı değerlendirmesi
+- **Düzeltme**: Uyumluluk ihlallerinin otomatik düzeltmesi
 
-## Monitoring and Operations
+## İzleme ve İşlemler
 
 ### Amazon CloudWatch
 
-- **Performance Monitoring**: Monitor storage performance metrics
-- **Custom Metrics**: Create custom metrics for specific workloads
-- **Alarms**: Set up alarms for critical thresholds
-- **Dashboards**: Create custom monitoring dashboards
+- **Performans İzleme**: Depolama performans metriklerini izle
+- **Özel Metrikler**: Belirli iş yükleri için özel metrikler oluştur
+- **Alarmlar**: Kritik eşikler için alarmlar ayarla
+- **Panolar**: Özel izleme panoları oluştur
 
 ### AWS X-Ray
 
-- **Distributed Tracing**: Trace requests across distributed systems
-- **Performance Analysis**: Analyze application performance bottlenecks
-- **Service Map**: Visualize service dependencies
-- **Error Analysis**: Identify and analyze errors and exceptions
+- **Dağıtık İzleme**: Dağıtık sistemler arasında istekleri izle
+- **Performans Analizi**: Uygulama performans darboğazlarını analiz et
+- **Servis Haritası**: Servis bağımlılıklarını görselleştir
+- **Hata Analizi**: Hataları ve istisnaları belirle ve analiz et
 
 ### AWS Systems Manager
 
-- **Patch Management**: Automated patch management
-- **Configuration Management**: Centralized configuration management
-- **Operational Insights**: Operational insights and recommendations
-- **Automation**: Automated operational tasks and workflows
+- **Yama Yönetimi**: Otomatik yama yönetimi
+- **Yapılandırma Yönetimi**: Merkezi yapılandırma yönetimi
+- **İşletimsel İçgörüler**: İşletimsel içgörüler ve öneriler
+- **Otomatikleştirme**: Otomatik işletimsel görevler ve iş akışları
 
-## Deployment Architectures
+## Dağıtım Mimarileri
 
-### Single-Region Deployment
+### Tek Bölge Dağıtımı
 
 ```
 ┌─────────────────┐
-│   AWS Region    │
+│   AWS Bölgesi    │
 │                 │
 │  ┌─────────────┐│
 │  │     AZ-A    ││
 │  │   RustFS    ││
-│  │   Node 1-2  ││
+│  │   Düğüm 1-2 ││
 │  └─────────────┘│
 │                 │
 │  ┌─────────────┐│
 │  │     AZ-B    ││
 │  │   RustFS    ││
-│  │   Node 3-4  ││
+│  │   Düğüm 3-4 ││
 │  └─────────────┘│
 └─────────────────┘
 ```
 
-### Multi-Region Deployment
+### Çok Bölgeli Dağıtım
 
 ```
 ┌─────────────────┐    ┌─────────────────┐
-│   Primary       │    │   Secondary     │
-│   Region        │◄──►│   Region        │
-│                 │    │                 │
-│ • Active Data   │    │ • Replica Data  │
-│ • Read/Write    │    │ • Read Only     │
-│ • Low Latency   │    │ • DR Ready      │
+│   Birincil       │    │   İkincil       │
+│   Bölge          │◄──►│   Bölge         │
+│                  │    │                  │
+│ • Aktif Veri     │    │ • Replika Veri   │
+│ • Okuma/Yazma    │    │ • Salt Okunur    │
+│ • Düşük Gecikme │    │ • DR Hazır       │
 └─────────────────┘    └─────────────────┘
 ```
 
-### Hybrid Cloud Architecture
+### Hibrit Bulut Mimarisi
 
 ```
 ┌─────────────────┐    ┌─────────────────┐
-│   On-Premises   │    │      AWS        │
-│     RustFS      │◄──►│     RustFS      │
-│                 │    │                 │
-│ • Primary Data  │    │ • Backup Data   │
-│ • Hot Storage   │    │ • Cold Storage  │
-│ • Low Latency   │    │ • Cost Optimized│
+│   Şirket İçi     │    │      AWS        │
+│     RustFS       │◄──►│     RustFS       │
+│                  │    │                  │
+│ • Birincil Veri  │    │ • Yedek Veri     │
+│ • Sıcak Depolama │    │ • Soğuk Depolama │
+│ • Düşük Gecikme │    │ • Maliyet Optimize│
 └─────────────────┘    └─────────────────┘
 ```
 
-## Cost Optimization
+## Maliyet Optimizasyonu
 
-### AWS Cost Management
+### AWS Maliyet Yönetimi
 
-- **Cost Explorer**: Analyze and optimize AWS costs
-- **Budgets**: Set up budgets and cost alerts
-- **Reserved Instances**: Purchase reserved capacity for cost savings
-- **Spot Instances**: Use spot instances for non-critical workloads
+- **Maliyet Gezgini**: AWS maliyetlerini analiz et ve optimize et
+- **Bütçeler**: Bütçeler ve maliyet uyarıları ayarla
+- **Rezerv Örnekler**: Maliyet tasarrufu için rezerv kapasite satın al
+- **Spot Örnekler**: Kritik olmayan iş yükleri için spot örnekler kullan
 
-### Storage Cost Optimization
+### Depolama Maliyet Optimizasyonu
 
-- **Intelligent Tiering**: Automatic movement to lower-cost storage tiers
-- **Lifecycle Policies**: Automated data lifecycle management
-- **Compression**: Built-in compression to reduce storage costs
-- **Deduplication**: Eliminate duplicate data to optimize storage
+- **Akıllı Katmanlandırma**: Daha düşük maliyetli depolama katmanlarına otomatik hareket
+- **Yaşam Döngüsü Politikaları**: Otomatik veri yaşam döngüsü yönetimi
+- **Sıkıştırma**: Depolama maliyetlerini düşürmek için yerleşik sıkıştırma
+- **Yinelenen Veri Ortadan Kaldırma**: Depolamayı optimize etmek için yinelenen verileri ortadan kaldır
 
-### Compute Cost Optimization
+### Hesaplama Maliyet Optimizasyonu
 
-- **Right-sizing**: Optimize instance sizes for workloads
-- **Auto Scaling**: Scale resources based on demand
-- **Scheduled Scaling**: Scale resources based on predictable patterns
-- **Resource Tagging**: Tag resources for cost allocation and tracking
+- **Doğru Boyutlandırma**: İş yükleri için örnek boyutlarını optimize et
+- **Oto Ölçeklendirme**: Talebe göre kaynakları ölçeklendir
+- **Zamanlanmış Ölçeklendirme**: Öngörülebilir kalıplara göre kaynakları ölçeklendir
+- **Kayıt Etiketleme**: Maliyet tahsisi ve takibi için kaynakları etiketle
 
-## Migration Services
+## Göç Hizmetleri
 
 ### AWS Migration Hub
 
-- **Migration Tracking**: Track migration progress across tools
-- **Application Discovery**: Discover and assess applications
-- **Migration Planning**: Plan and coordinate migrations
-- **Progress Monitoring**: Monitor migration progress and status
+- **Göç Takibi**: Araçlar arasında göç ilerlemesini takip et
+- **Uygulama Keşfi**: Uygulamaları keşfet ve değerlendir
+- **Göç Planlama**: Göçleri planla ve koordinasyon sağla
+- **İlerleme İzleme**: Göç ilerlemesini ve durumunu izle
 
 ### AWS DataSync
 
-- **Data Transfer**: High-speed data transfer to AWS
-- **Scheduling**: Schedule regular data synchronization
-- **Bandwidth Control**: Control bandwidth usage during transfer
-- **Monitoring**: Monitor transfer progress and performance
+- **Veri Transferi**: AWS'ye yüksek hızlı veri transferi
+- **Zamanlama**: Düzenli veri senkronizasyonunu zamanla
+- **Bant Genişliği Kontrolü**: Transfer sırasında bant genişliği kullanımını kontrol et
+- **İzleme**: Transfer ilerlemesini ve performansını izle
 
 ### AWS Database Migration Service
 
-- **Database Migration**: Migrate databases to AWS
-- **Continuous Replication**: Continuous data replication
-- **Schema Conversion**: Convert database schemas
-- **Minimal Downtime**: Minimize downtime during migration
+- **Veritabanı Göçü**: Veritabanlarını AWS'ye göç et
+- **Sürekli Çoğaltma**: Sürekli veri çoğaltma
+- **Şema Dönüştürme**: Veritabanı şemalarını dönüştür
+- **Minimum Kesinti Süresi**: Göç sırasında kesinti süresini en aza indir
 
-## Best Practices
+## En İyi Uygulamalar
 
-### Architecture Best Practices
+### Mimari En İyi Uygulamaları
 
-1. **Multi-AZ Deployment**: Deploy across multiple availability zones
-2. **Auto Scaling**: Implement auto scaling for high availability
-3. **Load Balancing**: Use Elastic Load Balancing for traffic distribution
-4. **Backup Strategy**: Implement comprehensive backup and recovery
+1. **Çoklu AZ Dağıtımı**: Birden fazla kullanılabilirlik bölgesinde dağıtım yap
+2. **Oto Ölçeklendirme**: Yüksek kullanılabilirlik için oto ölçeklendirme uygula
+3. **Yük Dengeleme**: Trafik dağıtımı için Elastic Load Balancing kullan
+4. **Yedekleme Stratejisi**: Kapsamlı yedekleme ve kurtarma uygula
 
-### Security Best Practices
+### Güvenlik En İyi Uygulamaları
 
-1. **Principle of Least Privilege**: Grant minimum required permissions
-2. **Encryption**: Enable encryption for data at rest and in transit
-3. **Network Security**: Use VPC and security groups for isolation
-4. **Monitoring**: Implement comprehensive security monitoring
+1. **En Az Ayrıcalık Prensibi**: Minimum gerekli izinleri ver
+2. **Şifreleme**: Dinlenme halindeki ve aktarım halindeki veriler için şifreleme etkinleştir
+3. **Ağ Güvenliği**: İzolasyon için VPC ve güvenlik gruplarını kullan
+4. **İzleme**: Kapsamlı güvenlik izleme uygula
 
-### Performance Best Practices
+### Performans En İyi Uygulamaları
 
-1. **Instance Optimization**: Choose appropriate instance types
-2. **Storage Optimization**: Use appropriate storage types and configurations
-3. **Network Optimization**: Optimize network configuration for performance
-4. **Caching**: Implement caching strategies for better performance
+1. **Örnek Optimizasyonu**: Uygun örnek türlerini seç
+2. **Depolama Optimizasyonu**: Uygun depolama türlerini ve yapılandırmalarını kullan
+3. **Ağ Optimizasyonu**: Performans için ağ yapılandırmasını optimize et
+4. **Önbellekleme**: Daha iyi performans için önbellekleme stratejileri uygula
 
-### Cost Optimization Best Practices
+### Maliyet Optimizasyonu En İyi Uygulamaları
 
-1. **Resource Tagging**: Tag all resources for cost tracking
-2. **Regular Reviews**: Regularly review and optimize costs
-3. **Reserved Capacity**: Purchase reserved instances for predictable workloads
-4. **Automated Policies**: Implement automated cost optimization policies
+1. **Kayıt Etiketleme**: Maliyet takibi için tüm kaynakları etiketle
+2. **Düzenli İncelemeler**: Maliyetleri düzenli olarak gözden geçir ve optimize et
+3. **Rezerv Kapasite**: Öngörülebilir iş yükleri için rezerv örnekler satın al
+4. **Otomatik Politikalar**: Otomatik maliyet optimizasyonu politikaları uygula
 
-## Support and Services
+## Destek ve Hizmetler
 
-### AWS Support Plans
+### AWS Destek Planları
 
-- **Basic Support**: Basic support included with all AWS accounts
-- **Developer Support**: Business hours email support
-- **Business Support**: 24/7 phone and email support
-- **Enterprise Support**: Dedicated Technical Account Manager
+- **Temel Destek**: Tüm AWS hesaplarıyla birlikte gelen temel destek
+- **Geliştirici Desteği**: İş saatleri içinde e-posta desteği
+- **İş Desteği**: 7/24 telefon ve e-posta desteği
+- **Kurumsal Destek**: Özel Teknik Hesap Yöneticisi
 
-### AWS Professional Services
+### AWS Profesyonel Hizmetleri
 
-- **Architecture Review**: Review and optimize architecture
-- **Migration Services**: End-to-end migration services
-- **Training**: Comprehensive AWS training programs
-- **Optimization**: Ongoing optimization and best practices
+- **Mimari İnceleme**: Mimariyi gözden geçir ve optimize et
+- **Göç Hizmetleri**: Baştan sona göç hizmetleri
+- **Eğitim**: Kapsamlı AWS eğitim programları
+- **Optimizasyon**: Sürekli optimizasyon ve en iyi uygulamalar
 
-### AWS Partner Network
+### AWS Partner Ağı
 
-- **Consulting Partners**: Access to certified AWS consulting partners
-- **Technology Partners**: Integration with AWS technology partners
-- **Training Partners**: Access to AWS training partners
-- **Marketplace**: AWS Marketplace for third-party solutions
-
-## Getting Started
-
-### Prerequisites
-
-1. **AWS Account**: Set up AWS account with appropriate permissions
-2. **VPC Configuration**: Configure Virtual Private Cloud
-3. **Security Setup**: Configure security groups and IAM roles
-4. **Network Connectivity**: Set up network connectivity
-
-### Quick Start Guide
-
-1. **Launch EC2 Instances**: Launch compute instances for RustFS
-2. **Configure Storage**: Attach and configure EBS volumes
-3. **Install RustFS**: Install and configure RustFS software
-4. **Network Configuration**: Configure networking and security
-5. **Testing**: Test functionality and performance
-6. **Production Deployment**: Deploy to production environment
-
-### Next Steps
-
-- **Monitoring**: Set up CloudWatch monitoring and alarms
-- **Backup**: Configure backup and disaster recovery
-- **Optimization**: Optimize performance and costs
-- **Security**: Implement additional security measures
-- **Scaling**: Plan for future scaling requirements
+- **Danışmanlık Ortakları**: Sertifikalı AWS danışmanlık ortaklarına erişim
+- **Teknoloji Ortakları**: AWS teknoloji ortaklarıyla entegrasyon
+- **Eğitim Ortakları**: AWS eğitim ortaklarına erişim
+- **Marketplace**: Üçüncü taraf çözümler için AWS Marketplace

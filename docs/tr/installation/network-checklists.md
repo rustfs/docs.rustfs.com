@@ -1,113 +1,114 @@
 ---
-title: "Network Checklist"
-description: "RustFS Enterprise Deployment Network Checklist"
+title: "Ağ Kontrol Listesi"
+description: "RustFS Kurumsal Dağıtım Ağ Kontrol Listesi"
+---
+# Ağ Kontrol Listesi
+
+## 1. Ağ Mimarisi Tasarımı
+
+### Temel Ağ Planlaması
+
+- **Topoloji Yapısı Doğrulama**
+ Dağıtım mimarisinin (yıldız/halkalı/örgü) dağıtık depolama için yüksek kullanılabilirlik gereksinimlerini karşılayıp karşılamadığını doğrulayın
+
+- **Yedekli Yol Kontrolü**
+ Düğümler arasında en az iki bağımsız fiziksel bağlantının var olduğunu sağlayın
+
+- **Bant Genişliği Planlaması**
+ Tahmini trafiği hesaplayın: Nesne depolama okuma/yazma bant genişliği × Düğüm sayısı × Replika sayısı + %20 yedeklilik
+
+### IP Planlaması
+
+- [ ] Yönetim ağını veri ağından ayırın
+- [ ] Depolama düğümleri için ardışık IP segmentleri atayın (önerilen /24 alt ağ)
+- [ ] Genişleme için en az %15 IP adresi rezerv edin
+
 ---
 
-# Network Checklist
+## 2. Donanım Ekipmanı Gereksinimleri
 
-## 1. Network Architecture Design
+### Anahtar Yapılandırması
 
-### Basic Network Planning
-
-- **Topology Structure Verification**
- Confirm whether the deployment architecture (star/ring/mesh) meets the high availability requirements of distributed storage
-- **Redundant Path Check**
- Ensure at least two independent physical links exist between nodes
-- **Bandwidth Planning**
- Calculate estimated traffic: Object storage read/write bandwidth × Number of nodes × Number of replicas + 20% redundancy
-
-### IP Planning
-
-- [ ] Separate management network from data network
-- [ ] Assign consecutive IP segments for storage nodes (recommend /24 subnet)
-- [ ] Reserve at least 15% of IP addresses for expansion
-
----
-
-## 2. Hardware Equipment Requirements
-
-### Switch Configuration
-
-| Check Item | Standard Requirements |
+| Kontrol Maddesi | Standart Gereksinimler |
 |--------|---------|
-| Backplane Bandwidth | ≥ Full port line-speed forwarding capacity × 1.2 |
-| Port Type | 10G/25G/100G SFP+/QSFP+ fiber ports |
-| Flow Table Capacity | ≥ Number of nodes × 5 |
-| Spanning Tree Protocol | Enable RSTP/MSTP fast convergence |
+| Arka Panel Bant Genişliği | ≥ Tam port hattı hızında iletim kapasitesi × 1.2 |
+| Port Tipi | 10G/25G/100G SFP+/QSFP+ fiber portlar |
+| Akış Tablosu Kapasitesi | ≥ Düğüm sayısı × 5 |
+| Spanning Tree Protokolü | RSTP/MSTP hızlı yakınsama etkinleştir |
 
-### Physical Connections
+### Fiziksel Bağlantılar
 
-- [ ] Fiber attenuation test (single-mode ≤0.35dB/km)
-- [ ] Port misalignment connection check (Node A eth0 ↔ Node B eth0)
-- [ ] Cable labeling system (including source/destination IP + port number)
+- [ ] Fiber zayıflama testi (tek mod ≤0.35dB/km)
+- [ ] Port uyuşmazlık bağlantı kontrolü (Düğüm A eth0 ↔ Düğüm B eth0)
+- [ ] Kablo etiketleme sistemi (kaynak/hedef IP + port numarası dahil)
 
 ---
 
-## 3. Operating System Network Configuration
+## 3. İşletim Sistemi Ağ Yapılandırması
 
-### Kernel Parameter Tuning
+### Çekirdek Parametre Ayarlama
 
 ```bash
-# Check the following parameter settings
+# Aşağıdaki parametre ayarlarını kontrol edin
 net.core.rmem_max = 16777216
 net.core.wmem_max = 16777216
 net.ipv4.tcp_keepalive_time = 600
 net.ipv4.tcp_slow_start_after_idle = 0
 ```
 
-### Network Card Configuration
+### Ağ Kartı Yapılandırması
 
-- [ ] Enable jumbo frames (MTU=9000, requires full path support)
-- [ ] Verify network card bonding mode (LACP mode4 recommended)
-- [ ] Disable IPv6 (if not needed)
+- [ ] Jumbo çerçeveleri etkinleştir (MTU=9000, tam yol desteği gerektirir)
+- [ ] Ağ kartı bağlama modunu doğrula (LACP mode4 önerilir)
+- [ ] IPv6'yı devre dışı bırak (gerekmiyorsa)
 
 ---
 
-## 4. Security Policies
+## 4. Güvenlik Politikaları
 
-### Firewall Rules
+### Güvenlik Duvarı Kuralları
 
 ```bash
-# Required open ports
+# Gerekli açık portlar
 - TCP 443 (HTTPS API)
-- TCP 9000 (S3 compatible interface)
-- TCP 7946 (Serf node communication)
-- UDP 4789 (VxLAN tunnel)
+- TCP 9000 (S3 uyumlu arayüz)
+- TCP 7946 (Serf düğüm iletişimi)
+- UDP 4789 (VxLAN tüneli)
 ```
 
-### Access Control
+### Erişim Kontrolü
 
-- Switch port security MAC limitation
-- IPSec tunnel encryption between storage nodes
-- Enable TLS 1.3 for management interface
+- Anahtar port güvenliği MAC sınırlaması
+- Depolama düğümleri arasında IPSec tünel şifreleme
+- Yönetim arayüzü için TLS 1.3 etkinleştir
 
 ---
 
-## 5. Performance Verification Testing
+## 5. Performans Doğrulama Testi
 
-### Benchmark Test Items
+### Benchmark Test Maddeleri
 
-1. Inter-node latency test: `iperf3 -s 8972 <target IP>`
-2. Cross-rack bandwidth test: `iperf3 -c <target IP> -P 8 -t 30`
-3. Failover test: Randomly disconnect core links and observe recovery time
+1. Düğümler arası gecikme testi: `iperf3 -s 8972 <hedef IP>`
+2. Çapraz raf bant genişliği testi: `iperf3 -c <hedef IP> -P 8 -t 30`
+3. Devralma testi: Çekirdek bağlantılarını rastgele kesin ve kurtarma süresini gözlemleyin
 
-### Acceptance Standards
+### Kabul Standartları
 
-| Metric | Requirements |
+| Metrik | Gereksinimler |
 |------|------|
-| Node Latency | ≤1ms (same data center)/≤5ms (cross AZ) |
-| Bandwidth Utilization | Peak ≤70% design capacity |
-| Failover | <500ms BPDU convergence |
+| Düğüm Gecikmesi | ≤1ms (aynı veri merkezi)/≤5ms (farklı AZ) |
+| Bant Genişliği Kullanımı | Tepe ≤%70 tasarım kapasitesi |
+| Devralma | <500ms BPDU yakınsama |
 
 ---
 
-## 6. Documentation Requirements
+## 6. Dokümantasyon Gereksinimleri
 
-1. Network topology diagram (including physical connections and logical IPs)
-2. Switch configuration backup files (with timestamps)
-3. Baseline test reports (with raw data)
-4. Change record table (with maintenance window information)
+1. Ağ topoloji diyagramı (fiziksel bağlantılar ve mantıksal IP'ler dahil)
+2. Anahtar yapılandırma yedek dosyaları (zaman damgalı)
+3. Baz çizgisi test raporları (ham veri ile)
+4. Değişiklik kayıt tablosu (bakım pencere bilgileri ile)
 
-> **Tip**: It is recommended to conduct 72-hour stress testing before formal deployment, simulating 110% of peak traffic load scenarios
+> **İpucu**: Resmi dağıtımdan önce 72 saatlik stres testi yapılması önerilir, tepe trafik yük senaryolarının %110'unu simüle edin
 
-This checklist covers key checkpoints for enterprise-level storage system network deployment, specifically optimized for distributed object storage characteristics. You can contact RustFS for official technical support.
+Bu kontrol listesi, özellikle dağıtık nesne depolama özellikleri için optimize edilmiş, kurumsal düzeyde depolama sistemi ağ dağıtımı için temel kontrol noktalarını kapsar. Resmi teknik destek için RustFS ile iletişime geçebilirsiniz.

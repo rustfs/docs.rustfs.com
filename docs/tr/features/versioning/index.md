@@ -1,63 +1,63 @@
-# Bucket and Object Versioning
+# Kova ve Nesne Sürümleme
 
-## RustFS Object Storage Provides AWS S3 Versioning Compatibility
+## RustFS Nesne Depolama, AWS S3 Sürümleme Uyumluluğu Sağlar
 
-Object-level versioning is a significant improvement compared to SAN and NAS versioning methods. Versioning not only provides data protection but also serves as the foundation for powerful features such as object locking, immutability, tiering, and lifecycle management.
+Nesne düzeyinde sürümleme, SAN ve NAS sürümleme yöntemlerine kıyasla önemli bir iyileştirmedir. Sürümleme sadece veri koruması sağlamakla kalmaz, aynı zamanda nesne kilitleme, değiştirilemezlik, katmanlandırma ve yaşam döngüsü yönetimi gibi güçlü özelliklerin temelini oluşturur.
 
-With RustFS, objects are versioned independently according to Amazon's S3 structure/implementation. RustFS assigns a unique ID to each version of a given object - applications can specify a version ID at any time to access a point-in-time snapshot of that object.
+RustFS ile nesneler, Amazon'un S3 yapısı/uygulamasına göre bağımsız olarak sürümlenir. RustFS, belirli bir nesnenin her sürümü için benzersiz bir kimlik atar - uygulamalar, nesnenin belirli bir zaman dilimindeki anlık görüntüsüne erişmek için herhangi bir zamanda bir sürüm kimliği belirtebilir.
 
-Versioning allows users to preserve multiple variants of an object in the same bucket and provides a mechanism to save, retrieve, and restore every version of every object stored in the bucket, eliminating the need for snapshots. Versioning ensures objects remain available through a series of failures, including those caused by application and human errors.
+Sürümleme, kullanıcıların aynı kovada bir nesnenin birden fazla varyantını korumasına olanak tanır ve kovada depolanan her nesnenin her sürümünü kaydetmek, almak ve geri yüklemek için bir mekanizma sağlar, böylece anlık görüntülere olan ihtiyacı ortadan kaldırır. Sürümleme, nesnelerin uygulama ve insan hataları da dahil olmak üzere bir dizi arıza sonrasında bile kullanılabilir olmasını sağlar.
 
-Versioning is enabled at the bucket level. Once enabled, RustFS automatically creates a unique version ID for objects. The same object can have multiple versions.
+Sürümleme kova düzeyinde etkinleştirilir. Etkinleştirildikten sonra, RustFS nesneler için otomatik olarak benzersiz bir sürüm kimliği oluşturur. Aynı nesnenin birden fazla sürümü olabilir.
 
-One of the main benefits of versioning is preventing accidental overwrites or deletions. This is implemented using the concept of delete markers. When a versioned object is deleted, it is not permanently removed. Instead, a delete marker is created and becomes the current version of the object. When that object is requested, RustFS returns a 404 Not Found message. The object can be restored by deleting the delete marker.
+Sürümlemenin temel faydalarından biri, kazara üzerine yazma veya silme işlemlerini önlemektir. Bu, silme işaretleyicileri kavramı kullanılarak uygulanır. Bir sürümlü nesne silindiğinde, kalıcı olarak kaldırılmaz. Bunun yerine, bir silme işaretleyicisi oluşturulur ve nesnenin geçerli sürümü haline gelir. O nesne talep edildiğinde, RustFS bir 404 Bulunamadı mesajı döndürür. Nesne, silme işaretleyicisini silerek geri yüklenebilir.
 
-Similarly, if a versioned object is overwritten, RustFS creates a new version and it becomes the current version. Likewise, old versions can be restored as needed.
+Benzer şekilde, bir sürümlü nesne üzerine yazılırsa, RustFS yeni bir sürüm oluşturur ve bu sürüm geçerli sürüm haline gelir. Eski sürümler gerektiği gibi geri yüklenebilir.
 
-## RustFS Supports Object Versioning with Three Different Bucket States
+## RustFS, Üç Farklı Kova Durumu ile Nesne Sürümlemeyi Destekler
 
-![Bucket States](./images/bucket-states.png)
+![Kova Durumları](./images/bucket-states.png)
 
-Note that once versioning is enabled for a bucket, the operation cannot be undone - it can only be suspended. Versioning is a global setting in the bucket - meaning all objects are now versioned.
+Bir kova için sürümleme etkinleştirildikten sonra, işlemin geri alınamayacağını unutmayın - sadece askıya alınabilir. Sürümleme, kovadaki bir küresel ayardır - yani artık tüm nesneler sürümlenir.
 
-Users with appropriate permissions can suspend versioning to stop accumulating object versions. Similar to enabling versioning, this operation is performed at the bucket level.
+Uygun izinlere sahip kullanıcılar, nesne sürümlerini biriktirmeyi durdurmak için sürümlemeyi askıya alabilir. Sürümlemeyi etkinleştirmeye benzer şekilde, bu işlem kova düzeyinde gerçekleştirilir.
 
-Like all RustFS features, versioning can be applied using the RustFS console, client (mc), SDK, or through command-line applications.
+Tüm RustFS özelliklerinde olduğu gibi, sürümleme RustFS konsolu, istemci (mc), SDK veya komut satırı uygulamaları aracılığıyla uygulanabilir.
 
-Versioning is the simplest way to protect data from accidental operations. However, as objects are versioned, it leads to larger bucket sizes and may result in more interdependencies between objects and risks of hidden object dependencies. These factors can be mitigated through lifecycle management.
+Sürümleme, verileri kazara işlemlerden korumanın en basit yoludur. Ancak, nesneler sürümlendikçe, daha büyük kova boyutlarına ve nesneler arasında daha fazla bağımlılıklara ve gizli nesne bağımlılıkları risklerine yol açabilir. Bu faktörler, yaşam döngüsü yönetimi ile hafifletilebilir.
 
-## Core Feature Advantages
+## Temel Özellik Avantajları
 
-> In addition to its data protection benefits, RustFS's object storage versioning serves as the foundation for other key features
+> Veri koruma faydalarının yanı sıra, RustFS'nin nesne depolama sürümleme özelliği diğer önemli özelliklerin temelini oluşturur.
 
-### Main Feature Characteristics
+### Ana Özellik Karakteristikleri
 
-- ✅ **Bucket Replication** (Active-Active, Active-Passive)
-- ✅ **Mc undo** - Rollback PUT/DELETE objects with a single command
-- ✅ **Object Lock**
-- ✅ **Continuous Data Protection-like protection** without the overhead of snapshots or full system replication
-- ✅ **Mc rewind** - View buckets or objects at any point in time after versioning is enabled
+- ✅ **Kova Çoğaltma** (Aktif-Aktif, Aktif-Pasif)
+- ✅ **Mc undo** - Tek bir komutla PUT/SİL nesneleri geri al
+- ✅ **Nesne Kilidi**
+- ✅ **Anlık görüntülerin veya tam sistem çoğaltmasının yükü olmadan Sürekli Veri Koruması benzeri koruma**
+- ✅ **Mc rewind** - Sürümleme etkinleştirildikten sonra kovaları veya nesneleri herhangi bir zamanda görüntüle
 
-## Architecture
+## Mimari
 
-![Architecture Diagram](./images/architecture.png)
+![Mimari Diyagram](./images/architecture.png)
 
-### System Requirements
+### Sistem Gereksinimleri
 
-> Versioning requires: Erasure coding and at least four disks.
+> Sürümleme gerektirir: Silme kodlama ve en az dört disk.
 
-### Versioning States
+### Sürümleme Durumları
 
-RustFS supports three different bucket versioning states:
+RustFS, üç farklı kova sürümleme durumunu destekler:
 
-1. **🔴 Unversioned** - Default state, no versioning performed
-2. **🟢 Enabled** - Full versioning functionality, assigns unique ID to each object version
-3. **🟡 Suspended** - Stops accumulating new versions but retains existing versions
+1. **🔴 Sürümsüz** - Varsayılan durum, sürümleme yapılmaz
+2. **🟢 Etkin** - Tam sürümleme işlevselliği, her nesne sürümü için benzersiz bir kimlik atar
+3. **🟡 Askıya Alınmış** - Yeni sürümleri biriktirmeyi durdurur ancak mevcut sürümleri saklar
 
-### Key Features
+### Ana Özellikler
 
-- 🆔 **Unique Version ID** - Each object version has a unique identifier
-- 🔄 **Point-in-Time Recovery** - Can access any historical version of an object
-- 🛡️ **Delete Protection** - Uses delete markers to prevent accidental deletion
-- 📊 **Lifecycle Management** - Automatically manages version count and storage costs
-- 🔐 **Permission Control** - Fine-grained access permission management
+- 🆔 **Benzersiz Sürüm Kimliği** - Her nesne sürümünün benzersiz bir tanımlayıcısı vardır
+- 🔄 **Zamana Göre Kurtarma** - Bir nesnenin herhangi bir tarihsel sürümüne erişilebilir
+- 🛡️ **Silme Koruması** - Kazara silmeyi önlemek için silme işaretleyicileri kullanır
+- 📊 **Yaşam Döngüsü Yönetimi** - Sürüm sayısını ve depolama maliyetlerini otomatik olarak yönetir
+- 🔐 **İzin Kontrolü** - İnce ayarlı erişim izin yönetimi

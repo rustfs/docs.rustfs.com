@@ -1,73 +1,73 @@
-# RustFS for Modern Data Lakes
+# Modern Veri Gölleri için RustFS
 
-Modern data lakes and lakehouse architectures are built on modern object storage. This means they are built on RustFS.
+Modern veri gölleri ve lakehouse mimarileri, modern nesne depolama üzerine inşa edilmiştir. Bu, onların RustFS üzerine inşa edildiği anlamına gelir.
 
-**RustFS provides a unified storage solution for modern data lakes/lakehouses that can run anywhere: private cloud, public cloud, colos, bare metal - even at the edge. Yes, fast, scalable, cloud-native and ready to go - batteries included.**
+**RustFS, her yerde çalışabilen modern veri gölleri/lakehouse'lar için birleşik bir depolama çözümü sunar: özel bulut, genel bulut, colos, çıplak metal - hatta kenarda. Evet, hızlı, ölçeklenebilir, bulut yerli ve kullanıma hazır - piller dahil.**
 
-![Data Lake Architecture](images/data-lake-architecture.png)
+![Veri Gölü Mimarisi](images/data-lake-architecture.png)
 
-## Open Table Format Ready
+## Açık Tablo Formatına Hazır
 
-![Table Formats](images/table-formats.png)
+![Tablo Formatları](images/table-formats.png)
 
-Modern data lakes are multi-engine, and these engines (Spark, Flink, Trino, Arrow, Dask, etc.) all need to be bound together in some cohesive architecture. Modern data lakes must provide central table storage, portable metadata, access control, and persistent structure. This is where formats like Iceberg, Hudi, and Delta Lake come into play. They are designed for modern data lakes, and RustFS supports each of them. We may have opinions on which one will win (you can always ask us...), but we are committed to supporting them until it doesn't make sense (see Docker Swarm and Mesosphere).
+Modern veri gölleri çoklu motorlu olup, bu motorlar (Spark, Flink, Trino, Arrow, Dask, vb.) birbirine tutarlı bir mimari içinde bağlanmalıdır. Modern veri gölleri, merkezi tablo depolama, taşınabilir meta veriler, erişim kontrolü ve kalıcı yapı sağlamalıdır. İşte burada Iceberg, Hudi ve Delta Lake gibi formatlar devreye girer. Bunlar modern veri gölleri için tasarlanmıştır ve RustFS hepsini destekler. Hangisinin kazanacağına dair görüşlerimiz olabilir (bize her zaman sorabilirsiniz...), ancak artık mantıklı olmadığı sürece onları desteklemeye devam edeceğiz (Docker Swarm ve Mesosphere'a bakınız).
 
-## Cloud Native
+## Bulut Yerli
 
-RustFS was born in the cloud and operates on cloud principles - containerization, orchestration, microservices, APIs, infrastructure as code, and automation. Because of this, the cloud-native ecosystem "just works" with RustFS - from Spark to Presto/Trino, from Snowflake to Dremio, from NiFi to Kafka, from Prometheus to OpenObserve, from Istio to Linkerd, from Hashicorp Vault to Keycloak.
+RustFS, bulutta doğmuş ve bulut ilkeleri üzerine çalışır - konteynerleştirme, orkestrasyon, mikroservisler, API'ler, altyapı olarak kod ve otomasyon. Bu nedenle, bulut yerli ekosistem RustFS ile "sadece çalışır" - Spark'tan Presto/Trino'ya, Snowflake'den Dremio'ya, NiFi'den Kafka'ya, Prometheus'tan OpenObserve'a, Istio'dan Linkerd'e, Hashicorp Vault'tan Keycloak'a.
 
-Don't take our word for it - enter your favorite cloud-native technology and let Google provide the evidence.
+Bunu bizden duymayın - favori bulut yerli teknolojinizi girin ve Google kanıtları sunsun.
 
-## Multi-Engine
+## Çoklu Motor
 
-RustFS supports all S3-compatible query engines, which is to say all of them. Don't see the one you use - drop us a line and we'll investigate.
+RustFS, tüm S3 uyumlu sorgulama motorlarını destekler, yani hepsini. Kullandığınız motoru görmüyor musunuz? Bize bir satır bırakın ve biz araştıralım.
 
-![Multi-Engine Support](images/multi-engine-1.svg)
+![Çoklu Motor Desteği](images/multi-engine-1.svg)
 
-![Multi-Engine Support](images/multi-engine-2.svg)
+![Çoklu Motor Desteği](images/multi-engine-2.svg)
 
-## Performance
+## Performans
 
-Modern data lakes require a level of performance, and even more importantly, performance at scale that the old Hadoop-era commodity stores could only dream of. RustFS has proven in multiple benchmarks that it outperforms Hadoop, and migration paths are well documented. This means query engines (Spark, Presto, Trino, Snowflake, Microsoft SQL Server, Teradata, etc.) perform better. This also includes your AI/ML platforms - from MLflow to Kubeflow.
+Modern veri gölleri, bir performans seviyesi ve daha da önemlisi, eski Hadoop döneminin emtia mağazalarının sadece hayal edebileceği ölçekte performans gerektirir. RustFS, birçok benchmarkta Hadoop'u geride bıraktığını kanıtlamıştır ve göç yolları iyi belgelenmiştir. Bu, sorgulama motorlarının (Spark, Presto, Trino, Snowflake, Microsoft SQL Server, Teradata, vb.) daha iyi performans göstermesi anlamına gelir. Bu aynı zamanda AI/ML platformlarınızı - MLflow'dan Kubeflow'a kadar - içerir.
 
-We publish our benchmarks for the world to see and make them reproducible. Learn how we achieved 325 GiB/s (349 GB/s) on GET and 165 GiB/s (177 GB/s) on PUT with just 32 off-the-shelf NVMe SSD nodes in this article.
+Dünyanın görmesi için benchmarklarımızı yayınlıyoruz ve bunları yeniden üretebilir hale getiriyoruz. Bu makalede, sadece 32 adet standart NVMe SSD düğümü ile GET işlemlerinde 325 GiB/s (349 GB/s) ve PUT işlemlerinde 165 GiB/s (177 GB/s) nasıl başardığımızı öğrenin.
 
-## Lightweight
+## Hafif
 
-RustFS's server binary is < 100 MB in its entirety. Despite its power, it's robust enough to run in data centers but still small enough to live comfortably at the edge. There's no such alternative in the Hadoop world. For enterprises, this means your S3 applications can access data anywhere with the same API. By implementing RustFS edge locations and replication capabilities, we can capture and filter data at the edge and deliver it to the parent cluster for aggregation and further analytical implementation.
+RustFS'in sunucu ikili dosyası tamamıyla < 100 MB'dır. Gücüne rağmen, veri merkezlerinde çalışacak kadar sağlam ve kenarda rahatça yaşayacak kadar küçüktür. Hadoop dünyasında böyle bir alternatif yoktur. Kuruluşlar için bu, S3 uygulamalarınızın aynı API ile her yerden veriye erişebileceği anlamına gelir. RustFS kenar konumlarını ve çoğaltma yeteneklerini uygulayarak, veriyi kenarda yakalayabilir ve filtreleyebilir ve agregasyon ve daha fazla analitik uygulama için ana kümeye teslim edebiliriz.
 
-## Decomposition
+## Ayrıştırma
 
-Modern data lakes extend the decomposition capabilities that broke up Hadoop. Modern data lakes have high-speed query processing engines and high-throughput storage. Modern data lakes are too large to fit in databases, so data resides in object storage. This way, databases can focus on query optimization functionality and outsource storage functionality to high-speed object storage. By keeping subsets of data in memory and leveraging features like predicate pushdown (S3 Select) and external tables - query engines have greater flexibility.
+Modern veri gölleri, Hadoop'u parçalayan ayrıştırma yeteneklerini genişletir. Modern veri gölleri, yüksek hızlı sorgulama işleme motorlarına ve yüksek verimli depolamaya sahiptir. Modern veri gölleri, veritabanlarına sığmayacak kadar büyüktür, bu nedenle veri nesne depolamada bulunur. Bu şekilde, veritabanları sorgulama optimizasyonu işlevselliğine odaklanabilir ve depolama işlevselliğini yüksek hızlı nesne depolamaya devredebilir. Verinin alt kümelerini bellekte tutarak ve S3 Select ve harici tablolar gibi özellikleri kullanarak, sorgulama motorları daha fazla esnekliğe sahip olur.
 
-## Open Source
+## Açık Kaynak
 
-Enterprises that adopted Hadoop did so out of preference for open source technology. As the logical successor - enterprises want their data lakes to be open source as well. This is why Iceberg is thriving and why Databricks open-sourced Delta Lake.
+Hadoop'u benimseyen kuruluşlar, açık kaynak teknolojisini tercih ettikleri için bunu yaptı. Mantıksal halefi olarak, kuruluşlar veri göllerinin de açık kaynak olmasını istiyor. Bu nedenle Iceberg gelişiyor ve Databricks Delta Lake'i açık kaynak yaptı.
 
-The capabilities, freedom from lock-in, and comfort that come from tens of thousands of users have real value. RustFS is also 100% open source, ensuring organizations can stay true to their goals when investing in modern data lakes.
+On binlerce kullanıcının getirdiği yetenekler, kilitlenmeden özgürlük ve rahatlık gerçek değere sahiptir. RustFS de %100 açık kaynak olup, kuruluşların modern veri göllerine yatırım yaparken hedeflerine sadık kalmalarını sağlar.
 
-## Rapid Growth
+## Hızlı Büyüme
 
-Data is constantly being generated, which means it must be constantly ingested - without causing indigestion. RustFS is built for this world and works out of the box with Kafka, Flink, RabbitMQ, and numerous other solutions. The result is that the data lake/lakehouse becomes a single source of truth that can seamlessly scale to exabytes and beyond.
+Veri sürekli olarak üretilmektedir, bu da sürekli olarak alınması gerektiği anlamına gelir - sindirime neden olmadan. RustFS bu dünya için inşa edilmiştir ve Kafka, Flink, RabbitMQ ve birçok diğer çözümle kutudan çıkar çıkmaz çalışır. Sonuç olarak, veri gölü/lakehouse tek bir doğru kaynağı haline gelir ve exabaytların ötesine sorunsuzca ölçeklenebilir.
 
-RustFS has multiple customers with daily data ingestion exceeding 250PB.
+RustFS'in günlük veri alımı 250PB'yi aşan birçok müşterisi vardır.
 
-## Simplicity
+## Basitlik
 
-Simplicity is hard. It requires work, discipline, and most importantly, commitment. RustFS's simplicity is legendary and is a philosophical commitment that makes our software easy to deploy, use, upgrade, and scale. Modern data lakes don't have to be complex. There are a few parts, and we're committed to ensuring RustFS is the easiest to adopt and deploy.
+Basitlik zordur. Çalışma, disiplin ve en önemlisi, taahhüt gerektirir. RustFS'in basitliği efsanevidir ve yazılımımızı dağıtmayı, kullanmayı, yükseltmeyi ve ölçeklendirmeyi kolaylaştıran bir felsefi taahhüttür. Modern veri gölleri karmaşık olmak zorunda değildir. Birkaç parçadan oluşur ve RustFS'in benimsenmesini ve dağıtımını en kolay hale getirmeye kararlıyız.
 
-## ELT or ETL - It Just Works
+## ELT veya ETL - Sadece Çalışır
 
-RustFS doesn't just work with every data streaming protocol, but every data pipeline - every data streaming protocol and data pipeline works with RustFS. Every vendor has been extensively tested, and typically, data pipelines have resilience and performance.
+RustFS, her veri akışı protokolü ile çalışmakla kalmaz, her veri boru hattı - her veri akışı protokolü ve veri boru hattı RustFS ile çalışır. Her satıcı kapsamlı bir şekilde test edilmiştir ve tipik olarak veri boru hatları dirençlilik ve performansa sahiptir.
 
-## Resilience
+## Dirençlilik
 
-RustFS protects data using inline erasure coding for each object, which is far more efficient than the HDFS replication alternatives that were never adopted. Additionally, RustFS's bitrot detection ensures it never reads corrupted data - capturing and repairing corrupted data dynamically for objects. RustFS also supports cross-region, active-active replication. Finally, RustFS supports a complete object locking framework providing legal hold and retention (with governance and compliance modes).
+RustFS, her nesne için satır içi silme kodlaması kullanarak verileri korur, bu da hiçbir zaman benimsenmeyen HDFS çoğaltma alternatiflerinden çok daha verimlidir. Ayrıca, RustFS'in bit çürümesi tespiti, asla bozuk verileri okumaz - nesneler için bozuk verileri dinamik olarak yakalar ve onarır. RustFS ayrıca çapraz bölge, aktif-aktif çoğaltmayı destekler. Son olarak, RustFS, yasal tutma ve saklama (yönetişim ve uyumluluk modlarıyla) sağlayan tam bir nesne kilitleme çerçevesini destekler.
 
-## Software Defined
+## Yazılım Tanımlı
 
-The successor to Hadoop HDFS is not a hardware appliance but software running on commodity hardware. This is the essence of RustFS - software. Like Hadoop HDFS, RustFS is designed to take full advantage of commodity servers. Able to leverage NVMe drives and 100 GbE networks, RustFS can shrink data centers, thereby improving operational efficiency and manageability. In fact, companies building alternative data lakes reduce their hardware footprint by 60% or more while improving performance and reducing the FTEs required to manage it.
+Hadoop HDFS'in halefi, bir donanım cihazı değil, emtia donanımı üzerinde çalışan bir yazılımdır. Bu, RustFS'in özüdür - yazılım. Hadoop HDFS gibi, RustFS de emtia sunucularından tam olarak yararlanmak için tasarlanmıştır. NVMe sürücüleri ve 100 GbE ağlarını kullanabilen RustFS, veri merkezlerini küçültebilir, böylece operasyonel verimliliği ve yönetilebilirliği artırabilir. Aslında, alternatif veri gölleri inşa eden şirketler, performansı artırırken ve yönetmek için gereken FTE'leri azaltırken donanım ayak izlerini %60 veya daha fazla azaltır.
 
-## Security
+## Güvenlik
 
-RustFS supports multiple sophisticated server-side encryption schemes to protect data wherever it resides, whether in flight or at rest. RustFS's approach ensures confidentiality, integrity, and authenticity with negligible performance overhead. Server-side and client-side encryption support using AES-256-GCM, ChaCha20-Poly1305, and AES-CBC ensures application compatibility. Additionally, RustFS supports industry-leading key management systems (KMS).
+RustFS, verileri nerede olursa olsun, uçuşta veya dinlenirken korumak için birçok sofistike sunucu tarafı şifreleme şeması destekler. RustFS'in yaklaşımı, ihmal edilebilir performans yükü ile gizlilik, bütünlük ve doğruluğu sağlar. AES-256-GCM, ChaCha20-Poly1305 ve AES-CBC kullanarak sunucu tarafı ve istemci tarafı şifreleme desteği, uygulama uyumluluğunu sağlar. Ayrıca, RustFS, sektör lideri anahtar yönetim sistemlerini (KMS) destekler.

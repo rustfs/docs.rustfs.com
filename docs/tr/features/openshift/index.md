@@ -1,75 +1,75 @@
-# OpenShift Integration
+# OpenShift Entegrasyonu
 
-RustFS provides native integration with Red Hat OpenShift, enabling enterprise-grade container storage solutions with advanced security, compliance, and operational features.
+RustFS, Red Hat OpenShift ile yerel entegrasyon sağlayarak, gelişmiş güvenlik, uyumluluk ve operasyonel özelliklere sahip kurumsal sınıf konteyner depolama çözümleri sunar.
 
-## Overview
+## Genel Bakış
 
-![OpenShift Integration](./images/sec1-1.png)
+![OpenShift Entegrasyonu](./images/sec1-1.png)
 
-RustFS on OpenShift delivers:
+OpenShift üzerindeki RustFS şunları sunar:
 
-- **Container-Native Storage**: Purpose-built for containerized applications
-- **Enterprise Security**: Advanced security and compliance features
-- **Operator Management**: Kubernetes Operator for automated lifecycle management
-- **Multi-Cloud Support**: Deploy across hybrid and multi-cloud environments
+- **Konteyner Yerel Depolama**: Konteynerleştirilmiş uygulamalar için özel olarak tasarlanmıştır
+- **Kurumsal Güvenlik**: Gelişmiş güvenlik ve uyumluluk özellikleri
+- **Operatör Yönetimi**: Otomatik yaşam döngüsü yönetimi için Kubernetes Operatörü
+- **Çoklu Bulut Desteği**: Hibrit ve çoklu bulut ortamlarında dağıtım
 
-## Core Features
+## Temel Özellikler
 
-### OpenShift Container Storage Integration
+### OpenShift Konteyner Depolama Entegrasyonu
 
-#### Persistent Volume Claims (PVC)
+#### Kalıcı Hacim Talepleri (PVC)
 
-- **Dynamic Provisioning**: Automatic storage provisioning for applications
-- **Storage Classes**: Multiple storage classes for different performance needs
-- **Volume Expansion**: Online volume expansion without downtime
-- **Snapshots**: Application-consistent snapshots and clones
+- **Dinamik Sağlama**: Uygulamalar için otomatik depolama sağlama
+- **Depolama Sınıfları**: Farklı performans ihtiyaçları için çoklu depolama sınıfları
+- **Hacim Genişletme**: Kesintisiz çevrimiçi hacim genişletme
+- **Anlık Görüntüler**: Uygulama tutarlı anlık görüntüler ve klonlar
 
-#### Container Storage Interface (CSI)
+#### Konteyner Depolama Arayüzü (CSI)
 
-- **CSI Driver**: Native CSI driver for seamless integration
-- **Volume Lifecycle**: Complete volume lifecycle management
-- **Topology Awareness**: Zone and region-aware volume placement
-- **Multi-Attach**: Shared volumes across multiple pods
+- **CSI Sürücüsü**: Sorunsuz entegrasyon için yerel CSI sürücüsü
+- **Hacim Yaşam Döngüsü**: Tam hacim yaşam döngüsü yönetimi
+- **Topoloji Farkındalığı**: Bölge ve bölge farkında hacim yerleştirme
+- **Çoklu Bağlantı**: Çoklu podlar arasında paylaşılan hacimler
 
-### OpenShift Operator
+### OpenShift Operatörü
 
-#### Automated Deployment
+#### Otomatik Dağıtım
 
-- **One-Click Installation**: Deploy RustFS with OpenShift Operator
-- **Configuration Management**: Automated configuration and updates
-- **Health Monitoring**: Continuous health monitoring and alerting
-- **Self-Healing**: Automatic recovery from failures
+- **Tek Tıklama Kurulumu**: OpenShift Operatörü ile RustFS dağıtımı
+- **Yapılandırma Yönetimi**: Otomatik yapılandırma ve güncellemeler
+- **Sağlık İzleme**: Sürekli sağlık izleme ve uyarılar
+- **Kendi Kendini Onarma**: Otomatik hata kurtarma
 
-#### Lifecycle Management
+#### Yaşam Döngüsü Yönetimi
 
-- **Rolling Updates**: Zero-downtime software updates
-- **Backup and Restore**: Automated backup and disaster recovery
-- **Scaling**: Automatic scaling based on demand
-- **Monitoring**: Integrated monitoring and metrics
+- **Yuvarlak Güncellemeler**: Sıfır kesinti süresi yazılım güncellemeleri
+- **Yedekleme ve Geri Yükleme**: Otomatik yedekleme ve felaket kurtarma
+- **Ölçeklendirme**: Talebe dayalı otomatik ölçeklendirme
+- **İzleme**: Entegre izleme ve metrikler
 
-### Security Integration
+### Güvenlik Entegrasyonu
 
-#### Red Hat Advanced Cluster Security (ACS)
+#### Red Hat Gelişmiş Küme Güvenliği (ACS)
 
-- **Container Security**: Runtime container security scanning
-- **Vulnerability Management**: Continuous vulnerability assessment
-- **Compliance**: Automated compliance reporting
-- **Policy Enforcement**: Security policy enforcement
+- **Konteyner Güvenliği**: Çalışma zamanı konteyner güvenlik tarama
+- **Zafiyet Yönetimi**: Sürekli zafiyet değerlendirmesi
+- **Uyumluluk**: Otomatik uyumluluk raporlaması
+- **Politika Uygulaması**: Güvenlik politikası uygulaması
 
-#### OpenShift Security Context Constraints (SCC)
+#### OpenShift Güvenlik Bağlamı Kısıtlamaları (SCC)
 
-- **Pod Security**: Fine-grained pod security controls
-- **Privilege Management**: Manage container privileges
-- **Resource Limits**: Enforce resource constraints
-- **Network Policies**: Network segmentation and isolation
+- **Pod Güvenliği**: İnce taneli pod güvenlik kontrolleri
+- **Ayrıcalık Yönetimi**: Konteyner ayrıcalıklarını yönetme
+- **Kaynak Limitleri**: Kaynak kısıtlamalarını uygulama
+- **Ağ Politikaları**: Ağ segmentasyonu ve izolasyonu
 
-## Deployment Architectures
+## Dağıtım Mimarileri
 
-### On-Premises OpenShift
+### Yerel OpenShift
 
 ```
 ┌─────────────────────────────────────┐
-│        OpenShift Cluster            │
+│        OpenShift Kümesi             │
 │                                     │
 │  ┌─────────────┐  ┌─────────────┐  │
 │  │   Master    │  │   Master    │  │
@@ -83,14 +83,14 @@ RustFS on OpenShift delivers:
 └─────────────────────────────────────┘
 ```
 
-### OpenShift on Public Cloud
+### Genel Bulut Üzerinde OpenShift
 
 ```
 ┌─────────────────────────────────────┐
-│         Cloud Provider              │
+│         Bulut Sağlayıcısı          │
 │                                     │
 │  ┌─────────────────────────────────┐│
-│  │       OpenShift Service         ││
+│  │       OpenShift Servisi         ││
 │  │                                 ││
 │  │  ┌─────────┐  ┌─────────────┐  ││
 │  │  │ Control │  │   Worker    │  ││
@@ -100,248 +100,248 @@ RustFS on OpenShift delivers:
 └─────────────────────────────────────┘
 ```
 
-### Hybrid OpenShift
+### Hibrit OpenShift
 
 ```
 ┌─────────────────┐    ┌─────────────────┐
-│   On-Premises   │    │   Public Cloud  │
+│   Yerel         │    │   Genel Bulut   │
 │   OpenShift     │◄──►│   OpenShift     │
 │                 │    │                 │
-│ • Primary Apps  │    │ • Burst Apps    │
-│ • Sensitive Data│    │ • Dev/Test      │
-│ • Compliance    │    │ • Elastic Scale │
+│ • Birincil Uygulamalar │ • Patlama Uygulamaları │
+│ • Hassas Veriler│    │ • Geliştirme/Test │
+│ • Uyumluluk     │    │ • Esnek Ölçeklendirme │
 └─────────────────┘    └─────────────────┘
 ```
 
-## Application Integration
+## Uygulama Entegrasyonu
 
-### Stateful Applications
+### Durumlu Uygulamalar
 
-#### Databases
+#### Veritabanları
 
-- **PostgreSQL**: High-performance database storage
-- **MongoDB**: Scalable document database storage
-- **Redis**: In-memory database with persistence
-- **Elasticsearch**: Search and analytics storage
+- **PostgreSQL**: Yüksek performanslı veri tabanı depolama
+- **MongoDB**: Ölçeklenebilir belge veri tabanı depolama
+- **Redis**: Kalıcı bellek içi veri tabanı
+- **Elasticsearch**: Arama ve analiz depolama
 
-#### Enterprise Applications
+#### Kurumsal Uygulamalar
 
-- **Jenkins**: CI/CD pipeline artifact storage
-- **GitLab**: Source code and container registry storage
-- **Prometheus**: Metrics and monitoring data storage
-- **Grafana**: Dashboard and configuration storage
+- **Jenkins**: CI/CD boru hattı eseri depolama
+- **GitLab**: Kaynak kodu ve konteyner kayıt defteri depolama
+- **Prometheus**: Metrikler ve izleme veri depolama
+- **Grafana**: Gösterge paneli ve yapılandırma depolama
 
-### Microservices Architecture
+### Mikroservis Mimarisi
 
-#### Service Mesh Integration
+#### Servis Ağı Entegrasyonu
 
-- **Istio**: Service mesh data plane storage
-- **Linkerd**: Lightweight service mesh storage
-- **Consul Connect**: Service discovery and configuration
-- **Envoy**: Proxy configuration and logs
+- **Istio**: Servis ağı veri düzlemi depolama
+- **Linkerd**: Hafif servis ağı depolama
+- **Consul Connect**: Servis keşfi ve yapılandırma
+- **Envoy**: Proxy yapılandırması ve günlükleri
 
-#### API Management
+#### API Yönetimi
 
-- **3scale**: API management data storage
-- **Kong**: API gateway configuration and logs
-- **Ambassador**: Edge stack configuration
-- **Zuul**: API gateway routing and filtering
+- **3scale**: API yönetimi veri depolama
+- **Kong**: API ağ geçidi yapılandırması ve günlükleri
+- **Ambassador**: Kenar yığını yapılandırması
+- **Zuul**: API ağ geçidi yönlendirme ve filtreleme
 
-## DevOps Integration
+## DevOps Entegrasyonu
 
-### CI/CD Pipelines
+### CI/CD Boru Hatları
 
-#### OpenShift Pipelines (Tekton)
+#### OpenShift Boru Hatları (Tekton)
 
-- **Pipeline Storage**: Store pipeline artifacts and logs
-- **Build Cache**: Cache build dependencies and images
-- **Test Results**: Store test results and reports
-- **Deployment Artifacts**: Store deployment configurations
+- **Boru Hattı Depolama**: Boru hattı eserleri ve günlükleri depolama
+- **Derleme Önbelleği**: Derleme bağımlılıklarını ve görüntüleri önbelleğe alma
+- **Test Sonuçları**: Test sonuçlarını ve raporları depolama
+- **Dağıtım Eserleri**: Dağıtım yapılandırmalarını depolama
 
-#### GitOps Workflows
+#### GitOps İş Akışları
 
-- **ArgoCD**: GitOps deployment configurations
-- **Flux**: Continuous delivery configurations
-- **Jenkins X**: Cloud-native CI/CD pipelines
-- **Spinnaker**: Multi-cloud deployment pipelines
+- **ArgoCD**: GitOps dağıtım yapılandırmaları
+- **Flux**: Sürekli teslimat yapılandırmaları
+- **Jenkins X**: Bulut yerel CI/CD boru hatları
+- **Spinnaker**: Çoklu bulut dağıtım boru hatları
 
-### Container Registry Integration
+### Konteyner Kayıt Defteri Entegrasyonu
 
-#### OpenShift Container Registry
+#### OpenShift Konteyner Kayıt Defteri
 
-- **Image Storage**: Store container images and layers
-- **Vulnerability Scanning**: Store scan results and metadata
-- **Image Signing**: Store image signatures and attestations
-- **Registry Mirroring**: Mirror external registries locally
+- **Görüntü Depolama**: Konteyner görüntüleri ve katmanları depolama
+- **Zafiyet Tarama**: Tarama sonuçlarını ve meta verileri depolama
+- **Görüntü İmzalama**: Görüntü imzalarını ve doğrulama bilgilerini depolama
+- **Kayıt Defteri Aynalama**: Dış kayıt defterlerini yerel olarak aynalama
 
-#### External Registries
+#### Harici Kayıt Defterleri
 
-- **Quay**: Enterprise container registry integration
-- **Harbor**: Cloud-native registry integration
-- **Docker Hub**: Public registry integration
-- **ECR/ACR/GCR**: Cloud provider registry integration
+- **Quay**: Kurumsal konteyner kayıt defteri entegrasyonu
+- **Harbor**: Bulut yerel kayıt defteri entegrasyonu
+- **Docker Hub**: Genel kayıt defteri entegrasyonu
+- **ECR/ACR/GCR**: Bulut sağlayıcı kayıt defteri entegrasyonu
 
-## Monitoring and Observability
+## İzleme ve Gözlemlenebilirlik
 
-### OpenShift Monitoring Stack
+### OpenShift İzleme Yığını
 
-#### Prometheus Integration
+#### Prometheus Entegrasyonu
 
-- **Metrics Storage**: Store time-series metrics data
-- **Long-term Storage**: Archive historical metrics
-- **Federation**: Multi-cluster metrics aggregation
-- **Alerting**: Store alerting rules and configurations
+- **Metrik Depolama**: Zaman serisi metrik verilerini depolama
+- **Uzun Süreli Depolama**: Tarihsel metrikleri arşivleme
+- **Federasyon**: Çoklu küme metriklerini birleştirme
+- **Uyarılar**: Uyarı kurallarını ve yapılandırmalarını depolama
 
-#### Grafana Integration
+#### Grafana Entegrasyonu
 
-- **Dashboard Storage**: Store dashboard configurations
-- **Data Sources**: Configure multiple data sources
-- **User Management**: Store user preferences and settings
-- **Plugins**: Store custom plugins and extensions
+- **Gösterge Paneli Depolama**: Gösterge paneli yapılandırmalarını depolama
+- **Veri Kaynakları**: Çoklu veri kaynaklarını yapılandırma
+- **Kullanıcı Yönetimi**: Kullanıcı tercihlerini ve ayarlarını depolama
+- **Eklentiler**: Özel eklentileri ve uzantıları depolama
 
-### Logging Integration
+### Günlükleme Entegrasyonu
 
-#### OpenShift Logging (EFK Stack)
+#### OpenShift Günlükleme (EFK Yığını)
 
-- **Elasticsearch**: Store and index log data
-- **Fluentd**: Log collection and forwarding
-- **Kibana**: Log visualization and analysis
-- **Log Rotation**: Automated log lifecycle management
+- **Elasticsearch**: Günlük verilerini depolama ve dizinleme
+- **Fluentd**: Günlük toplama ve iletme
+- **Kibana**: Günlük görselleştirme ve analiz
+- **Günlük Döndürme**: Otomatik günlük yaşam döngüsü yönetimi
 
-#### External Logging Solutions
+#### Harici Günlükleme Çözümleri
 
-- **Splunk**: Enterprise log management integration
-- **Datadog**: Cloud monitoring and logging
-- **New Relic**: Application performance monitoring
-- **Sumo Logic**: Cloud-native log analytics
+- **Splunk**: Kurumsal günlük yönetimi entegrasyonu
+- **Datadog**: Bulut izleme ve günlükleme
+- **New Relic**: Uygulama performans izleme
+- **Sumo Logic**: Bulut yerel günlük analitiği
 
-## Security and Compliance
+## Güvenlik ve Uyumluluk
 
-### Compliance Frameworks
+### Uyumluluk Çerçeveleri
 
-#### Industry Standards
+#### Endüstri Standartları
 
-- **SOC 2**: Service Organization Control compliance
-- **ISO 27001**: Information security management
-- **HIPAA**: Healthcare data protection
-- **PCI DSS**: Payment card industry standards
+- **SOC 2**: Hizmet Organizasyonu Kontrol uyumluluğu
+- **ISO 27001**: Bilgi güvenliği yönetimi
+- **HIPAA**: Sağlık veri koruması
+- **PCI DSS**: Ödeme kartı endüstrisi standartları
 
-#### Government Regulations
+#### Hükümet Düzenlemeleri
 
-- **FedRAMP**: Federal cloud security requirements
-- **FISMA**: Federal information security management
-- **GDPR**: European data protection regulation
-- **SOX**: Financial reporting compliance
+- **FedRAMP**: Federal bulut güvenlik gereksinimleri
+- **FISMA**: Federal bilgi güvenliği yönetimi
+- **GDPR**: Avrupa veri koruma düzenlemesi
+- **SOX**: Finansal raporlama uyumluluğu
 
-### Security Features
+### Güvenlik Özellikleri
 
-#### Data Protection
+#### Veri Koruma
 
-- **Encryption at Rest**: AES-256 encryption for stored data
-- **Encryption in Transit**: TLS 1.3 for data transmission
-- **Key Management**: Integration with OpenShift secrets
-- **Data Masking**: Sensitive data protection
+- **Dinlenme Halinde Şifreleme**: Depolanan veriler için AES-256 şifreleme
+- **Aktarım Halinde Şifreleme**: Veri iletimi için TLS 1.3
+- **Anahtar Yönetimi**: OpenShift sırlarıyla entegrasyon
+- **Veri Maskeleme**: Hassas veri koruması
 
-#### Access Control
+#### Erişim Kontrolü
 
-- **RBAC Integration**: Role-based access control
-- **LDAP/AD Integration**: Enterprise directory integration
-- **OAuth/OIDC**: Modern authentication protocols
-- **Service Accounts**: Automated service authentication
+- **RBAC Entegrasyonu**: Rol tabanlı erişim kontrolü
+- **LDAP/AD Entegrasyonu**: Kurumsal dizin entegrasyonu
+- **OAuth/OIDC**: Modern kimlik doğrulama protokolleri
+- **Servis Hesapları**: Otomatik servis kimlik doğrulaması
 
-## Performance Optimization
+## Performans Optimizasyonu
 
-### Storage Performance
+### Depolama Performansı
 
-#### High-Performance Workloads
+#### Yüksek Performanslı İş Yükleri
 
-- **NVMe Storage**: Ultra-low latency storage
-- **RDMA Networking**: High-bandwidth, low-latency networking
-- **CPU Affinity**: Optimize CPU usage for storage
-- **NUMA Awareness**: Non-uniform memory access optimization
+- **NVMe Depolama**: Ultra düşük gecikme süresi depolama
+- **RDMA Ağ Oluşturma**: Yüksek bant genişliği, düşük gecikme süresi ağ oluşturma
+- **CPU Affinitesi**: Depolama için CPU kullanımını optimize etme
+- **NUMA Farkındalığı**: Düzensiz bellek erişimi optimizasyonu
 
-#### Large-Scale Workloads
+#### Büyük Ölçekli İş Yükleri
 
-- **Horizontal Scaling**: Scale storage across multiple nodes
-- **Load Balancing**: Distribute I/O across storage nodes
-- **Caching**: Intelligent caching for hot data
-- **Compression**: Reduce storage footprint
+- **Yatay Ölçeklendirme**: Çoklu düğümler arasında depolama ölçeklendirme
+- **Yük Dengeleme**: G/Ç'yi depolama düğümleri arasında dağıtma
+- **Önbellekleme**: Sık kullanılan veriler için akıllı önbellekleme
+- **Sıkıştırma**: Depolama ayak izini azaltma
 
-### Network Optimization
+### Ağ Optimizasyonu
 
-#### Container Networking
+#### Konteyner Ağ Oluşturma
 
-- **CNI Integration**: Container Network Interface support
-- **Network Policies**: Micro-segmentation for security
-- **Service Mesh**: Optimize service-to-service communication
-- **Ingress Controllers**: Optimize external traffic routing
+- **CNI Entegrasyonu**: Konteyner Ağ Arayüzü desteği
+- **Ağ Politikaları**: Güvenlik için mikro segmentasyon
+- **Servis Ağı**: Servisler arası iletişimi optimize etme
+- **Giriş Denetleyicileri**: Harici trafik yönlendirmeyi optimize etme
 
-#### Multi-Zone Deployment
+#### Çoklu Bölge Dağıtımı
 
-- **Zone Awareness**: Deploy across availability zones
-- **Cross-Zone Replication**: Replicate data across zones
-- **Latency Optimization**: Minimize cross-zone traffic
-- **Disaster Recovery**: Multi-zone disaster recovery
+- **Bölge Farkındalığı**: Kullanılabilirlik bölgeleri arasında dağıtım
+- **Çapraz Bölge Çoğaltma**: Bölgeler arasında veri çoğaltma
+- **Gecikme Süresi Optimizasyonu**: Çapraz bölge trafiğini en aza indirme
+- **Felaket Kurtarma**: Çoklu bölge felaket kurtarma
 
-## Best Practices
+## En İyi Uygulamalar
 
-### Deployment Best Practices
+### Dağıtım En İyi Uygulamaları
 
-1. **Resource Planning**: Plan CPU, memory, and storage resources
-2. **Node Affinity**: Use node affinity for optimal placement
-3. **Pod Disruption Budgets**: Ensure application availability
-4. **Health Checks**: Implement comprehensive health monitoring
+1. **Kaynak Planlama**: CPU, bellek ve depolama kaynaklarını planlama
+2. **Düğüm Affinitesi**: Optimal yerleştirme için düğüm afinitesi kullanma
+3. **Pod Kesinti Bütçeleri**: Uygulama kullanılabilirliğini sağlama
+4. **Sağlık Kontrolleri**: Kapsamlı sağlık izleme uygulama
 
-### Security Best Practices
+### Güvenlik En İyi Uygulamaları
 
-1. **Least Privilege**: Grant minimum required permissions
-2. **Network Segmentation**: Use network policies for isolation
-3. **Image Security**: Scan container images for vulnerabilities
-4. **Secret Management**: Use OpenShift secrets for sensitive data
+1. **En Az Ayrıcalık**: Minimum gerekli izinleri verme
+2. **Ağ Segmentasyonu**: İzolasyon için ağ politikaları kullanma
+3. **Görüntü Güvenliği**: Konteyner görüntülerini zafiyetler için tarama
+4. **Sır Yönetimi**: Hassas veriler için OpenShift sırlarını kullanma
 
-### Performance Best Practices
+### Performans En İyi Uygulamaları
 
-1. **Storage Classes**: Use appropriate storage classes
-2. **Resource Limits**: Set CPU and memory limits
-3. **Monitoring**: Implement comprehensive monitoring
-4. **Capacity Planning**: Plan for future growth
+1. **Depolama Sınıfları**: Uygun depolama sınıflarını kullanma
+2. **Kaynak Limitleri**: CPU ve bellek limitleri ayarlama
+3. **İzleme**: Kapsamlı izleme uygulama
+4. **Kapasite Planlama**: Gelecekteki büyüme için planlama
 
-## Support and Services
+## Destek ve Hizmetler
 
-### Red Hat Support
+### Red Hat Desteği
 
-- **Enterprise Support**: 24/7 enterprise support
-- **Consulting Services**: Architecture and implementation consulting
-- **Training**: OpenShift and container storage training
-- **Certification**: Red Hat certification programs
+- **Kurumsal Destek**: 7/24 kurumsal destek
+- **Danışmanlık Hizmetleri**: Mimari ve uygulama danışmanlığı
+- **Eğitim**: OpenShift ve konteyner depolama eğitimi
+- **Sertifikasyon**: Red Hat sertifikasyon programları
 
-### Partner Ecosystem
+### Partner Ekosistemi
 
-- **System Integrators**: Certified implementation partners
-- **ISV Partners**: Application vendor partnerships
-- **Cloud Providers**: Multi-cloud deployment support
-- **Technology Partners**: Integration with complementary technologies
+- **Sistem Entegratörleri**: Sertifikalı uygulama partnerleri
+- **ISV Partnerleri**: Uygulama satıcı ortaklıkları
+- **Bulut Sağlayıcıları**: Çoklu bulut dağıtım desteği
+- **Teknoloji Partnerleri**: Tamamlayıcı teknolojilerle entegrasyon
 
-## Getting Started
+## Başlarken
 
-### Prerequisites
+### Ön Koşullar
 
-1. **OpenShift Cluster**: Running OpenShift 4.6 or later
-2. **Storage Nodes**: Dedicated nodes for storage workloads
-3. **Network Configuration**: Configure cluster networking
-4. **Security Setup**: Configure security contexts and policies
+1. **OpenShift Kümesi**: OpenShift 4.6 veya daha yeni sürümü çalıştırma
+2. **Depolama Düğümleri**: Depolama iş yükleri için ayrılmış düğümler
+3. **Ağ Yapılandırması**: Küme ağ yapılandırması
+4. **Güvenlik Kurulumu**: Güvenlik bağlamlarını ve politikaları yapılandırma
 
-### Installation Steps
+### Kurulum Adımları
 
-1. **Install Operator**: Deploy RustFS Operator from OperatorHub
-2. **Create Storage Cluster**: Configure and deploy storage cluster
-3. **Create Storage Classes**: Define storage classes for applications
-4. **Test Deployment**: Verify installation with test workloads
-5. **Monitor Health**: Set up monitoring and alerting
+1. **Operatörü Yükle**: OperatorHub'dan RustFS Operatörünü dağıt
+2. **Depolama Kümesi Oluştur**: Depolama kümesini yapılandır ve dağıt
+3. **Depolama Sınıfları Oluştur**: Uygulamalar için depolama sınıflarını tanımla
+4. **Dağıtımı Test Et**: Test iş yükleriyle kurulumu doğrula
+5. **Sağlığı İzle**: İzleme ve uyarı sistemini kur
 
-### Next Steps
+### Sonraki Adımlar
 
-- **Application Migration**: Migrate existing applications
-- **Performance Tuning**: Optimize for specific workloads
-- **Security Hardening**: Implement security best practices
-- **Disaster Recovery**: Set up backup and recovery procedures
+- **Uygulama Geçişi**: Mevcut uygulamaları geçir
+- **Performans Ayarlama**: Belirli iş yükleri için optimize et
+- **Güvenlik Sertleştirme**: Güvenlik en iyi uygulamalarını uygula
+- **Felaket Kurtarma**: Yedekleme ve kurtarma prosedürlerini kur

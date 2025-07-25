@@ -1,17 +1,17 @@
 ---
 title: "Java SDK"
-description: "This article mainly explains the use of Java SDK in RustFS."
+description: "Bu makale, RustFS'ta Java SDK'nın kullanımını temel olarak açıklamaktadır."
 ---
 
 # Java SDK
 
-RustFS is an object storage system compatible with the S3 protocol, supporting integration with the system through AWS S3 SDK. This article will use the AWS S3 Java SDK as an example to introduce how to build a development environment from scratch, connect to RustFS, and complete basic object storage operations.
+RustFS, AWS S3 SDK ile sistem entegrasyonunu destekleyen, S3 protokolüyle uyumlu bir nesne depolama sistemidir. Bu makale, AWS S3 Java SDK örneği kullanılarak sıfırdan bir geliştirme ortamının nasıl oluşturulacağını, RustFS'a nasıl bağlanılacağını ve temel nesne depolama işlemlerinin nasıl tamamlanacağını açıklayacaktır.
 
-## 1. Integrating AWS S3 Java SDK
+## 1. AWS S3 Java SDK Entegrasyonu
 
-### 1.1 Create Maven Project
+### 1.1 Maven Projesi Oluşturma
 
-Use the following directory structure or create a new Maven project in IDE:
+Aşağıdaki dizin yapısını kullanın veya IDE'de yeni bir Maven projesi oluşturun:
 
 ```
 rustfs-java-s3-demo/
@@ -24,9 +24,9 @@ rustfs-java-s3-demo/
                     └── RustfsS3Example.java
 ```
 
-### 1.2 Add Dependencies
+### 1.2 Bağımlılıkların Eklenmesi
 
-Add AWS SDK dependencies in `pom.xml`:
+`pom.xml` dosyasına AWS SDK bağımlılıklarını ekleyin:
 
 ```xml
 <dependencies>
@@ -38,13 +38,13 @@ Add AWS SDK dependencies in `pom.xml`:
 </dependencies>
 ```
 
-> We recommend using AWS SDK v2 version, which has more complete functionality and supports asynchronous, reactive modes.
+> AWS SDK v2 sürümünü kullanmanızı öneririz, daha fazla işlevsellik sunar ve asenkron, reaktif modları destekler.
 
 ---
 
-## 2. Connect and Use RustFS
+## 2. RustFS'a Bağlanma ve Kullanma
 
-### 2.1 Initialize S3 Client
+### 2.1 S3 İstemcisini Başlatma
 
 ```java
 package com.example;
@@ -61,50 +61,50 @@ import java.nio.file.Paths;
 public class RustfsS3Example {
 
     public static void main(String[] args) {
-        // 1. Initialize S3 client
+        // 1. S3 istemcisini başlat
         S3Client s3 = S3Client.builder()
-                .endpointOverride(URI.create("http://192.168.1.100:9000")) // RustFS address
-                .region(Region.US_EAST_1) // Can be hardcoded, RustFS doesn't validate region
+                .endpointOverride(URI.create("http://192.168.1.100:9000")) // RustFS adresi
+                .region(Region.US_EAST_1) // Sabit kodlanabilir, RustFS bölgeyi doğrulamaz
                 .credentialsProvider(
                         StaticCredentialsProvider.create(
                                 AwsBasicCredentials.create("rustfsadmin", "rustfssecret")
                         )
                 )
-                .forcePathStyle(true) // Key configuration! RustFS requires Path-Style enabled
+                .forcePathStyle(true) // Önemli yapılandırma! RustFS Path-Style etkinleştirilmesini gerektirir
                 .build();
 
-        // 2. Create Bucket
+        // 2. Bucket oluştur
         String bucket = "my-bucket";
         try {
             s3.createBucket(CreateBucketRequest.builder().bucket(bucket).build());
-            System.out.println("Bucket created: " + bucket);
+            System.out.println("Bucket oluşturuldu: " + bucket);
         } catch (BucketAlreadyExistsException | BucketAlreadyOwnedByYouException e) {
-            System.out.println("Bucket already exists.");
+            System.out.println("Bucket zaten mevcut.");
         }
 
-        // 3. Upload file
+        // 3. Dosya yükle
         s3.putObject(
                 PutObjectRequest.builder().bucket(bucket).key("hello.txt").build(),
                 Paths.get("hello.txt")
         );
-        System.out.println("Uploaded hello.txt");
+        System.out.println("hello.txt yüklendi");
 
-        // 4. Download file
+        // 4. Dosya indir
         s3.getObject(
                 GetObjectRequest.builder().bucket(bucket).key("hello.txt").build(),
                 Paths.get("downloaded-hello.txt")
         );
-        System.out.println("Downloaded hello.txt");
+        System.out.println("hello.txt indirildi");
 
-        // 5. List objects
+        // 5. Nesneleri listele
         ListObjectsV2Response listResponse = s3.listObjectsV2(ListObjectsV2Request.builder().bucket(bucket).build());
-        listResponse.contents().forEach(obj -> System.out.println("Found object: " + obj.key()));
+        listResponse.contents().forEach(obj -> System.out.println("Bulunan nesne: " + obj.key()));
 
-        // 6. Delete object
+        // 6. Nesneyi sil
         s3.deleteObject(DeleteObjectRequest.builder().bucket(bucket).key("hello.txt").build());
-        System.out.println("Deleted hello.txt");
+        System.out.println("hello.txt silindi");
 
-        // 7. Delete bucket (optional)
+        // 7. Bucket'i sil (isteğe bağlı)
         // s3.deleteBucket(DeleteBucketRequest.builder().bucket(bucket).build());
     }
 }
@@ -112,48 +112,48 @@ public class RustfsS3Example {
 
 ---
 
-## 3. Common Issues and Troubleshooting
+## 3. Yaygın Sorunlar ve Çözümleri
 
-| Issue | Cause | Solution |
+| Sorun | Nedeni | Çözüm |
 | -------------------------------------- | ------------------------------------ | ----------------------------------------- |
-| `S3Exception: 301 Moved Permanently` | Path-style not enabled or region error | Set `.forcePathStyle(true)` and use any region value |
-| `ConnectException: Connection refused` | RustFS not started or incorrect port | Check RustFS status and port |
-| `403 Forbidden` | AccessKey / SecretKey error | Check authentication configuration |
-| Upload fails with no response | SDK defaults to HTTPS, RustFS only supports HTTP (or requires certificates) | Use `http://` address and configure `endpointOverride` |
+| `S3Exception: 301 Moved Permanently` | Path-style etkin değil veya bölge hatası | `.forcePathStyle(true)` ayarla ve herhangi bir bölge değeri kullan |
+| `ConnectException: Connection refused` | RustFS başlatılmamış veya yanlış port | RustFS durumunu ve portu kontrol et |
+| `403 Forbidden` | AccessKey / SecretKey hatası | Kimlik doğrulama yapılandırmasını kontrol et |
+| Yanıt olmadan yükleme başarısız | SDK varsayılan olarak HTTPS kullanır, RustFS yalnızca HTTP'yi destekler (veya sertifikalar gerektirir) | `http://` adresi kullan ve `endpointOverride` yapılandır |
 
 ---
 
-## 4. Appendix
+## 4. Ekler
 
-### 4.1 Maven Packaging
+### 4.1 Maven Paketleme
 
-Package the project:
+Projeyi paketle:
 
 ```bash
 mvn clean package
 ```
 
-Execute:
+Çalıştır:
 
 ```bash
 java -cp target/rustfs-java-s3-demo-1.0-SNAPSHOT.jar com.example.RustfsS3Example
 ```
 
-### 4.2 RustFS Configuration Recommendations
+### 4.2 RustFS Yapılandırma Önerileri
 
-* Ensure SSL verification is disabled when service uses HTTP protocol.
-* Enable CORS support (if used for web frontend).
-* Recommend setting `max_object_size` and `max_part_size` limits to prevent large file transfer failures.
+* Hizmet HTTP protokolünü kullandığında SSL doğrulamanın devre dışı olduğundan emin olun.
+* CORS desteğini etkinleştirin (web önyüzü için kullanılıyorsa).
+* Büyük dosya aktarım hatalarını önlemek için `max_object_size` ve `max_part_size` sınırlarını ayarlamanız önerilir.
 
 ---
 
-## 5. Advanced Java Feature Examples
+## 5. Gelişmiş Java Özellik Örnekleri
 
-### 5.1 Generate and Use Presigned URLs
+### 5.1 Ön İmzalı URL'ler Oluşturma ve Kullanma
 
-> Presigned URLs allow clients to temporarily access private objects without exposing credentials, widely used for browser direct upload or download scenarios.
+> Ön imzalı URL'ler, istemcilerin kimlik bilgilerini açığa çıkarmadan özel nesnelere geçici olarak erişmesine izin verir, tarayıcıdan doğrudan yükleme veya indirme senaryolarında yaygın olarak kullanılır.
 
-#### 5.1.1 Add Dependencies (URL signing for v2 SDK is in the `s3-presigner` module)
+#### 5.1.1 Bağımlılıkları Ekleme (v2 SDK için URL imzalama `s3-presigner` modülündedir)
 
 ```xml
 <dependency>
@@ -163,7 +163,7 @@ java -cp target/rustfs-java-s3-demo-1.0-SNAPSHOT.jar com.example.RustfsS3Example
 </dependency>
 ```
 
-#### 5.1.2 Generate Download Link (GET)
+#### 5.1.2 İndirme Bağlantısı Oluşturma (GET)
 
 ```java
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -186,18 +186,18 @@ GetObjectRequest getObjectRequest = GetObjectRequest.builder()
 
 GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
         .getObjectRequest(getObjectRequest)
-        .signatureDuration(Duration.ofMinutes(15)) // Valid for 15 minutes
+        .signatureDuration(Duration.ofMinutes(15)) // 15 dakika geçerli
         .build();
 
 PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
 String url = presignedRequest.url().toString();
 
-System.out.println("Presigned GET URL: " + url);
+System.out.println("Ön imzalı GET URL: " + url);
 ```
 
-### 5.2 Multipart Upload
+### 5.2 Çok Parçalı Yükleme
 
-For files larger than 10 MB, you can manually control each part.
+10 MB'tan büyük dosyalar için her parçayı manuel olarak kontrol edebilirsiniz.
 
 ```java
 import software.amazon.awssdk.services.s3.model.*;
@@ -205,7 +205,7 @@ import software.amazon.awssdk.services.s3.model.*;
 String bucket = "my-bucket";
 String key = "large-file.bin";
 
-// 1. Initiate multipart upload
+// 1. Çok parçalı yüklemeyi başlat
 CreateMultipartUploadRequest createRequest = CreateMultipartUploadRequest.builder()
         .bucket(bucket)
         .key(key)
@@ -214,11 +214,11 @@ CreateMultipartUploadRequest createRequest = CreateMultipartUploadRequest.builde
 CreateMultipartUploadResponse createResponse = s3.createMultipartUpload(createRequest);
 String uploadId = createResponse.uploadId();
 
-// 2. Upload parts
+// 2. Parçaları yükle
 List<CompletedPart> completedParts = new ArrayList<>();
-// ... upload logic ...
+// ... yükleme mantığı ...
 
-// 3. Complete multipart upload
+// 3. Çok parçalı yüklemeyi tamamla
 CompleteMultipartUploadRequest completeRequest = CompleteMultipartUploadRequest.builder()
         .bucket(bucket)
         .key(key)
@@ -227,4 +227,3 @@ CompleteMultipartUploadRequest completeRequest = CompleteMultipartUploadRequest.
         .build();
 
 s3.completeMultipartUpload(completeRequest);
-```

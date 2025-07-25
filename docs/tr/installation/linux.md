@@ -1,66 +1,65 @@
 ---
-title: "Installing RustFS on Linux"
-description: "Quick guide for installing RustFS on Linux operating systems"
+title: "Linux'ta RustFS Kurulumu"
+description: "Linux işletim sistemlerinde RustFS kurulumu için hızlı rehber"
 ---
+# Linux'ta RustFS Kurulumu
 
-# Installing RustFS on Linux
+## 1. Kurulum Öncesi Okuma
 
-## 1. Pre-Installation Reading
+Bu sayfa, RustFS'nin tüm üç kurulum modu için eksiksiz dokümantasyon ve talimatlar içerir. Bunlar arasında, çok makineli çok disk modu, kurumsal düzeyde performans, güvenlik ve ölçeklenebilirlik içerir. Ayrıca üretim iş yükleri için gerekli mimari diyagramları da sağlar.
 
-This page contains complete documentation and instructions for all three installation modes of RustFS. Among them, the multi-machine multi-disk mode includes enterprise-level performance, security, and scalability. It also provides architecture diagrams needed for production workloads.
-Before installation, please read our startup modes and checklists:
+Kurulumdan önce lütfen başlangıç modlarımızı ve kontrol listelerimizi okuyun:
 
-1. Startup modes: Clarify your Linux startup mode beforehand;
+1. Başlangıç modları: Linux başlangıç modunuzu önceden netleştirin;
+2. Kontrol listeleri: Çeşitli göstergelerin üretim rehberlik özelliklerini karşılayıp karşılamadığını kontrol edin. Üretim standartları gerektirilmiyorsa, bu rehberliği atlayabilirsiniz;
 
-2. Checklists: Check whether various indicators meet production guidance characteristics. If production standards are not required, you may skip this guidance;
+## 2. Önkoşullar
 
-## 2. Prerequisites
+1. İşletim sistemi sürümü;
+2. Güvenlik duvarı;
+3. Ana bilgisayar adı;
+4. Bellek gereksinimleri;
+5. Zaman senkronizasyonu;
+6. Kapasite planlaması;
+7. Disk planlaması;
+8. Veri katmanlama planlaması.
 
-1. Operating system version;
-2. Firewall;
-3. Hostname;
-4. Memory requirements;
-5. Time synchronization;
-6. Capacity planning;
-7. Disk planning;
-8. Data tiering planning.
+### 2.1. İşletim Sistemi Sürümü
 
-### 2.1. Operating System Version
+Linux çekirdek sürümü 4.x ve üstünü öneriyoruz, ancak 5.x ve üstü sürümler daha iyi IO verimi ve ağ performansı elde edebilir.
 
-We recommend Linux kernel version 4.x and above, but versions 5.x and above can achieve better IO throughput and network performance.
+Ubuntu 20.04 ve RHEL 8.x kullanarak RustFS'yi kurabilirsiniz.
 
-You can use Ubuntu 20.04 and RHEL 8.x to install RustFS.
+### 2.2 Güvenlik Duvarı
 
-### 2.2 Firewall
-
-Linux systems have firewalls enabled by default. You can check the firewall status using the following command:
+Linux sistemlerinde varsayılan olarak güvenlik duvarları etkindir. Güvenlik duvarı durumunu aşağıdaki komutla kontrol edebilirsiniz:
 
 ```bash
 systemctl status firewalld
 ```
 
-If your firewall status is "active", you can disable the firewall using the following commands:
+Güvenlik duvarı durumunuz "aktif" ise, güvenlik duvarını aşağıdaki komutlarla devre dışı bırakabilirsiniz:
 
 ```bash
 systemctl stop firewalld
 systemctl disable firewalld
 ```
 
-Or allow RustFS port 9000:
+Veya RustFS portu 9000'i izin verin:
 
 ```bash
 firewall-cmd --zone=public --add-port=9000/tcp --permanent
 firewall-cmd --reload
 ```
 
-All RustFS servers in the deployment **must** use the same listening port. If you're using port 9000, all other servers must also use port 9000.
+Dağıtımınızdaki tüm RustFS sunucuları aynı dinleme portunu kullanmalıdır. Eğer 9000 portunu kullanıyorsanız, diğer tüm sunucular da 9000 portunu kullanmalıdır.
 
-### 2.3 Hostname
+### 2.3 Ana Bilgisayar Adı
 
-Creating a RustFS cluster requires using **consistent, continuous** hostnames. There are two ways to achieve continuous hostnames:
+Bir RustFS kümesi oluşturmak için **tutarlı, sürekli** ana bilgisayar adları kullanmanız gerekir. Sürekli ana bilgisayar adları elde etmek için iki yol vardır:
 
-1. DNS configuration;
-2. HOSTS configuration.
+1. DNS yapılandırması;
+2. HOSTS yapılandırması.
 
 ```bash
 vim /etc/hosts
@@ -72,43 +71,43 @@ vim /etc/hosts
 192.168.1.4 node4
 ```
 
-### 2.4 Memory Requirements
+### 2.4 Bellek Gereksinimleri
 
-RustFS requires at least 2 GB of memory to run in test environments, with a minimum of 64 GB of memory required for production environments.
+RustFS, test ortamlarında çalıştırılmak için en az 2 GB belleğe ihtiyaç duyar, üretim ortamları için ise en az 64 GB bellek gereklidir.
 
-### 2.5 Time Synchronization
+### 2.5 Zaman Senkronizasyonu
 
-Multi-node consistency requires using time servers to maintain time consistency, otherwise service startup failures may occur. Related time servers include `ntp`, `timedatectl`, or `timesyncd`.
+Çok düğümlü tutarlılık, zaman sunucularını kullanarak zaman tutarlılığını korumayı gerektirir, aksi takdirde hizmet başlatma hataları meydana gelebilir. İlgili zaman sunucuları arasında `ntp`, `timedatectl` veya `timesyncd` bulunur.
 
-RustFS requires time synchronization. You can check time synchronization status using the following command:
+RustFS zaman senkronizasyonu gerektirir. Zaman senkronizasyonu durumunu aşağıdaki komutla kontrol edebilirsiniz:
 
 ```bash
 timedatectl status
 ```
 
-If the status is "synchronized", time synchronization is normal.
+Durum "senkronize" ise, zaman senkronizasyonu normaldir.
 
-## 3. Configure Username
+## 3. Kullanıcı Adı Yapılandırma
 
-For RustFS startup, we recommend configuring a dedicated user without login privileges to start the RustFS service. In the rustfs.service startup control script, the default user and user group are `rustfs-user` and `rustfs-user`.
+RustFS başlatması için, RustFS servisini başlatmak üzere giriş ayrıcalıkları olmayan özel bir kullanıcı yapılandırmanızı öneririz. rustfs.service başlangıç kontrol betiğinde, varsayılan kullanıcı ve kullanıcı grubu `rustfs-user` ve `rustfs-user`dır.
 
-You can use the groupadd and useradd commands to create users and groups. The following example creates users, groups, and sets permissions to access RustFS-specified data directories.
+Kullanıcı ve gruplar oluşturmak için groupadd ve useradd komutlarını kullanabilirsiniz. Aşağıdaki örnek, kullanıcıları, grupları oluşturur ve RustFS tarafından belirtilen veri dizinlerine erişim izinlerini ayarlar.
 
-## 4. Download Installation Package
+## 4. Kurulum Paketini İndirme
 
-Please first install wget or curl to download the rustfs installation package.
+Lütfen önce wget veya curl kullanarak rustfs kurulum paketini indirin.
 
 ```bash
-# Download address
+# İndirme adresi
 wget https://dl.rustfs.com/artifacts/rustfs/release/rustfs-linux-x86_64-latest.zip
 unzip rustfs-linux-x86_64-latest.zip
 chmod +x rustfs
 mv rustfs /usr/local/bin/
 ```
 
-## 5. Configure Environment Variables
+## 5. Ortam Değişkenlerini Yapılandırma
 
-1. Create configuration file
+1. Yapılandırma dosyası oluşturun
 
 ```bash
 sudo tee /etc/default/rustfs <<EOF
@@ -124,40 +123,39 @@ RUSTFS_TLS_PATH="/opt/tls"
 EOF
 ```
 
-2. Create storage directories
+2. Depolama dizinleri oluşturun
 
 ```bash
 sudo mkdir -p /data/rustfs{0..3} /var/logs/rustfs /opt/tls
 sudo chmod -R 750 /data/rustfs* /var/logs/rustfs
 ```
 
-## 6. Configure Observability System
+## 6. İzlenebilirlik Sistemi Yapılandırma
 
-1. Create observability configuration file
+1. İzlenebilirlik yapılandırma dosyası oluşturun
 
 ```bash
-export RUSTFS_OBS_ENDPOINT=http://localhost:4317 # The address of OpenTelemetry Collector
-export RUSTFS_OBS_USE_STDOUT=false # Whether to use standard output
-export RUSTFS_OBS_SAMPLE_RATIO=2.0 # Sampling rate, between 0.0-1.0, 0.0 means no sampling, 1.0 means all samples
-export RUSTFS_OBS_METER_INTERVAL=1 # Sampling interval, unit in seconds
-export RUSTFS_OBS_SERVICE_NAME=rustfs # Service name
-export RUSTFS_OBS_SERVICE_VERSION=0.1.0 # Service Version
-export RUSTFS_OBS_ENVIRONMENT=develop # Environment name
-export RUSTFS_OBS_LOGGER_LEVEL=debug # Log level, support trace, debug, info, warning, error
-export RUSTFS_OBS_LOCAL_LOGGING_ENABLED=true # Whether to enable local logging
-# Log Directory When the value `RUSTFS_OBS_ENDPOINT` is empty, the following log processing rules are executed by default.
-export RUSTFS_OBS_LOG_DIRECTORY="$current_dir/deploy/logs" # 日志目录
-export RUSTFS_OBS_LOG_ROTATION_TIME="minute" # Log rotation time unit, can be "second", "minute", "hour", "day"
-export RUSTFS_OBS_LOG_ROTATION_SIZE_MB=1 # Log rotation size in MB
-
-# Configure logging
+export RUSTFS_OBS_ENDPOINT=http://localhost:4317 # OpenTelemetry Collector adresi
+export RUSTFS_OBS_USE_STDOUT=false # Standart çıktı kullanılıp kullanılmayacağı
+export RUSTFS_OBS_SAMPLE_RATIO=2.0 # Örnekleme oranı, 0.0-1.0 arasında, 0.0 örnekleme yok demektir, 1.0 tüm örnekler demektir
+export RUSTFS_OBS_METER_INTERVAL=1 # Örnekleme aralığı, saniye cinsinden
+export RUSTFS_OBS_SERVICE_NAME=rustfs # Servis adı
+export RUSTFS_OBS_SERVICE_VERSION=0.1.0 # Servis Sürümü
+export RUSTFS_OBS_ENVIRONMENT=develop # Ortam adı
+export RUSTFS_OBS_LOGGER_LEVEL=debug # Günlük düzeyi, trace, debug, info, warning, error destekler
+export RUSTFS_OBS_LOCAL_LOGGING_ENABLED=true # Yerel günlük kaydının etkinleştirilip etkinleştirilmeyeceği
+# Günlük Dizinleri `RUSTFS_OBS_ENDPOINT` değeri boş olduğunda, aşağıdaki günlük işleme kuralları varsayılan olarak yürütülür.
+export RUSTFS_OBS_LOG_DIRECTORY="$current_dir/deploy/logs" # Günlük dizini
+export RUSTFS_OBS_LOG_ROTATION_TIME="minute" # Günlük döndürme zaman birimi, "second", "minute", "hour", "day" olabilir
+export RUSTFS_OBS_LOG_ROTATION_SIZE_MB=1 # Günlük döndürme boyutu MB cinsinden
+# Günlük kaydı yapılandırma
 export RUSTFS_SINKS_FILE_PATH="$current_dir/deploy/logs/rustfs.log"
 export RUSTFS_SINKS_FILE_BUFFER_SIZE=12
 export RUSTFS_SINKS_FILE_FLUSH_INTERVAL_MS=1000
 export RUSTFS_SINKS_FILE_FLUSH_THRESHOLD=100
 ```
 
-2. Set up log rotation
+2. Günlük döndürme ayarlayın
 
 ```bash
 sudo tee /etc/logrotate.d/rustfs <<EOF
@@ -173,33 +171,30 @@ sudo tee /etc/logrotate.d/rustfs <<EOF
 EOF
 ```
 
-## 7. Start RustFS
+## 7. RustFS'i Başlatma
 
 ```bash
-# Start RustFS service
+# RustFS servisini başlat
 sudo systemctl start rustfs
 sudo systemctl enable rustfs
-
-# Check service status
+# Servis durumunu kontrol et
 sudo systemctl status rustfs
 ```
 
-## 8. Verify Installation
+## 8. Kurulumu Doğrulama
 
-Test the installation using the MinIO client:
+MinIO istemcisi kullanarak kurulumu test edin:
 
 ```bash
-# Install mc client
+# mc istemcisini kur
 wget https://dl.min.io/client/mc/release/linux-amd64/mc
 chmod +x mc
 sudo mv mc /usr/local/bin/
-
-# Configure alias
+# Takma ad yapılandır
 mc alias set rustfs http://localhost:7000 rustfsadmin rustfsadmin
-
-# Test operations
+# İşlemleri test et
 mc mb rustfs/test-bucket
 mc ls rustfs
 ```
 
-If you can successfully create and list buckets, the installation is complete.
+Eğer kovaları başarıyla oluşturup listeleyebiliyorsanız, kurulum tamamlanmıştır.

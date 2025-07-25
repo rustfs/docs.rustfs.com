@@ -1,41 +1,41 @@
-# Data Lifecycle Management and Tiering
+# Veri Yaşam Döngüsü Yönetimi ve Katmanlandırma
 
-As data continues to grow, the ability to collaboratively optimize for access, security, and economics becomes a hard requirement rather than a nice-to-have. This is where lifecycle data management comes into play. RustFS provides a unique set of features to protect data within and between clouds - including public and private clouds. RustFS's enterprise data lifecycle management tools, including versioning, object locking, and various derivative components, satisfy many use cases.
+Veri büyümeye devam ettikçe, erişim, güvenlik ve ekonomi için işbirliği içinde optimize etme yeteneği, bir "güzel olma" durumundan çok zorunlu bir gereksinim haline gelir. İşte burada yaşam döngüsü veri yönetimi devreye girer. RustFS, genel ve özel bulutlar dahil olmak üzere bulutlar içinde ve arasında verileri korumak için benzersiz bir özellik seti sunar. RustFS'nin kurumsal veri yaşam döngüsü yönetimi araçları, sürüm oluşturma, nesne kilitleme ve çeşitli türev bileşenler dahil olmak üzere birçok kullanım durumunu karşılar.
 
-## Object Expiration
+## Nesne Süresi Dolması
 
-Data doesn't have to exist forever: RustFS lifecycle management tools allow you to define how long data remains on disk before deletion. Users define the time length as a specific date or number of days before RustFS begins deleting objects.
+Verilerin sonsuza kadar var olması gerekmez: RustFS yaşam döngüsü yönetimi araçları, verilerin silinmeden önce diskte ne kadar kalacağını tanımlamanıza olanak tanır. Kullanıcılar, RustFS'nin nesneleri silmeye başlamadan önce süre uzunluğunu belirli bir tarih veya gün sayısı olarak tanımlar.
 
-Lifecycle management rules are created per bucket and can be constructed using any combination of object and tag filters. Don't specify filters to set expiration rules for the entire bucket, or specify multiple rules to create more complex expiration behavior.
+Yaşam döngüsü yönetimi kuralları, kova başına oluşturulur ve nesne ve etiket filtrelerinin herhangi bir kombinasyonu kullanılarak yapılandırılabilir. Tüm kova için süre sonu kuralları ayarlamak için filtre belirtmeyin veya daha karmaşık süre sonu davranışı oluşturmak için birden fazla kural belirtin.
 
-RustFS object expiration rules also apply to versioned buckets and come with some versioning-specific flavors. For example, you can specify expiration rules only for non-current versions of objects to maximize the benefits of object versioning without incurring long-term storage costs. Similarly, you can create lifecycle management rules for deleting objects whose only remaining version is a delete marker.
+RustFS nesne süre sonu kuralları ayrıca sürümlü kovlara da uygulanır ve bazı sürümlemeye özgü varyasyonlarla gelir. Örneğin, nesnelerin mevcut olmayan sürümleri için süre sonu kuralları belirtip, uzun vadeli depolama maliyetlerini üstlenmeden nesne sürümlemenin avantajlarını en üst düzeye çıkarabilirsiniz. Benzer şekilde, kalan tek sürümü bir silme işareti olan nesneleri silmek için yaşam döngüsü yönetimi kuralları oluşturabilirsiniz.
 
-Bucket expiration rules fully comply with RustFS WORM locking and legal holds - objects in a locked state will remain on disk until the lock expires or is explicitly released. Once objects are no longer constrained by locks, RustFS begins applying expiration rules normally.
+Kova süre sonu kuralları, RustFS WORM kilitleme ve yasal tutma işlemleriyle tamamen uyumludur - kilitli durumdaki nesneler, kilit süresi dolana veya açıkça serbest bırakılana kadar diskte kalır. Nesneler artık kilitler tarafından kısıtlanmadığında, RustFS normal olarak süre sonu kurallarını uygulamaya başlar.
 
-RustFS object expiration lifecycle management rules are functionally and syntactically compatible with AWS Lifecycle Management. RustFS also supports importing existing rules in JSON format, making it easy to migrate existing AWS expiration rules.
+RustFS nesne süre sonu yaşam döngüsü yönetimi kuralları, işlevsel ve sentaktik olarak AWS Yaşam Döngüsü Yönetimi ile uyumludur. RustFS ayrıca JSON formatında mevcut kuralları içe aktarmayı destekler, bu da mevcut AWS süre sonu kurallarını geçirmeyi kolaylaştırır.
 
-## Policy-Based Object Tiering
+## Politika Tabanlı Nesne Katmanlandırma
 
-RustFS can be programmatically configured for object storage tiering so that objects transition from one state or class to another based on any number of variables - though the most commonly used are time and frequency of access. This feature is best understood in the context of tiering. Tiering allows users to optimize storage costs or functionality in response to changing data access patterns. Tiered data storage is generally used in the following scenarios:
+RustFS, nesne depolama katmanlandırma için programlı olarak yapılandırılabilir, böylece nesneler, zaman ve erişim sıklığı gibi birçok değişkene dayanarak bir durumdan veya sınıftan diğerine geçiş yapar. Bu özellik, katmanlandırma bağlamında en iyi anlaşılır. Katmanlandırma, kullanıcıların değişen veri erişim kalıplarına yanıt olarak depolama maliyetlerini veya işlevselliğini optimize etmesine olanak tanır. Katmanlı veri depolama genellikle aşağıdaki senaryolarda kullanılır:
 
-## Across Storage Media
+## Depolama Ortamları Arasında
 
-Cross-storage media tiering is the most well-known and straightforward tiering use case. Here, RustFS abstracts the underlying media and collaboratively optimizes for performance and cost. For example, for performance or nearline workloads, data might be stored on NVMe or SSD, but after a period of time, tiered to HDD media, or for workloads that value performance scaling. Over time, if appropriate, this data can be further migrated to long-term storage.
+Çapraz depolama ortamı katmanlandırma, en iyi bilinen ve en basit katmanlandırma kullanım durumudur. Burada RustFS, altta yatan ortamı soyutlar ve performans ve maliyet için işbirliği içinde optimize eder. Örneğin, performans veya çevrimiçi iş yükleri için veri NVMe veya SSD'de depolanabilir, ancak bir süre sonra HDD ortamına katmanlandırılabilir veya performans ölçeklendirme değerine sahip iş yükleri için. Zamanla, uygun görülürse, bu veri daha uzun süreli depolamaya daha da taşınabilir.
 
-![Cross-Storage Media Tiering](images/s9-2.png)
+![Çapraz Depolama Ortamı Katmanlandırma](images/s9-2.png)
 
-## Across Cloud Types
+## Bulut Türleri Arasında
 
-A rapidly emerging use case involves using public cloud's cheap storage and compute resources as another tier for private clouds. In this use case, performance-oriented nearline workloads are executed using appropriate private cloud media. Data volume doesn't matter, but value and performance expectations do. As data volumes increase and performance expectations decrease, enterprises can use public cloud's cold storage options to optimize costs and access capabilities associated with retaining data.
+Hızla ortaya çıkan bir kullanım durumu, özel bulutlar için ucuz depolama ve bilgi işlem kaynakları olarak genel bulutun başka bir katman olarak kullanılmasıdır. Bu kullanım durumunda, performans odaklı çevrimiçi iş yükleri, uygun özel bulut ortamı kullanılarak yürütülür. Veri hacmi önemli değildir, ancak değer ve performans beklentileri önemlidir. Veri hacimleri arttıkça ve performans beklentileri azaldıkça, işletmeler veri saklama ile ilişkili maliyetleri ve erişim yeteneklerini optimize etmek için genel bulutun soğuk depolama seçeneklerini kullanabilir.
 
-This is achieved by running RustFS on both private and public clouds. Using replication, RustFS can move data to cheap public cloud options and use RustFS in the public cloud to protect and access it when necessary. In this case, the public cloud becomes dumb storage for RustFS, just as JBOD becomes dumb storage for RustFS. This approach avoids replacing and adding outdated tape infrastructure.
+Bu, RustFS'nin hem özel hem de genel bulutlarda çalıştırılmasıyla sağlanır. Çoğaltma kullanarak, RustFS veri taşıyabilir ve gerekli olduğunda korumak ve erişmek için genel bulutta RustFS kullanabilir. Bu durumda, genel bulut, RustFS için aptal depolama haline gelir, tıpkı JBOD'un RustFS için aptal depolama haline gelmesi gibi. Bu yaklaşım, eski teyp altyapısını değiştirmeyi ve eklemeyi önler.
 
-![Cross-Cloud Type Tiering](images/s9-3.png)
+![Çapraz Bulut Türü Katmanlandırma](images/s9-3.png)
 
-## In Public Clouds
+## Genel Bulutlarda
 
-RustFS typically serves as the primary application storage tier in public clouds. In this case, as with other use cases, RustFS is the only storage accessed by applications. Applications (and developers) don't need to know anything beyond the storage endpoint. RustFS determines which data belongs where based on management parameters. For example, RustFS can determine that block data should move to the object tier, and which object tier meets the enterprise's performance and economic goals.
+RustFS tipik olarak genel bulutlarda birincil uygulama depolama katmanı olarak hizmet verir. Bu durumda, diğer kullanım durumlarında olduğu gibi, RustFS, uygulamaların eriştiği tek depolama alanıdır. Uygulamalar (ve geliştiriciler), depolama uç noktasının ötesinde herhangi bir şey bilmek zorunda değildir. RustFS, yönetim parametrelerine dayanarak hangi verilerin nereye ait olduğunu belirler. Örneğin, RustFS, blok verilerinin nesne katmanına taşınması gerektiğini ve hangi nesne katmanının işletmenin performans ve ekonomik hedeflerini karşıladığını belirleyebilir.
 
-RustFS combines different storage tiering layers and determines appropriate media to provide better economics without compromising performance. Applications simply address objects through RustFS, while RustFS transparently applies policies to move objects between tiers and retains that object's metadata in the block tier.
+RustFS, farklı depolama katmanlandırma katmanlarını birleştirir ve daha iyi ekonomi sağlamak için uygun ortamı belirler ve performanstan ödün vermez. Uygulamalar basitçe nesneleri RustFS aracılığıyla adreslerken, RustFS, nesneleri katmanlar arasında taşımak için politikaları şeffaf bir şekilde uygular ve o nesnenin meta verilerini blok katmanında tutar.
 
-![Public Cloud Tiering](images/s9-4.png)
+![Genel Bulut Katmanlandırma](images/s9-4.png)

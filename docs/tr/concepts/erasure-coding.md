@@ -1,87 +1,86 @@
 ---
-title: "Erasure Coding Principles"
-description: "RustFS, as a next-generation distributed object storage system, demonstrates unique advantages in cloud storage through innovative architectural design and memory safety features. One of its core innovations is the deep application of Reed-Solomon Erasure Coding."
+title: "Silme Kodlama İlkeleri"
+description: "RustFS, yenilikçi mimari tasarımı ve bellek güvenliği özellikleriyle bulut depolamada benzersiz avantajlar sunan yeni nesil dağıtık nesne depolama sistemidir. Temel yeniliklerinden biri, Reed-Solomon Silme Kodlamasının derinlemesine uygulanmasıdır."
 ---
+# Silme Kodlama İlkeleri
 
-# Erasure Coding Principles
+## 1. Temel Algoritmalar ve Uygulama Kapsamı
 
-## 1. Core Algorithms and Application Scope
+Reed-Solomon Kodu (RS Kodu), sonlu alan cebirsel yapılarına dayanan bir silme kodudur. **Verimli veri kurtarma yetenekleri** ve **esnek yedeklilik yapılandırması** nedeniyle, birçok alanda geniş bir uygulama alanına sahiptir. Aşağıda teknik alanlar ve pratik uygulamalardan temel uygulama senaryoları detaylandırılmıştır:
 
-Reed-Solomon Code (RS Code) is an erasure code based on finite field algebraic structures. Due to its **efficient data recovery capabilities** and **flexible redundancy configuration**, it is widely applied across multiple domains. The following details its core application scenarios from both technical domains and practical applications:
+### 1.1. Dağıtık Depolama Sistemleri (örneğin RustFS)
 
-### 1.1. Distributed Storage Systems (such as RustFS)
+- **Veri Parçalama ve Yedeklilik**
+  Orijinal veriyi `k` parçaya bölün ve `m` parite parçası oluşturun (toplam `n=k+m`). ≤ `m` parça kaybından veri kurtarılabilir.
+  **Örnek**: RS(10,4) stratejisi, aynı anda 4 düğüm kaybına izin verir (%71 depolama kullanımı), üç kopyaya göre %50 depolama alanı tasarrufu sağlar (%33).
 
-- **Data Sharding and Redundancy**
-  Divide original data into `k` shards and generate `m` parity shards (total `n=k+m`). Data can be recovered from any loss of ≤ `m` shards.
-  **Example**: RS(10,4) strategy allows simultaneous loss of 4 nodes (71% storage utilization), saving 50% storage space compared to three replicas (33%).
+- **Arıza Kurtarma Mekanizması**
+  **Gaussian eliminasyonu** veya **Hızlı Fourier Dönüşümü (FFT)** algoritmaları aracılığıyla hayatta kalan parçaları kullanarak kaybolan verileri yeniden oluşturun, kurtarma süresi ağ bant genişliği ile ters orantılıdır.
 
-- **Failure Recovery Mechanism**
-  Through **Gaussian elimination** or **Fast Fourier Transform (FFT)** algorithms, use surviving shards to rebuild lost data, with recovery time inversely proportional to network bandwidth.
+- **Dinamik Ayarlama Kabiliyeti**
+  Çalışma zamanı `(k,m)` parametrelerinin ayarlanmasını destekler, farklı depolama katmanlarının (sıcak/ılık/soğuk veri) güvenilirlik gereksinimlerine uyum sağlar.
 
-- **Dynamic Adjustment Capability**
-  Supports runtime adjustment of `(k,m)` parameters to adapt to different storage tiers' (hot/warm/cold data) reliability requirements.
+### 1.2. İletişim İletimi
 
-### 1.2. Communication Transmission
+- **Uydu İletişimi**
+  Derin uzay kanallarındaki uzun gecikme ve yüksek bit hata oranı sorunlarını ele alır (örneğin, NASA Mars gezgini RS(255,223) kodunu kullanır, kod sözcüğü başına 16 bayt hata düzeltme kabiliyetine sahiptir).
 
-- **Satellite Communication**
-  Handles long delay and high bit error rate issues in deep space channels (e.g., NASA Mars rover uses RS(255,223) code with 16-byte/codeword error correction capability).
+- **5G NR Standardı**
+  Kontrol kanallarında RS kodlarını CRC checksum'ları ile birleştirerek kritik sinyallemenin güvenilir iletimini sağlar.
 
-- **5G NR Standard**
-  Uses RS codes combined with CRC checksums in control channels to ensure reliable transmission of critical signaling.
+- **Kablosuz Sensör Ağları**
+  Çoklu atlamalı iletimdeki birikimli paket kaybını çözer, tipik RS(6,2) yapılandırması %33 veri kaybına tolerans gösterir.
 
-- **Wireless Sensor Networks**
-  Solves cumulative packet loss in multi-hop transmission, with typical RS(6,2) configuration tolerating 33% data loss.
+### 1.3. Dijital Medya Depolama
 
-### 1.3. Digital Media Storage
+- **QR Kodları**
+  Hata düzeltme seviyesi ayarlaması için RS kodlarını kullanır (L%7, M%15, Q%25, H%30), kısmi alan hasarıyla bile doğru çözümlemeyi sağlar.
 
-- **QR Codes**
-  Uses RS codes for error correction level adjustment (L7%, M15%, Q25%, H30%), enabling correct decoding even with partial area damage.
+- **Blu-ray Diskler**
+  Çiziklerden kaynaklanan sürekli patlama hatalarını düzeltmek için çapraz iç içe geçme ile RS(248,216) kodunu kullanır.
 
-- **Blu-ray Discs**
-  Employs RS(248,216) code with cross-interleaving to correct continuous burst errors caused by scratches.
+- **DNA Veri Depolama**
+  Biyolojik moleküler zincirlerin sentezlenmesi sırasında RS doğrulaması ekler, baz sentezleme/dizileme hatalarına karşı direnç gösterir (örneğin, Microsoft deneysel projesi RS(4,2) kullanır).
 
-- **DNA Data Storage**
-  Adds RS verification when synthesizing biological molecular chains to resist base synthesis/sequencing errors (e.g., Microsoft experimental project uses RS(4,2)).
+## 2. Silme Kodlama Temel Kavramları
 
-## 2. Erasure Coding Basic Concepts
-
-### 2.1 Evolution of Storage Redundancy
+### 2.1. Depolama Yedekliliğinin Evrimi
 
 ```rust
-// Traditional three-replica storage
+// Geleneksel üç kopyalı depolama
 let data = "object_content";
 let replicas = vec![data.clone(), data.clone(), data.clone()];
 ```
 
-Traditional multi-replica schemes have low storage efficiency issues (33% storage utilization). Erasure coding technology calculates verification information after data blocking, achieving a balance between storage efficiency and reliability.
+Geleneksel çoklu kopyalama şemaları düşük depolama verimliliği sorunlarına sahiptir (%33 depolama kullanımı). Silme kodlama teknolojisi, veri bloklamadan sonra doğrulama bilgilerini hesaplayarak depolama verimliliği ve güvenilirlik arasında bir denge sağlar.
 
-### 2.2 Core Parameter Definitions
+### 2.2. Temel Parametre Tanımları
 
-- **k**: Number of original data shards
-- **m**: Number of parity shards
-- **n**: Total number of shards (n = k + m)
-- **Recovery Threshold**: Any k shards can recover original data
+- **k**: Orijinal veri parçalarının sayısı
+- **m**: Parite parçalarının sayısı
+- **n**: Toplam parça sayısı (n = k + m)
+- **Kurtarma Eşiği**: Herhangi k parça orijinal veriyi kurtarabilir
 
-| Scheme Type | Redundancy | Fault Tolerance |
-|------------|----------|------------|
-| 3 Replicas | 200% | 2 nodes |
-| RS(10,4) | 40% | 4 nodes |
+| Şema Türü | Yedeklilik | Hata Toleransı |
+|------------|------------|----------------|
+| 3 Kopyası | %200 | 2 düğüm |
+| RS(10,4) | %40 | 4 düğüm |
 
-## 3. Reed-Solomon Code Mathematical Principles
+## 3. Reed-Solomon Kod Matematiksel İlkeleri
 
-### 3.1 Finite Field (Galois Field) Construction
+### 3.1. Sonlu Alan (Galois Alanı) Yapısı
 
-Uses GF(2^8) field (256 elements), satisfying:
+GF(2^8) alanını kullanır (256 eleman), şu koşulu sağlar:
 
 ```math
 α^8 + α^4 + α^3 + α^2 + 1 = 0
 ```
 
-Generator polynomial is `0x11D`, corresponding to binary `100011101`
+Üreteç polinomu `0x11D`dir, ikili olarak `100011101` karşılık gelir.
 
-### 3.2 Encoding Matrix Construction
+### 3.2. Kodlama Matrisi Yapısı
 
-Vandermonde matrix example (k=2, m=2):
+Vandermonde matris örneği (k=2, m=2):
 
 ```math
 G = \begin{bmatrix}
@@ -92,27 +91,29 @@ G = \begin{bmatrix}
 \end{bmatrix}
 ```
 
-### 3.3 Encoding Process
+### 3.3. Kodlama Süreci
 
-Data vector D = [d₁, d₂,..., dk]
-Encoding result C = D × G
+Veri vektörü D = [d₁, d₂,..., dk]
 
-**Generator Polynomial Interpolation Method**:
-Construct polynomial passing through k data points:
+Kodlama sonucu C = D × G
+
+**Üreteç Polinom Enterpolasyon Yöntemi**:
+
+k veri noktasından geçen polinom oluşturun:
 
 ```math
 p(x) = d_1 + d_2x + ... + d_kx^{k-1}
 ```
 
-Parity value calculation:
+Parite değer hesaplaması:
 
 ```math
 c_i = p(i), \quad i = k+1,...,n
 ```
 
-## 4. Engineering Implementation in RustFS
+## 4. RustFS'de Mühendislik Uygulaması
 
-### 4.1 Data Sharding Strategy
+### 4.1. Veri Parçalama Stratejisi
 
 ```rust
 struct Shard {
@@ -122,96 +123,96 @@ struct Shard {
 }
 
 fn split_data(data: &[u8], k: usize) -> Vec<Shard> {
-    // Sharding logic implementation
+    // Parçalama mantığı uygulama
 }
 ```
 
-- Dynamic shard size adjustment (64 KB-4 MB)
-- Hash verification values using Blake3 algorithm
+- Dinamik parça boyutu ayarlama (64 KB-4 MB)
+- Blake3 algoritması kullanılarak hash doğrulama değerleri
 
-### 4.2 Parallel Encoding Optimization
+### 4.2. Paralel Kodlama Optimizasyonu
 
 ```rust
 use rayon::prelude::*;
 
 fn rs_encode(data: &[Shard], m: usize) -> Vec<Shard> {
     data.par_chunks(k).map(|chunk| {
-        // SIMD-accelerated matrix operations
+        // SIMD-hızlandırılmış matris işlemleri
         unsafe { gf256_simd::rs_matrix_mul(chunk, &gen_matrix) }
     }).collect()
 }
 ```
 
-- Parallel computing framework based on Rayon
-- AVX2 instruction set optimization for finite field operations
+- Rayon tabanlı paralel hesaplama çerçevesi
+- Sonlu alan işlemleri için AVX2 komut seti optimizasyonu
 
-### 4.3 Decoding Recovery Process
+### 4.3. Kod Çözme Kurtarma Süreci
 
 ```mermaid
 sequenceDiagram
-    Client->>Coordinator: Data read request
-    Coordinator->>Nodes: Query shard status
-    alt Sufficient available shards
-        Nodes->>Coordinator: Return k shards
-        Coordinator->>Decoder: Start decoding
-        Decoder->>Client: Return original data
-    else Insufficient shards
-        Coordinator->>Repairer: Trigger repair process
-        Repairer->>Nodes: Collect surviving shards
-        Repairer->>Decoder: Data reconstruction
-        Decoder->>Nodes: Write new shards
+    Client->>Coordinator: Veri okuma isteği
+    Coordinator->>Nodes: Parça durumunu sorgula
+    alt Yeterli kullanılabilir parçalar
+        Nodes->>Coordinator: k parçayı döndür
+        Coordinator->>Decoder: Kod çözmeyi başlat
+        Decoder->>Client: Orijinal veriyi döndür
+    else Yetersiz parçalar
+        Coordinator->>Repairer: Onarım sürecini tetikle
+        Repairer->>Nodes: Hayatta kalan parçaları topla
+        Repairer->>Decoder: Veri yeniden inşa et
+        Decoder->>Nodes: Yeni parçaları yaz
     end
 ```
 
-## 5. Performance Optimization
+## 5. Performans Optimizasyonu
 
-### 5.1 Computational Complexity
+### 5.1. Hesaplama Karmaşıklığı
 
-- **Encoding**: O(k×m) finite field multiplications
-- **Decoding**: O(k³) Gaussian elimination complexity
-- **Memory Usage**: O(k²) for generator matrix storage
+- **Kodlama**: O(k×m) sonlu alan çarpımları
+- **Kod Çözme**: O(k³) Gaussian eliminasyon karmaşıklığı
+- **Bellek Kullanımı**: Üreteç matrisi depolama için O(k²)
 
-### 5.2 Hardware Acceleration
+### 5.2. Donanım Hızlandırma
 
-- **Intel ISA-L Library**: Optimized assembly implementation
-- **GPU Acceleration**: CUDA-based parallel matrix operations
-- **FPGA Implementation**: Custom hardware for high-throughput scenarios
+- **Intel ISA-L Kütüphanesi**: Optimize edilmiş assembly uygulaması
+- **GPU Hızlandırma**: CUDA tabanlı paralel matris işlemleri
+- **FPGA Uygulaması**: Yüksek verimli senaryolar için özel donanım
 
-### 5.3 Network Optimization
+### 5.3. Ağ Optimizasyonu
 
-- **Partial Reconstruction**: Only decode required data portions
-- **Lazy Repair**: Delay reconstruction until reaching failure threshold
-- **Bandwidth Balancing**: Distribute reconstruction load across nodes
+- **Kısmi Yeniden Yapılandırma**: Sadece gerekli veri kısımlarını kod çöz
+- **Tembel Onarım**: Kurtarma eşiğine ulaşana kadar yeniden yapılandırmayı ertele
+- **Bant Genişliği Dengesi**: Yeniden yapılandırma yükünü düğümler arasında dağıt
 
-## 6. Reliability Analysis
+## 6. Güvenilirlik Analizi
 
-### 6.1 Failure Probability Modeling
+### 6.1. Arıza Olasılığı Modelleme
 
-For RS(k,m) scheme with node failure rate λ:
+RS(k,m) şeması için düğüm arıza oranı λ:
 
 ```math
 MTTF = \frac{1}{\lambda} \times \frac{1}{\binom{n}{m+1}} \times \sum_{i=0}^{m} \binom{n}{i}
 ```
 
-### 6.2 Real-world Durability
+### 6.2. Gerçek Dünya Dayanıklılığı
 
-- **RS(10,4)**: 99.999999999% (11 nines) annual durability
-- **RS(14,4)**: 99.9999999999% (12 nines) annual durability
-- **Comparison**: 3-replica achieves ~99.9999% (6 nines)
+- **RS(10,4)**: Yıllık %99.999999999 (11 dokuz) dayanıklılık
+- **RS(14,4)**: Yıllık %99.9999999999 (12 oniki) dayanıklılık
+- **Karşılaştırma**: 3 kopyası ~%99.9999 (6 dokuz) dayanıklılık sağlar
 
-## 7. Best Practices
+## 7. En İyi Uygulamalar
 
-### 7.1 Parameter Selection Guidelines
+### 7.1. Parametre Seçim Kılavuzu
 
-| Data Type | Access Pattern | Recommended RS | Rationale |
-|-----------|---------------|----------------|-----------|
-| Hot Data | High IOPS | RS(6,2) | Fast recovery |
-| Warm Data | Medium Access | RS(10,4) | Balanced efficiency |
-| Cold Data | Archive | RS(14,4) | Maximum efficiency |
+| Veri Türü | Erişim Modeli | Önerilen RS | Gerekçe |
+|-----------|---------------|-------------|---------|
+| Sıcak Veri | Yüksek IOPS | RS(6,2) | Hızlı kurtarma |
+| Ilık Veri | Orta Erişim | RS(10,4) | Dengeli verimlilik |
+| Soğuk Veri | Arşiv | RS(14,4) | Maksimum verimlilik |
 
-### 7.2 Operational Considerations
+### 7.2. İşletimsel Hususlar
 
-- **Repair Speed**: Monitor and optimize reconstruction bandwidth
-- **Scrubbing**: Regular integrity checks using background verification
-- **Upgrades**: Support for online parameter reconfiguration
-- **Monitoring**: Track shard distribution and failure patterns
+- **Onarım Hızı**: Yeniden yapılandırma bant genişliğini izleyin ve optimize edin
+- **Temizleme**: Arka plan doğrulaması kullanarak düzenli bütünlük kontrolleri
+- **Yükseltmeler**: Çevrimiçi parametre yeniden yapılandırmasını destekleyin
+- **İzleme**: Parça dağılımını ve arıza modellerini takip edin

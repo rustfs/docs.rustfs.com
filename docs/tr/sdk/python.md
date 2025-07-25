@@ -1,29 +1,29 @@
 ---
 title: "Python SDK"
-description: "This article mainly explains the use of Python SDK in RustFS."
+description: "Bu makale, RustFS'ta Python SDK'nın kullanımını açıklamaktadır."
 ---
 
-# RustFS Using S3 Python SDK (Boto3) Documentation
+# RustFS S3 Python SDK (Boto3) Dokümantasyonu
 
-## 1. Overview
+## 1. Genel Bakış
 
-RustFS is an object storage service compatible with the Amazon S3 protocol, supporting integration through Python's [Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) SDK.
+RustFS, Amazon S3 protokolüyle uyumlu bir nesne depolama hizmetidir ve Python'un [Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) SDK'sı ile entegrasyonu destekler.
 
-This tutorial will explain how to integrate Python with RustFS and complete the following operations through Boto3:
+Bu eğitimde, Python'un RustFS ile nasıl entegre edileceği ve Boto3 aracılığıyla aşağıdaki işlemlerin nasıl gerçekleştirileceği açıklanacaktır:
 
-* Bucket creation/deletion
-* Object upload/download/deletion
-* List objects
-* Generate presigned URLs
-* Multipart upload for large files
+* Bucket oluşturma/silme
+* Nesne yükleme/indirme/silme
+* Nesneleri listeleme
+* Ön imzalı URL oluşturma
+* Büyük dosyalar için çok parçalı yükleme
 
 ---
 
-## 2. Environment Preparation
+## 2. Ortam Hazırlığı
 
-### 2.1 RustFS Information
+### 2.1 RustFS Bilgileri
 
-Assume RustFS is deployed as follows:
+RustFS'in aşağıdaki gibi dağıtıldığını varsayalım:
 
 ```
 Endpoint: http://192.168.1.100:9000
@@ -31,9 +31,9 @@ AccessKey: rustfsadmin
 SecretKey: rustfssecret
 ```
 
-### 2.2 Install Boto3
+### 2.2 Boto3 Kurulumu
 
-Recommended to use `venv` virtual environment:
+`venv` sanal ortamının kullanılması önerilir:
 
 ```bash
 python3 -m venv venv
@@ -41,11 +41,11 @@ source venv/bin/activate
 pip install boto3
 ```
 
-> Boto3 depends on `botocore`, which will be automatically installed.
+> Boto3, `botocore` bağımlılığına sahiptir ve otomatik olarak kurulacaktır.
 
 ---
 
-## 3. Connect to RustFS
+## 3. RustFS'a Bağlanma
 
 ```python
 import boto3
@@ -61,85 +61,85 @@ s3 = boto3.client(
 )
 ```
 
-> ✅ `endpoint_url`: Points to RustFS
-> ✅ `signature_version='s3v4'`: RustFS supports v4 signatures
-> ✅ `region_name`: RustFS doesn't validate region, any value works
+> ✅ `endpoint_url`: RustFS'ı işaret eder
+> ✅ `signature_version='s3v4'`: RustFS v4 imzalarını destekler
+> ✅ `region_name`: RustFS bölge doğrulaması yapmaz, herhangi bir değer kullanılabilir
 
 ---
 
-## 4. Basic Operations
+## 4. Temel İşlemler
 
-### 4.1 Create Bucket
+### 4.1 Bucket Oluşturma
 
 ```python
 bucket_name = 'my-bucket'
 
 try:
     s3.create_bucket(Bucket=bucket_name)
-    print(f'Bucket {bucket_name} created.')
+    print(f'{bucket_name} bucketı oluşturuldu.')
 except s3.exceptions.BucketAlreadyOwnedByYou:
-    print(f'Bucket {bucket_name} already exists.')
+    print(f'{bucket_name} bucketı zaten mevcut.')
 ```
 
 ---
 
-### 4.2 Upload File
+### 4.2 Dosya Yükleme
 
 ```python
 s3.upload_file('hello.txt', bucket_name, 'hello.txt')
-print('File uploaded.')
+print('Dosya yüklendi.')
 ```
 
 ---
 
-### 4.3 Download File
+### 4.3 Dosya İndirme
 
 ```python
 s3.download_file(bucket_name, 'hello.txt', 'hello-downloaded.txt')
-print('File downloaded.')
+print('Dosya indirildi.')
 ```
 
 ---
 
-### 4.4 List Objects
+### 4.4 Nesneleri Listeleme
 
 ```python
 response = s3.list_objects_v2(Bucket=bucket_name)
 for obj in response.get('Contents', []):
-    print(f"- {obj['Key']} ({obj['Size']} bytes)")
+    print(f"- {obj['Key']} ({obj['Size']} bayt)")
 ```
 
 ---
 
-### 4.5 Delete Object and Bucket
+### 4.5 Nesne ve Bucket Silme
 
 ```python
 s3.delete_object(Bucket=bucket_name, Key='hello.txt')
-print('Object deleted.')
+print('Nesne silindi.')
 
 s3.delete_bucket(Bucket=bucket_name)
-print('Bucket deleted.')
+print('Bucket silindi.')
 ```
 
 ---
 
-## 5. Advanced Features
+## 5. Gelişmiş Özellikler
 
-### 5.1 Generate Presigned URLs
+### 5.1 Ön İmzalı URL Oluşturma
 
-#### 5.1.1 Download Link (GET)
+#### 5.1.1 İndirme Bağlantısı (GET)
 
 ```python
 url = s3.generate_presigned_url(
     ClientMethod='get_object',
     Params={'Bucket': bucket_name, 'Key': 'hello.txt'},
-    ExpiresIn=600  # 10 minutes validity
+    ExpiresIn=600  # 10 dakika geçerlilik
 )
 
-print('Presigned GET URL:', url)
+print('Ön imzalı GET URL:', url)
 ```
 
-#### 5.1.2 Upload Link (PUT)
+#### 5.1.2 Yükleme Bağlantısı (PUT)
 
 ```python
 url = s3.generate_presigned_url(
@@ -148,10 +148,10 @@ url = s3.generate_presigned_url(
     ExpiresIn=600
 )
 
-print('Presigned PUT URL:', url)
+print('Ön imzalı PUT URL:', url)
 ```
 
-You can use the `curl` tool to upload:
+`curl` aracı ile yükleme yapabilirsiniz:
 
 ```bash
 curl -X PUT --upload-file hello.txt "http://..."
@@ -159,9 +159,9 @@ curl -X PUT --upload-file hello.txt "http://..."
 
 ---
 
-### 5.2 Multipart Upload
+### 5.2 Çok Parçalı Yükleme
 
-Suitable for files larger than 10 MB, allowing manual control of each part.
+10 MB'tan büyük dosyalar için uygundur, her parçanın manuel kontrolüne izin verir.
 
 ```python
 import os
@@ -170,7 +170,7 @@ file_path = 'largefile.bin'
 key = 'largefile.bin'
 part_size = 5 * 1024 * 1024  # 5 MB
 
-# 1. Start upload
+# 1. Yüklemeyi başlat
 response = s3.create_multipart_upload(Bucket=bucket_name, Key=key)
 upload_id = response['UploadId']
 parts = []
@@ -192,29 +192,29 @@ try:
             )
 
             parts.append({'ETag': part['ETag'], 'PartNumber': part_number})
-            print(f'Uploaded part {part_number}')
+            print(f'{part_number}. parça yüklendi')
             part_number += 1
 
-    # 2. Complete upload
+    # 2. Yüklemeyi tamamla
     s3.complete_multipart_upload(
         Bucket=bucket_name,
         Key=key,
         UploadId=upload_id,
         MultipartUpload={'Parts': parts}
     )
-    print('Multipart upload completed.')
+    print('Çok parçalı yükleme tamamlandı.')
 
 except Exception as e:
-    # Abort upload on error
+    # Hata durumunda yüklemeyi iptal et
     s3.abort_multipart_upload(Bucket=bucket_name, Key=key, UploadId=upload_id)
-    print(f'Upload aborted: {e}')
+    print(f'Yükleme iptal edildi: {e}')
 ```
 
 ---
 
-## 6. Error Handling
+## 6. Hata Yönetimi
 
-### 6.1 Common Exception Types
+### 6.1 Yaygın Hata Türleri
 
 ```python
 from botocore.exceptions import ClientError
@@ -224,14 +224,14 @@ try:
 except ClientError as e:
     error_code = e.response['Error']['Code']
     if error_code == '404':
-        print('Object not found')
+        print('Nesne bulunamadı')
     elif error_code == 'NoSuchBucket':
-        print('Bucket not found')
+        print('Bucket bulunamadı')
     else:
-        print(f'Error: {error_code}')
+        print(f'Hata: {error_code}')
 ```
 
-### 6.2 Connection Issues
+### 6.2 Bağlantı Sorunları
 
 ```python
 import socket
@@ -239,22 +239,22 @@ import socket
 try:
     response = s3.list_buckets()
 except socket.timeout:
-    print('Connection timeout')
+    print('Bağlantı zaman aşımına uğradı')
 except ConnectionError:
-    print('Connection failed')
+    print('Bağlantı başarısız oldu')
 ```
 
 ---
 
-## 7. Best Practices
+## 7. En İyi Uygulamalar
 
-1. **Use Connection Pooling**: Boto3 automatically manages connection pooling
-2. **Error Retry**: Configure retry policies using `Config`
-3. **Async Operations**: Use `aioboto3` for high-concurrency scenarios
-4. **Resource Management**: Use context managers when possible
+1. **Bağlantı Havuzu Kullanımı**: Boto3 bağlantı havuzunu otomatik yönetir
+2. **Hata Yeniden Deneme**: `Config` kullanarak yeniden deneme politikalarını yapılandırın
+3. **Eşzamanlı İşlemler**: Yüksek eşzamanlılık senaryolarında `aioboto3` kullanın
+4. **Kaynak Yönetimi**: Mümkün olduğunda bağlam yöneticilerini kullanın
 
 ```python
-# Configure retry policy
+# Yeniden deneme politikası yapılandırma
 from botocore.config import Config
 
 config = Config(
@@ -267,7 +267,7 @@ s3 = boto3.client('s3', config=config, ...)
 
 ---
 
-## 8. Complete Example
+## 8. Tam Örnek
 
 ```python
 #!/usr/bin/env python3
@@ -276,7 +276,7 @@ from botocore.client import Config
 from botocore.exceptions import ClientError
 
 def main():
-    # Initialize client
+    # İstemciyi başlat
     s3 = boto3.client(
         's3',
         endpoint_url='http://192.168.1.100:9000',
@@ -289,33 +289,33 @@ def main():
     bucket_name = 'test-bucket'
 
     try:
-        # Create bucket
+        # Bucket oluştur
         s3.create_bucket(Bucket=bucket_name)
-        print(f'Created bucket: {bucket_name}')
+        print(f'Bucket oluşturuldu: {bucket_name}')
 
-        # Upload file
+        # Dosya yükle
         with open('test.txt', 'w') as f:
-            f.write('Hello RustFS!')
+            f.write('Merhaba RustFS!')
 
         s3.upload_file('test.txt', bucket_name, 'test.txt')
-        print('File uploaded successfully')
+        print('Dosya başarıyla yüklendi')
 
-        # List objects
+        # Nesneleri listele
         response = s3.list_objects_v2(Bucket=bucket_name)
-        print('Objects in bucket:')
+        print('Bucket içindeki nesneler:')
         for obj in response.get('Contents', []):
             print(f"  - {obj['Key']}")
 
-        # Generate presigned URL
+        # Ön imzalı URL oluştur
         url = s3.generate_presigned_url(
             'get_object',
             Params={'Bucket': bucket_name, 'Key': 'test.txt'},
             ExpiresIn=3600
         )
-        print(f'Presigned URL: {url}')
+        print(f'Ön imzalı URL: {url}')
 
     except ClientError as e:
-        print(f'Error: {e}')
+        print(f'Hata: {e}')
 
 if __name__ == '__main__':
     main()

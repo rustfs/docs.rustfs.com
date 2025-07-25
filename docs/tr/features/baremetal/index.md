@@ -1,133 +1,133 @@
-# Bare Metal Deployment
+# Bare Metal Dağıtımı
 
-When deploying RustFS on bare metal servers, you can maximize hardware performance and achieve the best storage efficiency. This guide covers bare metal deployment best practices.
+RustFS'ı çıplak metal sunuculara dağıttığınızda, donanım performansını en üst düzeye çıkarabilir ve en iyi depolama verimliliğini elde edebilirsiniz. Bu kılavuz, çıplak metal dağıtımı en iyi uygulamalarını kapsar.
 
-## Hardware Requirements
+## Donanım Gereksinimleri
 
-### Minimum Configuration
+### Minimum Yapılandırma
 
-- **CPU**: 4 cores, 2.4GHz or higher
-- **Memory**: 8GB RAM minimum, 16GB recommended
-- **Storage**: At least 4 drives for erasure coding
-- **Network**: Gigabit Ethernet
+- **İşlemci**: 4 çekirdek, 2.4GHz veya daha yüksek
+- **Bellek**: 8GB RAM minimum, 16GB önerilir
+- **Depolama**: Silme kodlaması için en az 4 sürücü
+- **Ağ**: Gigabit Ethernet
 
-### Recommended Configuration
+### Önerilen Yapılandırma
 
-- **CPU**: 16+ cores, 3.0GHz or higher
-- **Memory**: 32GB+ RAM
-- **Storage**: 8+ drives, mixed SSD/HDD for tiering
-- **Network**: 10Gb Ethernet or higher
+- **İşlemci**: 16+ çekirdek, 3.0GHz veya daha yüksek
+- **Bellek**: 32GB+ RAM
+- **Depolama**: Katmanlandırma için 8+ sürücü, karışık SSD/HDD
+- **Ağ**: 10Gb Ethernet veya daha yüksek
 
-## Deployment Architecture
+## Dağıtım Mimarisi
 
-![Bare Metal Architecture 1](./images/sec2-1.png)
+![Çıplak Metal Mimarisi 1](./images/sec2-1.png)
 
-### Single Node Mode (SNSD)
+### Tek Düğüm Modu (SNSD)
 
-Suitable for development and testing environments:
+Geliştirme ve test ortamları için uygundur:
 
 ```bash
-# Single node with single drive
+# Tek sürücü ile tek düğüm
 rustfs server /data
 ```
 
-![Bare Metal Architecture 2](./images/sec2-2.png)
+![Çıplak Metal Mimarisi 2](./images/sec2-2.png)
 
-### Multi-Node Mode (MNMD)
+### Çok Düğüm Modu (MNMD)
 
-Recommended for production environments:
+Üretim ortamları için önerilir:
 
 ```bash
-# Node 1
-rustfs server http://server{1...4}/data{1...4} \
+# Düğüm 1
+rustfs server http://server{1...4}/data{1...4}
 
-# Node 2-4 (similar configuration)
+# Düğüm 2-4 (benzer yapılandırma)
 ```
 
-![Bare Metal Architecture 3](./images/sec2-3.png)
+![Çıplak Metal Mimarisi 3](./images/sec2-3.png)
 
-## Performance Optimization
+## Performans Optimizasyonu
 
-### Storage Configuration
+### Depolama Yapılandırması
 
-1. **Drive Selection**
-   - Use enterprise-grade drives for production
-   - Consider NVMe SSDs for high-performance workloads
-   - Separate OS and data drives
+1. **Sürücü Seçimi**
+   - Üretim için kurumsal sınıf sürücüler kullanın
+   - Yüksek performanslı iş yükleri için NVMe SSD'leri düşünün
+   - İşletim sistemi ve veri sürücülerini ayırın
 
-2. **RAID Configuration**
-   - Disable hardware RAID for object storage
-   - Use JBOD (Just a Bunch of Disks) mode
-   - Let RustFS handle redundancy
+2. **RAID Yapılandırması**
+   - Nesne depolama için donanım RAID'ini devre dışı bırakın
+   - JBOD (Just a Bunch of Disks) modunu kullanın
+   - Yedekliliği RustFS'ın yönetmesine izin verin
 
-### Network Optimization
+### Ağ Optimizasyonu
 
-1. **Network Bonding**
+1. **Ağ Bağlama**
 
    ```bash
-   # Configure network bonding for redundancy
+   # Yedeklilik için ağ bağlama yapılandırma
    sudo modprobe bonding
    echo "balance-rr" > /sys/class/net/bond0/bonding/mode
    ```
 
-2. **Jumbo Frames**
+2. **Jumbo Çerçeveler**
 
    ```bash
-   # Enable jumbo frames for better throughput
+   # Daha iyi aktarım hızı için jumbo çerçeveleri etkinleştir
    sudo ip link set dev eth0 mtu 9000
    ```
 
-![Bare Metal Architecture 4](./images/sec2-4.png)
+![Çıplak Metal Mimarisi 4](./images/sec2-4.png)
 
-## Monitoring and Maintenance
+## İzleme ve Bakım
 
-### Health Monitoring
+### Sağlık İzleme
 
-- Monitor drive health with SMART tools
-- Track network utilization and latency
-- Set up alerts for hardware failures
+- SMART araçları ile sürücü sağlığını izleyin
+- Ağ kullanımını ve gecikmeyi takip edin
+- Donanım arızaları için uyarılar ayarlayın
 
-### Maintenance Procedures
+### Bakım Prosedürleri
 
-1. **Drive Replacement**
-   - Hot-swap failed drives
-   - Monitor healing process
-   - Verify data integrity
+1. **Sürücü Değiştirme**
+   - Arızalı sürücüleri sıcak takas yapın
+   - İyileştirme sürecini izleyin
+   - Veri bütünlüğünü doğrulayın
 
-2. **Node Maintenance**
-   - Graceful node shutdown
-   - Rolling updates
-   - Capacity planning
+2. **Düğüm Bakımı**
+   - Düğümü düzgün bir şekilde kapatın
+   - Yuvarlak güncellemeler yapın
+   - Kapasite planlaması yapın
 
-## Security Considerations
+## Güvenlik Hususları
 
-### Physical Security
+### Fiziksel Güvenlik
 
-- Secure server room access
-- Environmental monitoring
-- Power redundancy
+- Sunucu odası erişimini güvence altına alın
+- Çevresel izleme yapın
+- Güç yedekliliği sağlayın
 
-### Network Security
+### Ağ Güvenliği
 
-- Firewall configuration
-- Network segmentation
-- TLS encryption for client connections
+- Güvenlik duvarı yapılandırması
+- Ağ segmentasyonu
+- İstemci bağlantılar için TLS şifreleme
 
-## Troubleshooting
+## Sorun Giderme
 
-### Common Issues
+### Yaygın Sorunlar
 
-1. **Drive Failures**
-   - Check SMART status
-   - Replace failed drives promptly
-   - Monitor healing progress
+1. **Sürücü Arızaları**
+   - SMART durumunu kontrol edin
+   - Arızalı sürücüleri derhal değiştirin
+   - İyileştirme ilerlemesini izleyin
 
-2. **Network Issues**
-   - Verify network connectivity
-   - Check bandwidth utilization
-   - Monitor for packet loss
+2. **Ağ Sorunları**
+   - Ağ bağlantısını doğrulayın
+   - Bant genişliği kullanımını kontrol edin
+   - Paket kaybı için izleme yapın
 
-3. **Performance Issues**
-   - Analyze I/O patterns
-   - Check for CPU/memory bottlenecks
-   - Optimize drive layout
+3. **Performans Sorunları**
+   - G/Ç kalıplarını analiz edin
+   - İşlemci/bellek darboğazları için kontrol edin
+   - Sürücü düzenini optimize edin

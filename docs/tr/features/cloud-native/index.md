@@ -1,35 +1,35 @@
-# Cloud-Native Deployment
+# Bulut Yerel Dağıtım
 
-RustFS is designed for cloud-native environments, providing seamless integration with Kubernetes, container orchestration, and modern DevOps workflows.
+RustFS, bulut yerel ortamlar için tasarlanmıştır ve Kubernetes, konteyner orkestrasyonu ve modern DevOps iş akışları ile sorunsuz entegrasyon sağlar.
 
-## Multi-Cloud Architecture
+## Çoklu Bulut Mimarisi
 
-![Multi-Cloud Architecture](./images/multi-cloud-architecture.png)
+![Çoklu Bulut Mimarisi](./images/multi-cloud-architecture.png)
 
-RustFS supports deployment across multiple cloud providers, enabling:
+RustFS, birden fazla bulut sağlayıcıya dağıtımı destekleyerek şunları sağlar:
 
-- **Vendor Independence**: Avoid cloud provider lock-in
-- **Cost Optimization**: Leverage best pricing across providers
-- **Geographic Distribution**: Deploy closer to users worldwide
-- **Risk Mitigation**: Reduce dependency on single provider
+- **Satıcı Bağımsızlığı**: Bulut sağlayıcı kilidinden kaçının
+- **Maliyet Optimizasyonu**: Sağlayıcılar arasında en iyi fiyatlandırmayı kullanın
+- **Coğrafi Dağılım**: Dünya çapında kullanıcılara daha yakın dağıtım yapın
+- **Risk Azaltma**: Tek sağlayıcıya olan bağımlılığı azaltın
 
-## Kubernetes Integration
+## Kubernetes Entegrasyonu
 
-### Helm Chart Deployment
+### Helm Chart Dağıtımı
 
 ```bash
-# Add RustFS Helm repository
+# RustFS Helm deposunu ekleyin
 helm repo add rustfs https://charts.rustfs.com
 helm repo update
 
-# Install RustFS cluster
+# RustFS kümesini yükleyin
 helm install rustfs rustfs/rustfs \
   --set replicas=4 \
   --set storage.size=100Gi \
   --set storage.storageClass=fast-ssd
 ```
 
-### Operator Deployment
+### Operatör Dağıtımı
 
 ```yaml
 apiVersion: rustfs.io/v1
@@ -50,7 +50,7 @@ spec:
       cpu: "2"
 ```
 
-## Container Orchestration
+## Konteyner Orkestrasyonu
 
 ### Docker Compose
 
@@ -66,7 +66,7 @@ services:
       - data2:/data2
       - data3:/data3
       - data4:/data4
-    command: server /data{1...4} 
+    command: server /data{1...4}
     environment:
       - RUSTFS_ROOT_USER=admin
       - RUSTFS_ROOT_PASSWORD=password123
@@ -104,7 +104,7 @@ services:
           memory: 4G
         reservations:
           memory: 2G
-    command: server http://rustfs_rustfs:9000/data 
+    command: server http://rustfs_rustfs:9000/data
     networks:
       - rustfs_network
 
@@ -118,9 +118,9 @@ volumes:
     driver: local
 ```
 
-## Service Mesh Integration
+## Servis Ağı Entegrasyonu
 
-### Istio Integration
+### Istio Entegrasyonu
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -149,7 +149,7 @@ spec:
         fixedDelay: 5s
 ```
 
-### Linkerd Integration
+### Linkerd Entegrasyonu
 
 ```yaml
 apiVersion: v1
@@ -165,12 +165,11 @@ spec:
   - name: api
     port: 9000
     targetPort: 9000
-
 ```
 
-## Observability
+## Gözlemleme
 
-### Prometheus Monitoring
+### Prometheus İzleme
 
 ```yaml
 apiVersion: monitoring.coreos.com/v1
@@ -187,19 +186,19 @@ spec:
     path: /rustfs/v2/metrics/cluster
 ```
 
-### Grafana Dashboards
+### Grafana Panoları
 
-Key metrics to monitor:
+İzlenmesi gereken temel metrikler:
 
-- **Cluster Health**: Node status, quorum health
-- **Performance**: Request latency, throughput
-- **Storage**: Capacity utilization, I/O metrics
-- **Network**: Bandwidth, connection count
+- **Küme Sağlığı**: Düğüm durumu, kuorum sağlığı
+- **Performans**: İstek gecikmesi, aktarım hızı
+- **Depolama**: Kapasite kullanımı, G/Ç metrikleri
+- **Ağ**: Bant genişliği, bağlantı sayısı
 
-### Distributed Tracing
+### Dağıtık İzleme
 
 ```yaml
-# Jaeger integration
+# Jaeger entegrasyonu
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -212,9 +211,9 @@ data:
       sample_rate: 0.1
 ```
 
-## CI/CD Integration
+## CI/CD Entegrasyonu
 
-### GitOps with ArgoCD
+### GitOps ile ArgoCD
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
@@ -236,7 +235,7 @@ spec:
       selfHeal: true
 ```
 
-### Jenkins Pipeline
+### Jenkins Boru Hattı
 
 ```groovy
 pipeline {
@@ -265,9 +264,9 @@ pipeline {
 }
 ```
 
-## Security
+## Güvenlik
 
-### Pod Security Standards
+### Pod Güvenlik Standartları
 
 ```yaml
 apiVersion: v1
@@ -290,7 +289,7 @@ spec:
       readOnlyRootFilesystem: true
 ```
 
-### Network Policies
+### Ağ Politikaları
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -314,23 +313,23 @@ spec:
       port: 9000
 ```
 
-## Best Practices
+## En İyi Uygulamalar
 
-### Resource Management
+### Kaynak Yönetimi
 
-1. **Resource Limits**
-   - Set appropriate CPU and memory limits
-   - Use resource quotas at namespace level
-   - Monitor resource utilization trends
+1. **Kaynak Limitleri**
+   - Uygun CPU ve bellek limitleri ayarlayın
+   - Ad alanları düzeyinde kaynak kotaları kullanın
+   - Kaynak kullanım eğilimlerini izleyin
 
-2. **Storage Classes**
-   - Use fast SSDs for high-performance workloads
-   - Consider regional persistent disks for durability
-   - Implement automated backup strategies
+2. **Depolama Sınıfları**
+   - Yüksek performanslı iş yükleri için hızlı SSD'ler kullanın
+   - Dayanıklılık için bölgesel kalıcı diskleri düşünün
+   - Otomatik yedekleme stratejileri uygulayın
 
-### High Availability
+### Yüksek Kullanılabilirlik
 
-1. **Multi-Zone Deployment**
+1. **Çoklu Bölge Dağıtımı**
 
    ```yaml
    spec:
@@ -346,7 +345,7 @@ spec:
            topologyKey: topology.kubernetes.io/zone
    ```
 
-2. **Health Checks**
+2. **Sağlık Kontrolleri**
 
    ```yaml
    livenessProbe:
@@ -364,21 +363,21 @@ spec:
      periodSeconds: 5
    ```
 
-## Troubleshooting
+## Sorun Giderme
 
-### Common Issues
+### Yaygın Sorunlar
 
-1. **Pod Startup Issues**
-   - Check resource constraints
-   - Verify storage class availability
-   - Review security contexts
+1. **Pod Başlatma Sorunları**
+   - Kaynak kısıtlamalarını kontrol edin
+   - Depolama sınıfı kullanılabilirliğini doğrulayın
+   - Güvenlik bağlamlarını gözden geçirin
 
-2. **Network Connectivity**
-   - Validate service discovery
-   - Check network policies
-   - Monitor DNS resolution
+2. **Ağ Bağlantısı**
+   - Servis keşfini doğrulayın
+   - Ağ politikalarını kontrol edin
+   - DNS çözümlemesini izleyin
 
-3. **Performance Issues**
-   - Analyze resource utilization
-   - Check storage I/O patterns
-   - Review network bandwidth
+3. **Performans Sorunları**
+   - Kaynak kullanımını analiz edin
+   - Depolama G/Ç kalıplarını kontrol edin
+   - Ağ bant genişliğini gözden geçirin

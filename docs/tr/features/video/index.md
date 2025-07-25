@@ -1,109 +1,109 @@
-# Video Storage Cost Reduction Solutions
+# Video Depolama Maliyet Azaltma Çözümleri
 
-Help video storage achieve dramatic cost reduction through object storage and hybrid cloud approaches
+Video depolama maliyetlerinde dramatik bir azalma sağlamak için nesne depolama ve hibrit bulut yaklaşımları kullanın.
 
-## Core Pain Points of Video Storage
+## Video Depolamanın Temel Sorunları
 
-### Traditional Solution Defects
+### Geleneksel Çözüm Kusurları
 
-- Linear storage architecture causes read/write speeds to decline as capacity increases
-- Original videos occupy space, cold data long-term occupation of high-performance storage
-- Single replica storage + periodic backup mechanism
-- Storage expansion requires downtime maintenance, lacks intelligent management tools
+- Doğrusal depolama mimarisi, kapasite arttıkça okuma/yazma hızlarının düşmesine neden olur.
+- Orijinal videolar alan kaplar, soğuk veri uzun süreli olarak yüksek performanslı depolama alanını işgal eder.
+- Tek kopyalı depolama + periyodik yedekleme mekanizması.
+- Depolama genişletme, kesinti süresi gerektiren bakım gerektirir, akıllı yönetim araçlarından yoksundur.
 
-### Business Impact
+### İş Etkisi
 
-- Key frame retrieval delays exceed 5 seconds, emergency response efficiency reduced by 30%
-- Storage costs increase 47% annually, 80% storage resources occupied by low-frequency access videos
-- Hardware failures lead to 72-hour data recovery cycles, risk of critical evidence loss
-- Manual operations cost $3.2/TB/month, system availability below 99%
+- Ana kare alma gecikmeleri 5 saniyeyi aşar, acil durum müdahale verimliliği %30 azalır.
+- Depolama maliyetleri yıllık %47 artar, depolama kaynaklarının %80'i düşük frekanslı erişim videoları tarafından işgal edilir.
+- Donanım arızaları 72 saatlik veri kurtarma döngülerine yol açar, kritik kanıt kaybı riski vardır.
+- Manuel işlemler aylık 3,2 $/TB'ye mal olur, sistem kullanılabilirliği %99'un altındadır.
 
-## Five Core Cost Reduction Capabilities
+## Beş Temel Maliyet Azaltma Kabiliyeti
 
-### Storage Cost Direct Reduction 68%
+### Depolama Maliyetinde Doğrudan %68 Azalma
 
-- Original video frame-level compression algorithm (VFC-3 patent technology)
-- Intelligent hot-cold separation: automatically identify videos not accessed for 30 days and transfer to glacier storage
-- Support EB-level storage expansion, single TB cost as low as $0.015/month
+- Orijinal video kare düzeyi sıkıştırma algoritması (VFC-3 patent teknolojisi).
+- Akıllı sıcak-soğuk ayrımı: 30 gün boyunca erişilmeyen videoları otomatik olarak belirler ve buzul depolamaya transfer eder.
+- EB düzeyinde depolama genişletme desteği, tek TB maliyeti aylık 0,015 $ kadar düşük.
 
-### Minute-Level Data Access
+### Dakika Düzeyinde Veri Erişimi
 
-- Global deployment of 128 edge nodes, transmission speed improved 5x
-- Support 2000+ device concurrent writing, read/write latency less than 300ms
-- Intelligent preloading technology: high-frequency access videos automatically cached to edge nodes
+- 128 kenar düğümünün küresel dağıtımı, iletim hızı 5 kat iyileştirildi.
+- 2000+ cihazın eşzamanlı yazma desteği, okuma/yazma gecikmesi 300ms'nin altında.
+- Akıllı ön yükleme teknolojisi: yüksek frekanslı erişim videoları otomatik olarak kenar düğümlerine önbelleğe alınır.
 
-### Military-Grade Data Protection
+### Askeri Düzeyde Veri Koruması
 
-- Three-replica storage + remote disaster recovery (compliant with ISO27001/Level 3 Security)
-- Blockchain evidence storage: key videos generate timestamp hashes, judicial-level trusted evidence
-- Version rollback: video recovery at any time point within 120 days
+- Üç kopyalı depolama + uzak felaket kurtarma (ISO27001/Düzey 3 Güvenlik uyumlu).
+- Blok zinciri kanıt depolama: ana videolar zaman damgası hash'leri oluşturur, yargı düzeyi güvenilir kanıt.
+- Sürüm geri alma: 120 gün içinde herhangi bir zaman noktasında video kurtarma.
 
-### Zero-Modification Access
+### Sıfır Değişiklik Erişimi
 
-- Compatible with 14 protocols including ONVIF/RTSP/GB28181
-- Provides SDK/API/RESTful three access methods
-- One-click migration tool for existing data (supports NAS/SAN/Ceph)
+- ONVIF/RTSP/GB28181 dahil 14 protokole uyumluluk.
+- SDK/API/RESTful üç erişim yöntemi sunar.
+- Mevcut veri için tek tıklamayla geçiş aracı (NAS/SAN/Ceph desteği).
 
-### Intelligent Operations Dashboard
+### Akıllı İşlemler Paneli
 
-- Real-time monitoring of storage health, cost distribution, access hotspots
-- Capacity prediction algorithm: 3-day advance warning of storage bottlenecks
-- Automatically generate monthly optimization recommendation reports
+- Depolama sağlığı, maliyet dağılımı, erişim sıcak noktalarının gerçek zamanlı izlenmesi.
+- Kapasite tahmin algoritması: depolama darboğazları için 3 gün önceden uyarı.
+- Aylık optimizasyon öneri raporlarını otomatik olarak oluşturur.
 
-## Solutions
+## Çözümler
 
-Frontend monitoring videos can be uploaded to cloud through three methods
+Ön uç izleme videoları, buluta üç yöntemle yüklenebilir:
 
-### Hybrid Cloud Tiered Storage
+### Hibrit Bulut Katmanlı Depolama
 
-Applicable scenarios: Large parks, smart cities (1000+ cameras)
+Uygulanabilir senaryolar: Büyük parklar, akıllı şehirler (1000+ kamera).
 
-#### Core Capabilities
+#### Temel Kabiliyetler
 
-- Intelligent tiering: hot data stored locally on SSD (response <100ms), full data automatically synced to cloud
-- Direct cost reduction: cloud storage cost $0.021/GB-month, bandwidth usage reduced 80%
-- Seamless disaster recovery: real-time active-active between local and cloud data
+- Akıllı katmanlandırma: sıcak veri yerel olarak SSD'de depolanır (yanıt <100ms), tüm veri otomatik olarak buluta senkronize edilir.
+- Doğrudan maliyet azaltma: bulut depolama maliyeti 0,021 $/GB-ay, bant genişliği kullanımı %80 azaltılır.
+- Sorunsuz felaket kurtarma: yerel ve bulut verileri arasında gerçek zamanlı aktif-aktif.
 
-### Direct Cloud Storage
+### Doğrudan Bulut Depolama
 
-Applicable scenarios: Shops, communities, homes (50-200 cameras)
+Uygulanabilir senaryolar: Mağazalar, topluluklar, evler (50-200 kamera).
 
-#### Core Advantages
+#### Temel Avantajlar
 
-- 5-minute ultra-simple deployment: scan-to-use, automatically adapts H.265 compression
-- Intelligent management: motion detection automatically generates 30-second event clips
-- Zero maintenance: fully managed cloud storage, data durability 99.9999999%
+- 5 dakikalık ultra basit dağıtım: kullanmak için tarama, otomatik olarak H.265 sıkıştırmayı uyarlama.
+- Akıllı yönetim: hareket algılama otomatik olarak 30 saniyelik olay klipleri oluşturur.
+- Sıfır bakım: tamamen yönetilen bulut depolama, veri dayanıklılığı %99,9999999.
 
-### Server Relay Storage
+### Sunucu Röle Depolama
 
-Applicable scenarios: Educational parks, cross-regional enterprises
+Uygulanabilir senaryolar: Eğitim parkları, bölgesel işletmeler.
 
-#### Key Technologies
+#### Ana Teknolojiler
 
-- Edge preprocessing: video frame extraction analysis (saves 90% traffic)
-- Intelligent routing: automatically switches TCP/UDP protocols to ensure transmission
-- Tiered archiving: original videos stored 30 days, low-bitrate copies stored 180 days
+- Kenar ön işleme: video kare çıkarma analizi (trafiğin %90'ını tasarruf eder).
+- Akıllı yönlendirme: iletimi sağlamak için otomatik olarak TCP/UDP protokollerini değiştirir.
+- Katmanlı arşivleme: orijinal videolar 30 gün, düşük bit hızı kopyaları 180 gün depolanır.
 
-![Video Storage Solution Architecture](./images/solution.png)
+![Video Depolama Çözümü Mimarisi](./images/solution.png)
 
-## Why Choose Us
+## Neden Bizi Seçmelisiniz
 
-### Controllable Costs
+### Kontrol Edilebilir Maliyetler
 
-EB-level elastic expansion, cold data storage cost as low as $0.015/GB·month
+EB düzeyinde elastik genişleme, soğuk veri depolama maliyeti GB·ay başına 0,015 $ kadar düşük.
 
-### Ultra-Fast Response
+### Ultra Hızlı Yanıt
 
-Global 128 edge nodes, video transmission speed improved 5x
+Küresel 128 kenar düğümü, video iletim hızı 5 kat iyileştirildi.
 
-### Automatic Video Upload Encryption
+### Otomatik Video Yükleme Şifreleme
 
-Automatic video encryption ensures upload storage security, prevents data leakage and illegal distribution, while helping platforms meet privacy protection regulations and reduce legal risks
+Otomatik video şifreleme, yükleme depolama güvenliğini sağlar, veri sızıntısını ve yasadışı dağıtımı önler, platformların gizlilik koruma düzenlemelerine uymasına ve yasal riskleri azaltmasına yardımcı olur.
 
-### Version Protection
+### Sürüm Koruması
 
-Platform-provided original video automatic encryption service effectively prevents piracy and tampering, protects intellectual property, while improving user trust and satisfaction
+Platform tarafından sağlanan orijinal video otomatik şifreleme hizmeti, korsanlığı ve tahrifatı etkili bir şekilde önler, fikri mülkiyet haklarını korur, kullanıcı güvenini ve memnuniyetini artırır.
 
-## Technical Parameter Comparison Table
+## Teknik Parametre Karşılaştırma Tablosu
 
-![Technical Parameter Comparison Table](./images/params.png)
+![Teknik Parametre Karşılaştırma Tablosu](./images/params.png)

@@ -1,48 +1,47 @@
 ---
-title: Startup Modes
-description: How many startup modes does RustFS have?
+title: Başlangıç Modları
+description: RustFS'nin kaç tane başlangıç modu vardır?
 ---
+# Başlangıç Modları
 
-# Startup Modes
+RustFS'nin üç başlangıç modu vardır:
 
-RustFS has three startup modes:
+- **Tek Düğüm Tek Disk**: Bir sunucuda bir veri diski
+- **Tek Düğüm Çoklu Diskler**: Bir sunucuda çoklu veri diskleri
+- **Çoklu Düğümler Çoklu Diskler**: Çoklu sunucularda çoklu veri diskleri
 
-- **Single Node Single Disk**: One data disk on one server
-- **Single Node Multiple Disks**: Multiple data disks on one server
-- **Multiple Nodes Multiple Disks**: Multiple data disks on multiple servers
+## Tek Düğüm Tek Disk Modu (SNSD)
 
-## Single Node Single Disk Mode (SNSD)
+> Düşük yoğunluklu kritik olmayan işler için uygundur. Üretim ortamlarında veri yedeklemesi önerilir, risklerden kaçınmak için.
 
-> Suitable for low-density non-critical business. Data backup is recommended in production environments to avoid risks.
+Bir sunucuda yalnızca bir veri diski, tüm veriler bu tek veri diskinde depolanır.
 
-Only one data disk on one server, all data is stored on this single data disk.
+Belirli mimari diyagram aşağıdaki gibidir:
 
-The specific architecture diagram is as follows:
+![RustFS Tek Düğüm Tek Disk Modu](./images/1.jpg)
 
-<img src="./images/1.jpg" alt="RustFS Single Node Single Disk Mode" />
+## Tek Düğüm Çoklu Disk Modu (SNMD)
 
-## Single Node Multiple Disk Mode (SNMD)
+> Orta düzeyde kritik olmayan işler için uygundur. Üretim ortamlarında, belirtilen M diskine verilen hasar genellikle veri riskine neden olmaz. Eğer tüm sunucu hasar görürse veya M'den fazla disk hasar görürse, veri kaybolur.
 
-> Suitable for medium non-critical business. In production environments, damage to specified M disks usually won't cause data risk. If the entire server is damaged or more than M disks are damaged, data will be lost.
+Bir sunucuda çoklu veri diskleri, veriler çoklu veri disklerine parçalar halinde depolanır.
 
-Multiple data disks on one server, data is stored in shards across multiple data disks.
+Bir veri bloğu, belirtilen K veri bloğuna ve M parite bloğuna bölünecektir. En fazla K veri bloğu kaybolamaz ve en fazla M parite bloğu kaybolamaz.
 
-A data block will be split into specified K data blocks and M parity blocks. At most K data blocks cannot be lost, and at most M parity blocks cannot be lost.
+Aşağıdaki diyagramda gösterildiği gibi:
 
-As shown in the diagram below:
+![RustFS Tek Düğüm Çoklu Disk Modu](./images/2.jpg)
 
-<img src="./images/2.jpg" alt="RustFS Single Node Multiple Disk Mode" />
+## Çoklu Düğümler Çoklu Diskler (MNMD)
 
-## Multiple Nodes Multiple Disks (MNMD)
+> Üretim ortamlarındaki kritik işler için uygundur. Uzman rehberliği altında yapılandırma önerilir, eşzamanlılık, verim, iş senaryoları, basınç ve diğer metrikleri dikkate alan kapsamlı sistem optimizasyonu ile.
 
-> Suitable for critical business in production environments. Configuration under expert guidance is recommended, with comprehensive system optimization considering concurrency, throughput, business scenarios, pressure and other metrics.
+En az 4 sunucu gereklidir, her sunucuda en az 1 disk bulunmalıdır, böylece bir dağıtık nesne depolama kümesi güvenli bir şekilde başlatılabilir.
 
-Minimum of 4 servers required, with at least 1 disk per server to safely start a distributed object storage cluster.
+Aşağıdaki mimari diyagram örneğinde, veriler yük dengeleme yoluyla herhangi bir sunucuya rastgele yazılır. Varsayılan 12 + 4 modu kullanılarak, bir veri bloğu varsayılan olarak 12 veri bloğu + 4 parite bloğuna bölünür ve farklı sunucuların farklı disklerinde depolanır.
 
-In the following architecture diagram example, data is written to any server randomly through load balancing. Using the default 12 + 4 mode, a data block is split into 12 data blocks + 4 parity blocks by default, stored on different disks of different servers.
+Herhangi bir 1 sunucunun hasar görmesi veya bakımı veri güvenliğini etkilemez.
 
-Damage or maintenance of any 1 server will not affect data safety.
+Herhangi 4 disk veya daha azının hasar görmesi veri güvenliğini etkilemez.
 
-Damage to any 4 disks or fewer will not affect data safety.
-
-<img src="./images/lb.jpg" alt="RustFS Multiple Node Multiple Disk Mode" />
+![RustFS Çoklu Düğüm Çoklu Disk Modu](./images/lb.jpg)

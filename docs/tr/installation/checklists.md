@@ -1,24 +1,24 @@
 ---
-title: "Checklists"
-description: "Pre-installation checklists for RustFS"
+title: "Kontrol Listeleri"
+description: "RustFS için kurulum öncesi kontrol listeleri"
 ---
 
-# Checklists
+# Kontrol Listeleri
 
-The following documents contain pre-installation checklists for RustFS, including a series of necessary preparations and considerations required before preparing the production environment.
+Aşağıdaki belgeler, RustFS için üretim ortamını hazırlamadan önce gerekli olan bir dizi hazırlık ve dikkate alınması gereken noktaları içeren kurulum öncesi kontrol listelerini içermektedir.
 
-These checklists cannot fully meet the precise requirements of your unique deployment architecture, production characteristics, and production metrics. We recommend that you seek professional guidance based on your production environment, production characteristics, production metrics, and the version of RustFS you are using.
+Bu kontrol listeleri, benzersiz dağıtım mimarinizin, üretim özelliklerinizin ve üretim metriklerinizin kesin gereksinimlerini tam olarak karşılayamaz. Üretim ortamınıza, üretim özelliklerinize, üretim metriklerinize ve kullandığınız RustFS sürümüne göre profesyonel rehberlik almanızı öneririz.
 
-If you need professional guidance, please contact our storage experts: 400-033-5363 or email: <hello@rustfs.com>.
+Profesyonel rehberliğe ihtiyacınız varsa, lütfen depolama uzmanlarımızla iletişime geçin: 400-033-5363 veya e-posta: <hello@rustfs.com>.
 
-If you need community support, you can submit issues on GitHub or join our discussion groups. We do not guarantee the quality and results of community responses and do not provide SLA guarantees.
+Topluluk desteğine ihtiyacınız varsa, GitHub üzerinden sorun gönderebilir veya tartışma gruplarımıza katılabilirsiniz. Topluluk yanıtlarının kalitesi ve sonuçları için garanti vermeyiz ve SLA taahhüdü sağlamayız.
 
-## Checklists
+## Kontrol Listeleri
 
-1. [Hardware Checklists](./hard-checklists);
+1. [Donanım Kontrol Listeleri](./hard-checklists);
 
-2. [Security Checklists](./security-checklists);
+2. [Güvenlik Kontrol Listeleri](./security-checklists);
 
-3. [Software Checklists](./software-checklists);
+3. [Yazılım Kontrol Listeleri](./software-checklists);
 
-4. [Network Checklists](./network-checklists).
+4. [Ağ Kontrol Listeleri](./network-checklists).

@@ -1,144 +1,144 @@
-# Object Storage Cold Archiving Solution
+# Nesne Depolama Soğuk Arşivleme Çözümü
 
-Built for century-long data storage, constructing secure, intelligent, and sustainable cold data infrastructure
+Yüzyıl boyunca veri depolama için inşa edilmiş, güvenli, akıllı ve sürdürülebilir soğuk veri altyapısı oluşturma
 
-## Core Pain Points
+## Temel Sorunlar
 
-### Century-Long Storage Challenges
+### Yüzyıl Boyu Depolama Zorlukları
 
-**Pain Point**: Data needs to be stored for decades or even centuries, facing multiple risks including media aging, technology obsolescence, and regulatory changes.
+**Sorun**: Verilerin onlarca hatta yüzyıllarca saklanması gerekiyor, medya yaşlanması, teknoloji eskimesi ve düzenleyici değişiklikler gibi birçok riskle karşı karşıya.
 
-**Technical Challenges**:
+**Teknik Zorluklar**:
 
-- Limited hardware lifespan (tape 10-30 years)
-- Old data formats cannot adapt to new systems
-- High compliance audit costs
+- Sınırlı donanım ömrü (teyp 10-30 yıl)
+- Eski veri formatları yeni sistemlere uyum sağlayamaz
+- Yüksek uyumluluk denetim maliyetleri
 
-**RustFS Solution**:
+**RustFS Çözümü**:
 
-- Mini-program storage-free architecture: Continuous writing to storage buckets, supporting upgrades according to audit standards/OLC/S3 storage handwriting
-- Dynamic encoding technology: Automatic conversion of encoded data formats (e.g., COBOL→JSON)
-- Full-stack sandbox: Built-in GDPR/data templates, one-click audit report generation
+- Mini-program depolama-ücretsiz mimari: Depolama kovalarına sürekli yazma, denetim standartları/OLC/S3 depolama elle yazmaya göre yükseltme desteği
+- Dinamik kodlama teknolojisi: Kodlanmış veri formatlarının otomatik dönüştürülmesi (örneğin, COBOL→JSON)
+- Tam yığın kum havuzu: Yerleşik GDPR/veri şablonları, tek tıklama denetim raporu oluşturma
 
-### Power-Off Network Disaster Recovery
+### Güç Kesintisi Ağ Felaket Kurtarma
 
-**Pain Point**: Offline storage is affected by natural environment and human operational errors, traditional large-scale solutions themselves have data loss risks.
+**Sorun**: Çevrimdışı depolama, doğal çevre ve insan operasyonel hataları nedeniyle etkilenir, geleneksel büyük ölçekli çözümlerin kendileri veri kaybı riskleri taşır.
 
-**Technical Challenges**:
+**Teknik Zorluklar**:
 
-- Physical damage risk to tape libraries
-- High network latency for cross-regional replication
-- Long cold data offline storage time (hours to days)
+- Teyp kütüphanelerine fiziksel hasar riski
+- Bölgeler arası çoğaltma için yüksek ağ gecikmesi
+- Soğuk veri çevrimdışı depolama süresi uzun (saatlerce günlere)
 
-**RustFS Solution**:
+**RustFS Çözümü**:
 
-- Magneto-optical hybrid cloud storage: Mixed optical storage electromagnetic interference + tape low cost, disaster recovery
-- Cold data direct read technology: No need to defrost, recommended <15 seconds
-- Blockchain dump synchronization: Automatic metadata synchronization, ensuring three-site replica consistency
+- Manyeto-optik hibrit bulut depolama: Optik depolama elektromanyetik girişim + teyp düşük maliyet, felaket kurtarma
+- Soğuk veri doğrudan okuma teknolojisi: Çözülmeye gerek yok, önerilen <15 saniye
+- Blok zinciri döküm senkronizasyonu: Meta verilerin otomatik senkronizasyonu, üç site replika tutarlılığı
 
-### Power-Off Network Disaster Recovery
+### Güç Kesintisi Ağ Felaket Kurtarma
 
-**Pain Point**: Long-term offline data is susceptible to malware infection, potentially causing data "zombification".
+**Sorun**: Uzun süreli çevrimdışı veriler, kötü amaçlı yazılım enfeksiyonuna yatkın, potansiyel olarak veri "zombileşmesi"ne neden olabilir.
 
-**Technical Challenges**:
+**Teknik Zorluklar**:
 
-- High cost of implementing air gap
-- Increased decoding error risk (such as error code decoding)
-- Risk of metadata index loss
+- Hava boşluğu uygulama maliyeti yüksek
+- Artan kod çözme hatası riski (örneğin, hata kodu çözme)
+- Meta veri dizin kaybı riski
 
-**RustFS Solution**:
+**RustFS Çözümü**:
 
-- Hardware-level security protection: Read-only independent write-once optical discs, tamper-proof
-- Adaptive deployment: Periodic CRC + automatic error correction verification, automatic error repair
-- Cloud data blockchain storage: Cloud index on-demand online, permanently traceable
+- Donanım seviyesinde güvenlik koruması: Salt okunur bağımsız bir kez yazılabilir optik diskler, değiştirilemez
+- Uyarlanabilir dağıtım: Periyodik CRC + otomatik hata düzeltme doğrulama, otomatik hata onarımı
+- Bulut veri blok zinciri depolama: Bulut dizini talep üzerine çevrimiçi, kalıcı olarak izlenebilir
 
-## Solutions
+## Çözümler
 
-### Tiered Storage Engine
+### Katmanlı Depolama Motoru
 
-#### Intelligent Tiering
+#### Akıllı Katmanlandırma
 
-Automatically divides storage tiers based on access frequency (hot→warm→cold→deep cold), dynamically migrating to low-cost media (such as HDD/tape/Blu-ray)
+Erişim sıklığına göre depolama katmanlarını otomatik olarak böler (sıcak→ılık→soğuk→derin soğuk), düşük maliyetli ortamlara dinamik olarak taşır (örneğin, HDD/teyp/Blu-ray)
 
-#### Cross-Platform Compatibility
+#### Çapraz Platform Uyumluluğu
 
-Supports multiple protocol access including S3, NAS, HDFS, seamlessly connecting public cloud and private deployment
+S3, NAS, HDFS gibi çoklu protokol erişimini destekler, kamu bulutu ve özel dağıtımı sorunsuz bir şekilde bağlar
 
-### Century-Long Data Management Technology
+### Yüzyıl Boyu Veri Yönetimi Teknolojisi
 
-#### Media-Agnostic Design
+#### Ortamdan Bağımsız Tasarım
 
-Uses logical volume abstraction layer to shield hardware differences, supporting smooth upgrades from tape to QLC flash
+Mantıksal hacim soyutlama katmanı kullanarak donanım farklılıklarını gizler, teypten QLC flaşa sorunsuz yükseltme desteği
 
-#### Self-Healing Data Inspection
+#### Kendini Onaran Veri Denetimi
 
-Periodic CRC + erasure coding verification, automatic silent error repair
+Periyodik CRC + silme kodlama doğrulama, otomatik sessiz hata onarımı
 
-### Secure and Trusted System
+### Güvenli ve Güvenilir Sistem
 
-#### Hardware-Level Air Gap
+#### Donanım Seviyesinde Hava Boşluğu
 
-Physical isolation and offline media implement "data vault", resisting network attacks
+Fiziksel izolasyon ve çevrimdışı medya ile "veri kasası" uygulama, ağ saldırılarına karşı direnç
 
-#### Blockchain Evidence Storage
+#### Blok Zinciri Kanıt Depolama
 
-Key metadata on-chain, ensuring operation logs are tamper-proof
+Kritik meta verilerin zincir üzerinde olması, işlem kayıtlarının değiştirilemezliğini sağlama
 
-### Green Energy Practices
+### Yeşil Enerji Uygulamaları
 
-#### Near-Zero Power Storage
+#### Sıfıra Yakın Güç Tüketimi
 
-Hard disk power consumption <1W/unit in sleep mode, 70% more energy efficient than traditional solutions
+Uyku modunda sabit disk güç tüketimi <1W/ünite, geleneksel çözümlerden %70 daha enerji verimli
 
-#### Hot-Cold Collaborative Scheduling
+#### Sıcak-Soğuk İşbirliği Zamanlama
 
-AI predicts access cycles, optimizing energy peak load
+AI erişim döngülerini tahmin eder, enerji pik yükünü optimize eder
 
-## Customer Cases
+## Müşteri Örnekleri
 
-### Provincial Archives
+### İl Arşivi
 
-#### Deployed Distributed Magneto-Optical-Electric Hybrid Storage
+#### Dağıtılmış Manyeto-Optik-Elektrik Hibrit Depolama Dağıtıldı
 
-- **10PB** historical document digitization archive
-- **45% ▼** annual maintenance cost reduction
+- **10PB** tarihsel belge dijital arşiv
+- **45% ▼** yıllık bakım maliyetinde azalma
 
-### New Energy Vehicle Manufacturer
+### Yeni Enerji Araç Üreticisi
 
-#### Autonomous Driving Road Test Data Cold Archiving
+#### Otonom Sürüş Yol Testi Verisi Soğuk Arşivleme
 
-- **EB** supports EB-level expansion
-- **99.95% ▲** data recovery SLA reaches 99.95%
+- **EB** EB seviyesinde genişleme desteği
+- **99.95% ▲** veri kurtarma SLA %99.95'e ulaştı
 
-## Core Advantage Comparison
+## Temel Avantaj Karşılaştırması
 
-| Dimension | Traditional Solution | RustFS Solution | Value Gain |
+| Boyut | Geleneksel Çözüm | RustFS Çözümü | Değer Kazancı |
 |-----------|---------------------|-----------------|------------|
-| **Lifespan** | Tape 10-30 years, depends on regular migration | ✓ Media-agnostic + logical redundancy, theoretically permanent storage | Reduce migration costs, avoid technology obsolescence risks |
-| **Energy Consumption** | Tape library standby, power >50W/node | ✓ Intelligent sleep + magneto-optical-electric hybrid architecture, <5W/node | TCO reduced by 60% |
-| **Recovery Speed** | Deep archive defrosting takes days | ✓ Cold data direct read, latency <1 minute | Emergency retrieval efficiency improved 100x↑ |
-| **Compliance** | Manual audit, human vulnerabilities exist | ✓ Automated compliance reports + blockchain evidence | Pass Level 3 Security/ISO 27001 certification |
+| **Ömür** | Teyp 10-30 yıl, düzenli göç gerektirir | ✓ Ortamdan bağımsız + mantıksal yedeklilik, teorik olarak kalıcı depolama | Göç maliyetlerini azaltır, teknoloji eskimesi risklerinden kaçınır |
+| **Enerji Tüketimi** | Teyp kütüphanesi bekleme, güç >50W/düğüm | ✓ Akıllı uyku + manyeto-optik-elektrik hibrit mimari, <5W/düğüm | TCO %60 azaltıldı |
+| **Kurtarma Hızı** | Derin arşiv çözülmesi günler sürer | ✓ Soğuk veri doğrudan okuma, gecikme <1 dakika | Acil geri alma verimliliği 100x↑ iyileştirildi |
+| **Uyumluluk** | Manuel denetim, insan hataları olabilir | ✓ Otomatik uyumluluk raporları + blok zinciri kanıtı | Seviye 3 Güvenlik/ISO 27001 sertifikasını geçin |
 
-## Industry Scenario Empowerment
+## Endüstri Senaryosu Güçlendirme
 
-### Financial Compliance Archiving
+### Finansal Uyumluluk Arşivleme
 
-#### Dual Recording Data Evidence
+#### Çift Kayıt Veri Kanıtı
 
-Millions of audio/video files automatically classified, meeting banking regulator 15-year retention requirements
+Milyonlarca ses/video dosyası otomatik olarak sınıflandırılır, bankacılık düzenleyicisinin 15 yıllık saklama gereksinimlerini karşılar
 
-### Supercomputing Center Cold Backup
+### Süper Bilgisayar Merkezi Soğuk Yedekleme
 
-#### PB-Level Scientific Research Data
+#### PB Seviyesi Bilimsel Araştırma Verisi
 
-Erasure coding + intelligent compression, storage density improved 3x
+Silme kodlama + akıllı sıkıştırma, depolama yoğunluğu 3x iyileştirildi
 
-### Media Asset Library
+### Medya Varlık Kütüphanesi
 
-#### 4K/8K Original Film Archive
+#### 4K/8K Orijinal Film Arşivi
 
-Blu-ray library + object storage linkage, copyright material second-level retrieval
+Blu-ray kütüphanesi + nesne depolama bağlantısı, telif malzemesi saniye seviyesi geri alma
 
-## Contact Us
+## Bize Ulaşın
 
-Contact us immediately to get century-long storage cost optimization solutions
+Yüzyıl boyunca depolama maliyet optimizasyon çözümleri için hemen bizimle iletişime geçin

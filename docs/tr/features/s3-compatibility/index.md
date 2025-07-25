@@ -1,51 +1,51 @@
-# Amazon S3 Compatibility
+# Amazon S3 Uyumluluğu
 
-S3 compatibility is a hard requirement for cloud-native applications. RustFS steadfastly adheres to using the API and has tens of thousands of users, including commercial users and the community. RustFS's S3 implementation is the world's most widely tested and deployed alternative to AWS S3.
+S3 uyumluluğu, bulut yerel uygulamalar için zorunlu bir gereksinimdir. RustFS, API kullanımına sıkı sıkıya bağlı kalır ve on binlerce kullanıcıya sahiptir, bunlar arasında ticari kullanıcılar ve topluluk üyeleri de bulunmaktadır. RustFS'in S3 uygulamasının, AWS S3'e en yaygın test edilmiş ve dağıtılmış alternatif olduğu kabul edilir.
 
-## RustFS and S3 API - Designed for Multi-Cloud Storage
+## RustFS ve S3 API - Çoklu Bulut Depolama İçin Tasarlanmıştır
 
-RustFS has established itself as the standard for AWS S3 compatibility from the beginning. As one of the earliest adopters of the S3 API (V2 and V4) and one of the only storage companies focused exclusively on S3, RustFS's large community ensures no other AWS alternative is more compatible. The S3 API is the de facto standard in the cloud, so AWS alternatives must be able to use the API fluently to operate and interoperate across different environments (public cloud, private cloud, data center, multi-cloud, hybrid cloud, and edge).
+RustFS, başından beri AWS S3 uyumluluğu için standart olarak kabul edilmiştir. S3 API'sinin (V2 ve V4) en erken benimseyenlerinden biri ve yalnızca S3'e odaklanan birkaç depolama şirketinden biri olarak, RustFS'in büyük topluluğu sayesinde hiçbir AWS alternatifinin daha uyumlu olmadığını garanti eder. S3 API, bulutta bir de facto standart haline gelmiştir, bu nedenle AWS alternatifleri, farklı ortamlarda (genel bulut, özel bulut, veri merkezi, çoklu bulut, hibrit bulut ve kenar) çalışmak ve birlikte çalışmak için bu API'yi akıcı bir şekilde kullanabilmelidir.
 
-## S3 Enables Hybrid and Multi-Cloud Computing
+## S3, Hibrit ve Çoklu Bulut Bilgi İşlemi Sağlar
 
-There is only one path to achieving multi-cloud and hybrid cloud compatibility, and that is S3. As a RESTful API standard, S3 has revolutionized interactions between applications, data, and infrastructure. Additionally, the dual forces of containerization and Kubernetes orchestration are also built around RESTful APIs, relegating POSIX APIs to legacy status.
+Çoklu bulut ve hibrit bulut uyumluluğunu elde etmenin tek yolu S3'tür. RESTful API standardı olarak, S3, uygulamalar, veri ve altyapı arasındaki etkileşimleri devrimleştirmiştir. Ayrıca, konteynerleştirme ve Kubernetes orkestrasyonunun da RESTful API'ler etrafında inşa edilmesi, POSIX API'lerini eski statüye indirmiştir.
 
-The result is that Kubernetes-native, S3-compatible object storage and applications can run anywhere - from various public cloud instances (RustFS has nearly 1 million deployments on Google, Azure, and AWS) to private clouds (Red Hat OpenShift, VMware Tanzu), to bare metal. By leveraging advanced S3 API-driven ILM technology, enterprises can perform operationally optimized instances across cloud and on-premises instances.
+Sonuç olarak, Kubernetes yerel, S3 uyumlu nesne depolama ve uygulamalar her yerde çalışabilir - çeşitli genel bulut örneklerinde (RustFS, Google, Azure ve AWS üzerinde neredeyse 1 milyon dağıtım), özel bulutlarda (Red Hat OpenShift, VMware Tanzu) ve çıplak metal üzerinde. Gelişmiş S3 API odaklı ILM teknolojisini kullanarak, işletmeler bulut ve yerel örnekler arasında operasyonel olarak optimize edilmiş örnekler gerçekleştirebilir.
 
-Customers interested in S3 conversion layers for Microsoft Azure can purchase the RustFS Blob Storage Gateway (S3 API) from Azure Marketplace.
+Microsoft Azure için S3 dönüştürme katmanlarına ilgi duyan müşteriler, Azure Marketplace'den RustFS Blob Depolama Ağ Geçidini (S3 API) satın alabilirler.
 
-## S3 Compatibility for Bare Metal Workloads
+## Çıplak Metal İş Yükleri İçin S3 Uyumluluğu
 
-Private cloud is a fundamental building block of any hybrid cloud architecture. This means that, like public clouds, S3 compatibility is crucial - regardless of the application - from analytics to artifacts to archiving.
+Özel bulut, herhangi bir hibrit bulut mimarisinin temel yapı taşlarından biridir. Bu, genel bulutlarda olduğu gibi, uygulama türünden bağımsız olarak (analitikten eserlere ve arşivlemeye kadar) S3 uyumluluğunun kritik olduğunu gösterir.
 
-With RustFS, S3 compatibility is completely location-independent. This means RustFS's bare metal on-premises instances have exactly the same S3 compatibility and performance as public cloud instances or even edge instances.
+RustFS ile S3 uyumluluğu tamamen konumdan bağımsızdır. Bu, RustFS'in çıplak metal yerel örneklerinin, genel bulut örnekleri veya hatta kenar örnekleri ile tamamen aynı S3 uyumluluğuna ve performansına sahip olduğu anlamına gelir.
 
-## Advantages of RustFS Scalable Object Storage
+## RustFS Ölçeklenebilir Nesne Depolamanın Avantajları
 
-Cloud-native applications use the S3 API to communicate with object storage. But not all S3 compatibility is the same - many object storage vendors only support a small subset of overall functionality - which can cause application failures. Others claim comprehensive coverage, but their proprietary software or device models limit this claim, as only a small portion of applications, hardware, and software are tested.
+Bulut yerel uygulamalar, nesne depolama ile iletişim kurmak için S3 API'sini kullanır. Ancak tüm S3 uyumluluğu aynı değildir - birçok nesne depolama satıcısı yalnızca genel işlevselliğin küçük bir alt kümesini destekler - bu da uygulama hatalarına neden olabilir. Diğerleri kapsamlı kapsama iddiasında bulunur, ancak bu iddialar, yalnızca küçük bir bölümün test edildiği özel yazılım veya cihaz modelleri tarafından sınırlandırılır.
 
-RustFS's uniqueness lies in its ability to support its S3 compatibility claims. We have tens of thousands of customers and open-source users, and our S3 API compatibility is the most widely tested and implemented in the world - covering millions of hardware, software, and application combinations. RustFS releases software weekly, and any defects in the S3 API are immediately reported by the community and corrected by RustFS.
+RustFS'in benzersizliği, S3 uyumluluk iddialarını destekleme yeteneğinde yatar. On binlerce müşteriye ve açık kaynak kullanıcısına sahibiz ve S3 API uyumluluğumuz, milyonlarca donanım, yazılım ve uygulama kombinasyonunu kapsayan dünyada en yaygın test edilmiş ve uygulanmıştır. RustFS, haftalık olarak yazılım yayınlar ve S3 API'sindeki herhangi bir kusur hemen topluluk tarafından bildirilir ve RustFS tarafından düzeltilir.
 
-There are rumors that even Amazon uses RustFS to test third-party S3 compatibility.
+Hatta Amazon'un üçüncü taraf S3 uyumluluğunu test etmek için RustFS kullandığına dair söylentiler vardır.
 
-The most comprehensive support for the S3 API means applications can leverage data stored in RustFS on any hardware, any location, and any cloud. Developers are free to innovate and iterate, confident that RustFS will never break versions.
+S3 API'si için en kapsamlı destek, uygulamaların verileri RustFS üzerinde herhangi bir donanımda, herhangi bir konumda ve herhangi bir bulutta depolayabilmesini sağlar. Geliştiriciler, RustFS'in sürümleri hiçbir zaman bozmayacağına güvenerek yenilik yapabilir ve yineleyebilirler.
 
-## Core Features
+## Temel Özellikler
 
 ### S3 Select
 
 ![S3 Select](images/s1-4.png)
 
-S3 Select depends on large-scale performance for complex queries, and RustFS performance characteristics can fully leverage the API. RustFS leverages SIMD instruction sets to optimize performance at the chip level, capable of running large, complex S3 Select queries on CSV, Parquet, JSON, and more.
+S3 Select, karmaşık sorgular için büyük ölçekli performansa dayanır ve RustFS performans özellikleri API'yi tam olarak kullanabilir. RustFS, performansı çip düzeyinde optimize etmek için SIMD talimat setlerini kullanır ve CSV, Parquet, JSON ve daha fazlası üzerinde büyük, karmaşık S3 Select sorgularını çalıştırabilir.
 
-### Amazon Signature V4
+### Amazon İmza V4
 
-![Amazon Signature V4](images/s1-5.png)
+![Amazon İmza V4](images/s1-5.png)
 
-Applications and clients must authenticate to access any RustFS management API. RustFS was the first company to support AWS Signature Version 4 (supporting the deprecated Signature Version 2). After authentication, RustFS uses policy-based access control compatible with AWS IAM policy syntax, structure, and behavior to authorize operations.
+Uygulamalar ve istemciler, herhangi bir RustFS yönetim API'sine erişmek için kimlik doğrulaması yapmalıdır. RustFS, AWS İmza Sürüm 4'ü destekleyen ilk şirketti (eski İmza Sürüm 2'yi de destekler). Kimlik doğrulamasından sonra, RustFS, işlemleri yetkilendirmek için AWS IAM politika sözdizimi, yapısı ve davranışıyla uyumlu politika tabanlı erişim kontrolü kullanır.
 
-## AWS S3 API and RustFS
+## AWS S3 API ve RustFS
 
-RustFS is the world's fastest object storage. Combined with its S3 compatibility, it ensures it can run the industry's widest set of use cases. This includes modern application workloads such as GitHub and GitLab for code repositories, modern analytics workloads such as MongoDB, ClickHouse, MariaDB, CockroachDB, and Teradata, to traditional archiving, backup, and disaster recovery use cases.
+RustFS, dünyanın en hızlı nesne depolama sistemidir. S3 uyumluluğu ile birleştirildiğinde, endüstrinin en geniş kullanım durumları setini çalıştırabilmesini sağlar. Bu, kod havuzları için GitHub ve GitLab gibi modern uygulama iş yüklerini, MongoDB, ClickHouse, MariaDB, CockroachDB ve Teradata gibi modern analiz iş yüklerini ve geleneksel arşivleme, yedekleme ve felaket kurtarma kullanım durumlarını içerir.
 
-RustFS's performance characteristics, combined with its S3 compatibility, make it the standard for AI/ML and data science workloads. KubeFlow and TensorFlow require high-performance S3-compatible object storage and are increasingly designed first for RustFS, then for AWS or other clouds. RustFS provides truly multi-cloud object storage and efficient replication for applications. Applications written for the S3 API can run anywhere, enabling developers to innovate quickly when the best cloud tools are available.
+RustFS'in performans özellikleri, S3 uyumluluğu ile birleştirildiğinde, onu AI/ML ve veri bilimi iş yükleri için standart haline getirir. KubeFlow ve TensorFlow, yüksek performanslı S3 uyumlu nesne depolamaya ihtiyaç duyar ve giderek daha fazla RustFS için, ardından AWS veya diğer bulutlar için tasarlanır. RustFS, gerçekten çoklu bulut nesne depolama ve uygulamalar için verimli çoğaltma sağlar. S3 API'si için yazılmış uygulamalar her yerde çalışabilir, böylece geliştiriciler en iyi bulut araçları mevcut olduğunda hızlı bir şekilde yenilik yapabilirler.

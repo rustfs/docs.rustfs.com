@@ -1,80 +1,97 @@
 ---
-title: "Security Checklist"
-description: "RustFS Security Checklist (for enterprise deployers). RustFS is a high-performance distributed object storage software developed in Rust, released under the Apache 2.0 open source license."
+title: "Güvenlik Kontrol Listesi"
+description: "RustFS Güvenlik Kontrol Listesi (kurumsal dağıtıcılar için). RustFS, Apache 2.0 açık kaynak lisansı altında yayınlanan, Rust ile geliştirilmiş yüksek performanslı dağıtık nesne depolama yazılımıdır."
+---
+# Güvenlik Kontrol Listesi
+
+> Kurumların RustFS'yi güvenli bir şekilde dağıtmasına yardımcı olmak için, resmi RustFS güvenlik uygulaması önerilerine başvurduk ve aşağıdaki en iyi güvenlik uygulamalarını derledik. Dağıtım sırasında her bir maddeyi kontrol etmenizi ve sistem güvenliğini ve güvenilirliğini sağlamanızı öneririz.
+
+## 1. Kimlik Doğrulama ve Erişim Kontrolü
+
+- **S3 Uyumlu Anahtar Doğrulaması Kullanın**
+
+ RustFS, kimlik doğrulaması için AWS İmza V4'e benzer bir imza mekanizması kullanır. Her kullanıcı veya hizmet, erişim için geçerli Erişim Anahtarı ve Gizli Anahtar kullanmalıdır; asla doğrulama adımlarını atlamayın.
+
+- **Politika Tabanlı Erişim Kontrolü**
+
+ Farklı roller ve kullanıcılar için en az ayrıcalık prensibine göre erişim politikaları tanımlayın. Grup politikaları ve kullanıcı politikaları ayarlayabilir, izin verilen S3 işlemlerini açıkça belirtebilirsiniz. Varsayılan olarak, politikada açıkça yetkilendirilmemiş işlemler reddedilmelidir.
+
+## 2. Ağ Taşımacılığı Şifreleme (TLS/SSL)
+
+- **TLS/SSL Şifrelemeyi Etkinleştirin**
+
+ RustFS dağıtımı sırasında geçerli SSL sertifikaları ve özel anahtarlar yapılandırın. Dış ve iç ağ erişimi için farklı alan adları için sertifikalar kullanmanız ve TLS 1.2 veya daha yüksek güvenlik protokollerini benimsemeniz önerilir.
+
+- **Sertifika Yönetimi**
+
+ Sertifikaların güvenilir Sertifika Otoriteleri (veya dahili kurumsal kök Sertifika Otoriteleri) tarafından verildiğinden emin olun, süresi dolmuş veya kendi kendine imzalanmış sertifikalar kullanmaktan kaçının. Özel anahtar dosyaları, yalnızca RustFS hizmet süreçleri veya özel kullanıcıların okumasına izin veren sıkı dosya izinlerine sahip olmalıdır.
+
+- **Çoklu Alan Adları ve Şifre Setleri**
+
+ Çoklu erişim alanları için bağımsız sertifikalar yapılandırın; anahtar oluştururken önerilen şifreleme algoritmalarını kullanın (örneğin, 2048-bit RSA veya 256-bit ECC).
+
+## 3. Ortam Değişkenleri ve Kimlik Bilgisi Koruma
+
+- **Varsayılan Kimlik Bilgilerini Değiştirin**
+
+ RustFS, başlatma sırasında varsayılan hesaplar kullanıyorsa (örneğin, `rustfsadmin` / `rustfsadmin`), dağıtımdan sonra rastgele karmaşık parolalarla değiştirmeniz gerekir.
+
+- **Kimlik Bilgilerini Güvenli Bir Şekilde Saklayın**
+
+ Düz metin parolaları betiklerde, görüntülerde veya günlüklerde sabit kodlamayın. Ortam değişkenlerini veya Kubernetes Sırlarını kullanarak parolaları yönetin.
+
+## 4. Günlük Kaydı ve Denetim İzleri
+
+- **Denetim Günlüklerini Etkinleştirin**
+
+ RustFS, denetim günlüklerini HTTP Webhook, Kafka, ELK, Splunk vb. gibi harici sistemlere dışa aktarmayı destekler.
+
+- **Çalışma Zamanı Günlük Toplama**
+
+ Farklı platformlarda (örneğin, systemd, Docker, K8s) günlükleri toplamak ve analiz etmek için standart yöntemler kullanın. ELK, Grafana Loki ile kullanmanız önerilir.
+
+- **İzleme ve Uyarılar**
+
+ Oturum açma başarısızlıkları, alışılmadık saatlerde erişim, büyük ölçekli silme işlemleri gibi anormal davranışlar için uyarı bildirimleri ayarlayın.
+
+- **Gözlemlenebilirlik**
+
+ RustFS, gözlemlenebilir ortam dağıtımını destekler, bireysel işlev yürütme sürelerine kadar optimizasyon sağlar. Farklı ortamlar için yapılandırmanızı daha da optimize edebilirsiniz.
+
+## 5. API Erişim Kısıtlamaları
+
+- **Ağ Erişimini Sınırlayın**
+
+ Varsayılan olarak, RustFS S3 API 9000 numaralı portu dinler ve yönetim konsolu 9090 numaralı portu dinler. Güvenlik duvarları veya bulut güvenlik grupları aracılığıyla erişim kaynak IP'lerini kısıtlayın.
+
+- **Ağ İzolasyonu ve Proxy**
+
+ Hizmetleri ters proxy (örneğin, Nginx) aracılığıyla sunmanız önerilir, depolama düğümü IP'lerini doğrudan maruz bırakmaktan kaçının.
+
+- **Gereksiz Portları Kapatın**
+
+ Kullanılmayan portları veya arayüzleri devre dışı bırakın, örneğin, yönetim arayüzlerini genel internete maruz bırakmayın.
+
+## 6. Bir Kere Yaz Çok Kez Oku (WORM)
+
+- **Sürümleme ve Nesne Kilitleme**
+
+ Düzenleyici gereksinimleri karşılamak için (örneğin, finansal, hükümet) nesne sürümleme ve nesne kilitleme politikalarını etkinleştirin.
+
+## 7. Güncellemeler ve Sürüm Yönetimi
+
+- **Yamaları ve Yükseltmeleri Zamanında Uygulayın**
+
+ Resmi RustFS güncelleme bildirimlerini takip edin, düzenli olarak yükseltme yapın ve değişiklik notlarını gözden geçirerek güvenlik açıklarından kaçının.
+
+- **Yıkıcı Olmayan Yükseltme Süreci**
+
+ RustFS, sıcak güncelleme süreçlerini destekler, düğüm düğüm yeniden başlatma yoluyla sıfır kesinti süresi hizmeti sağlar.
+
+- **İşletim Sistemi ve Bağımlılık Yönetimi**
+
+ İşletim sistemleri ve temel bileşenler (örneğin, OpenSSL) için güvenlik açıkları güncellemelerini ve düzeltmelerini izleyin.
+
 ---
 
-# Security Checklist
-
-> To help enterprises securely deploy RustFS, we have referenced official RustFS security practice recommendations and compiled the following security best practices. We recommend checking each item during deployment to ensure system security and reliability.
-
-## 1. Identity Authentication and Access Control
-
-- **Use S3-Compatible Key Authentication**
- RustFS uses a signature mechanism similar to AWS Signature V4 for identity verification. Each user or service must use legitimate Access Key and Secret Key for access; never skip authentication steps.
-
-- **Policy-Based Access Control**
- Define access policies for different roles and users according to the principle of least privilege. You can set group policies and user policies, clearly specifying allowed S3 operations. By default, operations not explicitly authorized in policies should be denied.
-
-## 2. Network Transport Encryption (TLS/SSL)
-
-- **Enable TLS/SSL Encryption**
- Be sure to configure valid SSL certificates and private keys for RustFS during deployment. It's recommended to use certificates for different domain names for external and internal network access, and adopt TLS 1.2 or higher security protocols.
-
-- **Certificate Management**
- Ensure certificates are issued by trusted CAs (or use internal corporate root CAs), avoid using expired or self-signed certificates. Private key files should have strict file permissions, allowing only RustFS service processes or dedicated users to read.
-
-- **Multiple Domains and Cipher Suites**
- Configure independent certificates for multiple access domains; use recommended encryption algorithms (such as 2048-bit RSA or 256-bit ECC) when generating keys.
-
-## 3. Environment Variables and Credential Protection
-
-- **Change Default Credentials**
- If RustFS uses default accounts during initialization (such as `rustfsadmin` / `rustfsadmin`), you must change to random complex passwords after deployment.
-
-- **Secure Credential Storage**
- Don't hardcode plaintext passwords in scripts, images, or logs. Use environment variables or Kubernetes Secrets to manage passwords.
-
-## 4. Logging and Audit Trails
-
-- **Enable Audit Logging**
- RustFS supports exporting audit logs to external systems such as HTTP Webhook, Kafka, ELK, Splunk, etc.
-
-- **Runtime Log Collection**
- Use standard methods to collect and analyze logs on different platforms (such as systemd, Docker, K8s). Recommend using with ELK, Grafana Loki.
-
-- **Monitoring and Alerting**
- Set alert notifications for abnormal behaviors such as login failures, access during unusual hours, large-scale deletions, etc.
-
-- **Observability**
- RustFS supports observable environment deployment, enabling optimization down to individual function execution times. You can further optimize your configuration for different environments.
-
-## 5. API Access Restrictions
-
-- **Limit Network Access**
- By default, RustFS S3 API listens on port 9000, and the management console listens on port 9090. Restrict access source IPs through firewalls or cloud security groups.
-
-- **Network Isolation and Proxy**
- Recommend exposing services through reverse proxy (such as Nginx), avoiding direct exposure of storage node IPs.
-
-- **Close Unnecessary Ports**
- Disable unused ports or interfaces, for example, don't expose management interfaces to the public internet.
-
-## 6. Write Once Read Many (WORM)
-
-- **Versioning and Object Locking**
- Enable object versioning and object locking policies to meet regulatory requirements (such as financial, government).
-
-## 7. Updates and Version Management
-
-- **Timely Application of Patches and Upgrades**
- Follow official RustFS update notifications, regularly upgrade and review change notes to avoid security vulnerabilities.
-
-- **Non-Destructive Upgrade Process**
- RustFS supports hot update processes, enabling zero-downtime service through node-by-node restarts.
-
-- **Operating System and Dependency Management**
- Monitor vulnerability updates and fixes for operating systems and basic components (such as OpenSSL).
-
----
-
-The above is the **RustFS Enterprise Deployment Security Checklist**. Check each item before deployment and regularly review after deployment to significantly reduce risks and improve stability.
+Yukarıda belirtilenler **RustFS Kurumsal Dağıtım Güvenlik Kontrol Listesi**dir. Dağıtımdan önce her bir maddeyi kontrol edin ve dağıtımdan sonra düzenli olarak gözden geçirin, böylece riskleri önemli ölçüde azaltabilir ve stabiliteyi artırabilirsiniz.

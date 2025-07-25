@@ -1,442 +1,443 @@
-# Commvault Integration
+# Commvault Entegrasyonu
 
-RustFS provides seamless integration with Commvault Complete Data Protection, delivering enterprise-scale backup, recovery, and data management solutions with exceptional performance and reliability.
+RustFS, Commvault Complete Data Protection ile sorunsuz bir şekilde entegre olarak, olağanüstü performans ve güvenilirlikle kurumsal ölçekte yedekleme, kurtarma ve veri yönetimi çözümleri sunar.
 
-## Overview
+## Genel Bakış
 
-![Commvault Logo](./images/commvault-logo.png)
+![Commvault Logosu](./images/commvault-logo.png)
 
-RustFS with Commvault offers:
+RustFS ile Commvault şunları sunar:
 
-- **Enterprise Data Protection**: Comprehensive backup and recovery for all workloads
-- **Cloud-Scale Storage**: Massively scalable object storage backend
-- **Advanced Data Management**: Intelligent data lifecycle management
-- **Unified Platform**: Single platform for backup, archive, and analytics
+- **Kurumsal Veri Koruma**: Tüm iş yükleri için kapsamlı yedekleme ve kurtarma
+- **Bulut Ölçeğinde Depolama**: Kütle olarak ölçeklenebilir nesne depolama altyapısı
+- **Gelişmiş Veri Yönetimi**: Akıllı veri yaşam döngüsü yönetimi
+- **Birleşik Platform**: Yedekleme, arşivleme ve analiz için tek platform
 
-## Key Advantages
+## Ana Avantajlar
 
-### Atomic Metadata Operations
+### Atomik Meta Veri İşlemleri
 
-![Atomic Metadata](./images/atomic-metadata.png)
+![Atomik Meta Veri](./images/atomic-metadata.png)
 
-#### Consistent Metadata
+#### Tutarlı Meta Veri
 
-- **ACID Transactions**: Atomic, consistent, isolated, durable operations
-- **Metadata Integrity**: Guaranteed metadata consistency
-- **Fast Recovery**: Rapid recovery with consistent metadata
-- **Concurrent Operations**: High concurrency without conflicts
+- **ACID İşlemleri**: Atomik, tutarlı, izole, dayanıklı işlemler
+- **Meta Veri Bütünlüğü**: Garantili meta veri tutarlılığı
+- **Hızlı Kurtarma**: Tutarlı meta veri ile hızlı kurtarma
+- **Eşzamanlı İşlemler**: Çatışma olmadan yüksek eşzamanlılık
 
-### Fast Performance at Scale
+### Ölçekte Hızlı Performans
 
-![Fast Performance](./images/fast-performance.png)
+![Hızlı Performans](./images/fast-performance.png)
 
-#### High-Throughput Operations
+#### Yüksek Verimli İşlemler
 
-- **Parallel Processing**: Massive parallel backup and restore
-- **Optimized I/O**: Optimized for data protection workloads
-- **Intelligent Caching**: Smart caching for frequently accessed data
-- **Linear Scaling**: Performance scales with cluster growth
+- **Paralel İşleme**: Kütle paralel yedekleme ve geri yükleme
+- **Optimize Edilmiş G/Ç**: Veri koruma iş yükleri için optimize edilmiş
+- **Akıllı Önbellekleme**: Sık erişilen veriler için akıllı önbellekleme
+- **Doğrusal Ölçekleme**: Performans küme büyümesi ile ölçeklenir
 
-### Unmatched Scalability
+### Eşsiz Ölçeklenebilirlik
 
-![Scalability](./images/scalability.png)
+![Ölçeklenebilirlik](./images/scalability.png)
 
-#### Elastic Scaling
+#### Esnek Ölçekleme
 
-- **Petabyte Scale**: Scale to petabytes of backup data
-- **Horizontal Scaling**: Add nodes for capacity and performance
-- **Auto-Scaling**: Automatic scaling based on demand
-- **Global Namespace**: Unified namespace across all nodes
+- **Petabayt Ölçeği**: Petabaytlarca yedekleme verisine ölçeklenme
+- **Yatay Ölçekleme**: Kapasite ve performans için düğüm ekleme
+- **Oto-Ölçekleme**: Talebe göre otomatik ölçekleme
+- **Küresel Ad Alanı**: Tüm düğümler arasında birleşik ad alanı
 
-### Simple and Secure Architecture
+### Basit ve Güvenli Mimari
 
-![Simple Secure](./images/simple-secure.png)
+![Basit Güvenli](./images/simple-secure.png)
 
-#### Enterprise Security
+#### Kurumsal Güvenlik
 
-- **End-to-End Encryption**: Encryption at rest and in transit
-- **Access Controls**: Fine-grained access control policies
-- **Audit Logging**: Comprehensive audit trails
-- **Compliance**: Meet regulatory compliance requirements
+- **Uçtan Uca Şifreleme**: Dinlenirken ve aktarımda şifreleme
+- **Erişim Kontrolleri**: İnce taneli erişim kontrol politikaları
+- **Denetim Günlükleri**: Kapsamlı denetim izleri
+- **Uyumluluk**: Düzenleyici uyumluluk gereksinimlerini karşılama
 
-## Commvault Integration Features
+## Commvault Entegrasyon Özellikleri
 
-### Storage Integration
+### Depolama Entegrasyonu
 
-#### Disk Library Configuration
+#### Disk Kütüphanesi Yapılandırması
 
-- **Disk Library**: Configure RustFS as Commvault disk library
-- **Deduplication**: Global deduplication across all data
-- **Compression**: Advanced compression algorithms
-- **Encryption**: Hardware-accelerated encryption
+- **Disk Kütüphanesi**: RustFS'i Commvault disk kütüphanesi olarak yapılandırın
+- **Yinelenen Veri Giderme**: Tüm veriler arasında küresel yinelenen veri giderme
+- **Sıkıştırma**: Gelişmiş sıkıştırma algoritmaları
+- **Şifreleme**: Donanım hızlandırımlı şifreleme
 
-#### Cloud Storage Integration
+#### Bulut Depolama Entegrasyonu
 
-- **Cloud Library**: Use RustFS as cloud storage library
-- **S3 Compatibility**: Full Amazon S3 API compatibility
-- **Hybrid Deployment**: Seamless hybrid cloud deployment
-- **Cost Optimization**: Intelligent storage tiering
+- **Bulut Kütüphanesi**: RustFS'i bulut depolama kütüphanesi olarak kullanın
+- **S3 Uyumluluğu**: Tam Amazon S3 API uyumluluğu
+- **Hibrit Dağıtım**: Sorunsuz hibrit bulut dağıtımı
+- **Maliyet Optimizasyonu**: Akıllı depolama katmanlandırma
 
-### Data Protection Capabilities
+### Veri Koruma Yetkinlikleri
 
-#### Backup and Recovery
+#### Yedekleme ve Kurtarma
 
-- **Application-Aware**: Application-consistent backups
-- **Granular Recovery**: File, folder, and application-level recovery
-- **Instant Recovery**: Fast recovery with minimal RTO
-- **Cross-Platform**: Support for all major platforms
+- **Uygulama Bilinçli**: Uygulama tutarlı yedeklemeler
+- **Detaylı Kurtarma**: Dosya, klasör ve uygulama seviyesi kurtarma
+- **Anında Kurtarma**: Minimal RTO ile hızlı kurtarma
+- **Çapraz Platform**: Tüm büyük platformlar için destek
 
-#### Archive and Compliance
+#### Arşiv ve Uyumluluk
 
-- **Intelligent Archiving**: Policy-based data archiving
-- **Legal Hold**: Legal hold and litigation support
-- **Retention Management**: Flexible retention policies
-- **Compliance Reporting**: Automated compliance reporting
+- **Akıllı Arşivleme**: Politika tabanlı veri arşivleme
+- **Yasal Tutma**: Yasal tutma ve dava desteği
+- **Saklama Yönetimi**: Esnek saklama politikaları
+- **Uyumluluk Raporlama**: Otomatik uyumluluk raporlama
 
-## Deployment Architectures
+## Dağıtım Mimarileri
 
-### On-Premises Data Protection
+### Şirket İçi Veri Koruma
 
 ```
 ┌─────────────────┐    ┌─────────────────┐
-│   Production    │    │   CommServe     │
-│   Environment   │───►│   + MediaAgent  │
-│                 │    │                 │
-│ • Servers       │    │ ┌─────────────┐ │
-│ • Databases     │    │ │   RustFS    │ │
-│ • Applications  │    │ │   Storage   │ │
-│ • VMs           │    │ │   Library   │ │
-└─────────────────┘    │ └─────────────┘ │
+│   Üretim Ortamı │    │   CommServe      │
+│                 │───►│   + MediaAgent   │
+│                 │    │                  │
+│ • Sunucular     │    │ ┌─────────────┐  │
+│ • Veritabanları │    │ │   RustFS     │  │
+│ • Uygulamalar   │    │ │   Depolama   │  │
+│ • VM'ler        │    │ │   Kütüphanesi│  │
+└─────────────────┘    │ └─────────────┘  │
                        └─────────────────┘
 ```
 
-### Hybrid Cloud Architecture
+### Hibrit Bulut Mimarisi
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   On-Premises   │    │   Primary       │    │   Cloud         │
-│   Production    │───►│   Backup        │───►│   Archive       │
+│   Şirket İçi    │    │   Birincil       │    │   Bulut         │
+│   Üretim       │───►│   Yedekleme      │───►│   Arşiv         │
 │                 │    │   (RustFS)      │    │   (RustFS)      │
-│ • Primary Data  │    │                 │    │                 │
-│ • Applications  │    │ • Fast Recovery │    │ • Long-term     │
-│ • Databases     │    │ • Deduplication │    │ • Compliance    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+│ • Birincil Veri │    │                  │    │                  │
+│ • Uygulamalar  │    │ • Hızlı Kurtarma │    │ • Uzun Vadeli    │
+│ • Veritabanları │    │ • Yinelenen Veri │    │ • Uyumluluk     │
+└─────────────────┘    │   Giderme       │    │                  │
+                       └─────────────────┘    └─────────────────┘
 ```
 
-### Multi-Site Data Protection
+### Çoklu Site Veri Koruma
 
 ```
 ┌─────────────────┐    ┌─────────────────┐
-│   Primary DC    │    │   DR Site       │
-│                 │◄──►│                 │
+│   Birincil DC   │    │   DR Sitesi      │
+│                 │◄──►│                  │
 │ ┌─────────────┐ │    │ ┌─────────────┐ │
-│ │ Production  │ │    │ │ DR Systems  │ │
+│ │ Üretim      │ │    │ │ DR Sistemleri │ │
 │ └─────────────┘ │    │ └─────────────┘ │
-│                 │    │                 │
+│                 │    │                  │
 │ ┌─────────────┐ │    │ ┌─────────────┐ │
-│ │   RustFS    │ │    │ │   RustFS    │ │
-│ │   Primary   │ │    │ │   Replica   │ │
+│ │   RustFS     │ │    │ │   RustFS     │ │
+│ │   Birincil   │ │    │ │   Replika    │ │
 │ └─────────────┘ │    │ └─────────────┘ │
 └─────────────────┘    └─────────────────┘
 ```
 
-## Configuration and Setup
+## Yapılandırma ve Kurulum
 
-### Commvault Configuration
+### Commvault Yapılandırması
 
-#### Disk Library Setup
-
-```bash
-# Configure RustFS as disk library
-# Via Commvault Command Center
-1. Storage → Disk → Create Disk Library
-2. Library Name: RustFS-Library
-3. MediaAgent: Select appropriate MediaAgent
-4. Mount Path: /mnt/rustfs
-5. Enable Deduplication: Yes
-6. Encryption: Enable
-```
-
-#### Cloud Library Configuration
+#### Disk Kütüphanesi Kurulumu
 
 ```bash
-# Configure RustFS as cloud library
-1. Storage → Cloud → Create Cloud Library
-2. Cloud Storage: Generic S3
-3. Service Host: rustfs.example.com
-4. Access Key: your-access-key
-5. Secret Key: your-secret-key
-6. Container: commvault-backups
+# RustFS'i disk kütüphanesi olarak yapılandırın
+# Commvault Command Center üzerinden
+1. Depolama → Disk → Disk Kütüphanesi Oluştur
+2. Kütüphane Adı: RustFS-Kütüphanesi
+3. MediaAgent: Uygun MediaAgent'i seçin
+4. Bağlama Yolu: /mnt/rustfs
+5. Yinelenen Veri Gidermeyi Etkinleştir: Evet
+6. Şifreleme: Etkinleştir
 ```
 
-### Storage Policy Configuration
+#### Bulut Kütüphanesi Yapılandırması
 
-#### Backup Storage Policies
+```bash
+# RustFS'i bulut kütüphanesi olarak yapılandırın
+1. Depolama → Bulut → Bulut Kütüphanesi Oluştur
+2. Bulut Depolama: Genel S3
+3. Servis Ana Bilgisayarı: rustfs.example.com
+4. Erişim Anahtarı: erişim-anahtarınız
+5. Gizli Anahtar: gizli-anahtarınız
+6. Konteyner: commvault-yedeklemeleri
+```
 
-- **Primary Copy**: High-performance storage for recent backups
-- **Secondary Copy**: Cost-optimized storage for older backups
-- **Archive Copy**: Long-term retention and compliance
-- **Auxiliary Copy**: Disaster recovery and replication
+### Depolama Politikası Yapılandırması
 
-#### Data Aging Policies
+#### Yedekleme Depolama Politikaları
 
-- **Retention Rules**: Define retention periods for different data types
-- **Aging Policies**: Automatic movement between storage tiers
-- **Pruning**: Automatic deletion of expired data
-- **Compliance**: Meet regulatory retention requirements
+- **Birincil Kopya**: Yakın zamandaki yedeklemeler için yüksek performanslı depolama
+- **İkincil Kopya**: Daha eski yedeklemeler için maliyet optimize edilmiş depolama
+- **Arşiv Kopyası**: Uzun vadeli saklama ve uyumluluk
+- **Yardımcı Kopya**: Felaket kurtarma ve çoğaltma
 
-## Workload Protection
+#### Veri Yaşlandırma Politikaları
 
-### Virtual Machine Protection
+- **Saklama Kuralları**: Farklı veri türleri için saklama süreleri tanımlayın
+- **Yaşlandırma Politikaları**: Depolama katmanları arasında otomatik hareket
+- **Budama**: Süresi dolmuş verilerin otomatik silinmesi
+- **Uyumluluk**: Düzenleyici saklama gereksinimlerini karşılayın
+
+## İş Yükü Koruması
+
+### Sanal Makine Koruması
 
 #### VMware vSphere
 
-- **vCenter Integration**: Native vCenter integration
-- **Changed Block Tracking**: Incremental backup optimization
-- **Application Consistency**: VSS-aware backups
-- **Instant Recovery**: Fast VM recovery and failover
+- **vCenter Entegrasyonu**: Yerel vCenter entegrasyonu
+- **Değişen Blok İzleme**: Artımlı yedekleme optimizasyonu
+- **Uygulama Tutarlılığı**: VSS bilinçli yedeklemeler
+- **Anında Kurtarma**: Hızlı VM kurtarma ve devralma
 
 #### Microsoft Hyper-V
 
-- **SCVMM Integration**: System Center integration
+- **SCVMM Entegrasyonu**: System Center entegrasyonu
 - **Hyper-V VSS**: Volume Shadow Copy Service
-- **Live Migration**: Backup during live migration
-- **Cluster Support**: Failover cluster support
+- **Canlı Göç**: Canlı göç sırasında yedekleme
+- **Küme Desteği**: Devralma kümesi desteği
 
-### Database Protection
+### Veritabanı Koruması
 
 #### Microsoft SQL Server
 
-- **SQL VSS Writer**: Application-consistent backups
-- **Log Shipping**: Transaction log backup and shipping
-- **Always On**: Always On Availability Groups support
-- **Granular Recovery**: Database, table, and row-level recovery
+- **SQL VSS Writer**: Uygulama tutarlı yedeklemeler
+- **Günlük Gönderimi**: İşlem günlüğü yedekleme ve gönderimi
+- **Always On**: Always On Kullanılabilirlik Grupları desteği
+- **Detaylı Kurtarma**: Veritabanı, tablo ve satır seviyesi kurtarma
 
-#### Oracle Database
+#### Oracle Veritabanı
 
-- **RMAN Integration**: Oracle Recovery Manager integration
-- **Data Guard**: Oracle Data Guard support
-- **RAC Support**: Real Application Clusters support
-- **Point-in-Time Recovery**: Granular point-in-time recovery
+- **RMAN Entegrasyonu**: Oracle Recovery Manager entegrasyonu
+- **Data Guard**: Oracle Data Guard desteği
+- **RAC Desteği**: Gerçek Uygulama Kümeleri desteği
+- **Zamana Göre Kurtarma**: Detaylı zamana göre kurtarma
 
-#### Other Databases
+#### Diğer Veritabanları
 
-- **MySQL**: MySQL database protection
-- **PostgreSQL**: PostgreSQL backup and recovery
-- **MongoDB**: NoSQL database protection
-- **SAP HANA**: SAP HANA database backup
+- **MySQL**: MySQL veritabanı koruması
+- **PostgreSQL**: PostgreSQL yedekleme ve kurtarma
+- **MongoDB**: NoSQL veritabanı koruması
+- **SAP HANA**: SAP HANA veritabanı yedekleme
 
-### File System Protection
+### Dosya Sistemi Koruması
 
-#### Windows File Systems
+#### Windows Dosya Sistemleri
 
-- **NTFS**: Windows NTFS file system
-- **Share Protection**: Network share backup
-- **VSS Integration**: Volume Shadow Copy Service
-- **Open File Backup**: Backup of open and locked files
+- **NTFS**: Windows NTFS dosya sistemi
+- **Paylaşım Koruması**: Ağ paylaşımı yedekleme
+- **VSS Entegrasyonu**: Volume Shadow Copy Service
+- **Açık Dosya Yedekleme**: Açık ve kilitli dosyaların yedeklenmesi
 
-#### Unix/Linux File Systems
+#### Unix/Linux Dosya Sistemleri
 
-- **ext4/XFS**: Linux file system support
-- **NFS**: Network File System backup
-- **Snapshot Integration**: LVM and filesystem snapshots
-- **Symbolic Links**: Preserve symbolic links and permissions
+- **ext4/XFS**: Linux dosya sistemi desteği
+- **NFS**: Ağ Dosya Sistemi yedekleme
+- **Anlık Görüntü Entegrasyonu**: LVM ve dosya sistemi anlık görüntüleri
+- **Sembolik Bağlantılar**: Sembolik bağlantılar ve izinlerin korunması
 
-### Application Protection
+### Uygulama Koruması
 
 #### Microsoft Exchange
 
-- **Exchange VSS**: Exchange-aware backups
-- **Mailbox Recovery**: Individual mailbox recovery
-- **Database Recovery**: Exchange database recovery
-- **Public Folder**: Public folder backup and recovery
+- **Exchange VSS**: Exchange bilinçli yedeklemeler
+- **Posta Kutusu Kurtarma**: Bireysel posta kutusu kurtarma
+- **Veritabanı Kurtarma**: Exchange veritabanı kurtarma
+- **Genel Klasör**: Genel klasör yedekleme ve kurtarma
 
 #### Microsoft SharePoint
 
-- **SharePoint VSS**: SharePoint-aware backups
-- **Site Collection**: Site collection backup and recovery
-- **Content Database**: Content database protection
-- **Search Index**: Search index backup and recovery
+- **SharePoint VSS**: SharePoint bilinçli yedeklemeler
+- **Site Koleksiyonu**: Site koleksiyonu yedekleme ve kurtarma
+- **İçerik Veritabanı**: İçerik veritabanı koruması
+- **Arama İndeksi**: Arama indeksi yedekleme ve kurtarma
 
-#### Enterprise Applications
+#### Kurumsal Uygulamalar
 
-- **SAP**: SAP application backup
+- **SAP**: SAP uygulama yedekleme
 - **Lotus Notes**: IBM Lotus Notes/Domino
-- **Active Directory**: Active Directory backup
-- **File Shares**: Network file share protection
+- **Active Directory**: Active Directory yedekleme
+- **Dosya Paylaşımları**: Ağ dosya paylaşımı koruması
 
-## Data Management and Analytics
+## Veri Yönetimi ve Analitik
 
-### Content Indexing
+### İçerik İndeksleme
 
-#### Search and Discovery
+#### Arama ve Keşif
 
-- **Full-Text Search**: Search across all backup data
-- **Metadata Indexing**: Index file and application metadata
-- **Content Analytics**: Analyze data patterns and trends
-- **eDiscovery**: Legal discovery and compliance
+- **Tam Metin Arama**: Tüm yedekleme verilerinde arama
+- **Meta Veri İndeksleme**: Dosya ve uygulama meta verilerini indeksleme
+- **İçerik Analitiği**: Veri kalıplarını ve trendlerini analiz etme
+- **eKeşif**: Yasal keşif ve uyumluluk
 
-#### Data Classification
+#### Veri Sınıflandırma
 
-- **Automatic Classification**: AI-powered data classification
-- **Policy-Based**: Rule-based classification policies
-- **Sensitive Data**: Identify and protect sensitive data
-- **Compliance**: Meet data governance requirements
+- **Otomatik Sınıflandırma**: AI destekli veri sınıflandırma
+- **Politika Tabanlı**: Kural tabanlı sınıflandırma politikaları
+- **Duyarlı Veri**: Duyarlı verileri tanımlama ve koruma
+- **Uyumluluk**: Veri yönetişim gereksinimlerini karşılama
 
-### Data Lifecycle Management
+### Veri Yaşam Döngüsü Yönetimi
 
-#### Intelligent Data Movement
+#### Akıllı Veri Hareketi
 
-- **Policy-Based Tiering**: Automatic data movement between tiers
-- **Cost Optimization**: Optimize storage costs
-- **Performance Optimization**: Balance performance and cost
-- **Compliance**: Meet retention and compliance requirements
+- **Politika Tabanlı Katmanlandırma**: Katmanlar arasında otomatik veri hareketi
+- **Maliyet Optimizasyonu**: Depolama maliyetlerini optimize etme
+- **Performans Optimizasyonu**: Performans ve maliyet dengesini sağlama
+- **Uyumluluk**: Saklama ve uyumluluk gereksinimlerini karşılama
 
-#### Archive and Retention
+#### Arşiv ve Saklama
 
-- **Automated Archiving**: Policy-based data archiving
-- **Legal Hold**: Legal hold and litigation support
-- **Retention Policies**: Flexible retention management
-- **Disposition**: Secure data disposal
+- **Otomatik Arşivleme**: Politika tabanlı veri arşivleme
+- **Yasal Tutma**: Yasal tutma ve dava desteği
+- **Saklama Politikaları**: Esnek saklama yönetimi
+- **Bertaraf**: Güvenli veri imhası
 
-## Security and Compliance
+## Güvenlik ve Uyumluluk
 
-### Data Security
+### Veri Güvenliği
 
-#### Encryption
+#### Şifreleme
 
-- **AES-256 Encryption**: Strong encryption for data at rest
-- **In-Transit Encryption**: TLS encryption for data transfer
-- **Key Management**: Centralized encryption key management
-- **Hardware Security**: Hardware security module support
+- **AES-256 Şifreleme**: Dinlenirken veriler için güçlü şifreleme
+- **Aktarımda Şifreleme**: Veri transferi için TLS şifreleme
+- **Anahtar Yönetimi**: Merkezi şifreleme anahtarı yönetimi
+- **Donanım Güvenliği**: Donanım güvenlik modülü desteği
 
-#### Access Control
+#### Erişim Kontrolü
 
-- **Role-Based Access**: Role-based access control (RBAC)
-- **Multi-Factor Authentication**: Enhanced authentication
-- **LDAP/AD Integration**: Enterprise directory integration
-- **Audit Logging**: Comprehensive access logging
+- **Rol Tabanlı Erişim**: Rol tabanlı erişim kontrolü (RBAC)
+- **Çok Faktörlü Kimlik Doğrulama**: Gelişmiş kimlik doğrulama
+- **LDAP/AD Entegrasyonu**: Kurumsal dizin entegrasyonu
+- **Denetim Günlükleri**: Kapsamlı erişim günlükleri
 
-### Compliance Features
+### Uyumluluk Özellikleri
 
-#### Regulatory Compliance
+#### Düzenleyici Uyumluluk
 
-- **GDPR**: General Data Protection Regulation
-- **HIPAA**: Healthcare Insurance Portability Act
-- **SOX**: Sarbanes-Oxley Act
-- **SEC**: Securities and Exchange Commission rules
+- **GDPR**: Genel Veri Koruma Yönetmeliği
+- **HIPAA**: Sağlık Sigortası Taşınabilirlik Yasası
+- **SOX**: Sarbanes-Oxley Yasası
+- **SEC**: Menkul Kıymetler ve Borsa Komisyonu kuralları
 
-#### Data Governance
+#### Veri Yönetişimi
 
-- **Data Retention**: Automated retention policies
-- **Legal Hold**: Legal hold and preservation
-- **Audit Reports**: Automated audit reporting
-- **Chain of Custody**: Maintain data chain of custody
+- **Veri Saklama**: Otomatik saklama politikaları
+- **Yasal Tutma**: Yasal tutma ve muhafaza
+- **Denetim Raporları**: Otomatik denetim raporlama
+- **Zincirleme Gözetim**: Veri zincirleme gözetimini sürdürme
 
-## Monitoring and Management
+## İzleme ve Yönetim
 
-### Commvault Command Center
+### Commvault Komut Merkezi
 
-#### Centralized Management
+#### Merkezi Yönetim
 
-- **Single Console**: Unified management interface
-- **Multi-Tenant**: Support for multiple organizations
-- **Dashboard**: Real-time status and analytics
-- **Reporting**: Comprehensive reporting and analytics
+- **Tek Konsol**: Birleşik yönetim arayüzü
+- **Çok Kiracılı**: Birden fazla organizasyon desteği
+- **Gösterge Paneli**: Gerçek zamanlı durum ve analizler
+- **Raporlama**: Kapsamlı raporlama ve analizler
 
-#### Job Monitoring
+#### İş İzleme
 
-- **Real-Time Status**: Real-time job status monitoring
-- **Performance Metrics**: Backup and restore performance
-- **Capacity Planning**: Storage capacity planning
-- **Alerting**: Proactive alerting and notifications
+- **Gerçek Zamanlı Durum**: Gerçek zamanlı iş durumu izleme
+- **Performans Metrikleri**: Yedekleme ve geri yükleme performansı
+- **Kapasite Planlama**: Depolama kapasitesi planlama
+- **Uyarılar**: Proaktif uyarılar ve bildirimler
 
-### Integration and Automation
+### Entegrasyon ve Otomasyon
 
 #### REST API
 
-- **Programmatic Access**: RESTful API for automation
-- **Third-Party Integration**: Integration with external systems
-- **Custom Applications**: Build custom applications
-- **Workflow Automation**: Automate operational workflows
+- **Programatik Erişim**: Otomasyon için RESTful API
+- **Üçüncü Taraf Entegrasyonu**: Harici sistemlerle entegrasyon
+- **Özel Uygulamalar**: Özel uygulamalar oluşturma
+- **İş Akışı Otomasyonu**: Operasyonel iş akışlarını otomatikleştirme
 
-#### PowerShell Integration
+#### PowerShell Entegrasyonu
 
-- **PowerShell Cmdlets**: Native PowerShell support
-- **Scripting**: Automate routine tasks
-- **Bulk Operations**: Perform bulk operations
-- **Custom Scripts**: Create custom automation scripts
+- **PowerShell Cmdlet'leri**: Yerel PowerShell desteği
+- **Komut Dosyası Oluşturma**: Rutin görevleri otomatikleştirme
+- **Toplu İşlemler**: Toplu işlemler gerçekleştirme
+- **Özel Komut Dosyaları**: Özel otomasyon komut dosyaları oluşturma
 
-## Best Practices
+## En İyi Uygulamalar
 
-### Deployment Best Practices
+### Dağıtım En İyi Uygulamaları
 
-1. **Sizing**: Proper sizing for backup workloads
-2. **Network**: Optimize network configuration
-3. **Storage**: Configure appropriate storage policies
-4. **Security**: Implement security best practices
+1. **Boyutlandırma**: Yedekleme iş yükleri için uygun boyutlandırma
+2. **Ağ**: Ağ yapılandırmasını optimize etme
+3. **Depolama**: Uygun depolama politikalarını yapılandırma
+4. **Güvenlik**: Güvenlik en iyi uygulamalarını uygulama
 
-### Performance Optimization
+### Performans Optimizasyonu
 
-1. **Concurrent Operations**: Optimize concurrent job settings
-2. **Deduplication**: Configure global deduplication
-3. **Compression**: Balance compression and performance
-4. **Network**: Optimize network bandwidth usage
+1. **Eşzamanlı İşlemler**: Eşzamanlı iş ayarlarını optimize etme
+2. **Yinelenen Veri Giderme**: Küresel yinelenen veri gidermeyi yapılandırma
+3. **Sıkıştırma**: Sıkıştırma ve performans dengesini sağlama
+4. **Ağ**: Ağ bant genişliği kullanımını optimize etme
 
-### Data Management
+### Veri Yönetimi
 
-1. **Storage Policies**: Design effective storage policies
-2. **Retention**: Implement appropriate retention policies
-3. **Archiving**: Use intelligent archiving policies
-4. **Monitoring**: Continuous monitoring and optimization
+1. **Depolama Politikaları**: Etkili depolama politikaları tasarlama
+2. **Saklama**: Uygun saklama politikalarını uygulama
+3. **Arşivleme**: Akıllı arşivleme politikaları kullanma
+4. **İzleme**: Sürekli izleme ve optimizasyon
 
-## Troubleshooting
+## Sorun Giderme
 
-### Common Issues
+### Yaygın Sorunlar
 
-#### Performance Issues
+#### Performans Sorunları
 
-- **Slow Backups**: Check network and storage performance
-- **High CPU Usage**: Monitor MediaAgent resource usage
-- **Memory Issues**: Optimize memory allocation
-- **Disk Space**: Monitor available disk space
+- **Yavaş Yedeklemeler**: Ağ ve depolama performansını kontrol edin
+- **Yüksek CPU Kullanımı**: MediaAgent kaynak kullanımını izleyin
+- **Bellek Sorunları**: Bellek tahsisini optimize edin
+- **Disk Alanı**: Kullanılabilir disk alanını izleyin
 
-#### Connectivity Issues
+#### Bağlantı Sorunları
 
-- **Network Connectivity**: Verify network connectivity
-- **Firewall Rules**: Check firewall configuration
-- **DNS Resolution**: Verify DNS resolution
-- **Service Status**: Check Commvault service status
+- **Ağ Bağlantısı**: Ağ bağlantısını doğrulayın
+- **Güvenlik Duvarı Kuralları**: Güvenlik duvarı yapılandırmasını kontrol edin
+- **DNS Çözümleme**: DNS çözümlemesini doğrulayın
+- **Servis Durumu**: Commvault servis durumunu kontrol edin
 
-#### Configuration Issues
+#### Yapılandırma Sorunları
 
-- **Library Configuration**: Verify library settings
-- **Storage Policy**: Check storage policy configuration
-- **Credentials**: Verify access credentials
-- **Permissions**: Check file system permissions
+- **Kütüphane Yapılandırması**: Kütüphane ayarlarını doğrulayın
+- **Depolama Politikası**: Depolama politika yapılandırmasını kontrol edin
+- **Kimlik Bilgileri**: Erişim kimlik bilgilerini doğrulayın
+- **İzinler**: Dosya sistemi izinlerini kontrol edin
 
-## Getting Started
+## Başlarken
 
-### Prerequisites
+### Önkoşullar
 
-1. **Commvault Environment**: Commvault Complete Data Protection v11.20+
-2. **RustFS Cluster**: Properly configured RustFS cluster
-3. **Network Connectivity**: Network connectivity between Commvault and RustFS
-4. **MediaAgent**: Commvault MediaAgent with sufficient resources
+1. **Commvault Ortamı**: Commvault Complete Data Protection v11.20+
+2. **RustFS Kümesi**: Uygun şekilde yapılandırılmış RustFS kümesi
+3. **Ağ Bağlantısı**: Commvault ve RustFS arasında ağ bağlantısı
+4. **MediaAgent**: Yeterli kaynaklara sahip Commvault MediaAgent
 
-### Quick Start Guide
+### Hızlı Başlangıç Kılavuzu
 
-1. **Install MediaAgent**: Install and configure Commvault MediaAgent
-2. **Configure Library**: Add RustFS as disk or cloud library
-3. **Create Storage Policy**: Create storage policy using RustFS library
-4. **Configure Subclient**: Create subclient for data protection
-5. **Run Backup**: Execute initial backup job
-6. **Test Recovery**: Test backup recovery procedures
+1. **MediaAgent Kurulumu**: Commvault MediaAgent'i kurun ve yapılandırın
+2. **Kütüphane Yapılandırma**: RustFS'i disk veya bulut kütüphanesi olarak ekleyin
+3. **Depolama Politikası Oluşturma**: RustFS kütüphanesi kullanarak depolama politikası oluşturun
+4. **Alt İstemci Yapılandırma**: Veri koruması için alt istemci oluşturun
+5. **Yedekleme Çalıştırma**: İlk yedekleme işini yürütün
+6. **Kurtarma Testi**: Yedekleme kurtarma prosedürlerini test edin
 
-### Next Steps
+### Sonraki Adımlar
 
-- **Optimize Performance**: Tune backup settings for optimal performance
-- **Implement Security**: Configure encryption and access controls
-- **Set Up Monitoring**: Implement comprehensive monitoring
-- **Plan Disaster Recovery**: Develop disaster recovery procedures
-- **Train Staff**: Train staff on backup and recovery procedures
+- **Performansı Optimize Etme**: Optimal performans için yedekleme ayarlarını ayarlayın
+- **Güvenliği Uygulama**: Şifreleme ve erişim kontrollerini yapılandırın
+- **İzleme Kurulumu**: Kapsamlı izleme uygulayın
+- **Felaket Kurtarma Planlama**: Felaket kurtarma prosedürleri geliştirin
+- **Personel Eğitimi**: Personeli yedekleme ve kurtarma prosedürleri konusunda eğitin

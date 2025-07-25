@@ -1,38 +1,37 @@
 ---
-title: "Hard Drive Failure"
-description: "RustFS ensures read/write access during partial disk failures through erasure coding-like mechanisms and automatically heals data after disk replacement."
+title: "Sabit Disk Arızası"
+description: "RustFS, silme kodlama benzeri mekanizmalar aracılığıyla kısmi disk arızaları sırasında okuma/yazma erişimini sağlar ve disk değiştirildikten sonra verileri otomatik olarak onarır."
 ---
+# Sabit Disk Arızası
 
-# Hard Drive Failure
-
-RustFS ensures read/write access during partial disk failures through erasure coding-like mechanisms and automatically heals data after disk replacement.
-
----
-
-### Table of Contents
-
-1. [Unmount Failed Disk](#1-unmount-failed-disk)
-2. [Replace Failed Disk](#2-replace-failed-disk)
-3. [Update `/etc/fstab` or RustFS Configuration](#3-update-etcfstab-or-rustfs-configuration)
-4. [Remount New Disk](#4-remount-new-disk)
-5. [Trigger and Monitor Data Healing](#5-trigger-and-monitor-data-healing)
-6. [Subsequent Checks and Considerations](#6-subsequent-checks-and-considerations)
+RustFS, silme kodlama benzeri mekanizmalar aracılığıyla kısmi disk arızaları sırasında okuma/yazma erişimini sağlar ve disk değiştirildikten sonra verileri otomatik olarak onarır.
 
 ---
 
-### 1) Unmount Failed Disk
+### İçindekiler
 
-Before replacing the physical hard drive, you must first safely unmount the failed disk from the operating system level to avoid file system or RustFS I/O errors during the replacement process.
+1. [Arızalı Diski Bağlantısını Kesme](#1-arızalı-diskin-bağlantısını-kesme)
+2. [Arızalı Diski Değiştirme](#2-arızalı-diskin-değiştirilmesi)
+3. [`/etc/fstab` veya RustFS Yapılandırmasını Güncelleme](#3-etcfstab-veya-rustfs-yapılandırmasını-güncelleme)
+4. [Yeni Diski Yeniden Bağlama](#4-yeni-diskin-yeniden-bağlanması)
+5. [Veri Onarımını Tetikleme ve İzleme](#5-veri-onarımını-tetikleme-ve-izleme)
+6. [Sonraki Kontroller ve Dikkat Edilmesi Gerekenler](#6-sonraki-kontroller-ve-dikkat-edilmesi-gerekenler)
+
+---
+
+### 1) Arızalı Diskin Bağlantısını Kesme
+
+Fiziksel sabit diski değiştirmeden önce, işletim sistemi seviyesinden arızalı diskin bağlantısını güvenli bir şekilde kesmelisiniz, böylece değiştirme süreci sırasında dosya sistemi veya RustFS G/Ç hataları oluşmaz.
 
 ```bash
-# Assuming the failed disk is /dev/sdb
+# Arızalı diskin /dev/sdb olduğunu varsayalım
 umount /dev/sdb
 ```
 
-> **Note**
+> **Not**
 >
-> * If there are multiple mount points, execute `umount` for each separately.
-> * If you encounter "device busy", you can stop the RustFS service first:
+> * Birden fazla bağlama noktası varsa, her biri için ayrı ayrı `umount` komutunu çalıştırın.
+> * "Aygıt meşgul" hatası alırsanız, önce RustFS servisini durdurabilirsiniz:
 >
 > ```bash
 > systemctl stop rustfs
@@ -40,119 +39,111 @@ umount /dev/sdb
 
 ---
 
-### 2) Replace Failed Disk
+### 2) Arızalı Diskin Değiştirilmesi
 
-After physically replacing the failed disk, you need to partition and format the new disk and label it consistently with the original disk.
+Arızalı diski fiziksel olarak değiştirdikten sonra, yeni diski bölümlendirmeniz, biçimlendirmeniz ve orijinal diskle aynı etiketi vermeniz gerekir.
 
 ```bash
-# Format as ext4 and label as DISK1 (must correspond to original label)
+# ext4 olarak biçimlendirin ve DISK1 olarak etiketleyin (orijinal etiketle eşleşmelidir)
 mkfs.ext4 /dev/sdb -L DISK1
 ```
 
-> **Requirements**
+> **Gereksinimler**
 >
-> * New disk capacity ≥ original disk capacity;
-> * File system type must be consistent with other disks;
-> * Recommend using LABEL or UUID for mounting to ensure disk order is not affected by system restarts.
+> * Yeni disk kapasitesi ≥ orijinal disk kapasitesi;
+> * Dosya sistemi türü diğer disklerle tutarlı olmalıdır;
+> * Bağlama için LABEL veya UUID kullanmanız önerilir, böylece disk sırası sistem yeniden başlatmalarından etkilenmez.
 
 ---
 
-### 3) Update `/etc/fstab` or RustFS Configuration
+### 3) `/etc/fstab` veya RustFS Yapılandırmasını Güncelleme
 
-Confirm that the mount entry labels or UUIDs in `/etc/fstab` point to the new disk. If using RustFS proprietary configuration files (such as `config.yaml`), you also need to synchronously update corresponding entries.
+`/etc/fstab` içindeki bağlama girişlerinin etiketlerinin veya UUID'lerinin yeni diski işaret ettiğini doğrulayın. RustFS özel yapılandırma dosyaları kullanıyorsanız (örneğin `config.yaml`), ilgili girişleri de eşzamanlı olarak güncellemeniz gerekir.
 
 ```bash
-# View current fstab
+# Mevcut fstab'ı görüntüleyin
 cat /etc/fstab
-
-# Example fstab entry (no modification needed if labels are the same)
+# fstab giriş örneği (etiketler aynıysa değişiklik gerekmez)
 LABEL=DISK1 /mnt/disk1 ext4 defaults,noatime 0 2
 ```
 
-> **Tip**
+> **İpucu**
 >
-> * If using UUID:
+> * UUID kullanıyorsanız:
 >
 > ```bash
 > blkid /dev/sdb
-> # Get the UUID of the new partition, then replace the corresponding field in fstab
+> # Yeni bölümün UUID'sini alın, ardından fstab'daki ilgili alanı değiştirin
 > ```
 >
-> * After modifying fstab, be sure to verify syntax:
+> * fstab'ı değiştirdikten sonra, söz dizimini mutlaka doğrulayın:
 >
 > ```bash
-> mount -a # If no errors, configuration is correct
+> mount -a # Hata yoksa, yapılandırma doğrudur
 > ```
 
 ---
 
-### 4) Remount New Disk
+### 4) Yeni Diskin Yeniden Bağlanması
 
-Execute the following commands to batch mount all disks and start the RustFS service:
+Tüm diskleri toplu olarak bağlamak ve RustFS servisini başlatmak için aşağıdaki komutları çalıştırın:
 
 ```bash
 mount -a
 systemctl start rustfs
 ```
 
-Confirm all disks are mounted normally:
+Tüm disklerin normal şekilde bağlandığını doğrulayın:
 
 ```bash
 df -h | grep /mnt/disk
 ```
 
-> **Note**
+> **Not**
 >
-> * If some mounts fail, please check if fstab entries are consistent with disk labels/UUIDs.
+> * Bazı bağlamalar başarısız olursa, lütfen fstab girişlerinin disk etiketleri/UUID'leri ile tutarlı olup olmadığını kontrol edin.
 
 ---
 
-### 5) Trigger and Monitor Data Healing
+### 5) Veri Onarımını Tetikleme ve İzleme
 
-RustFS will automatically or manually trigger the data healing process after detecting the new disk. The following example uses the hypothetical `rustfs-admin` tool:
+RustFS, yeni diski algıladıktan sonra veri onarım sürecini otomatik veya manuel olarak tetikleyecektir. Aşağıdaki örnek, varsayımsal `rustfs-admin` aracını kullanır:
 
 ```bash
-# View current disk status
+# Mevcut disk durumunu görüntüleyin
 rustfs-admin disk status
-
-# Manually trigger healing for the new disk
+# Yeni disk için manuel olarak onarımı tetikleyin
 rustfs-admin heal --disk /mnt/disk1
-
-# View healing progress in real-time
+# Onarım ilerlemesini gerçek zamanlı olarak görüntüleyin
 rustfs-admin heal status --follow
 ```
 
-Meanwhile, you can confirm that the system has recognized and started data recovery by viewing service logs:
+Aynı zamanda, hizmet günlüklerini görüntüleyerek sistemin onarımı tanıdığını ve veri kurtarmaya başladığını doğrulayabilirsiniz:
 
 ```bash
-# For systemd managed installations
+# systemd tarafından yönetilen kurulumlar için
 journalctl -u rustfs -f
-
-# Or view dedicated log files
+# Veya özel günlük dosyalarını görüntüleyin
 tail -f /var/log/rustfs/heal.log
 ```
 
-> **Note**
+> **Not**
 >
-> * The healing process will complete in the background and typically has minimal impact on online access;
-> * After healing is complete, the tool will report success or list failed objects.
+> * Onarım süreci arka planda tamamlanacak ve genellikle çevrimiçi erişim üzerinde minimal etkiye sahip olacaktır;
+> * Onarım tamamlandığında, araç başarılı olduğunu veya başarısız nesneleri listeleyecektir.
 
 ---
 
-### 6) Subsequent Checks and Considerations
+### 6) Sonraki Kontroller ve Dikkat Edilmesi Gerekenler
 
-1. **Performance Monitoring**
+1. **Performans İzleme**
+   * Onarım sırasında G/Ç'de hafif dalgalanmalar olabilir; disk ve ağ yükünü izlemeniz önerilir.
 
-* I/O may fluctuate slightly during healing; recommend monitoring disk and network load.
+2. **Toplu Arızalar**
+   * Aynı parti disklerde birden fazla arıza meydana gelirse, daha sık donanım kontrolleri düşünün.
 
-2. **Batch Failures**
+3. **Düzenli Tatbikatlar**
+   * Disk arıza tatbikatlarını düzenli olarak simüle edin, böylece ekip kurtarma prosedürleriyle aşina olsun.
 
-* If multiple failures occur in the same batch of disks, consider more frequent hardware inspections.
-
-3. **Regular Drills**
-
-* Regularly simulate disk failure drills to ensure the team is familiar with recovery procedures.
-
-4. **Maintenance Windows**
-
-* When failure rates are high, schedule dedicated maintenance windows to accelerate replacement and healing speed.
+4. **Bakım Windows**
+   * Arıza oranları yüksek olduğunda, değiştirme ve onarım hızını artırmak için özel bakım windows planlayın.

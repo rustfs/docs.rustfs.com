@@ -1,80 +1,80 @@
-# Multi-Site, Active-Active Replication for Object Storage
+# Çoklu Site, Aktif-Aktif Nesne Depolama Çoğaltma
 
-## Active Replication for Object Storage
+## Nesne Depolama İçin Aktif Çoğaltma
 
-![Object Storage Replication](images/s6-1.png)
+![Nesne Depolama Çoğaltma](images/s6-1.png)
 
-Active replication for object storage is a critical requirement for mission-critical production environments. RustFS is currently the only vendor providing this service. Executed at bucket-level granularity, it's used in the following situations:
+Nesne depolama için aktif çoğaltma, kritik görev üretim ortamları için hayati bir gereksinimdir. RustFS, şu anda bu hizmeti sağlayan tek satıcıdır. Kova düzeyinde ince taneli olarak yürütülen bu işlem, aşağıdaki durumlarda kullanılır:
 
-RustFS supports synchronous and near-synchronous replication, depending on architectural choices and data change rates. In each of the above cases, replication must be as close to strictly consistent as possible (considering bandwidth considerations and change rates).
+RustFS, mimari seçimlere ve veri değişiklik hızlarına bağlı olarak eşzamanlı ve neredeyse eşzamanlı çoğaltmayı destekler. Yukarıdaki durumların her birinde, çoğaltma, bant genişliği kısıtlamaları ve değişiklik hızları göz önüne alındığında mümkün olduğunca katı bir tutarlılıkla gerçekleştirilmelidir.
 
-## RustFS Data Replication Designed for Large-Scale Resilience
+## Büyük Ölçekli Dayanıklılık İçin Tasarlanmış RustFS Veri Çoğaltma
 
-Key features include:
+Ana özellikler şunları içerir:
 
-- ✅ Encrypted or unencrypted objects and their associated metadata (written atomically with objects)
-- ✅ Object versions
-- ✅ Object tags (if any)
-- ✅ S3 object lock retention information (if any)
+- ✅ Şifrelenmiş veya şifrelenmemiş nesneler ve bunlarla ilişkili meta veriler (nesnelerle birlikte atomik olarak yazılır)
+- ✅ Nesne sürümleri
+- ✅ Nesne etiketleri (varsa)
+- ✅ S3 nesne kilidi saklama bilgileri (varsa)
 
-## Core Features
+## Temel Özellikler
 
-### Ability for Source and Target Buckets to Have the Same Name
+### Kaynak ve Hedef Kovaların Aynı Ada Sahip Olabilme Yeteneği
 
-This is required for applications that must transparently failover to remote sites without any interruption.
+Uygulamaların uzak sitelere herhangi bir kesinti olmadan şeffaf bir şekilde geçiş yapabilmesi için gereklidir.
 
-### Native Support for Automatic Object Lock/Retention Replication Across Source and Target
+### Kaynak ve Hedef Arasında Otomatik Nesne Kilidi/Saklama Çoğaltması için Yerel Destek
 
-Ensures data integrity and compliance requirements are maintained during replication.
+Çoğaltma sırasında veri bütünlüğü ve uyumluluk gereksinimlerinin korunmasını sağlar.
 
-### Near-Synchronous Replication
+### Neredeyse Eşzamanlı Çoğaltma
 
-Can update objects immediately after any mutation occurs in the bucket. RustFS follows strict consistency within data centers and eventual consistency between data centers to protect data.
+Kovada herhangi bir değişiklik meydana geldikten hemen sonra nesneleri güncelleyebilir. RustFS, veri merkezleri içinde katı tutarlılığı ve veri merkezleri arasında nihai tutarlılığı korur.
 
-### Notification Functionality
+### Bildirim İşlevselliği
 
-Notification functionality for pushing replication failure events. Applications can subscribe to these events and alert operations teams.
+Çoğaltma hata olaylarını iletmek için bildirim işlevselliği. Uygulamalar bu olaylara abone olabilir ve operasyon ekiplerini uyarabilir.
 
-## Considerations When Implementing RustFS Active-Active Replication
+## RustFS Aktif-Aktif Çoğaltmayı Uygularken Dikkat Edilmesi Gerekenler
 
-At the most basic level, any design needs to consider infrastructure, bandwidth, latency, resilience, and scale. Let's examine them in order:
+En temel düzeyde, herhangi bir tasarım altyapı, bant genişliği, gecikme süresi, dayanıklılık ve ölçek gibi faktörleri dikkate almalıdır. Bunları sırayla inceleyelim:
 
-### Infrastructure
+### Altyapı
 
-RustFS recommends using the same hardware at both ends of the replication endpoints. While similar hardware can work, introducing heterogeneous hardware profiles brings complexity and slows problem identification.
+RustFS, çoğaltma uç noktalarının her iki tarafında da aynı donanımın kullanılmasını önerir. Benzer donanım çalışabilir, ancak heterojen donanım profilleri getirmek karmaşıklığı artırır ve sorun tespitini yavaşlatır.
 
-### Bandwidth
+### Bant Genişliği
 
-Bandwidth is a critical factor in keeping two sites consistently synchronized. The optimal bandwidth requirement between sites is determined by the rate of incoming data. Specifically, if bandwidth is insufficient to handle peaks, changes will queue to the remote site and eventually synchronize.
+İki siteyi tutarlı bir şekilde senkronize tutmak için bant genişliği kritik bir faktördür. Siteler arasındaki optimal bant genişliği gereksinimi, gelen veri hızına göre belirlenir. Özellikle, bant genişliği zirve değişiklikleri işlemek için yetersizse, değişiklikler uzak siteye kuyruğa alınacak ve sonunda senkronize olacaktır.
 
-### Latency
+### Gecikme Süresi
 
-After bandwidth, latency is the most important consideration when designing an active-active model. Latency represents the round-trip time (RTT) between two RustFS clusters. The goal is to reduce latency to the smallest possible number within the budget constraints imposed by bandwidth. RustFS recommends RTT thresholds not exceeding 20 milliseconds for Ethernet links and networks, with packet loss rates not exceeding 0.01%.
+Bant genişliğinden sonra, aktif-aktif bir model tasarlarken dikkate alınması gereken en önemli faktör gecikme süresidir. Gecikme süresi, iki RustFS kümesi arasındaki gidip gelme süresini (RTT) temsil eder. Amaç, bant genişliği tarafından uygulanan bütçe kısıtlamaları içinde gecikme süresini mümkün olan en küçük sayıya indirmektir. RustFS, Ethernet bağlantılar ve ağlar için RTT eşiklerinin 20 milisaniyeyi aşmamasını ve paket kaybı oranlarının %0.01'i aşmamasını önerir.
 
-### Architecture
+### Mimari
 
-Currently, RustFS only recommends replication across two data centers. Replication across multiple data centers is possible, however, the complexity involved and the trade-offs required make this quite difficult.
+Şu anda, RustFS yalnızca iki veri merkezi arasında çoğaltmayı önermektedir. Çoklu veri merkezleri arasında çoğaltma mümkün olsa da, bu işlemdeki karmaşıklık ve gerekli olan ödünleşmeler bu durumu oldukça zorlaştırmaktadır.
 
-## Large-Scale Deployment Architecture
+## Büyük Ölçekli Dağıtım Mimarisi
 
-RustFS supports very large deployments in each data center, including source and target, with the above considerations determining scale.
+RustFS, yukarıda belirtilen hususlar ölçeği belirlerken, her veri merkezinde kaynak ve hedef dahil olmak üzere çok büyük dağıtımları destekler.
 
-![Large-Scale Deployment Architecture](images/s6-2.png)
+![Büyük Ölçekli Dağıtım Mimarisi](images/s6-2.png)
 
-## Frequently Asked Questions
+## Sıkça Sorulan Sorular
 
-### What happens when the replication target fails?
+### Çoğaltma hedefi başarısız olduğunda ne olur?
 
-If the target goes down, the source will cache changes and begin synchronizing after the replication target recovers. There may be some delay in reaching full synchronization, depending on the duration, number of changes, bandwidth, and latency.
+Hedef devre dışı kalırsa, kaynak değişiklikleri önbelleğe alacak ve çoğaltma hedefi kurtarıldıktan sonra senkronizasyona başlayacaktır. Tam senkronizasyona ulaşmakta bazı gecikmeler olabilir; bu, süre, değişiklik sayısı, bant genişliği ve gecikme süresine bağlıdır.
 
-### What are the parameters for immutability?
+### Değiştirilemezlik için parametreler nelerdir?
 
-Immutability is supported. Key concepts can be found in this article. In active-active replication mode, immutability can only be guaranteed when objects are versioned. Versioning cannot be disabled on the source. If versioning is suspended on the target, RustFS will begin failing replication.
+Değiştirilemezlik desteklenmektedir. Ana kavramlar bu makalede bulunabilir. Aktif-aktif çoğaltma modunda, değiştirilemezlik yalnızca nesneler sürümlendirildiğinde garanti edilebilir. Sürüm oluşturma kaynağında devre dışı bırakılamaz. Hedefte sürüm oluşturma askıya alınırsa, RustFS çoğaltmayı başarısızlığa uğratmaya başlayacaktır.
 
-### What other impacts are there if versioning is suspended or there's a mismatch?
+### Sürüm oluşturma askıya alınırsa veya bir uyumsuzluk olursa başka ne gibi etkiler olur?
 
-In these cases, replication may fail. For example, if you try to disable versioning on the source bucket, an error will be returned. You must first remove the replication configuration before you can disable versioning on the source bucket. Additionally, if versioning is disabled on the target bucket, replication will fail.
+Bu durumlarda, çoğaltma başarısız olabilir. Örneğin, kaynak kovada sürüm oluşturmayı devre dışı bırakmaya çalışırsanız bir hata döndürülür. Sürüm oluşturmayı devre dışı bırakmadan önce çoğaltma yapılandırmasını kaldırmanız gerekir. Ayrıca, hedef kovada sürüm oluşturma devre dışı bırakılırsa, çoğaltma başarısız olacaktır.
 
-### How is it handled if object locking is not enabled on both ends?
+### Nesne kilitleme her iki uçta da etkinleştirilmezse nasıl işlem görür?
 
-Object locking must be enabled on both source and target. There's an edge case where after setting up bucket replication, the target bucket can be deleted and recreated but without object locking enabled, and replication may fail. If object locking settings are not configured on both ends, inconsistent situations may occur. In this case, RustFS will fail silently.
+Nesne kilitleme, kaynak ve hedefte de etkinleştirilmelidir. Kovada çoğaltma kurulduktan sonra, hedef kova silinebilir ve nesne kilitleme etkinleştirilmeden yeniden oluşturulabilir ve çoğaltma başarısız olabilir. Nesne kilitleme ayarları her iki uçta da yapılandırılmazsa, tutarsız durumlar ortaya çıkabilir. Bu durumda, RustFS sessizce başarısız olacaktır.

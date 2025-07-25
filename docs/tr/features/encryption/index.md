@@ -1,44 +1,44 @@
-# Infrastructure for Large-Scale Data
+# Büyük Ölçekli Veri Altyapısı
 
-RustFS is designed for scale. Technical scale, operational scale, and economic scale. Foundational scale.
+RustFS, teknik ölçek, operasyonel ölçek ve ekonomik ölçek için tasarlanmıştır. Temel ölçek.
 
-In the object storage field, robust encryption is required to have a seat at the negotiating table. RustFS provides more functionality through the highest level of encryption and extensive optimizations, virtually eliminating the overhead typically associated with storage encryption operations.
+Nesne depolama alanında, müzakere masasında yer almak için sağlam şifreleme gereklidir. RustFS, en yüksek düzeyde şifreleme ve kapsamlı optimizasyonlar aracılığıyla daha fazla işlevsellik sunar ve depolama şifreleme işlemleriyle genellikle ilişkilendirilen ek yükü neredeyse ortadan kaldırır.
 
-![Data Encryption Architecture](images/s5-1.png)
+![Veri Şifreleme Mimarisi](images/s5-1.png)
 
-RustFS encrypts data both when stored on disk and when transmitted over the network. RustFS's state-of-the-art encryption scheme supports fine-grained object-level encryption using modern industry-standard encryption algorithms such as AES-256-GCM, ChaCha20-Poly1305, and AES-CBC. RustFS is fully compatible with S3 encryption semantics and also extends S3 by supporting non-AWS key management services such as Hashicorp Vault, Gemalto KeySecure, and Google Secrets Manager.
+RustFS, verileri hem diske kaydedildiğinde hem de ağ üzerinden iletildiğinde şifreler. RustFS'nin en son şifreleme şeması, AES-256-GCM, ChaCha20-Poly1305 ve AES-CBC gibi modern endüstri standardı şifreleme algoritmalarını kullanarak ince taneli nesne düzeyinde şifrelemeyi destekler. RustFS, S3 şifreleme semantikleriyle tamamen uyumludur ve ayrıca Hashicorp Vault, Gemalto KeySecure ve Google Secrets Manager gibi AWS dışı anahtar yönetim hizmetlerini destekleyerek S3'ü genişletir.
 
-## Network Encryption
+## Ağ Şifreleme
 
-When data is transmitted between object storage and applications, it may bounce between any number of unknown and/or untrusted networks. Encrypting data while it's transmitted over the network (also known as "in transit") successfully mitigates man-in-the-middle attacks and ensures data remains secure regardless of the routing path taken.
+Nesne depolama ve uygulamalar arasında veri iletildiğinde, veri bilinmeyen ve/veya güvenilmeyen ağlar arasında zıplayabilir. Verileri ağ üzerinden iletilirken (aynı zamanda "aktarım halinde" olarak da bilinir) şifrelemek, adamın-ortasında saldırılarını başarıyla azaltır ve verilerin aldığı yönlendirme yolundan bağımsız olarak güvenli kalmasını sağlar.
 
-RustFS supports Transport Layer Security (TLS) v1.2+ between all components in the cluster. This approach ensures there are no weak links in encrypted traffic between or within clusters. TLS is a ubiquitous encryption framework: it's the same encryption protocol used by banks, e-commerce websites, and other enterprise-level systems that rely on data storage encryption.
+RustFS, kümedeki tüm bileşenler arasında Transport Layer Security (TLS) v1.2+'yı destekler. Bu yaklaşım, küme içi ve kümeler arası şifreli trafikte zayıf bağlantılar olmadığını garanti eder. TLS, her yerde bulunan bir şifreleme çerçevesidir: bankalar, e-ticaret web siteleri ve veri depolama şifrelemesine güvenen diğer kurumsal düzey sistemler tarafından kullanılan aynı şifreleme protokolüdür.
 
-RustFS's TLS implementation is optimized at the CPU instruction level with negligible performance overhead. It only requires specifying TLS private keys and public certificates for each RustFS server in the cluster. For Kubernetes environments, the RustFS Kubernetes Operator integrates/automatically generates and assigns TLS certificates during tenant deployment. RustFS supports multiple TLS certificates, where each certificate corresponds to a specific domain name. RustFS uses Server Name Indication (SNI) to determine which certificate to serve for any given request.
+RustFS'nin TLS uygulamasının performans ek yükü ihmal edilebilir düzeydedir ve CPU talimat düzeyinde optimize edilmiştir. Sadece kümedeki her RustFS sunucusu için TLS özel anahtarlarını ve genel sertifikaları belirtmeyi gerektirir. Kubernetes ortamları için, RustFS Kubernetes Operatörü, kiracı dağıtımı sırasında TLS sertifikalarını entegre eder/otomatik olarak oluşturur ve atar. RustFS, her sertifikanın belirli bir etki alanı adıyla eşleştiği çoklu TLS sertifikalarını destekler. RustFS, Sunucu Adı Belirleme (SNI) kullanarak herhangi bir istek için hangi sertifikayı sunacağını belirler.
 
-## Object Encryption
+## Nesne Şifreleme
 
-Data stored on disk relies entirely on the security of the disk and extends to the host system to ensure data security. RustFS server-side object encryption automatically encrypts data before it's stored on disk (encryption at rest). This approach guarantees that no data is written to unencrypted disks. This baseline security layer ensures the confidentiality, integrity, and authenticity of data at rest. RustFS supports both client-driven and automatic bucket default object encryption for maximum flexibility in data encryption.
+Diske kaydedilen veriler, veri güvenliğini sağlamak için tamamen disk güvenliğine ve ana bilgisayar sistemine dayanır. RustFS sunucu tarafı nesne şifrelemesi, verileri diske kaydedilmeden önce otomatik olarak şifreler (dinlenme halinde şifreleme). Bu yaklaşım, hiçbir verinin şifrelenmemiş diskler üzerine yazılmadığını garanti eder. Bu temel güvenlik katmanı, dinlenme halindeki verilerin gizliliğini, bütünlüğünü ve doğruluğunu sağlar. RustFS, veri şifrelemede maksimum esneklik için hem müşteri tarafından yönlendirilen hem de otomatik kova varsayılan nesne şifrelemesini destekler.
 
-RustFS server-side encryption is compatible with Amazon AWS-S3 semantics (SSE-S3). RustFS extends baseline support for AWS KMS to include common enterprise KMS systems such as Hashicorp Vault and Thales Ciphertrust (formerly Gemalto KeySecure). RustFS also supports client-driven encryption (SSE-C), where applications can specify the data key used to encrypt objects. For both SSE-S3 and SSE-C, the RustFS server performs all encryption operations, including key rotation and object re-encryption.
+RustFS sunucu tarafı şifrelemesi, Amazon AWS-S3 semantikleriyle (SSE-S3) uyumludur. RustFS, Hashicorp Vault ve Thales Ciphertrust (eski adıyla Gemalto KeySecure) gibi yaygın kurumsal KMS sistemlerini içerecek şekilde AWS KMS desteğini genişleterek temel desteği genişletir. RustFS ayrıca, uygulamaların nesneleri şifrelemek için kullanılan veri anahtarını belirleyebildiği müşteri tarafından yönlendirilen şifrelemeyi (SSE-C) de destekler. Hem SSE-S3 hem de SSE-C için, RustFS sunucusu, anahtar döndürme ve nesne yeniden şifreleme dahil olmak üzere tüm şifreleme işlemlerini gerçekleştirir.
 
-Through automatic server-side encryption, RustFS encrypts each object with a unique key and applies multiple layers of additional encryption using dynamic encryption keys and keys derived from external KMS or client-provided keys. This secure and sophisticated approach is performed within RustFS without the need to handle multiple independent kernel and userspace encryption utilities.
+Otomatik sunucu tarafı şifreleme aracılığıyla, RustFS her nesneyi benzersiz bir anahtarla şifreler ve dinamik şifreleme anahtarları ve harici KMS veya müşteri tarafından sağlanan anahtarlardan türetilen anahtarlar kullanarak ek şifreleme katmanları uygular. Bu güvenli ve sofistike yaklaşım, RustFS içinde, çoklu bağımsız çekirdek ve kullanıcı alanı şifreleme yardımcı programlarını işleme ihtiyacı olmadan gerçekleştirilir.
 
-RustFS uses Authenticated Encryption with Associated Data (AEAD) schemes to encrypt/decrypt objects when objects are written to or read from object storage. RustFS AEAD encryption supports industry-standard encryption protocols such as AES-256-GCM and ChaCha20-Poly1305 to protect object data. RustFS's CPU-level optimizations (such as SIMD acceleration) ensure negligible performance overhead for encryption/decryption operations. Organizations can run automatic bucket-level encryption at any time rather than being forced to make suboptimal security choices.
+RustFS, nesneler nesne depolamasına yazılırken veya okunurken nesneleri şifrelemek/şifresini çözmek için İlişkili Verilerle Kimlik Doğrulanmış Şifreleme (AEAD) şemalarını kullanır. RustFS AEAD şifrelemesi, AES-256-GCM ve ChaCha20-Poly1305 gibi endüstri standardı şifreleme protokollerini destekleyerek nesne verilerini korur. RustFS'nin CPU düzeyi optimizasyonları (SIMD hızlandırma gibi), şifreleme/şifre çözme işlemleri için ihmal edilebilir performans ek yükü sağlar. Kuruluşlar, alt optimal güvenlik seçimleri yapmaya zorlanmak yerine herhangi bir zamanda otomatik kova düzeyi şifreleme çalıştırabilirler.
 
-## RustFS Key Encryption Service
+## RustFS Anahtar Şifreleme Servisi
 
-RustFS provides built-in options for key encryption. RustFS's Key Encryption Service (KES) is a stateless distributed key management system for high-performance applications. It's designed to run in Kubernetes and distribute encryption keys to applications. KES is a required component for RustFS server-side object encryption (SSE-S3).
+RustFS, anahtar şifreleme için yerleşik seçenekler sunar. RustFS'in Anahtar Şifreleme Servisi (KES), yüksek performanslı uygulamalar için durum bilgisiz dağıtılmış bir anahtar yönetim sistemidir. Kubernetes içinde çalışacak şekilde tasarlanmıştır ve uygulamalara şifreleme anahtarları dağıtır. KES, RustFS sunucu tarafı nesne şifrelemesi (SSE-S3) için gerekli bir bileşendir.
 
-KES supports encryption operations on RustFS clusters and is a key mechanism for ensuring scalable and high-performance encryption operations. KES acts as an intermediary between RustFS clusters and external KMS, generating encryption keys as needed and performing encryption operations without being limited by KMS constraints. Therefore, there's still a central KMS that protects master keys and serves as the root of trust in the infrastructure. KES simplifies deployment and management by eliminating the need to bootstrap KMS for each set of applications. Instead, applications can request data encryption keys (DEKs) from KES servers or ask KES servers to decrypt encrypted DEKs.
+KES, RustFS kümeleri üzerinde şifreleme işlemlerini destekler ve ölçeklenebilir ve yüksek performanslı şifreleme işlemlerini sağlamak için anahtar bir mekanizmadır. KES, RustFS kümeleri ve harici KMS arasında bir aracı olarak hareket eder, gerektiğinde şifreleme anahtarları oluşturur ve KMS kısıtlamaları olmadan şifreleme işlemleri gerçekleştirir. Bu nedenle, hala ana anahtarları koruyan ve altyapıdaki güven kökü olarak hizmet veren merkezi bir KMS vardır. KES, her uygulama seti için KMS'yi başlatma ihtiyacını ortadan kaldırarak dağıtımı ve yönetimi basitleştirir. Bunun yerine, uygulamalar KES sunucularından veri şifreleme anahtarları (DEK'ler) talep edebilir veya KES sunucularından şifrelenmiş DEK'lerin şifresini çözmesini isteyebilir.
 
-Since KES servers are completely stateless, they can be automatically scaled, such as through Kubernetes Horizontal Pod Autoscaler. At the same time, since KES independently handles the vast majority of application requests, the load on the central KMS doesn't increase significantly.
+KES sunucuları tamamen durum bilgisiz olduğu için, Kubernetes Yatay Pod Otomatik Ölçekleyici aracılığıyla otomatik olarak ölçeklenebilir. Aynı zamanda, KES uygulama taleplerinin büyük çoğunluğunu bağımsız olarak ele aldığından, merkezi KMS üzerindeki yük önemli ölçüde artmaz.
 
-For Kubernetes environments, the RustFS Kubernetes Operator supports deploying and configuring KES for each tenant, enabling SSE-S3 as part of each tenant deployment.
+Kubernetes ortamları için, RustFS Kubernetes Operatörü, her kiracı için KES'in dağıtılmasını ve yapılandırılmasını destekler ve her kiracı dağıtımının bir parçası olarak SSE-S3'ü etkinleştirir.
 
-![KES Key Encryption Service Architecture](images/s5-2.png)
+![KES Anahtar Şifreleme Servisi Mimarisi](images/s5-2.png)
 
-## Supported External Key Management Systems
+## Desteklenen Harici Anahtar Yönetim Sistemleri
 
 | ![AWS KMS](images/s5i-1.png) | ![HashiCorp Vault](images/s5i-2.png) | ![Google Secret Manager](images/s5i-3.png) |
 |-------------------------------|----------------------------------------|-------------------------------------------|

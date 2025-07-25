@@ -1,310 +1,310 @@
-# Tencent Cloud Integration
+# Tencent Cloud Entegrasyonu
 
-RustFS provides seamless integration with Tencent Cloud services, enabling high-performance, scalable, and cost-effective storage solutions for modern applications.
+RustFS, Tencent Cloud hizmetleriyle sorunsuz bir entegrasyon sağlayarak, modern uygulamalar için yüksek performanslı, ölçeklenebilir ve maliyet etkin depolama çözümleri sunar.
 
-## Overview
+## Genel Bakış
 
-![Tencent Cloud Integration](./images/sec1-1.png)
+![Tencent Cloud Entegrasyonu](./images/sec1-1.png)
 
-RustFS on Tencent Cloud offers:
+Tencent Cloud üzerindeki RustFS şunları sunar:
 
-- **Native Integration**: Deep integration with Tencent Cloud ecosystem
-- **Gaming Optimization**: Optimized for gaming and multimedia workloads
-- **AI/ML Support**: Enhanced support for AI and machine learning applications
-- **Global Reach**: Worldwide deployment with edge acceleration
+- **Yerel Entegrasyon**: Tencent Cloud ekosistemiyle derin entegrasyon
+- **Oyun Optimizasyonu**: Oyun ve çoklu ortam iş yükleri için optimize edilmiştir
+- **AI/ML Desteği**: Yapay zeka ve makine öğrenimi uygulamaları için geliştirilmiş destek
+- **Küresel Erişim**: Kenar hızlandırmasıyla dünya çapında dağıtım
 
-## Core Integrations
+## Temel Entegrasyonlar
 
-### Compute Services
+### Hesaplama Hizmetleri
 
-#### Cloud Virtual Machine (CVM)
+#### Bulut Sanal Makinesi (CVM)
 
-- **Optimized Instances**: Recommended instance types for storage workloads
-- **Auto Scaling**: Automatic scaling based on demand
-- **Spot Instances**: Cost-effective spot instances for batch workloads
-- **GPU Instances**: GPU-accelerated instances for AI/ML workloads
+- **Optimize Edilmiş Örnekler**: Depolama iş yükleri için önerilen örnek türleri
+- **Otomatik Ölçeklendirme**: Talebe dayalı otomatik ölçeklendirme
+- **Spot Örnekler**: Toplu iş yükleri için maliyet etkin spot örnekler
+- **GPU Örnekleri**: AI/ML iş yükleri için GPU hızlandırılmış örnekler
 
-#### Tencent Kubernetes Engine (TKE)
+#### Tencent Kubernetes Motoru (TKE)
 
-- **Kubernetes Deployment**: Deploy RustFS on managed Kubernetes
-- **Serverless Containers**: Serverless container deployment
-- **Service Mesh**: Integration with Tencent Service Mesh
-- **CI/CD**: Integration with CODING DevOps platform
+- **Kubernetes Dağıtımı**: Yönetilen Kubernetes üzerinde RustFS dağıtımı
+- **Sunucusuz Konteynerlar**: Sunucusuz konteyner dağıtımı
+- **Servis Ağı**: Tencent Servis Ağı ile entegrasyon
+- **CI/CD**: CODING DevOps platformu ile entegrasyon
 
-#### Serverless Cloud Function (SCF)
+#### Sunucusuz Bulut Fonksiyonu (SCF)
 
-- **Event-driven Processing**: Process storage events with serverless functions
-- **Auto Scaling**: Automatic scaling based on events
-- **Cost Optimization**: Pay only for execution time
-- **Integration**: Seamless integration with storage events
+- **Olay Odaklı İşleme**: Sunucusuz fonksiyonlarla depolama olaylarını işleme
+- **Otomatik Ölçeklendirme**: Olaylara dayalı otomatik ölçeklendirme
+- **Maliyet Optimizasyonu**: Sadece çalışma süresi için ödeme
+- **Entegrasyon**: Depolama olaylarıyla sorunsuz entegrasyon
 
-### Storage Services
+### Depolama Hizmetleri
 
-#### Cloud Object Storage (COS)
+#### Bulut Nesne Depolama (COS)
 
-- **S3 Compatibility**: Full Amazon S3 API compatibility
-- **Intelligent Tiering**: Automatic data tiering for cost optimization
-- **Global Acceleration**: Accelerated data transfer worldwide
-- **Lifecycle Management**: Automated data lifecycle policies
+- **S3 Uyumluluğu**: Tam Amazon S3 API uyumluluğu
+- **Akıllı Katmanlandırma**: Maliyet optimizasyonu için otomatik veri katmanlandırma
+- **Küresel Hızlandırma**: Dünya çapında hızlandırılmış veri transferi
+- **Yaşam Döngüsü Yönetimi**: Otomatik veri yaşam döngüsü politikaları
 
-#### Cloud Block Storage (CBS)
+#### Bulut Blok Depolama (CBS)
 
-- **High-Performance Storage**: SSD and Enhanced SSD volumes
-- **Snapshot Management**: Automated backup and snapshot management
-- **Encryption**: Built-in encryption with KMS
-- **Multi-Attach**: Shared storage across multiple instances
+- **Yüksek Performanslı Depolama**: SSD ve Geliştirilmiş SSD hacimleri
+- **Anlık Görüntü Yönetimi**: Otomatik yedekleme ve anlık görüntü yönetimi
+- **Şifreleme**: KMS ile yerleşik şifreleme
+- **Çoklu Bağlantı**: Çoklu örnekler arasında paylaşılan depolama
 
-#### Cloud File Storage (CFS)
+#### Bulut Dosya Depolama (CFS)
 
-- **NFS Protocol**: POSIX-compliant network file system
-- **Performance Modes**: Standard and Performance file systems
-- **Capacity Scaling**: Automatic capacity scaling
-- **Access Control**: Fine-grained access permissions
+- **NFS Protokolü**: POSIX uyumlu ağ dosya sistemi
+- **Performans Modları**: Standart ve Performans dosya sistemleri
+- **Kapasite Ölçeklendirme**: Otomatik kapasite ölçeklendirme
+- **Erişim Kontrolü**: İnce taneli erişim izinleri
 
-### Network Services
+### Ağ Hizmetleri
 
-#### Virtual Private Cloud (VPC)
+#### Sanal Özel Bulut (VPC)
 
-- **Network Isolation**: Secure isolated network environment
-- **Cross-Region Connectivity**: Connect VPCs across regions
-- **Security Groups**: Fine-grained network access control
-- **Flow Logs**: Network traffic monitoring and analysis
+- **Ağ İzolasyonu**: Güvenli izole ağ ortamı
+- **Çok Bölgeli Bağlantı**: Bölgeler arası VPC bağlantılar
+- **Güvenlik Grupları**: İnce taneli ağ erişim kontrolü
+- **Akış Günlükleri**: Ağ trafiği izleme ve analiz
 
-#### Cloud Load Balancer (CLB)
+#### Bulut Yük Dengesleyici (CLB)
 
-- **Layer 4/7 Load Balancing**: Support for TCP/UDP and HTTP/HTTPS
-- **Health Checks**: Automatic health monitoring
-- **SSL Offloading**: SSL/TLS termination
-- **Global Load Balancing**: Global traffic distribution
+- **Katman 4/7 Yük Dengeleme**: TCP/UDP ve HTTP/HTTPS desteği
+- **Sağlık Kontrolleri**: Otomatik sağlık izleme
+- **SSL Offloading**: SSL/TLS sonlandırma
+- **Küresel Yük Dengeleme**: Küresel trafik dağıtımı
 
-#### Content Delivery Network (CDN)
+#### İçerik Dağıtım Ağı (CDN)
 
-- **Global Edge Network**: 2800+ edge nodes worldwide
-- **Dynamic Content Acceleration**: Accelerate dynamic content
-- **Video Acceleration**: Optimized for video streaming
-- **Real-time Monitoring**: Performance analytics and monitoring
+- **Küresel Kenar Ağı**: Dünya çapında 2800'den fazla kenar düğümü
+- **Dinamik İçerik Hızlandırma**: Dinamik içerik hızlandırma
+- **Video Hızlandırma**: Video akışı için optimize edilmiştir
+- **Gerçek Zamanlı İzleme**: Performans analitiği ve izleme
 
-## Gaming and Multimedia Optimization
+## Oyun ve Çoklu Ortam Optimizasyonu
 
-### Game Server Engine (GSE)
+### Oyun Sunucu Motoru (GSE)
 
-- **Game Server Hosting**: Managed game server hosting
-- **Auto Scaling**: Automatic scaling based on player demand
-- **Global Deployment**: Deploy game servers worldwide
-- **Low Latency**: Optimized for low-latency gaming
+- **Oyun Sunucusu Barındırma**: Yönetilen oyun sunucusu barındırma
+- **Otomatik Ölçeklendirme**: Oyuncu talebine dayalı otomatik ölçeklendirme
+- **Küresel Dağıtım**: Dünya çapında oyun sunucuları dağıtma
+- **Düşük Gecikme Süresi**: Düşük gecikme süresi için optimize edilmiştir
 
-### Video on Demand (VOD)
+### Video İsteğe Bağlı (VOD)
 
-- **Video Processing**: Automated video transcoding and processing
-- **Content Distribution**: Global video content distribution
-- **DRM Protection**: Digital rights management
-- **Analytics**: Video viewing analytics and insights
+- **Video İşleme**: Otomatik video dönüştürme ve işleme
+- **İçerik Dağıtımı**: Küresel video içerik dağıtımı
+- **DRM Koruması**: Dijital haklar yönetimi
+- **Analitik**: Video izleme analitiği ve içgörüleri
 
-### Live Video Broadcasting (LVB)
+### Canlı Video Yayıncılığı (LVB)
 
-- **Live Streaming**: Real-time video streaming
-- **Stream Processing**: Real-time stream processing
-- **Recording**: Automatic stream recording to storage
-- **CDN Acceleration**: Global live stream acceleration
+- **Canlı Akış**: Gerçek zamanlı video akışı
+- **Akış İşleme**: Gerçek zamanlı akış işleme
+- **Kayıt**: Otomatik akış kaydı ve depolama
+- **CDN Hızlandırma**: Küresel canlı akış hızlandırma
 
-## AI and Machine Learning Integration
+## AI ve Makine Öğrenimi Entegrasyonu
 
 ### TencentDB for AI
 
-- **Vector Database**: Store and query high-dimensional vectors
-- **ML Model Storage**: Store and version machine learning models
-- **Feature Store**: Centralized feature storage and serving
-- **Data Pipeline**: Automated data processing pipelines
+- **Vektör Veritabanı**: Yüksek boyutlu vektörleri depolama ve sorgulama
+- **ML Model Depolama**: Makine öğrenimi modellerini depolama ve sürümleme
+- **Özellik Mağazası**: Merkezi özellik depolama ve sunma
+- **Veri Boru Hattı**: Otomatik veri işleme boru hatları
 
-### Tencent Machine Learning Platform (TMLP)
+### Tencent Makine Öğrenimi Platformu (TMLP)
 
-- **Model Training**: Distributed model training
-- **Model Serving**: Scalable model inference
-- **Data Processing**: Large-scale data processing
-- **Experiment Management**: ML experiment tracking
+- **Model Eğitimi**: Dağıtık model eğitimi
+- **Model Servis**: Ölçeklenebilir model çıkarsama
+- **Veri İşleme**: Büyük ölçekli veri işleme
+- **Deney Yönetimi**: ML deney izleme
 
-### AI Services Integration
+### AI Hizmetleri Entegrasyonu
 
-- **Computer Vision**: Integration with image and video analysis
-- **Natural Language Processing**: Text processing and analysis
-- **Speech Recognition**: Audio processing and transcription
-- **Recommendation Engine**: Personalized recommendation systems
+- **Bilgisayar Görüşü**: Görüntü ve video analiz entegrasyonu
+- **Doğal Dil İşleme**: Metin işleme ve analiz
+- **Konuşma Tanıma**: Ses işleme ve transkripsiyon
+- **Öneri Motoru**: Kişiselleştirilmiş öneri sistemleri
 
-## Security Integration
+## Güvenlik Entegrasyonu
 
-### Cloud Access Management (CAM)
+### Bulut Erişim Yönetimi (CAM)
 
-- **Identity Management**: Centralized identity and access management
-- **Policy-based Access**: Fine-grained access control policies
-- **Multi-Factor Authentication**: Enhanced security with MFA
-- **Cross-Account Access**: Secure cross-account access
+- **Kimlik Yönetimi**: Merkezi kimlik ve erişim yönetimi
+- **Politika Tabanlı Erişim**: İnce taneli erişim kontrol politikaları
+- **Çok Faktörlü Kimlik Doğrulama**: MFA ile geliştirilmiş güvenlik
+- **Çapraz Hesap Erişimi**: Güvenli çapraz hesap erişimi
 
-### Key Management Service (KMS)
+### Anahtar Yönetim Hizmeti (KMS)
 
-- **Encryption Key Management**: Centralized encryption key management
-- **Hardware Security Modules**: HSM-backed key protection
-- **Key Rotation**: Automatic key rotation policies
-- **Compliance**: Meet regulatory compliance requirements
+- **Şifreleme Anahtarı Yönetimi**: Merkezi şifreleme anahtarı yönetimi
+- **Donanım Güvenlik Modülleri**: HSM destekli anahtar koruma
+- **Anahtar Döndürme**: Otomatik anahtar döndürme politikaları
+- **Uyumluluk**: Düzenleyici uyumluluk gereksinimlerini karşılama
 
-### Cloud Audit (CloudAudit)
+### Bulut Denetimi (CloudAudit)
 
-- **API Auditing**: Complete audit trail of all API calls
-- **Compliance Reporting**: Automated compliance reporting
-- **Security Monitoring**: Real-time security event monitoring
-- **Integration**: Integration with SIEM systems
+- **API Denetimi**: Tüm API çağrılarının tam denetim izi
+- **Uyumluluk Raporlaması**: Otomatik uyumluluk raporlaması
+- **Güvenlik İzleme**: Gerçek zamanlı güvenlik olay izleme
+- **Entegrasyon**: SIEM sistemleriyle entegrasyon
 
-### Web Application Firewall (WAF)
+### Web Uygulaması Güvenlik Duvarı (WAF)
 
-- **Application Protection**: Protect against web attacks
-- **Bot Protection**: Automated bot detection and mitigation
-- **DDoS Protection**: Distributed denial of service protection
-- **Custom Rules**: Custom security rules and policies
+- **Uygulama Koruması**: Web saldırılarına karşı koruma
+- **Bot Koruması**: Otomatik bot tespiti ve azaltma
+- **DDoS Koruması**: Dağıtılmış hizmet reddi koruması
+- **Özel Kurallar**: Özel güvenlik kuralları ve politikaları
 
-## Monitoring and Operations
+## İzleme ve İşlemler
 
-### Cloud Monitor
+### Bulut İzleme
 
-- **Performance Monitoring**: Monitor system and application metrics
-- **Custom Metrics**: Create custom monitoring metrics
-- **Alerting**: Configurable alerts and notifications
-- **Dashboards**: Custom monitoring dashboards
+- **Performans İzleme**: Sistem ve uygulama metriklerini izleme
+- **Özel Metrikler**: Özel izleme metrikleri oluşturma
+- **Uyarılar**: Yapılandırılabilir uyarılar ve bildirimler
+- **Gösterge Panelleri**: Özel izleme gösterge panelleri
 
-### Cloud Log Service (CLS)
+### Bulut Günlük Hizmeti (CLS)
 
-- **Centralized Logging**: Collect and analyze all system logs
-- **Real-time Processing**: Real-time log processing and analysis
-- **Log Search**: Powerful log search and query capabilities
-- **Integration**: Integration with monitoring and alerting
+- **Merkezi Günlükleme**: Tüm sistem günlüklerini toplama ve analiz etme
+- **Gerçek Zamanlı İşleme**: Gerçek zamanlı günlük işleme ve analiz
+- **Günlük Arama**: Güçlü günlük arama ve sorgulama yetenekleri
+- **Entegrasyon**: İzleme ve uyarı sistemleriyle entegrasyon
 
-### Application Performance Monitoring (APM)
+### Uygulama Performans İzleme (APM)
 
-- **Distributed Tracing**: Trace requests across microservices
-- **Performance Analysis**: Application performance bottleneck analysis
-- **Error Tracking**: Error detection and analysis
-- **Code Profiling**: Code-level performance profiling
+- **Dağıtık İzleme**: Mikroservisler arasında istekleri izleme
+- **Performans Analizi**: Uygulama performans darboğaz analizi
+- **Hata Takibi**: Hata tespiti ve analiz
+- **Kod Profil Oluşturma**: Kod düzeyi performans profil oluşturma
 
-## Cost Optimization
+## Maliyet Optimizasyonu
 
-### Pricing Models
+### Fiyatlandırma Modelleri
 
-- **Pay-as-you-go**: Pay only for resources consumed
-- **Reserved Instances**: Reserved capacity for predictable workloads
-- **Spot Instances**: Cost-effective spot instances
-- **Resource Packages**: Bundled resources for better pricing
+- **Kullandıkça Öde**: Sadece tüketilen kaynaklar için ödeme
+- **Rezerv Edilmiş Örnekler**: Öngörülebilir iş yükleri için rezerv kapasite
+- **Spot Örnekler**: Maliyet etkin spot örnekler
+- **Kaynak Paketleri**: Daha iyi fiyatlandırma için paketlenmiş kaynaklar
 
-### Gaming Cost Optimization
+### Oyun Maliyet Optimizasyonu
 
-- **Dynamic Scaling**: Scale game servers based on player count
-- **Regional Optimization**: Deploy in cost-effective regions
-- **Off-peak Scaling**: Reduce resources during off-peak hours
-- **Spot Instances**: Use spot instances for development and testing
+- **Dinamik Ölçeklendirme**: Oyuncu sayısına dayalı oyun sunucularını ölçeklendirme
+- **Bölgesel Optimizasyon**: Maliyet etkin bölgelerde dağıtım
+- **Zirve Dışı Ölçeklendirme**: Zirve dışı saatlerde kaynakları azaltma
+- **Spot Örnekler**: Geliştirme ve test için spot örnekler kullanma
 
-### AI/ML Cost Optimization
+### AI/ML Maliyet Optimizasyonu
 
-- **Preemptible Training**: Use preemptible instances for training
-- **Model Compression**: Compress models to reduce storage costs
-- **Batch Inference**: Batch inference for cost efficiency
-- **Auto Scaling**: Automatic scaling based on inference demand
+- **Öncelikli Eğitim**: Eğitim için öncelikli örnekler kullanma
+- **Model Sıkıştırma**: Depolama maliyetlerini azaltmak için modelleri sıkıştırma
+- **Toplu Çıkarsama**: Maliyet verimliliği için toplu çıkarsama
+- **Otomatik Ölçeklendirme**: Çıkarsama talebine dayalı otomatik ölçeklendirme
 
-## Migration Services
+## Geçiş Hizmetleri
 
-### Cloud Migration Service
+### Bulut Geçiş Hizmeti
 
-- **Assessment**: Comprehensive infrastructure assessment
-- **Planning**: Detailed migration planning and strategy
-- **Execution**: Automated migration execution
-- **Validation**: Post-migration validation and testing
+- **Değerlendirme**: Kapsamlı altyapı değerlendirmesi
+- **Planlama**: Detaylı geçiş planlaması ve stratejisi
+- **Yürütme**: Otomatik geçiş yürütme
+- **Doğrulama**: Geçiş sonrası doğrulama ve test
 
-### Database Migration Service (DMS)
+### Veritabanı Geçiş Hizmeti (DMS)
 
-- **Database Migration**: Migrate databases with minimal downtime
-- **Real-time Sync**: Real-time data synchronization
-- **Schema Conversion**: Automatic schema conversion
-- **Monitoring**: Migration progress monitoring
+- **Veritabanı Geçişi**: Minimum kesinti süresiyle veritabanları geçişi
+- **Gerçek Zamanlı Eşzamanlama**: Gerçek zamanlı veri eşzamanlaması
+- **Şema Dönüştürme**: Otomatik şema dönüştürme
+- **İzleme**: Geçiş ilerleme izleme
 
-### Server Migration Service
+### Sunucu Geçiş Hizmeti
 
-- **Physical to Cloud**: Migrate physical servers to cloud
-- **VM Migration**: Migrate virtual machines
-- **Containerization**: Containerize legacy applications
-- **Testing**: Comprehensive migration testing
+- **Fizikselden Buluta**: Fiziksel sunucuları buluta geçirme
+- **VM Geçişi**: Sanal makineleri geçirme
+- **Konteynerleştirme**: Eski uygulamaları konteynerleştirme
+- **Test Etme**: Kapsamlı geçiş testi
 
-## Best Practices
+## En İyi Uygulamalar
 
-### Gaming Best Practices
+### Oyun En İyi Uygulamaları
 
-1. **Global Deployment**: Deploy game servers in multiple regions
-2. **Auto Scaling**: Implement auto scaling for player demand
-3. **Low Latency**: Optimize for low-latency gaming experience
-4. **Data Analytics**: Implement player behavior analytics
+1. **Küresel Dağıtım**: Oyun sunucularını çoklu bölgelerde dağıtma
+2. **Otomatik Ölçeklendirme**: Oyuncu talebi için otomatik ölçeklendirme uygulama
+3. **Düşük Gecikme Süresi**: Düşük gecikme süresi için oyun deneyimini optimize etme
+4. **Veri Analitiği**: Oyuncu davranış analitiği uygulama
 
-### AI/ML Best Practices
+### AI/ML En İyi Uygulamaları
 
-1. **Data Pipeline**: Build robust data processing pipelines
-2. **Model Versioning**: Implement model versioning and rollback
-3. **A/B Testing**: Implement A/B testing for model deployment
-4. **Monitoring**: Monitor model performance and drift
+1. **Veri Boru Hattı**: Sağlam veri işleme boru hatları oluşturma
+2. **Model Sürümleme**: Model sürümleme ve geri alma uygulama
+3. **A/B Testi**: Model dağıtımı için A/B testi uygulama
+4. **İzleme**: Model performansını ve kaymasını izleme
 
-### Security Best Practices
+### Güvenlik En İyi Uygulamaları
 
-1. **Network Security**: Use VPC and security groups
-2. **Data Encryption**: Encrypt data at rest and in transit
-3. **Access Control**: Implement fine-grained access control
-4. **Audit Logging**: Enable comprehensive audit logging
+1. **Ağ Güvenliği**: VPC ve güvenlik gruplarını kullanma
+2. **Veri Şifreleme**: Dinlenme halinde ve aktarım halinde veri şifreleme
+3. **Erişim Kontrolü**: İnce taneli erişim kontrolü uygulama
+4. **Denetim Günlükleme**: Kapsamlı denetim günlükleme etkinleştirme
 
-## Support and Services
+## Destek ve Hizmetler
 
-### Technical Support
+### Teknik Destek
 
-- **24/7 Support**: Round-the-clock technical support
-- **Gaming Expertise**: Specialized gaming industry support
-- **AI/ML Expertise**: Specialized AI/ML technical support
-- **Training**: Comprehensive training programs
+- **7/24 Destek**: Kesintisiz teknik destek
+- **Oyun Uzmanlığı**: Oyun endüstrisi için özel destek
+- **AI/ML Uzmanlığı**: AI/ML için özel teknik destek
+- **Eğitim**: Kapsamlı eğitim programları
 
-### Professional Services
+### Profesyonel Hizmetler
 
-- **Architecture Design**: Design optimal cloud architecture
-- **Gaming Solutions**: Specialized gaming solution design
-- **AI/ML Consulting**: AI/ML architecture consulting
-- **Migration Services**: End-to-end migration services
+- **Mimari Tasarım**: Optimal bulut mimarisi tasarlama
+- **Oyun Çözümleri**: Oyun çözümleri için özel tasarım
+- **AI/ML Danışmanlığı**: AI/ML mimari danışmanlığı
+- **Geçiş Hizmetleri**: Baştan sona geçiş hizmetleri
 
-### Partner Ecosystem
+### Partner Ekosistemi
 
-- **Gaming Partners**: Access to gaming industry partners
-- **AI/ML Partners**: Access to AI/ML technology partners
-- **System Integrators**: Certified system integration partners
-- **Marketplace**: Tencent Cloud Marketplace solutions
+- **Oyun Partnerleri**: Oyun endüstrisi partnerlerine erişim
+- **AI/ML Partnerleri**: AI/ML teknoloji partnerlerine erişim
+- **Sistem Entegratörleri**: Sertifikalı sistem entegrasyon partnerleri
+- **Marketplace**: Tencent Cloud Marketplace çözümleri
 
-## Getting Started
+## Başlarken
 
-### Prerequisites
+### Ön Koşullar
 
-1. **Tencent Cloud Account**: Set up account with appropriate permissions
-2. **VPC Configuration**: Configure Virtual Private Cloud
-3. **Security Setup**: Configure security groups and CAM
-4. **Network Planning**: Plan network architecture
+1. **Tencent Cloud Hesabı**: Uygun izinlerle hesap kurma
+2. **VPC Yapılandırması**: Sanal Özel Bulut yapılandırma
+3. **Güvenlik Kurulumu**: Güvenlik gruplarını ve CAM'ı yapılandırma
+4. **Ağ Planlama**: Ağ mimarisini planlama
 
-### Quick Start for Gaming
+### Oyun İçin Hızlı Başlangıç
 
-1. **Launch CVM Instances**: Launch gaming-optimized instances
-2. **Configure GSE**: Set up Game Server Engine
-3. **Install RustFS**: Install and configure storage
-4. **CDN Setup**: Configure CDN for content delivery
-5. **Testing**: Test gaming performance
-6. **Production**: Deploy to production environment
+1. **CVM Örneklerini Başlat**: Oyun için optimize edilmiş örnekler başlatma
+2. **GSE Yapılandırma**: Oyun Sunucu Motorunu kurma
+3. **RustFS Kur**: Depolamayı kur ve yapılandır
+4. **CDN Kurulumu**: İçerik dağıtımı için CDN yapılandırma
+5. **Test Etme**: Oyun performansını test etme
+6. **Üretim**: Üretim ortamına dağıtma
 
-### Quick Start for AI/ML
+### AI/ML İçin Hızlı Başlangıç
 
-1. **Launch GPU Instances**: Launch GPU-optimized instances
-2. **Configure TMLP**: Set up ML platform
-3. **Install RustFS**: Install and configure storage
-4. **Data Pipeline**: Set up data processing pipeline
-5. **Model Training**: Start model training
-6. **Model Serving**: Deploy models for inference
+1. **GPU Örneklerini Başlat**: GPU optimize edilmiş örnekler başlatma
+2. **TMLP Yapılandırma**: ML platformunu kurma
+3. **RustFS Kur**: Depolamayı kur ve yapılandır
+4. **Veri Boru Hattı**: Veri işleme boru hattını kurma
+5. **Model Eğitimi**: Model eğitimine başlama
+6. **Model Servis**: Çıkarsama için modelleri dağıtma
 
-### Next Steps
+### Sonraki Adımlar
 
-- **Monitoring**: Set up comprehensive monitoring
-- **Optimization**: Optimize performance and costs
-- **Scaling**: Plan for future growth
-- **Security**: Implement security best practices
+- **İzleme**: Kapsamlı izleme kurma
+- **Optimizasyon**: Performansı ve maliyetleri optimize etme
+- **Ölçeklendirme**: Gelecekteki büyüme için planlama
+- **Güvenlik**: Güvenlik en iyi uygulamalarını uygulama

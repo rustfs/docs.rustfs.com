@@ -1,75 +1,74 @@
 ---
-title: "Availability and Scalability Guide"
-description: "This document provides detailed technical information about RustFS scaling capabilities and procedures."
+title: "Kullanılabilirlik ve Ölçeklenebilirlik Kılavuzu"
+description: "Bu belge, RustFS ölçeklenebilirlik yetenekleri ve prosedürleri hakkında detaylı teknik bilgi sağlar."
+---
+# Kullanılabilirlik ve Ölçeklenebilirlik Kılavuzu
+
+## Ölçeklenebilirlik Genel Bakış
+
+RustFS, yeni depolama havuzları (Sunucu Havuzları) ekleyerek yatay ölçeklenebilirliği destekler. Her yeni depolama havuzu aşağıdaki gereksinimleri karşılamalıdır:
+
+1. Depolama havuzundaki düğümler **art arda ana bilgisayar adları** kullanmalıdır (örneğin, node5-node8)
+2. Tek bir depolama havuzundaki tüm düğümler **aynı disk özelliklerini** kullanmalıdır (tip/kapasite/miktar)
+3. Yeni depolama havuzları, mevcut küme ile **zaman senkronizasyonunu** ve **ağ bağlantısını** korumalıdır
+
+![RustFS Mimari](./images/s2-1.png)
+
 ---
 
-# Availability and Scalability Guide
+## 1. Ölçeklendirme Öncesi Hazırlık
 
-## Scaling Overview
+### 1.1 Donanım Planlama Gereksinimleri
 
-RustFS supports horizontal scaling through adding new storage pools (Server Pools). Each new storage pool must meet the following requirements:
-
-1. Nodes within the storage pool must use **consecutive hostnames** (e.g., node5-node8)
-2. All nodes within a single storage pool must use **identical disk specifications** (type/capacity/quantity)
-3. New storage pools must maintain **time synchronization** and **network connectivity** with the existing cluster
-
-![RustFS Architecture](./images/s2-1.png)
-
----
-
-## 1. Pre-Scaling Preparation
-
-### 1.1 Hardware Planning Requirements
-
-| Item | Minimum Requirements | Recommended Production Configuration |
+| Öğe | Minimum Gereksinimler | Önerilen Üretim Yapılandırması |
 |---------------|---------------------------|---------------------------|
-| Node Count | 4 nodes/pool | 4 - 8 nodes/pool |
-| Node Memory | 128 GB | 128 GB |
-| Disk Type | SSD | NVMe SSD |
-| Disk Capacity | ≥1 TB | ≥4 TB |
-| Network Bandwidth | 10 Gbps | 25 Gbps |
+| Düğüm Sayısı | 4 düğüm/havuz | 4 - 8 düğüm/havuz |
+| Düğüm Belleği | 128 GB | 128 GB |
+| Disk Türü | SSD | NVMe SSD |
+| Disk Kapasitesi | ≥1 TB | ≥4 TB |
+| Ağ Bant Genişliği | 10 Gbps | 25 Gbps |
 
-### 1.2 System Environment Check
+### 1.2 Sistem Ortamı Kontrolü
 
 ```bash
-# Check hostname continuity (new nodes example)
+# Ana bilgisayar adı sürekliliğini kontrol edin (yeni düğüm örnekleri)
 cat /etc/hosts
 192.168.10.5 node5
 192.168.10.6 node6
 192.168.10.7 node7
 192.168.10.8 node8
 
-# Verify time synchronization status
+# Zaman senkronizasyonu durumunu doğrulayın
 timedatectl status | grep synchronized
 
-# Check firewall rules (all nodes need ports 7000/7001 open)
+# Güvenlik duvarı kurallarını kontrol edin (tüm düğümlerin 7000/7001 portları açık olmalı)
 firewall-cmd --list-ports | grep 7000
 ```
 
 ---
 
-## 2. Scaling Implementation Steps
+## 2. Ölçeklendirme Uygulama Adımları
 
-### 2.1 New Node Basic Configuration
+### 2.1 Yeni Düğüm Temel Yapılandırması
 
 ```bash
-# Create dedicated user (execute on all new nodes)
+# Özel kullanıcı oluşturun (tüm yeni düğümlerde çalıştırın)
 groupadd rustfs-user
 useradd -M -r -g rustfs-user rustfs-user
 
-# Create storage directories (8 disks example)
+# Depolama dizinleri oluşturun (8 disk örneği)
 mkdir -p /data/rustfs{0..7}
 chown -R rustfs-user:rustfs-user /data/rustfs*
 ```
 
-### 2.2 Install RustFS Service
+### 2.2 RustFS Servisini Yükleyin
 
 ```bash
-# Download latest binary package (version must match existing cluster)
+# En son ikili paketi indirin (sürüm mevcut kümeyle eşleşmeli)
 wget https://dl.rustfs.com/rustfs/v2.3.0/rustfs -O /usr/local/bin/rustfs
 chmod +x /usr/local/bin/rustfs
 
-# Create configuration file (/etc/default/rustfs)
+# Yapılandırma dosyası oluşturun (/etc/default/rustfs)
 cat <<EOF > /etc/default/rustfs
 RUSTFS_ROOT_USER=admin
 RUSTFS_ROOT_PASSWORD=YourSecurePassword
@@ -79,60 +78,60 @@ RUSTFS_CONSOLE_ADDRESS=":7001"
 EOF
 ```
 
-### 2.3 Cluster Scaling Operation
+### 2.3 Küme Ölçeklendirme İşlemi
 
 ```bash
-# Update configuration on all existing nodes (add new storage pool)
+# Tüm mevcut düğümlerde yapılandırmayı güncelleyin (yeni depolama havuzu ekleyin)
 sed -i '/RUSTFS_VOLUMES/s|"$| http://node{5...8}:7000/data/rustfs{0...7}"|' /etc/default/rustfs
 
-# Global service restart (execute simultaneously on all nodes)
+# Küresel servis yeniden başlatma (tüm düğümlerde eşzamanlı olarak çalıştırın)
 systemctl restart rustfs.service
 ```
 
 ---
 
-## 3. Post-Scaling Verification
+## 3. Ölçeklendirme Sonrası Doğrulama
 
-### 3.1 Cluster Status Check
+### 3.1 Küme Durumu Kontrolü
 
 ```bash
-# Check node join status
+# Düğüm katılım durumunu kontrol edin
 curl -s http://node1:7001/cluster/nodes | jq .poolMembers
 
-# Verify storage pool distribution
+# Depolama havuzu dağılımını doğrulayın
 rc admin info cluster
 ```
 
-### 3.2 Data Balance Verification
+### 3.2 Veri Dengesini Doğrulayın
 
 ```bash
-# Check data distribution ratio (should approximate storage pool capacity ratio)
+# Veri dağılım oranını kontrol edin (depolama havuzu kapasite oranına yaklaşmalı)
 watch -n 5 "rustfs-admin metrics | grep 'PoolUsagePercent'"
 ```
 
 ---
 
-## 4. Important Notes
+## 4. Önemli Notlar
 
-1. **Rolling Restart Prohibited**: All nodes must be restarted simultaneously to avoid data inconsistency
-2. **Capacity Planning Recommendation**: Plan next scaling when storage utilization reaches 70%
-3. **Performance Tuning Recommendations**:
+1. **Kademeli Yeniden Başlatma Yasak**: Veri tutarsızlığını önlemek için tüm düğümler eşzamanlı olarak yeniden başlatılmalıdır
+2. **Kapasite Planlama Önerisi**: Depolama kullanımı %70'e ulaştığında bir sonraki ölçeklendirmeyi planlayın
+3. **Performans Ayarlama Önerileri**:
 
- ```bash
- # Adjust kernel parameters (all nodes)
- echo "vm.swappiness=10" >> /etc/sysctl.conf
- echo "net.core.somaxconn=32768" >> /etc/sysctl.conf
- sysctl -p
- ```
+```bash
+# Çekirdek parametrelerini ayarlayın (tüm düğümler)
+echo "vm.swappiness=10" >> /etc/sysctl.conf
+echo "net.core.somaxconn=32768" >> /etc/sysctl.conf
+sysctl -p
+```
 
 ---
 
-## 5. Troubleshooting Guide
+## 5. Sorun Giderme Kılavuzu
 
-| Symptom | Check Point | Fix Command |
+| Belirti | Kontrol Noktası | Düzeltme Komutu |
 |---------------------------|---------------------------------|-------------------------------|
-| New node cannot join cluster | Check port 7000 connectivity | `telnet node5 7000` |
-| Data distribution imbalance | Check storage pool capacity configuration | `rustfs-admin rebalance start`|
-| Console shows abnormal node status | Verify time synchronization status | `chronyc sources` |
+| Yeni düğüm kümeye katılamıyor | 7000 portu bağlantısını kontrol edin | `telnet node5 7000` |
+| Veri dağılımı dengesiz | Depolama havuzu kapasite yapılandırmasını kontrol edin | `rustfs-admin rebalance start` |
+| Konsol anormal düğüm durumunu gösteriyor | Zaman senkronizasyonu durumunu doğrulayın | `chronyc sources` |
 
-> Note: This document is based on the latest version of RustFS. Please ensure full data backup before scaling operations. For production environments, we recommend consulting with RustFS technical support engineers for solution review.
+> Not: Bu belge, RustFS'nin en son sürümüne dayanmaktadır. Ölçeklendirme işlemlerinden önce tam veri yedeği alınmasını sağlayın. Üretim ortamları için, çözüm incelemesi için RustFS teknik destek mühendisleriyle görüşmenizi öneririz.

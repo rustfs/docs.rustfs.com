@@ -1,138 +1,138 @@
-# Huawei Cloud Integration
+# Huawei Cloud Entegrasyonu
 
-RustFS provides comprehensive integration with Huawei Cloud services, enabling secure, compliant, and high-performance storage solutions for enterprise customers.
+RustFS, Huawei Cloud hizmetleriyle kapsamlı bir entegrasyon sunarak, kurumsal müşteriler için güvenli, uyumlu ve yüksek performanslı depolama çözümleri sağlar.
 
-## Overview
+## Genel Bakış
 
-![Huawei Cloud Integration](./images/sec1-1.png)
+![Huawei Cloud Entegrasyonu](./images/sec1-1.png)
 
-RustFS on Huawei Cloud delivers:
+Huawei Cloud üzerindeki RustFS şunları sunar:
 
-- **Native Integration**: Deep integration with Huawei Cloud services
-- **Enterprise Security**: Enhanced security and compliance features
-- **High Performance**: Optimized for Huawei Cloud infrastructure
-- **Cost Efficiency**: Intelligent resource management and optimization
+- **Yerel Entegrasyon**: Huawei Cloud hizmetleriyle derin entegrasyon
+- **Kurumsal Güvenlik**: Gelişmiş güvenlik ve uyumluluk özellikleri
+- **Yüksek Performans**: Huawei Cloud altyapısı için optimize edilmiştir
+- **Maliyet Verimliliği**: Akıllı kaynak yönetimi ve optimizasyon
 
-## Core Integrations
+## Temel Entegrasyonlar
 
-### Compute Services
+### Hesaplama Hizmetleri
 
-#### Elastic Cloud Server (ECS)
+#### Esnek Bulut Sunucusu (ECS)
 
-- **Optimized Instances**: Recommended instance types for storage workloads
-- **Auto Scaling**: Automatic scaling based on demand
-- **High Availability**: Multi-AZ deployment for fault tolerance
-- **Performance Optimization**: CPU and memory optimization for storage
+- **Optimize Edilmiş Örnekler**: Depolama iş yükleri için önerilen örnek türleri
+- **Otomatik Ölçeklendirme**: Talebe dayalı otomatik ölçeklendirme
+- **Yüksek Kullanılabilirlik**: Hata toleransı için çoklu kullanılabilirlik bölgesi dağıtımı
+- **Performans Optimizasyonu**: Depolama için CPU ve bellek optimizasyonu
 
-#### Cloud Container Engine (CCE)
+#### Bulut Konteyner Motoru (CCE)
 
-- **Kubernetes Deployment**: Deploy RustFS on managed Kubernetes
-- **Container Storage**: Integration with cloud storage services
-- **Service Mesh**: Integration with Istio service mesh
-- **DevOps Pipeline**: CI/CD integration with CodeArts
+- **Kubernetes Dağıtımı**: Yönetilen Kubernetes üzerinde RustFS dağıtımı
+- **Konteyner Depolama**: Bulut depolama hizmetleriyle entegrasyon
+- **Servis Ağı**: Istio servis ağıyla entegrasyon
+- **DevOps Boru Hattı**: CodeArts ile CI/CD entegrasyonu
 
-### Storage Services
+### Depolama Hizmetleri
 
-#### Object Storage Service (OBS)
+#### Nesne Depolama Hizmeti (OBS)
 
-- **S3 Compatibility**: Full S3 API compatibility
-- **Intelligent Tiering**: Automatic data tiering to optimize costs
-- **Cross-Region Replication**: Multi-region data replication
-- **Lifecycle Management**: Automated data lifecycle policies
+- **S3 Uyumluluğu**: Tam S3 API uyumluluğu
+- **Akıllı Katmanlandırma**: Maliyetleri optimize etmek için otomatik veri katmanlandırma
+- **Çok Bölgeli Çoğaltma**: Çok bölge veri çoğaltma
+- **Yaşam Döngüsü Yönetimi**: Otomatik veri yaşam döngüsü politikaları
 
-#### Elastic Volume Service (EVS)
+#### Esnek Hacim Hizmeti (EVS)
 
-- **High-Performance Storage**: SSD and Ultra-high I/O volumes
-- **Snapshot Management**: Automated backup and snapshot management
-- **Encryption**: Built-in encryption with KMS integration
-- **Multi-Attach**: Shared storage across multiple instances
+- **Yüksek Performanslı Depolama**: SSD ve Ultra yüksek G/Ç hacimleri
+- **Anlık Görüntü Yönetimi**: Otomatik yedekleme ve anlık görüntü yönetimi
+- **Şifreleme**: KMS entegrasyonlu yerleşik şifreleme
+- **Çoklu Bağlantı**: Çoklu örnekler arasında paylaşılan depolama
 
-#### Scalable File Service (SFS)
+#### Ölçeklenebilir Dosya Hizmeti (SFS)
 
-- **NFS Protocol**: POSIX-compliant file system interface
-- **Performance Tiers**: Standard and Performance file systems
-- **Capacity Scaling**: Automatic capacity scaling
-- **Access Control**: Fine-grained access control
+- **NFS Protokolü**: POSIX uyumlu dosya sistemi arayüzü
+- **Performans Katmanları**: Standart ve Performans dosya sistemleri
+- **Kapasite Ölçeklendirme**: Otomatik kapasite ölçeklendirme
+- **Erişim Kontrolü**: İnce taneli erişim kontrolü
 
-### Network Services
+### Ağ Hizmetleri
 
-#### Virtual Private Cloud (VPC)
+#### Sanal Özel Bulut (VPC)
 
-- **Network Isolation**: Secure isolated network environment
-- **Subnets**: Multi-AZ subnet deployment
-- **Security Groups**: Fine-grained network access control
-- **VPC Peering**: Cross-VPC connectivity
+- **Ağ İzolasyonu**: Güvenli izole ağ ortamı
+- **Alt Ağlar**: Çoklu kullanılabilirlik bölgesi alt ağ dağıtımı
+- **Güvenlik Grupları**: İnce taneli ağ erişim kontrolü
+- **VPC Eşleştirme**: Çapraz VPC bağlantısı
 
-#### Elastic Load Balance (ELB)
+#### Esnek Yük Dengesleyici (ELB)
 
-- **Traffic Distribution**: Distribute traffic across multiple instances
-- **Health Checks**: Automatic health monitoring
-- **SSL Termination**: SSL/TLS termination at load balancer
-- **Session Persistence**: Session affinity support
+- **Trafik Dağıtımı**: Trafiği çoklu örnekler arasında dağıtma
+- **Sağlık Kontrolleri**: Otomatik sağlık izleme
+- **SSL Sonlandırma**: Yük dengeleyicide SSL/TLS sonlandırma
+- **Oturum Kalıcılığı**: Oturum afinitesi desteği
 
-#### Content Delivery Network (CDN)
+#### İçerik Dağıtım Ağı (CDN)
 
-- **Global Acceleration**: Accelerate content delivery worldwide
-- **Edge Caching**: Intelligent edge caching strategies
-- **HTTPS Support**: Secure content delivery
-- **Real-time Monitoring**: Performance and usage analytics
+- **Küresel Hızlandırma**: Dünya çapında içerik dağıtımını hızlandırma
+- **Kenar Önbellekleme**: Akıllı kenar önbellekleme stratejileri
+- **HTTPS Desteği**: Güvenli içerik dağıtımı
+- **Gerçek Zamanlı İzleme**: Performans ve kullanım analitiği
 
-## Security Integration
+## Güvenlik Entegrasyonu
 
-### Identity and Access Management (IAM)
+### Kimlik ve Erişim Yönetimi (IAM)
 
-- **Fine-grained Permissions**: Precise access control policies
-- **Role-based Access**: IAM roles and policies
-- **Multi-Factor Authentication**: Enhanced security with MFA
-- **Federation**: Integration with enterprise identity systems
+- **İnce Taneli İzinler**: Kesin erişim kontrol politikaları
+- **Rol Tabanlı Erişim**: IAM roller ve politikaları
+- **Çok Faktörlü Kimlik Doğrulama**: MFA ile geliştirilmiş güvenlik
+- **Federasyon**: Kurumsal kimlik sistemleriyle entegrasyon
 
-### Key Management Service (KMS)
+### Anahtar Yönetim Hizmeti (KMS)
 
-- **Encryption Key Management**: Centralized key management
-- **Hardware Security Modules**: HSM-backed key protection
-- **Key Rotation**: Automatic key rotation policies
-- **Compliance**: Meet regulatory compliance requirements
+- **Şifreleme Anahtarı Yönetimi**: Merkezi anahtar yönetimi
+- **Donanım Güvenlik Modülleri**: HSM destekli anahtar koruma
+- **Anahtar Döndürme**: Otomatik anahtar döndürme politikaları
+- **Uyumluluk**: Düzenleyici uyumluluk gereksinimlerini karşılama
 
-### Cloud Trace Service (CTS)
+### Bulut İzleme Hizmeti (CTS)
 
-- **API Auditing**: Complete audit trail of all operations
-- **Compliance Reporting**: Automated compliance reporting
-- **Security Analysis**: Security event analysis and monitoring
-- **Integration**: Integration with SIEM systems
+- **API Denetimi**: Tüm işlemlerin tam denetim izi
+- **Uyumluluk Raporlaması**: Otomatik uyumluluk raporlaması
+- **Güvenlik Analizi**: Güvenlik olay analizi ve izleme
+- **Entegrasyon**: SIEM sistemleriyle entegrasyon
 
-### Web Application Firewall (WAF)
+### Web Uygulaması Güvenlik Duvarı (WAF)
 
-- **Application Protection**: Protect against web attacks
-- **DDoS Protection**: Distributed denial of service protection
-- **Bot Management**: Automated bot detection and mitigation
-- **Custom Rules**: Custom security rules and policies
+- **Uygulama Koruması**: Web saldırılarına karşı koruma
+- **DDoS Koruması**: Dağıtılmış hizmet reddi koruması
+- **Bot Yönetimi**: Otomatik bot tespiti ve azaltma
+- **Özel Kurallar**: Özel güvenlik kuralları ve politikaları
 
-## Monitoring and Operations
+## İzleme ve İşlemler
 
 ### Cloud Eye
 
-- **Performance Monitoring**: Monitor system and application metrics
-- **Custom Metrics**: Create custom monitoring metrics
-- **Alerting**: Set up alerts and notifications
-- **Dashboards**: Custom monitoring dashboards
+- **Performans İzleme**: Sistem ve uygulama metriklerini izleme
+- **Özel Metrikler**: Özel izleme metrikleri oluşturma
+- **Uyarılar**: Uyarılar ve bildirimler ayarlama
+- **Gösterge Panelleri**: Özel izleme gösterge panelleri
 
-### Log Tank Service (LTS)
+### Günlük Tank Hizmeti (LTS)
 
-- **Centralized Logging**: Collect and analyze all system logs
-- **Real-time Analysis**: Real-time log processing
-- **Search and Query**: Powerful log search capabilities
-- **Integration**: Integration with monitoring systems
+- **Merkezi Günlükleme**: Tüm sistem günlüklerini toplama ve analiz etme
+- **Gerçek Zamanlı Analiz**: Gerçek zamanlı günlük işleme
+- **Arama ve Sorgulama**: Güçlü günlük arama yetenekleri
+- **Entegrasyon**: İzleme sistemleriyle entegrasyon
 
-### Application Performance Management (APM)
+### Uygulama Performans Yönetimi (APM)
 
-- **Performance Monitoring**: Monitor application performance
-- **Distributed Tracing**: Trace requests across services
-- **Error Analysis**: Identify and analyze errors
-- **Performance Optimization**: Performance tuning recommendations
+- **Performans İzleme**: Uygulama performansını izleme
+- **Dağıtık İzleme**: Hizmetler arasında istekleri izleme
+- **Hata Analizi**: Hataları tanımlama ve analiz etme
+- **Performans Optimizasyonu**: Performans ayarlama önerileri
 
-## Deployment Architectures
+## Dağıtım Mimarileri
 
-### Single-Region Deployment
+### Tek Bölge Dağıtımı
 
 ```
 ┌─────────────────┐
@@ -153,7 +153,7 @@ RustFS on Huawei Cloud delivers:
 └─────────────────┘
 ```
 
-### Multi-Region Deployment
+### Çok Bölgeli Dağıtım
 
 ```
 ┌─────────────────┐    ┌─────────────────┐
@@ -166,7 +166,7 @@ RustFS on Huawei Cloud delivers:
 └─────────────────┘    └─────────────────┘
 ```
 
-### Hybrid Cloud Architecture
+### Hibrit Bulut Mimarisi
 
 ```
 ┌─────────────────┐    ┌─────────────────┐
@@ -179,157 +179,157 @@ RustFS on Huawei Cloud delivers:
 └─────────────────┘    └─────────────────┘
 ```
 
-## Industry Solutions
+## Sektörel Çözümler
 
-### Government and Public Sector
+### Hükümet ve Kamu Sektörü
 
-- **Compliance**: Meet government security and compliance requirements
-- **Data Sovereignty**: Ensure data remains within national boundaries
-- **Security Clearance**: Support for classified data handling
-- **Audit Trail**: Complete audit trails for regulatory compliance
+- **Uyumluluk**: Hükümet güvenlik ve uyumluluk gereksinimlerini karşılama
+- **Veri Egemenliği**: Verilerin ulusal sınırlar içinde kalmasını sağlama
+- **Güvenlik Onayı**: Sınıflandırılmış veri işleme desteği
+- **Denetim İzi**: Düzenleyici uyumluluk için tam denetim izleri
 
-### Financial Services
+### Finansal Hizmetler
 
-- **Regulatory Compliance**: Meet banking and financial regulations
-- **High Availability**: 99.99% uptime guarantees
-- **Low Latency**: Sub-millisecond data access
-- **Disaster Recovery**: Multi-site disaster recovery capabilities
+- **Düzenleyici Uyumluluk**: Bankacılık ve finans düzenlemelerini karşılama
+- **Yüksek Kullanılabilirlik**: %99,99 çalışma süresi garantisi
+- **Düşük Gecikme Süresi**: Milisaniyenin altında veri erişimi
+- **Felaket Kurtarma**: Çoklu site felaket kurtarma yetenekleri
 
-### Healthcare
+### Sağlık Hizmetleri
 
-- **Data Privacy**: Protect patient data and medical records
-- **Compliance**: Meet healthcare regulatory requirements
-- **Integration**: Integration with healthcare systems
-- **Backup**: Automated backup and recovery
+- **Veri Gizliliği**: Hasta verilerini ve tıbbi kayıtları koruma
+- **Uyumluluk**: Sağlık düzenleyici gereksinimlerini karşılama
+- **Entegrasyon**: Sağlık sistemleriyle entegrasyon
+- **Yedekleme**: Otomatik yedekleme ve kurtarma
 
-### Manufacturing
+### İmalat
 
-- **IoT Integration**: Support for industrial IoT data
-- **Real-time Processing**: Real-time data processing and analytics
-- **Edge Computing**: Edge storage and computing capabilities
-- **Scalability**: Scale to handle massive data volumes
+- **IoT Entegrasyonu**: Endüstriyel IoT verileri için destek
+- **Gerçek Zamanlı İşleme**: Gerçek zamanlı veri işleme ve analitiği
+- **Kenar Bilgi İşlem**: Kenar depolama ve bilgi işlem yetenekleri
+- **Ölçeklenebilirlik**: Kütle veri hacimlerini işlemek için ölçeklendirme
 
-## Cost Optimization
+## Maliyet Optimizasyonu
 
-### Pricing Models
+### Fiyatlandırma Modelleri
 
-- **Pay-as-you-go**: Pay only for resources consumed
-- **Monthly Subscription**: Reserved capacity for predictable workloads
-- **Yearly Subscription**: Long-term commitments for better pricing
-- **Resource Packages**: Bundled resources for cost optimization
+- **Kullandıkça Öde**: Sadece tüketilen kaynaklar için ödeme
+- **Aylık Abonelik**: Öngörülebilir iş yükleri için rezerv kapasite
+- **Yıllık Abonelik**: Daha iyi fiyatlandırma için uzun vadeli taahhütler
+- **Kaynak Paketleri**: Maliyet optimizasyonu için paketlenmiş kaynaklar
 
-### Cost Management
+### Maliyet Yönetimi
 
-- **Usage Monitoring**: Monitor resource usage and costs
-- **Budget Management**: Set budgets and cost alerts
-- **Cost Analysis**: Detailed cost analysis and recommendations
-- **Optimization**: Automated cost optimization recommendations
+- **Kullanım İzleme**: Kaynak kullanımını ve maliyetleri izleme
+- **Bütçe Yönetimi**: Bütçeler ve maliyet uyarıları ayarlama
+- **Maliyet Analizi**: Detaylı maliyet analizi ve öneriler
+- **Optimizasyon**: Otomatik maliyet optimizasyon önerileri
 
-### Resource Optimization
+### Kaynak Optimizasyonu
 
-- **Right-sizing**: Optimize instance sizes for workloads
-- **Auto Scaling**: Scale resources based on demand
-- **Scheduled Scaling**: Scale based on predictable patterns
-- **Resource Tagging**: Tag resources for cost allocation
+- **Doğru Boyutlandırma**: İş yükleri için örnek boyutlarını optimize etme
+- **Otomatik Ölçeklendirme**: Talebe dayalı kaynakları ölçeklendirme
+- **Zamanlanmış Ölçeklendirme**: Öngörülebilir kalıplara dayalı ölçeklendirme
+- **Kaynak Etiketleme**: Maliyet tahsisi için kaynakları etiketleme
 
-## Migration Services
+## Geçiş Hizmetleri
 
-### Cloud Migration Service
+### Bulut Geçiş Hizmeti
 
-- **Assessment**: Assess current infrastructure and applications
-- **Planning**: Develop comprehensive migration strategy
-- **Execution**: Execute migration with minimal downtime
-- **Validation**: Validate migrated systems and data
+- **Değerlendirme**: Mevcut altyapıyı ve uygulamaları değerlendirme
+- **Planlama**: Kapsamlı geçiş stratejisi geliştirme
+- **Yürütme**: Minimum kesinti süresiyle geçişi yürütme
+- **Doğrulama**: Geçirilen sistemleri ve verileri doğrulama
 
-### Data Replication Service (DRS)
+### Veri Çoğaltma Hizmeti (DRS)
 
-- **Real-time Replication**: Real-time data replication
-- **Migration**: Database and application migration
-- **Synchronization**: Keep data synchronized across environments
-- **Monitoring**: Monitor replication status and performance
+- **Gerçek Zamanlı Çoğaltma**: Gerçek zamanlı veri çoğaltma
+- **Geçiş**: Veritabanı ve uygulama geçişi
+- **Eşzamanlama**: Ortamlar arasında verileri eşzamanlı tutma
+- **İzleme**: Çoğaltma durumunu ve performansını izleme
 
-### Server Migration Service (SMS)
+### Sunucu Geçiş Hizmeti (SMS)
 
-- **Physical to Cloud**: Migrate physical servers to cloud
-- **Virtual to Cloud**: Migrate virtual machines to cloud
-- **Automated Migration**: Automated migration tools
-- **Testing**: Test migrated systems before cutover
+- **Fizikselden Buluta**: Fiziksel sunucuları buluta geçirme
+- **Sanaldan Buluta**: Sanal makineleri buluta geçirme
+- **Otomatik Geçiş**: Otomatik geçiş araçları
+- **Test Etme**: Geçiş öncesi sistemleri test etme
 
-## Best Practices
+## En İyi Uygulamalar
 
-### Architecture Best Practices
+### Mimari En İyi Uygulamaları
 
-1. **Multi-AZ Deployment**: Deploy across multiple availability zones
-2. **Load Balancing**: Use load balancers for high availability
-3. **Auto Scaling**: Implement auto scaling for elasticity
-4. **Backup Strategy**: Implement comprehensive backup and recovery
+1. **Çoklu Kullanılabilirlik Bölgesi Dağıtımı**: Çoklu kullanılabilirlik bölgesinde dağıtım yapma
+2. **Yük Dengeleme**: Yüksek kullanılabilirlik için yük dengeleyiciler kullanma
+3. **Otomatik Ölçeklendirme**: Esneklik için otomatik ölçeklendirme uygulama
+4. **Yedekleme Stratejisi**: Kapsamlı yedekleme ve kurtarma uygulama
 
-### Security Best Practices
+### Güvenlik En İyi Uygulamaları
 
-1. **Least Privilege**: Grant minimum required permissions
-2. **Encryption**: Enable encryption for data at rest and in transit
-3. **Network Security**: Use VPC and security groups
-4. **Monitoring**: Implement security monitoring and alerting
+1. **En Az Ayrıcalık**: Minimum gerekli izinleri verme
+2. **Şifreleme**: Dinlenme halinde ve aktarım halinde veri için şifreleme etkinleştirme
+3. **Ağ Güvenliği**: VPC ve güvenlik gruplarını kullanma
+4. **İzleme**: Güvenlik izleme ve uyarı uygulama
 
-### Performance Best Practices
+### Performans En İyi Uygulamaları
 
-1. **Instance Selection**: Choose appropriate instance types
-2. **Storage Optimization**: Use appropriate storage types
-3. **Network Optimization**: Optimize network configuration
-4. **Caching**: Implement caching for better performance
+1. **Örnek Seçimi**: Uygun örnek türlerini seçme
+2. **Depolama Optimizasyonu**: Uygun depolama türlerini kullanma
+3. **Ağ Optimizasyonu**: Ağ yapılandırmasını optimize etme
+4. **Önbellekleme**: Daha iyi performans için önbellekleme uygulama
 
-### Cost Optimization Best Practices
+### Maliyet Optimizasyonu En İyi Uygulamaları
 
-1. **Resource Planning**: Plan resource requirements carefully
-2. **Regular Reviews**: Regularly review and optimize costs
-3. **Reserved Instances**: Use reserved instances for predictable workloads
-4. **Lifecycle Policies**: Implement data lifecycle policies
+1. **Kaynak Planlama**: Kaynak gereksinimlerini dikkatlice planlama
+2. **Düzenli İncelemeler**: Maliyetleri düzenli olarak gözden geçirme ve optimize etme
+3. **Rezerv Edilmiş Örnekler**: Öngörülebilir iş yükleri için rezerv örnekleri kullanma
+4. **Yaşam Döngüsü Politikaları**: Veri yaşam döngüsü politikaları uygulama
 
-## Support and Services
+## Destek ve Hizmetler
 
-### Technical Support
+### Teknik Destek
 
-- **24/7 Support**: Round-the-clock technical support
-- **Dedicated Support**: Dedicated support for enterprise customers
-- **Expert Consultation**: Access to cloud experts
-- **Training**: Comprehensive training programs
+- **7/24 Destek**: Kesintisiz teknik destek
+- **Özel Destek**: Kurumsal müşteriler için özel destek
+- **Uzman Danışmanlığı**: Bulut uzmanlarına erişim
+- **Eğitim**: Kapsamlı eğitim programları
 
-### Professional Services
+### Profesyonel Hizmetler
 
-- **Architecture Design**: Design optimal cloud architecture
-- **Implementation**: Professional implementation services
-- **Migration**: End-to-end migration services
-- **Optimization**: Ongoing optimization services
+- **Mimari Tasarım**: Optimal bulut mimarisi tasarlama
+- **Uygulama**: Profesyonel uygulama hizmetleri
+- **Geçiş**: Baştan sona geçiş hizmetleri
+- **Optimizasyon**: Sürekli optimizasyon hizmetleri
 
-### Partner Ecosystem
+### Partner Ekosistemi
 
-- **System Integrators**: Access to certified partners
-- **ISV Partners**: Integration with software vendors
-- **Training Partners**: Access to training providers
-- **Marketplace**: Huawei Cloud Marketplace solutions
+- **Sistem Entegratörleri**: Sertifikalı partnere erişim
+- **ISV Partnerleri**: Yazılım satıcılarıyla entegrasyon
+- **Eğitim Partnerleri**: Eğitim sağlayıcılarına erişim
+- **Marketplace**: Huawei Cloud Marketplace çözümleri
 
-## Getting Started
+## Başlarken
 
-### Prerequisites
+### Ön Koşullar
 
-1. **Huawei Cloud Account**: Set up account with appropriate permissions
-2. **VPC Configuration**: Configure Virtual Private Cloud
-3. **Security Setup**: Configure security groups and IAM
-4. **Network Planning**: Plan network architecture
+1. **Huawei Cloud Hesabı**: Uygun izinlerle hesap kurma
+2. **VPC Yapılandırması**: Sanal Özel Bulut yapılandırma
+3. **Güvenlik Kurulumu**: Güvenlik gruplarını ve IAM'ı yapılandırma
+4. **Ağ Planlama**: Ağ mimarisini planlama
 
-### Quick Start Guide
+### Hızlı Başlangıç Kılavuzu
 
-1. **Launch ECS Instances**: Launch compute instances
-2. **Configure Storage**: Set up storage volumes
-3. **Install RustFS**: Install and configure software
-4. **Network Setup**: Configure networking
-5. **Testing**: Test functionality and performance
-6. **Production**: Deploy to production environment
+1. **ECS Örneklerini Başlat**: Hesaplama örneklerini başlat
+2. **Depolamayı Yapılandır**: Depolama hacimlerini kur
+3. **RustFS Kur**: Yazılımı kur ve yapılandır
+4. **Ağ Kurulumu**: Ağ yapılandırmasını yap
+5. **Test Etme**: İşlevselliği ve performansı test et
+6. **Üretim**: Üretim ortamına dağıt
 
-### Next Steps
+### Sonraki Adımlar
 
-- **Monitoring**: Set up monitoring and alerting
-- **Backup**: Configure backup and disaster recovery
-- **Security**: Implement security best practices
-- **Optimization**: Optimize performance and costs
-- **Scaling**: Plan for future growth and scaling
+- **İzleme**: İzleme ve uyarı sistemini kur
+- **Yedekleme**: Yedekleme ve felaket kurtarma yapılandır
+- **Güvenlik**: Güvenlik en iyi uygulamalarını uygula
+- **Optimizasyon**: Performansı ve maliyetleri optimize et
+- **Ölçeklendirme**: Gelecekteki büyüme ve ölçeklendirme için plan yap

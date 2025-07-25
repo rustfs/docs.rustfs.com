@@ -1,160 +1,160 @@
 ---
-title: "Production Environment Hardware Configuration Guide"
-description: "RustFS is a high-performance distributed object storage system developed in Rust, suitable for massive unstructured data storage scenarios. This document provides comprehensive hardware selection and configuration guidance for production environment deployment."
+title: "Üretim Ortamı Donanım Yapılandırma Rehberi"
+description: "RustFS, Rust ile geliştirilmiş yüksek performanslı dağıtılmış bir nesne depolama sistemidir ve büyük ölçekli yapılandırılmamış veri depolama senaryoları için uygundur. Bu belge, üretim ortamı dağıtımı için kapsamlı donanım seçim ve yapılandırma rehberi sağlar."
 ---
 
-# Production Environment Hardware Configuration Guide
+# Üretim Ortamı Donanım Yapılandırma Rehberi
 
-## 1. Deployment Planning Factor Analysis
+## 1. Dağıtım Planlama Faktör Analizi
 
-Before formally deploying RustFS, it's recommended to conduct 2-3 weeks of business research, focusing on evaluating the following dimensions:
+RustFS'ı resmi olarak dağıtmadan önce, aşağıdaki boyutları değerlendirmek üzere 2-3 haftalık bir iş araştırması yapılması önerilir:
 
-1. **Data Scale Analysis**
+1. **Veri Ölçeği Analizi**
 
-- **Initial Data Volume**: Accurately measure effective data volume at initial production (recommended in TiB units), considering hot and cold data ratios
-- **Growth Trend Prediction**: Based on business development plans, estimate data growth for the next 24 months (recommended using quarterly growth rate model)
-- **Object Scale**: Calculate total object count based on average object size (recommended 128 KB-1 MB range), noting special optimization needed for over 100 million objects
+- **Başlangıç Veri Hacmi**: İlk üretimdeki etkin veri hacmini doğru ölçün (TiB birimi önerilir), sıcak ve soğuk veri oranlarını dikkate alın
+- **Büyüme Eğilimi Tahmini**: İş geliştirme planlarına dayanarak önümüzdeki 24 ay için veri büyümesini tahmin edin (üç aylık büyüme oranı modeli önerilir)
+- **Nesne Ölçeği**: Ortalama nesne boyutuna göre toplam nesde sayısını hesaplayın (128 KB-1 MB aralığı önerilir), 100 milyondan fazla nesne için özel optimizasyon gerektiğini unutmayın
 
-2. **Business Characteristics Assessment**
+2. **İş Özellikleri Değerlendirmesi**
 
-- **Access Patterns**: Distinguish between read-intensive (e.g., content distribution) and write-intensive (e.g., log collection) scenarios
-- **Compliance Requirements**: Data retention periods must comply with industry regulatory requirements (e.g., financial industry minimum 5 years)
-- **Multi-Site Deployment**: For cross-regional deployment, evaluate network latency (recommended under 50ms) and bandwidth costs
+- **Erişim Modelleri**: Okuma yoğun (ör. içerik dağıtımı) ve yazma yoğun (ör. log toplama) senaryoları ayırt edin
+- **Uyumluluk Gereksinimleri**: Veri saklama süreleri sektör düzenlemelerine uymalıdır (ör. finans sektörü minimum 5 yıl)
+- **Çoklu Bölge Dağıtımı**: Bölgeler arası dağıtım için ağ gecikmesini (50ms altı önerilir) ve bant genişliği maliyetlerini değerlendirin
 
-3. **Storage Architecture Design**
+3. **Depolama Mimarisi Tasarımı**
 
-- **Bucket Planning**: Divide buckets by business units, recommend no more than 500 active buckets per cluster
-- **Disaster Recovery Strategy**: Choose active-active architecture (recommended) or asynchronous replication based on data importance
+- **Bucket Planlaması**: Bucket'ları iş birimlerine göre bölün, küme başına 500'den fazla aktif bucket önerilmez
+- **Afet Kurtarma Stratejisi**: Veri önemine göre aktif-aktif mimari (önerilir) veya asenkron çoğaltma seçin
 
-## 2. Hardware Configuration Matrix
+## 2. Donanım Yapılandırma Matrisi
 
-Baseline configuration solutions based on stress test results:
+Stres test sonuçlarına dayalı temel yapılandırma çözümleri:
 
-| Component | Basic Environment | Production Standard Configuration | High-Performance Configuration |
+| Bileşen | Temel Ortam | Üretim Standart Yapılandırma | Yüksek Performans Yapılandırması |
 |--------------|---------------------------|--------------------------|--------------------------|
-| Node Count | 4 nodes | 8 nodes | 16+ nodes |
-| Storage Media | 4× NVMe SSD | 8×NVMe SSD | 12×NVMe SSD |
-| Network Architecture | Dual 25GbE (link aggregation) | Dual 100GbE | 200GbE |
-| CPU | 2×Intel Silver 4310 (16 cores) | 2×AMD EPYC 7313 (32 cores) | 2×Intel Platinum 8461Y (48 cores) |
-| Memory | 64 GB DDR4-3200 ECC | 256 GB DDR5-4800 ECC | 512 GB DDR5-5600 ECC |
-| Storage Controller | HBA 9500-8i | HBA 9600-16i | Dual controller redundant architecture |
+| Düğüm Sayısı | 4 düğüm | 8 düğüm | 16+ düğüm |
+| Depolama Ortamı | 4× NVMe SSD | 8×NVMe SSD | 12×NVMe SSD |
+| Ağ Mimarisi | Çift 25GbE (bağlantı toplama) | Çift 100GbE | 200GbE |
+| CPU | 2×Intel Silver 4310 (16 çekirdek) | 2×AMD EPYC 7313 (32 çekirdek) | 2×Intel Platinum 8461Y (48 çekirdek) |
+| Bellek | 64 GB DDR4-3200 ECC | 256 GB DDR5-4800 ECC | 512 GB DDR5-5600 ECC |
+| Depolama Denetleyici | HBA 9500-8i | HBA 9600-16i | Çift denetleyici yedekli mimari |
 
-**Important Deployment Principles:**
+**Önemli Dağıtım İlkeleri:**
 
-1. Use "server farm" mode, ensuring all nodes use identical hardware batches and firmware versions
-2. Network architecture must meet: leaf-spine topology + physically isolated storage network + dual uplink connections
-3. Recommend using 2U server models, single node should have 12+ drive bays (based on actual hard drive count)
+1. "Sunucu çiftliği" modunu kullanın, tüm düğümlerin aynı donanım partisi ve firmware sürümlerini kullandığından emin olun
+2. Ağ mimarisi şunları karşılamalıdır: leaf-spine topoloji + fiziksel olarak izole edilmiş depolama ağı + çift uplink bağlantı
+3. 2U sunucu modellerini kullanmanız önerilir, tek düğümde 12+ disk yuvası olmalıdır (gerçek disk sayısına göre)
 
-## 3. Performance Critical Path Optimization
+## 3. Performans Kritik Yol Optimizasyonu
 
-### 1. Network Topology Optimization (Highest Priority)
+### 1. Ağ Topolojisi Optimizasyonu (En Yüksek Öncelik)
 
-- **Bandwidth Calculation**: Each TB of effective data requires 0.5 Gbps bandwidth reservation (e.g., 100 TB data needs 50 Gbps dedicated bandwidth)
-- **Latency Requirements**:
-- Inter-node P99 latency ≤ 2ms
-- Cross-rack latency ≤ 5ms
+- **Bant Genişliği Hesaplama**: Her TB etkin veri için 0.5 Gbps bant genişliği ayırın (ör. 100 TB veri için 50 Gbps özel bant genişliği gerekir)
+- **Gecikme Gereksinimleri**:
+- Düğümler arası P99 gecikme ≤ 2ms
+- Raf ötesi gecikme ≤ 5ms
 
-### 2. Storage Subsystem Tuning
+### 2. Depolama Alt Sistemi Ayarları
 
-- **Controller Configuration**:
-- Enable read-ahead cache (recommended 256 MB+)
-- Disable all RAID functions, use passthrough mode
-- Regularly check BBU battery health status
-- **SSD Parameters**:
-- Reserve 20% OP space to improve durability
-- Enable atomic write features (requires hardware support)
+- **Denetleyici Yapılandırması**:
+- Ön okuma önbelleğini etkinleştirin (256 MB+ önerilir)
+- Tüm RAID işlevlerini devre dışı bırakın, passthrough modunu kullanın
+- BBU pil durumunu düzenli olarak kontrol edin
+- **SSD Parametreleri**:
+- Dayanıklılığı artırmak için %20 OP alanı ayırın
+- Atomik yazma özelliklerini etkinleştirin (donanım desteği gerektirir)
 
-### 3. Memory Management Strategy
+### 3. Bellek Yönetimi Stratejisi
 
-- **Allocation Ratio**:
-- Metadata cache: 60% of total memory
-- Read/write buffers: 30%
-- System reserved: 10%
+- **Ayırma Oranı**:
+- Meta veri önbelleği: Toplam belleğin %60'ı
+- Okuma/yazma tamponları: %30
+- Sistem ayrılmış: %10
 
-## 4. Network Design Reference Model
+## 4. Ağ Tasarım Referans Modeli
 
-### Bandwidth to Disk Ratio Relationship
+### Disk Başına Bant Genişliği Oranı İlişkisi
 
-| Network Type | Theoretical Throughput | Applicable Disk Type | Maximum Disk Support Count |
+| Ağ Türü | Teorik Verim | Uygun Disk Türü | Maksimum Desteklenen Disk Sayısı |
 |------------|------------|---------------------|----------------|
-| 10GbE | 1.25 GB/s | 7.2K HDD (180 MB/s) | 8 drives |
-| 25GbE | 3.125 GB/s | SATA SSD (550 MB/s) | 6 drives |
-| 100GbE | 12.5 GB/s | NVMe Gen4 (7 GB/s) | 2 drives full-speed read/write |
+| 10GbE | 1.25 GB/sn | 7.2K HDD (180 MB/sn) | 8 disk |
+| 25GbE | 3.125 GB/sn | SATA SSD (550 MB/sn) | 6 disk |
+| 100GbE | 12.5 GB/sn | NVMe Gen4 (7 GB/sn) | 2 disk tam hızda okuma/yazma |
 
-**Best Practice Case**: A video platform uses 16-node cluster, each node configured with:
+**En İyi Uygulama Örneği**: Bir video platformu 16 düğümlü küme kullanıyor, her düğüm şu şekilde yapılandırılmış:
 
 - 8×7.68 TB NVMe SSD
-- Dual 100GbE CX5 network cards
-- Achieving aggregate throughput of 38 GB/s
+- Çift 100GbE CX5 ağ kartı
+- 38 GB/sn toplam verim elde ediliyor
 
-## 5. Memory Configuration Calculator
+## 5. Bellek Yapılandırma Hesaplayıcısı
 
-Dynamic algorithm based on disk capacity and business characteristics:
+Disk kapasitesi ve iş özelliklerine dayalı dinamik algoritma:
 
 ```python
-# Memory calculation formula (unit: GB)
+# Bellek hesaplama formülü (birim: GB)
 def calc_memory(data_tb, access_pattern):
- base = 32 # Base memory
+ base = 32 # Temel bellek
  if access_pattern == "read_heavy":
  return base + data_tb * 0.8
  elif access_pattern == "write_heavy":
  return base + data_tb * 1.2
- else: # mixed
+ else: # karma
  return base + data_tb * 1.0
 ```
 
-**Reference Configuration Table**:
+**Referans Yapılandırma Tablosu**:
 
-| Data Scale | Read-Intensive | Write-Intensive | Mixed |
+| Veri Ölçeği | Okuma Yoğun | Yazma Yoğun | Karma |
 |-----------|----------|----------|---------|
 | 10 TB | 40 GB | 44 GB | 42 GB |
 | 100 TB | 112 GB | 152 GB | 132 GB |
 | 500 TB | 432 GB | 632 GB | 532 GB |
 
-## 6. Storage Deployment Specifications
+## 6. Depolama Dağıtım Spesifikasyonları
 
-### 1. Media Selection Standards
+### 1. Ortam Seçim Standartları
 
-| Metric | HDD Applicable Scenarios | SSD Applicable Scenarios | NVMe Mandatory Scenarios |
+| Metrik | HDD Uygun Senaryolar | SSD Uygun Senaryolar | NVMe Zorunlu Senaryolar |
 |-------------|------------------|---------------------|----------------------|
-| Latency Requirements | >50ms | 1 to 10ms | <1ms |
-| Throughput Requirements | <500 MB/s | 500 MB-3 GB/s | >3 GB/s |
-| Typical Use Cases | Archive storage | Hot data cache | Real-time analytics |
+| Gecikme Gereksinimleri | >50ms | 1-10ms | <1ms |
+| Verim Gereksinimleri | <500 MB/sn | 500 MB-3 GB/sn | >3 GB/sn |
+| Tipik Kullanım Örnekleri | Arşiv depolama | Sıcak veri önbelleği | Gerçek zamanlı analitik |
 
-### 2. File System Configuration
+### 2. Dosya Sistemi Yapılandırması
 
 ```bash
-# XFS formatting example
+# XFS biçimlendirme örneği
 mkfs.xfs -f -L rustfs_disk1 -d su=256k,sw=10 /dev/sdb
 
-# Recommended mount parameters
+# Önerilen bağlama parametreleri
 UUID=xxxx /mnt/disk1 xfs defaults,noatime,nodiratime,logbsize=256k 0 0
 ```
 
-## 7. High Availability Assurance Measures
+## 7. Yüksek Kullanılabilirlik Güvence Önlemleri
 
-1. **Power Supply**:
+1. **Güç Kaynağı**:
 
-- Use dual power supply architecture
-- Each PDU connects to different substations
-- Equipped with UPS (minimum 30 minutes backup)
+- Çift güç kaynağı mimarisi kullanın
+- Her PDU farklı trafo merkezlerine bağlanmalı
+- UPS ile donatın (minimum 30 dakika yedek)
 
-2. **Cooling Requirements**:
+2. **Soğutma Gereksinimleri**:
 
-- Cabinet power density ≤ 15kW/cabinet
-- Control inlet/outlet temperature difference within 8℃
+- Kabinet güç yoğunluğu ≤ 15kW/kabinet
+- Giriş/çıkış sıcaklık farkını 8℃ içinde tutun
 
-3. **Firmware Management**:
+3. **Firmware Yönetimi**:
 
-- Establish hardware compatibility matrix
-- Use unified firmware versions
+- Donanım uyumluluk matrisi oluşturun
+- Birleşik firmware sürümleri kullanın
 
-> **Implementation Recommendation**: Recommend 72-hour stress testing before formal deployment, simulating the following scenarios:
+> **Uygulama Önerisi**: Resmi dağıtım öncesinde 72 saatlik stres testi yapmanız önerilir, aşağıdaki senaryoları simüle edin:
 >
-> 1. Node failover testing
-> 2. Network partition drills
-> 3. Burst write pressure testing (recommended to reach 120% of theoretical value)
+> 1. Düğüm failover testi
+> 2. Ağ bölünmesi tatbikatları
+> 3. Ani yazma basınç testi (teorik değerin %120'sine ulaşması önerilir)
 
 ---
 
-This guide is written based on the latest development version of RustFS. For actual deployment, please fine-tune parameters in conjunction with specific hardware vendor whitepapers. Or contact RustFS official for quarterly hardware health assessments to ensure continuous stable operation of storage clusters.
+Bu rehber, RustFS'ın en son geliştirme sürümü temel alınarak yazılmıştır. Gerçek dağıtım için lütfen belirli donanım satıcılarının teknik incelemeleri ile birlikte parametreleri ince ayarlayın. Veya RustFS resmi desteği ile üç aylık donanım sağlık değerlendirmeleri yaparak depolama kümelerinin sürekli kararlı çalışmasını sağlayın.

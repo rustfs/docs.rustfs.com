@@ -1,203 +1,203 @@
-# Domestic Cloud Solutions
+# Yerel Bulut Çözümleri
 
-RustFS provides comprehensive solutions for domestic cloud environments, supporting major Chinese cloud providers and meeting compliance requirements for data sovereignty.
+RustFS, Çin'in önde gelen bulut sağlayıcılarıyla uyumlu olarak, veri egemenliği gereksinimlerini karşılayan yerel bulut ortamları için kapsamlı çözümler sunar.
 
-## Core Advantages
+## Temel Avantajlar
 
-![Domestic Cloud Icon 1](./images/icon-1.png)
+![Yerel Bulut İkon 1](./images/icon-1.png)
 
-### Regulatory Compliance
+### Düzenleyici Uyumluluk
 
-- **Data Sovereignty**: Full compliance with Chinese data protection laws
-- **Industry Standards**: Meets GB/T standards and industry regulations
-- **Audit Support**: Complete audit trails and compliance reporting
-- **Certification**: Supports various certification requirements
+- **Veri Egemenliği**: Çin veri koruma yasalarına tam uyum
+- **Endüstri Standartları**: GB/T standartlarını ve endüstri düzenlemelerini karşılar
+- **Denetim Desteği**: Tam denetim izleri ve uyumluluk raporlaması
+- **Sertifikasyon**: Çeşitli sertifikasyon gereksinimlerini destekler
 
-![Domestic Cloud Icon 2](./images/icon-2.png)
+![Yerel Bulut İkon 2](./images/icon-2.png)
 
-### Localized Support
+### Yerelleştirilmiş Destek
 
-- **24/7 Chinese Support**: Native Chinese technical support team
-- **Local Deployment**: Support for on-premises and hybrid deployments
-- **Regional Optimization**: Optimized for Chinese network conditions
-- **Documentation**: Complete Chinese documentation and training materials
+- **7/24 Çin Desteği**: Yerel Çin teknik destek ekibi
+- **Yerel Dağıtım**: Şirket içi ve hibrit dağıtımlar için destek
+- **Bölgesel Optimizasyon**: Çin ağ koşulları için optimize edilmiştir
+- **Dokümantasyon**: Tam Çin dokümantasyonu ve eğitim materyalleri
 
-![Domestic Cloud Icon 3](./images/icon-3.png)
+![Yerel Bulut İkon 3](./images/icon-3.png)
 
-### Technology Independence
+### Teknoloji Bağımsızlığı
 
-- **Independent Architecture**: No dependency on foreign technology stacks
-- **Open Source**: Transparent and auditable codebase
-- **Customizable**: Flexible architecture for specific requirements
-- **Future-Proof**: Continuous innovation and development
+- **Bağımsız Mimari**: Yabancı teknoloji yığınlarına bağımlılık yok
+- **Açık Kaynak**: Şeffaf ve denetlenebilir kod tabanı
+- **Özelleştirilebilir**: Belirli gereksinimler için esnek mimari
+- **Geleceğe Hazır**: Sürekli yenilik ve geliştirme
 
-![Domestic Cloud Icon 4](./images/icon-4.png)
+![Yerel Bulut İkon 4](./images/icon-4.png)
 
-### Cost Effectiveness
+### Maliyet Etkinliği
 
-- **Competitive Pricing**: Optimized for Chinese market conditions
-- **Flexible Licensing**: Various licensing models available
-- **ROI Optimization**: Proven cost savings and efficiency gains
-- **Scalable Investment**: Pay-as-you-grow pricing models
+- **Rekabetçi Fiyatlandırma**: Çin pazar koşulları için optimize edilmiştir
+- **Esnek Lisanslama**: Çeşitli lisanslama modelleri mevcut
+- **Yatırım Getirisi Optimizasyonu**: Kanıtlanmış maliyet tasarrufu ve verimlilik kazanımları
+- **Ölçeklenebilir Yatırım**: Büyüdükçe öde fiyatlandırma modelleri
 
-## Solution Architecture
+## Çözüm Mimarisi
 
-![Solution Architecture Arrow](./images/arrow.png)
+![Çözüm Mimarisi Ok](./images/arrow.png)
 
-### Multi-Cloud Integration
+### Çoklu Bulut Entegrasyonu
 
-![Solution Item 1](./images/item-1.png)
+![Çözüm Öğesi 1](./images/item-1.png)
 
-#### Hybrid Cloud Architecture
+#### Hibrit Bulut Mimarisi
 
-- **On-Premises Integration**: Seamless integration with existing infrastructure
-- **Cloud Bursting**: Automatic scaling to cloud resources when needed
-- **Data Mobility**: Easy data movement between environments
-- **Unified Management**: Single pane of glass for all environments
+- **Şirket İçi Entegrasyon**: Mevcut altyapıyla sorunsuz entegrasyon
+- **Bulut Patlaması**: Gerektiğinde bulut kaynaklarına otomatik ölçeklendirme
+- **Veri Hareketliliği**: Ortamlar arasında kolay veri hareketi
+- **Birleşik Yönetim**: Tüm ortamlar için tek bir yönetim arayüzü
 
-### Industry Solutions
+### Endüstri Çözümleri
 
-![Solution Item 2](./images/item-2.png)
+![Çözüm Öğesi 2](./images/item-2.png)
 
-#### Financial Services
+#### Finansal Hizmetler
 
-- **Regulatory Compliance**: Meet banking and financial regulations
-- **High Availability**: 99.99% uptime guarantees
-- **Security**: End-to-end encryption and access controls
-- **Performance**: Low-latency data access for trading systems
+- **Düzenleyici Uyumluluk**: Bankacılık ve finans düzenlemelerini karşılar
+- **Yüksek Kullanılabilirlik**: %99,99 çalışma süresi garantisi
+- **Güvenlik**: Uçtan uca şifreleme ve erişim kontrolleri
+- **Performans**: Ticaret sistemleri için düşük gecikmeli veri erişimi
 
-### Enterprise Features
+### Kurumsal Özellikler
 
-![Solution Item 3](./images/item-3.png)
+![Çözüm Öğesi 3](./images/item-3.png)
 
-#### Government and Public Sector
+#### Hükümet ve Kamu Sektörü
 
-- **Security Clearance**: Meet government security requirements
-- **Data Residency**: Ensure data stays within national boundaries
-- **Disaster Recovery**: Comprehensive backup and recovery solutions
-- **Integration**: Compatible with existing government systems
+- **Güvenlik Onayı**: Hükümet güvenlik gereksinimlerini karşılar
+- **Veri İkameti**: Verilerin ulusal sınırlar içinde kalmasını sağlar
+- **Felaket Kurtarma**: Kapsamlı yedekleme ve kurtarma çözümleri
+- **Entegrasyon**: Mevcut hükümet sistemleriyle uyumlu
 
-## Key Features
+## Ana Özellikler
 
-### Data Security
+### Veri Güvenliği
 
-- **Encryption at Rest**: AES-256 encryption for stored data
-- **Encryption in Transit**: TLS 1.3 for all data transfers
-- **Key Management**: Integration with domestic KMS solutions
-- **Access Control**: Fine-grained permissions and audit logging
+- **Dinlenme Halinde Şifreleme**: Depolanan veriler için AES-256 şifreleme
+- **Aktarım Halinde Şifreleme**: Tüm veri transferleri için TLS 1.3
+- **Anahtar Yönetimi**: Yerel KMS çözümleriyle entegrasyon
+- **Erişim Kontrolü**: İnce ayarlı izinler ve denetim günlükleri
 
-### Performance Optimization
+### Performans Optimizasyonu
 
-- **Network Optimization**: Optimized for Chinese internet infrastructure
-- **Edge Computing**: Support for edge deployments
-- **Caching**: Intelligent caching for improved performance
-- **Load Balancing**: Automatic load distribution
+- **Ağ Optimizasyonu**: Çin internet altyapısı için optimize edilmiştir
+- **Kenar Bilgi İşlem**: Kenar dağıtımları için destek
+- **Önbellekleme**: Geliştirilmiş performans için akıllı önbellekleme
+- **Yük Dengeleme**: Otomatik yük dağılımı
 
-### Compliance and Governance
+### Uyumluluk ve Yönetişim
 
-- **Data Classification**: Automatic data classification and labeling
-- **Retention Policies**: Configurable data retention and deletion
-- **Audit Logging**: Comprehensive audit trails
-- **Reporting**: Automated compliance reporting
+- **Veri Sınıflandırma**: Otomatik veri sınıflandırma ve etiketleme
+- **Saklama Politikaları**: Yapılandırılabilir veri saklama ve silme
+- **Denetim Günlükleri**: Kapsamlı denetim izleri
+- **Raporlama**: Otomatik uyumluluk raporlaması
 
-## Deployment Options
+## Dağıtım Seçenekleri
 
-### Public Cloud Integration
+### Genel Bulut Entegrasyonu
 
-- **Alibaba Cloud**: Native integration with Alibaba Cloud services
-- **Tencent Cloud**: Optimized for Tencent Cloud infrastructure
-- **Huawei Cloud**: Certified compatibility with Huawei Cloud
-- **Baidu Cloud**: Support for Baidu Cloud AI services
+- **Alibaba Cloud**: Alibaba Cloud hizmetleriyle yerel entegrasyon
+- **Tencent Cloud**: Tencent Cloud altyapısı için optimize edilmiştir
+- **Huawei Cloud**: Huawei Cloud ile sertifikalı uyumluluk
+- **Baidu Cloud**: Baidu Cloud AI hizmetleri için destek
 
-### Private Cloud Solutions
+### Özel Bulut Çözümleri
 
-- **On-Premises**: Complete on-premises deployment
-- **Hybrid**: Combination of on-premises and cloud
-- **Edge**: Distributed edge computing support
-- **Air-Gapped**: Support for isolated environments
+- **Şirket İçi**: Tam şirket içi dağıtım
+- **Hibrit**: Şirket içi ve bulutun kombinasyonu
+- **Kenar**: Dağıtılmış kenar bilgi işlem desteği
+- **Hava Boşluğunda**: İzole edilmiş ortamlar için destek
 
-### Industry-Specific Solutions
+### Sektöre Özel Çözümler
 
-- **Manufacturing**: IoT data management and analytics
-- **Healthcare**: HIPAA-equivalent compliance for medical data
-- **Education**: Student data protection and management
-- **Government**: Classified data handling capabilities
+- **İmalat**: IoT veri yönetimi ve analitiği
+- **Sağlık Hizmetleri**: Tıbbi veri için HIPAA eşdeğeri uyumluluk
+- **Eğitim**: Öğrenci veri koruma ve yönetimi
+- **Hükümet**: Sınıflandırılmış veri işleme yetenekleri
 
-## Migration Services
+## Göç Hizmetleri
 
-### Assessment and Planning
+### Değerlendirme ve Planlama
 
-- **Current State Analysis**: Comprehensive assessment of existing systems
-- **Migration Strategy**: Detailed migration planning and timeline
-- **Risk Assessment**: Identification and mitigation of migration risks
-- **Training**: Staff training and knowledge transfer
+- **Mevcut Durum Analizi**: Mevcut sistemlerin kapsamlı değerlendirmesi
+- **Göç Stratejisi**: Detaylı göç planlaması ve zaman çizelgesi
+- **Risk Değerlendirmesi**: Göç risklerinin belirlenmesi ve azaltılması
+- **Eğitim**: Personel eğitimi ve bilgi transferi
 
-### Data Migration
+### Veri Göçü
 
-- **Automated Tools**: Automated data migration utilities
-- **Validation**: Data integrity verification and validation
-- **Rollback**: Safe rollback procedures if needed
-- **Monitoring**: Real-time migration monitoring and reporting
+- **Otomatik Araçlar**: Otomatik veri göç yardımcı programları
+- **Doğrulama**: Veri bütünlüğü doğrulama ve geçerlilik
+- **Geri Alma**: Gerektiğinde güvenli geri alma prosedürleri
+- **İzleme**: Gerçek zamanlı göç izleme ve raporlama
 
-### Post-Migration Support
+### Göç Sonrası Destek
 
-- **Optimization**: Performance tuning and optimization
-- **Monitoring**: Continuous monitoring and alerting
-- **Support**: Dedicated support team for post-migration issues
-- **Training**: Ongoing training and best practices
+- **Optimizasyon**: Performans ayarlama ve optimizasyon
+- **İzleme**: Sürekli izleme ve uyarı
+- **Destek**: Göç sonrası sorunlar için özel destek ekibi
+- **Eğitim**: Devam eden eğitim ve en iyi uygulamalar
 
-## Success Stories
+## Başarı Hikayeleri
 
-### Large Enterprise Deployment
+### Büyük Kurumsal Dağıtım
 
-- **Scale**: 10PB+ data storage
-- **Performance**: 50% improvement in data access speed
-- **Cost**: 40% reduction in storage costs
-- **Compliance**: Full regulatory compliance achieved
+- **Ölçek**: 10PB+ veri depolama
+- **Performans**: Veri erişim hızında %50 iyileştirme
+- **Maliyet**: Depolama maliyetlerinde %40 azalma
+- **Uyumluluk**: Tam düzenleyici uyumluluk sağlandı
 
-### Government Implementation
+### Hükümet Uygulaması
 
-- **Security**: Meet all government security requirements
-- **Availability**: 99.99% uptime achieved
-- **Integration**: Seamless integration with existing systems
-- **Support**: 24/7 local support provided
+- **Güvenlik**: Tüm hükümet güvenlik gereksinimlerini karşılar
+- **Kullanılabilirlik**: %99,99 çalışma süresi sağlandı
+- **Entegrasyon**: Mevcut sistemlerle sorunsuz entegrasyon
+- **Destek**: 7/24 yerel destek sağlandı
 
-### Financial Services Case
+### Finansal Hizmetler Vakası
 
-- **Latency**: Sub-millisecond data access
-- **Compliance**: Full financial regulatory compliance
-- **Scalability**: Support for peak trading volumes
-- **Disaster Recovery**: Multi-site disaster recovery
+- **Gecikme**: Milisaniyenin altında veri erişimi
+- **Uyumluluk**: Tam finansal düzenleyici uyumluluk
+- **Ölçeklenebilirlik**: Zirve ticaret hacimleri için destek
+- **Felaket Kurtarma**: Çoklu site felaket kurtarma
 
-## Getting Started
+## Başlarken
 
-### Evaluation Process
+### Değerlendirme Süreci
 
-1. **Requirements Assessment**: Understanding your specific needs
-2. **Proof of Concept**: Small-scale pilot implementation
-3. **Performance Testing**: Validation of performance requirements
-4. **Security Review**: Security assessment and validation
+1. **Gereksinim Değerlendirmesi**: Özel ihtiyaçlarınızın anlaşılması
+2. **Kavram Kanıtı**: Küçük ölçekli pilot uygulama
+3. **Performans Testi**: Performans gereksinimlerinin doğrulanması
+4. **Güvenlik İncelemesi**: Güvenlik değerlendirmesi ve doğrulaması
 
-### Implementation Steps
+### Uygulama Adımları
 
-1. **Planning**: Detailed implementation planning
-2. **Infrastructure**: Hardware and network setup
-3. **Deployment**: Software installation and configuration
-4. **Testing**: Comprehensive testing and validation
-5. **Go-Live**: Production deployment and monitoring
+1. **Planlama**: Detaylı uygulama planlaması
+2. **Altyapı**: Donanım ve ağ kurulumu
+3. **Dağıtım**: Yazılım kurulumu ve yapılandırma
+4. **Test**: Kapsamlı test ve doğrulama
+5. **Canlıya Alma**: Üretim dağıtımı ve izleme
 
-### Support and Maintenance
+### Destek ve Bakım
 
-- **24/7 Support**: Round-the-clock technical support
-- **Regular Updates**: Automatic updates and patches
-- **Health Monitoring**: Proactive system monitoring
-- **Performance Optimization**: Ongoing optimization services
+- **7/24 Destek**: Kesintisiz teknik destek
+- **Düzenli Güncellemeler**: Otomatik güncellemeler ve yamalar
+- **Sağlık İzleme**: Proaktif sistem izleme
+- **Performans Optimizasyonu**: Devam eden optimizasyon hizmetleri
 
-## Contact Information
+## İletişim Bilgileri
 
-For more information about domestic cloud solutions:
+Yerel bulut çözümleri hakkında daha fazla bilgi için:
 
-- **Sales**: Contact our sales team for pricing and licensing
-- **Technical**: Speak with our technical experts
-- **Support**: Access our support resources
-- **Training**: Learn about our training programs
+- **Satış**: Fiyatlandırma ve lisanslama için satış ekibimizle iletişime geçin
+- **Teknik**: Teknik uzmanlarımızla konuşun
+- **Destek**: Destek kaynaklarımıza erişin
+- **Eğitim**: Eğitim programlarımız hakkında bilgi edinin

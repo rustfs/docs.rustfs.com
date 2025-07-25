@@ -1,41 +1,41 @@
 ---
-title: "Installing RustFS with Docker"
-description: "RustFS Docker deployment guide."
+title: "Docker ile RustFS Kurulumu"
+description: "RustFS Docker dağıtım rehberi."
 ---
 
-# Installing RustFS with Docker
+# Docker ile RustFS Kurulumu
 
-RustFS is a high-performance, 100% S3-compatible open-source distributed object storage system. In Single Node Single Drive (SNSD) deployment mode, the backend uses zero erasure coding without additional data redundancy, suitable for local testing and small-scale scenarios.
-This document is based on the official RustFS Linux binary package, creating a custom Dockerfile to package RustFS and its runtime environment into a container, configuring data volumes and environment variables for one-click service startup.
-
----
-
-## 1. Prerequisites
-
-1. **Host Requirements**
-
-   * Docker installed (≥ 20.10) with ability to pull images and run containers
-   * Local path `/mnt/rustfs/data` (or custom path) for mounting object data
-
-2. **Network & Firewall**
-
-   * Ensure host port 7000 is open to external access (or consistent with custom port)
-
-3. **Configuration File Preparation**
-
-   * Define listening port, admin account, data path, etc. in `/etc/rustfs/config.toml` on the host (see Section 4)
+RustFS, yüksek performanslı, %100 S3 uyumlu, açık kaynaklı dağıtık bir nesne depolama sistemidir. Tek Düğüm Tek Disk (SNSD) dağıtım modunda, arka uç herhangi bir hata düzeltme kodlaması (erasure coding) olmadan çalışır ve veri yedekliliği sunmaz. Bu mod, yerel testler ve küçük ölçekli senaryolar için uygundur.  
+Bu belge, resmi RustFS Linux ikili paketine dayanarak RustFS'i ve çalışma ortamını bir konteyner içine paketleyen özel bir Dockerfile oluşturur; veri dizinlerini ve ortam değişkenlerini yapılandırarak tek komutla servis başlatmayı sağlar.
 
 ---
 
-## 2. Quick Pull of Official RustFS Image
+## 1. Ön Koşullar
 
-Using the official Ubuntu base image, quickly pull the official RustFS image:
+1. **Ana Makine Gereksinimleri**
+
+   * Docker kurulu olmalı (≥ 20.10) ve imaj çekip konteyner çalıştırabilmeli
+   * Nesne verileri için `/mnt/rustfs/data` (veya özel bir yol) adlı yerel bir yol mevcut olmalı
+
+2. **Ağ & Güvenlik Duvarı**
+
+   * Ana makine portu 7000 dış erişime açık olmalı (veya özel portla tutarlı olmalı)
+
+3. **Yapılandırma Dosyasının Hazırlanması**
+
+   * `/etc/rustfs/config.toml` dosyasında dinleme portu, yönetici hesabı, veri yolu vb. tanımlanmalı (Bkz. Bölüm 4)
+
+---
+
+## 2. Resmi RustFS İmajını Hızlı Çekme
+
+Resmi Ubuntu tabanlı imajı kullanarak RustFS imajını hızlıca çekin:
 
 ```bash
 docker pull quay.io/rustfs/rustfs
-```
+````
 
-Or use docker to pull:
+Veya alternatif olarak:
 
 ```bash
 docker pull rustfs/rustfs
@@ -43,9 +43,9 @@ docker pull rustfs/rustfs
 
 ---
 
-## 3. Writing Environment Configuration
+## 3. Ortam Yapılandırması Yazma
 
-Create configuration file `/etc/rustfs/config.toml` on the host, example content:
+Ana makinede `/etc/rustfs/config.toml` dosyasını oluşturun, örnek içerik:
 
 ```bash
 RUSTFS_ACCESS_KEY=rustfsadmin
@@ -59,13 +59,13 @@ RUSTFS_OBS_CONFIG="/etc/default/obs.toml"
 RUSTFS_TLS_PATH="/opt/tls"
 ```
 
-> **Note:** For configuration item formats and default values, please refer to the official Linux installation documentation.
+> **Not:** Yapılandırma öğelerinin biçimleri ve varsayılan değerleri için resmi Linux kurulum belgelerine bakınız.
 
 ---
 
-## 4. Running RustFS Container
+## 4. RustFS Konteynerini Çalıştırmak
 
-RustFS SNSD Docker runtime method, combining the above image and configuration, execute:
+Yukarıdaki imaj ve yapılandırma ile RustFS SNSD Docker çalıştırma yöntemi:
 
 ```bash
 docker run -d \
@@ -75,17 +75,17 @@ docker run -d \
   rustfs/rustfs:latest
 ```
 
-Parameter descriptions:
+Parametre açıklamaları:
 
-* `-p 7000:7000`: Map host port 7000 to container
-* `-v /mnt/rustfs/data:/data`: Mount data volume
-* `-v /etc/rustfs/rustfs:/config/rustfs:ro`: Mount configuration file
-* `--name rustfs_local`: Custom container name
-* `-d`: Run in background
+* `-p 7000:7000`: Ana makine portu 7000’i konteyner ile eşleştirir
+* `-v /mnt/rustfs/data:/data`: Veri dizinini bağlar
+* `-v /etc/rustfs/rustfs:/config/rustfs:ro`: Yapılandırma dosyasını bağlar
+* `--name rustfs_local`: Özel konteyner adı
+* `-d`: Arka planda çalıştır
 
 ---
 
-### Complete parameter configuration example
+### Tüm Parametrelerle Yapılandırma Örneği
 
 ```bash
 docker run -d \
@@ -105,9 +105,10 @@ docker run -d \
   /data
 ```
 
-### Parameter description and corresponding method
+### Parametre açıklamaları ve yöntemleri
 
-1. **Environment variable method** (recommended):
+1. **Ortam değişkeni yöntemi (önerilir):**
+
    ```bash
    -e RUSTFS_ADDRESS=:9000 \
    -e RUSTFS_SERVER_DOMAINS=example.com \
@@ -116,8 +117,9 @@ docker run -d \
    -e RUSTFS_CONSOLE_ENABLE=true \
    ```
 
-2. **Command line parameter method**:
-   ```
+2. **Komut satırı parametre yöntemi:**
+
+   ```bash
    --address :9000 \
    --server-domains example.com \
    --access-key rustfsadmin \
@@ -125,12 +127,14 @@ docker run -d \
    --console-enable \
    ```
 
-3. **Required parameters**:
-   - `<VOLUMES>`: Specify at the end of the command, `/data`
+3. **Gerekli parametreler:**
 
-### Common configuration combinations
+   * `<VOLUMES>`: Komut sonunda belirtilmeli, örneğin `/data`
 
-1. **Basic Configuration**:
+### Yaygın Yapılandırma Kombinasyonları
+
+1. **Temel Yapılandırma:**
+
    ```bash
    docker run -d \
      -p 9000:9000 \
@@ -139,7 +143,8 @@ docker run -d \
      /data
    ```
 
-2. **Enable console**:
+2. **Yönetim Konsolu Etkinleştirme:**
+
    ```bash
    docker run -d \
      -p 9000:9000 \
@@ -151,7 +156,8 @@ docker run -d \
      /data
    ```
 
-3. **Custom authentication key**:
+3. **Özel Kimlik Doğrulama Anahtarı:**
+
    ```bash
    docker run -d \
      -p 9000:9000 \
@@ -165,37 +171,40 @@ docker run -d \
      /data
    ```
 
-### Things to note
+### Dikkat Edilmesi Gerekenler
 
-1. The port mapping must correspond to:
-   - Service port default 9000(`-p 9000:9000`)
+1. Port eşlemeleri uyumlu olmalı:
 
-2. Data volumes should be persisted:
-   - `-v /host/path:/container/path`
+   * Servis portu varsayılan 9000 (`-p 9000:9000`)
 
-3. Environment variables and command line parameters can be used in a mixed manner, but command line parameters have higher priority
+2. Veri dizinleri kalıcı hale getirilmeli:
 
-4. If using TLS, additional certificate paths are required:
+   * `-v /ana_makine/yol:/konteyner/yol`
+
+3. Ortam değişkenleri ve komut satırı parametreleri birlikte kullanılabilir, ancak **komut satırı parametreleri önceliklidir**
+
+4. TLS kullanılıyorsa ek sertifika yolları gerekir:
+
    ```bash
-   -v /path/to/certs:/certs \
+   -v /sertifika/yolu:/certs \
    -e RUSTFS_TLS_PATH=/certs \
    ```
 
+---
 
+## 5. Doğrulama ve Erişim
 
-## 5. Verification and Access
-
-1. **Check container status and logs:**
+1. **Konteyner durumu ve logları kontrol etme:**
 
    ```bash
    docker logs rustfs_local
    ```
 
-   Logs should show successful service startup and listening on port 7000.
+   Loglar servis başarıyla başlatıldıysa ve 7000 portunda dinliyorsa bunu gösterecektir.
 
-2. **Test S3 API:**
+2. **S3 API Testi:**
 
-   Using `mc` or other S3 clients:
+   `mc` veya başka S3 istemcisi ile:
 
    ```bash
    mc alias set rustfs http://localhost:7000 rustfsadmin ChangeMe123!
@@ -203,26 +212,28 @@ docker run -d \
    mc ls rustfs
    ```
 
-   If you can successfully create and list buckets, the deployment is effective.
-
-## 6. Additional Recommendations
-
-1. Production environment recommendations:
-
-- Use multi-node deployment architecture
-* Enable TLS encrypted communication
-* Configure log rotation policies
-* Set up regular backup strategies
-
-2. Storage recommendations:
-
-- Use local SSD/NVMe storage
-* Avoid using network file systems (NFS)
-* Ensure exclusive access to storage directories
+   Eğer başarıyla bucket oluşturulup listelenebiliyorsa kurulum başarılıdır.
 
 ---
 
-## Summary
+## 6. Ek Öneriler
 
-This document combines RustFS single-node single-drive containerization best practices, demonstrating in detail how to build RustFS images through Docker and deploy SNSD environments.
-This solution is easy to start quickly and experiment with, and can later be extended to multi-node multi-drive production-grade clusters using the same approach on platforms like Kubernetes and Swarm.
+1. Üretim ortamı için öneriler:
+
+* Çok düğümlü dağıtım mimarisi kullanılmalı
+* TLS ile şifreli iletişim etkinleştirilmeli
+* Log döndürme (rotation) politikaları tanımlanmalı
+* Düzenli yedekleme stratejileri kurulmalı
+
+2. Depolama için öneriler:
+
+* Yerel SSD/NVMe diskler tercih edilmeli
+* Ağ dosya sistemlerinden (NFS) kaçınılmalı
+* Depolama dizinlerine özel erişim sağlanmalı
+
+---
+
+## Özet
+
+Bu belge, RustFS’in tek düğüm tek diskli konteynerleştirme en iyi uygulamalarını bir araya getirerek, Docker aracılığıyla RustFS imajı oluşturma ve SNSD ortamlarını dağıtma sürecini detaylı biçimde açıklamaktadır.
+Bu çözüm, hızlıca başlatılıp denenebilir ve aynı yaklaşım Kubernetes, Swarm gibi platformlarda çok düğümlü, çok diskli üretim ortamlarına ölçeklendirilebilir.

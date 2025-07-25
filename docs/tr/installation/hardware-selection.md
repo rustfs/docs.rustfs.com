@@ -1,41 +1,41 @@
 ---
-title: Hardware Selection
-description: What hardware can I use to run RustFS
+title: Donanım Seçimi
+description: RustFS'yi çalıştırmak için hangi donanımı kullanabilirim?
 ---
 
-# Hardware Selection
+# Donanım Seçimi
 
-> RustFS has lower memory requirements and more stable memory fluctuation.
+> RustFS daha düşük bellek gereksinimlerine sahiptir ve bellek dalgalanmaları daha stabildir.
 
-## Test Environment Hardware Selection
+## Test Ortamı Donanım Seçimi
 
-> Test environment can be used quickly, does not need to be responsible for high load and production assurance, only needs to meet experimental requirements.
+> Test ortamı hızlı bir şekilde kullanılabilir, yüksek yük ve üretim garantisi sağlamak zorunda değildir, yalnızca deneysel gereksinimleri karşılaması yeterlidir.
 
-| No. | Hardware Type | Parameters |
+| No. | Donanım Türü | Parametreler |
 | - | - | - |
-| 1 | CPU | 1 Core+ |
-| 2 | CPU Architecture | X86, ARM both supported |
-| 3 | Memory | 1 GB+ |
-| 4 | Hard Disk | HDD, SSD both supported |
-| 5 | Docker Support | Supported |
-| 6 | Network Requirements | Local communication and no network both supported |
-| 7 | Operating System | Windows, Linux, MacOS all supported |
-| 8 | Load Balancer | None |
-| 9 | Minimum Nodes | 1 |
+| 1 | İşlemci | 1 Çekirdek+ |
+| 2 | İşlemci Mimarisi | X86, ARM desteklenir |
+| 3 | Bellek | 1 GB+ |
+| 4 | Sabit Disk | HDD, SSD desteklenir |
+| 5 | Docker Desteği | Desteklenir |
+| 6 | Ağ Gereksinimleri | Yerel iletişim ve ağ bağlantısı olmadan çalışabilir |
+| 7 | İşletim Sistemi | Windows, Linux, MacOS desteklenir |
+| 8 | Yük Dengeleyici | Gerekli değil |
+| 9 | Minimum Düğüm Sayısı | 1 |
 
-## Production Environment Hardware Selection
+## Üretim Ortamı Donanım Seçimi
 
-| No. | Hardware Type | Parameters |
+| No. | Donanım Türü | Parametreler |
 | - | - | - |
-| 1 | CPU | 2 x 12 Cores+ |
-| 2 | CPU Type | Multiple CPU architectures including X86, ARM |
-| 3 | Memory | 64 GB+ |
-| 4 | Hard Disk | HDD, SSD both supported, SSD recommended |
-| 5 | Network Requirements | 10 Gbps+ |
-| 6 | Operating System | Linux preferred |
-| 8 | Load Balancer | Load balancer recommended |
-| 9 | Minimum Nodes | 4 nodes minimum |
+| 1 | İşlemci | 2 x 12 Çekirdek+ |
+| 2 | İşlemci Türü | X86, ARM dahil çoklu işlemci mimarileri |
+| 3 | Bellek | 64 GB+ |
+| 4 | Sabit Disk | HDD, SSD desteklenir, SSD önerilir |
+| 5 | Ağ Gereksinimleri | 10 Gbps+ |
+| 6 | İşletim Sistemi | Linux tercih edilir |
+| 8 | Yük Dengeleyici | Yük dengeleyici önerilir |
+| 9 | Minimum Düğüm Sayısı | En az 4 düğüm |
 
-## Expert Services
+## Uzman Hizmetleri
 
-If you're concerned about whether your hardware environment can meet actual production requirements, or have storage cost reduction needs, you can ask questions and initiate expert consultation with the RustFS team. Contact: 400-033-5363.
+Donanım ortamınızın gerçek üretim gereksinimlerini karşılayıp karşılamayacağı konusunda endişeleriniz varsa veya depolama maliyetlerini düşürme ihtiyaçlarınız varsa, RustFS ekibine sorular sorabilir ve uzman danışmanlık talep edebilirsiniz. İletişim: 400-033-5363.

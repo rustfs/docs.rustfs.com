@@ -1,84 +1,88 @@
 ---
-title: "Object Inspection and Automatic Recovery"
-description: "This document introduces RustFS's self-healing functionality design and implementation in single-server multi-disk architecture, including the significance, principles, processes, configuration, and common troubleshooting of self-healing."
+title: "Nesne İnceleme ve Otomatik Kurtarma"
+description: "Bu belge, RustFS'nin tek sunuculu çok diskli mimarideki kendi kendini iyileştirme işlevselliği tasarımını ve uygulamasını tanıtır. Kendi kendini iyileştirmenin önemi, ilkeleri, süreçleri, yapılandırması ve yaygın sorun giderme yöntemlerini içerir."
 ---
+# Nesne İnceleme ve Otomatik Kurtarma
 
-# Object Inspection and Automatic Recovery
+## Genel Bakış
 
-## Overview
+RustFS, depolama sistemleri boyunca veri bütünlüğünü ve kullanılabilirliğini sağlamak için güçlü nesne kendi kendini iyileştirme yetenekleri sunar.
 
-RustFS provides robust object self-healing capabilities to ensure data integrity and availability across storage systems.
+## RustFS Mimari ve Kendi Kendini İyileştirme Tasarımı
 
-## RustFS Architecture and Self-Healing Design
+### Tek Sunuculu Çok Diskli Mimari
 
-### Single-Server Multi-Disk Architecture
+RustFS, tek sunuculu çok diskli bir tasarım benimser ve birden fazla diski mantıksal bir depolama havuzuna organize ederek nesne depolama hizmetleri sunar. Her nesne yazma sırasında birden fazla veri parçasına ve yedek parçasına bölünür ve farklı diskler arasında dağıtılır, böylece güvenilirlik ve performans artırılır.
 
-RustFS adopts a single-server multi-disk design, organizing multiple disks into a logical storage pool to provide object storage services. Each object is split into multiple data shards and redundant shards when written, distributed across different disks to improve reliability and performance.
+### Kendi Kendini İyileştirme Tasarım İlkeleri
 
-### Self-Healing Design Principles
+1. **Veri Bütünlüğü Doğrulama**: Sağlama toplamı mekanizmalarını birleştirerek okuma sırasında nesne parça veri tutarlılığını sağlar. Örneğin, ZFS, okuma sırasında her veri bloğunun sağlama toplamını doğrular ve doğrulama başarısız olduğunda onarımlar yapar.
 
-1. **Data Integrity Verification**: Combines checksum mechanisms to ensure object shard data consistency during reads. For example, ZFS verifies the checksum of each data block during reads and performs repairs when verification fails.
-2. **Shard Redundancy and Erasure**: Generates redundant shards through erasure coding. When some data shards are lost or corrupted, the original object can be reconstructed using redundant shards.
-3. **Multi-Level Self-Healing Triggers**: Includes online healing during reads, background scanning healing, and manual triggered healing to balance performance and data reliability.
+2. **Parça Yedekliliği ve Silme**: Silme kodlaması aracılığıyla yedek parçalar oluşturur. Bazı veri parçaları kaybolduğunda veya bozulduğunda, orijinal nesne yedek parçalar kullanılarak yeniden oluşturulabilir.
 
-## Object Self-Healing Principles
+3. **Çok Seviyeli Kendi Kendini İyileştirme Tetikleyicileri**: Okuma sırasında çevrimiçi iyileştirme, arka plan tarama iyileştirmesi ve elle tetiklenen iyileştirmeyi içerir, böylece performans ve veri güvenilirliği dengelenir.
 
-### Verification and Erasure
+## Nesne Kendi Kendini İyileştirme İlkeleri
 
-During object writing, RustFS splits the object into *k* data shards and *m* redundant shards, distributed across *n=k+m* devices according to specified erasure parameters. During reads, if shards are found damaged or missing, they can be reconstructed from other intact shards.
+### Doğrulama ve Silme
 
-### Data Verification and Repair (Scrub & Repair)
+Nesne yazma sırasında, RustFS nesneyi belirtilen silme parametrelerine göre *k* veri parçasına ve *m* yedek parçasına böler ve *n=k+m* cihaz arasında dağıtır. Okuma sırasında, parçaların hasarlı veya eksik olduğu tespit edilirse, diğer sağlam parçalardan yeniden oluşturulabilir.
 
-RustFS periodically performs lightweight scrub and deep scrub on storage pools:
+### Veri Doğrulama ve Onarım (Scrub & Repair)
 
-- **Light Scrub**: Compares object metadata and shard sizes, promptly marking damage when detected.
-- **Deep Scrub**: Reads shard data bit by bit and verifies checksums, detecting and repairing hidden bad blocks or bit rot issues.
+RustFS, depolama havuzlarında periyodik olarak hafif ve derin tarama işlemleri gerçekleştirir:
 
-When data scanning discovers inconsistencies, RustFS automatically invokes the Repair process, reconstructing damaged shards using redundant shards and writing the repaired shards back to the original disk or spare disk, ensuring data integrity for subsequent access.
+- **Hafif Tarama**: Nesne meta verilerini ve parça boyutlarını karşılaştırır, hasar tespit edildiğinde hemen işaretler.
 
-## Self-Healing Workflow
+- **Derin Tarama**: Parça verilerini bit bit okur ve sağlama toplamlarını doğrular, gizli kötü blokları veya bit çürümesini tespit eder ve onarır.
 
-### Online Healing During Reads
+Veri taraması tutarsızlıklar tespit ettiğinde, RustFS otomatik olarak Onarım sürecini çağırır, hasarlı parçaları yedek parçalar kullanarak yeniden oluşturur ve onarılmış parçaları orijinal diske veya yedek diske yazar, böylece sonraki erişimler için veri bütünlüğünü sağlar.
 
-Every time a client executes a `GET` or `HEAD` request, RustFS first checks all data shards of the corresponding object:
+## Kendi Kendini İyileştirme İş Akışı
 
-1. If all data shards are intact, it directly returns the data.
-2. If shards are missing or damaged, the system calculates missing shards based on redundant shards, repairs them, then returns the complete object to the client.
+### Çevrimiçi Okuma Sırasında İyileştirme
 
-This mechanism is consistent with MinIO's read-time healing process, transparently repairing data without affecting client requests.
+Bir istemci her `GET` veya `HEAD` isteği gerçekleştirdiğinde, RustFS önce ilgili nesnenin tüm veri parçalarını kontrol eder:
 
-### Background Scanning Healing
+1. Eğer tüm veri parçaları sağlam ise, veriyi doğrudan döndürür.
 
-RustFS has a built-in object scanner that traverses 1/1024 of objects in the storage pool using a hash method for integrity checks:
+2. Eğer parçalar eksik veya hasarlı ise, sistem yedek parçalara dayanarak eksik parçaları hesaplar, onarır ve ardından tamamlanmış nesneyi istemciye döndürür.
 
-- The object scanner runs lightweight verification at regular (configurable) intervals.
-- If damage is detected, it immediately triggers the self-healing reconstruction process.
+Bu mekanizma, MinIO'nun okuma zamanı iyileştirme süreciyle tutarlıdır ve istemci isteklerini etkilemeden veriyi şeffaf bir şekilde onarır.
 
-By default, deep bit rot checking is not performed to reduce resource overhead, but deep verification functionality can be enabled as needed.
+### Arka Plan Tarama İyileştirmesi
 
-### Manual Triggered Healing
+RustFS, bir hash yöntemi kullanarak depolama havuzundaki nesnelerin 1/1024'ünü taramak için yerleşik bir nesne tarayıcıya sahiptir:
 
-Administrators can execute full healing via command-line tools:
+- Nesne tarayıcı, düzenli (yapılandırılabilir) aralıklarla hafif doğrulama gerçekleştirir.
+
+- Eğer hasar tespit edilirse, hemen kendi kendini iyileştirme yeniden oluşturma sürecini tetikler.
+
+Varsayılan olarak, derin bit çürümesi kontrolü kaynak yükünü azaltmak için gerçekleştirilmez, ancak gerektiğinde derin doğrulama işlevselliği etkinleştirilebilir.
+
+### Elle Tetiklenen İyileştirme
+
+Yöneticiler, komut satırı araçları aracılığıyla tam iyileştirme gerçekleştirebilir:
 
 ```bash
 rc admin heal start --all
 ```
 
-This operation scans the entire storage pool and performs complete verification and repair on all objects. It consumes significant resources and should be used cautiously during low-traffic periods.
+Bu işlem, tüm depolama havuzunu tarar ve tüm nesneler üzerinde tam doğrulama ve onarım gerçekleştirir. Bu işlem önemli kaynak tüketir ve düşük trafik dönemlerinde dikkatli kullanılmalıdır.
 
-## Usage Examples
+## Kullanım Örnekleri
 
 ```bash
-# View current healing status
+# Mevcut iyileştirme durumunu görüntüle
 rc admin heal status
 
-# Start healing for a specific bucket
+# Belirli bir kovası için iyileştirmeyi başlat
 rc admin heal start --bucket photos
 
-# Stop ongoing healing tasks
+# Devam eden iyileştirme görevlerini durdur
 rc admin heal stop
 ```
 
-## Summary
+## Özet
 
-RustFS's object self-healing combines mature designs from systems like MinIO, Ceph, and ZFS. Through multi-level triggered verification and repair processes, it effectively handles shard damage, disk failures, and bit rot issues in both single-machine multi-disk and multi-machine multi-disk environments, ensuring high reliability and high availability of object storage.
+RustFS'nin nesne kendi kendini iyileştirmesi, MinIO, Ceph ve ZFS gibi sistemlerin olgun tasarımlarını birleştirir. Çok seviyeli tetiklenmiş doğrulama ve onarım süreçleri aracılığıyla, tek makineli çok diskli ve çok makineli çok diskli ortamlarda parça hasarlarını, disk arızalarını ve bit çürümesini etkili bir şekilde ele alır ve nesne depolamanın yüksek güvenilirliğini ve yüksek kullanılabilirliğini sağlar.
