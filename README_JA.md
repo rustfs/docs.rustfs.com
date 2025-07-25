@@ -7,7 +7,8 @@ RustFS コミュニティへようこそ！ドキュメントへの貢献にご�
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_ZH.md">简体中文</a> |
  日本語 |
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_DA.md">(#deutsch)</a> |
- <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_FR.md">Français</a>
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_FR.md">Français</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_TR.md">Türkçe</a>
 
 ------
 
