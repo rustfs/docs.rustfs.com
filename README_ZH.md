@@ -9,7 +9,8 @@
  简体中文 |
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_JA.md">日本語</a> |
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_DA.md">(#deutsch)</a> |
- <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_FR.md">Français</a>
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_FR.md">Français</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_TR.md">Türkçe</a>
 </p>
 
 ------

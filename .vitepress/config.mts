@@ -45,6 +45,22 @@ export default defineConfig({
               },
             },
           },
+          tr: {
+            translations: {
+              button: {
+                buttonText: 'Belgeleri Ara',
+                buttonAriaLabel: 'Belgeleri Ara',
+              },
+              modal: {
+                noResultsText: 'İlgili sonuç bulunamadı',
+                resetButtonTitle: 'Sorgu koşullarını temizle',
+                footer: {
+                  selectText: 'Seç',
+                  navigateText: 'Geçiş yap',
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -92,6 +108,7 @@ export default defineConfig({
   locales: {
     root: { label: 'English' },
     zh: { label: '简体中文' },
+    tr: { label: 'Türkçe' },
   },
   sitemap: {
     hostname: 'https://docs.rustfs.com',
@@ -125,6 +142,8 @@ export default defineConfig({
               return 'Скопировать код'
             case 'zh':
               return '复制代码'
+            case 'tr':
+              return 'Kodu kopyala'
             default:
               return 'Copy code'
           }
