@@ -100,7 +100,7 @@ export const zhSidebar = [
     collapsed: true,
     home: true,
     items: [
-      { text: 'MCP', link: '/zh/​instruction/mcp' },
+      { text: 'MCP', link: '/zh/guide/mcp' },
     ]
   },
   {

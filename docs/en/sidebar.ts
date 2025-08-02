@@ -97,11 +97,11 @@ export const enSidebar = [
     ]
   },
   {
-    text: '​Instruction Manual​',
+    text: '​User Guide​',
     collapsed: true,
     home: true,
     items: [
-      { text: 'MCP', link: '/​instruction/mcp' },
+      { text: 'MCP', link: '/guide/mcp' },
     ]
   },
   {
