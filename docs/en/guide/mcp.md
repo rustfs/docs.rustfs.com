@@ -1,5 +1,10 @@
+---
+title: "RustFS MCP"
+description: "RustFS MCP ​User Guide​"
+---
 
-## 📖 Overview
+# RustFS MCP
+
 
 **RustFS MCP Server** is a high-performance [Model Context Protocol (MCP)](https://spec.modelcontextprotocol.org) server that provides AI/LLM tools with seamless access to S3-compatible object storage operations. Built with Rust for maximum performance and safety, it enables AI assistants like Claude Desktop to interact with cloud storage through a standardized protocol.
 
