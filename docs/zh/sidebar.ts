@@ -95,6 +95,14 @@ export const zhSidebar = [
       },
     ]
   },
+    {
+    text: '功能使用指南l​',
+    collapsed: true,
+    home: true,
+    items: [
+      { text: 'MCP', link: '/zh/​instruction/mcp' },
+    ]
+  },
   {
     text: 'SDK 和 API',
     collapsed: true,

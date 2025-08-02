@@ -97,6 +97,14 @@ export const enSidebar = [
     ]
   },
   {
+    text: '​Instruction Manual​',
+    collapsed: true,
+    home: true,
+    items: [
+      { text: 'MCP', link: '/​instruction/mcp' },
+    ]
+  },
+  {
     text: 'SDK and API',
     collapsed: true,
     home: true,
