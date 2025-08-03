@@ -61,6 +61,102 @@ export default defineConfig({
               },
             },
           },
+          ja: {
+            translations: {
+              button: {
+                buttonText: 'ドキュメントを検索',
+                buttonAriaLabel: 'ドキュメントを検索',
+              },
+              modal: {
+                noResultsText: '関連する結果が見つかりません',
+                resetButtonTitle: '検索条件をクリア',
+                footer: {
+                  selectText: '選択',
+                  navigateText: '切り替え',
+                },
+              },
+            },
+          },
+          fr: {
+            translations: {
+              button: {
+                buttonText: 'Rechercher la documentation',
+                buttonAriaLabel: 'Rechercher la documentation',
+              },
+              modal: {
+                noResultsText: 'Aucun résultat pertinent trouvé',
+                resetButtonTitle: 'Effacer les conditions de recherche',
+                footer: {
+                  selectText: 'Sélectionner',
+                  navigateText: 'Basculer',
+                },
+              },
+            },
+          },
+          de: {
+            translations: {
+              button: {
+                buttonText: 'Dokumentation durchsuchen',
+                buttonAriaLabel: 'Dokumentation durchsuchen',
+              },
+              modal: {
+                noResultsText: 'Keine relevanten Ergebnisse gefunden',
+                resetButtonTitle: 'Suchbedingungen löschen',
+                footer: {
+                  selectText: 'Auswählen',
+                  navigateText: 'Wechseln',
+                },
+              },
+            },
+          },
+          es: {
+            translations: {
+              button: {
+                buttonText: 'Buscar documentación',
+                buttonAriaLabel: 'Buscar documentación',
+              },
+              modal: {
+                noResultsText: 'No se encontraron resultados relevantes',
+                resetButtonTitle: 'Limpiar condiciones de búsqueda',
+                footer: {
+                  selectText: 'Seleccionar',
+                  navigateText: 'Cambiar',
+                },
+              },
+            },
+          },
+          ru: {
+            translations: {
+              button: {
+                buttonText: 'Поиск в документации',
+                buttonAriaLabel: 'Поиск в документации',
+              },
+              modal: {
+                noResultsText: 'Соответствующих результатов не найдено',
+                resetButtonTitle: 'Очистить условия поиска',
+                footer: {
+                  selectText: 'Выбрать',
+                  navigateText: 'Переключить',
+                },
+              },
+            },
+          },
+          ko: {
+            translations: {
+              button: {
+                buttonText: '문서 검색',
+                buttonAriaLabel: '문서 검색',
+              },
+              modal: {
+                noResultsText: '관련 결과를 찾을 수 없습니다',
+                resetButtonTitle: '검색 조건 지우기',
+                footer: {
+                  selectText: '선택',
+                  navigateText: '전환',
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -109,6 +205,12 @@ export default defineConfig({
     root: { label: 'English' },
     zh: { label: '简体中文' },
     tr: { label: 'Türkçe' },
+    ja: { label: '日本語' },
+    fr: { label: 'Français' },
+    de: { label: 'Deutsch' },
+    es: { label: 'Español' },
+    ru: { label: 'Русский' },
+    ko: { label: '한국어' },
   },
   sitemap: {
     hostname: 'https://docs.rustfs.com',
@@ -144,6 +246,12 @@ export default defineConfig({
               return '复制代码'
             case 'tr':
               return 'Kodu kopyala'
+            case 'ja':
+              return 'コードをコピー'
+            case 'fr':
+              return 'Copier le code'
+            case 'de':
+              return 'Code kopieren'
             default:
               return 'Copy code'
           }
