@@ -96,10 +96,14 @@ export const zhSidebar = [
     ]
   },
     {
-    text: '功能使用指南l​',
+    text: '功能使用指南​',
     collapsed: true,
     home: true,
     items: [
+      { text: '存储桶管理', link: '/zh/guide/bucket/bucket-create-and-delete' },
+      { text: '对象管理', link: '/zh/guide/bucket/object-upload-and-delete' },
+      { text: '访问密钥管理', link: '/zh/guide/access-token' },
+      { text: 'mc（MinIO Client） 使用', link: '/zh/guide/mc' },
       { text: 'MCP', link: '/zh/guide/mcp' },
     ]
   },
