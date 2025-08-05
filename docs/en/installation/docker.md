@@ -31,11 +31,7 @@ This document is based on the official RustFS Linux binary package, creating a c
 
 Using the official Ubuntu base image, quickly pull the official RustFS image:
 
-```bash
-docker pull quay.io/rustfs/rustfs
-```
 
-Or use docker to pull:
 
 ```bash
 docker pull rustfs/rustfs

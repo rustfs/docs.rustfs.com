@@ -31,11 +31,6 @@ Bu belge, resmi RustFS Linux ikili paketine dayanarak RustFS'i ve çalışma ort
 
 Resmi Ubuntu tabanlı imajı kullanarak RustFS imajını hızlıca çekin:
 
-```bash
-docker pull quay.io/rustfs/rustfs
-````
-
-Veya alternatif olarak:
 
 ```bash
 docker pull rustfs/rustfs

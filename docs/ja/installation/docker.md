@@ -28,11 +28,7 @@ RustFS は、高性能で100% S3互換のオープンソース分散オブジェ
 
 公式 Ubuntu ベースイメージを使用して、RustFS 公式イメージを高速プル：
 
-```bash
-docker pull quay.io/rustfs/rustfs
-```
 
-または docker を使用してプル：
 ```bash
 docker pull rustfs/rustfs
 ```

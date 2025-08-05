@@ -33,11 +33,7 @@ RustFS 是一款高性能、100% 兼容 S3 的开源分布式对象存储系统�
 
 使用官方 Ubuntu 基础镜像，快速拉取 RustFS 官方镜像：
 
-```bash
-docker pull quay.io/rustfs/rustfs
-```
 
-或者使用 docker 拉取：
 ```bash
 docker pull rustfs/rustfs
 

@@ -30,11 +30,6 @@ Ce document est basé sur le package binaire Linux officiel RustFS, à travers u
 Utiliser l'image de base Ubuntu officielle, tirage rapide de l'image officielle RustFS :
 
 ```bash
-docker pull quay.io/rustfs/rustfs
-```
-
-Ou utiliser docker pull :
-```bash
 docker pull rustfs/rustfs
 
 ```
