@@ -7,7 +7,7 @@ description: "Introduction to RustFS Architecture"
 
 RustFS is an object storage system, similar to the well-known AWS S3. As a replacement for MinIO, RustFS references MinIO's simple, lightweight, scalable, and elegant architecture.
 
-Objects can be documents, videos, PDF files, etc. To store objects, MinIO provides a scalable, flexible, and efficient solution for storing, accessing, and managing data. Its compatibility with AWS S3 API enables seamless integration with applications based on AWS S3.
+Objects can be documents, videos, PDF files, etc. To store objects, RustFS provides a scalable, flexible, and efficient solution for storing, accessing, and managing data. Its compatibility with AWS S3 API enables seamless integration with applications based on AWS S3.
 
 The architecture diagram is as follows:
 
@@ -22,11 +22,11 @@ In both distributed and single-machine modes, all read and write operations stri
 
 ## Several Important Concepts in RustFS
 
-**Object**: The basic object stored in Minio, such as files, byte streams, anything...
+**Object**: The basic object stored in RustFS, such as files, byte streams, anything...
 
 **Bucket**: A logical space used to store Objects. Data between each Bucket is mutually isolated. For clients, it is equivalent to a top-level folder for storing files.
 
-**Drive**: The disk that stores data, passed as a parameter when MinIO starts. All object data in Minio will be stored in Drives.
+**Drive**: The disk that stores data, passed as a parameter when RustFS starts. All object data in RustFS will be stored in Drives.
 
 **Set**: A collection of Drives. Distributed deployment automatically divides into one or more Sets based on cluster scale, with Drives in each Set distributed in different locations. An object is stored on one Set. (Some places also refer to the combination of Sets as **Strips**).
 
