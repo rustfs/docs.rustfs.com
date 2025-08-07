@@ -95,11 +95,15 @@ export const esSidebar = [
       },
     ]
   },
-    {
+  {
     text: 'Guía de uso de funciones',
     collapsed: true,
     home: true,
     items: [
+      { text: 'Gestión de buckets', link: '/es/guide/bucket/bucket-create-and-delete' },
+      { text: 'Gestión de objetos', link: '/es/guide/bucket/object-upload-and-delete' },
+      { text: 'Claves de acceso', link: '/es/guide/access-token' },
+      { text: 'MinIO Client (mc)', link: '/es/guide/mc' },
       { text: 'MCP', link: '/es/guide/mcp' },
     ]
   },
