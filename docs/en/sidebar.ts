@@ -101,6 +101,10 @@ export const enSidebar = [
     collapsed: true,
     home: true,
     items: [
+      { text: 'Bucket Management', link: '/guide/bucket/bucket-create-and-delete' },
+      { text: 'Object Management', link: '/guide/bucket/object-upload-and-delete' },
+      { text: 'Access Keys', link: '/guide/access-token' },
+      { text: 'MinIO Client (mc)', link: '/guide/mc' },
       { text: 'MCP', link: '/guide/mcp' },
     ]
   },
