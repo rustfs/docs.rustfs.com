@@ -1,100 +1,95 @@
 ---
-title: "网络检查清单"
-description: "RustFS 企业级部署网络检查清单"
+title: "Checklist de rede"
+description: "Checklist de rede para implantação empresarial do RustFS"
 ---
 
-# 网络检查清单
+# Checklist de rede
 
+## 1. Desenho da arquitetura de rede
 
+### Planeamento básico
+- Verificação da topologia (estrela/anel/malha) para alta disponibilidade
+- Verificação de caminhos redundantes: pelo menos dois enlaces físicos independentes entre nós
+- Planeamento de largura de banda: Tráfego estimado de leitura/gravação × nº de nós × nº de réplicas + 20% de margem
 
-## 1. 网络架构设计
-
-### 基础网络规划
-- **拓扑结构验证** 
- 确认部署架构（星型/环形/网状）是否满足分布式存储的高可用需求
-- **冗余路径检查** 
- 确保节点间存在至少两条独立物理链路
-- **带宽规划** 
- 计算预估流量：对象存储读写带宽 × 节点数量 × 副本数 + 20%冗余
-
-### IP 规划
-- [ ] 管理网络与数据网络分离
-- [ ] 为存储节点分配连续 IP 段（建议/24 子网）
-- [ ] 预留至少 15%的 IP 地址用于扩展
+### Planeamento de IP
+- [ ] Separar rede de gestão e rede de dados
+- [ ] Alocar bloco de IPs contínuos aos nós de armazenamento (sugestão: /24)
+- [ ] Reservar pelo menos 15% dos IPs para expansão
 
 ---
 
-## 2. 硬件设备要求
-### 交换机配置
-| 检查项 | 标准要求 | 
-|--------|---------|
-| 背板带宽 | ≥ 全端口线速转发能力 × 1.2 | 
-| 端口类型 | 10G/25G/100G SFP+/QSFP+ 光纤端口 | 
-| 流表容量 | ≥ 节点数 × 5 | 
-| 生成树协议 | 启用 RSTP/MSTP 快速收敛 |
+## 2. Requisitos de hardware
+### Switches
+| Item | Requisito |
+|------|-----------|
+| Backplane | ≥ capacidade de encaminhamento em linha de todas as portas × 1,2 |
+| Tipo de portas | 10G/25G/100G SFP+/QSFP+ óticas |
+| Tabela de fluxos | ≥ nº de nós × 5 |
+| STP | Habilitar RSTP/MSTP com convergência rápida |
 
-### 物理连接
-- [ ] 光纤衰减测试（单模≤0.35dB/km）
-- [ ] 端口错位连接检查（A 节点 eth0 ↔ B 节点 eth0）
-- [ ] 线缆标签系统（包含源/目的 IP+端口号）
+### Ligações físicas
+- [ ] Teste de atenuação de fibra (monomodo ≤ 0,35 dB/km)
+- [ ] Verificação de cruzamento de portas (nó A eth0 ↔ nó B eth0)
+- [ ] Etiquetagem de cabos (IP de origem/destino + nº da porta)
 
 ---
 
-## 3. 操作系统网络配置
-### 内核参数调优
+## 3. Sistema operativo e tuning de rede
+### Parâmetros de kernel
 ```bash
-# 检查以下参数设置
+# Verificar as seguintes definições
 net.core.rmem_max = 16777216
 net.core.wmem_max = 16777216
 net.ipv4.tcp_keepalive_time = 600
 net.ipv4.tcp_slow_start_after_idle = 0
 ```
 
-### 网卡配置
-- [ ] 启用巨帧（MTU=9000，需全线路径支持）
-- [ ] 验证网卡绑定模式（推荐 LACP mode4）
-- [ ] 关闭 IPv6（如不需使用）
+### Configuração de NIC
+- [ ] Jumbo frame (MTU=9000, com suporte end‑to‑end)
+- [ ] Modo de bonding (recomendado LACP mode4)
+- [ ] Desativar IPv6 (se não usado)
 
 ---
 
-## 4. 安全策略
-### 防火墙规则
+## 4. Segurança
+### Regras de firewall
 ```bash
-# 必要开放端口
-- TCP 443（HTTPS API）
-- TCP 9000（S3 兼容接口） 
-- TCP 7946（Serf 节点通信）
-- UDP 4789（VxLAN 隧道）
+# Portas necessárias
+- TCP 443 (HTTPS API)
+- TCP 9000 (S3 compatível)
+- TCP 7946 (Serf)
+- UDP 4789 (VxLAN)
 ```
 
-### 访问控制
-- 交换机端口安全 MAC 限制
-- 存储节点间 IPSec 隧道加密
-- 管理接口启用 TLS 1.3
+### Controlo de acesso
+- Segurança de porta no switch (limite de MAC)
+- Túnel IPSec entre nós de armazenamento
+- Interface de gestão com TLS 1.3
 
 ---
 
-## 5. 性能验证测试
-### 基准测试项
-1. 节点间延迟测试：`iperf3 -s 8972 <目标 IP>`
-2. 跨机架带宽测试：`iperf3 -c <目标 IP> -P 8 -t 30`
-3. 故障切换测试：随机断开核心链路观察恢复时间
+## 5. Testes de desempenho
+### Itens de benchmark
+1. Latência entre nós: `iperf3 -s 8972 <IP alvo>`
+2. Largura de banda cross‑rack: `iperf3 -c <IP alvo> -P 8 -t 30`
+3. Failover: desconectar link crítico e observar tempo de recuperação
 
-### 验收标准
-| 指标 | 要求 |
-|------|------|
-| 节点延迟 | ≤1ms（同机房）/≤5ms（跨 AZ） |
-| 带宽利用率 | 峰值≤70% 设计容量 |
-| 故障切换 | 小于 500ms BPDU 收敛 |
+### Critérios de aceitação
+| Métrica | Requisito |
+|--------|-----------|
+| Latência | ≤1 ms (mesmo DC) / ≤5 ms (entre AZs) |
+| Utilização de banda | Pico ≤70% da capacidade projetada |
+| Failover | Convergência BPDU < 500 ms |
 
 ---
 
-## 6. 文档记录要求
-1. 网络拓扑图（含物理连接与逻辑 IP）
-2. 交换机配置备份文件（含时间戳）
-3. 基线测试报告（含原始数据）
-4. 变更记录表（含维护窗口信息）
+## 6. Registos e documentação
+1. Diagrama de topologia (ligações físicas e IP lógicos)
+2. Backup de configurações de switch (com timestamp)
+3. Relatório de testes baseline (com dados brutos)
+4. Registo de mudanças (com janela de manutenção)
 
-> **提示**：建议在正式部署前进行 72 小时压力测试，模拟峰值流量 110%的负载场景
+> Dica: antes da produção, execute teste de stress por 72 h simulando 110% do pico de tráfego.
 
-此清单覆盖了企业级存储系统网络部署的关键检查点，特别针对分布式对象存储的特点优化了参数要求，您可以联系 RustFS 获得官方技术支持。
+Esta checklist cobre pontos críticos para implantação de armazenamento distribuído; para apoio oficial, contacte a equipa RustFS.

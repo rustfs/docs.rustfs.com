@@ -1,48 +1,46 @@
 ---
-title: 启动模式
-description: RustFS 一共分为几种启动模式？
+title: "Modos de arranque"
+description: "Quantos modos de arranque o RustFS oferece?"
 ---
 
-# 启动模式
+# Modos de arranque
 
-RustFS 一共分为三种启动模式：
+O RustFS suporta três modos:
 
-- **单机单盘**： 一台服务器上有一个数据盘；
-- **单机多盘**： 一台服务器上有多个数据盘；
-- **多机多盘**： 多台服务器上有多个数据盘。
+- Single Node Single Disk (SNSD): um único disco numa só máquina
+- Single Node Multiple Disk (SNMD): múltiplos discos numa só máquina
+- Multiple Node Multiple Disk (MNMD): múltiplas máquinas com múltiplos discos
 
-## 单机单盘模式（SNSD， Single Node Single Disk）
+## Modo SNSD (Single Node Single Disk)
 
-> 适用于低密度非关键业务，在生产环境建议经验进行数据备份，避免出现风险。
+> Indicado para cargas não críticas e baixa densidade. Em produção, mantenha backups para evitar risco.
 
-1 台服务器中只有一个数据盘，所有的数据全部落入这一个数据盘中。
+Uma máquina com um único disco de dados; todos os dados residem nesse disco.
 
-具体架构图如下：
+Arquitetura:
 
 <img src="./images/1.jpg" alt="RustFS Single Node Single Disk Mode" />
 
-## 单机多盘模式(SNMD， Single Node Multiple Disk)
+## Modo SNMD (Single Node Multiple Disk)
 
-> 适用于中性非关键业务，在生产环境中通常损坏指定的 M 块硬盘不会出现数据风险，若整个服务器损坏或者超过 M 磁盘损坏，则数据丢失。
+> Para cargas médias não críticas. Em produção, perda de até M discos não implica risco de dados; perda do servidor inteiro ou >M discos leva a perda de dados.
 
-1 台服务器中只有多数据盘，数据以分片的形式存储在多个数据盘上。
+Uma máquina com múltiplos discos. Os objetos são fragmentados e distribuídos entre discos.
 
-一个数据块，会拆成指定的 K 个数据块和 M 个校验块，最多不能丢失 K 个数据块，最多不能丢失 M 个校验块。
+Um bloco é dividido em K fragmentos de dados e M de paridade; tolera perda de até M fragmentos de paridade e requer K dados para reconstrução.
 
-以下图为例：
+Exemplo:
 
 <img src="./images/2.jpg" alt="RustFS Single Node Multiple Disk Mode" />
 
-## 多机多盘（MNMD， Multiple Node Multiple Disk）
+## Modo MNMD (Multiple Node Multiple Disk)
 
-> 适用于生产环境中的关键业务，建议在专家指导下进行配置，并且了解并发、吞吐、业务场景、压力等多项指标，对系统进行全面优化。
+> Para cargas críticas em produção. Requer ajuste por especialistas considerando concorrência, throughput, cenários e pressão.
 
-最小需要 4 台服务器，最低每台服务器需要 1 块磁盘，才可以安全的启动分布式象存储集群。
+Mínimo 4 servidores; cada servidor com pelo menos 1 disco para formar um cluster distribuído seguro.
 
-以下架构图例，数据通过负载均衡，随机向任何一台服务器写入数据。以默认 12 + 4 的模式。 一个数据块默认会切分成 12 个数据块 + 4 个校验块，分别存到不同服务器的不同磁盘上。
+Com balanceador de carga, dados podem ser escritos em qualquer servidor. Exemplo padrão 12+4: um bloco divide‑se em 12 de dados + 4 de paridade, distribuídos em discos distintos de servidores distintos.
 
-任何 1 台服务器损坏或者维护都不会影响到数据安全。
-
-任何 4 块磁盘以内的数据损坏都不会影响数据安全。
+Falha de 1 servidor não afeta a segurança dos dados. Danos em até 4 discos permanecem tolerados.
 
 <img src="./images/lb.jpg" alt="RustFS Multiple Node Multiple Disk Mode" />

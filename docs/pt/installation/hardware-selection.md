@@ -1,42 +1,41 @@
 ---
-title: 硬件选择
-description: 我可以使用哪些硬件运行 RustFS
+title: "Seleção de hardware"
+description: "Que hardware posso usar para executar o RustFS?"
 ---
 
-# 硬件选择
+# Seleção de hardware
 
-> RustFS 更低的内存需求和更稳定的内存抖动。
+> O RustFS tem baixa exigência de memória e jitter estável.
 
-## 测试环境硬件选择
+## Ambiente de testes
 
-> 测试环境可快速使用，不需要对高负载和生产保障负责，只需要满足实验需求即可。
+> Para uso rápido sem responsabilidade por alta carga; apenas suprir necessidades de experimento.
 
-| 编号 | 硬件类型 | 参数 |
+| Nº | Tipo | Parâmetros |
 | - | - | - |
-| 1 | CPU | 1 核+ |
-| 2 | CPU 架构 | X86、ARM 均可 |
-| 3 | 内存 | 1 GB+ |
-| 4 | 硬盘 | HDD、SSD 均可 |
-| 5 | Docker 支持 | 支持 |
-| 6 | 网络要求 | 本地通信和无网络均可 |
-| 7 | 操作系统 | Windows、Linux、MacOS 均可 |
-| 8 | 负载均衡 | 无 |
-| 9 | 最小节点 | 1 |
+| 1 | CPU | 1 núcleo+ |
+| 2 | Arquitetura CPU | x86 ou ARM |
+| 3 | Memória | 1 GB+ |
+| 4 | Disco | HDD ou SSD |
+| 5 | Docker | Suportado |
+| 6 | Rede | Local/sem rede OK |
+| 7 | SO | Windows, Linux, macOS |
+| 8 | LB | Não |
+| 9 | Mín. nós | 1 |
 
-## 生产环境硬件选择
+## Ambiente de produção
 
-| 编号 | 硬件类型 | 参数 |
+| Nº | Tipo | Parâmetros |
 | - | - | - |
-| 1 | CPU | 2 x 12 核+ |
-| 2 | CPU 类型 | X86、ARM 等多种 CPU 架构 |
-| 3 | 内存 | 64 GB+ |
-| 4 | 硬盘 | HDD、SSD 均可，推荐使用 SSD |
-| 5 | 网络要求 | 10 Gbps+ |
-| 6 | 操作系统 | Linux 优先 |
-| 8 | 负载均衡 | 建议使用负载均衡 |
-| 9 | 最小节点 | 4 节点起 |
+| 1 | CPU | 2 × 12 núcleos+ |
+| 2 | Tipo de CPU | x86/ARM |
+| 3 | Memória | 64 GB+ |
+| 4 | Disco | HDD/SSD (recomendado SSD) |
+| 5 | Rede | 10 Gbps+ |
+| 6 | SO | Preferir Linux |
+| 8 | LB | Recomendado usar balanceador |
+| 9 | Mín. nós | 4 nós |
 
-## 专家服务
+## Serviço de especialistas
 
-如果您提心您的的硬件环境是否可以满足实际的生产需求，或者有存储降本需求。
-可向 RustFS 团队提问和发起专家咨询。可联系：400-033-5363。
+Se tiver dúvidas se o seu hardware atende produção, ou busca redução de custos, contacte a equipa RustFS para consultoria especializada: 400-033-5363.

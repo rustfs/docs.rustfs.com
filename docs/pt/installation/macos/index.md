@@ -1,70 +1,52 @@
 ---
-title: "MacOS 安装 RustFS"
-description: "本文主要讲解 RustFS MacOS 下的快速启动方式"
+title: "Instalar RustFS no macOS"
+description: "Guia de arranque rápido do RustFS no macOS"
 ---
 
-# MacOS 安装 RustFS
+# Instalar RustFS no macOS
 
-
-在 MacOS 下可以使用三种方式进行方案：
+No macOS, há três formas de iniciar:
 1. Docker
-2. 图形化一键启动包
-3. 二进制包
+2. Pacote gráfico de arranque com um clique
+3. Binário
 
-> 本文主要讲解 使用 RustFS**图形化一键启动包**进行快速拉起 RustFS 的模式。
+> Este guia foca o arranque rápido usando o pacote gráfico de um clique do RustFS.
 
+## 1. Preparação
 
+Atenção:
 
-## 一、准备工作
+> O modo gráfico suporta apenas SNSD (single node, single disk) e é indicado para desenvolvimento, debug e testes.
 
-请了解：
+1. Para detalhes de modos de arranque, veja [Modos](../mode/)
+2. Descarregue o instalador, ajuste permissões e inicie
 
-> **图形化启动模式** 只支持单机单盘模式，更适用于开发、调试和测试环境。
+## 2. Download
 
+Vá ao site oficial e descarregue a versão mais recente do instalador do RustFS.
 
-1. 关于启动模式的详细介绍，请参考 [启动模式](../mode/);
+## 3. Permissões
 
-2. 下载安装包，修改权限，并进行启动。
+No macOS, confirme que a aplicação tem permissões de execução.
 
+## Iniciar com duplo clique
 
-## 二、下载
+1. Faça duplo clique no ícone da aplicação
+2. Clique para configurar o disco
+3. Clique em "Start Service" para iniciar o RustFS
 
-前往官网下载页面，下载最新版 RustFS 安装包。
+<img src="./images/macos-setup.jpg" alt="macOS start" />
 
+## 4. Alterar configurações
 
-## 三、修改权限
+Clique no botão de configuração (ícone de engrenagem) no canto superior direito para ajustar:
 
-请确认在 MacOS 操作系统中，本程序有相关的执行权限。
+1. Porta padrão do servidor
+2. Nome de utilizador e palavra‑passe do admin
+3. Diretório do disco
 
+<img src="./images/setting.jpg" alt="Configuração RustFS no macOS" />
 
-## 双击启动图标
+## 5. Aceder ao Console
 
-1. 双击启动图标；
-
-2. 点击配置磁盘；
-
-3. 点击"Start Service"，RustFS 服务启动成功。
-
-
-<img src="./images/macos-setup.jpg" alt="macos 启动" />
-
-
-
-## 四、修改配置
-
-点击右上脚的修改按钮（齿轮状按钮），可以修改：
-
-1. 服务器默认端口；
-
-2. 默认管理员的用户名和密码；
-
-3. 指定的磁盘目录；
-
-<img src="./images/setting.jpg" alt="RustFS windows 配置" />
-
-
-
-## 五、访问 Console
-
-
-启动成功后，访问 `http://127.0.0.1:7001`，即可访问控制台。
+Depois de iniciar, aceda a `http://127.0.0.1:7001` para abrir o console.
