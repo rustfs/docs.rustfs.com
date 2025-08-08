@@ -1,36 +1,33 @@
 ---
-title: "对象扫描"
-description: "RustFS 是一款简单、高效、分布式的对象存储。它 100%兼容 S3，使用 Apache2 许可证发行的开源软件。"
+title: "Scanner de objetos"
+description: "Design do scanner de objetos do RustFS, integração com EC, monitorização e troubleshooting"
 ---
 
-# 对象扫描
+# Scanner de objetos
 
+Este documento descreve o design e a implementação do scanner de objetos do RustFS, cobrindo a integração com Erasure Coding, mecanismos de Scrub & Repair, estratégia de escalonamento, métricas e troubleshooting.
 
-本文深入介绍了 RustFS 对象扫描器的设计与实现，涵盖其与 Erasure Coding、Scrub & Repair 机制的集成，以及调度策略、监控指标与故障排查方法。 
+## Visão geral
 
-## 概述
+O scanner de objetos está embutido no motor de armazenamento e verifica periodicamente a integridade dos objetos, executando ações programadas.
+As tarefas incluem estatísticas de uso de disco, avaliação de regras de ciclo de vida, replicação e acionamento de auto‑recuperação para objetos corrompidos.
 
-RustFS 对象扫描器内置于存储引擎中，负责周期性检查对象完整性及执行预定操作。
-扫描任务包括统计磁盘使用、评估生命周期管理规则、执行对象复制及触发损坏对象自愈等功能。
+## Arquitetura e princípios de design
 
-## 架构与设计原则
+### Arquitetura do scanner
 
-### 扫描器架构
+O scanner usa amostragem por hash: para cada 1024 objetos, seleciona 1 para verificação, mitigando impacto em tráfego normal.
+Integra‑se profundamente com o módulo de Erasure Coding: ao detetar perda/corrupção de partes, reconstrói online usando redundância, garantindo alta disponibilidade e consistência.
 
-RustFS 扫描器采用了哈希抽样机制，根据对象名称哈希选择每 1024 个对象中的一个进行检查，以减少对正常请求的性能影响。 
-扫描器与 Erasure Coding 模块深度集成，在检测到丢失或损坏分片时，能够利用冗余分片进行在线重建，确保数据高可用和一致性。 
+## Verificação e recuperação de dados
 
-## 数据校验与恢复
+A verificação pode comparar metadados e tamanhos, e fazer leitura bit‑a‑bit para detetar bit rot. Quando necessário, o scanner aciona o fluxo de reparo.
 
-RustFS 数据校验机制可以快速检查元数据一致性，后者按位读取并校验数据以发现隐蔽的坏块。对象扫描器的执行可对 bit rot 等问题进行发现，并在必要时触发修复流程。
+## Modos de varrimento e agendamento
 
-## 扫描模式与调度
+Três modos: verificação online em leitura, varrimento periódico em segundo plano e varrimento total manual—equilibrando performance e confiabilidade.
+Semelhante ao `osd_scrub_begin_hour` no Ceph, administradores podem configurar janelas e frequência (ex.: verificação leve diária).
 
-RustFS 支持三种扫描触发模式：读取时在线扫描、后台定期扫描和手动全量扫描，兼顾性能与可靠性。
-类似 Ceph 中的 `osd_scrub_begin_hour` 配置，管理员可以设置扫描启动时间和频率，例如将轻度校验默认设为每日一次。
+## Monitorização e métricas
 
-
-## 监控与指标
-
-RustFS 扫描器统计任务总数、失败次数和耗时分布，并通过 Prometheus 数据模型暴露指标如 `rustfs_scanner_jobs_total`、`rustfs_scanner_failures_total` 和 `rustfs_scanner_duration_seconds`。 
-结合监控系统可根据扫描失败率和时长设置告警，及时发现并定位存储或网络等层面的潜在问题。 
+Expõe contagem total de tarefas, falhas e distribuição de duração; publica métricas Prometheus como `rustfs_scanner_jobs_total`, `rustfs_scanner_failures_total`, `rustfs_scanner_duration_seconds`. Alarmes podem ser definidos com base em taxa de falhas e duração. 

@@ -1,99 +1,91 @@
-# 商标下载及使用
+---
+title: "Descarregar e utilizar marcas"
+description: "Diretrizes de uso da marca RustFS e ligação para descarregar logótipos"
+---
 
-此页面中的所有图片只供您在您的产品架构图或者支持列表中用于代表 RustFS 时使用。使用图片时，请标明图片来源为 RustFS 官方网站。图片可以按比例调整大小，但不能以任何其他方式进行修改。
+# Descarregar e utilizar marcas
 
-RustFS® 和 rustfs logo® 是北京恒河沙科技有限公司在中国获得注册的注册商标。任何人未经 RustFS 书面同意，不得使用这些图片作任何其他用途。
+Todas as imagens desta página destinam‑se apenas a representar o RustFS em diagramas de arquitetura de produto ou listas de suporte. Ao usar, indique a fonte como o site oficial do RustFS. As imagens podem ser redimensionadas proporcionalmente, mas não podem ser modificadas por outros meios.
 
-如有其他未尽事宜，请通过电子邮件 <hello@rustfs.com> 与我们取得联系。
+RustFS® e rustfs logo® são marcas registadas da Beijing Hengheshake Technology Co., Ltd. na China. Sem consentimento escrito do RustFS, não é permitida a utilização destas imagens para outros fins.
 
-## RustFS Logo
+Para outras questões, contacte‑nos por e‑mail: <hello@rustfs.com>.
 
-### 白色背景版本
+## Logótipo RustFS
 
-![RustFS Logo - 白色背景](./images/logo-white-bg.svg)
+### Versão para fundo branco
 
-### 不同背景版本
+![RustFS Logo - fundo branco](./images/logo-white-bg.svg)
 
-| 黑色背景 | 灰色背景 | 粉色背景 |
+### Versões para diferentes fundos
+
+| Fundo preto | Fundo cinzento | Fundo rosa |
 |----------|----------|----------|
-| ![RustFS Logo - 黑色背景](./images/logo-black-bg.svg) | ![RustFS Logo - 灰色背景](./images/logo-gray-bg.svg) | ![RustFS Logo - 粉色背景](./images/logo-pink-bg.svg) |
+| ![RustFS Logo - fundo preto](./images/logo-black-bg.svg) | ![RustFS Logo - fundo cinzento](./images/logo-gray-bg.svg) | ![RustFS Logo - fundo rosa](./images/logo-pink-bg.svg) |
 
-### 下载链接
+### Ligações de download
 
-🔗 [一键全部下载](https://rustfs.com/images/trademark/logo.zip)
+🔗 [Descarregar tudo](https://rustfs.com/images/trademark/logo.zip)
 
-## 商标使用规范
+## Diretrizes de uso da marca
 
-![商标使用规范](./images/trademark-guidelines.svg)
+![Diretrizes de marca](./images/trademark-guidelines.svg)
 
-## 商标使用规范文档
+## Documento de diretrizes
 
-### 版本信息
+### Versão
 
 v1.0
 
-### 引言
+### Introdução
 
-RustFS 是一种高性能分布式对象存储系统。它是软件定义的，可在行业标准硬件上运行，并且根据 Apache Version 2.0 开源许可证 100% 商用友好的开源。
+O RustFS é um sistema de armazenamento de objetos distribuído e de alto desempenho. É software definido, corre em hardware padrão de mercado e é 100% open source sob a licença Apache Version 2.0.
 
-本文件概述了 RustFS 项目关于其商标使用的政策。任何 RustFS 商标的使用都必须符合本政策。就本政策而言，"商标"是指 RustFS 的文字标记、服务标记、徽标、商品外观、产品名称、服务、业务和公司名称。
+Este documento resume a política de uso de marca do projeto RustFS. Qualquer utilização das marcas RustFS deve cumprir esta política. “Marca” inclui marcas verbais, marcas de serviço, logótipos, trade dress, nomes de produtos, serviços, negócio e empresa do RustFS.
 
-RustFS 商标包括 RustFS 及其衍生出来的子产品等。
+As marcas RustFS incluem RustFS e produtos derivados.
 
-作为自由软件精神的坚定信徒和受人尊敬的社区成员，我们希望用户、分销商和其他社区成员能够广泛使用和改进我们的代码，这些代码是根据开源许可证分发的。尽管我们的代码是开源的，但 RustFS 希望确保其商标仍然是用户对我们的期望的质量和来源的可靠指标。严格执行我们的商标权也非常重要，以便能够保护我们的用户免受使用商标进行欺诈的人的侵害。这意味着，虽然您有相当大的自由来重新分发和修改我们的软件，但即使对于开源软件，您也必须遵守商标法和本政策。平衡这两个相互竞争的利益并非易事。我们依靠我们的用户、客户和社区来帮助我们实现这一平衡。
+Como comunidade open source, encorajamos a utilização e melhoria alargada do nosso código, distribuído sob licenças abertas. Ainda assim, é crucial garantir que as marcas RustFS permaneçam um indicador fiável de qualidade e origem e proteger utilizadores contra fraude. Assim, embora haja ampla liberdade para redistribuir/modificar código, a lei de marcas e esta política devem ser cumpridas.
 
-### 一般准则
+### Diretrizes gerais
 
-RustFS 的商标政策的根本依据是商标的一般规律。
+- O uso deve evitar causar confusão quanto a oficialidade/apoio do RustFS
+- Sites/software não oficiais não devem sugerir aprovação/afiliação
+- Em caso de dúvida, contacte: <hello@rustfs.com>
 
-RustFS 被设计为可供使用和扩展，并且 RustFS 认识到社区成员可能需要某种方式来以某种方式识别 RustFS 产品，但您必须确保消费者不会对它们是否是官方的（意味着得到 RustFS 批准）感到困惑。
+### O que pode fazer
 
-您对 RustFS 商标的使用必须始终不会造成混淆。人们应该始终知道他们正在与谁打交道，以及他们下载的软件来自哪里。非 RustFS 制作或正式授权的网站和软件不应直接或间接暗示它们是 RustFS 制作或正式授权的。
+- Redistribuir binários oficiais não modificados de <https://rustfs.com/download>, respeitando leis/licenças. Não remova/altere marcas. Pode declarar veridicamente que fornece RustFS não modificado
+- Usar marcas em materiais de marketing/divulgação sem causar confusão
+- Serviços relacionados: pode referenciar marcas ao descrever/ promover serviços, sem violar diretrizes gerais ou sugerir relação direta
+- Logótipos/merchandising: pode produzir itens para si/próximos (sem contrapartida comercial)
+- Referenciar/ligar honestamente a programas/produtos/serviços/tecnologias RustFS não modificados
 
-如有任何疑惑或需要澄清，请发邮件至 <hello@rustfs.com>
+### O que não pode fazer
 
-### 你可以做什么
+1. Colocar o logótipo RustFS em produtos de produção comercial
+2. Modificar, abreviar, combinar com outros símbolos/texto/imagens ou incorporar em slogans
+3. Criar versões modificadas do logótipo RustFS para qualquer fim
+4. Usar marcas de modo a sugerir afiliação, patrocínio, endosso ou aprovação indevida
+5. Usar marcas para fins comerciais, salvo uso meramente descritivo/verdadeiro
+6. Usar marcas em nomes/handles de redes sociais
 
-您可以以任何方式将从 <https://rustfs.com/download> 下载的未修改的官方二进制文件分发给任何人，但须遵守适用法律和许可证的相关条款，而无需获得 RustFS 的任何进一步许可。但是，您不得删除或更改任何 RustFS 商标。在您的网站或其他材料中，您可以如实声明您提供的软件是 RustFS 的未修改版本，同时牢记本政策文件中详述的有关使用 RustFS 商标的总体准则。我们建议，如果您选择为网站访问者提供下载 RustFS 二进制文件的机会，您可以通过链接到我们的网站来下载，以帮助确保更快、更可靠的下载。
+É permitido modificar o software sob licenças open source, mas não redistribuir versões modificadas com marcas RustFS. Em vez de “baseado em RustFS”, use “baseado na tecnologia RustFS” ou “contém código‑fonte RustFS”. Altere nomes de produto/binários para evitar confusão com o RustFS original.
 
-您可以在营销和其他宣传相关材料中使用 RustFS 商标。这包括表明个人或组织正在运输或销售 RustFS 产品的广告。当然，任何使用 RustFS 商标的行为都必须遵守一项基本要求，即其使用不得造成混淆。
+### Autorizações necessárias
 
-**与 RustFS 相关的服务：** 如果您提供与 RustFS 相关的服务，您可以在描述和宣传您的服务时使用 RustFS 的商标，只要您不违反使用 RustFS 商标的总体准则或做任何可能误导客户认为 RustFS 与您的组织有任何直接关系的事情。
+- Ícones de website: requerem autorização prévia
+- Domínios: incluir as marcas (total/parcial) num domínio exige autorização por escrito; tal uso pode causar confusão
 
-**标志和商品：** 您可以制作带有 RustFS 标志的 T 恤、桌面壁纸或棒球帽，但只能为您自己和您的朋友（即您不会从他们那里得到任何有价值回报的人）制作。
+### Como usar as marcas
 
-您可以使用 RustFS 商标真实地引用和/或链接到未经修改的 RustFS 程序、产品、服务和技术。
+1. Forma correta — usar a marca tal como é (sem abreviações/combinações)
+2. Símbolos — na primeira ou mais proeminente menção, indicar ® ou ™ conforme aplicável
+3. Atribuição — incluir a indicação “[Marca] é marca [registada, se aplicável] da RustFS”
+4. Distinção — a marca deve destacar‑se do texto (maiúsculas, itálico, negrito ou sublinhado)
 
-### 你不能做什么
+Não altere o logótipo exceto escala. Não adicione ornamentos, mude cores, proporções, distorça, adicione elementos ou combine com outros logótipos. Em contextos a preto‑e‑branco, pode reproduzir o logótipo em P&B.
 
-1. 您不能将 RustFS 标志放在您商业生产的任何产品上。
-2. 您不得修改 RustFS 的商标、缩写其或将其与任何其他符号、文字或图像结合，或将其合并到标语或口号中。
-3. 您不得出于任何目的制作 RustFS Logos 的修改版本。
-4. 您不得以错误暗示 RustFS 与您的产品或服务有关联、赞助、认可或批准的方式使用 RustFS 商标。
-5. 您不得将 RustFS 商标用于任何形式的商业用途，除非此类使用仅限于真实和描述性的引用。
-6. 您不能在社交媒体帐户的名称和名称中使用 RustFS 商标。
+### Questões
 
-您可以根据开源许可条款修改 RustFS 软件，但不得以任何 RustFS 商标重新分发您的修改。例如，您的产品或网站不适合说"基于 RustFS"。相反，为了完全准确，您应该将其描述为"基于 RustFS 技术"或"包含 RustFS 源代码"。您还必须更改产品和二进制文件的名称，以减少修改后的软件的用户被误导相信它是原生 RustFS 或与我们关联的可能性。
-
-### 你需要获得哪些许可
-
-如果您计划使用 RustFS 商标作为网站图标，则需要请求许可。
-
-**域名：** 如果您想在域名中包含全部或部分 RustFS 商标，则必须获得 RustFS 的书面许可。在域名中使用 RustFS 商标几乎任何行为都可能让消费者产生混淆，因此违反了 RustFS 商标使用不得造成混淆的总体要求。
-
-### 如何使用我们的商标
-
-1. **正确的形式** - RustFS 的商标应以其准确的形式使用 - 既不能缩写也不能与任何其他单词组合。
-2. **伴随符号** - RustFS 商标的首次或最突出提及应伴随一个符号，表明该商标是注册商标（"®"）还是未注册商标（"™"）；
-3. **归属声明** - 以下声明应出现在使用 RustFS 商标附近的某个地方（至少在同一页面上）："[商标] 是 RustFS 公司的 ["注册"，如果适用] 商标"；
-4. **可区分** - 商标应与周围文字区分开来，可以通过大写、斜体、粗体或下划线来区分。
-
-您不得更改任何 RustFS 徽标，除非对其进行缩放。这意味着您不得添加装饰元素、更改颜色、更改比例、扭曲它、添加元素或将其与其他徽标组合。但是，当上下文需要使用黑白图形并且徽标是彩色时，您可以以产生黑白图像的方式复制徽标。
-
-### 问题
-
-RustFS 已尽力使其商标政策尽可能全面。如果您正在考虑使用不受该政策保护的 RustFS 商标，并且不确定该使用是否违反 RustFS 的准则，请通过 <hello@rustfs.com> 与我们联系。
-
-如果 RustFS 随时自行决定您对我们的任何商标的使用违反本政策，我们可能撤销您使用的许可，并且您必须立即停止对该商标的所有使用。
-
-本政策可能会不时更新。请参阅此页面了解所有更新。
+Se considerar um uso não coberto por esta política, contacte <hello@rustfs.com>. O RustFS pode revogar autorizações a qualquer momento em caso de violação, exigindo a cessação imediata do uso. Esta política pode ser atualizada; consulte esta página para atualizações.

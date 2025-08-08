@@ -1,77 +1,64 @@
 ---
-title: "对象检查和自动恢复"
-description: "本文介绍了 RustFS 在单服务器多磁盘架构下的对象自愈（self-healing）功能设计与实现，包括自愈的意义、原理、流程、配置及常见故障排查。"
+title: "Verificação e auto‑recuperação de objetos"
+description: "Design e princípios da self‑healing no RustFS em ambiente single‑server multi‑disk"
 ---
 
-# 对象检查和自动恢复
+# Verificação e auto‑recuperação de objetos
 
-## 概述
+## Visão geral
 
+## Arquitetura do RustFS e design de auto‑recuperação
 
-## RustFS 架构与自愈设计
+### Arquitetura single‑server multi‑disk
 
-### 单服务器多磁盘架构
+O RustFS organiza múltiplos discos como um pool lógico. Objetos são divididos em shards de dados e de paridade (erasure coding) e distribuídos por discos distintos para fiabilidade e desempenho.
 
-RustFS 采用单服务器多磁盘的设计，将多个磁盘组织为一个逻辑存储池，提供对象存储服务。每个对象在写入时会被切分为多个数据分片（shard）和冗余分片，并分散存放于不同磁盘，以提高可靠性与性能。
+### Princípios de self‑healing
 
-### 自愈设计原则
+1. Verificação de integridade por checksum durante leitura (semelhante a ZFS)
+2. Redundância por erasure coding para reconstrução quando partes se perdem/corrompem
+3. Disparos multi‑nível: online na leitura, scanner de fundo e gatilho manual
 
-1. **数据完整性校验**：结合校验和（checksum）机制确保对象分片数据在读取时一致，例如 ZFS 会在读取时校验每个数据块的校验和，并在校验失败时进行修复。
-2. **分片冗余与纠删**：通过纠删码（erasure coding）生成冗余分片，当部分数据分片丢失或损坏时，可利用冗余分片重建原始对象。
-3. **多级自愈触发**：包括读取时在线自愈、后台扫描自愈和手动触发自愈，以兼顾性能与数据可靠性。
+## Princípios de auto‑recuperação
 
-## 对象自愈原理
+### Verificação e erasure
 
-### 校验与纠删
+Durante escrita, objetos são particionados em `k` shards de dados e `m` de paridade (total `n=k+m`). Na leitura, shards em falta são reconstruídos a partir dos restantes.
 
-RustFS 在对象写入阶段，将对象分成 *k* 个数据分片和 *m* 个冗余分片，根据指定的纠删参数分布存储于 *n=k+m* 块设备上。读取时，若发现有分片损坏或丢失，可从其他完好分片重建。
+### Scrub & Repair
 
-### 数据校验与修复（Scrub & Repair）
+Executa varrimento leve (comparação de metadados/tamanhos) e profundo (leitura bit‑a‑bit com checksum) para detetar e corrigir bit rot. Ao detetar inconsistências, aciona Repair para reconstruir shards e reescrevê‑los.
 
-RustFS 定期对存储池执行轻量级校验（light scrub）和深度校验（deep scrub）：
-- **轻量级校验** 对象元数据及分片大小进行比较，发现损坏及时标。
-- **深度校验** 按位读取分片数据并校验校验和，可以检测并修复隐藏的坏块或 bit rot 问题。
+## Fluxos de self‑healing
 
-当数据扫描发现不一致时，RustFS 会自动调用 Repair 流程，将损坏分片用冗余分片重建，并将修复后的分片写回原磁盘或备用磁盘，保证下一次访问时数据完好。
+### Auto‑recuperação online em leitura
 
-## 自愈流程
+1) Se todos os shards estão íntegros, retorna dados
+2) Se há perda/corrupção, reconstrói com shards redundantes e devolve objeto completo
 
-### 读取时在线自愈
+### Auto‑recuperação por scanner de fundo
 
-每次客户端执行 `GET` 或 `HEAD` 请求时，RustFS 会首先检查对应对象的所有数据分片：
-1. 若所有数据分片完好，则直接返回数据。
-2. 若有分片丢失或损坏，系统会根据冗余分片计算出缺失分片并修复后，再返回完整对象给客户端。
-此机制与 MinIO 的读取时自愈流程一致，能够在不影响客户端请求的前提下透明修复数。
+O scanner percorre 1/1024 dos objetos por hashing, executa verificações periódicas e dispara reconstrução quando necessário. Por omissão, o deep scrub fica desativado (pode ser ligado sob demanda).
 
-### 背景扫描自愈
-
-RustFS 内置对象扫描器，按哈希方式遍历存储池中 1/1024 的对象进行完整性检查：
-- 对象扫描器定期（可配置频率）运行轻量级校验；
-- 若发现损坏，立即触发自愈重建流程。
-默认情况下不进行深度 bit rot 检查，以降低资源开销，可按需开启深度校验功能。
-
-### 手动触发自愈
-
-管理员可通过命令行工具执行全量自愈：
+### Gatilho manual
 
 ```bash
 rc admin heal start --all
 ```
-该操作会扫描整个存储池并对所有对象执行完整校验与修复，资源消耗较大，应在低峰期谨慎使用。
 
-## 使用示例
+Varre todo o pool e verifica/repara integralmente. Consome recursos; use em janelas de baixa atividade.
+
+## Exemplos
 
 ```bash
-# 查看当前自愈状态
+# Estado de self‑healing
 rc admin heal status
-# 启动指定桶（bucket）的自愈
+# Auto‑recuperar apenas um bucket
 rc admin heal start --bucket photos
-# 停止正在进行的自愈任务
+# Parar tarefa em execução
 rc admin heal stop
 ```
 
+## Sumário
 
-
-## 总结
-
-RustFS 的对象自愈结合了 MinIO、Ceph 和 ZFS 等系统的成熟设计，通过多级触发的校验与修复流程，能够在单机多盘和多机多盘环境下有效应对分片损坏、磁盘故障和 bit rot 等问题，保障对象存储的高可靠性与高可用性。
+A self‑healing do RustFS combina práticas de MinIO, Ceph e ZFS e, com múltiplos gatilhos e verificação/repair, lida eficazmente com shards danificados, falhas de disco e bit rot em cenários single‑node/multi‑node, garantindo alta fiabilidade e disponibilidade.

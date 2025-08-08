@@ -1,72 +1,70 @@
 ---
-title: "使用限制"
-description: "RustFS 是一款简单、高效、分布式的对象存储。它 100% 兼容 S3，使用 Apache2 许可证发行的开源软件。"
+title: "Limites de utilização"
+description: "RustFS é um armazenamento de objetos simples, eficiente e distribuído. 100% compatível com S3, em licença Apache 2.0."
 ---
 
-# 使用限制
+# Limites de utilização
 
-## 一、S3 API 限制
+## 1) Limites da API S3
 
-> 以下标准严格遵循 S3 协议标准进行规范。
+> Os seguintes valores seguem o padrão do protocolo S3.
 
-| 项目 | 规格 |
+| Item | Especificação |
 | --------------------- | ---------------------------------- |
-| 最大对象大小 | 5 TiB |
-| 最小对象大小 | 0 B |
-| 单次 PUT 操作的最大对象大小 | 非分片上传：500 GiB；分片上传：5 TiB |
-| 每次上传的最大分片数量 | 10,000 |
-| 分片大小范围 | 5 MiB 至 5 GiB；最后一个分片可为 0 B 至 5 GiB |
-| 每次列出分片请求返回的最大分片数量 | 10,000 |
-| 每次列出对象请求返回的最大对象数量 | 1,000 |
-| 每次列出分片上传请求返回的最大分片上传数量 | 1,000 |
-| 存储桶名称的最大长度 | 63 个字符 |
-| 对象名称的最大长度 | 1024 个字符 |
-| 每个 `/` 分隔的对象名称段的最大长度 | 255 个字符 |
-| 单个对象的最大版本数量 | 10,000（可配置） |
+| Tamanho máximo de objeto | 5 TiB |
+| Tamanho mínimo de objeto | 0 B |
+| Tamanho máx. por PUT | Upload simples: 500 GiB; Multipart: 5 TiB |
+| Nº máx. de partes por upload | 10,000 |
+| Faixa de tamanho de parte | 5 MiB a 5 GiB; última parte 0 B a 5 GiB |
+| Máx. de partes por listagem | 10,000 |
+| Máx. de objetos por listagem | 1,000 |
+| Máx. de uploads multipart por listagem | 1,000 |
+| Máx. comprimento de nome de bucket | 63 caracteres |
+| Máx. comprimento de chave de objeto | 1024 caracteres |
+| Máx. comprimento de cada segmento (separado por `/`) | 255 caracteres |
+| Máx. versões por objeto | 10,000 (configurável) |
 
 ---
 
+## 2) Limites de Erasure Coding (EC)
 
-## 二、 擦除编码限制
+> Parâmetros EC devem seguir a configuração baseada na matriz Reed‑Solomon. Considere a parametrização efetiva em produção.
 
-> EC 参数请，基于里德-所罗门矩阵的 EC 算法进行配置。以实际 EC 参数配置为准。
-
-| 项目 | 规格 |
+| Item | Especificação |
 | ---------------------------- | ------------------------------ |
-| 每个集群的最大服务器数量 | 无限制 |
-| 最小服务器数量 | 1 |
-| 当服务器数量为 1 时，每个服务器的最小驱动器数量 | 1（适用于单节点单驱动器部署，无法提供额外的可靠性或可用性） |
-| 当服务器数量为 2 或更多时，每个服务器的最小驱动器数量 | 1 |
-| 每个服务器的最大驱动器数量 | 无限制 |
-| 读取仲裁数 | N/2 |
-| 写入仲裁数 | (N/2) + 1 |
-
+| Nº máx. de servidores por cluster | Sem limite |
+| Nº mín. de servidores | 1 |
+| Quando há 1 servidor: nº mín. de drives | 1 (single‑node/drive, sem redundância) |
+| Quando há ≥2 servidores: nº mín. de drives por servidor | 1 |
+| Nº máx. de drives por servidor | Sem limite |
+| Quórum de leitura | N/2 |
+| Quórum de escrita | (N/2) + 1 |
 
 ---
 
-## 三、 对象命名限制
+## 3) Restrições de nomenclatura de objetos
 
-### 文件系统与操作系统限制
+### Sistema de ficheiros e SO
 
-RustFS 中的对象名称主要受底层操作系统和文件系统的限制。例如，Windows 和某些其他操作系统限制使用某些特殊字符，如 `^`、`*`、`|`、`\`、`/`、`&`、`"` 或 `;`。
+Os nomes de objetos no RustFS estão sujeitos às restrições do SO/sistema de ficheiros subjacente. Por exemplo, no Windows e noutros sistemas, certos caracteres especiais são proibidos: `^`, `*`, `|`, `\`, `/`, `&`, `"` ou `;`.
 
-请根据您的操作系统和文件系统的具体情况，参考相关文档以获取完整的限制列表。
+Consulte a documentação do seu SO e FS para a lista completa de restrições.
 
-RustFS 建议在生产环境中使用基于 XFS 文件系统的 Linux 操作系统，以获得更好的性能和兼容性。
+Para produção, recomenda‑se Linux com XFS para melhor desempenho e compatibilidade.
 
-### 命名冲突处理
+### Conflitos de nomes
 
-在 RustFS 中，应用程序必须为所有对象分配唯一且不冲突的键。这包括避免创建名称可能与父对象或同级对象名称冲突的对象。RustFS 在发生冲突的位置执行 LIST 操作时将返回空集。
+Aplicações devem garantir chaves únicas sem conflito. Evite criar objetos cujo nome conflite com prefixos existentes. Quando ocorre conflito, uma operação LIST no caminho em conflito retornará conjunto vazio.
 
-例如，以下操作会导致命名空间冲突：
+Exemplo de conflitos:
 
 ```bash
 PUT data/hello/2025/first/a.csv
-PUT data/hello/2025/first # 与现有对象前缀冲突
+PUT data/hello/2025/first # conflita com prefixo existente
 
 PUT data/hello/2025/first/
-PUT data/hello/2025/first/vendors.csv # 与现有对象冲突
+PUT data/hello/2025/first/vendors.csv # conflita com objeto existente
 ```
 
-尽管您可以对这些对象执行 GET 或 HEAD 操作，但名称冲突会导致在 `hello/2025/first/` 路径执行 LIST 操作时返回空结果集。
+Embora GET/HEAD possam funcionar sobre objetos específicos, conflitos farão a LIST em `hello/2025/first/` retornar vazio.
 
