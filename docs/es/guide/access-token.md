@@ -1,31 +1,31 @@
 ---
 title: "Gestión de claves de acceso de RustFS"
-description: "Creación, uso y eliminación de las claves de acceso de RustFS."
+description: "Creación, uso y eliminación de claves de acceso en RustFS"
 ---
 
 # Claves de acceso
 
-Las claves de acceso de RustFS son las credenciales básicas del sistema, utilizadas para la autenticación y la autorización. Son esenciales en escenarios de API y SDK. Esta sección explica cómo crear y eliminar claves de acceso en RustFS.
+Las claves de acceso de RustFS son las credenciales centrales para autenticar identidades y autorizar operaciones. Son especialmente útiles en escenarios de API y SDK. Esta sección explica cómo crear y eliminar claves de acceso en RustFS.
 
 Requisitos previos:
 
-- Una instancia disponible de RustFS. Consulta la [Guía de instalación](/es/installation/index) para desplegarla.
+- Una instancia disponible de RustFS. Consulte la [guía de instalación](../../es/installation/index.md).
 
 ## Crear una clave de acceso
 
-1. Inicia sesión en la consola UI de RustFS.
-2. En la navegación izquierda, selecciona **Claves de acceso**.
-3. En la página de Claves de acceso, haz clic en **Agregar clave de acceso** en la esquina superior derecha.
-4. Introduce **fecha de expiración, nombre y descripción** de la clave y haz clic en **Enviar**.
-5. (Opcional pero recomendado) En la página de detalle de la clave, elige **Copiar** o **Exportar** para guardar de forma segura las credenciales para su uso posterior.
+1. Inicie sesión en la consola UI de RustFS.
+1. En la barra de navegación izquierda, seleccione «Claves de acceso».
+1. En la página de claves de acceso, haga clic en «Añadir clave de acceso» (arriba a la derecha).
+1. Introduzca «vigencia, nombre y descripción» de la clave y haga clic en «Enviar».
+1. (Opcional pero recomendado) En la página de la clave creada, seleccione «Copiar» o «Exportar» para guardarla para usos futuros.
 
 ![access key list page](images/access_token_creation.png)
 
 ## Eliminar una clave de acceso
 
-1. Inicia sesión en la consola UI de RustFS.
-2. En la navegación izquierda, selecciona **Claves de acceso**.
-3. En la página de Claves de acceso, selecciona la clave a eliminar.
-4. Haz clic en **Eliminar** a la derecha de la clave, o en **Eliminar seleccionados** en la parte superior derecha.
+1. Inicie sesión en la consola UI de RustFS.
+1. En la barra de navegación izquierda, seleccione «Claves de acceso».
+1. En la página de claves de acceso, seleccione la clave que desea eliminar.
+1. Haga clic en «Eliminar» en la fila correspondiente o en «Eliminar seleccionados» (arriba a la derecha).
 
 ![access key deletion](images/access_token_deletion.png)
