@@ -1,33 +1,33 @@
 ---
 title: "Python SDK"
-description: "本文主要讲解 RustFS 中 Python SDK 的使用。"
+description: "Como usar o Boto3 (S3 Python SDK) com o RustFS: instalação, operações básicas, presigned URL e multipart."
 ---
 
-以下是 **RustFS 使用 S3 Python SDK（Boto3）完整文档**，包含了安装、连接、基本操作、高级功能（Presigned URL 和分片上传）等内容，适用于开发者使用 Python 与 RustFS 对接。
-
----
-
-# RustFS 使用 S3 Python SDK（Boto3）文档
-
-## 一、概述
-
-RustFS 是一款兼容 Amazon S3 协议的对象存储服务，支持通过 Python 的 [Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) SDK 接入。
-
-本教程将讲解如何使用 Python 与 RustFS 进行集成，并通过 Boto3 完成如下操作：
-
-* Bucket 创建/删除
-* 对象上传/下载/删除
-* 列举对象
-* 生成预签名 URL
-* 分片上传大文件
+Abaixo está a documentação para usar o **Boto3 (S3 Python SDK)** com o RustFS: instalação, conexão, operações básicas, URL pré‑assinada e upload multipart.
 
 ---
 
-## 二、环境准备
+# RustFS com S3 Python SDK (Boto3)
 
-### 2.1 RustFS 信息
+## 1. Visão geral
 
-假设 RustFS 部署如下：
+RustFS é compatível com o protocolo Amazon S3 e pode ser acessado pelo [Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html).
+
+Este guia mostra como integrar RustFS com Python e realizar:
+
+* Criar/Excluir buckets
+* Upload/Download/Delete de objetos
+* Listar objetos
+* Gerar URL pré‑assinada
+* Upload multipart para arquivos grandes
+
+---
+
+## 2. Preparação do ambiente
+
+### 2.1 Informações do RustFS
+
+Suponha uma instância:
 
 ```
 Endpoint: http://192.168.1.100:9000
@@ -35,9 +35,9 @@ AccessKey: rustfsadmin
 SecretKey: rustfssecret
 ```
 
-### 2.2 安装 Boto3
+### 2.2 Instalar Boto3
 
-推荐使用 `venv` 虚拟环境：
+Recomendamos `venv`:
 
 ```bash
 python3 -m venv venv
@@ -45,11 +45,11 @@ source venv/bin/activate
 pip install boto3
 ```
 
-> Boto3 依赖 `botocore`，会自动安装。
+> Boto3 depende de `botocore` (instala automaticamente).
 
 ---
 
-## 三、连接 RustFS
+## 3. Conectar ao RustFS
 
 ```python
 import boto3
@@ -65,15 +65,15 @@ s3 = boto3.client(
 )
 ```
 
-> ✅ `endpoint_url`：指向 RustFS
-> ✅ `signature_version='s3v4'`：RustFS 支持 v4 签名
-> ✅ `region_name`：RustFS 不校验 region，填写任意值即可
+> ✅ `endpoint_url`: aponta para o RustFS
+> ✅ `signature_version='s3v4'`: RustFS suporta assinatura v4
+> ✅ `region_name`: RustFS não valida região (valor arbitrário)
 
 ---
 
-## 四、基础操作
+## 4. Operações básicas
 
-### 4.1 创建 Bucket
+### 4.1 Criar bucket
 
 ```python
 bucket_name = 'my-bucket'
@@ -87,7 +87,7 @@ except s3.exceptions.BucketAlreadyOwnedByYou:
 
 ---
 
-### 4.2 上传文件
+### 4.2 Upload de arquivo
 
 ```python
 s3.upload_file('hello.txt', bucket_name, 'hello.txt')
@@ -96,7 +96,7 @@ print('File uploaded.')
 
 ---
 
-### 4.3 下载文件
+### 4.3 Download de arquivo
 
 ```python
 s3.download_file(bucket_name, 'hello.txt', 'hello-downloaded.txt')
@@ -105,7 +105,7 @@ print('File downloaded.')
 
 ---
 
-### 4.4 列出对象
+### 4.4 Listar objetos
 
 ```python
 response = s3.list_objects_v2(Bucket=bucket_name)
@@ -115,7 +115,7 @@ for obj in response.get('Contents', []):
 
 ---
 
-### 4.5 删除对象与 Bucket
+### 4.5 Excluir objeto e bucket
 
 ```python
 s3.delete_object(Bucket=bucket_name, Key='hello.txt')
@@ -127,23 +127,23 @@ print('Bucket deleted.')
 
 ---
 
-## 五、高级功能
+## 5. Recursos avançados
 
-### 5.1 生成预签名 URL
+### 5.1 URL pré‑assinada
 
-#### 5.1.1 下载链接（GET）
+#### 5.1.1 Link de download (GET)
 
 ```python
 url = s3.generate_presigned_url(
  ClientMethod='get_object',
  Params={'Bucket': bucket_name, 'Key': 'hello.txt'},
- ExpiresIn=600 # 10 分钟有效期
+ ExpiresIn=600 # válido por 10 minutos
 )
 
 print('Presigned GET URL:', url)
 ```
 
-#### 5.1.2 上传链接（PUT）
+#### 5.1.2 Link de upload (PUT)
 
 ```python
 url = s3.generate_presigned_url(
@@ -155,7 +155,7 @@ url = s3.generate_presigned_url(
 print('Presigned PUT URL:', url)
 ```
 
-你可以使用 `curl` 工具上传：
+Você pode usar `curl` para enviar:
 
 ```bash
 curl -X PUT --upload-file hello.txt "http://..."
@@ -163,9 +163,9 @@ curl -X PUT --upload-file hello.txt "http://..."
 
 ---
 
-### 5.2 分片上传（Multipart Upload）
+### 5.2 Upload multipart
 
-适合大于 10 MB 文件上传，可手动控制每个分片。
+Indicado para arquivos >10 MB, com controle manual de partes.
 
 ```python
 import os
@@ -174,60 +174,60 @@ file_path = 'largefile.bin'
 key = 'largefile.bin'
 part_size = 5 * 1024 * 1024 # 5 MB
 
-# 1. 启动上传
+# 1. Iniciar upload
 response = s3.create_multipart_upload(Bucket=bucket_name, Key=key)
 upload_id = response['UploadId']
 parts = []
 
 try:
  with open(file_path, 'rb') as f:
- part_number = 1
- while True:
- data = f.read(part_size)
- if not data:
- break
+  part_number = 1
+  while True:
+   data = f.read(part_size)
+   if not data:
+    break
 
- part = s3.upload_part(
- Bucket=bucket_name,
- Key=key,
- PartNumber=part_number,
- UploadId=upload_id,
- Body=data
- )
+   part = s3.upload_part(
+    Bucket=bucket_name,
+    Key=key,
+    PartNumber=part_number,
+    UploadId=upload_id,
+    Body=data
+   )
 
- parts.append({'ETag': part['ETag'], 'PartNumber': part_number})
- print(f'Uploaded part {part_number}')
- part_number += 1
+   parts.append({'ETag': part['ETag'], 'PartNumber': part_number})
+   print(f'Uploaded part {part_number}')
+   part_number += 1
 
- # 2. 完成上传
- s3.complete_multipart_upload(
- Bucket=bucket_name,
- Key=key,
- UploadId=upload_id,
- MultipartUpload={'Parts': parts}
- )
- print('Multipart upload complete.')
+  # 2. Concluir upload
+  s3.complete_multipart_upload(
+   Bucket=bucket_name,
+   Key=key,
+   UploadId=upload_id,
+   MultipartUpload={'Parts': parts}
+  )
+  print('Multipart upload complete.')
 
 except Exception as e:
- # 中止上传
+ # Abortar upload
  s3.abort_multipart_upload(Bucket=bucket_name, Key=key, UploadId=upload_id)
  print('Multipart upload aborted due to error:', e)
 ```
 
 ---
 
-## 六、常见问题排查
+## 6. Troubleshooting
 
-| 问题 | 原因 | 解决方法 |
+| Problema | Causa | Solução |
 | ------------------------- | ----------------- | -------------------------------------------------------------- |
-| `SignatureDoesNotMatch` | 未使用 v4 签名 | 设置 `signature_version='s3v4'` |
-| `EndpointConnectionError` | RustFS 地址错误或服务未启动 | 检查 endpoint 与 RustFS 服务状态 |
-| `AccessDenied` | 凭证错误或权限不足 | 检查 AccessKey/SecretKey 或桶策略 |
-| `PermanentRedirect` | 未启用 path-style | Boto3 默认使用 virtual-host，RustFS 仅支持 path-style，但设置 endpoint 可绕过 |
+| `SignatureDoesNotMatch` | Não usa v4 | Defina `signature_version='s3v4'` |
+| `EndpointConnectionError` | Endpoint incorreto/serviço inativo | Verifique endpoint e serviço |
+| `AccessDenied` | Credenciais/políticas incorretas | Revise AccessKey/SecretKey ou política do bucket |
+| `PermanentRedirect` | Path‑style desativado | Boto3 usa virtual‑host por padrão; use path‑style via endpoint |
 
 ---
 
-## 七、附录：快速上传/下载脚本模板
+## 7. Anexos: helpers rápidos
 
 ```python
 def upload_file(local_path, bucket, object_key):

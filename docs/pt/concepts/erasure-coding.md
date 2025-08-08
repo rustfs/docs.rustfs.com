@@ -1,79 +1,77 @@
 ---
-title: "纠删码原理"
-description: "RustFS 作为新一代分布式对象存储系统，通过创新的架构设计和内存安全特性，在云存储领域展现出独特优势。其核心创新之一是对里德-所罗门纠删码（Reed-Solomon Erasure Coding）的深度应用。"
+title: "Princípios do Erasure Coding"
+description: "O RustFS aplica de forma profunda o código Reed‑Solomon (Erasure Coding) para obter alta confiabilidade e eficiência de armazenamento."
 ---
 
-# 纠删码原理
+# Princípios do Erasure Coding
 
-## 一、核心算法和核心算法应用范围
+## 1. Algoritmo central e cenários de aplicação
 
-里德-所罗门码（Reed-Solomon Code，RS 码）是一种基于有限域代数结构的纠删码（Erasure Code），因其**高效的数据恢复能力**和**灵活的冗余配置**，被广泛应用于多个领域。以下从技术领域和实际应用两个维度，详细说明其核心应用场景：
+O código de Reed‑Solomon (RS) é um tipo de Erasure Code baseado em campos finitos, conhecido pela alta capacidade de recuperação de dados e pela flexibilidade de configuração de redundância. É amplamente usado em:
 
-### 1.1. 分布式存储系统（如 RustFS）
-- **数据分片与冗余**
- 将原始数据分为 `k` 个分片，生成 `m` 个校验分片（总计 `n=k+m`）。任意丢失≤ `m` 个分片均可恢复数据。
- **示例**：RS(10,4) 策略允许同时丢失 4 个节点（存储利用率 71%），相比三副本（33%）节省 50% 存储空间。
+### 1.1. Armazenamento distribuído (ex.: RustFS)
+- **Fragmentação de dados e redundância**
+  Divide‑se o dado original em `k` fragmentos e geram‑se `m` fragmentos de paridade (total `n = k + m`). É possível recuperar o dado se até `m` fragmentos forem perdidos.
+  **Exemplo**: uma política RS(10,4) tolera perda simultânea de 4 nós (utilização 71%), economizando ~50% de espaço em relação a três réplicas (33%).
 
-- **故障恢复机制**
- 通过**高斯消元法**或**快速傅里叶变换(FFT)** 算法，利用存活分片重建丢失数据，恢复时间与网络带宽成反比。
+- **Recuperação de falhas**
+  Recostrução por eliminação gaussiana ou FFT a partir dos fragmentos sobreviventes; o tempo de recuperação é inversamente proporcional à largura de banda.
 
-- **动态调整能力**
- 支持运行时调整`(k,m)`参数，适应不同存储层级（热/温/冷数据）的可靠性需求。
+- **Ajuste dinâmico**
+  Suporta ajustar `(k,m)` em runtime para adequar níveis de confiabilidade (dados quentes/mornos/frios).
 
-### 1.2. 通信传输
-- **卫星通信**
- 处理深空信道中的长延时、高误码率问题（如 NASA 火星探测器使用 RS(255,223)码，纠错能力达 16 字节/码字）。
+### 1.2. Comunicação
+- **Comunicação via satélite**
+  RS(255,223) em cenários de alto atraso e alto BER (ex.: NASA), com capacidade de correção de 16 bytes por codeword.
 
-- **5G NR 标准**
- 在控制信道采用 RS 码结合 CRC 校验，确保关键信令的可靠传输。
+- **Padrão 5G NR**
+  RS combinado com CRC em canais de controle para transmissão confiável.
 
-- **无线传感器网络**
- 解决多跳传输中的累积丢包问题，典型配置 RS(6,2)可容忍 33%的数据丢失。
+- **Redes de sensores sem fio**
+  RS(6,2) para mitigar perdas acumuladas em múltiplos saltos, tolerando ~33% de perda.
 
-### 1.3. 数字媒体存储
-- **二维码（QR Code）**
- 使用 RS 码实现容错等级调节（L7%, M15%, Q25%, H30%），即使部分区域污损仍可正确解码。
+### 1.3. Armazenamento de mídia digital
+- **QR Code**
+  Níveis de tolerância a erros (L 7%, M 15%, Q 25%, H 30%), permitindo decodificação mesmo com danos parciais.
 
-- **蓝光光盘**
- 采用 RS(248,216)码组合交叉交织，纠正因划痕导致的连续突发错误。
+- **Blu‑ray**
+  Combina RS(248,216) com entrelaçamento cruzado para corrigir erros em rajada.
 
-- **DNA 数据存储**
- 在合成生物分子链时添加 RS 校验，抵御碱基合成/测序错误（如 Microsoft 实验项目使用 RS(4,2)）。
+- **Armazenamento em DNA**
+  RS em cadeias sintéticas para resistir a erros de síntese/sequenciamento (ex.: RS(4,2) em pesquisas da Microsoft).
 
+## 2. Conceitos básicos de EC
 
-
-## 二、纠删码基础概念
-
-### 2.1 存储冗余的演进
+### 2.1 Evolução da redundância de armazenamento
 ```rust
-// 传统三副本存储
+// Armazenamento tradicional com três réplicas
 let data = "object_content";
 let replicas = vec![data.clone(), data.clone(), data.clone()];
 ```
-传统多副本方案存在存储效率低下的问题（存储利用率 33%）。纠删码技术将数据分块后计算校验信息，实现存储效率与可靠性的平衡。
+A abordagem multi‑réplica tem baixa eficiência (33%). EC divide e adiciona paridade para equilibrar eficiência e confiabilidade.
 
-### 2.2 核心参数定义
-- **k**: 原始数据分片数量
-- **m**: 校验分片数量
-- **n**: 总分片数量（n = k + m）
-- **恢复阈值**: 任意 k 个分片可恢复原始数据
+### 2.2 Parâmetros
+- **k**: número de fragmentos de dados
+- **m**: número de fragmentos de paridade
+- **n**: total de fragmentos (n = k + m)
+- **limiar de recuperação**: quaisquer k fragmentos recuperam o dado
 
-| 方案类型 | 冗余度 | 故障容忍度 |
-|------------|----------|------------|
-| 3 副本 | 200% | 2 节点 |
-| RS(10,4) | 40% | 4 节点 |
+| Esquema | Redundância | Tolerância a falhas |
+|--------|-------------|---------------------|
+| 3 réplicas | 200% | 2 nós |
+| RS(10,4) | 40% | 4 nós |
 
-## 三、里德-所罗门码数学原理
+## 3. Fundamentos matemáticos de RS
 
-### 3.1 有限域(Galois Field)构建
-采用 GF(2^8)域（256 个元素），满足：
+### 3.1 Construção do campo finito (Galois Field)
+Usa‑se GF(2^8) com 256 elementos, satisfazendo:
 ```math
 α^8 + α^4 + α^3 + α^2 + 1 = 0
 ```
-生成元多项式为`0x11D`，对应二进制`100011101`
+Polinómio gerador `0x11D` (binário `100011101`).
 
-### 3.2 编码矩阵构造
-范德蒙矩阵示例（k=2, m=2）：
+### 3.2 Matriz de codificação
+Matriz de Vandermonde (k=2, m=2):
 ```math
 G = \begin{bmatrix}
 1 & 0 \\
@@ -83,24 +81,22 @@ G = \begin{bmatrix}
 \end{bmatrix}
 ```
 
+### 3.3 Processo de codificação
+Vetor de dados D = [d₁, d₂, ..., d_k]
+Resultado C = D × G
 
-### 3.3 编码过程
-数据向量 D = [d₁, d₂,..., dk]
-编码结果 C = D × G
-
-**生成多项式插值法**：
-构造通过 k 个数据点的多项式：
+Interpolação pelo polinómio gerador:
 ```math
 p(x) = d_1 + d_2x + ... + d_kx^{k-1}
 ```
-校验值计算：
+Cálculo dos valores de paridade:
 ```math
 c_i = p(i), \quad i = k+1,...,n
 ```
 
-## 四、RustFS 中的工程实现
+## 4. Implementação no RustFS
 
-### 4.1 数据分片策略
+### 4.1 Estratégia de fragmentação
 ```rust
 struct Shard {
  index: u8,
@@ -109,40 +105,40 @@ struct Shard {
 }
 
 fn split_data(data: &[u8], k: usize) -> Vec<Shard> {
- // 分片逻辑实现
+ // Implementação da lógica de fragmentação
 }
 ```
-- 动态分片大小调整（64 KB-4 MB）
-- 哈希校验值使用 Blake3 算法
+- Tamanho de fragmento dinâmico (64 KB‑4 MB)
+- Hash Blake3 para verificação
 
-### 4.2 并行编码优化
+### 4.2 Otimizações de codificação paralela
 ```rust
 use rayon::prelude::*;
 
 fn rs_encode(data: &[Shard], m: usize) -> Vec<Shard> {
  data.par_chunks(k).map(|chunk| {
- // SIMD 加速的矩阵运算
+ // Multiplicação matricial acelerada com SIMD
  unsafe { gf256_simd::rs_matrix_mul(chunk, &gen_matrix) }
  }).collect()
 }
 ```
-- 基于 Rayon 的并行计算框架
-- 使用 AVX2 指令集优化有限域运算
+- Paralelismo com Rayon
+- Operações no campo finito otimizadas com AVX2
 
-### 4.3 解码恢复流程
+### 4.3 Fluxo de recuperação (decoding)
 ```mermaid
 sequenceDiagram
- Client->>Coordinator: 数据读取请求
- Coordinator->>Nodes: 查询分片状态
- alt 有足够可用分片
- Nodes->>Coordinator: 返回 k 个分片
- Coordinator->>Decoder: 启动解码
- Decoder->>Client: 返回原始数据
- else 分片不足
- Coordinator->>Repairer: 触发修复流程
- Repairer->>Nodes: 收集存活分片
- Repairer->>Decoder: 数据重建
- Decoder->>Nodes: 写入新分片
+ Client->>Coordinator: Pedido de leitura de dados
+ Coordinator->>Nodes: Consultar estado dos fragmentos
+ alt Fragmentos suficientes disponíveis
+ Nodes->>Coordinator: Retornar k fragmentos
+ Coordinator->>Decoder: Iniciar decodificação
+ Decoder->>Client: Retornar dados originais
+ else Fragmentos insuficientes
+ Coordinator->>Repairer: Acionar reparo
+ Repairer->>Nodes: Recolher fragmentos vivos
+ Repairer->>Decoder: Reconstrução de dados
+ Decoder->>Nodes: Escrever novos fragmentos
  end
 ```
 

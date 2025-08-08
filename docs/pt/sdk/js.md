@@ -1,33 +1,33 @@
 ---
 title: "JS SDK"
-description: "本文主要讲解 RustFS 中 JS SDK 的使用。"
+description: "Este documento explica como usar o SDK JavaScript da AWS (v3) com o RustFS."
 ---
 
-下面是为 **RustFS 使用 AWS S3 JS SDK** 编写的完整开发文档，内容涵盖 SDK 安装、初始化配置、基础操作（上传、下载、删除、列举）、预签名 URL 和分片上传等功能，适用于 Node.js 环境。
-
----
-
-# RustFS 使用 AWS S3 JS SDK 文档（适用于 Node.js）
-
-## 一、概述
-
-RustFS 是一款兼容 S3 协议的对象存储系统，可通过 AWS 官方 JavaScript SDK（v3）进行访问。本指南将指导你如何使用 JS 连接 RustFS 并执行常见对象存储操作。
+A seguir está a documentação para usar o **AWS S3 JS SDK** com o RustFS: instalação, configuração, operações básicas (upload, download, delete, list), URL pré‑assinada e upload multipart, para ambiente Node.js.
 
 ---
 
-## 二、准备工作
+# RustFS com AWS S3 JS SDK (Node.js)
 
-### 2.1 安装 SDK
+## 1. Visão geral
 
-使用 NPM 安装 AWS SDK v3 所需模块：
+RustFS é compatível com o protocolo S3 e pode ser acessado com o AWS SDK para JavaScript (v3). Este guia mostra como conectar e realizar operações comuns.
+
+---
+
+## 2. Preparação
+
+### 2.1 Instalar SDK
+
+Instale os módulos necessários do AWS SDK v3:
 
 ```bash
 npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
 ```
 
-### 2.2 RustFS 示例配置
+### 2.2 Configuração de exemplo do RustFS
 
-假设 RustFS 实例部署如下：
+Suponha a seguinte instância RustFS:
 
 ```
 Endpoint: http://192.168.1.100:9000
@@ -37,20 +37,20 @@ Secret Key: rustfssecret
 
 ---
 
-## 三、初始化 S3 客户端
+## 3. Inicializar o cliente S3
 
 ```js
 import { S3Client } from "@aws-sdk/client-s3";
 import { NodeHttpHandler } from "@smithy/node-http-handler";
 
 const s3 = new S3Client({
- endpoint: "http://192.168.1.100:9000", // RustFS endpoint
- region: "us-east-1", // 可随意填写
+ endpoint: "http://192.168.1.100:9000", // endpoint do RustFS
+ region: "us-east-1", // valor arbitrário
  credentials: {
  accessKeyId: "rustfsadmin",
  secretAccessKey: "rustfssecret",
  },
- forcePathStyle: true, // 必须启用 Path-style 以兼容 RustFS
+ forcePathStyle: true, // necessário para compatibilidade com RustFS
  requestHandler: new NodeHttpHandler({
  connectionTimeout: 3000,
  socketTimeout: 5000,
@@ -60,9 +60,9 @@ const s3 = new S3Client({
 
 ---
 
-## 四、基本操作
+## 4. Operações básicas
 
-### 4.1 创建 Bucket
+### 4.1 Criar bucket
 
 ```js
 import { CreateBucketCommand } from "@aws-sdk/client-s3";
@@ -73,7 +73,7 @@ console.log("Bucket created");
 
 ---
 
-### 4.2 上传对象
+### 4.2 Upload de objeto
 
 ```js
 import { PutObjectCommand } from "@aws-sdk/client-s3";
@@ -94,7 +94,7 @@ console.log("File uploaded");
 
 ---
 
-### 4.3 下载对象
+### 4.3 Download de objeto
 
 ```js
 import { GetObjectCommand } from "@aws-sdk/client-s3";
@@ -118,7 +118,7 @@ console.log("File downloaded");
 
 ---
 
-### 4.4 列举对象
+### 4.4 Listar objetos
 
 ```js
 import { ListObjectsV2Command } from "@aws-sdk/client-s3";
@@ -129,7 +129,7 @@ res.Contents?.forEach((obj) => console.log(`${obj.Key} (${obj.Size} bytes)`));
 
 ---
 
-### 4.5 删除对象
+### 4.5 Excluir objeto
 
 ```js
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
@@ -140,13 +140,13 @@ console.log("File deleted");
 
 ---
 
-## 五、高级功能
+## 5. Funcionalidades avançadas
 
-### 5.1 生成预签名 URL
+### 5.1 URL pré‑assinada
 
-> 允许前端或第三方用户使用临时链接上传/下载文件
+> Permite a terceiros usar links temporários para upload/download
 
-#### 下载（GET）
+#### Download (GET)
 
 ```js
 import { GetObjectCommand } from "@aws-sdk/client-s3";
@@ -161,7 +161,7 @@ const url = await getSignedUrl(
 console.log("Presigned GET URL:", url);
 ```
 
-#### 上传（PUT）
+#### Upload (PUT)
 
 ```js
 import { PutObjectCommand } from "@aws-sdk/client-s3";
@@ -177,7 +177,7 @@ console.log("Presigned PUT URL:", url);
 
 ---
 
-### 5.2 分片上传（Multipart Upload）
+### 5.2 Upload multipart
 
 ```js
 import {
@@ -193,14 +193,14 @@ const key = "large-file.zip";
 const filePath = "./large-file.zip";
 const partSize = 5 * 1024 * 1024; // 5 MB
 
-// 1. 创建上传任务
+// 1. Criar tarefa de upload
 const createRes = await s3.send(
  new CreateMultipartUploadCommand({ Bucket: bucket, Key: key })
 );
 const uploadId = createRes.UploadId;
 
-// 2. 分段上传
-import { statSync, openSync, readSync } from "fs";
+// 2. Enviar partes
+import { statSync, openSync, readSync, closeSync } from "fs";
 
 const fileSize = statSync(filePath).size;
 const fd = openSync(filePath, "r");
@@ -226,7 +226,7 @@ for (let partNumber = 1, offset = 0; offset < fileSize; partNumber++) {
 
 closeSync(fd);
 
-// 3. 完成上传
+// 3. Concluir upload
 await s3.send(
  new CompleteMultipartUploadCommand({
  Bucket: bucket,
@@ -241,32 +241,30 @@ console.log("Multipart upload completed");
 
 ---
 
-## 六、常见问题与注意事项
+## 6. FAQ e notas
 
-| 问题 | 原因 | 解决方法 |
+| Problema | Causa | Solução |
 | --------------------------- | -------------------- | --------------------------------------- |
-| SignatureDoesNotMatch | 签名版本错误 | JS SDK v3 默认使用 v4，确保 RustFS 支持 v4 |
-| EndpointConnectionError | Endpoint 地址配置不正确或未启动 | 检查 RustFS 地址是否可访问 |
-| NoSuchKey | 文件不存在 | 检查 `Key` 是否拼写正确 |
-| InvalidAccessKeyId / Secret | 凭证配置错误 | 检查 `accessKeyId` / `secretAccessKey` 配置 |
-| 上传失败（路径问题） | 未启用 Path-style | 设置 `forcePathStyle: true` |
+| SignatureDoesNotMatch | Versão de assinatura incorreta | JS SDK v3 usa v4; confirme suporte v4 no RustFS |
+| EndpointConnectionError | Endpoint incorreto ou serviço inativo | Verifique acessibilidade do RustFS |
+| NoSuchKey | Objeto inexistente | Verifique `Key` |
+| InvalidAccessKeyId / Secret | Credenciais incorretas | Verifique `accessKeyId` / `secretAccessKey` |
+| Falha de upload (path‑style) | Path‑style desativado | Defina `forcePathStyle: true` |
 
 ---
 
-## 七、附录：适配前端上传
+## 7. Anexo: upload via front‑end
 
-使用预签名 URL 可允许浏览器直接上传文件，无需传递 AccessKey。
+É possível permitir uploads diretos do navegador com URL pré‑assinada, sem expor AccessKey.
 
-前端（HTML+JS）上传示例：
+Exemplo (HTML+JS):
 
 ```html
 <input type="file" id="fileInput" />
 <script>
- document.getElementById("fileInput").addEventListener("change", async (e) => {
+document.getElementById("fileInput").addEventListener("change", async (e) => {
  const file = e.target.files[0];
- const url = await fetch("/api/presigned-put-url?key=" + file.name).then((r) =>
- r.text()
- );
+ const url = await fetch("/api/presigned-put-url?key=" + file.name).then((r) => r.text());
 
  const res = await fetch(url, {
  method: "PUT",
@@ -274,7 +272,7 @@ console.log("Multipart upload completed");
  });
 
  if (res.ok) alert("Uploaded!");
- });
+});
 </script>
 ```
 
