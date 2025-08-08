@@ -119,6 +119,73 @@ rustfs-mcp --log-level debug --region us-west-2
   }
 }
 ```
+
+### Use RustFS MCP with Docker
+
+RustFS MCP provides the [official Dockerfile](https://github.com/rustfs/rustfs/tree/main/crates/mcp), which can be used to build docker image, then use the RustFS MCP with Docker.
+
+```
+# clone rustfs repo
+git clone git@github.com:rustfs/rustfs.git
+
+# build docker image
+docker build -f crates/mcp/Dockerfile -t rustfs/rustfs-mcp .
+```
+
+After building successfully, you can use the docker to configure MCP in AI IDE.
+
+#### RustFS MCP configuration in AI IDE
+
+Both of the popular AI IDE or editor(Cursor, windsurf, Trae, ect) support MCP. For example, if you use Trae, add the following content to MCP configuration page:
+
+```
+{
+  "mcpServers": {
+    "rustfs-mcp": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "-e",
+        "AWS_ACCESS_KEY_ID",
+        "-e",
+        "AWS_SECRET_ACCESS_KEY",
+        "-e",
+        "AWS_REGION",
+        "-e",
+        "AWS_ENDPOINT_URL",
+        "rustfs/rustfs-mcp"
+      ],
+      "env": {
+        "AWS_ACCESS_KEY_ID": "rustfs_access_key",
+        "AWS_SECRET_ACCESS_KEY": "rustfs_secret_key",
+        "AWS_REGION": "cn-east-1",
+        "AWS_ENDPOINT_URL": "rustfs_instance_url"
+      }
+    }
+  }
+}
+```
+
+Where `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are rustfs access token, for more details, you can see [rustfs access token management](access-token.md).
+
+If adding successfully, you can see the [available tools](#️-available-tools) on MCP page.
+
+![add rustfs mcp in trae mcp configuration successfully](images/add-rustfs-mcp-succ.png)
+
+You can use MCP in Trea by input the corresponding prompt. For example, input below content in chat:
+
+```
+Please help to list all the buckets on rustfs instance, thanks!
+```
+
+Response returned:
+
+![list rustfs bucket with rustfs mcp](images/list-rustfs-bucket-with-mcp.png)
+
+Trae working with **Builder with MCP** mode calls `list_buckets` tool, and lists all the buckets on instance configured. You can try other calls with the same way.
+
 ## 🛠️ Available Tools
 
 The MCP server exposes the following tools that AI assistants can use:
