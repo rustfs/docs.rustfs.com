@@ -9,7 +9,7 @@ As chaves de acesso do RustFS são credenciais essenciais para autenticar identi
 
 Pré‑requisitos:
 
-- Uma instância RustFS disponível. Consulte o [guia de instalação](../../pt/installation/index.md).
+- Uma instância RustFS disponível. Consulte o [guia de instalação](../installation/index.md).
 
 ## Criar uma chave de acesso
 
