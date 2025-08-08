@@ -1,56 +1,52 @@
 ---
-title: RustFS 与其他存储产品对比
-description: RustFS 与主流的对象存储产品的对比
+title: RustFS vs. outros produtos de armazenamento
+description: Comparação do RustFS com soluções de armazenamento de objetos populares
 ---
 
-# RustFS 与其他存储产品对比
+# RustFS vs. outros produtos de armazenamento
 
-| 参数 | Ceph | MinIO | RustFS |
+| Parâmetro | Ceph | MinIO | RustFS |
 | - | - | - | - |
-| 开发语言 | C++ | Go | Rust |
-| 开源许可证 | GPL-2.0、LGPL-2.1、LGPL-3.0 | AGPL-3.0 | Apache-2.0 |
-| 元数据中心 | √ | x | x |
-| 块存储 | √ | x | x |
-| 文件存储 | √ | x | x |
-| 架构 | 重架构设计 | 轻量级架构设计 | 轻量级架构设计 |
-| 社区活跃度 | √ | √ | √ |
-| 许证友好度 | 中 | 差 | 优 |
-| 性能 | 性能依赖于硬件和配置 | 高性能、低延迟，适合高速读写和大规模对象访问 | 高性能、低延迟，适合高速读写和大规模对象访问 |
-| 文件协议 | 支持 S3、RBD、CephFS 等多种协议 | S3 | S3 |
-| 使用难度 | 高 | 低 | 低 |
-| 扩容 | EB 级 | EB 级 | EB 级 |
-| 硬件需求 | 硬件资源占用高 | 资源占用中，对硬件要求较中 | 资源占用低，对硬件要求较低 |
-| 内存稳定性 | 稳定 | 高并发下抖动较高 | 稳定 |
-| 扩容 | 难度高 | 难度低 | 难度低 |
-| 再平衡 | 资源占用高 | 资源占用低 | 资源占用低 |
-| 商业支持 | √ | √ | √ |
+| Linguagem | C++ | Go | Rust |
+| Licença | GPL-2.0, LGPL-2.1, LGPL-3.0 | AGPL-3.0 | Apache-2.0 |
+| Meta‑data centralizada | √ | x | x |
+| Bloco | √ | x | x |
+| Ficheiro | √ | x | x |
+| Arquitetura | Re‑arquitetura pesada | Leve | Leve |
+| Comunidade | √ | √ | √ |
+| Amizade de licença | Média | Fraca | Boa |
+| Desempenho | Depende de hardware/config | Alta performance/baixa latência | Alta performance/baixa latência |
+| Protocolos | S3, RBD, CephFS, etc. | S3 | S3 |
+| Dificuldade de uso | Alta | Baixa | Baixa |
+| Escala | EB | EB | EB |
+| Requisitos HW | Elevado | Médio | Baixo |
+| Estabilidade memória | Estável | Oscila em alta concorrência | Estável |
+| Expansão | Difícil | Fácil | Fácil |
+| Rebalanceamento | Alto consumo | Baixo consumo | Baixo consumo |
+| Suporte comercial | √ | √ | √ |
 
+## Escolas de arquitetura de objeto
 
+Globalmente há dois estilos:
 
-## 全球对象存储架构派系
+1. Com meta‑data centralizada (ex.: Ceph)
+2. Sem meta‑data centralizada (ex.: RustFS e MinIO)
 
-目前，全世界的分布式对象存储产品主要分为两个派系：
+Comparação:
 
-1. 有元数据中心，有元数据中心的代表为：Ceph；
-
-2. 无元数据中心，无元数据中心的代表产品为：RustFS 和 MinIO。
-
-有无元数据中心的优缺点对比如下：
-
-| 特性 | 有元数据中心 | 无元数据中心 |
+| Característica | Com meta‑data | Sem meta‑data |
 | - | - | - |
-| 架构特点 | 专门的元数据服务器或中心统一管理元数据 | 元数据分布在存储节点中，无专门的元数据服务器 |
-| 元数据管理 | 高效集中管理，查询与更新速度快 | 元数据分布式存储，避免单点瓶颈 |
-| 单点故障 | 元数据服务器可能成为单点故障点，需额外设计高可用方案 | 无单节点故障风险 |
-| 部署复杂度 | 部署和维护复杂，需要专业运维技能 | 部署和维护相对简单，适合云原生和容器化场景 |
-| 性能问题 | 在高并发环境下，元数据服务器可能成为性能瓶颈 | 小文件支持会占用更多的 IOPS |
-| 典型场景 | 文件系统（如 Lustre、CephFS）和需要复杂元数据的场景 | 对象存储（RustFS、MinIO）和大规模分布式系统 |
+| Arquitetura | Servidor central para meta‑dados | Meta‑dados distribuídos nos nós |
+| Gestão de meta‑dados | Centralizada e rápida | Distribuída, evita gargalos |
+| Ponto único de falha | Possível no servidor de meta‑dados | Eliminado |
+| Complexidade de deploy | Elevada, requer operação especializada | Mais simples, nativo de cloud/conteiner |
+| Desempenho | Servidor de meta‑dados pode ser gargalo | Pequenos ficheiros consomem mais IOPS |
+| Cenários típicos | FS (Lustre, CephFS) com meta‑dados ricos | Objeto (RustFS, MinIO) e larga escala |
 
+## Sobre performance
 
-## 关于存储的速度
+RustFS e MinIO partilham desenho semelhante; o débito depende da rede e discos. Em testes, o RustFS atinge ~323 GB/s leitura e ~183 GB/s escrita.
 
-RustFS 与 MinIO 采用了同样的设计，整体的速度取决于存储节点的网络和硬盘的速度。经过评测 RustFS 可以达到 323 GB/s 的读取和 183 GB/s 的写入速度。
-
-可以这么说，RustFS 和 MinIO 是全世界速度唯二领先的分布式对象存储产品。在同等配置下，他们的速度远远快于 Ceph。
+Em configurações equivalentes, superam Ceph em velocidade.
 
 

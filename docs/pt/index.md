@@ -7,4 +7,4 @@ sidebar: false
 import { zhSidebar } from './sidebar';
 </script>
 
-<Home :sidebar="zhSidebar" title="RustFS 文档中心" />
+<Home :sidebar="zhSidebar" title="Centro de Documentação do RustFS" />

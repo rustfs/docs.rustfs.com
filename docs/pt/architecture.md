@@ -1,53 +1,40 @@
 ---
-title: "RustFS 架构"
-description: "RustFS 架构介绍"
+title: "Arquitetura do RustFS"
+description: "Introdução à arquitetura do RustFS"
 ---
 
-# RustFS 架构
+# Arquitetura do RustFS
 
-RustFS 是一个对象存储系统，类似于众所周知的 AWS S3。作为 MinIO 的平替产品，RustFS 参考了 MinIO 的简洁、轻量、可扩展、优雅的架构。
+O RustFS é um sistema de armazenamento de objetos, semelhante ao conhecido AWS S3. Como alternativa ao MinIO, o RustFS inspira‑se numa arquitetura simples, leve, escalável e elegante.
 
-对象可以是文档、视频、PDF 文件等。为了存储对象，MinIO 提供了一个可扩展、灵活且高效的解决方案来存储、访问和管理数据。它与 AWS S3 API 的兼容性使得与基于 AWS S3 的应用程序无缝集成。
+Os objetos podem ser documentos, vídeos, PDFs, etc. Para os armazenar, o MinIO oferece uma solução escalável, flexível e eficiente para armazenar, aceder e gerir dados. A compatibilidade com a API do AWS S3 permite integração transparente com aplicações que já falam S3.
 
-架构图如下:
+Diagrama de arquitetura:
 
+![Arquitetura do RustFS](./images/s2-1.png)
 
-![RustFS 架构图](./images/s2-1.png)
+Esta é a arquitetura básica do RustFS. O cluster distribuído utiliza múltiplos nós para executar um objetivo comum. Os nós comunicam entre si através da rede.
 
-这是 RustFS 的基本架构，分布式网格是一种使用多个节点执行单个任务的计算机架构。节点通过网络相互连接，这使得它们能够相互通信。
+## Modelo de consistência
 
+Em modos distribuído e single‑node, todas as operações de leitura/escrita seguem estritamente o modelo de consistência read‑after‑write.
 
+## Conceitos importantes no RustFS
 
-## 一致性设计
+- Object (objeto): a unidade básica armazenada (ficheiro, fluxo de bytes, etc.)
+- Bucket: espaço lógico que contém objetos; para o cliente equivale a uma pasta de topo
+- Drive (disco): dispositivo físico onde os dados são gravados
+- Set (conjunto): grupo de drives; os objetos são distribuídos por sets via hashing determinístico
 
-分布式和单机模式下，所有读写操作都严格遵守 read-after-write 一致性模型。
+Boas práticas de desenho/planeamento:
 
-## RustFS 中的几个重要概念
+1. Um objeto reside num único Set
+2. Um cluster é particionado em múltiplos Sets
+3. O número de Drives por Set é fixo e determinado pelo tamanho do cluster
+4. Drives de um mesmo Set devem estar, se possível, em nós distintos
 
-**Object（对象）**：存储到 Minio 的基本对象，如文件、字节流，Anything...
+## Agradecimentos
 
-**Bucket（桶）**：用来存储 Object 的逻辑空间。每个 Bucket 之间的数据是相互隔离的。对于客户端而言，就相当于一个存放文件的顶层文件夹。
+Arquiteturas tradicionais exigem Master/MetaData/Data Nodes, aumentando a complexidade de deployment e risco de perda de metadados. No RustFS, todos os nós são de mesmo nível, simplificando o desenho e evitando pontos únicos de falha.
 
-**Drive（磁盘）**：即存储数据的磁盘，在 MinIO 启动时，以参数的方式传入。Minio 中所有的对象数据都会存储在 Drive 里。
-
-**Set（集合）**：即一组 Drive 的集合，分布式部署根据集群规模自动划分一个或多个 Set，每个 Set 中的 Drive 分布在不同位置。一个对象存储在一个 Set 上。（有地方也将 Set 的组合称之为**Strips**——条带）。
-
-因此，在设计架构和部署设备前需要注意的是：
-
-1. 一个对象存储在一个 Set 上；
-
-2. 一个集群划分为多个 Set；
-
-3. 一个 Set 包含的 Drive 数量是固定的，默认由系统根据集群规模自动计算得出；
-
-4. 一个 Set 中的 Drive 尽可能分布在不同的节点上；
-
-## 特别鸣谢
-
-传统的分布式存储架构中必须存在：Master 节点、MetaData 节点和 Data Node 节点。而这种模式设计，让用户的部署非常复杂。同时，如果没有丰富的分布式存储的管理经验，一旦元数据丢失，数据会出现丢失的风险。
-
-所有的节点均为等层级关系的节点，极大的简化了架构设计并且不用担心元数据丢失，一条命令即可启动。
-
-不失优雅、简单、可靠，而 RustFS 采用了和 MinIO 一样的架构设计。
-
-感谢 MinIO 提出的架构理念，极大的方便了全球的用户和推广了 S3 协议。
+O RustFS adota princípios de arquitetura semelhantes ao MinIO. Agradecemos à comunidade MinIO por promover o S3 e democratizar o acesso ao armazenamento de objetos.

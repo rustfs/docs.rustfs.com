@@ -1,37 +1,37 @@
 ---
-title: "RustFS 是什么？"
-description: "RustFS 是一种对象存储解决方案，使用 Apache2 许可证发行的开源分布式对象存储。"
+title: "O que é o RustFS?"
+description: "RustFS é uma solução de armazenamento de objetos: software livre, distribuído e compatível com S3 sob licença Apache 2.0."
 ---
 
-# RustFS 是什么？
+# O que é o RustFS?
 
-RustFS 是一款简单、高效、分布式的对象存储。
-同时，也是一种高效、开源、自由的对象存储解决方案。它 100% 兼容 S3 协议，使用 Apache2 许可证发行的开源软件。RustFS 使用目前全世界最受欢迎的、内存安全的语言 Rust 语言编写。
-它是由全世界优秀的工程师参与并贡献的一款对于商用友好的分布式对象存储产品，RustFS 可以平替非常多非友好开源协议的对象存储产品。
+RustFS é um armazenamento de objetos simples, eficiente e distribuído.
+É também uma solução aberta e livre, 100% compatível com o protocolo S3, distribuída sob a licença Apache 2.0. O RustFS é escrito em Rust, uma linguagem amplamente adotada e com segurança de memória.
+É um produto de armazenamento de objetos amigável ao uso comercial, com contribuições de engenheiros de todo o mundo, capaz de substituir muitas soluções não amigáveis em termos de licenciamento.
 
-RustFS 即将从商业应用正式向开源，向全球进行发布，帮助全世界降低存储成本、提升数据安全。
+O RustFS passará de uso comercial para open source com lançamento global, ajudando a reduzir custos de armazenamento e a melhorar a segurança dos dados.
 
-## 操作系统和 CPU 支持
+## Sistemas Operativos e CPUs suportados
 
-你几乎可以在任何 CPU 和操作系统上运行 RustFS，不论是 Linux、Unix、Windows、MacOS、FreeBSD、Docker、甚至是边缘网关上，您都可以上运行 RustFS。
-CPU 架构支持：X86、ARM 等多种 CPU 架构。
+Pode executar o RustFS praticamente em qualquer CPU e sistema operativo: Linux, Unix, Windows, macOS, FreeBSD, Docker e até em gateways de borda.
+Arquiteturas de CPU suportadas: x86, ARM, entre outras.
 
-## RustFS 的特征
+## Características do RustFS
 
-- **S3 兼容**: 100% 兼容 S3 协议，优秀的兼容性与大数据、数据湖、备份软件、图像处理软件、工业生产软件兼容；
-- **分布式**: RustFS 是一个分布式的对象存储，因此，RustFS 可以满足各种需求；
-- **商用友好**: RustFS 是 100% 的开源软件，并且使用 Apache v2.0 许可证发行，因此，RustFS 是商用友好的；
-- **快速**: Rust 这一门开发语言的性能无限接近于 C 语言的速度。因此，RustFS 的性能非常强劲；
-- **安全**: RustFS 使用内存安全的语言 Rust 编写，因此，RustFS 是 100% 安全的；
-- **跨平台**: RustFS works on Windows, macOS, and Linux；
-- **可扩展**: RustFS 支持自定义插件，因此，RustFS 可以满足各种需求；
-- **可定制**: 由于开源的特性，你可以自定义各种插件插件，因此，RustFS 可以满足各种需求；
-- **云原生**: RustFS 支持 Docker 等方式部署，可快速在云原生环境下快速部署。
+- S3 compatível: 100% compatível com o protocolo S3; excelente interoperabilidade com big data, data lakes, software de backup, processamento de imagem e aplicações industriais.
+- Distribuído: o RustFS é um armazenamento de objetos distribuído, adaptado a múltiplas necessidades.
+- Comercialmente amigável: 100% open source sob Apache v2.0, adequado para uso comercial.
+- Rápido: Rust atinge desempenho próximo ao de C; o RustFS apresenta performance muito elevada.
+- Seguro: desenvolvido em Rust (segurança de memória), proporcionando elevada segurança.
+- Multiplataforma: funciona em Windows, macOS e Linux.
+- Extensível: suporta plugins personalizados para diversas necessidades.
+- Personalizável: por ser open source, pode adicionar plugins e adaptar o sistema.
+- Cloud‑native: suporta deploy com Docker e ambientes nativos de cloud.
 
-## RustFS 价值观
+## Valores do RustFS
 
-帮助全人类提升数据安全、降低存储成本。
+Ajudar a humanidade a elevar a segurança dos dados e reduzir o custo de armazenamento.
 
-## RustFS 的愿景
+## Visão do RustFS
 
-全世界每一个个人 AI 智体都可以使用 RustFS 来存储数据。
+Que cada agente/entidade de IA pessoal no mundo possa usar o RustFS para armazenar dados.
