@@ -1,6 +1,6 @@
 ---
-title: "待翻译"
-description: "此文档正在翻译中"
+title: "RustFS インストールガイド"
+description: "各OSおよび多様なデプロイ方式での RustFS インストール手順"
 ---
 
 # RustFS インストールガイド
