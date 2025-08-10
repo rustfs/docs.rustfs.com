@@ -1,6 +1,6 @@
 # Solução de redução de custos para armazenamento de vídeo
 
-Reduza significativamente o custo de armazenamento de vídeo com object storage e arquitetura híbrida/multicloud.
+Reduza significativamente o custo de armazenamento de vídeo com armazenamento de objetos e arquitetura híbrida/multicloud.
 
 ## Desafios centrais do armazenamento de vídeo
 

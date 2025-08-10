@@ -8,7 +8,7 @@
 
 O ACK é um serviço gerido para executar Kubernetes no Alibaba Cloud sem gerir control plane ou nós.
 
-O RustFS oferece object storage portátil e performante nas principais plataformas Kubernetes (ACK, Tanzu, Azure, GCP, etc.). No Alibaba Cloud, integra‑se nativamente ao ACK para operar storage multi‑inquilino em escala, como alternativa completa ao S3.
+O RustFS oferece armazenamento de objetos portátil e performante nas principais plataformas Kubernetes (ACK, Tanzu, Azure, GCP, etc.). No Alibaba Cloud, integra‑se nativamente ao ACK para operar storage multi‑inquilino em escala, como alternativa completa ao S3.
 
 ![Arquitetura RustFS](images/sec1-1.png)
 

@@ -1,4 +1,4 @@
-# Solução de arquivamento frio em object storage
+# Solução de arquivamento frio em armazenamento de objetos
 
 Base sustentável, segura e inteligente para dados de longo prazo.
 

@@ -1,12 +1,12 @@
-# A revolução da IA é impulsionada por GPUs e object storage de alto desempenho
+# A revolução da IA é impulsionada por GPUs e armazenamento de objetos de alto desempenho
 
-Somos object storage de alto desempenho.
+Somos armazenamento de objetos de alto desempenho.
 
 ## Armazenamento para IA com performance em escala
 
 ![Performance IA](images/ai-performance.png)
 
-O RustFS usa arquitetura distribuída e object storage. Durante treino, o paralelismo de dados e I/O reduz latência e acelera epochs. Em inferência, o alto throughput garante acesso rápido aos modelos e datasets. A performance escala linearmente de 100 TB a 100 PB+.
+O RustFS usa arquitetura distribuída e armazenamento de objetos. Durante treino, o paralelismo de dados e I/O reduz latência e acelera epochs. Em inferência, o alto throughput garante acesso rápido aos modelos e datasets. A performance escala linearmente de 100 TB a 100 PB+.
 
 ## No centro do ecossistema de IA
 
@@ -22,7 +22,7 @@ Dados corporativos crescem continuamente; LLMs e aplicações usam esses dados p
 
 ## Resiliência para IA
 
-Object storage tolerante a falhas para datasets, modelos e artefatos. Com replicação e EC, workflows seguem operando mesmo diante de falhas.
+Armazenamento de objetos tolerante a falhas para datasets, modelos e artefatos. Com replicação e EC, workflows seguem operando mesmo diante de falhas.
 
 ## Always‑On para AI/ML
 

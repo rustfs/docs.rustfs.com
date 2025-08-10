@@ -10,7 +10,7 @@ De AWS, Azure, GCP, IBM a Alibaba, Tencent e clouds governamentais. O seu storag
 
 ### Nuvem privada
 
-Kubernetes é a base das nuvens privadas modernas (Tanzu, OpenShift, Rancher/SUSE, HP Ezmeral, Rafay). Multicloud K8s requer object storage cloud‑native e definido por software. Inclui bare‑metal tradicional, mas workloads empresariais migram para contentores e orquestração.
+Kubernetes é a base das nuvens privadas modernas (Tanzu, OpenShift, Rancher/SUSE, HP Ezmeral, Rafay). Multicloud K8s requer armazenamento de objetos cloud‑native e definido por software. Inclui bare‑metal tradicional, mas workloads empresariais migram para contentores e orquestração.
 
 ### Edge
 
@@ -22,7 +22,7 @@ Edge move computação para onde os dados são gerados, depois envia para centro
 
 ## Atributos de storage híbrido/multicloud
 
-O padrão dominante em nuvem pública é object storage cloud‑native. O sucesso dos clouds tornou file/block legados obsoletos. Novas apps usam S3 API, não POSIX. Apps legadas devem ser reescritas para S3 e refatoradas em microserviços para contentores.
+O padrão dominante em nuvem pública é o armazenamento de objetos cloud‑native. O sucesso dos clouds tornou file/block legados obsoletos. Novas apps usam S3 API, não POSIX. Apps legadas devem ser reescritas para S3 e refatoradas em microserviços para contentores.
 
 ### Kubernetes‑Native
 

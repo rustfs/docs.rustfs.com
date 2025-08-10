@@ -75,4 +75,4 @@ Orquestração para colocar dados quentes em camadas de alto desempenho e frios 
 
 ![Pirâmide](./images/tech-value-pyramid.png)
 
-Baseado em object storage distribuído confiável e elástico, suporta produção inteligente fim‑a‑fim, QA assistido por IA e colaboração global de cadeia de fornecimento, impulsionando evolução para Indústria 4.0.
+Baseado em armazenamento de objetos distribuído confiável e elástico, suporta produção inteligente fim‑a‑fim, QA assistido por IA e colaboração global de cadeia de fornecimento, impulsionando evolução para Indústria 4.0.

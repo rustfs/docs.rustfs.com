@@ -1,8 +1,8 @@
-# Replicação multi‑site ativo‑ativo para object storage
+# Replicação multi‑site ativo‑ativo para armazenamento de objetos
 
-## Replicação ativa para object storage
+## Replicação ativa para armazenamento de objetos
 
-![Replicação de object storage](images/s6-1.png)
+![Replicação de armazenamento de objetos](images/s6-1.png)
 
 Replicação ativa é requisito crítico em produção. O RustFS oferece essa capacidade com granularidade por bucket:
 

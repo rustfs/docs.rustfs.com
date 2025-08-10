@@ -8,11 +8,11 @@
 
 O VMware Tanzu é uma plataforma Kubernetes empresarial com operações automatizadas de pilha completa para gerir implantações híbridas, multicloud e edge.
 
-O RustFS integra‑se nativamente ao Tanzu para operar object storage multi‑inquilino em grande escala, com toolchain do ecossistema Tanzu.
+O RustFS integra‑se nativamente ao Tanzu para operar armazenamento de objetos multi‑inquilino em grande escala, com toolchain do ecossistema Tanzu.
 
 ![Arquitetura RustFS](images/sec1-1.png)
 
-Sendo Kubernetes‑native e compatível com S3 desde a origem, o RustFS oferece object storage consistente, performante e escalável. Diferente do S3, escala entre infraestruturas híbridas/multicloud sem lock‑in.
+Sendo Kubernetes‑native e compatível com S3 desde a origem, o RustFS oferece armazenamento de objetos consistente, performante e escalável. Diferente do S3, escala entre infraestruturas híbridas/multicloud sem lock‑in.
 
 ## Integração nativa do RustFS Operator com Tanzu
 

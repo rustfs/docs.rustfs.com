@@ -4,19 +4,19 @@
 
 Escale sua instância v12 e aumente capacidade e desempenho do Veeam com o RustFS.
 
-## RustFS + Veeam: object storage privado de alto desempenho como endpoint S3
+## RustFS + Veeam: armazenamento de objetos privado de alto desempenho como endpoint S3
 
-O Veeam Backup & Replication oferece soluções de backup otimizadas e definidas por software. Em conjunto, adicionamos object storage de alto desempenho como endpoint, desacoplando computação e armazenamento no ambiente de backup, com excelente performance, escalabilidade e economia. Um único cluster RustFS pode servir como endpoint Veeam para VMs, Oracle, SAP e MS Office.
+O Veeam Backup & Replication oferece soluções de backup otimizadas e definidas por software. Em conjunto, adicionamos armazenamento de objetos de alto desempenho como endpoint, desacoplando computação e armazenamento no ambiente de backup, com excelente performance, escalabilidade e economia. Um único cluster RustFS pode servir como endpoint Veeam para VMs, Oracle, SAP e MS Office.
 
 ## Principais cenários
 
 ### 🖥️ Backups Veeam para VMware ESXi com RustFS
 
-Backups de infraestrutura virtual diretamente em object storage, com flexibilidade de capacidade praticamente ilimitada e controlo de custo/segurança.
+Backups de infraestrutura virtual diretamente em armazenamento de objetos, com flexibilidade de capacidade praticamente ilimitada e controlo de custo/segurança.
 
 ### 📧 Backups Veeam para Microsoft 365 com RustFS
 
-Backups do Microsoft 365 para object storage, com elasticidade de capacidade e políticas de proteção de dados.
+Backups do Microsoft 365 para armazenamento de objetos, com elasticidade de capacidade e políticas de proteção de dados.
 
 ### 💼 Backups Veeam para SAP HANA com RustFS
 
@@ -24,13 +24,13 @@ Com RustFS, os backups Veeam para SAP HANA ganham em desempenho e segurança.
 
 ### 🗄️ Backups Veeam para Oracle com RustFS
 
-Workloads Oracle exigem desempenho, resiliência e segurança. Otimize estes backups críticos com object storage RustFS.
+Workloads Oracle exigem desempenho, resiliência e segurança. Otimize estes backups críticos com armazenamento de objetos RustFS.
 
 ---
 
 ## Veeam e RustFS: parceria natural
 
-Ambos entregam software de classe mundial. De VMs ao Microsoft 365, a performance em escala é a métrica chave. O RustFS provê uma solução de object storage altamente escalável e performante, ideal para clientes Veeam.
+Ambos entregam software de classe mundial. De VMs ao Microsoft 365, a performance em escala é a métrica chave. O RustFS provê uma solução de armazenamento de objetos altamente escalável e performante, ideal para clientes Veeam.
 
 ## Vantagens
 
@@ -50,6 +50,6 @@ Os dados no RustFS são sempre legíveis e consistentes: todo I/O é commitado e
 
 Assim como o Veeam, o RustFS é definido por software e agnóstico a hardware, gerando economia e flexibilidade no desenho de soluções de backup.
 
-### 🚀 RustFS + Veeam: backup e restore a partir de object storage
+### 🚀 RustFS + Veeam: backup e restore a partir de armazenamento de objetos
 
-A combinação entrega as vantagens do SDS, velocidade de backup/restore e resiliência de um object storage que grava metadados de forma atômica.
+A combinação entrega as vantagens do SDS, velocidade de backup/restore e resiliência de um armazenamento de objetos que grava metadados de forma atômica.

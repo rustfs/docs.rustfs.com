@@ -4,7 +4,7 @@ Open source, compatível com S3, reforçado para enterprise e extremamente rápi
 
 O RustFS é um armazenamento de objetos distribuído de alto desempenho. Definido por software, executa em hardware padrão de mercado e é 100% open source (licença principal: Apache v2.0).
 
-Diferencial: desenhado desde o início como padrão para object storage de nuvem privada/híbrida. Focado exclusivamente em objetos, a arquitetura single‑tier reúne os recursos necessários sem sacrificar performance – resultando num servidor cloud‑native leve, escalável e rápido.
+Diferencial: desenhado desde o início como padrão para armazenamento de objetos de nuvem privada/híbrida. Focado exclusivamente em objetos, a arquitetura single‑tier reúne os recursos necessários sem sacrificar performance – resultando num servidor cloud‑native leve, escalável e rápido.
 
 Embora brilhe em casos clássicos (backup/DR/arquivamento), o RustFS destaca‑se em desafios de ML/analytics/apps cloud‑native.
 

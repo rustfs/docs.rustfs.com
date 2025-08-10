@@ -8,11 +8,11 @@
 
 O Red Hat OpenShift é uma plataforma Kubernetes empresarial com operações automatizadas de pilha completa para gerir implantações híbridas, multicloud e edge. Inclui SO empresarial Linux, runtime de contentores, rede, monitorização, registo e soluções de identidade/autorização.
 
-O RustFS integra‑se nativamente ao OpenShift para operar object storage multi‑inquilino em grande escala. O RustFS Operator funciona com OpenShift Cluster Manager CLI, registo Quay e restante toolchain.
+O RustFS integra‑se nativamente ao OpenShift para operar armazenamento de objetos multi‑inquilino em grande escala. O RustFS Operator funciona com OpenShift Cluster Manager CLI, registo Quay e restante toolchain.
 
 ![Arquitetura RustFS](images/sec1-1.png)
 
-Por ser Kubernetes‑native e compatível com S3 desde a origem, o RustFS oferece object storage consistente, performante e escalável. Os developers obtêm storage persistente compatível com S3 para apps cloud‑native no OpenShift. Diferente do S3, o RustFS escala entre infraestruturas híbridas/multicloud mantendo gestão no ecossistema OpenShift, sem lock‑in de cloud pública.
+Por ser Kubernetes‑native e compatível com S3 desde a origem, o RustFS oferece armazenamento de objetos consistente, performante e escalável. Os developers obtêm storage persistente compatível com S3 para apps cloud‑native no OpenShift. Diferente do S3, o RustFS escala entre infraestruturas híbridas/multicloud mantendo gestão no ecossistema OpenShift, sem lock‑in de cloud pública.
 
 ## Integração nativa do RustFS Operator com OpenShift
 

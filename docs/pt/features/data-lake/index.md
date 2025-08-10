@@ -1,6 +1,6 @@
 # RustFS para data lakes modernos
 
-Data lakes e lakehouses modernos assentam em object storage moderno – isto é, sobre RustFS.
+Data lakes e lakehouses modernos assentam em armazenamento de objetos moderno – isto é, sobre RustFS.
 
 **RustFS fornece armazenamento unificado para data lakes/lakehouses modernos, executando em qualquer ambiente: privado, público, colocation, bare‑metal e edge – rápido, escalável, cloud‑native e pronto para uso.**
 

@@ -8,7 +8,7 @@
 
 O TKE é um serviço gerido para executar Kubernetes na Tencent Cloud sem gerir control plane ou nós.
 
-O RustFS oferece object storage portátil e performante nas principais plataformas Kubernetes (ACK, Tanzu, Azure, GCP, TKE). No TKE, integra‑se nativamente para operar storage multi‑inquilino em escala, como alternativa ao S3.
+O RustFS oferece armazenamento de objetos portátil e performante nas principais plataformas Kubernetes (ACK, Tanzu, Azure, GCP, TKE). No TKE, integra‑se nativamente para operar storage multi‑inquilino em escala, como alternativa ao S3.
 
 ![Arquitetura RustFS](images/sec1-1.png)
 

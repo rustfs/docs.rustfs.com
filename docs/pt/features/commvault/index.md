@@ -30,17 +30,17 @@ Definido por software e agnóstico a hardware, o RustFS dá flexibilidade e econ
 
 ## Visão geral da solução
 
-RustFS e Commvault oferecem soluções de backup definidas por software. O object storage de alto desempenho do RustFS atua como endpoint, desacoplando computação e armazenamento, com performance, escala e economia. Um único cluster pode servir endpoints para VMs, Oracle, SAP e MS Office.
+RustFS e Commvault oferecem soluções de backup definidas por software. O armazenamento de objetos de alto desempenho do RustFS atua como endpoint, desacoplando computação e armazenamento, com performance, escala e economia. Um único cluster pode servir endpoints para VMs, Oracle, SAP e MS Office.
 
 ## Principais cenários
 
 ### 🖥️ Backups Commvault para VMware ESXi com RustFS
 
-Backups de infraestrutura virtual para object storage com elasticidade e controlo de custo/segurança.
+Backups de infraestrutura virtual para armazenamento de objetos com elasticidade e controlo de custo/segurança.
 
 ### 📧 Backups Commvault para Microsoft 365 com RustFS
 
-Backups do Microsoft 365 para object storage com gestão eficiente.
+Backups do Microsoft 365 para armazenamento de objetos com gestão eficiente.
 
 ### 💼 Backups Commvault para SAP HANA com RustFS
 
@@ -48,4 +48,4 @@ Desempenho e segurança reforçados.
 
 ### 🗄️ Backups Commvault para Oracle com RustFS
 
-Otimização de backups críticos de Oracle usando object storage RustFS.
+Otimização de backups críticos de Oracle usando armazenamento de objetos RustFS.
