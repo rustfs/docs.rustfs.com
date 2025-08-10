@@ -1,93 +1,76 @@
-# 量化交易文件存储解决方案
+# Solução de armazenamento para trading quantitativo
 
-专为高频交易、量化策略回测设计的智能存储架构，支撑每秒百万级 IOPS 的订单流处理，满足 Tick 级数据毫秒存取需求
+Arquitetura inteligente para HFT e backtesting de estratégias, suportando milhões de IOPS e acesso em ms a dados Tick.
 
-## 行业挑战与痛点
+## Desafios do setor
 
-| 类别 | 传统方案缺陷 | 量化需求 | 业务影响 |
-|------|-------------|----------|----------|
-| **数据管理** | 单协议存储（仅 S3/仅 POSIX） | 跨协议统一存取(S3+POSIX+NFS) | 策略迭代周期↑20% |
-| **性能指标** | ≤50 万 IOPS（小文件随机读） | 300 万+ IOPS<0.5ms 延迟 | 高频策略滑点↓0.3bps |
-| **存储成本** | 冷数据 > $0.05/GB/月 | 智能分层≤$0.015/GB/月 | 年存储预算增长↓65% |
+| Categoria | Limitações tradicionais | Necessidade | Impacto |
+|-----------|-------------------------|------------|---------|
+| Gestão de dados | Armazenamento mono‑protocolo | Acesso unificado S3+POSIX+NFS | Ciclo de iteração aumenta |
+| Métricas de performance | IOPS limitados p/ pequenos ficheiros | Múltiplos milhões de IOPS com baixa latência | Menos slippage |
+| Custo de storage | Dados frios caros | Tiering económico | Orçamento reduzido |
 
-## 为什么选择我们
+## Por que RustFS
 
-### 极速响应
+### Resposta rápida
 
-- 采用 RDMA 网络加速与 GPU 直连存储，延迟≤500μs，吞吐量达 200 Gbps
-- 高频交易回测提速 300%
+- Aceleração de rede e caminhos de dados eficientes para latência sub‑ms e alto throughput
+- Backtesting acelerado
 
-### 海量文件
+### Muitos ficheiros
 
-- 智能聚合小文件为逻辑大对象，单集群支持 4000 亿文件
-- 元数据检索效率提升 40%
+- Agregação inteligente de pequenos ficheiros em objetos lógicos; escala para centenas de mil milhões de ficheiros
+- Pesquisa de metadados eficiente
 
-### 弹性扩展
+### Escala elástica
 
-- 支持混合云部署，热数据本地 SSD 加速，冷数据自动云归档
-- 容量可线性扩展至 EB 级
+- Híbrido: SSD local para quente; arquivo automático na cloud para frio
+- Capacidade com escala linear
 
-### 金融安全
+### Segurança financeira
 
-- 国密 SM4 硬件加密，性能损失<3%
-- 支持三地五中心容灾，RTO<1 分钟
+- Encriptação com baixo overhead
+- DR geográfico com RTO reduzido
 
-## 场景化解决方案
+## Soluções
 
-### 高频策略开发
+### Desenvolvimento de estratégias de alta frequência
 
-提供内存映射文件接口（mmap），支持 C++/Python 策略代码直接访问原始交易数据
+- Interface de mapeamento de memória (mmap) para C++/Python aceder aos dados de mercado
 
-#### 实测指标
+### AI para fatores
 
-单策略回测 10 亿级订单数据仅需 4 小时（传统方案需 24 小时+）
+- Integração com TensorFlow/PyTorch; datasets mapeados para caminhos S3
 
-### AI 因子挖掘
+### Conformidade regulatória
 
-集成 TensorFlow/PyTorch 插件，自动将特征数据集映射为 S3 对象存储路径
+- WORM para imutabilidade de registos de transação
+- Auditoria integrada para alto volume de eventos
 
-#### 案例
+## Conformidade e segurança
 
-聚私募实现 3000+因子并行计算，存储吞吐提升 8 倍
+- Criptografia certificável e suites duplas (conforme exigência)
+- Replicação geográfica para requisitos de DR
+- Integração com Splunk/Elastic para auditoria
 
-### 监管合规存储
+## Comparativo
 
-内置 WORM（一次写入多次读取）模式，满足交易记录不可篡改要求
+| Dimensão | Tradicional | Com RustFS | Valor |
+|---------|-------------|------------|-------|
+| Order flow | IOPS limitados | IOPS superiores | Menos risco em picos |
+| Compressão | Taxa moderada | Taxas elevadas (ex.: ZSTD) | Redução de custo |
+| Failover | Segundos | Sub‑segundo | Menos penalidades |
 
-自动生成 CFCA 兼容的审计日志（每秒处理 10 万+操作记录）
+## Serviços
 
-## 行业合规与安全
+### Deploy
 
-### 金融级加密 **(必备)**
+- Appliance (RustFS pré‑instalado) ou software
 
-FIPS 140-2 认证的国密双算法支持
+### Otimização
 
-### 跨地域同步 **(必备)**
+- Guia de design de data lake quantitativo e consultoria
 
-满足 SEC 17a-4 异地灾备规范
+### Ecossistema
 
-### 审计接口 **(必备)**
-
-直接对接 Splunk、Elastic 监管模块
-
-## 核心优势对比
-
-| 维度 | 传统方案 | rustFS 方案 | 业务价值显现 |
-|------|----------|------------|--------------|
-| **订单流处理** | ≤50 万 IOPS | ✅ 230 万 IOPS | 消除行情高峰期的订单堆积风险 |
-| **数据压缩率** | 3:1 | ✅ 11:1（ZSTD+FPGA 加速） | PB 级回测数据存储成本下降 67% |
-| **故障切换时间** | 15–30 秒 | ✅ 82ms | 规避 SEC 条例规定的系统中断处罚 |
-
-## 服务保障体系
-
-### 部署服务
-
-提供存算一体机（预装 RustFS）或纯软件交付
-
-### 效能优化
-
-免费提供《量化数据湖设计白皮书》及数据治理咨询服务
-
-### 生态合作
-
-已与 20+量化平台完成认证（包括聚宽、掘金量化等）
+- Integrações com múltiplas plataformas quantitativas

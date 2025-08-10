@@ -1,103 +1,85 @@
-# 国产信创解决方案
+# Solução para ecossistema doméstico (Xinchuang)
 
-我们提供从硬件、操作系统到涉密、加密的全套存储合规和信创解决方案
+Portfólio completo de conformidade de storage: do hardware e sistemas operativos a requisitos de segurança e encriptação.
 
-## 信创存储实施痛点
+## Dores de implantação
 
-### 传统方案缺陷
+### Limitações de abordagens tradicionais
 
-- 国产芯片适配率不足 30%
-- 信创环境性能下降达 40-60%
-- 集中式架构扩展成本高
+- Baixa taxa de compatibilidade com CPUs domésticas
+- Queda de performance em ambientes de conformidade
+- Expansão cara em arquiteturas centralizadas
 
-### 我们的技术实现
+### Abordagem técnica
 
-- 完成 6 大国产芯片全适配（鲲鹏/海光/飞腾/龙芯/申威/兆芯）
-- 自研 RDMA 加速协议，IOPS 性能达 3240 万，时延<20μs
-- 分布式元数据集群设计，单集群支持 EB 级扩展
+- Adaptação validada para múltiplas arquiteturas de CPU domésticas
+- Protocolo de aceleração RDMA para IOPS e latência reduzida
+- Metadados distribuídos; escala de cluster até níveis de EB
 
-## 为什么选择我们
+## Por que escolher
 
-### 全栈信创适配
+### Adaptação full‑stack
 
-支持 6 大国产芯片平台
-硬件性能折损率＜5%
-工信部认证兼容性 100%
+- Suporte a várias plataformas de CPU
+- Baixa perda de performance de hardware
+- Compatibilidade validada por certificação industrial
 
-### 零衰减性能保障
+### Garantia de performance
 
-自研 RDMA 加速协议
-单节点 1620 万 IOPS
-时延＜20μs
+- Aceleração RDMA proprietária
+- Alto IOPS por nó com latências muito baixas
 
-### 国密级安全体系
+### Segurança de nível nacional
 
-SM2/SM4/SM9 全支持
-加密吞吐≥8 GB/s
-60%内资股权架构
+- Suporte a suites criptográficas domésticas (SM2/SM4/SM9)
+- Alto throughput de encriptação
 
-### 生态深度兼容
+### Ecossistema compatível
 
-适配 18 类信创操作系统
-200+ISV 联合认证
-30 个部委级应用验证
+- Suporte a múltiplos SOs do ecossistema doméstico
+- Integrações com ISVs e validações setoriais
 
-## 解决方案
+## Soluções
 
-### 党政机关信创替代加速引擎
+### Motor de substituição para órgãos públicos
 
-**覆盖党政办公 "三会一会" 全流程（公文/会议/督查）**
-**跨总分局系统互认机制（打造 12 类异构系统）**
+- Cobertura de fluxo completo de documentos/reuniões/supervisão
+- Mecanismos de confiança cruzada entre sistemas heterogéneos
 
-- ✓ 某省级政务云 3 个月完成 8 个系统迁移
-- ✓ 红头文件流转效率提升 210%
-- ✓ 等保 2.0 三级认证通过率 100%
+### Core distribuído para finanças
 
-### 金融级分布式核心系统
+- Motor distribuído de alta TPS
+- Pipelines inteligentes de processamento em lote
 
-**百万级 TPS 分布式主引擎（支持 ASM9 国密算法）**
-**智能批量管道（自动容器 40+类批量操作）**
+### Plataforma unificada para grandes empresas
 
-- ✓ 某股份制银行系统延迟从 68ms 降至 9ms
-- ✓ 某资管信贷节省 650 万/年 OIE 许可费用
-- ✓ 通过人行金融科技认证+银保监穿透审计
+- Orquestração heterogénea (x86/ARM/MIPS)
+- Ferramentas de migração com mínima intervenção
 
-### 大型企业跨平台云脑方案
+## Tabela de funcionalidades
 
-**异构资源调度一键平滑（x86/ARM/MIPS 适配管理）**
-**技术栈无感迁移工具链（Oracle 一站式迁移效率提升 6 倍）**
+| Dimensão | Storage tradicional | Solução RustFS | Benefício |
+|---------|---------------------|----------------|-----------|
+| Protocolos | FC/iSCSI | NVMe‑oF/S3/NFSv4 | Compatibilidade ampla |
+| Proteção | Controladoras + RAID | 3 cópias entre DC + EC | RTO reduzido |
+| Performance | IOPS por nó limitado | IOPS elevado e alto throughput | Ganho significativo |
 
-- ✓ 异构管理面 IT 运维成本下降 37%
-- ✓ 集中化研发系统宕机周期缩短 82%
-- ✓ 支持未来东数西算深度接轨和扩建
+## Serviços
 
-## 核心功能对比表
+### Validação de adaptação
 
-| 功能纬度 | 传统方案存储 | rustFS 信创方案 | 优势提升 |
-|---------|------------|--------------|----------|
-| 协议支持 | FC/iSCSI 为主 | ✓ 全协议支持（NVMe-oF/S3/NFSv4） | 协议兼容性提升 200% ↑ |
-| 数据保护 | 双控制器+RAID | ✓ 跨机房 3 副本+亚节点纠删码 | RTO 从小时级缩短至分钟级 |
-| 性能基准 | 单节点 IOPS≤50 万 | ✓ 单节点 IOPS 1620 万，吞吐 144 GB/s | 单机性能提升 32 倍 ↑ |
+- 5–7 dias úteis
+- Relatório de compatibilidade de hardware
+- Plano de tuning de performance
 
-## 服务保障体系
+### Implementação
 
-### 适配验证
+- 3 dias por PB
+- Arquitetura ativo‑ativo
+- Migração sem perda
 
-时间周期：5-7 工作日
+### Operação contínua
 
-硬件兼容性测试报告
-性能调优方案
-
-### 部署实施
-
-时间周期：3 天/PB 级
-
-双活架构搭建
-数据无损迁移
-
-### 持续运维
-
-服务级别：7x24 监控
-
-年度健康检查
-SLA 99.99%保障
+- Monitorização 24x7
+- Health check anual
+- SLA de alta disponibilidade
