@@ -1,77 +1,55 @@
-# 面向红帽 OpenShift 容器平台的 RustFS
+# RustFS para Red Hat OpenShift Container Platform
 
-## 客户在 Amazon EKS 上运行 RustFS 有三个原因
+## Três razões para executar RustFS no OpenShift
 
-- RustFS 在混合云或多云部署场景中充当一致的存储层
-- RustFS 是 Kubernetes 原生的高性能产品，可以在公有云、私有云和边缘云环境中提供可预测的性能。
-- 在 OpenShift 上运行 RustFS 可以灵活地 控制软件堆栈，从而避免云锁定。
+- Camada de armazenamento consistente em cenários híbridos/multicloud
+- Produto cloud‑native de alto desempenho no Kubernetes (público/privado/edge)
+- No OpenShift, mantém controlo da pilha e evita lock‑in
 
-红帽® OpenShift® 是一个企业级 Kubernetes 容器平台，具有全栈自动化运维功能，可管理混合云、多云和边缘部署。OpenShift 包括企业级 Linux 操作系统、容器运行时、网络、监控、注册表以及身份验证和授权解决方案。
+O Red Hat OpenShift é uma plataforma Kubernetes empresarial com operações automatizadas de pilha completa para gerir implantações híbridas, multicloud e edge. Inclui SO empresarial Linux, runtime de contentores, rede, monitorização, registo e soluções de identidade/autorização.
 
-RustFS 原生集成了 OpenShift，可以更轻松地将自己的大规模多租户对象存储作为服务进行操作。RustFS Operator 可与 OpenShift 工具链（例如 OpenShift Cluster Manager CLI 和 Quay 容器注册表）配合使用，确保您从 OpenShift 生态系统的投资中获得最大收益。
+O RustFS integra‑se nativamente ao OpenShift para operar object storage multi‑inquilino em grande escala. O RustFS Operator funciona com OpenShift Cluster Manager CLI, registo Quay e restante toolchain.
 
-![RustFS 架构图](images/sec1-1.png)
+![Arquitetura RustFS](images/sec1-1.png)
 
-RustFS 提供了一个一致、高性能和可扩展的对象存储，因为它在设计上是 Kubernetes 原生的，并且从一开始就与 S3 兼容。开发人员可以轻松地为在 OpenShift 上运行的所有云原生应用程序获取与 Amazon S3 兼容的持久存储服务。与 AWS S3 不同，RustFS 使应用程序能够跨任何多云和混合云基础设施进行扩展，并且仍然可以在 OpenShift 生态系统中进行管理，而不会受到公有云的锁定。
+Por ser Kubernetes‑native e compatível com S3 desde a origem, o RustFS oferece object storage consistente, performante e escalável. Os developers obtêm storage persistente compatível com S3 para apps cloud‑native no OpenShift. Diferente do S3, o RustFS escala entre infraestruturas híbridas/multicloud mantendo gestão no ecossistema OpenShift, sem lock‑in de cloud pública.
 
-## RustFS Operator 与 OpenShift 功能原生集成
+## Integração nativa do RustFS Operator com OpenShift
 
-### 功能概览
+### Visão geral
 
-- **存储类和分层**
-- **外部负载均衡**
-- **加密密钥管理**
-- **身份管理**
-- **证书管理**
-- **监视和警报**
-- **日志记录和审核**
+- Classes de armazenamento e tiering
+- Load balancer externo
+- Gestão de chaves (KMS)
+- Gestão de identidade
+- Gestão de certificados
+- Monitorização e alertas
+- Logging e auditoria
 
-## 存储类和分层
+## Classes de armazenamento e tiering
 
-在腾讯云 TKE 上大规模部署 RustFS 的关键要求是跨存储类（NVMe、HDD、公有云）的能力层。这使企业能够同时管理成本和性能。
+Tiering entre NVMe/HDD/cloud para equilibrar custo e performance. O RustFS migra objetos envelhecidos para camadas mais económicas mantendo namespace único e movimentos transparentes por políticas.
 
-RustFS 支持将老化对象从快速 NVMe 层自动过渡到更具成本效益的 HDD 层，甚至是成本优化的冷公有云存储层。
+## Load balancer externo
 
-分层时，RustFS 会跨层提供统一的命名空间。跨层的移动对应用程序是透明的，并由客户确定的策略触发。
+Tráfego HTTP/REST com suporte a Ingress compatível com Kubernetes (hardware/software). NGINX é opção popular. Instale via OperatorHub/Marketplace e exponha tenants com anotações.
 
-RustFS 通过在源头加密对象，在 OpenShift 混合云中提供安全存储，确保客户始终完全控制数据。当 OpenShift 部署在公有云中时，分层功能可帮助 OpenShift 跨持久块存储和更便宜的对象存储层有效地管理数据。
+## Gestão de chaves (KMS)
 
-**了解更多：**
+Recomenda‑se encriptação por padrão em todos os buckets. RustFS suporta AES‑256‑GCM/ChaCha20‑Poly1305 com overhead mínimo e modos SSE‑KMS/SSE‑S3/SSE‑C. O KMS inicializa KES por tenant para encriptação por objeto.
 
-## 外部负载均衡
+## Gestão de identidade
 
-RustFS 的所有通信都基于 HTTP、RESTful API，并将支持任何标准的 Kubernetes 兼容入口控制器。这包括基于硬件和软件定义的解决方案。最受欢迎的选择是 NGINX。使用 OperatorHub 或 OpenShift Marketplace 进行安装，然后使用注释公开 RustFS 租户。
+SSO via OpenID Connect/LDAP (Keycloak, Okta/Auth0, Google, Facebook, AD, OpenLDAP). RustFS fornece utilizadores/grupos/papéis/políticas/STS ao estilo AWS IAM, criando uma camada de IAM unificada.
 
-## 加密密钥管理
+## Gestão de certificados
 
-没有原生的 OpenShift 密钥管理功能。因此，RustFS 建议使用 HashiCorp Vault 在对象存储系统之外存储密钥。这是云原生应用程序的最佳实践。
+Todo tráfego app↔RustFS e inter‑nós usa TLS. Integração com gestor de certificados do OpenShift para provisionar/renovar automaticamente por tenant (isolado por namespace).
 
-对于所有生产环境，我们建议默认情况下在所有存储桶上启用加密。RustFS 使用 AES-256-GCM 或 ChaCha20-Poly1305 加密来保护数据完整性和机密性，对性能的影响可以忽略不计。
+## Monitorização e alertas
 
-RustFS 支持所有三种服务器端加密（SSE-KMS、SSE-S3 和 SSE-C）模式。SSE-S3 和 SSE-KMS 与服务器端的 KMS 集成，而 SSE-C 使用客户端提供的密钥。
+Exponha métricas Prometheus (capacidade, acessos, etc.). Use Grafana ou o monitoring do projeto openshift‑user‑workload. Defina baselines e alertas (PagerDuty/Freshservice/SNMP).
 
-RustFS 将使用此 KMS 引导其内部密钥加密服务器（KES 服务），以实现高性能的每对象加密。每个租户都在一个孤立的命名空间中运行自己的 KES 服务器。
+## Logging e auditoria
 
-## 身份管理
-
-在 OpenShift 上运行 RustFS 时，客户可以通过第三方 OpenID Connect/LDAP 兼容身份提供商（如 Keycloak、Okta/Auth0、Google、Facebook、ActiveDirectory 和 OpenLDAP）管理单点登录（SSO）。RustFS 推荐 OpenID Connect 兼容的 Keycloak IDP。
-
-外部 IDP 允许管理员集中管理用户/应用程序身份。RustFS 建立在 IDP 之上，提供 AWS IAM 风格的用户、组、角色、策略和令牌服务 API。独立于基础设施的统一身份和访问管理（IAM）层的能力提供了显著的架构灵活性。
-
-## 证书管理
-
-从应用程序到 RustFS 的所有流量，包括节点间流量，都使用 TLS 加密。TLS 证书用于保护网络通信和建立网络连接资源的身份，例如 RustFS 服务器域。
-
-RustFS 与 OpenShift 证书管理器集成，因此您可以使用 RustFS 操作员为 RustFS 租户自动配置、配置、管理和更新证书。租户在自己的 Kubernetes 命名空间中完全相互隔离，拥有自己的证书，以提高安全性。
-
-## 监控和警报
-
-RustFS 建议使用 Grafana，OpenShift-user-workload-monitoring 项目中安装的平台监控组件，或任何其他 OpenShift 容器监控工具连接到 RustFS。RustFS 发布所有可想象的与存储相关的 Prometheus 指标，从存储桶容量到访问指标。这些指标可以在任何与 Prometheus 兼容的工具或 RustFS 控制台中收集和可视化。
-
-外部监测解决方案定期刮取 RustFS Prometheus 端点。RustFS 建议使用 Grafana 或 openshift-user-workload-monitoring 项目中安装的平台监控组件连接到 RustFS。这些相同的工具也可用于建立基线和设置通知警报阈值，然后可以路由到 PagerDuty、Freshservice 甚至 SNMP 等通知平台。
-
-## 记录和审计
-
-启用 RustFS 审计会为对象存储集群上的每个操作生成日志。除了审计日志外，RustFS 还记录控制台错误，用于操作故障排除。
-
-RustFS 支持将日志输出到弹性堆栈（或第三方）进行分析和警报。
+A auditoria regista todas as operações de objetos; erros de console ajudam no troubleshooting. Suporta envio para Elastic Stack ou terceiros.

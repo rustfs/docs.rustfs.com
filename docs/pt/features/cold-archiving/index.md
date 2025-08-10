@@ -1,144 +1,101 @@
-# 对象存储冷归档解决方案
+# Solução de arquivamento frio em object storage
 
-为百年数据而生，构建安全、智能、可持续的冷数据基石
+Base sustentável, segura e inteligente para dados de longo prazo.
 
-## 核心痛点
+## Desafios principais
 
-### 百年存储挑战
+### Retenção de longo prazo
 
-**痛点**：数据需要保存数十年甚至百年存储，面临介质老化、技术淘汰、法规变更等多重风险
+- Longevidade de mídias (fita 10–30 anos)
+- Formatos legados vs. sistemas modernos
+- Custo/complexidade de auditoria e conformidade
 
-**技术挑战**：
+### Continuidade com conectividade limitada
 
-- 硬件寿命有限（磁带 10-30 年）
-- 旧数据格式无法适配新系统
-- 合规审计成本高
+- Risco físico em bibliotecas de fita
+- Latência elevada em replicação geográfica
+- Tempos longos de disponibilização de dados frios
 
-**rustFS 方案**：
+### Segurança de dados offline
 
-- 小程序无存储架构：源源不断写入储存桶，支持按照审计规范/OLC/S3 存手写升级
-- 动态编码技术：自动转换编码数据格式（例如 COBOL→JSON）
-- 全栈沙箱：内置 GDPR/数据模板，一键生成审计报告
+- Mitigar malware/ransomware em dados arquivados
+- Custos de implementar air‑gap
+- Risco de erros de decodificação/índices de metadados
 
-### 脱电断网存灾
+## Abordagem
 
-**痛点**：离线存储要受自然环境影响，人为操作失误，传统多大方案本身就有数据丢失风险
+### Motor de storage em camadas
 
-**技术挑战**：
+#### Tiering inteligente
 
-- 磁带库物理损坏风险
-- 跨地域复制网络延迟高
-- 冷数据离线存储时间长（数小时至数天）
+Classificação automática por frequência de acesso (quente→morno→frio→deep‑cold) e migração para mídias de menor custo (HDD/fita/óptico) conforme políticas.
 
-**rustFS 方案**：
+#### Interoperabilidade
 
-- 磁光混合云存储：混光存储电磁干扰+磁带低成本，灾难恢复
-- 冷数据直读技术：无需解冻，建议<15 秒
-- 区块链转储同步：元数据自动同步，确保三地副本一致性
+Compatível com S3, NAS, HDFS e implantações cloud/privadas.
 
-### 脱电断网容灾
+### Gestão de dados de longo prazo
 
-**痛点**：长期离线数据易受到恶意软件感染，可能导致数据"僵尸化"
+#### Abstração independente de mídia
 
-**技术挑战**：
+Camada lógica de volumes para abstrair diferenças de hardware e permitir evolução de fita→QLC e além.
 
-- 空气间隙（Air Gap）实现成本高
-- 解码错误风险增加（如出错码解码）
-- 元数据索引丢失风险
+#### Auto‑healing e verificação periódica
 
-**rustFS 方案**：
+Verificação cíclica (CRC/EC) com correção automática de erros silenciosos.
 
-- 硬件级安全保护：只读独立一次写入光盘，防篡改
-- 自适应部署：周期性 CRC+自动纠错检验，自动修复错误
-- 云数据区块链转存：云端索引按需上线，永久可追溯
+### Segurança e confiança
 
-## 解决方案
+#### Air Gap
 
-### 分层存储引擎
+Isolamento físico/mediado para reduzir superfície de ataque.
 
-#### 智能分级
+#### Prova de integridade
 
-基于访问频率自动划分存储层级（热→温→冷→深度冷），动态迁移至低成本介质（如 HDD/磁带/蓝光）
+Registo imutável de metadados/ações para auditoria.
 
-#### 跨平台兼容
+### Eficiência energética
 
-支持 S3、NAS、HDFS 等多协议接入，无缝对接公有云与私有化部署
+#### Baixo consumo em repouso
 
-### 百年数据管理技术
+Mídias e políticas orientadas a reduzir consumo quando inativas.
 
-#### 介质无关性设计
+#### Orquestração por políticas
 
-采用逻辑卷卷抽象层，屏蔽硬件差异，支持磁带到 QLC 闪存的平滑升级
+Previsão de acessos para otimizar picos de energia.
 
-#### 自愈式数据巡检
+## Casos de uso
 
-周期性校验 CRC+纠删码，自动修复静默错误
+### Arquivos históricos
 
-### 安全可信体系
+- Digitalização e preservação documental
+- Redução de OPEX de operação
 
-#### 硬件级 Air Gap
+### Dados científicos
 
-物理隔离与离线介质实现"数据保险箱"，抵御网络攻击
+- Pesquisa/engenharia com volumes em PB
+- Codificação/EC para densidade e resiliência
 
-#### 区块链存证
+### Media/Entretenimento
 
-关键元数据上链，确保操作日志不可篡改
+- Arquivo de masters 4K/8K
+- Indexação/pesquisa eficiente
 
-### 绿色节能实践
+## Comparativo
 
-#### 近零功耗存储
+| Dimensão | Abordagem tradicional | Com RustFS | Benefício |
+|---------|------------------------|------------|-----------|
+| Longevidade | Depende de migrações periódicas | Abstração de mídia + redundância lógica | Menos migrações, menor risco de obsolescência |
+| Energia | Bibliotecas ativas consomem continuamente | Políticas de repouso e camadas frias | TCO reduzido |
+| RTO | Demora de rehidratação | Leitura direta de dados frios (conforme política) | Recuperação mais rápida |
+| Conformidade | Auditoria manual | Relato automatizado + trilha de auditoria | Facilita certificações |
 
-休眠模式下硬盘功耗<1W/台，比传统方案节能 70%
+## Setores
 
-#### 冷热协同调度
+- Finanças: retenção/regulatório
+- HPC: cold standby de datasets
+- Mídia: arquivo de conteúdos em alta resolução
 
-AI 预测访问周期，优化能源峰值负载
+## Contacto
 
-## 客户案例
-
-### 某省级档案馆
-
-#### 部署分布式磁光电混合存储
-
-- **10PB** 历史文献数字化归档
-- **45% ▼** 年运维成本下降
-
-### 新能源汽车厂商
-
-#### 自动驾驶路测数据冷归档
-
-- **EB** 支持 EB 级扩容
-- **99.95% ▲** 数据恢复 SLA 达 99.95%
-
-## 核心优势对比
-
-| 维度 | 传统方案 | rustFS 方案 | 增益价值 |
-|------|----------|------------|----------|
-| **寿命** | 磁带 10-30 年，依赖定期迁移 | ✓ 介质无关+逻辑冗余，理论永久存储 | 降低迁移成本，规避技术过时风险 |
-| **能耗** | 磁带库常时待机，功耗>50W/节点 | ✓ 智能休眠+磁光电混合架构，<5W/节点 | TCO 降低 60% |
-| **恢复速度** | 深度归档解冻需数天 | ✓ 冷数据直读，延迟<1 分钟 | 紧急调阅效率提升百倍↑ |
-| **合规性** | 手动审计，存在人为漏洞 | ✓ 自动化合规报告+区块链存证 | 通过等保三级/ISO 27001 认证 |
-
-## 行业场景赋能
-
-### 金融合规归档
-
-#### 双录数据存证
-
-百万级音视频文件自动分类，满足银保监 15 年留存要求
-
-### 超算中心冷备
-
-#### PB 级科研数据
-
-纠删码+智能压缩，存储密度提升 3 倍
-
-### 媒体资产库
-
-#### 4K/8K 原片归档
-
-蓝光库+对象存储联动，版权素材秒级检索
-
-## 联系我们
-
-马上联系，获得提升百年存储成本优化方案
+Fale connosco para avaliar requisitos de arquivamento a longo prazo com RustFS.
