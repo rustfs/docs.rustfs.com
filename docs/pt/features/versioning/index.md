@@ -1,63 +1,63 @@
-# 桶和对象版本控制
+# Versionamento de buckets e objetos
 
-## RustFS 对象存储提供 AWS S3 版本控制兼容性
+## Compatibilidade com versionamento AWS S3
 
-与 SAN 和 NAS 版本控制方法相比，对象级版本控制是一项重大改进。版本控制不仅提供数据保护，还是对象锁定、不可变性、分层和生命周期管理等强大功能的基础。
+Comparado a SAN/NAS, o versionamento a nível de objeto é um avanço. Além de proteger dados, é base para bloqueio de objetos, imutabilidade, tiering e gestão do ciclo de vida.
 
-使用 RustFS，对象根据 Amazon 的 S3 结构/实现进行独立版本控制。RustFS 为给定对象的每个版本分配一个唯一 ID - 应用程序可以随时指定一个版本 ID 以访问该对象的时间点快照。
+No RustFS, cada objeto é versionado de forma independente conforme a semântica S3. Cada versão recebe um ID único; aplicações podem referenciar um version ID para obter um snapshot temporal.
 
-版本控制允许用户在同一存储桶中保留一个对象的多个变体，并提供一种机制来保存、检索和恢复存储在存储桶中的每个对象的每个版本，从而消除了对快照的要求。版本控制确保对象在一系列故障中保持可用，包括由应用程序和人为错误引起的故障。
+O versionamento permite manter múltiplas variantes do mesmo objeto no bucket, com mecanismos para salvar, recuperar e restaurar cada versão – eliminando a necessidade de snapshots. Protege contra falhas diversas, incluindo erros humanos/aplicativos.
 
-在存储桶级别启用版本控制。启用后，RustFS 会自动为对象创建一个唯一的版本 ID。同一对象可以有多个版本。
+Ative no nível do bucket. Após ativar, o RustFS cria automaticamente IDs únicos por versão e o mesmo objeto pode ter várias versões.
 
-版本控制的主要好处之一是防止意外覆盖或删除。这是使用删除标记的概念执行的。删除版本化对象时，它不会永久删除。而是创建一个删除标记并成为对象的当前版本。当请求该对象时，RustFS 返回 404 Not Found 消息。可以通过删除删除标记来恢复对象。
+Um benefício chave é impedir sobrescrita/exclusão acidental, usando delete markers. Ao “apagar” um objeto versionado, cria‑se um delete marker como versão atual (o GET retorna 404). Para restaurar, remova o delete marker.
 
-同理，如果版本化对象被覆盖，RustFS 会创建一个新版本并成为当前版本。同样，可以根据需要恢复旧版本。
+De forma similar, ao sobrescrever um objeto versionado, cria‑se nova versão como atual; versões antigas podem ser restauradas quando necessário.
 
-## RustFS 支持具有三种不同存储桶状态的对象版本控制
+## Três estados de versionamento por bucket
 
-![存储桶状态](./images/bucket-states.png)
+![Estados do bucket](./images/bucket-states.png)
 
-请注意，一旦为存储桶启用了版本控制，该操作就无法撤消 - 只能暂停。版本控制是存储桶中的全局设置 - 这意味着所有对象现在都已进行版本控制。
+Uma vez ativado o versionamento, não é possível desfazer – apenas pausar. É um setting global do bucket.
 
-具有适当权限的用户可以暂停版本控制以停止累积对象版本。与启用版本控制类似，此操作在存储桶级别执行。
+Com permissões adequadas, é possível pausar para interromper a criação de novas versões. Tal como a ativação, a pausa é aplicada no nível do bucket.
 
-与所有 RustFS 一样，可以使用 RustFS 控制台、客户端 (mc)、SDK 或通过命令行应用版本控制。
+O versionamento pode ser aplicado via Console do RustFS, cliente (mc), SDKs ou linha de comando.
 
-版本控制是保护数据免受意外操作影响的最简单方法。但是，随着对象的版本化，它会导致更大的桶大小，并可能导致对象之间更多的相互依赖性以及隐藏对象依赖性的风险。这些因素可以通过生命周期管理来缓解。
+Versionamento é a forma mais simples de proteger contra operações acidentais. Contudo, mais versões aumentam o tamanho do bucket e dependências entre objetos; mitigue com regras de ciclo de vida.
 
-## 核心功能优势
+## Benefícios principais
 
-> 除了其数据保护优势外，RustFS 的对象存储版本控制还是其他关键功能的基础
+> Além de proteção de dados, o versionamento do RustFS fundamenta várias capacidades‑chave
 
-### 主要功能特性
+### Destaques
 
-- ✅ **桶复制**（主动-主动，主动-被动）
-- ✅ **Mc undo** - 使用单个命令回滚 PUT/DELETE 对象
-- ✅ **对象锁**
-- ✅ **类似持续数据保护的保护**，无需快照或完整复制系统的开销
-- ✅ **Mc rewind** - 在启用版本控制后的任何时间点查看存储桶或对象
+- ✅ Replicação de buckets (ativo‑ativo, ativo‑passivo)
+- ✅ mc undo – reverter PUT/DELETE com um comando
+- ✅ Bloqueio de objetos
+- ✅ Proteção tipo CDP sem overhead de snapshots/replicação completa
+- ✅ mc rewind – visualizar bucket/objeto em qualquer ponto após ativação
 
-## 架构
+## Arquitetura
 
-![架构图](./images/architecture.png)
+![Arquitetura](./images/architecture.png)
 
-### 系统要求
+### Requisitos do sistema
 
-> 版本控制必须要求：纠删码和至少四个磁盘。
+> Versionamento requer EC e ao menos quatro discos.
 
-### 版本控制状态
+### Estados de versionamento
 
-RustFS 支持三种不同的存储桶版本控制状态：
+O RustFS suporta três estados distintos de versionamento de bucket:
 
-1. **🔴 未启用** - 默认状态，不进行版本控制
-2. **🟢 已启用** - 完整的版本控制功能，为每个对象版本分配唯一 ID
-3. **🟡 已暂停** - 停止累积新版本，但保留现有版本
+1. 🔴 Desativado – estado padrão
+2. 🟢 Ativado – ID único por versão, versionamento completo
+3. 🟡 Pausado – não cria novas versões, mantém as existentes
 
-### 关键特性
+### Recursos‑chave
 
-- 🆔 **唯一版本 ID** - 每个对象版本都有唯一标识符
-- 🔄 **时间点恢复** - 可以访问对象的任何历史版本
-- 🛡️ **删除保护** - 使用删除标记防止意外删除
-- 📊 **生命周期管理** - 自动管理版本数量和存储成本
-- 🔐 **权限控制** - 精细的访问权限管理
+- 🆔 ID único por versão
+- 🔄 Recuperação temporal por version ID
+- 🛡️ Proteção contra eliminação acidental (delete markers)
+- 📊 Gestão do ciclo de vida para controlar quantidade/custos de versões
+- 🔐 Controlo de permissões refinado
