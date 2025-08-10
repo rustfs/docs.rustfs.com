@@ -1,20 +1,20 @@
-# RustFS para VMware Tanzu Kubernetes Platform
+# RustFS para Amazon Elastic Kubernetes Service (EKS)
 
-## Três razões para executar RustFS no VMware Tanzu
+## Três razões para executar RustFS no Amazon EKS
 
 - Camada de armazenamento consistente em cenários híbridos/multicloud
 - Produto cloud‑native de alto desempenho no Kubernetes (público/privado/edge)
-- Controle da pilha no Tanzu, evitando lock‑in
+- Controle total da pilha no EKS, evitando lock‑in
 
-O VMware Tanzu é uma plataforma Kubernetes empresarial com operações automatizadas de pilha completa para gerir implantações híbridas, multicloud e edge.
+Amazon Elastic Kubernetes Service (EKS) é um serviço gerido para executar Kubernetes na AWS sem gerir o control plane ou nós.
 
-O RustFS integra‑se nativamente ao Tanzu para operar armazenamento de objetos multi‑inquilino em grande escala, com toolchain do ecossistema Tanzu.
+O RustFS integra‑se nativamente ao EKS para operar armazenamento de objetos multi‑inquilino em escala, como alternativa compatível com S3.
 
 ![Arquitetura RustFS](images/sec1-1.png)
 
-Sendo Kubernetes‑native e compatível com S3 desde a origem, o RustFS oferece armazenamento de objetos consistente, performante e escalável. Diferente do S3, escala entre infraestruturas híbridas/multicloud sem lock‑in.
+Diferente do S3, o RustFS permite escalar aplicações entre nuvens sem reescritas dispendiosas ou integrações proprietárias. Por ser contentorizado e cloud‑native, implanta‑se facilmente sem skills especializados.
 
-## Integração nativa do RustFS Operator com Tanzu
+## Integração nativa do RustFS Operator com EKS
 
 ### Visão geral
 
@@ -28,19 +28,19 @@ Sendo Kubernetes‑native e compatível com S3 desde a origem, o RustFS oferece 
 
 ## Classes de armazenamento e tiering
 
-Tiering entre NVMe/HDD/cloud com namespace único e políticas.
+Tiering entre classes/mídias (NVMe, HDD, cloud) com namespace único e políticas transparentes.
 
 ## Load balancer externo
 
-Ingress compatível com Kubernetes (inclui NGINX). Exponha tenants com anotações.
+Suporte a Ingress compatível com Kubernetes (inclui NGINX). Instale via marketplace e exponha tenants.
 
 ## Gestão de chaves (KMS)
 
-Encriptação por padrão; AES‑256‑GCM/ChaCha20‑Poly1305; SSE‑KMS/SSE‑S3/SSE‑C; KMS inicializa KES por tenant.
+Encriptação por padrão recomendada; suporta AES‑256‑GCM/ChaCha20‑Poly1305 e SSE‑KMS/SSE‑S3/SSE‑C. KMS inicializa KES por tenant.
 
 ## Gestão de identidade
 
-SSO via OpenID Connect/LDAP (Keycloak, Okta/Auth0, Google, AD, OpenLDAP). IAM estilo AWS (utilizadores/grupos/papéis/políticas/STS).
+SSO via OpenID Connect/LDAP (Keycloak, Okta/Auth0, Google, AD, OpenLDAP). IAM estilo AWS.
 
 ## Gestão de certificados
 
