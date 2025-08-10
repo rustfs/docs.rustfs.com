@@ -1,21 +1,19 @@
 ---
-title: RustFS 的开源许可证
-description: RustFS 采用 100% 商用友好的 Apache v2.0 许可证发行
+title: Licença open source do RustFS
+description: O RustFS é distribuído sob a licença Apache v2.0, 100% amigável para uso comercial
 ---
 
-# RustFS 的开源许可证
+# Licença open source do RustFS
 
-## 开源许可证
+## Licença open source
 
-- RustFS 采用 100% 商用友好的 Apache v2.0 许可证发行
+- O RustFS é distribuído sob a licença Apache v2.0 (100% amigável para uso comercial)
 - [Apache v2.0](https://www.apache.org/licenses/LICENSE-2.0)
 
-
-## 许可证条款
+## Termos da licença
 
 _Version 2.0, January 2004_
 http://www.apache.org/licenses/
-
 
 ### Terms and Conditions for use, reproduction, and distribution
 

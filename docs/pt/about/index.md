@@ -1,47 +1,47 @@
-# 关于我们
+# Sobre nós
 
-**RustFS 立志成为一家世界领先的数据安全和数据降本公司。**
+**A missão do RustFS é tornar-se uma empresa líder mundial em segurança de dados e redução de custos de armazenamento.**
 
-由百度、腾讯、好未来等公司的优秀存储架构师组成的一个开源存储组织（北京恒河沙科技有限公司）。北京恒河沙总部位于中国北京。公司秉承的价值观是：诚信、 专注、简单。
+Somos uma organização open source de armazenamento (Beijing Hengheshake Technology Co., Ltd.), composta por arquitetos de armazenamento experientes vindos de empresas como Baidu, Tencent e TAL. A sede localiza-se em Pequim, China. Os nossos valores: integridade, foco e simplicidade.
 
-我们的愿景是我们将会向全世界提供多语言的安全、降本的分布式对象存储产品。
+A nossa visão é fornecer ao mundo um produto de armazenamento de objetos distribuído, seguro e económico, com suporte multilíngue.
 
-RustFS 不断的在人工智能、大数据、视频、云计算、加密存储、工业生产、云原生、数据备份等全方面保障数据安全和降低数据存储成本。
+O RustFS trabalha continuamente para garantir segurança e reduzir custos de armazenamento em IA, big data, vídeo, computação em nuvem, armazenamento encriptado, manufatura/industrial, cloud‑native e backup de dados.
 
-帮助人类的全球化存储，在路上... ...
+Ajudando na globalização do armazenamento humano, sempre em frente...
 
-## 我们的愿景和价值观
+## A nossa visão e valores
 
-### 愿景
+### Visão
 
-让全人类的数据安全和降本
+Segurança e redução de custos para os dados de toda a humanidade
 
-### 价值观
+### Valores
 
-诚信、专注、简单
+Integridade, foco, simplicidade
 
-![愿景和价值观](./images/vision-values.png)
+![Visão e valores](./images/vision-values.png)
 
-## 办公地址
+## Endereço do escritório
 
-📍 **地址**
-北京市海淀区西小口路 66 号中关村东升科技园北领地 C 区
+📍 **Endereço**
+Parque de Ciência e Tecnologia Zhongguancun Dongsheng, Zona C (Beijing, Haidian, Xixiaokou Rd 66)
 
-📞 **电话**
+📞 **Telefone**
 400-033-5363
 
-📧 **邮箱**
+📧 **E‑mail**
 <hello@rustfs.com>
 
-![办公环境](./images/office-location.png)
+![Ambiente de escritório](./images/office-location.png)
 
-## RustFS 为全球提供安全、可靠的分布式存储方案
+## RustFS fornece armazenamento distribuído seguro e fiável para o mundo
 
-![全球数据存储市场增长](./images/market-growth.png)
+![Crescimento do mercado de armazenamento de dados](./images/market-growth.png)
 
-> 根据 Fortune Business Insights 的报告，全球数据存储市场预计将从 2024 年的 2183.3 亿美元增长到 2032 年的 7740 亿美元，在此期间的年复合增长率为 17.1%
+> Segundo a Fortune Business Insights, o mercado global de armazenamento de dados deverá crescer de 218,33 mil milhões USD (2024) para 774 mil milhões USD (2032), com CAGR de 17,1%.
 
-### 投资 RustFS
+### Invista no RustFS
 
-📧 **联系**
+📧 **Contato**
 <hello@rustfs.com>

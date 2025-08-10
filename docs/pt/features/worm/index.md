@@ -1,41 +1,41 @@
-# 来自 RustFS 的对象不变性
+# Imutabilidade de objetos no RustFS
 
-## RustFS 和 S3 API-专为多云存储而设计
+## RustFS e S3 API — concebido para multicloud
 
-RustFS 从一开始就将自己确立为 AWS S3 包容性的标准。作为 S3 API（V2 和 V4）的最早采用者之一，也是唯一专注于 S3 的存储公司之一，RustFS 的庞大社区确保没有其他 AWS 替代方案更兼容。S3 API 是云中事实上的标准，因此，AWS 的替代方案必须能够流畅地使用 API，才能在不同环境（公有云、私有云、数据中心、多云、混合云和边缘）中运行和互操作。
+O RustFS adota o S3 como padrão desde o início. Como um dos primeiros a suportar S3 API (V2 e V4) e focado em S3, a comunidade assegura elevada compatibilidade. O S3 é o padrão de facto na nuvem; para interoperar em ambientes públicos/privados/híbridos/edge, a compatibilidade de API é essencial.
 
-## 对象保留
+## Retenção de objetos
 
-对象存储保留规则可确保对象在一段时间内受到 WORM 保护。对象存储保留策略指定在对象版本上设置的保留期，可以显式或通过存储桶默认设置。在存储桶级别设置的默认锁定配置适用于随后创建的对象，并且不追溯适用于之前创建的对象的版本。
+Políticas de retenção garantem proteção WORM por um período. A retenção pode ser definida por versão de objeto (explícita) ou por padrão no bucket. A configuração padrão do bucket aplica‑se a objetos criados depois (não retroativa).
 
-使用存储桶默认设置时，将设置以天或年为单位的持续时间，以定义放置在存储桶中的每个对象版本应受到保护的时间长度。放置在存储桶中的新对象将继承为存储桶设置的保护持续时间。
+Com o padrão do bucket, define‑se a duração em dias/anos para proteger cada nova versão colocada no bucket. Objetos novos herdam a duração.
 
-可以为对象版本显式设置保留期。显式保留期指定对象版本的"保留截止日期"。"保留截止日期"设置存储在对象版本的元数据中，并保护对象版本，直到保留期到期。
+Pode‑se definir retenção explícita por versão, com uma “data de expiração de retenção” armazenada nos metadados. Até expirar, a versão fica protegida.
 
-保留期到期后，可以删除对象版本，除非还对对象版本进行了法律保留。
+Após expirar, a versão pode ser eliminada, salvo se houver legal hold.
 
-显式保留模式设置将覆盖默认存储桶设置。
+A retenção explícita sobrepõe o padrão do bucket.
 
-通过提交新的锁定请求，可以轻松延长保留期。
+A duração pode ser estendida emitindo nova solicitação de bloqueio.
 
-在保留框架中，有两种类型的模式用于设置对象和存储桶的保留期。
+Existem dois modos de retenção:
 
-## 治理模式
+## Modo de governança
 
-治理模式用于防止对象被标准用户删除。但是，某些用户需要保留修改保留设置或删除对象所需的权限。这些用户将需要特殊权限，例如 s3：BypassGovernanceRetention 权限和 DeleteObject 权限。
+Evita que utilizadores comuns apaguem objetos. Para determinados utilizadores com necessidade de alterar retenções ou eliminar objetos, conceda permissões específicas, como `s3:BypassGovernanceRetention` e `DeleteObject`.
 
-## 合规模式
+## Modo de conformidade
 
-合规模式限制性更强，无法在保留期内撤消。因此，合规性模式可确保任何人（包括 root 用户）都无法在对象保留期内删除对象。
+Mais restritivo: não pode ser removido durante o período de retenção. Nem mesmo o root pode eliminar a versão nesse período.
 
-## 法定保留
+## Legal hold
 
-法定保留提供与保留期相同的 WORM 保护，但没有到期日期。这是无限期保留，只能由授权用户删除。
+Oferece proteção WORM equivalente à retenção, porém sem data de expiração. É indefinido e só pode ser removido por utilizadores autorizados.
 
-当对象定义了保留或法定保留策略时，它们将继续进行版本控制。对某个对象版本执行的复制操作不会将保留和法定保留设置从源存储桶转移到目标。
+Quando há retenção ou legal hold, o versionamento permanece. Operações de cópia entre buckets não propagam automaticamente retenção/legal hold do source para o destino.
 
-## RustFS 数据不变性达到或超过 Cohasset 认证标准
+## Conformidade do RustFS com Cohasset
 
-对象锁定、保留和合法保留的黄金标准是 Cohasset Associates 的验证。RustFS 的对象存储保留和数据不变性赢得了 Cohasset Associates 的积极评价，特别是在 SEC 规则 17a-4（f）、FINRA 规则 4511 和 CFTC 法规 1.31 方面。规则 17a-4 对电子数据存储有具体要求，包括记录管理的许多方面，例如经纪自营商记录保留的持续时间、格式、质量、可用性和问责制。
+A referência para bloqueio/imutabilidade/retenção é a avaliação da Cohasset Associates. O RustFS obteve avaliação positiva relativamente às exigências de SEC 17a‑4(f), FINRA 4511 e CFTC 1.31, incluindo duração, formato, qualidade, disponibilidade e responsabilização.
 
-Cohasset Associates 评估报告的副本可以完整下载，并在 RustFS 上存储数据时与相应的监管机构共享。它详细介绍了如何配置 RustFS 以满足要求以及支持对象锁定功能的逻辑。
+O relatório da Cohasset pode ser obtido integralmente e partilhado com reguladores ao armazenar dados no RustFS. Nele constam detalhes de configuração e a lógica de suporte ao bloqueio de objetos.

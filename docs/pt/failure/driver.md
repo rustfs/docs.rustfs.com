@@ -1,161 +1,149 @@
 ---
-title: "硬盘损坏"
-description: "RustFS 通过类似纠删码的机制保证在部分磁盘故障时仍能提供读写访问并在更换磁盘后自动愈合数据。"
+title: "Falha de disco"
+description: "Com EC, o RustFS mantém acesso durante falhas parciais de discos e realiza auto‑healing após substituição."
 ---
 
-
-
-RustFS 通过类似纠删码的机制保证在部分磁盘故障时仍能提供读写访问并在更换磁盘后自动愈合数据。
----
-
-### 目录
-
-1. [卸载故障磁盘](#1-卸载故障磁盘)
-2. [更换故障磁盘](#2-更换故障磁盘)
-3. [更新 `/etc/fstab` 或 RustFS 配置](#3-更新-etcfstab-或-rustfs-配置)
-4. [重新挂载新磁盘](#4-重新挂载新磁盘)
-5. [触发并监控数据愈合](#5-触发并监控数据愈合)
-6. [后续检查与注意事项](#6-后续检查与注意事项)
+O RustFS, via Erasure Coding, mantém leitura/escrita mesmo com falhas parciais e executa healing após troca de disco.
 
 ---
 
-### 1) 卸载故障磁盘
+### Índice
 
-在更换物理硬盘之前，需先从操作系统层面安全卸载故障盘，避免文件系统或 RustFS 在更换过程中出现 I/O 错误。
+1. [Desmontar o disco com falha](#1-desmontar-o-disco-com-falha)
+2. [Substituir o disco com falha](#2-substituir-o-disco-com-falha)
+3. [Atualizar `/etc/fstab` ou configuração do RustFS](#3-atualizar-etcfstab-ou-configuração-do-rustfs)
+4. [Remontar o novo disco](#4-remontar-o-novo-disco)
+5. [Acionar e monitorizar o healing](#5-acionar-e-monitorizar-o-healing)
+6. [Verificações finais e notas](#6-verificações-finais-e-notas)
+
+---
+
+### 1) Desmontar o disco com falha
+
+Desmonte com segurança no SO antes de trocar fisicamente, evitando erros de I/O.
 
 ```bash
-# 假设故障盘为 /dev/sdb
+# Supondo /dev/sdb
 umount /dev/sdb
 ```
 
-> **说明**
+> Nota
 >
-> * 若挂载点有多条，分别执行 `umount`。
-> * 如遇“设备正忙”，可先停止 RustFS 服务：
+> - Se houver múltiplos pontos de montagem, execute `umount` em cada um
+> - Se “device is busy”, pare o serviço RustFS:
 >
 > ```bash
 > systemctl stop rustfs
 > ```
->
-
 
 ---
 
-### 2) 更换故障磁盘
+### 2) Substituir o disco com falha
 
-物理上替换故障盘后，需要对新盘进行分区与格式化，并打上与原盘一致的标签。
+Após trocar fisicamente, particione/formatte e aplique o mesmo rótulo do disco antigo.
 
 ```bash
-# 格式化为 ext4，并打标签为 DISK1（需与原来标签对应）
+# Formatar ext4 com label DISK1 (igual ao original)
 mkfs.ext4 /dev/sdb -L DISK1
 ```
 
-> **要求**
+> Requisitos
 >
-> * 新盘容量 ≥ 原盘容量；
-> * 文件系统类型与其他盘保持一致；
-> * 建议使用标签（LABEL）或 UUID 挂载，以保证磁盘顺序不受系统重启影响。
-
+> - Capacidade do novo disco ≥ anterior
+> - Tipo de FS igual aos demais
+> - Prefira montar por LABEL/UUID para resistir a reorder após reboot
 
 ---
 
-### 3) 更新 `/etc/fstab` 或 RustFS 配置
+### 3) Atualizar `/etc/fstab` ou configuração do RustFS
 
-确认 `/etc/fstab` 中的挂载项标签或 UUID 指向新盘。若使用 RustFS 专有的配置文件（如 `config.yaml`），也需同步更新对应条目。
+Garanta que LABEL/UUID no `fstab` apontem para o novo disco. Se usar config específica (ex.: `config.yaml`), atualize também.
 
 ```bash
-# 查看当前 fstab
+# Ver fstab
 cat /etc/fstab
 
-# 示例 fstab 条目（无需修改标签相同的情况）
+# Exemplo de entrada (sem alterações se LABEL igual)
 LABEL=DISK1 /mnt/disk1 ext4 defaults,noatime 0 2
 ```
 
-> **提示**
+> Dicas
 >
-> * 如使用 UUID：
+> - Para usar UUID:
 >
 > ```bash
 > blkid /dev/sdb
-> # 获取新分区的 UUID，然后替换 fstab 中对应字段
+> # copie o UUID para o fstab
 > ```
-> * fstab 修改后务必校验语法：
+> - Valide sintaxe do fstab:
 >
 > ```bash
-> mount -a # 若无报错，则配置正确
+> mount -a # sem erro => OK
 > ```
->
-
 
 ---
 
-### 4) 重新挂载新磁盘
+### 4) Remontar o novo disco
 
-执行以下命令批量挂载所有盘，并启动 RustFS 服务：
+Monte e inicie o RustFS:
 
 ```bash
 mount -a
 systemctl start rustfs
 ```
 
-确认所有磁盘已正常挂载：
+Confirme as montagens:
 
 ```bash
 df -h | grep /mnt/disk
 ```
 
-> **注意**
+> Atenção
 >
-> * 若部分挂载失败，请检查 fstab 条目与磁盘标签/UUID 是否一致。
-
+> - Se alguma montagem falhar, verifique fstab e LABEL/UUID
 
 ---
 
-### 5) 触发并监控数据愈合
+### 5) Acionar e monitorizar o healing
 
-RustFS 在检测到新盘后，会自动或手动触发数据愈合（heal）流程。以下示例使用假设的 `rustfs-admin` 工具：
+O RustFS aciona healing automático/manual. Exemplo com uma ferramenta hipotética `rustfs-admin`:
 
 ```bash
-# 查看当前磁盘状态
+# Estado dos discos
 rustfs-admin disk status
 
-# 手动触发对新盘的愈合
+# Acionar healing no novo disco
 rustfs-admin heal --disk /mnt/disk1
 
-# 实时查看愈合进度
+# Acompanhar progresso
 rustfs-admin heal status --follow
 ```
 
-同时，可以通过查看服务日志确认系统已识别并开始恢复数据：
+Verifique logs do serviço:
 
 ```bash
-# 对于 systemd 管理的安装
+# Em instalações geridas por systemd
 journalctl -u rustfs -f
 
-# 或查看专用日志文件
+# Ou ficheiro dedicado
 tail -f /var/log/rustfs/heal.log
 ```
 
-> **说明**
+> Notas
 >
-> * 愈合过程会在后台完成，通常对在线访问影响极小；
-> * 愈合完成后，工具会报告成功或列出失败的对象。
-
+> - Healing roda em background e afeta pouco os acessos
+> - Ao concluir, a ferramenta reporta sucesso ou objetos pendentes
 
 ---
 
-### 6) 后续检查与注意事项
+### 6) Verificações finais e notas
 
-1. **性能监控**
-
- * 愈合期间 I/O 可能略有波动，建议监控磁盘和网络负载。
-2. **批量故障**
-
- * 如果同一批次磁盘出现多次故障，应考虑更频繁的硬件巡检。
-3. **定期演练**
-
- * 定期模拟磁盘故障演练，保证团队对恢复流程熟悉。
-4. **维护窗口**
-
- * 在故障率较高时，安排专门的维护窗口，加快替换与愈合速度。
+1. Monitorização de performance
+   - I/O pode oscilar; monitore disco e rede
+2. Falhas em lote
+   - Se vários discos falharem no mesmo lote, aumente inspeções preventivas
+3. Exercícios periódicos
+   - Simule falhas para treinar a equipa
+4. Janela de manutenção
+   - Se a taxa de falha aumentar, planeie janelas para acelerar substituição e healing
 
