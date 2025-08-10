@@ -6,7 +6,7 @@ description: "RustFS MCP 使用指南​"
 # RustFS MCP
 
 
-**RustFS MCP 服务器**是一个高性能的 [模型上下文协议（MCP）](https://spec.modelcontextprotocol.org) 服务器，它为 AI/LLM 工具提供对 S3 兼容对象存储操作的无缝访问。该服务器使用 Rust 构建，以实现最大的性能和安全性，它使像 Claude Desktop 这样的 AI 助手能够通过标准化协议与云存储进行交互。
+**RustFS MCP 服务器**是一个高性能的 [模型上下文协议（MCP）](https://www.anthropic.com/news/model-context-protocol) 服务器，它为 AI/LLM 工具提供对 S3 兼容对象存储操作的无缝访问。该服务器使用 Rust 构建，以实现最大的性能和安全性，它使像 Claude Desktop 这样的 AI 助手能够通过标准化协议与云存储进行交互。
 
 ### 什么是 MCP？
 
@@ -128,6 +128,72 @@ rustfs-mcp --log-level debug --region us-west-2
 }
 ```
 
+### 在 Docker 中使用
+
+[RustFS MCP 官方提供 Dockerfile](https://github.com/rustfs/rustfs/tree/main/crates/mcp)，可以使用 Dockerfile 构建容器镜像来使用 RustFS MCP。
+
+```
+# 克隆 RustFS 仓库代码
+git clone git@github.com:rustfs/rustfs.git
+
+# 构建 Docker 镜像
+docker build -f crates/mcp/Dockerfile -t rustfs/rustfs-mcp .
+```
+
+构建成功后可以在 AI IDE 的 MCP 配置中配置使用。
+
+#### 在 AI IDE 中配置 MCP
+
+目前主流的 AI IDE，诸如 Cursor、Windsurf、Trae 等都支持 MCP。比如，在 Trae 中，将如下内容添加到 MCP 配置中（**MCP --> 添加**）：
+
+```
+{
+  "mcpServers": {
+    "rustfs-mcp": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "-e",
+        "AWS_ACCESS_KEY_ID",
+        "-e",
+        "AWS_SECRET_ACCESS_KEY",
+        "-e",
+        "AWS_REGION",
+        "-e",
+        "AWS_ENDPOINT_URL",
+        "rustfs/rustfs-mcp"
+      ],
+      "env": {
+        "AWS_ACCESS_KEY_ID": "rustfs_access_key",
+        "AWS_SECRET_ACCESS_KEY": "rustfs_secret_key",
+        "AWS_REGION": "cn-east-1",
+        "AWS_ENDPOINT_URL": "rustfs_instance_url"
+      }
+    }
+  }
+}
+```
+
+> `AWS_ACCESS_KEY_ID` 和 `AWS_SECRET_ACCESS_KEY` 是 RustFS 的访问密钥，可以参考[访问密钥的管理章节](access-token.md)进行创建。
+
+如果添加成功，可以在 MCP 配置页面列出[可用的工具](#️-可用工具)。
+
+![add rustfs mcp in trae mcp configuration successfully](images/add-rustfs-mcp-succ.png)
+
+在 Trae 中，输入对应的提示词就可以使用对应的工具（Tool）了。比如在 Trae 的聊天对话框中输入：
+
+```
+请帮我列出当前 rustfs 实例中的存储桶，谢谢！
+```
+
+返回如下响应：
+
+![list rustfs bucket with rustfs mcp](images/list-rustfs-bucket-with-mcp.png)
+
+
+Trae 使用 **Builder with MCP** 模式，调用了 `list_buckets` 工具，列出了配置 RustFS 实例中所有的存储桶。对于其他工具的调用也是一样的。
 
 ## 🛠️ 可用工具
 
