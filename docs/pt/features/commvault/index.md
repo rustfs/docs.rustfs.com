@@ -1,51 +1,51 @@
-# 用于 Commvault 备份、恢复和复制的高性能对象存储
+# Object storage de alto desempenho para Commvault (backup, restore e replicação)
 
-**简单。可伸缩。快。防勒索软件。换句话说，正是你想要的。**
+**Simples. Escalável. Rápido. Resistente a ransomware. Exatamente o que precisa.**
 
-## 核心优势
+## Vantagens
 
-### 🔒 简单 = 安全
+### 🔒 Simples = Seguro
 
-这个世界已经足够复杂了。Commvault 和 RustFS 简化了备份和恢复，以保护您的数据。它适用于从 VM 到 Office 365 的一系列数据源。
+Commvault e RustFS simplificam backup e restore para proteger os seus dados – de VMs ao Microsoft 365.
 
-### 📈 简单交付规模
+### 📈 Escala simples
 
-RustFS 对象存储通过其服务器池方法无缝扩展到 EB 甚至更高。这确保了 Commvault 可以专注于其核心任务，而将其余任务（从硬件异构性到纠删码和位腐保护）留给 RustFS。这意味着企业可以扩展其备份并尽可能多地保护数据。
+O RustFS escala linearmente com clusters de servidores, até EB e além. O Commvault foca no core, enquanto o RustFS cuida de heterogeneidade de hardware, erasure coding e proteção contra bitrot. Assim, é possível expandir o backup e proteger mais dados.
 
-### ⚡ 快速备份是一回事，快速恢复是另一回事
+### ⚡ Backup rápido é uma coisa; restore rápido é outra
 
-无论大小，备份和恢复都需要快速进行。RustFS 和 Commvault 能够在单个 32 节点集群中以超过 **325 GiB/s** 的速度进行读/写，因此可以以曾经被认为不可能的速度从对象存储进行备份和恢复。当您的业务依赖于快速恢复时，市场上没有比这更好的解决方案了。
+RustFS + Commvault pode exceder 325 GiB/s de leitura/escrita num cluster de 32 nós, permitindo backup/restore a velocidades antes impraticáveis.
 
-### ⚛️ 原子能
+### ⚛️ Atómico
 
-由于 RustFS 以原子方式将元数据与对象数据一起写入，因此不需要外部元数据数据库（大多数情况下为 Cassandra）。这消除了与小物体相关的性能损失。RustFS 可在 Commvault 推荐的对象大小范围内提供性能，有助于快速删除和重复数据删除。
+O RustFS grava metadados de forma atômica com os objetos, dispensando bases externas (como Cassandra) em muitos casos. Elimina penalidades comuns de pequenos objetos e atende às recomendações de tamanho do Commvault.
 
-### 🔐 内联且严格一致
+### 🔐 Inline e consistente
 
-RustFS 中的数据始终是可读和一致的，因为所有 I/O 都与内联擦除码、bitrot 哈希和加密同步提交。RustFS 提供的 S3 服务可灵活应对繁忙事务中的任何中断或重启。异步 I/O 没有缓存或暂存数据。这保证了所有备份操作的成功。
+Todo I/O é commitado com EC/bitrot/encriptação inline. O serviço S3 é resiliente a interrupções/reinícios. Sem staging assíncrono: garantia de operações concluídas.
 
-### 🔧 与硬件无关
+### 🔧 Agnóstico a hardware
 
-与 Commvault 一样，RustFS 与软件定义和硬件无关。这种方法为 Commvault 客户在设计系统以适应各种不同的备份用例时提供了巨大的节省和灵活性。
+Definido por software e agnóstico a hardware, o RustFS dá flexibilidade e economia no design de soluções de backup com Commvault.
 
-## 解决方案概述
+## Visão geral da solução
 
-RustFS 和 Commvault 提供各种软件定义的优化备份解决方案。我们携手合作，在备份环境中添加高性能对象存储作为端点分解计算和存储，同时提供卓越的性能、可扩展性和经济性。RustFS 的单个集群可以用作 VM、Oracle、SAP 和 MS Office 中任何内容的 Commvault 端点。
+RustFS e Commvault oferecem soluções de backup definidas por software. O object storage de alto desempenho do RustFS atua como endpoint, desacoplando computação e armazenamento, com performance, escala e economia. Um único cluster pode servir endpoints para VMs, Oracle, SAP e MS Office.
 
-## 主要应用场景
+## Principais cenários
 
-### 🖥️ Commvault Backups for VMware ESXi 使用 RustFS
+### 🖥️ Backups Commvault para VMware ESXi com RustFS
 
-使用 Commvault 将虚拟基础架构无缝备份到对象存储，为您提供近乎无限的对象存储容量的灵活性。您可以控制成本和安全性，从而控制数据的访问方式。
+Backups de infraestrutura virtual para object storage com elasticidade e controlo de custo/segurança.
 
-### 📧 Commvault Backups for Office 365 使用 RustFS
+### 📧 Backups Commvault para Microsoft 365 com RustFS
 
-使用 Commvault 将 Office 365 数据无缝备份到对象存储，为您提供近乎无限的对象存储容量的灵活性。您可以控制成本和安全性，从而控制数据的访问方式。
+Backups do Microsoft 365 para object storage com gestão eficiente.
 
-### 💼 Commvault Backups for SAP HANA 使用 RustFS
+### 💼 Backups Commvault para SAP HANA com RustFS
 
-借助 RustFS，面向 SAP HANA 的 Commvault 备份解决方案更快、更安全。
+Desempenho e segurança reforçados.
 
-### 🗄️ 使用 RustFS 的 Commvault Backups for Oracle
+### 🗄️ Backups Commvault para Oracle com RustFS
 
-备份 Oracle 工作负载需要性能、弹性和安全性。使用 RustFS 对象存储优化此任务关键型备份。
+Otimização de backups críticos de Oracle usando object storage RustFS.
