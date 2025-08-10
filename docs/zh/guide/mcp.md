@@ -6,7 +6,7 @@ description: "RustFS MCP 使用指南​"
 # RustFS MCP
 
 
-**RustFS MCP 服务器**是一个高性能的 [模型上下文协议（MCP）](https://spec.modelcontextprotocol.org) 服务器，它为 AI/LLM 工具提供对 S3 兼容对象存储操作的无缝访问。该服务器使用 Rust 构建，以实现最大的性能和安全性，它使像 Claude Desktop 这样的 AI 助手能够通过标准化协议与云存储进行交互。
+**RustFS MCP 服务器**是一个高性能的 [模型上下文协议（MCP）](https://www.anthropic.com/news/model-context-protocol) 服务器，它为 AI/LLM 工具提供对 S3 兼容对象存储操作的无缝访问。该服务器使用 Rust 构建，以实现最大的性能和安全性，它使像 Claude Desktop 这样的 AI 助手能够通过标准化协议与云存储进行交互。
 
 ### 什么是 MCP？
 
