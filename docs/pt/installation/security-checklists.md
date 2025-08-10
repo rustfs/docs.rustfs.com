@@ -1,90 +1,80 @@
 ---
-title: "安全检查清单"
-description: "RustFS 安全检查清单（面向企业部署者），RustFS 是一款基于 Rust 语言开发的高性能分布式对象存储软件，采用 Apache 2.0 开源协议发布。"
+title: "Checklist de segurança"
+description: "Checklist de segurança para implantações empresariais do RustFS (licença Apache 2.0, desenvolvido em Rust)."
 ---
 
-# 安全检查清单
+# Checklist de segurança
 
+> Para ajudar na implantação segura do RustFS em ambientes empresariais, reunimos abaixo as melhores práticas recomendadas. Verifique item a item durante a implantação para garantir segurança e confiabilidade.
 
+## 1. Autenticação e controlo de acesso
 
-> 为了帮助企业安全部署 RustFS，我们参考了 RustFS 官方的安全实践建议，整理了以下安全最佳实践。建议部署时按照清单逐项检查，确保系统安全可靠。
+- Uso de chaves compatíveis com S3
+  O RustFS utiliza mecanismo de assinatura similar ao AWS Signature V4. Cada utilizador/serviço deve usar Access Key e Secret Key válidas. Nunca ignore autenticação.
 
-## 1. 身份认证与访问控制
+- Políticas de acesso com privilégio mínimo
+  Defina políticas por função/utilizador com base no princípio do privilégio mínimo. Configure políticas de grupo e de utilizador, especificando operações S3 permitidas. Por padrão, operações não explicitamente autorizadas devem ser recusadas.
 
-- **使用 S3 兼容的密钥认证** 
- RustFS 采用类似 AWS Signature V4 的签名机制进行身份验证。每个用户或服务都必须使用合法的 Access Key 和 Secret Key 进行访问，切勿跳过认证步骤。
+## 2. Criptografia de transporte (TLS/SSL)
 
-- **策略化访问控制** 
- 按照最小权限原则为不同角色和用户定义访问策略。可以设置组策略和用户策略，明确允许的 S3 操作。默认情况下，未在策略中明确授权的操作应被拒绝。
+- Ativar TLS/SSL
+  Configure certificados SSL e chaves privadas válidos. Para acesso externo e interno, considere domínios/certificados separados. Use TLS 1.2 ou superior.
 
+- Gestão de certificados
+  Utilize CA confiável (ou CA interna). Evite certificados expirados/autofirmados. Restrinja permissões dos ficheiros de chave privada apenas ao processo RustFS/usuário dedicado.
 
-## 2. 网络传输加密（TLS/SSL）
+- Múltiplos domínios e suites criptográficas
+  Configure certificados distintos para múltiplos domínios. Use algoritmos recomendados (ex.: RSA 2048 ou ECC 256) para geração de chaves.
 
-- **启用 TLS/SSL 加密** 
- 部署时务必为 RustFS 配置有效的 SSL 证书和私钥。建议对外网访问和内网访问分别使用不同域名的证书，并采用 TLS1.2 或更高版本的安全协议。
+## 3. Variáveis de ambiente e proteção de credenciais
 
-- **证书管理** 
- 确保证书由受信任的 CA 签发（或使用公司内部根 CA），避免使用过期或自签名证书。私钥文件要设置严格的文件权限，仅允许 RustFS 服务进程或专用用户读取。
+- Alterar credenciais padrão
+  Se a instalação inicial usar credenciais padrão (ex.: `rustfsadmin`/`rustfsadmin`), altere imediatamente para senhas fortes e aleatórias.
 
-- **多域名与加密套件** 
- 对多个访问域名分别配置独立证书；生成密钥时使用推荐的加密算法（如 2048 位 RSA 或 256 位 ECC）。
+- Armazenamento seguro de credenciais
+  Não faça hard‑code de senhas em scripts, imagens ou logs. Utilize variáveis de ambiente ou Kubernetes Secrets.
 
-## 3. 环境变量与凭证保护
+## 4. Registos e auditoria
 
-- **更改默认凭证** 
- RustFS 初始化时如使用默认账号（如 `rustfsadmin` / `rustfsadmin`），必须在部署后更改为随机复杂密码。
+- Ativar auditoria
+  O RustFS pode exportar auditoria para HTTP Webhook, Kafka, ELK, Splunk, etc.
 
-- **安全存储凭证** 
- 不要将明文密码硬编码在脚本、镜像或日志中。使用环境变量或 Kubernetes Secret 管理密码。
+- Recolha de logs
+  Em systemd/Docker/K8s, recolha e analise logs de forma padronizada. Recomendado integrar com ELK/Grafana Loki.
 
+- Monitorização e alertas
+  Configure alertas para falhas de login, acessos fora de hora, deleções em massa e outras anomalias.
 
+- Observabilidade
+  O RustFS suporta implantação observável, permitindo afinar tempos de execução por função e otimizar conforme o ambiente.
 
-## 4. 日志与审计跟踪
+## 5. Restrições de acesso à API
 
-- **启用审计日志** 
- RustFS 支持将审计日志导出至 HTTP Webhook、Kafka、ELK、Splunk 等外部系统。
+- Restringir acesso de rede
+  Por padrão, o S3 API do RustFS escuta na porta 9000 e o console de gestão na 9090. Limite IPs de origem via firewall/security groups.
 
-- **运行日志收集** 
- 在不同平台下（如 systemd、Docker、K8s）使用标准方法收集并分析日志。建议配合 ELK、Grafana Loki 使用。
+- Isolamento e proxy
+  Exponha o serviço por reverse proxy (ex.: Nginx) e evite expor diretamente os IPs dos nós de armazenamento.
 
-- **监控与告警** 
- 对登录失败、非正常时间访问、大规模删除等异常行为设置告警通知。
+- Fechar portas desnecessárias
+  Desative portas/interfaces não utilizadas. Não exponha o console de gestão à Internet pública.
 
-- **可观测性**
- RustFS 支持可观测的环境部署，可以精确到每个函数的执行时间的调优。可以针对不同环境进一步优化您的配置。
+## 6. Dados imutáveis (WORM)
 
-## 5. API 访问限制
+- Versionamento e bloqueio de objetos
+  Ative versionamento e políticas de bloqueio para cumprir requisitos regulatórios (ex.: finanças, governo).
 
-- **限制网络访问** 
- 默认 RustFS 的 S3 API 监听 9000 端口，管理控制台监听 9090 端口。通过防火墙或云安全组限制访问来源 IP。
+## 7. Atualizações e gestão de versões
 
-- **网络隔离与代理** 
- 建议通过反向代理（如 Nginx）暴露服务，避免直接暴露存储节点 IP。
+- Patches e upgrades em dia
+  Acompanhe comunicados oficiais, atualize periodicamente e leia notas de versão para mitigar vulnerabilidades.
 
-- **关闭不必要端口** 
- 禁用未使用的端口或接口，例如不开放管理界面到公网。
+- Atualização sem interrupção
+  O RustFS suporta atualização por rolling restart nó a nó, evitando downtime.
 
-## 6. 数据只读（WORM）
-
-
-- **版本控制与对象锁定** 
- 开启对象版本功能和对象锁定策略，满足法规要求（如金融、政务）。
-
-
-## 7. 更新与版本管理
-
-- **及时应用补丁和升级** 
- 关注 RustFS 官方更新通知，定期升级并查看变更说明，规避安全漏洞。
-
-- **非破坏性升级流程** 
- RustFS 支持热更新流程，可逐节点重启实现无中断服务。
-
-- **操作系统与依赖管理** 
- 关注操作系统和基础组件（如 OpenSSL）的漏洞更新和修复情况。
-
-
-
+- SO e dependências
+  Monitore CVEs/atualizações do SO e componentes (ex.: OpenSSL).
 
 ---
 
-以上即为 **RustFS 企业级部署的安全检查清单**。部署前逐项对照，部署后定期复盘，能显著降低风险、提升稳定性。
+Esta é a checklist de segurança para implantação empresarial do RustFS. Revise antes da produção e reavalie periodicamente para reduzir riscos e aumentar a estabilidade.

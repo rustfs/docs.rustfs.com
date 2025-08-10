@@ -1,62 +1,45 @@
 ---
-title: "Windows 安装 RustFS"
-description: "使用 Windows 一键启动 RustFS。"
+title: "Instalar RustFS no Windows"
+description: "Arranque do RustFS no Windows com um clique"
 ---
 
-# Windows 安装 RustFS
+# Instalar RustFS no Windows
 
+## 1. Preparação
 
+Atenção:
 
-## 一、准备工作
+> O modo de arranque no Windows suporta apenas SNSD (single node, single disk), indicado para desenvolvimento, debug e testes.
 
-请了解：
+1. Para detalhes dos modos, veja [Modos](../mode/)
+2. Descarregue o instalador, ajuste permissões e inicie
 
-> Windows 启动 **模式** 只支持单机单盘模式，更适用于开发、调试和测试环境。
+## 2. Download
 
+Vá ao site oficial e descarregue a versão mais recente do instalador do RustFS.
 
-1. 关于 Windows 启动模式的详细介绍，请参考 [启动模式](../mode/);
+## 3. Permissões
 
-2. 下载安装包，修改权限，并进行启动。
+No Windows, confirme que a aplicação tem permissões de execução.
 
+## Iniciar com duplo clique
 
-## 二、下载
+1. Faça duplo clique no ícone da aplicação
+2. Clique para configurar o disco
+3. Clique em "Start Service" para iniciar o RustFS
 
-前往官网下载页面，下载最新版 RustFS 安装包。
+<img src="./images/windows-setup.jpg" alt="Windows start" />
 
+## 4. Alterar configurações
 
-## 三、修改权限
+Clique no botão de configuração (ícone de engrenagem) no canto superior direito para ajustar:
 
-请确认在 windows 操作系统中，本程序有相关的执行权限。
+1. Porta padrão do servidor
+2. Nome de utilizador e palavra‑passe do admin
+3. Diretório do disco
 
+<img src="./images/setting.jpg" alt="Configuração RustFS no Windows" />
 
-## 双击启动图标
+## 5. Aceder ao Console
 
-1. 双击启动图标；
-
-2. 点击配置磁盘；
-
-3. 点击"Start Service"，RustFS 服务启动成功。
-
-
-<img src="./images/windows-setup.jpg" alt="windows 启动" />
-
-
-
-## 四、修改配置
-
-点击右上脚的修改按钮（齿轮状按钮），可以修改：
-
-1. 服务器默认端口；
-
-2. 默认管理员的用户名和密码；
-
-3. 指定的磁盘目录；
-
-<img src="./images/setting.jpg" alt="RustFS windows 配置" />
-
-
-
-## 五、访问 Console
-
-
-启动成功后，访问 `http://127.0.0.1:7001`，即可访问控制台。
+Depois de iniciar, aceda a `http://127.0.0.1:7001` para abrir o console.
