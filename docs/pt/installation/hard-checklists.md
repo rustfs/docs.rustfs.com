@@ -1,150 +1,144 @@
 ---
-title: "生产环境硬件配置指南"
-description: "RustFS 是基于 Rust 语言开发的高性能分布式对象存储系统，适用于海量非结构化数据存储场景。本文档为生产环境部署提供全面的硬件选型与配置指引。"
+title: "Guia de configuração de hardware para produção"
+description: "RustFS é um armazenamento de objetos distribuído de alto desempenho desenvolvido em Rust. Este guia fornece recomendações de escolha e configuração de hardware para implantação em produção."
 ---
 
-# 生产环境硬件配置指南
+# Guia de configuração de hardware para produção
 
+## 1. Análise de planeamento
 
-## 一、部署规划要素分析
+Antes da produção, conduza 2–3 semanas de levantamento para avaliar:
 
-在正式部署 RustFS 前，建议进行为期 2-3 周的业务调研，重点评估以下维度：
+1. Escala de dados
+   - Volume inicial efetivo (em TiB) e proporção hot/cold
+   - Crescimento previsto em 24 meses (modelo de taxa trimestral)
+   - Número de objetos (média 128 KB–1 MB). Acima de 100 milhões exige otimizações
 
-1. **数据规模分析**
- - **初始数据量**：精确测算投产初期的有效数据量（建议以 TiB 为单位），需考虑冷热数据比例
- - **增长趋势预测**：根据业务发展计划，估算未来 24 个月的数据增量（建议采用季度增长率模型）
- - **对象规模**：基于平均对象大小（推荐 128 KB-1 MB 范围）计算总对象数，需注意超过 1 亿对象时需特殊优化
+2. Perfil de negócio
+   - Padrão de acesso: leitura intensiva (CDN) vs escrita intensiva (logs)
+   - Conformidade: retenção conforme regulação (ex.: 5 anos em finanças)
+   - Multissite: latência (<50 ms) e custo de banda entre regiões
 
-2. **业务特征评估**
- - **访问模式**：区分读密集型（如内容分发）与写密集型（如日志采集）场景
- - **合规要求**：数据留存周期需符合行业监管要求（如金融行业至少保留 5 年）
- - **多站点部署**：跨地域部署时需评估网络延迟（建议控制在 50ms 以内）和带宽成本
+3. Arquitetura de armazenamento
+   - Planeamento de buckets por domínio de negócio (≤ 500 buckets ativos/cluster)
+   - DR: ativo‑ativo (recomendado) ou replicação assíncrona
 
-3. **存储架构设计**
- - **存储桶规划**：按业务单元划分存储桶，单个集群建议不超过 500 个活跃存储桶
- - **灾备策略**：根据数据重要性选择双活架构（推荐）或异步复制方案
+## 2. Matriz de configuração de hardware
 
-## 二、硬件配置矩阵
+Configuração base sugerida por resultados de testes de stress:
 
-根据压力测试结果给出的基准配置方案：
+| Componente | Ambiente base | Padrão de produção | Alto desempenho |
+|------------|----------------|--------------------|-----------------|
+| Nº de nós | 4 | 8 | 16+ |
+| Mídia | 4× NVMe SSD | 8× NVMe SSD | 12× NVMe SSD |
+| Rede | Duplo 25GbE (LACP) | Duplo 100GbE | 200GbE |
+| CPU | 2× Intel Silver 4310 (16c) | 2× AMD EPYC 7313 (32c) | 2× Intel Platinum 8461Y (48c) |
+| Memória | 64 GB DDR4‑3200 ECC | 256 GB DDR5‑4800 ECC | 512 GB DDR5‑5600 ECC |
+| Controlador | HBA 9500‑8i | HBA 9600‑16i | Duplo controlador redundante |
 
-| 组件 | 基础环境 | 生产标准配置 | 高性能配置 |
-|--------------|---------------------------|--------------------------|--------------------------|
-| 节点数量 | 4 节点 | 8 节点 | 16+ 节点 |
-| 存储介质 | 4× NVMe SSD | 8×NVMe SSD | 12×NVMe SSD |
-| 网络架构 | 双 25GbE（链路聚合） | 双 100GbE | 200GbE |
-| CPU | 2×Intel 银牌 4310（16 核） | 2×AMD EPYC 7313（32 核） | 2×Intel 铂金 8461Y（48 核） |
-| 内存 | 64 GB DDR4-3200 ECC | 256 GB DDR5-4800 ECC | 512 GB DDR5-5600 ECC |
-| 存储控制器 | HBA 9500-8i | HBA 9600-16i | 双控制器冗余架构 |
+Princípios críticos:
+1) “Fazenda” homogénea: mesmo lote de hardware/firmware em todos os nós
+2) Rede: leaf‑spine + rede de storage isolada + dupla uplink
+3) Servidor 2U recomendado; ≥ 12 bays por nó (conforme discos reais)
 
-**重要部署原则：**
-1. 采用"服务器农场"模式，确保所有节点采用完全相同的硬件批次和固件版本
-2. 网络架构需满足：叶脊拓扑 + 物理隔离存储网络 + 双上联链路
-3. 推荐使用 2U 服务器机型，单个节点建议配置 12 盘位以上（以实际硬盘数量为准）
+## 3. Otimização de caminho crítico
 
+### 1) Topologia de rede (prioridade máxima)
+- Cálculo de banda: reserve 0,5 Gbps por TiB efetivo (ex.: 100 TiB ⇒ 50 Gbps dedicados)
+- Latência:
+  - P99 entre nós ≤ 2 ms
+  - Entre racks ≤ 5 ms
 
-## 三、性能关键路径优化
+### 2) Subsistema de armazenamento
+- Controlador:
+  - Read‑ahead ativo (≥ 256 MB)
+  - RAID desativado (modo HBA pass‑through)
+  - Verificar saúde de BBU regularmente
+- SSD:
+  - 20% OP para durabilidade
+  - Atomic write se suportado
 
+### 3) Gestão de memória
+- Proporções:
+  - Cache de metadados: 60%
+  - Buffers R/W: 30%
+  - Reserva do sistema: 10%
 
-### 1. 网络拓扑优化（最高优先级）
-- **带宽计算**：每 TB 有效数据需预留 0.5 Gbps 带宽（例如 100 TB 数据需 50 Gbps 专用带宽）
-- **时延要求**：
- - 节点间 P99 延迟 ≤ 2ms
- - 跨机架延迟 ≤ 5ms
+## 4. Modelos de rede de referência
 
+### Relação banda vs discos
+| Rede | Throughput teórico | Mídia | Nº máx. de discos |
+|------|--------------------|-------|-------------------|
+| 10GbE | 1.25 GB/s | HDD 7.2K (180 MB/s) | 8 |
+| 25GbE | 3.125 GB/s | SATA SSD (550 MB/s) | 6 |
+| 100GbE | 12.5 GB/s | NVMe Gen4 (7 GB/s) | 2 a full RW |
 
-### 2. 存储子系统调优
-- **控制器配置**：
- - 启用预读缓存（推荐 256 MB 以上）
- - 禁用所有 RAID 功能，采用直通模式
- - 定期检查 BBU 电池健康状态
-- **SSD 参数**：
- - 预留 20% OP 空间提升耐久性
- - 启用原子写特性（需硬件支持）
- 
-### 3. 内存管理策略
-- **分配比例**：
- - 元数据缓存：占总内存 60%
- - 读写缓冲区：占 30%
- - 系统保留：10%
+Caso prático: plataforma de vídeo com 16 nós, cada um com:
+- 8× 7.68 TB NVMe SSD
+- Duas NICs 100GbE CX5
+- Throughput agregado 38 GB/s
 
-## 四、网络设计参考模型
+## 5. Calculadora de memória
 
-### 带宽与磁盘配比关系
-| 网络类型 | 理论吞吐量 | 适用磁盘类型 | 最大磁盘支持数 |
-|------------|------------|---------------------|----------------|
-| 10GbE | 1.25 GB/s | 7.2K HDD（180 MB/s） | 8 块 |
-| 25GbE | 3.125 GB/s | SATA SSD（550 MB/s） | 6 块 |
-| 100GbE | 12.5 GB/s | NVMe Gen4（7 GB/s） | 2 块全速读写 |
-
-**最佳实践案例**：某视频平台采用 16 节点集群，每节点配置：
-- 8×7.68 TB NVMe SSD
-- 双 100GbE CX5 网卡
-- 实现聚合吞吐量 38 GB/s
-
-## 五、内存配置计算器
-
-基于磁盘容量与业务特征的动态算法：
+Algoritmo dinâmico por capacidade e padrão de acesso:
 
 ```python
-# 内存计算公式（单位：GB）
+# Fórmula (GB)
 def calc_memory(data_tb, access_pattern):
- base = 32 # 基础内存
+ base = 32
  if access_pattern == "read_heavy":
- return base + data_tb * 0.8
+  return base + data_tb * 0.8
  elif access_pattern == "write_heavy":
- return base + data_tb * 1.2
- else: # mixed
- return base + data_tb * 1.0
+  return base + data_tb * 1.2
+ else:  # mixed
+  return base + data_tb * 1.0
 ```
 
-**参考配置表**：
-| 数据规模 | 读密集型 | 写密集型 | 混合型 |
-|-----------|----------|----------|---------|
+Tabela de referência:
+| Escala | Leitura | Escrita | Misto |
+|--------|---------|---------|-------|
 | 10 TB | 40 GB | 44 GB | 42 GB |
 | 100 TB | 112 GB | 152 GB | 132 GB |
 | 500 TB | 432 GB | 632 GB | 532 GB |
 
-## 六、存储部署规范
+## 6. Normas de implantação de storage
 
-### 1. 介质选型标准
-| 指标 | HDD 适用场景 | SSD 适用场景 | NVMe 强制要求场景 |
-|-------------|------------------|---------------------|----------------------|
-| 延迟需求 | >50ms | 1 到 10ms | 小于 1ms |
-| 吞吐需求 | < 500 MB/s | 500 MB-3 GB/s | > 3 GB/s |
-| 典型用例 | 归档存储 | 热数据缓存 | 实时分析 |
+### 1) Seleção de mídia
+| Métrica | HDD | SSD | NVMe (requisitos) |
+|--------|-----|-----|-------------------|
+| Latência | >50 ms | 1–10 ms | <1 ms |
+| Throughput | < 500 MB/s | 500 MB–3 GB/s | > 3 GB/s |
+| Casos | Arquivo | Hot cache | Análise em tempo real |
 
-### 2. 文件系统配置
+### 2) Sistema de ficheiros
 ```bash
-# XFS 格式化示例
+# Exemplo XFS
 mkfs.xfs -f -L rustfs_disk1 -d su=256k,sw=10 /dev/sdb
 
-# 推荐挂载参数
+# Montagem recomendada
 UUID=xxxx /mnt/disk1 xfs defaults,noatime,nodiratime,logbsize=256k 0 0
 ```
 
+## 7. Alta disponibilidade
 
+1) Energia
+- Dual power feed
+- PDUs em subestações distintas
+- UPS (≥ 30 min)
 
-## 七、高可用保障措施
+2) Arrefecimento
+- Densidade ≤ 15 kW/rack
+- Delta T in/out ≤ 8 °C
 
-1. **电力供应**：
- - 采用 2 路供电架构
- - 每个 PDU 连接不同变电站
- - 配备 UPS（至少 30 分钟续航）
+3) Firmware
+- Matriz de compatibilidade de hardware
+- Versões de firmware unificadas
 
-2. **散热要求**：
- - 机柜功率密度 ≤ 15kW/柜
- - 进出风温差控制在 8℃以内
-
-3. **固件管理**：
- - 建立硬件兼容性矩阵
- - 使用统一固件版本
-
-> **实施建议**：建议在正式部署前进行 72 小时压力测试，模拟以下场景：
-> 1. 节点故障转移测试
-> 2. 网络分区演练
-> 3. 突发写入压力测试（建议达到理论值的 120%）
+> Sugestão: execute stress test de 72 h antes da produção, simulando:
+> 1) Failover de nó
+> 2) Partition de rede
+> 3) Pico de escrita (até 120% do teórico)
 
 ---
 
-本指南基于 RustFS 最新开发版本编写，实际部署时请结合具体硬件供应商白皮书进行参数微调。或者联系 RustFS 官方建议每季度进行一次硬件健康度评估，确保存储集群持续稳定运行。
+Este guia baseia‑se na versão recente do RustFS. Ajuste parâmetros conforme whitepapers dos fornecedores e considere auditoria de saúde de hardware trimestral com a equipa RustFS.
