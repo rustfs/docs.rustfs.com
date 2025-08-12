@@ -21,11 +21,11 @@ En modo distribuido y de máquina única, todas las operaciones de lectura y esc
 
 ## Conceptos importantes en RustFS
 
-**Object (Objeto)**: El objeto básico almacenado en Minio, como archivos, flujos de bytes, cualquier cosa...
+**Object (Objeto)**: El objeto básico almacenado en RustFS, como archivos, flujos de bytes, cualquier cosa...
 
 **Bucket (Cubo)**: El espacio lógico utilizado para almacenar objetos. Los datos entre cada bucket están mutuamente aislados. Para el cliente, equivale a una carpeta de nivel superior para colocar archivos.
 
-**Drive (Unidad)**: El disco que almacena datos, pasado como parámetro al iniciar MinIO. Todos los datos de objetos en Minio se almacenarán en las unidades.
+**Drive (Unidad)**: El disco que almacena datos, pasado como parámetro al iniciar RustFS. Todos los datos de objetos en RustFS se almacenarán en las unidades.
 
 **Set (Conjunto)**: Un grupo de unidades. El despliegue distribuido se divide automáticamente en uno o más conjuntos según la escala del cluster, y las unidades en cada conjunto se distribuyen en diferentes ubicaciones. Un objeto se almacena en un conjunto.
 

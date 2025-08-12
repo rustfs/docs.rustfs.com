@@ -21,11 +21,11 @@ Hem dağıtık hem de tek makine modlarında, tüm okuma ve yazma işlemleri kes
 
 ## RustFS'deki Önemli Kavramlar
 
-**Nesne**: Minio'da depolanan temel birimler; dosyalar, byte akışları, herhangi bir şey...
+**Nesne**: RustFS'da depolanan temel birimler; dosyalar, byte akışları, herhangi bir şey...
 
 **Bucket**: Nesneleri depolamak için kullanılan mantıksal alan. Her Bucket arasındaki veriler birbirinden izoledir. İstemciler için dosya saklamak üzere kullanılan üst seviye bir klasör gibidir.
 
-**Drive**: Verilerin depolandığı diskler, MinIO başlatılırken parametre olarak iletilir. Minio'daki tüm nesne verileri Drive'larda saklanır.
+**Drive**: Verilerin depolandığı diskler, RustFS başlatılırken parametre olarak iletilir. RustFS'daki tüm nesne verileri Drive'larda saklanır.
 
 **Set**: Drive'ların bir koleksiyonudur. Dağıtık dağıtım, küme ölçeğine göre otomatik olarak bir veya daha fazla Set'e bölünür ve her Set'teki Drive'lar farklı konumlarda dağıtılır. Bir nesne bir Set üzerinde depolanır. (Bazı kaynaklarda Set'lerin kombinasyonuna **Şeritler** de denir).
 

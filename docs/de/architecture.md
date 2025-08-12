@@ -21,11 +21,11 @@ Im verteilten und Einzelmaschinen-Modus folgen alle Lese- und Schreiboperationen
 
 ## Wichtige Konzepte in RustFS
 
-**Object (Objekt)**: Das grundlegende Objekt, das in Minio gespeichert wird, wie Dateien, Byte-Streams, alles...
+**Object (Objekt)**: Das grundlegende Objekt, das in RustFS gespeichert wird, wie Dateien, Byte-Streams, alles...
 
 **Bucket (Bucket)**: Der logische Raum zur Speicherung von Objekten. Die Daten zwischen jedem Bucket sind voneinander isoliert. Für den Client entspricht es einem Top-Level-Ordner zum Platzieren von Dateien.
 
-**Drive (Laufwerk)**: Die Festplatte, die Daten speichert, wird beim Start von MinIO als Parameter übergeben. Alle Objektdaten in Minio werden in Laufwerken gespeichert.
+**Drive (Laufwerk)**: Die Festplatte, die Daten speichert, wird beim Start von RustFS als Parameter übergeben. Alle Objektdaten in RustFS werden in Laufwerken gespeichert.
 
 **Set (Satz)**: Eine Gruppe von Laufwerken. Die verteilte Bereitstellung teilt automatisch in einen oder mehrere Sätze basierend auf der Clustergröße auf, und die Laufwerke in jedem Satz sind an verschiedenen Standorten verteilt. Ein Objekt wird in einem Satz gespeichert. (An manchen Stellen wird die Kombination von Sätzen auch **Strips** — Streifen genannt).
 

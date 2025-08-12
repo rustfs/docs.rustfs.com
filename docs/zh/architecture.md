@@ -24,11 +24,11 @@ RustFS 是一个对象存储系统，类似于众所周知的 AWS S3。作为 Mi
 
 ## RustFS 中的几个重要概念
 
-**Object（对象）**：存储到 Minio 的基本对象，如文件、字节流，Anything...
+**Object（对象）**：存储到 RustFS 的基本对象，如文件、字节流，Anything...
 
 **Bucket（桶）**：用来存储 Object 的逻辑空间。每个 Bucket 之间的数据是相互隔离的。对于客户端而言，就相当于一个存放文件的顶层文件夹。
 
-**Drive（磁盘）**：即存储数据的磁盘，在 MinIO 启动时，以参数的方式传入。Minio 中所有的对象数据都会存储在 Drive 里。
+**Drive（磁盘）**：即存储数据的磁盘，在 RustFS 启动时，以参数的方式传入。RustFS 中所有的对象数据都会存储在 Drive 里。
 
 **Set（集合）**：即一组 Drive 的集合，分布式部署根据集群规模自动划分一个或多个 Set，每个 Set 中的 Drive 分布在不同位置。一个对象存储在一个 Set 上。（有地方也将 Set 的组合称之为**Strips**——条带）。
 

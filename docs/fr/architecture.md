@@ -21,11 +21,11 @@ En mode distribué et en mode machine unique, toutes les opérations de lecture 
 
 ## Concepts importants dans RustFS
 
-**Object (Objet)** : L'objet de base stocké dans Minio, comme des fichiers, des flux d'octets, n'importe quoi...
+**Object (Objet)** : L'objet de base stocké dans RustFS, comme des fichiers, des flux d'octets, n'importe quoi...
 
 **Bucket (Seau)** : L'espace logique utilisé pour stocker les objets. Les données entre chaque bucket sont mutuellement isolées. Pour le client, cela équivaut à un dossier de niveau supérieur pour placer des fichiers.
 
-**Drive (Lecteur)** : Le disque qui stocke les données, passé en paramètre lors du démarrage de MinIO. Toutes les données d'objets dans Minio seront stockées dans les lecteurs.
+**Drive (Lecteur)** : Le disque qui stocke les données, passé en paramètre lors du démarrage de RustFS. Toutes les données d'objets dans RustFS seront stockées dans les lecteurs.
 
 **Set (Ensemble)** : Un groupe de lecteurs. Le déploiement distribué divise automatiquement en un ou plusieurs ensembles selon l'échelle du cluster, et les lecteurs dans chaque ensemble sont distribués à différents emplacements. Un objet est stocké sur un ensemble. (Certains endroits appellent aussi la combinaison d'ensembles **Strips** — bandes).
 
