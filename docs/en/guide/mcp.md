@@ -87,7 +87,9 @@ rustfs-mcp --log-level debug --region us-west-2
 ```
 
 ### Integration with chat client
+
 #### Option 1: Using Command Line Arguments
+
 ```json
 {
   "mcpServers": {
@@ -105,6 +107,7 @@ rustfs-mcp --log-level debug --region us-west-2
 ```
 
 #### Option 2: Using Environment Variables
+
 ```json
 {
   "mcpServers": {
@@ -191,21 +194,26 @@ Trae working with **Builder with MCP** mode calls `list_buckets` tool, and lists
 The MCP server exposes the following tools that AI assistants can use:
 
 ### `list_buckets`
+
 List all S3 buckets accessible with the configured credentials.
 
 **Parameters:** None
 
 ### `list_objects`
+
 List objects in an S3 bucket with optional prefix filtering.
 
 **Parameters:**
+
 - `bucket_name` (string): Name of the S3 bucket
 - `prefix` (string, optional): Prefix to filter objects
 
 ### `upload_file`
+
 Upload a local file to S3 with automatic MIME type detection.
 
 **Parameters:**
+
 - `local_file_path` (string): Path to the local file
 - `bucket_name` (string): Target S3 bucket
 - `object_key` (string): S3 object key (destination path)
@@ -214,9 +222,11 @@ Upload a local file to S3 with automatic MIME type detection.
 - `cache_control` (string, optional): Cache control header
 
 ### `get_object`
+
 Retrieve an object from S3 with two operation modes: read content directly or download to a file.
 
 **Parameters:**
+
 - `bucket_name` (string): Source S3 bucket
 - `object_key` (string): S3 object key
 - `version_id` (string, optional): Version ID for versioned objects
@@ -224,6 +234,21 @@ Retrieve an object from S3 with two operation modes: read content directly or do
 - `local_path` (string, optional): Local file path (required when mode is "download")
 - `max_content_size` (number, optional): Maximum content size in bytes for read mode (default: 1MB)
 
+### `create_bucket`
+
+Create a new RustFS bucket.
+
+**Parameters:**
+
+- `bucket_name` (string): Name of the bucket to create.
+
+### `delete_bucket`
+
+Delete a RustFS bucket.
+
+**Parameters:**
+
+- `bucket_name` (string): Name of the bucket to delete.
 ## Architecture
 
 The MCP server is built with a modular architecture:
