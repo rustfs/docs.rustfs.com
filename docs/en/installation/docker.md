@@ -171,7 +171,7 @@ docker run -d \
 
 3. Environment variables and command line parameters can be used in a mixed manner, but command line parameters have higher priority
 
-4. If using TLS, additional certificate paths are required:
+4. If [using TLS](../guide/configured/tls-configured.md), additional certificate paths are required:
    ```bash
    -v /path/to/certs:/certs \
    -e RUSTFS_TLS_PATH=/certs \
@@ -206,7 +206,7 @@ docker run -d \
 1. Production environment recommendations:
 
 - Use multi-node deployment architecture
-* Enable TLS encrypted communication
+* [Enable TLS encrypted communication](../guide/configured/tls-configured.md)
 * Configure log rotation policies
 * Set up regular backup strategies
 

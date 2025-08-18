@@ -94,6 +94,13 @@ export const enSidebar = [
           { text: 'Docker Installation', link: '/installation/docker' },
         ]
       },
+      {
+        text: 'Configuration Guides',
+        link: '/guide/configured',
+        items: [
+          { text: 'TLS configuration', link: '/guide/configured/tls-configured' },
+        ]
+      },
     ]
   },
   {
@@ -105,7 +112,7 @@ export const enSidebar = [
       { text: 'Object Management', link: '/guide/bucket/object-upload-and-delete' },
       { text: 'Access Keys', link: '/guide/access-token' },
       { text: 'MinIO Client (mc)', link: '/guide/mc' },
-      { text: 'MCP', link: '/guide/mcp' },
+      { text: 'MCP Server', link: '/guide/mcp' },
     ]
   },
   {
