@@ -85,7 +85,7 @@ export const zhSidebar = [
       },
       {
         text: '安装指南',
-        link: '/zh/installation/linux',
+        link: '/zh/installation/index',
         items: [
           { text: 'Linux 安装', link: '/zh/installation/linux' },
           { text: 'macOS 安装', link: '/zh/installation/macos/' },
@@ -93,6 +93,15 @@ export const zhSidebar = [
           { text: 'Docker 安装', link: '/zh/installation/docker' },
         ]
       },
+      {
+        text: '配置指南',
+        link: '/zh/guide/configured',
+        collapsed: true,
+        home: true,
+        items: [
+          { text: 'TLS 配置', link: '/zh/guide/configured/tls-configured' },
+        ]
+      }
     ]
   },
     {
@@ -104,7 +113,7 @@ export const zhSidebar = [
       { text: '对象管理', link: '/zh/guide/bucket/object-upload-and-delete' },
       { text: '访问密钥管理', link: '/zh/guide/access-token' },
       { text: 'mc（MinIO Client） 使用', link: '/zh/guide/mc' },
-      { text: 'MCP', link: '/zh/guide/mcp' },
+      { text: 'MCP 使用指南', link: '/zh/guide/mcp' },
     ]
   },
   {
