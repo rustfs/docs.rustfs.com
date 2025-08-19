@@ -240,6 +240,21 @@ MCP 服务器公开了 AI 助手可以使用的以下工具：
   - `local_path` (字符串, 可选)：本地文件路径（当模式为 "download" 时必填）
   - `max_content_size` (数字, 可选)：读取模式的最大内容大小（字节）（默认：1MB）
 
+### `create_bucket`
+
+创建一个新的 RustFS 存储桶。
+
+**参数**：
+
+  - `bucket_name` (字符串)：要创建的存储桶名称。
+
+### `delete_bucket`
+
+删除指定的 RustFS 存储桶。
+
+**参数**：
+
+  - `bucket_name` (字符串)：要删除的存储桶名称。
 
 ## 架构
 
