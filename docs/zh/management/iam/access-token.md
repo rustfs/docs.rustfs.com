@@ -9,7 +9,7 @@ RustFS 访问密钥是RustFS 系统的核心凭据，用于对身份进行认证
 
 前提条件：
 
-- 一个可用的 RustFS 实例。可参考[安装指南](../../zh/installation/index.md)进行安装。
+- 一个可用的 RustFS 实例。可参考[安装指南](../../installation/index.md)进行安装。
 
 ## 创建访问密钥
 
