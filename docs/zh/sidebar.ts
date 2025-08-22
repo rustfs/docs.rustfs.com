@@ -39,10 +39,10 @@ export const zhSidebar = [
         text: 'Docker 安装',
         link: '/zh/installation/docker/index'
       }, 
-      {
-        text: '云原生安装',
-        link: '/zh/installation/cloud-native/index'
-      },   
+      // {
+      //   text: '云原生安装',
+      //   link: '/zh/installation/cloud-native/index'
+      // },   
       {
         text: '安装检查',
         link: '/zh/installation/checklists',
@@ -85,24 +85,24 @@ export const zhSidebar = [
         items: [
           {
             text: '对象的上传和下载',
-            link: '/zh/management/object/object-upload-download',
+            link: '/zh/management/object/object-upload-and-delete',
           },
-          {
-            text: '对象版本',
-            link: '/zh/management/object/object-version',
-          },
-          {
-            text: '对象锁',
-            link: '/zh/management/object/object-lock',
-          },
-          {
-            text: '对象分享',
-            link: '/zh/management/object/object-share',
-          },
-          {
-            text: '对象扫描',
-            link: '/zh/management/object/object-scanner'
-          },
+          // {
+          //   text: '对象版本',
+          //   link: '/zh/management/object/object-version',
+          // },
+          // {
+          //   text: '对象锁',
+          //   link: '/zh/management/object/object-lock',
+          // },
+          // {
+          //   text: '对象分享',
+          //   link: '/zh/management/object/object-share',
+          // },
+          // {
+          //   text: '对象扫描',
+          //   link: '/zh/management/object/object-scanner'
+          // },
           {
             text: '对象检查与自动恢复',
             link: '/zh/management/object/object-healing'
@@ -118,89 +118,89 @@ export const zhSidebar = [
             text: '创建与删除',
             link: '/zh/management/bucket/bucket-create-and-delete'
           },
-          {
-            text: '存储桶复制',
-            link: '/zh/management/bucket/bucket-repulication'
-          }
+          // {
+          //   text: '存储桶复制',
+          //   link: '/zh/management/bucket/bucket-repulication'
+          // }
         ]
       },
-      {
-        text: '生命周期管理',
-        link: '/zh/management/lifecycle',
-      },
-      {
-          text: '事件通知管理',
-          link: '/zh/management/event-notification',
-      },
-      {
-        text: '日志管理',
-        link: '/zh/management/logs',
-        collapsed: true,
-        items: [
-          {
-            text: '日志配置',
-            link: '/zh/management/logs/configuration',
-          },
-          {
-            text: 'Prometheus 配置',
-            link: '/zh/management/logs/prometheus',
-          },
-          {
-            text: '可观测性配置',
-            link: '/zh/management/logs/observability'
-          }
-        ]
-      },
+      // {
+      //   text: '生命周期管理',
+      //   link: '/zh/management/lifecycle',
+      // },
+      // {
+      //     text: '事件通知管理',
+      //     link: '/zh/management/event-notification',
+      // },
+      // {
+      //   text: '日志管理',
+      //   link: '/zh/management/logs',
+      //   collapsed: true,
+      //   items: [
+      //     {
+      //       text: '日志配置',
+      //       link: '/zh/management/logs/configuration',
+      //     },
+      //     {
+      //       text: 'Prometheus 配置',
+      //       link: '/zh/management/logs/prometheus',
+      //     },
+      //     {
+      //       text: '可观测性配置',
+      //       link: '/zh/management/logs/observability'
+      //     }
+      //   ]
+      // },
       {
         text: 'IAM 管理',
-        link: '/zh/management/iam/',
+        link: '/zh/management/iam/index',
         collapsed: true,
         items: [
-          {
-            text: '用户',
-            link: '/zh/management/iam/user',
-          },
-          {
-            text: '用户组',
-            link: '/zh/management/iam/user-group',
-          },
-          {
-            text: 'AK/SK',
-            link: '/zh/management/iam/ak-sk',
-          },
-          {
-            text: '策略',
-            link: '/zh/management/iam/policy',
-          },
-          {
-            text: '桶策略',
-            link: '/zh/management/iam/bucket-policy',
-          },
+          // {
+          //   text: '用户',
+          //   link: '/zh/management/iam/user',
+          // },
+          // {
+          //   text: '用户组',
+          //   link: '/zh/management/iam/user-group',
+          // },
+          // {
+          //   text: 'AK/SK',
+          //   link: '/zh/management/iam/ak-sk',
+          // },
+          // {
+          //   text: '策略',
+          //   link: '/zh/management/iam/policy',
+          // },
+          // {
+          //   text: '桶策略',
+          //   link: '/zh/management/iam/bucket-policy',
+          // },
           {
             text: '访问令牌',
             link: '/zh/management/iam/access-token'
           }
         ]
       },
-      {
-        text: '加密',
-        link: '/zh/management/encryption',
-        collapsed: true,
-        items: [
-          {
-            text: 'SSE-C',
-            link: '/zh/management/encryption/sse-c',
-          },
-          {
-            text: 'SSE-KMS',
-            link: '/zh/encryption/sse-kms',
-          },
-          {
-            text: 'SSE-S3',
-            link: '/zh/management/encryption/sse-s3'
-          }
-        ]
-      },
+      // {
+      //   text: '加密',
+      //   link: '/zh/management/encryption',
+      //   collapsed: true,
+      //   items: [
+      //     {
+      //       text: 'SSE-C',
+      //       link: '/zh/management/encryption/sse-c',
+      //     },
+      //     {
+      //       text: 'SSE-KMS',
+      //       link: '/zh/encryption/sse-kms',
+      //     },
+      //     {
+      //       text: 'SSE-S3',
+      //       link: '/zh/management/encryption/sse-s3'
+      //     }
+      //   ]
+      // },
       {
         text: '故障排查',
         link: '/zh/management/troubleshooting',
@@ -239,84 +239,84 @@ export const zhSidebar = [
         text: '术语说明',
         link: '/zh/concepts/glossary',
       },
-      {
-        text: '核心概念',
-        collapsed: true,
-        link: '/zh/concepts/principle',
-        items: [
-          {
-            text: '纠删码',
-            link: '/zh/concepts/principle/erasure-coding'
-          },
-          {
-            text: '条带',
-            link: '/zh/concepts/principle/stripe'
-          },
-          {
-            text: 'Data Scanner',
-            link: '/zh/concepts/principle/data-scanner'
-          },
-          {
-            text: 'bitrot',
-            link: '/zh/concepts/principle/bitrot'
-          },
-          {
-            text: '数据自愈',
-            link: '/zh/concepts/principle/data-self-recovery',
-          },
-          {
-            text: '使用限制',
-            link: '/zh/concepts/principle/limit'
-          }
-        ]
-      },
+      // {
+      //   text: '核心概念',
+      //   collapsed: true,
+      //   link: '/zh/concepts/principle',
+      //   items: [
+      //     {
+      //       text: '纠删码',
+      //       link: '/zh/concepts/principle/erasure-coding'
+      //     },
+      //     {
+      //       text: '条带',
+      //       link: '/zh/concepts/principle/stripe'
+      //     },
+      //     {
+      //       text: 'Data Scanner',
+      //       link: '/zh/concepts/principle/data-scanner'
+      //     },
+      //     {
+      //       text: 'bitrot',
+      //       link: '/zh/concepts/principle/bitrot'
+      //     },
+      //     {
+      //       text: '数据自愈',
+      //       link: '/zh/concepts/principle/data-self-recovery',
+      //     },
+      //     {
+      //       text: '使用限制',
+      //       link: '/zh/concepts/principle/limit'
+      //     }
+      //   ]
+      // },
     ]
   },
-  {
-    text: '升级和扩容',
-    link: '/zh/upgrade-scale/index',
-    collapsed: true,
-    home: true,
-    items: [
-      {
-        text: '升级',
-        link: '/zh/upgrade-scale/upgrade',
-      },
-      {
-        text: '扩容',
-        link: '/zh/upgrade-scale/scale',
-      },
-      {
-        text: '退役',
-        link: '/zh/upgrade-scale/retire'
-      },
-      {
-        text: '再平衡',
-        link: '/zh/upgrade-scale/re-balance'
-      }
-    ]
-  },
+  // {
+  //   text: '升级和扩容',
+  //   link: '/zh/upgrade-scale/index',
+  //   collapsed: true,
+  //   home: true,
+  //   items: [
+  //     {
+  //       text: '升级',
+  //       link: '/zh/upgrade-scale/upgrade',
+  //     },
+  //     {
+  //       text: '扩容',
+  //       link: '/zh/upgrade-scale/scale',
+  //     },
+  //     {
+  //       text: '退役',
+  //       link: '/zh/upgrade-scale/retire'
+  //     },
+  //     {
+  //       text: '再平衡',
+  //       link: '/zh/upgrade-scale/re-balance'
+  //     }
+  //   ]
+  // },
   {
     text: '集成',
     collapsed: true,
     home: true,
     items: [
-      {
-        text: 'Nginx',
-        link: '/zh/integration/nginx'
-      },
-      {
-        text: 'GitLab',
-        link: '/zh/integration/gitlab',
-      },
-      {
-        text: 'HDFS',
-        link: '/zh/integration/hdfs'
-      },
-      {
-        text: 'restic',
-        link: '/zh/integration/restic'
-      },
+      // {
+      //   text: 'Nginx',
+      //   link: '/zh/integration/nginx'
+      // },
+      // {
+      //   text: 'GitLab',
+      //   link: '/zh/integration/gitlab',
+      // },
+      // {
+      //   text: 'HDFS',
+      //   link: '/zh/integration/hdfs'
+      // },
+      // {
+      //   text: 'restic',
+      //   link: '/zh/integration/restic'
+      // },
       {
         text: 'TLS 配置',
         link: '/zh/integration/tls-configured'
@@ -329,10 +329,10 @@ export const zhSidebar = [
     collapsed: true,
     home: true, 
     items: [
-      {
-        text: 'STS',
-        link: '/zh/developer/sts'
-      },
+      // {
+      //   text: 'STS',
+      //   link: '/zh/developer/sts'
+      // },
       {
         text: 'MCP',
         link: '/zh/developer/mcp'
@@ -354,26 +354,26 @@ export const zhSidebar = [
             text: 'Python',
             link: '/zh/developer/sdk/python'
           },
-          {
-            text: 'Rust',
-            link: '/zh/developer/sdk/rust'
-          },
+          // {
+          //   text: 'Rust',
+          //   link: '/zh/developer/sdk/rust'
+          // },
           {
             text: 'JavaScript',
             link: '/zh/developer/sdk/javascript'
           },
-          {
-            text: '.Net',
-            link: '/zh/developer/sdk/dotnet'
-          },
-          {
-            text: 'PHP',
-            link: '/zh/developer/sdk/php'
-          },
-          {
-            text: 'Go',
-            link: '/zh/developer/sdk/go'
-          },
+          // {
+          //   text: '.Net',
+          //   link: '/zh/developer/sdk/dotnet'
+          // },
+          // {
+          //   text: 'PHP',
+          //   link: '/zh/developer/sdk/php'
+          // },
+          // {
+          //   text: 'Go',
+          //   link: '/zh/developer/sdk/go'
+          // },
           {
             text: '其他 SDK',
             link: '/zh/developer/other'
