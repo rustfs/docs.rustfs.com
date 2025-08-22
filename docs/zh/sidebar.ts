@@ -9,10 +9,10 @@ export const zhSidebar = [
         link: '/zh/installation/linux/index',
         collapsed: true,
         items: [
-          {
-            text: 'Linux 快速安装',
-            link: '/zh/installation/linux/quick-start'
-          },
+          // {
+          //   text: 'Linux 快速安装',
+          //   link: '/zh/installation/linux/quick-start'
+          // },
           {
             text: '单机单盘安装',
             link: '/zh/installation/linux/single-node-single-disk'
