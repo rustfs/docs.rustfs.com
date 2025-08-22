@@ -11,19 +11,19 @@ export const zhSidebar = [
         items: [
           {
             text: 'Linux 快速安装',
-            link: '/zh/installation/linux/quick-start',
+            link: '/zh/installation/linux/quick-start'
           },
           {
             text: '单机单盘安装',
-            link: '/zh/installation/linux/single-node-single-disk',
+            link: '/zh/installation/linux/single-node-single-disk'
           },
           {
             text: '单机多盘安装',
-            link: '/zh/installation/linux/single-node-multiple-disk',
+            link: '/zh/installation/linux/single-node-multiple-disk'
           },
           {
             text: '多机多盘安装',
-            link: '/zh/installation/linux/multiple-node-multiple-disk',
+            link: '/zh/installation/linux/multiple-node-multiple-disk'
           }
         ]
       },
@@ -50,7 +50,7 @@ export const zhSidebar = [
         items: [
           {
             text: '硬件要求',
-            link: '/zh/installation/checklists/hardware-checklists',
+            link: '/zh/installation/checklists/hardware-checklists'
           },
           {
             text: '硬件选择',
@@ -58,11 +58,11 @@ export const zhSidebar = [
           },
           {
             text: '网络检查',
-            link: '/zh/installation/checklists/network-checklists',
+            link: '/zh/installation/checklists/network-checklists'
           },
           {
             text: '软件检查',
-            link: '/zh/installation/checklists/software-checklists',
+            link: '/zh/installation/checklists/software-checklists'
           },
           {
             text: '安全检查',
@@ -85,7 +85,7 @@ export const zhSidebar = [
         items: [
           {
             text: '对象的上传和下载',
-            link: '/zh/management/object/object-upload-and-delete',
+            link: '/zh/management/object/object-upload-and-delete'
           },
           // {
           //   text: '对象版本',
@@ -233,11 +233,11 @@ export const zhSidebar = [
       },
       {
         text: 'RustFS设计架构',
-        link: '/zh/concepts/architecture',
+        link: '/zh/concepts/architecture'
       },
       {
         text: '术语说明',
-        link: '/zh/concepts/glossary',
+        link: '/zh/concepts/glossary'
       },
       // {
       //   text: '核心概念',
@@ -395,14 +395,38 @@ export const zhSidebar = [
     collapsed: true,
     home: true,
     items: [
-      { text: '分布式', link: '/zh/features/distributed/' },
-      { text: '日志管理', link: '/zh/features/logging/' },
-      { text: '版本控制', link: '/zh/features/versioning/' },
-      { text: 'S3 兼容', link: '/zh/features/s3-compatibility/' },
-      { text: '对象级与只读', link: '/zh/features/worm/' },
-      { text: '跨区域复制', link: '/zh/features/replication/' },
-      { text: '加密', link: '/zh/features/encryption/' },
-      { text: '生命周期管理', link: '/zh/features/lifecycle/' },
+      { 
+        text: '分布式', 
+        link: '/zh/features/distributed/' 
+      },
+      { 
+        text: '日志管理', 
+        link: '/zh/features/logging/' 
+      },
+      { 
+        text: '版本控制', 
+        link: '/zh/features/versioning/' 
+      },
+      { 
+        text: 'S3 兼容', 
+        link: '/zh/features/s3-compatibility/' 
+      },
+      { 
+        text: '对象级与只读', 
+        link: '/zh/features/worm/' 
+      },
+      { 
+        text: '跨区域复制', 
+        link: '/zh/features/replication/' 
+      },
+      { 
+        text: '加密', 
+        link: '/zh/features/encryption/' 
+      },
+      { 
+        text: '生命周期管理', 
+        link: '/zh/features/lifecycle/' 
+      },
     ],
   },
   {
@@ -410,16 +434,46 @@ export const zhSidebar = [
     collapsed: true,
     home: true,
     items: [
-      { text: '现代数据湖', link: '/zh/features/data-lake/' },
-      { text: 'AI 和机器学习', link: '/zh/features/ai/' },
-      { text: '云原生', link: '/zh/features/cloud-native/' },
-      { text: '大数据计算存储分离', link: '/zh/features/hdfs/' },
-      { text: 'SQL 支持', link: '/zh/features/sql-server/' },
-      { text: '量化交易', link: '/zh/features/quantitative-trading/' },
-      { text: '制造业降本', link: '/zh/features/industry/' },
-      { text: '冷归档存储', link: '/zh/features/cold-archiving/' },
-      { text: '视频存储方案', link: '/zh/features/video/' },
-      { text: '国产信创和 SM 解决方案', link: '/zh/features/domestic/' },
+      { 
+        text: '现代数据湖', 
+        link: '/zh/features/data-lake/' 
+      },
+      { 
+        text: 'AI 和机器学习', 
+        link: '/zh/features/ai/' 
+      },
+      { 
+        text: '云原生', 
+        link: '/zh/features/cloud-native/' 
+      },
+      { 
+        text: '大数据计算存储分离', 
+        link: '/zh/features/hdfs/' 
+      },
+      { 
+        text: 'SQL 支持', 
+        link: '/zh/features/sql-server/' 
+      },
+      { 
+        text: '量化交易', 
+        link: '/zh/features/quantitative-trading/' 
+      },
+      { 
+        text: '制造业降本', 
+        link: '/zh/features/industry/' 
+      },
+      { 
+        text: '冷归档存储', 
+        link: '/zh/features/cold-archiving/' 
+      },
+      { 
+        text: '视频存储方案', 
+        link: '/zh/features/video/' 
+      },
+      { 
+        text: '国产信创和 SM 解决方案', 
+        link: '/zh/features/domestic/' 
+      },
     ],
   },
 ]
