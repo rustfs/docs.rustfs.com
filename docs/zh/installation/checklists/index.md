@@ -12,11 +12,13 @@ description: "RustFS 安装前的检查清单"
 
 若您需要专业指导，请与我们的存储专家联系：400-033-5363 或者邮箱联系：hello@rustfs.com。
 
-若您需要社区支持可以在 Github 上提交 issue 或者加入我们的讨论组。对于社区的问题回复我们不对回答质量和结果负责，并且不保证 SLA。
+若您需要社区支持可以在 GitHub 上提交 issue 或者加入我们的讨论组。对于社区的问题回复我们不对回答质量和结果负责，并且不保证 SLA。
 
 ## 检查清单
 
-1. [硬件检查清单](./hard-checklists)；
+1. [硬件检查清单](./hardware-checklists.md)；
+
+2. [硬件选择](./hardware-selection.md)
 
 2. [安全检查清单](./security-checklists)；
 

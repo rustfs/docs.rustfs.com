@@ -5,7 +5,7 @@ description: "RustFS 存储桶管理，包括存储桶的创建和删除。​"
 
 # RustFS 存储桶
 
-存储桶（Bucket）是 RustFS 中用于组织和管理数据的基本容器。每个存储桶都具有唯一的名称，并且可以包含多个对象（Object）。存储桶提供了数据的逻辑分组，使得用户可以轻松地管理和访问数据。你可以通过 RustFS UI、`mc`（MinIO Client）或 API 来对存储桶进行操作（包括创建、删除、数据上传下载等）。
+本章节分享通过 RustFS UI、`mc`（MinIO Client）或 API 来对存储桶进行操作（包括创建、删除、数据上传下载等）。
 
 ## 创建存储桶
 
@@ -23,7 +23,7 @@ description: "RustFS 存储桶管理，包括存储桶的创建和删除。​"
 
 ### 使用 `mc` 创建存储桶
 
-> 对于 `mc` 的安装和配置可以查看[`mc` 使用指南](../mc.md)章节。
+> 对于 `mc` 的安装和配置可以查看[`mc` 使用指南](../../developer/mc.md)章节。
 
 使用 `mc mb` 命令创建存储桶：
 
@@ -71,7 +71,7 @@ curl --location --request PUT 'http://12.34.56.78:9000/bucket-creation-by-api' \
 
 ### 使用 `mc` 删除存储桶
 
-对于 `mc` 的安装和配置可以查看[`mc` 使用指南](../mc.md)章节。
+对于 `mc` 的安装和配置可以查看[`mc` 使用指南](../../developer/mc.md)章节。
 
 使用 `mc rb` 命令创建存储桶：
 

@@ -1,19 +1,15 @@
 ---
-title: "JS SDK"
-description: "本文主要讲解 RustFS 中 JS SDK 的使用。"
+title: "RustFS JavaScript SDK"
+description: "本文主要讲解 RustFS 中 JavaScript SDK 的使用。"
 ---
 
 下面是为 **RustFS 使用 AWS S3 JS SDK** 编写的完整开发文档，内容涵盖 SDK 安装、初始化配置、基础操作（上传、下载、删除、列举）、预签名 URL 和分片上传等功能，适用于 Node.js 环境。
-
----
 
 # RustFS 使用 AWS S3 JS SDK 文档（适用于 Node.js）
 
 ## 一、概述
 
 RustFS 是一款兼容 S3 协议的对象存储系统，可通过 AWS 官方 JavaScript SDK（v3）进行访问。本指南将指导你如何使用 JS 连接 RustFS 并执行常见对象存储操作。
-
----
 
 ## 二、准备工作
 
