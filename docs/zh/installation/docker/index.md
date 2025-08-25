@@ -168,7 +168,8 @@ docker run -d \
 
 3. 环境变量和命令行参数可以混合使用，但命令行参数优先级更高
 
-4. 如果[使用 TLS](../guide/configured/tls-configured.md)，需要额外挂载证书路径：
+4. 如果[使用 TLS](../../integration/tls-configured.md)，需要额外挂载证书路径：
+
    ```bash
    -v /path/to/certs:/certs \
    -e RUSTFS_TLS_PATH=/certs \
@@ -201,7 +202,7 @@ docker run -d \
 
 1. 生产环境建议：
 - 使用多节点部署架构
-- [启用 TLS 加密通信](../guide/configured/tls-configured.md)
+- [启用 TLS 加密通信](../../integration/tls-configured.md)
 - 配置日志轮转策略
 - 设置定期备份策略
 

@@ -9,9 +9,9 @@ MinIO Client（`mc`）是 MinIO 官方提供的命令行工具，用于管理 Mi
 
 前提条件：
 
-- 一个可用的 RustFS 实例。可参考[安装指南](../../zh/installation/index.md)进行安装。
+- 一个可用的 RustFS 实例。可参考[安装指南](../installation/index.md)进行安装。
 - 已安装 `mc` 工具。
-- 可用的[访问密钥](access-token.md)。
+- 可用的[访问密钥](../management/iam/access-token.md)。
 
 ## 用 `mc` 操作 RustFS 
 

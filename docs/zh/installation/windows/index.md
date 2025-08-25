@@ -5,8 +5,6 @@ description: "使用 Windows 一键启动 RustFS。"
 
 # Windows 安装 RustFS
 
-
-
 ## 一、准备工作
 
 请了解：
@@ -14,7 +12,7 @@ description: "使用 Windows 一键启动 RustFS。"
 > Windows 启动 **模式** 只支持单机单盘模式，更适用于开发、调试和测试环境。
 
 
-1. 关于 Windows 启动模式的详细介绍，请参考 [启动模式](../mode/);
+1. 关于 Windows 启动模式的详细介绍，请参考 [启动模式](../linux/index.md#mode;
 
 2. 下载安装包，修改权限，并进行启动。
 

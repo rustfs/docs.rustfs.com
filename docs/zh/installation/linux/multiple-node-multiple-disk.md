@@ -15,4 +15,4 @@ description: 在多台服务器的多个磁盘上安装 RustFS, 数据将存储�
 
 任何 4 块磁盘以内的数据损坏都不会影响数据安全。
 
-<img src="./images/multiple-node-multiple-disk.jgp" alt="RustFS Multiple Node Multiple Disk Mode" />
+<img src="./images/multiple-node-multiple-disk.jpg" alt="RustFS Multiple Node Multiple Disk Mode" />
