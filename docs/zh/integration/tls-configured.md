@@ -5,13 +5,13 @@ description: "为 RustFS 实例配置 TLS,通过 HTTPS 访问 RustFS,实现安�
 
 # RustFS TLS 配置
 
-RustFS 支持通过[配置 TLS](../../../zh/installation/security-checklists.md#2-网络传输加密tlsssl)来以更加安全的方式访问和使用 RustFS 实例。需要通过环境变量 `RUSTFS_TLS_PATH` 指定 TLS 所需证书路径。
+RustFS 支持通过[配置 TLS](../integration/tls-configured.md)来以更加安全的方式访问和使用 RustFS 实例。需要通过环境变量 `RUSTFS_TLS_PATH` 指定 TLS 所需证书路径。
 
 ## 配置
 
 ### 前提条件
 
-- 一个可用的 RustFS 实例（安装详情可查看[安装指南](../../../zh/installation/index.md)）
+- 一个可用的 RustFS 实例（安装详情可查看[安装指南](../installation/index.md)
 - 可用的证书对（包含证书文件和私钥文件）
 
 **注意**：证书对的名称必须为 `rustfs_cert.pem` 和 `rustfs_key.pem`，并放置在指定的证书路径中。

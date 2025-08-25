@@ -9,4 +9,4 @@ description: 介绍 STS/MCP/MinIO Client/SDK/API 在 RustFS 中的使用,帮助�
 - [MCP 使用指南](./mcp.md)
 - [MinIO Client 使用指南](./mc.md)
 - [SDK 使用指南](./sdk/index.md)
-- [API 使用指南](./api)
+- API 使用指南
