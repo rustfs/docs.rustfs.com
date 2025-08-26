@@ -15,13 +15,11 @@ RustFS 100%的符合S3存储协议的要求，在S3存储时，请求路径分�
 
 
 
-|特性	|虚拟主机模式 (Virtual Host Style)	|路径模式 (Path Style)|
+ |特性	| 虚拟主机模式 (Virtual Host Style)	|路径模式 (Path Style)|
 |  - |  - | - |
-|URL 格式	|https://<bucket>.<endpoint>/<object>	|https://<endpoint>/<bucket>/<object>|
-|存储桶位置	|在主机名（域名）中，作为子域名|	在 URL 路径中|
-|示例|	https://my-bucket.s3.rustfs.com/cat.jpg|	https://s3.rustfs.com/my-bucket/cat.jpg|
-
-
+|URL 格式	| https://<bucket>.<endpoint>/<object>	|https://<endpoint>/<bucket>/<object> |
+|存储桶位置	| 在主机名（域名）中，作为子域名 |	在 URL 路径中|
+|示例|	https://my-bucket.s3.rustfs.com/cat.jpg |	https://s3.rustfs.com/my-bucket/cat.jpg |
 
 
 
@@ -44,13 +42,15 @@ http://rustfs.com/test
 在启动的时，可以将模式改为Virtual Host Style。Virtual Host Style模式的特点是桶名在为域名的一部份，假设主机名为rustfs.com，桶名为test，那么Virtual Host Style拼接下来的路径为：
 
 ~~~
+
 http://test.rustfs.com/
+
 ~~~
 
 
 设置Virtual Host Style的步骤如下：
 
-1. 将你的域名泛解析至指定的服务器。 假设域名为rustfs.com，则可以将*.rustfs.com解析至指定的服务器；
+1. 将你的域名泛解析至指定的服务器。 假设域名为rustfs.com，则可以将 *.rustfs.com 解析至指定的服务器；
 2. 如果是Linux修改 `/etc/default/rustfs` 文件，如果是Docker 或者 Kubernetes则修改yaml或者启动配置参数；
-3. 在配置文件中加入：`RUSTFS_SERVER_DOMAINS`, 将这个参数设置为 RUSTFS_SERVER_DOMAINS = "rustfs.com" ；
+3. 在配置文件中加入：`RUSTFS_SERVER_DOMAINS` , 将这个参数设置为 `RUSTFS_SERVER_DOMAINS = "rustfs.com"` ；
 4. 保存配置文件，然后使用 `systemctl restart rustfs` 重启服务。

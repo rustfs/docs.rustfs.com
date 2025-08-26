@@ -13,9 +13,9 @@ description: "使用 Linux 操作系统安装 RustFS 的快速指导"
 
 1. 请明确您的三种安装启用模式：
 
-    1. [单机单盘模式（SNSD）](./single-node-single-disk.md)
-    2. [单机多盘模式（SNMD）](./single-node-multiple-disk.md)
-    3. [多机多盘模式（MNMD）](./multiple-node-multiple-disk.md)
+    1. 单机单盘模式（SNSD）
+    2. 单机多盘模式（SNMD）
+    3. 多机多盘模式（MNMD）
 
 2. [安装前检查](../checklists/index.md)，确保各项指标符合生产指导特征，若不需要生产标准可不阅读此指导；
 
@@ -25,7 +25,7 @@ description: "使用 Linux 操作系统安装 RustFS 的快速指导"
 
 2. 防火墙；
 
-3. 主机名；
+3. 主机别名或者域名解析；
 
 4. 内存条件；
 
@@ -41,7 +41,7 @@ description: "使用 Linux 操作系统安装 RustFS 的快速指导"
 
 ### 2.1. 操作系统版本
 
-我们推荐 Linux 内核为 4.x 及以上的版本，但是 5.x 及以上的版本可以获得更好的 IO 吞吐和网络性能。
+我们推荐 Linux 内核为 4.x 及以上的版本。因为，5.x / 6.x 的版本可以获得更好的 IO 吞吐和网络性能。
 
 您可以使用 Ubuntu 22.04 和 RHEL8.x 来安装 RustFS。
 
@@ -68,13 +68,21 @@ firewall-cmd --reload
 ```
 部署中的所有 RustFS 服务器 **必须** 使用相同的监听端口。如果您使用的是 9000 端口，其他服务器的所有端口均需要为 9000 端口。
 
-### 2.3 主机名
+
+
+
+
+### 2.3 主机名（单机单盘和单机多盘可跳过此步骤）
 
 创建 RustFS 集群必须要使用 **相同的、具备连续性** 的主机名。有两种方式实现连续性的主机名：
 
-1. DNS 配置；
+** 1. DNS 配置：**
 
-2. HOSTS 配置。
+    请配置你的DNS解析服务器，保障名字的连续性。
+
+2. ** HOSTS 配置：**
+
+修改 /etc/hosts中的本地别名设置，具体操作如下：
 
 
 ```bash
@@ -90,7 +98,8 @@ vim /etc/hosts
 
 ### 2.4 内存条件
 
-RustFS 需要至少 2 GB 的内存来运行测试环境，生产的环境最低需要 64 GB 的内存。
+RustFS 需要至少 2 GB 的内存来运行测试环境，生产的环境最低需要 128 GB 的内存。
+
 
 ### 2.5 时间同步
 
@@ -109,9 +118,26 @@ timedatectl status
 
 ## 三、配置用户名
 
-RustFS 启动，我们建议您配置一个专门的无登录权限的用户进行启动 RustFS 的服务。在 rustfs.service 启动控制脚本中，默认的用户和用户组是 `rustfs-user` 和 `rustfs-user` 。
+RustFS 启动，我们建议您配置一个专门的无登录权限的用户进行启动 RustFS 的服务。在 rustfs.service 启动控制脚本中。
 
-您可以使用 groupadd 和 useradd 命令创建用户和组。以下示例创建用户、组并设置权限以访问 RustFS 指定的数据目录。
+1. **不修改默认启动账户** ：默认的用户和用户组是 `root` 和 `root` ，若您想使用默认的`root` 和 `root`，则不需要进行任何修改。
+2. **不修改默认启动账户** ：您可以使用 groupadd 和 useradd 命令创建用户和组，添加后修改 systemctl 启动配置文件的用户名和密码。
+
+
+以下示例是修改创建用户、组并设置权限以访问 RustFS 指定的数据目录（可选）：
+
+~~~
+groupadd -r rustfs-user
+useradd -M -r -g rustfs-user rustfs-user
+chown rustfs-user:rustfs-user  /data/rustfs*
+~~~
+
+注意：
+- 如果创建了rustfs-user用户和组需要将 `/etc/systemd/system/rustfs.service` 中的User 和Group改为 `rustfs-user` ;
+- 将 ` /data/rustfs*`  调整为指定的挂载目录。
+
+
+
 
 ## 四、下载安装包
 
@@ -119,8 +145,8 @@ RustFS 启动，我们建议您配置一个专门的无登录权限的用户进�
 
 ```bash
 # 下载地址
-wget https://dl.rustfs.com/artifacts/rustfs/release/rustfs-linux-x86_64-latest.zip
-unzip rustfs-linux-x86_64-latest.zip
+wget https://dl.rustfs.com/artifacts/rustfs/release/rustfs-linux-x86_64-musl-latest.zip
+unzip rustfs-linux-x86_64-musl-latest.zip
 chmod +x rustfs
 mv rustfs /usr/local/bin/
 ```
@@ -128,21 +154,53 @@ mv rustfs /usr/local/bin/
 
 
 ### 五、配置环境变量
+
+
+
 1. 创建配置文件 
 
 
 ```bash
+# 单机单盘模式
+sudo tee /etc/default/rustfs <<EOF
+RUSTFS_ACCESS_KEY=rustfsadmin
+RUSTFS_SECRET_KEY=rustfsadmin
+RUSTFS_VOLUMES="/data/rustfs0"
+RUSTFS_ADDRESS=":9000"
+RUSTFS_CONSOLE_ENABLE=true
+RUST_LOG=error
+RUSTFS_OBS_LOG_DIRECTORY="/var/logs/rustfs/"
+EOF
+```
+
+
+```bash
+# 单机多盘模式
 sudo tee /etc/default/rustfs <<EOF
 RUSTFS_ACCESS_KEY=rustfsadmin
 RUSTFS_SECRET_KEY=rustfsadmin
 RUSTFS_VOLUMES="/data/rustfs{0...3}"
 RUSTFS_ADDRESS=":9000"
-#RUSTFS_SERVER_DOMAINS="play.rustfs.com:9000"
 RUSTFS_CONSOLE_ENABLE=true
-RUSTFS_OBS_ENDPOINT=""
-RUSTFS_TLS_PATH="/opt/tls"
+RUST_LOG=error
+RUSTFS_OBS_LOG_DIRECTORY="/var/logs/rustfs/"
 EOF
 ```
+
+```bash
+# 多机多盘模式
+sudo tee /etc/default/rustfs <<EOF
+RUSTFS_ACCESS_KEY=rustfsadmin
+RUSTFS_SECRET_KEY=rustfsadmin
+RUSTFS_VOLUMES="http://node{1...4}:9000/data/rustfs{0...3}"
+RUSTFS_ADDRESS=":9000"
+RUSTFS_CONSOLE_ENABLE=true
+RUST_LOG=error
+RUSTFS_OBS_LOG_DIRECTORY="/var/logs/rustfs/"
+EOF
+```
+
+
 
 2. 创建存储目录
 ```bash
@@ -150,47 +208,7 @@ sudo mkdir -p /data/rustfs{0..3} /var/logs/rustfs /opt/tls
 sudo chmod -R 750 /data/rustfs* /var/logs/rustfs
 ```
 
-### 六、配置可观测性系统
-1. 创建观测配置文件
-```
-export RUSTFS_OBS_ENDPOINT=http://localhost:4317 # OpenTelemetry Collector 的地址
-export RUSTFS_OBS_USE_STDOUT=false # 是否使用标准输出
-export RUSTFS_OBS_SAMPLE_RATIO=2.0 # 采样率，0.0-1.0之间，0.0表示不采样，1.0表示全部采样
-export RUSTFS_OBS_METER_INTERVAL=1 # 采样间隔，单位为秒
-export RUSTFS_OBS_SERVICE_NAME=rustfs # 服务名称
-export RUSTFS_OBS_SERVICE_VERSION=0.1.0 # 服务版本
-export RUSTFS_OBS_ENVIRONMENT=develop # 环境名称
-export RUSTFS_OBS_LOGGER_LEVEL=debug # 日志级别，支持 trace, debug, info, warn, error
-export RUSTFS_OBS_LOCAL_LOGGING_ENABLED=true # 是否启用本地日志记录
-# 日志目录 当 `RUSTFS_OBS_ENDPOINT` 值为空时，默认执行下面的日志处理规则
-export RUSTFS_OBS_LOG_DIRECTORY="$current_dir/deploy/logs" # Log directory
-export RUSTFS_OBS_LOG_ROTATION_TIME="minute" # Log rotation time unit, can be "second", "minute", "hour", "day"
-export RUSTFS_OBS_LOG_ROTATION_SIZE_MB=1 # Log rotation size in MB
 
-# 配置日志记录
-export RUSTFS_SINKS_FILE_PATH="$current_dir/deploy/logs/rustfs.log"
-export RUSTFS_SINKS_FILE_BUFFER_SIZE=12
-export RUSTFS_SINKS_FILE_FLUSH_INTERVAL_MS=1000
-export RUSTFS_SINKS_FILE_FLUSH_THRESHOLD=100
-```
-
-2. 设置日志轮转
-```bash
-sudo tee /etc/logrotate.d/rustfs <<EOF
-/var/logs/rustfs/*.log {
- daily
- rotate 7
- missingok
- notifempty
- compress
- delaycompress
- sharedscripts
- postrotate
- systemctl restart rustfs >/dev/null 2>&1 || true
- endscript
-}
-EOF
-```
 
 ### 七、配置系统服务
 1. 创建 systemd 服务文件
@@ -273,15 +291,7 @@ curl -u rustfsadmin:rustfsadmin http://localhost:9000/
 
 5. 查看日志文件
 ```bash
-tail -f /var/logs/rustfs/app.log
-```
-
-6. 测试存储接口（示例）
-```bash
-curl -X PUT -u rustfsadmin:rustfsadmin \
--H "Content-Type: application/octet-stream" \
---data-binary @testfile \
-http://localhost:9000/bucket1/object1
+tail -f /var/logs/rustfs/rustfs*.log
 ```
 
 
