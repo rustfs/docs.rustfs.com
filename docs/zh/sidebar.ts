@@ -1,7 +1,6 @@
 export const zhSidebar = [
   {
     text: 'RustFS 安装指南',
-    link: '/zh/installation/index',
     collapsed: true,
     home: true,
     items: [
@@ -34,8 +33,8 @@ export const zhSidebar = [
   },
   {
         text: '安装检查清单',
-        link: '/zh/installation/checklists',
         collapsed: true,
+        home: true,
         items: [
           {
             text: '硬件要求',
@@ -61,13 +60,11 @@ export const zhSidebar = [
   },  
   {
     text: '管理 RustFS',
-    link: '/zh/management/index',
     collapsed: true,
     home: true,
     items: [
       {
         text: '对象管理',
-        link: '/zh/management/object',
         collapsed: true,
         items: [
           {
@@ -98,7 +95,6 @@ export const zhSidebar = [
       },
       {
         text: '存储桶管理',
-        link: '/zh/management/bucket',
         collapsed: true,
         items: [
           {
@@ -140,7 +136,6 @@ export const zhSidebar = [
       // },
       {
         text: 'IAM 管理',
-        link: '/zh/management/iam/index',
         collapsed: true,
         items: [
           // {
@@ -190,7 +185,6 @@ export const zhSidebar = [
       // },
       {
         text: '故障排查',
-        link: '/zh/management/troubleshooting',
         collapsed: true,
         items: [
           {
@@ -316,7 +310,6 @@ export const zhSidebar = [
   },
   {
     text: '开发者',
-    link: '/zh/developer/index',
     collapsed: true,
     home: true, 
     items: [
@@ -334,7 +327,6 @@ export const zhSidebar = [
       },
       {
         text: 'SDK',
-        link: '/zh/developer/sdk',
         collapsed: true,
         items: [
           {
