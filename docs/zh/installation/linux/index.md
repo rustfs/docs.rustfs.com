@@ -184,7 +184,7 @@ sudo mkfs.xfs  -i size=512 -n ftype=1 -L RUSTFS0 /dev/sdb
 ~~~
 
 我们可以在格式化时加入一些推荐选项来优化性能:
-- -L <label>: 为文件系统设置一个标签（label），方便后续识别和挂载。
+- -L label: 为文件系统设置一个标签（label），方便后续识别和挂载。
 - -i size=512: RustFS官方推荐将inode大小设置为512字节，这对于存储大量小对象（元数据）的场景有性能优势。
 - -n ftype=1: 开启ftype功能。这允许文件系统在目录结构中记录文件类型，可以提高类似readdir和unlink操作的性能，对RustFS非常有利。
 
