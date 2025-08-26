@@ -14,15 +14,6 @@ RustFS 100%的符合S3存储协议的要求，在S3存储时，请求路径分�
 这两种模式的核心区别在于如何将存储桶（Bucket）的名称放入请求的 URL 中。
 
 
-
- |特性	| 虚拟主机模式 (Virtual Host Style)	|路径模式 (Path Style)|
-|  - |  - | - |
-|URL 格式	| https://<bucket>.<endpoint>/<object>	|https://<endpoint>/<bucket>/<object> |
-|存储桶位置	| 在主机名（域名）中，作为子域名 |	在 URL 路径中|
-|示例|	https://my-bucket.s3.rustfs.com/cat.jpg |	https://s3.rustfs.com/my-bucket/cat.jpg |
-
-
-
 ## 1. Path style mode
 
 在启动的时，默认使用Path style模式。Path style模式的特点是桶名在Endpoint接入端点后，假设主机名为rustfs.com，桶名为test，那么Path style拼接下来的路径为：
@@ -42,9 +33,7 @@ http://rustfs.com/test
 在启动的时，可以将模式改为Virtual Host Style。Virtual Host Style模式的特点是桶名在为域名的一部份，假设主机名为rustfs.com，桶名为test，那么Virtual Host Style拼接下来的路径为：
 
 ~~~
-
 http://test.rustfs.com/
-
 ~~~
 
 
