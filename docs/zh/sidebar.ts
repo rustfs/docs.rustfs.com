@@ -301,10 +301,10 @@ export const zhSidebar = [
     collapsed: true,
     home: true,
     items: [
-      // {
-      //   text: 'Nginx',
-      //   link: '/zh/integration/nginx'
-      // },
+       {
+         text: 'Nginx反向代理配置',
+         link: '/zh/integration/nginx'
+       },
       // {
       //   text: 'GitLab',
       //   link: '/zh/integration/gitlab',
