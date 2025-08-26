@@ -282,16 +282,19 @@ systemctl status rustfs
 
 3. 检查服务端口
 ```bash
+netstat -ntpl
 ```
 
-4. 验证控制台访问
-```bash
-curl -u rustfsadmin:rustfsadmin http://localhost:9000/
-```
 
-5. 查看日志文件
+4. 查看日志文件
 ```bash
 tail -f /var/logs/rustfs/rustfs*.log
 ```
 
+
+5. 访问访问控制台
+
+输入服务器的IP地址和端口，尝试访问访问控制台，查看到的界面如下：
+
+![Console](./images/console.png)
 
