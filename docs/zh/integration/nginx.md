@@ -3,7 +3,18 @@ title: "RustFS Nginx反向代理配置"
 description: "为 RustFS实现Nginx反向代理的配置"
 ---
 
-# 一、RustFS Nginx 前置条件
+
+# RustFS 与Nginx 集成
+
+通过RustFS与Nginx集成，可以实现如下功能：
+
+1. 日志的全面收集；
+2. 负载均衡配置；
+3. 自定义的URL转发和解析；
+4. 自定义的URL禁止。
+
+
+## 一、RustFS Nginx 前置条件
 
 为了让集成顺利进行，你需要提前准备了：
 
@@ -14,7 +25,7 @@ description: "为 RustFS实现Nginx反向代理的配置"
 
 
 
-# 二、 配置文件
+## 二、 配置文件
 
 
 ~~~
@@ -63,7 +74,7 @@ server {
 ~~~
 
 
-# 三、多机负载均衡
+## 三、多机负载均衡
 
 
 若需要在分布式环境中增加多个RustFS服务器，请提前调整好DNS解析或者本地的Hosts地址，修改和增加 server即可。

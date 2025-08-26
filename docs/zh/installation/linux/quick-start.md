@@ -1,3 +1,4 @@
+---
 title: "Linux快速安装 RustFS"
 description: "使用RustFS一键安装包快速进行Linux环境下的部署安装"
 ---
@@ -19,7 +20,7 @@ description: "使用RustFS一键安装包快速进行Linux环境下的部署安�
 2. [安装前检查](../checklists/index.md)，确保各项指标符合生产指导特征，若不需要生产标准可不阅读此指导；
 
 
-# 二、快速安装
+## 二、快速安装
 
 
 
@@ -38,7 +39,7 @@ curl -O https://rustfs.com/install_rustfs.sh && bash install_rustfs.sh
 
 
 
-# 三、其他注意事项
+## 三、其他注意事项
 
 1. 请检查防火墙是否开启；
 2. 请确定NTP 时间服务器的一致性；
