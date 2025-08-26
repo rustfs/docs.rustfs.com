@@ -296,5 +296,5 @@ tail -f /var/logs/rustfs/rustfs*.log
 
 输入服务器的IP地址和端口，尝试访问访问控制台，查看到的界面如下：
 
-![Console](./images/console.png)
+![Console](./images/console.jpg)
 
