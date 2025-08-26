@@ -5,27 +5,13 @@ export const zhSidebar = [
     collapsed: true,
     home: true,
     items: [
-      { text: 'Linux 安装',
-        link: '/zh/installation/linux/index',
-        collapsed: true,
-        items: [
-          {
+      {
             text: 'Linux 快速安装',
              link: '/zh/installation/linux/quick-start'
-          },
-          {
-            text: '单机单盘安装',
-            link: '/zh/installation/linux/single-node-single-disk'
-          },
-          {
-            text: '单机多盘安装',
-            link: '/zh/installation/linux/single-node-multiple-disk'
-          },
-          {
-            text: '多机多盘安装',
-            link: '/zh/installation/linux/multiple-node-multiple-disk'
-          }
-        ]
+      },
+      {
+            text: 'Linux详细安装',
+            link: '/zh/installation/linux/index'
       },
       {
         text: 'Windows 安装',
@@ -43,8 +29,11 @@ export const zhSidebar = [
       //   text: '云原生安装',
       //   link: '/zh/installation/cloud-native/index'
       // },   
-      {
-        text: '安装检查',
+      
+    ]
+  },
+  {
+        text: '安装检查清单',
         link: '/zh/installation/checklists',
         collapsed: true,
         items: [
@@ -69,9 +58,7 @@ export const zhSidebar = [
             link: '/zh/installation/checklists/security-checklists'
           }
         ]
-      },  
-    ]
-  },
+  },  
   {
     text: '管理 RustFS',
     link: '/zh/management/index',
@@ -304,6 +291,10 @@ export const zhSidebar = [
        {
          text: 'Nginx反向代理配置',
          link: '/zh/integration/nginx'
+       },
+        {
+         text: '虚拟主机模式配置',
+         link: '/zh/integration/virtual'
        },
       // {
       //   text: 'GitLab',
