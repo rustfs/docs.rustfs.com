@@ -13,16 +13,16 @@ description: "使用RustFS一键安装包快速进行Linux环境下的部署安�
 
 1. 请明确您的三种安装启用模式：
 
-    1. [单机单盘模式（SNSD）](./single-node-single-disk.md)
-    2. [单机多盘模式（SNMD）](./single-node-multiple-disk.md)
-    3. [多机多盘模式（MNMD）](./multiple-node-multiple-disk.md)
+    1. 单机单盘模式（SNSD）
+    2. 单机多盘模式（SNMD）
+    3. 多机多盘模式（MNMD）
 
 2. [安装前检查](../checklists/index.md)，确保各项指标符合生产指导特征，若不需要生产标准可不阅读此指导；
 
 
 ## 二、快速安装
 
-使用快速安装脚本，实现的是SNSD(单机单盘)模式安装，脚本如下：
+使用快速安装脚本，实现的是 **SNSD(单机单盘)** 模式快速安装，脚本如下：
 
 ~~~
 curl -O https://rustfs.com/install_rustfs.sh && bash install_rustfs.sh
