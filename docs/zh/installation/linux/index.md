@@ -5,7 +5,6 @@ description: "使用 Linux 操作系统安装 RustFS 的快速指导"
 
 # Linux 安装 RustFS
 
-
 ## 一、安装前必读
 
 本页面包含了 RustFS 的三种安装模式的全部文档和说明。其中，多机多盘的模式包含了企业级可用的性能、安全性和扩展性。并且，提供了生产工作负载需要的架构图。请装前请阅读，我们的启动模式与检查清单，如下：
@@ -35,7 +34,6 @@ description: "使用 Linux 操作系统安装 RustFS 的快速指导"
 7. 磁盘规划；
 
 
-
 ### 2.1. 操作系统版本
 
 我们推荐 Linux 内核为 4.x 及以上的版本。因为，5.x / 6.x 的版本可以获得更好的 IO 吞吐和网络性能。
@@ -63,11 +61,8 @@ systemctl disable firewalld
 firewall-cmd --zone=public --add-port=9000/tcp --permanent
 firewall-cmd --reload
 ```
+
 部署中的所有 RustFS 服务器 **必须** 使用相同的监听端口。如果您使用的是 9000 端口，其他服务器的所有端口均需要为 9000 端口。
-
-
-
-
 
 ### 2.3 主机名（单机单盘和单机多盘可跳过此步骤）
 
@@ -77,7 +72,7 @@ firewall-cmd --reload
 
 **1. DNS 配置：**
 
-    请配置你的DNS解析服务器，保障名字的连续性。
+请配置你的DNS解析服务器，保障名字的连续性。
 
 **2. HOSTS 配置：**
 
@@ -85,7 +80,6 @@ firewall-cmd --reload
 
 
 ```bash
-
 vim /etc/hosts
 127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1 localhost localhost.localdomain localhost6 localhost6.localdomain6
@@ -98,7 +92,6 @@ vim /etc/hosts
 ### 2.4 内存条件
 
 RustFS 需要至少 2 GB 的内存来运行测试环境，生产的环境最低需要 128 GB 的内存。
-
 
 ### 2.5 时间同步
 
@@ -131,22 +124,19 @@ EC（纠删码）规划如下：
 | 开发测试环境	| EC:2|  提供基本的冗余保护，适用于非关键业务。| 
 
 
-
-
 ### 2.7 磁盘规划
 
 由于NFS在高IO情况下，会产生幻写和锁的问题，在使用RustFS时 **禁止使用NFS** 作为RustFS的底层存储介质。 官方强烈建议使用**JBOD（Just a Bunch of Disks）**模式，即简单磁盘捆绑。这意味着将物理磁盘直接、独立地暴露给操作系统，由RustFS软件层面负责数据冗余和保护。
 
 
 原因如下：
+
 - **性能更优：** RustFS 的纠删码（Erasure Coding）引擎经过高度优化，能够直接并发读写多块磁盘，实现比硬件RAID控制器更高的吞吐量。硬件RAID会成为性能瓶颈。
 - **成本更低：** 无需昂贵的RAID卡，降低了硬件采购成本。
 - **管理更简单：** 由RustFS统一管理磁盘，简化了存储层的运维。
 - **故障恢复更快：** RustFS（healing）过程比传统的RAID重建（rebuild）速度更快，且对集群性能影响更小。
 
-
 官方推荐在磁盘上使用NVMe SSD作为您的存储介质，保障更高的性能和吞吐能力。
-
 
 ### 2.8 文件系统选择
 
@@ -164,7 +154,7 @@ RustFS 在写入新对象或对象的版本时，为了保证写入性能和减�
 
 首先，需要查看磁盘系统的情况：
 
-~~~
+```
 sudo lsblk
 
 NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
@@ -174,22 +164,22 @@ sda           8:0    0 465.7G  0 disk
 nvme0n1           8:16   0   3.7T  0 disk  <-- if this is our format new disk
 nvme1n1           8:32   0   3.7T  0 disk  <-- if this is our format new disk
 nvme2n1          8:48   0   3.7T   0  disk
-~~~
-
+```
 
 具体格式化命令如下：
 
-~~~
+```
 sudo mkfs.xfs  -i size=512 -n ftype=1 -L RUSTFS0 /dev/sdb
-~~~
+```
 
 我们可以在格式化时加入一些推荐选项来优化性能:
-- -L <label>: 为文件系统设置一个标签（label），方便后续识别和挂载。
+- -L \<label\>: 为文件系统设置一个标签（label），方便后续识别和挂载。
 - -i size=512: RustFS官方推荐将inode大小设置为512字节，这对于存储大量小对象（元数据）的场景有性能优势。
 - -n ftype=1: 开启ftype功能。这允许文件系统在目录结构中记录文件类型，可以提高类似readdir和unlink操作的性能，对RustFS非常有利。
 
 挂载：
-~~~
+
+```
 # write new line
 vim /etc/fstab
 LABEL=RUSTFS0 /data/rustfs0   xfs   defaults,noatime,nodiratime   0   0
@@ -198,9 +188,7 @@ LABEL=RUSTFS0 /data/rustfs0   xfs   defaults,noatime,nodiratime   0   0
 
 # mount disk
 sudo mount -a 
-~~~
-
-
+```
 
 ## 三、配置用户名
 
@@ -212,18 +200,15 @@ RustFS 启动，我们建议您配置一个专门的无登录权限的用户进�
 
 以下示例是修改创建用户、组并设置权限以访问 RustFS 指定的数据目录（可选）：
 
-~~~
+```
 groupadd -r rustfs-user
 useradd -M -r -g rustfs-user rustfs-user
 chown rustfs-user:rustfs-user  /data/rustfs*
-~~~
+```
 
 注意：
 - 如果创建了rustfs-user用户和组需要将 `/etc/systemd/system/rustfs.service` 中的User 和Group改为 `rustfs-user` ;
 - 将 ` /data/rustfs*`  调整为指定的挂载目录。
-
-
-
 
 ## 四、下载安装包
 
@@ -237,11 +222,7 @@ chmod +x rustfs
 mv rustfs /usr/local/bin/
 ```
 
-
-
 ### 五、配置环境变量
-
-
 
 1. 创建配置文件 
 
@@ -298,6 +279,7 @@ sudo chmod -R 750 /data/rustfs* /var/logs/rustfs
 
 ### 七、配置系统服务
 1. 创建 systemd 服务文件
+
 ```bash
 sudo tee /etc/systemd/system/rustfs.service <<EOF
 [Unit]

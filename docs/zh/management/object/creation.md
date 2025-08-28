@@ -1,6 +1,6 @@
 ---
-title: "RustFS 对象管理"
-description: "RustFS 对象管理，包括对象的创建和删除。​"
+title: "RustFS 对象创建"
+description: "可在 RustFS UI 上,或通过 MinIO Client 客户端和 API 对对象进行创建.​"
 ---
 
 # RustFS 对象
@@ -15,7 +15,7 @@ description: "RustFS 对象管理，包括对象的创建和删除。​"
 
 - 一个可用的 RustFS 实例。可参考[安装指南](../../installation/index.md)进行安装。
 
-[创建一个存储桶](../bucket/bucket-create-and-delete.md)，然后上传文件至存储桶，就会完成对象的创建。可以通过 RustFS UI、`mc` 以API 方式上传文件。
+[创建一个存储桶](../bucket/creation.md)，然后上传文件至存储桶，就会完成对象的创建。可以通过 RustFS UI、`mc` 以API 方式上传文件。
 
 ### 在 RustFS UI 上上传文件
 

@@ -176,7 +176,7 @@ docker build -f crates/mcp/Dockerfile -t rustfs/rustfs-mcp .
 }
 ```
 
-> `AWS_ACCESS_KEY_ID` 和 `AWS_SECRET_ACCESS_KEY` 是 RustFS 的访问密钥，可以参考[访问密钥的管理章节](../management/iam/access-token.md)进行创建。
+> `AWS_ACCESS_KEY_ID` 和 `AWS_SECRET_ACCESS_KEY` 是 RustFS 的访问密钥，可以参考[访问密钥的管理章节](../administration/iam/access-token.md)进行创建。
 
 如果添加成功，可以在 MCP 配置页面列出[可用的工具](#️-可用工具)。
 

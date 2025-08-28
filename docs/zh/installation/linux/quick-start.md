@@ -13,9 +13,9 @@ description: "使用RustFS一键安装包快速进行Linux环境下的部署安�
 
 1. 请明确您的三种安装启用模式：
 
-    1. 单机单盘模式（SNSD）
-    2. 单机多盘模式（SNMD）
-    3. 多机多盘模式（MNMD）
+    1. [单机单盘模式（SNSD）](./single-node-single-disk.md)
+    2. [单机多盘模式（SNMD）](./single-node-multiple-disk.md)
+    3. [多机多盘模式（MNMD）](./multiple-node-multiple-disk.md)
 
 2. [安装前检查](../checklists/index.md)，确保各项指标符合生产指导特征，若不需要生产标准可不阅读此指导；
 
