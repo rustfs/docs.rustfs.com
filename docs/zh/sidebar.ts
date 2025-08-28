@@ -6,7 +6,6 @@ export const zhSidebar = [
     items: [
       {
         text: 'Linux详细安装',
-        link: '/zh/installation/linux/index',
         items: [
           {
             text: 'Linux快速安装',
