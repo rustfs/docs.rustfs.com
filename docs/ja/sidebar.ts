@@ -10,6 +10,7 @@ export const jaSidebar = [
       { text: 'オープンソースライセンス', link: '/ja/license' },
       {
         text: 'コアコンセプト', items: [
+          { text: 'RustFS とは？', link: '/ja/concepts/introduction' },
           { text: '用語説明', link: '/ja/concepts/glossary' },
           { text: 'イレイジャーコーディング原理', link: '/ja/concepts/erasure-coding' },
           { text: '可用性と拡張性', link: '/ja/concepts/availability-and-resiliency' },
@@ -93,6 +94,23 @@ export const jaSidebar = [
           { text: 'Dockerインストール', link: '/ja/installation/docker' },
         ]
       },
+    ]
+  },
+  {
+    text: '管理',
+    collapsed: true,
+    home: true,
+    items: [
+      { text: 'RustFS 最適管理', link: '/ja/management/' },
+      { text: 'IAM 管理', link: '/ja/administration/iam/' },
+    ]
+  },
+  {
+    text: '開発者',
+    collapsed: true,
+    home: true,
+    items: [
+      { text: '開発者ガイド', link: '/ja/developer/' },
     ]
   },
     {
