@@ -10,6 +10,7 @@ export const koSidebar = [
       { text: '오픈소스 라이선스', link: '/ko/license' },
       {
         text: '핵심 개념', items: [
+          { text: 'RustFS란 무엇인가?', link: '/ko/concepts/introduction' },
           { text: '용어집', link: '/ko/concepts/glossary' },
           { text: '이레이저 코딩 원리', link: '/ko/concepts/erasure-coding' },
           { text: '가용성과 확장성', link: '/ko/concepts/availability-and-resiliency' },
@@ -93,6 +94,23 @@ export const koSidebar = [
           { text: 'Docker 설치', link: '/ko/installation/docker' },
         ]
       },
+    ]
+  },
+  {
+    text: '관리',
+    collapsed: true,
+    home: true,
+    items: [
+      { text: 'RustFS 최적 관리', link: '/ko/management/' },
+      { text: 'IAM 관리', link: '/ko/administration/iam/' },
+    ]
+  },
+  {
+    text: '개발자',
+    collapsed: true,
+    home: true,
+    items: [
+      { text: '개발자 가이드', link: '/ko/developer/' },
     ]
   },
     {
