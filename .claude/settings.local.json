@@ -11,7 +11,8 @@
       "Bash(rsync:*)",
       "Bash(npm run build:*)",
       "Bash(git pull:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
