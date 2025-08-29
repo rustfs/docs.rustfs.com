@@ -6,7 +6,7 @@ export const zhSidebar = [
     items: [
       {
         text: 'Linux安装',
-        link: '/zh/installation/linux/index'
+        link: '/zh/installation/linux/index',
         items: [
           {
             text: 'Linux快速安装',
@@ -467,23 +467,15 @@ export const zhSidebar = [
             text: 'JavaScript',
             link: '/zh/developer/sdk/javascript'
           },
-          // {
-          //   text: '.Net',
-          //   link: '/zh/developer/sdk/dotnet'
-          // },
-          // {
-          //   text: 'PHP',
-          //   link: '/zh/developer/sdk/php'
-          // },
-          // {
-          //   text: 'Go',
-          //   link: '/zh/developer/sdk/go'
-          // },
+          {
+            text: 'TypeScript',
+            link: '/zh/developer/sdk/typescript'
+          },
           {
             text: '其他 SDK',
             link: '/zh/developer/sdk/other'
           }
-        ]
+        ],
       },
       {
         text: 'S3 兼容性 API',

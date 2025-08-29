@@ -17,6 +17,7 @@ RustFS 是 100% 兼容 S3 协议的分布式对象存储软件。 用户可以�
 - [JavaScript SDK](./javascript.md)
 - [Python SDK](./python.md)
 - [Rust SDK](./rust.md)
+- [TypeScript SDK](./typescript.md)
 
 ## 阅读前名词解释
 
