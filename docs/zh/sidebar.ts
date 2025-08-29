@@ -5,22 +5,23 @@ export const zhSidebar = [
     home: true,
     items: [
       {
-        text: 'Linux详细安装',
+        text: 'Linux安装',
+        link: '/zh/installation/linux/index'
         items: [
           {
             text: 'Linux快速安装',
             link: '/zh/installation/linux/quick-start'
           },
           {
-            text: '单机单盘',
+            text: '单机单盘安装',
             link: '/zh/installation/linux/single-node-single-disk'
           },
           {
-            text: '单机多盘',
+            text: '单机多盘安装',
             link: '/zh/installation/linux/single-node-multiple-disk'
           },
           {
-            text: '多机多盘',
+            text: '多机多盘安装',
             link: '/zh/installation/linux/multiple-node-multiple-disk'
           }
         ]
@@ -76,10 +77,6 @@ export const zhSidebar = [
     // collapsed: true,
     home: true,
     items: [
-      {
-        text: 'RustFS 介绍',
-        link: '/zh/concepts/introduction'
-      },
       {
         text: 'RustFS性能对比',
         link: '/zh/concepts/comparison'
