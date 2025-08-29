@@ -406,14 +406,14 @@ export const zhSidebar = [
     // collapsed: true,
     home: true,
     items: [
-      //  {
-      //    text: 'Nginx反向代理配置',
-      //    link: '/zh/integration/nginx'
-      //  },
-      //   {
-      //    text: '虚拟主机模式配置',
-      //    link: '/zh/integration/virtual'
-      //  },
+         {
+          text: 'Nginx反向代理配置',
+          link: '/zh/integration/nginx'
+         },
+         {
+          text: '虚拟主机模式配置',
+          link: '/zh/integration/virtual'
+        },
       // {
       //   text: 'GitLab',
       //   link: '/zh/integration/gitlab',
