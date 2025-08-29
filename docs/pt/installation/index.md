@@ -1,8 +1,8 @@
 ---
-title: "Guia de Instalação do RustFS"
-description: "Visão geral das opções de instalação do RustFS"
+title: "Documentação em Português"
+description: "Esta documentação está sendo traduzida do chinês para o português"
 ---
 
-# Guia de Instalação do RustFS
+# Documentação em Português
 
-Esta secção apresenta uma visão geral das opções de instalação do RustFS em diferentes ambientes. O conteúdo detalhado será disponibilizado em breve para a língua portuguesa.
+Esta seção contém a documentação traduzida do RustFS em português.

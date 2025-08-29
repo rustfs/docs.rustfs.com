@@ -1,8 +1,8 @@
 ---
-title: "Glossário do RustFS"
-description: "Termos essenciais e conceitos do RustFS (versão resumida)"
+title: "Documentação em Português"
+description: "Esta documentação está sendo traduzida do chinês para o português"
 ---
 
-# Glossário do RustFS
+# Documentação em Português
 
-Esta página reunirá os principais termos e conceitos relacionados com o RustFS (objetos, buckets, metadados, chaves de acesso, versão, ciclo de vida, etc.). A versão completa será publicada em breve em português.
+Esta seção contém a documentação traduzida do RustFS em português.
