@@ -451,6 +451,7 @@ export const zhSidebar = [
       },
       {
         text: 'SDK',
+        link: '/zh/developer/sdk/index',
         // collapsed: true,
         items: [
           {
@@ -461,10 +462,10 @@ export const zhSidebar = [
             text: 'Python',
             link: '/zh/developer/sdk/python'
           },
-          // {
-          //   text: 'Rust',
-          //   link: '/zh/developer/sdk/rust'
-          // },
+          {
+            text: 'Rust',
+            link: '/zh/developer/sdk/rust'
+          },
           {
             text: 'JavaScript',
             link: '/zh/developer/sdk/javascript'
