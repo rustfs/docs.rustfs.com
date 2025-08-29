@@ -1,118 +1,103 @@
 export const deSidebar = [
   {
-    text: 'Einführung',
-    collapsed: true,
+    text: 'RustFS Installationsanleitung',
+    // collapsed: true,
     home: true,
     items: [
-      { text: 'RustFS Überblick', link: '/de/introduction' },
-      { text: 'Architekturaufbau', link: '/de/architecture' },
-      { text: 'Vergleich mit anderen Speicherlösungen', link: '/de/comparison' },
-      { text: 'Open Source Lizenz', link: '/de/license' },
       {
-        text: 'Kernkonzepte', items: [
-          { text: 'Glossar', link: '/de/concepts/glossary' },
-          { text: 'Erasure Coding Prinzip', link: '/de/concepts/erasure-coding' },
-          { text: 'Verfügbarkeit und Skalierbarkeit', link: '/de/concepts/availability-and-resiliency' },
-          { text: 'Objektprüfung und automatische Wiederherstellung', link: '/de/concepts/object-healing' },
-          { text: 'Objektscan', link: '/de/concepts/object-scanner' },
-          { text: 'Nutzungsbeschränkungen', link: '/de/concepts/limit' },
-        ],
-      },
-    ],
-  },
-  {
-    text: 'Architektur-Support',
-    collapsed: true,
-    home: true,
-    items: [
-      { text: 'Bare Metal und Virtualisierung', link: '/de/features/baremetal/' },
-      { text: 'Alibaba Cloud', link: '/de/features/aliyun/' },
-      { text: 'Tencent Cloud', link: '/de/features/qcloud/' },
-      { text: 'Huawei Cloud', link: '/de/features/huaweicloud/' },
-      { text: 'VMWare Tanzu', link: '/de/features/tanzu/' },
-      { text: 'Internationale Cloud-Anbieter', link: '/de/features/aws-elastic/' },
-    ],
-  },
-  {
-    text: 'Produktfunktionen',
-    collapsed: true,
-    home: true,
-    items: [
-      { text: 'Verteilt', link: '/de/features/distributed/' },
-      { text: 'Log-Management', link: '/de/features/logging/' },
-      { text: 'Versionskontrolle', link: '/de/features/versioning/' },
-      { text: 'S3-Kompatibilität', link: '/de/features/s3-compatibility/' },
-      { text: 'Objektebene und Nur-Lesen', link: '/de/features/worm/' },
-      { text: 'Regionsübergreifende Replikation', link: '/de/features/replication/' },
-      { text: 'Verschlüsselung', link: '/de/features/encryption/' },
-      { text: 'Lifecycle-Management', link: '/de/features/lifecycle/' },
-    ],
-  },
-  {
-    text: 'Lösungen',
-    collapsed: true,
-    home: true,
-    items: [
-      { text: 'Moderner Data Lake', link: '/de/features/data-lake/' },
-      { text: 'KI und maschinelles Lernen', link: '/de/features/ai/' },
-      { text: 'Cloud Native', link: '/de/features/cloud-native/' },
-      { text: 'Big Data Compute-Storage-Trennung', link: '/de/features/hdfs/' },
-      { text: 'SQL-Unterstützung', link: '/de/features/sql-server/' },
-      { text: 'Quantitativer Handel', link: '/de/features/quantitative-trading/' },
-      { text: 'Fertigungskostensenkung', link: '/de/features/industry/' },
-      { text: 'Cold-Archiv-Speicher', link: '/de/features/cold-archiving/' },
-      { text: 'Video-Speicherlösung', link: '/de/features/video/' },
-      { text: 'Nationale Informatisierung und SM-Lösungen', link: '/de/features/domestic/' },
-    ],
-  },
-  {
-    text: 'Installation und Bereitstellung',
-    collapsed: true,
-    home: true,
-    items: [
-      { text: 'Startmodus', link: '/de/installation/mode/' },
-      { text: 'Hardware-Auswahl', link: '/de/installation/hardware-selection' },
-      {
-        text: 'Vorinstallationsprüfungen',
-        link: '/de/installation/checklists',
+        text: 'Linux-Installation',
+        link: '/de/installation/linux/index',
         items: [
-          { text: 'Checkliste', link: '/de/installation/checklists' },
-          { text: 'Hardware-Checkliste', link: '/de/installation/hard-checklists' },
-          { text: 'Software-Checkliste', link: '/de/installation/software-checklists' },
-          { text: 'Netzwerk-Checkliste', link: '/de/installation/network-checklists' },
-          { text: 'Sicherheits-Checkliste', link: '/de/installation/security-checklists' },
+          {
+            text: 'Schnelle Linux-Installation',
+            link: '/de/installation/linux/quick-start'
+          },
+          {
+            text: 'Einzelserver-Einzelfestplatte-Installation',
+            link: '/de/installation/linux/single-node-single-disk'
+          },
+          {
+            text: 'Einzelserver-Mehrfachfestplatte-Installation',
+            link: '/de/installation/linux/single-node-multiple-disk'
+          },
+          {
+            text: 'Mehrfachserver-Mehrfachfestplatte-Installation',
+            link: '/de/installation/linux/multiple-node-multiple-disk'
+          }
         ]
       },
       {
-        text: 'Installationsanleitung',
-        link: '/de/installation/linux',
-        items: [
-          { text: 'Linux-Installation', link: '/de/installation/linux' },
-          { text: 'macOS-Installation', link: '/de/installation/macos/' },
-          { text: 'Windows-Installation', link: '/de/installation/windows/' },
-          { text: 'Docker-Installation', link: '/de/installation/docker' },
-        ]
+        text: 'Windows Installation',
+        link: '/de/installation/windows/index'
       },
-    ]
-  },
-    {
-    text: 'Funktions-Nutzungsanleitung',
-    collapsed: true,
-    home: true,
-    items: [
-      { text: 'MCP', link: '/de/guide/mcp' },
+      {
+        text: 'macOS Installation',
+        link: '/de/installation/macos/index'
+      },
+      {
+        text: 'Docker Installation',
+        link: '/de/installation/docker/index'
+      }
     ]
   },
   {
-    text: 'SDK und API',
-    collapsed: true,
+    text: 'Installations-Checkliste',
+    // collapsed: true,
     home: true,
     items: [
-      { text: 'SDK-Übersicht', link: '/de/sdk/' },
-      { text: 'Java SDK', link: '/de/sdk/java' },
-      { text: 'Python SDK', link: '/de/sdk/python' },
-      { text: 'JavaScript SDK', link: '/de/sdk/js' },
-      { text: 'Andere SDKs', link: '/de/sdk/other' },
+      {
+        text: 'Hardware-Anforderungen',
+        link: '/de/installation/checklists/hardware-checklists'
+      },
+      {
+        text: 'Hardware-Auswahl',
+        link: '/de/installation/checklists/hardware-selection'
+      },
+      {
+        text: 'Netzwerk-Check',
+        link: '/de/installation/checklists/network-checklists'
+      },
+      {
+        text: 'Software-Check',
+        link: '/de/installation/checklists/software-checklists'
+      },
+      {
+        text: 'Sicherheits-Check',
+        link: '/de/installation/checklists/security-checklists'
+      }
+    ]
+  },
+  {
+    text: 'RustFS Leistung und Framework',
+    // collapsed: true,
+    home: true,
+    items: [
+      {
+        text: 'RustFS Leistungsvergleich',
+        link: '/de/concepts/comparison'
+      },
+      {
+        text: 'RustFS Designarchitektur',
+        link: '/de/concepts/architecture'
+      },
+      {
+        text: 'Terminologie-Erklärung',
+        link: '/de/concepts/glossary'
+      },
+      {
+        text: 'Nutzungsbeschränkungen',
+        link: '/de/concepts/limit'
+      },
+      {
+        text: 'Kernkonzepte',
+        link: '/de/concepts/principle',
+        items: [
+          {
+            text: 'Erasure Coding',
+            link: '/de/concepts/principle/erasure-coding'
+          }
+        ]
+      }
     ]
   }
 ]
