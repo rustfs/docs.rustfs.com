@@ -6,7 +6,10 @@
       "Bash(mkdir:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(git branch:*)",
+      "Bash(rsync:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []
