@@ -10,10 +10,15 @@
       "Bash(git branch:*)",
       "Bash(rsync:*)",
       "Bash(comm:*)",
+      "Bash(echo:*)",
       "Bash(npm run build:*)",
       "Bash(git pull:*)",
       "Bash(git stash:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(for lang in de en ja fr es ko)",
+      "Bash(do)",
+      "Bash(echo:*)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []
