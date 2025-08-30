@@ -9,6 +9,7 @@
       "Bash(git merge:*)",
       "Bash(git branch:*)",
       "Bash(rsync:*)",
+      "Bash(comm:*)",
       "Bash(npm run build:*)",
       "Bash(git pull:*)",
       "Bash(git stash:*)",
