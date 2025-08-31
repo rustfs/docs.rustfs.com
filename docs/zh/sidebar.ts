@@ -300,10 +300,10 @@ export const zhSidebar = [
         text: '可用性和扩展说明',
         link: '/zh/upgrade-scale/availability-and-resiliency'
       },
-      // {
-      //   text: '升级',
-      //   link: '/zh/upgrade-scale/upgrade',
-      // },
+      {
+        text: '升级',
+        link: '/zh/upgrade-scale/upgrade',
+     },
       // {
       //   text: '扩容',
       //   link: '/zh/upgrade-scale/scale',
