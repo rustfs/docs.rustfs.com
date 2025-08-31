@@ -18,7 +18,11 @@
       "Bash(for lang in de en ja fr es ko)",
       "Bash(do)",
       "Bash(echo:*)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(for lang in de en es fr ja ko pt ru tr)",
+      "Bash(for lang in de fr es ko ja ru)",
+      "Bash(do echo \"=== $lang features ===\")",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []
