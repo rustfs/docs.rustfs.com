@@ -1,13 +1,12 @@
 # 韩语待翻译任务列表
 
-> 最后更新: 2025/9/2 01:10:01
-> 总计: 55 个文件待翻译
+> 最后更新: 2025/9/2 01:32:02
+> 总计: 48 个文件待翻译
 
 ## 📋 任务总览
 
-- **concepts**: 2 个文件
-- **developer**: 8 个文件
-- **features**: 22 个文件
+- **developer**: 4 个文件
+- **features**: 21 个文件
 - **installation**: 8 个文件
 - **integration**: 3 个文件
 - **management**: 6 个文件
@@ -17,21 +16,12 @@
 
 ## 📝 待翻译文件列表
 
-### concepts
-
-- [ ] [concepts/architecture.md](./concepts/architecture.md) (53 行)
-- [ ] [concepts/principle/erasure-coding.md](./concepts/principle/erasure-coding.md) (147 行)
-
 ### developer
 
-- [ ] [developer/license.md](./developer/license.md) (207 行)
 - [ ] [developer/mc.md](./developer/mc.md) (116 行)
 - [ ] [developer/mcp.md](./developer/mcp.md) (272 行)
 - [ ] [developer/sdk/java.md](./developer/sdk/java.md) (297 行)
 - [ ] [developer/sdk/other.md](./developer/sdk/other.md) (82 行)
-- [ ] [developer/sdk/python.md](./developer/sdk/python.md) (240 行)
-- [ ] [developer/sdk/rust.md](./developer/sdk/rust.md) (193 行)
-- [ ] [developer/sdk/typescript.md](./developer/sdk/typescript.md) (131 行)
 
 ### features
 
@@ -54,7 +44,6 @@
 - [ ] [features/small-file/index.md](./features/small-file/index.md) (35 行)
 - [ ] [features/sql-server/index.md](./features/sql-server/index.md) (504 行)
 - [ ] [features/tanzu/index.md](./features/tanzu/index.md) (77 行)
-- [ ] [features/versioning/index.md](./features/versioning/index.md) (63 行)
 - [ ] [features/video/index.md](./features/video/index.md) (109 行)
 - [ ] [features/worm/index.md](./features/worm/index.md) (41 行)
 

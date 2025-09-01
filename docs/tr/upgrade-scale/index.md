@@ -1,8 +1,14 @@
 ---
-title: "待翻译"
-description: "Bu dokümantasyon Çince'den Türkçe'ye çevriliyor"
+title: "Kullanılabilirlik ve Ölçeklenebilirlik Açıklaması"
+description: "Bu makale RustFS ölçeklendirme ile ilgili teknolojileri ve açıklamaları detaylı olarak sunacaktır."
 ---
 
-# 待翻译
+# RustFS Yükseltme ve Ölçeklendirme Genel Bakış
 
-Bu bölüm, Türkçe'ye çevrilmiş RustFS dokümantasyonunu içerir.
+Bu bölüm RustFS yükseltme ve ölçeklendirme ile ilgili içerikleri paylaşır, bunlar şunları içerir:
+
+- [Kullanılabilirlik ve ölçeklenebilirlik açıklaması](./availability-and-resiliency.md)
+- [Yükseltme] (./upgrade.md)
+- Ölçeklendirme
+- Emekliye ayırma
+- Yeniden dengeleme

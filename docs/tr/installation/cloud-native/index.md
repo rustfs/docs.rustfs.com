@@ -1,8 +1,6 @@
 ---
-title: "待翻译"
-description: "Bu dokümantasyon Çince'den Türkçe'ye çevriliyor"
+title: "RustFS Bulut Yerel Kurulum Kılavuzu"
+description: "Helm Chart veya Operator kullanarak Kubernetes'te RustFS kurulumu ve dağıtımı."
 ---
 
-# 待翻译
-
-Bu bölüm, Türkçe'ye çevrilmiş RustFS dokümantasyonunu içerir.
+# RustFS Bulut Yerel Kurulum Kılavuzu
