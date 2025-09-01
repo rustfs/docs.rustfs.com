@@ -4,7 +4,7 @@ sidebar: false
 ---
 
 <script setup>
-import { zhSidebar } from './sidebar';
+import { sidebar } from './sidebar';
 </script>
 
-<Home :sidebar="zhSidebar" title="RustFS 文档中心" />
+<Home :sidebar="sidebar" title="RustFS 文档中心" />

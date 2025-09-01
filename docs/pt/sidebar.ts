@@ -1,4 +1,4 @@
-export const zhSidebar = [
+export const sidebar = [
   {
     text: 'Guia de Instalação do RustFS',
     // collapsed: true,
@@ -41,32 +41,32 @@ export const zhSidebar = [
     ]
   },
   {
-        text: 'Lista de Verificação de Instalação',
-        // collapsed: true,
-        home: true,
-        items: [
-          {
-            text: 'Requisitos de Hardware',
-            link: '/pt/installation/checklists/hardware-checklists'
-          },
-          {
-            text: 'Seleção de Hardware',
-            link: '/pt/installation/checklists/hardware-selection'
-          },
-          {
-            text: 'Verificação de Rede',
-            link: '/pt/installation/checklists/network-checklists'
-          },
-          {
-            text: 'Verificação de Software',
-            link: '/pt/installation/checklists/software-checklists'
-          },
-          {
-            text: 'Verificação de Segurança',
-            link: '/pt/installation/checklists/security-checklists'
-          }
-        ]
-  },  
+    text: 'Lista de Verificação de Instalação',
+    // collapsed: true,
+    home: true,
+    items: [
+      {
+        text: 'Requisitos de Hardware',
+        link: '/pt/installation/checklists/hardware-checklists'
+      },
+      {
+        text: 'Seleção de Hardware',
+        link: '/pt/installation/checklists/hardware-selection'
+      },
+      {
+        text: 'Verificação de Rede',
+        link: '/pt/installation/checklists/network-checklists'
+      },
+      {
+        text: 'Verificação de Software',
+        link: '/pt/installation/checklists/software-checklists'
+      },
+      {
+        text: 'Verificação de Segurança',
+        link: '/pt/installation/checklists/security-checklists'
+      }
+    ]
+  },
   {
     text: 'Performance e Framework do RustFS',
     // collapsed: true,
@@ -165,11 +165,11 @@ export const zhSidebar = [
       },
       {
         text: 'Verificação e Recuperação Automática de Objetos',
-        link: '/pt/troubleshooting/healing'      
+        link: '/pt/troubleshooting/healing'
       },
       {
         text: 'Falha de Nó',
-        link: '/pt/troubleshooting/node'      
+        link: '/pt/troubleshooting/node'
       }
     ]
   },
@@ -185,7 +185,7 @@ export const zhSidebar = [
         items: [
           {
             text: 'Token de Acesso',
-            link: '/pt/administration/iam/access-token'  
+            link: '/pt/administration/iam/access-token'
           }
         ]
       }
@@ -196,14 +196,14 @@ export const zhSidebar = [
     // collapsed: true,
     home: true,
     items: [
-         {
-          text: 'Configuração de Proxy Reverso Nginx',
-          link: '/pt/integration/nginx'
-         },
-         {
-          text: 'Configuração de Modo de Host Virtual',
-          link: '/pt/integration/virtual'
-        },
+      {
+        text: 'Configuração de Proxy Reverso Nginx',
+        link: '/pt/integration/nginx'
+      },
+      {
+        text: 'Configuração de Modo de Host Virtual',
+        link: '/pt/integration/virtual'
+      },
       {
         text: 'Configuração TLS',
         link: '/pt/integration/tls-configured'
@@ -213,7 +213,7 @@ export const zhSidebar = [
   {
     text: 'Desenvolvedor',
     // collapsed: true,
-    home: true, 
+    home: true,
     items: [
       {
         text: 'MCP',
@@ -269,37 +269,37 @@ export const zhSidebar = [
     // collapsed: true,
     home: true,
     items: [
-      { 
-        text: 'Distribuído', 
-        link: '/pt/features/distributed/' 
+      {
+        text: 'Distribuído',
+        link: '/pt/features/distributed/'
       },
-      { 
-        text: 'Gerenciamento de Logs', 
-        link: '/pt/features/logging/' 
+      {
+        text: 'Gerenciamento de Logs',
+        link: '/pt/features/logging/'
       },
-      { 
-        text: 'Controle de Versão', 
-        link: '/pt/features/versioning/' 
+      {
+        text: 'Controle de Versão',
+        link: '/pt/features/versioning/'
       },
-      { 
-        text: 'Compatibilidade S3', 
-        link: '/pt/features/s3-compatibility/' 
+      {
+        text: 'Compatibilidade S3',
+        link: '/pt/features/s3-compatibility/'
       },
-      { 
-        text: 'Nível de Objeto e Somente Leitura', 
-        link: '/pt/features/worm/' 
+      {
+        text: 'Nível de Objeto e Somente Leitura',
+        link: '/pt/features/worm/'
       },
-      { 
-        text: 'Replicação Cross-Region', 
-        link: '/pt/features/replication/' 
+      {
+        text: 'Replicação Cross-Region',
+        link: '/pt/features/replication/'
       },
-      { 
-        text: 'Criptografia', 
-        link: '/pt/features/encryption/' 
+      {
+        text: 'Criptografia',
+        link: '/pt/features/encryption/'
       },
-      { 
-        text: 'Gerenciamento de Ciclo de Vida', 
-        link: '/pt/features/lifecycle/' 
+      {
+        text: 'Gerenciamento de Ciclo de Vida',
+        link: '/pt/features/lifecycle/'
       },
     ],
   },
@@ -308,45 +308,45 @@ export const zhSidebar = [
     // collapsed: true,
     home: true,
     items: [
-      { 
-        text: 'Data Lake Moderno', 
-        link: '/pt/features/data-lake/' 
+      {
+        text: 'Data Lake Moderno',
+        link: '/pt/features/data-lake/'
       },
-      { 
-        text: 'IA e Machine Learning', 
-        link: '/pt/features/ai/' 
+      {
+        text: 'IA e Machine Learning',
+        link: '/pt/features/ai/'
       },
-      { 
-        text: 'Cloud Native', 
-        link: '/pt/features/cloud-native/' 
+      {
+        text: 'Cloud Native',
+        link: '/pt/features/cloud-native/'
       },
-      { 
-        text: 'Separação de Computação e Armazenamento de Big Data', 
-        link: '/pt/features/hdfs/' 
+      {
+        text: 'Separação de Computação e Armazenamento de Big Data',
+        link: '/pt/features/hdfs/'
       },
-      { 
-        text: 'Suporte SQL', 
-        link: '/pt/features/sql-server/' 
+      {
+        text: 'Suporte SQL',
+        link: '/pt/features/sql-server/'
       },
-      { 
-        text: 'Trading Quantitativo', 
-        link: '/pt/features/quantitative-trading/' 
+      {
+        text: 'Trading Quantitativo',
+        link: '/pt/features/quantitative-trading/'
       },
-      { 
-        text: 'Redução de Custos na Manufatura', 
-        link: '/pt/features/industry/' 
+      {
+        text: 'Redução de Custos na Manufatura',
+        link: '/pt/features/industry/'
       },
-      { 
-        text: 'Armazenamento de Arquivo Frio', 
-        link: '/pt/features/cold-archiving/' 
+      {
+        text: 'Armazenamento de Arquivo Frio',
+        link: '/pt/features/cold-archiving/'
       },
-      { 
-        text: 'Solução de Armazenamento de Vídeo', 
-        link: '/pt/features/video/' 
+      {
+        text: 'Solução de Armazenamento de Vídeo',
+        link: '/pt/features/video/'
       },
-      { 
-        text: 'Solução Doméstica de Inovação e SM', 
-        link: '/pt/features/domestic/' 
+      {
+        text: 'Solução Doméstica de Inovação e SM',
+        link: '/pt/features/domestic/'
       },
     ],
   },

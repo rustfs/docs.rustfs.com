@@ -1,4 +1,4 @@
-export const deSidebar = [
+export const sidebar = [
   {
     text: 'RustFS Installationsanleitung',
     // collapsed: true,

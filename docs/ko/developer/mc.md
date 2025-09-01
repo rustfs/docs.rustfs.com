@@ -1,4 +1,5 @@
 ---
+<<<<<<< HEAD
 title: "MinIO Client로 RustFS 객체 관리"
 description: "MinIO Client로 RustFS 객체를 관리합니다"
 ---
@@ -114,3 +115,13 @@ mc get rustfs/bucket-creation-by-mc/file_name ./file_name
 ```
 ...eation-by-mc/file_name: 4 B / 4 B  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  18 B/s 0s%
 ```
+=======
+title: "한국어 문서"
+description: "이 문서는 중국어에서 한국어로 번역되고 있습니다"
+---
+
+# 한국어 문서
+
+이 섹션에는 한국어로 번역된 RustFS 문서가 포함되어 있습니다.
+
+>>>>>>> feature/complete-all-translations

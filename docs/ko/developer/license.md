@@ -1,4 +1,5 @@
 ---
+<<<<<<< HEAD
 title: RustFS의 오픈소스 라이선스
 description: RustFS는 100% 상업적으로 친화적인 Apache v2.0 라이선스로 배포됩니다
 ---
@@ -203,3 +204,13 @@ third-party archives.
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
+=======
+title: "한국어 문서"
+description: "이 문서는 중국어에서 한국어로 번역되고 있습니다"
+---
+
+# 한국어 문서
+
+이 섹션에는 한국어로 번역된 RustFS 문서가 포함되어 있습니다.
+
+>>>>>>> feature/complete-all-translations

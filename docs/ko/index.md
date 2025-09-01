@@ -4,7 +4,7 @@ sidebar: false
 ---
 
 <script setup>
-import { koSidebar } from './sidebar';
+import { sidebar } from './sidebar';
 </script>
 
-<Home :sidebar="koSidebar" title="RustFS 문서 센터" />
+<Home :sidebar="sidebar" title="RustFS 문서 센터" />

@@ -1,5 +1,5 @@
 import { defineAdditionalConfig } from 'vitepress'
-import { frSidebar } from './sidebar'
+import { sidebar } from './sidebar'
 
 export default defineAdditionalConfig({
   lang: 'fr-FR',
@@ -16,7 +16,7 @@ export default defineAdditionalConfig({
     ],
 
     sidebar: {
-      '/fr/': frSidebar,
+      '/fr/': sidebar,
     },
 
     editLink: {

@@ -9,10 +9,20 @@
       "Bash(git merge:*)",
       "Bash(git branch:*)",
       "Bash(rsync:*)",
+      "Bash(comm:*)",
+      "Bash(echo:*)",
       "Bash(npm run build:*)",
       "Bash(git pull:*)",
       "Bash(git stash:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(for lang in de en ja fr es ko)",
+      "Bash(do)",
+      "Bash(echo:*)",
+      "Bash(done)",
+      "Bash(for lang in de en es fr ja ko pt ru tr)",
+      "Bash(for lang in de fr es ko ja ru)",
+      "Bash(do echo \"=== $lang features ===\")",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []

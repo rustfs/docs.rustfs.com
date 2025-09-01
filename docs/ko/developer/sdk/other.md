@@ -11,22 +11,24 @@ AWS S3에서 공식적으로 지원하지 않는 언어를 사용하는 경우, 
 
 S3 프로토콜은 표준 RESTful API입니다. HTTP 요청을 지원하는 모든 언어(예: C, Rust, Lua, Erlang)를 통해 액세스 로직을 직접 래핑할 수 있습니다.
 
-### 핵심 사항:
+### 핵심 사항
 
 * **서명 알고리즘**: AWS Signature Version 4 서명 구현(복잡함)
 * **올바른 Header와 Canonical Request 구성**
 * **HTTPS / HTTP 클라이언트를 사용하여 요청 전송**
 
 👉 오픈소스 프로젝트의 서명 구현을 참조할 것을 권장합니다:
+
 * [AWS Signature V4 예제](https://docs.aws.amazon.com/general/latest/gr/sigv4-signed-request-examples.html)
 
 ## 2. 기존 SDK의 CLI 도구 또는 중간 서비스 호출
 
 서명을 직접 구현하고 싶지 않다면:
 
-### 2.1. 기존 언어가 지원하는 AWS CLI 도구 사용:
+### 2.1. 기존 언어가 지원하는 AWS CLI 도구 사용
 
 Shell을 통해 호출:
+
 ```bash
 aws s3 cp local.txt s3://mybucket/myfile.txt --endpoint-url http://rustfs.local:9000
 ```
@@ -56,6 +58,7 @@ AWS에 공식 SDK가 없지만, 일부 언어 커뮤니티에서 비공식 S3 �
 ## 4. 핵심 업로드 로직을 플랫폼 호스팅에 위임
 
 예를 들어:
+
 * 프론트엔드(Web/Mobile) 업로드 작업을 브라우저나 앱에서 실행(사전 서명된 URL 사용)
 * 백엔드는 Node.js/Python/Go 등을 사용하여 프록시로 업로드 로직 구현
 

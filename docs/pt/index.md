@@ -4,7 +4,7 @@ sidebar: false
 ---
 
 <script setup>
-import { zhSidebar } from './sidebar';
+import { sidebar } from './sidebar';
 </script>
 
-<Home :sidebar="zhSidebar" title="Centro de Documentação do RustFS" />
+<Home :sidebar="sidebar" title="Centro de Documentação do RustFS" />

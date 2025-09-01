@@ -4,7 +4,7 @@ sidebar: false
 ---
 
 <script setup>
-import { enSidebar } from './sidebar';
+import { sidebar } from './sidebar';
 </script>
 
-<Home :sidebar="enSidebar" title="RustFS Documentation" />
+<Home :sidebar="sidebar" title="RustFS Documentation" />
