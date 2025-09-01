@@ -1,5 +1,5 @@
 import { defineAdditionalConfig } from 'vitepress'
-import { koSidebar } from './sidebar'
+import { sidebar } from './sidebar'
 
 export default defineAdditionalConfig({
   lang: 'ko-KR',
@@ -16,7 +16,7 @@ export default defineAdditionalConfig({
     ],
 
     sidebar: {
-      '/ko/': koSidebar,
+      '/ko/': sidebar,
     },
 
     editLink: {

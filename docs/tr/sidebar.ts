@@ -1,4 +1,4 @@
-export const zhSidebar = [
+export const sidebar = [
   {
     text: 'RustFS Kurulum Kılavuzu',
     // collapsed: true,
@@ -41,32 +41,32 @@ export const zhSidebar = [
     ]
   },
   {
-        text: 'Kurulum Kontrol Listesi',
-        // collapsed: true,
-        home: true,
-        items: [
-          {
-            text: 'Donanım Gereksinimleri',
-            link: '/tr/installation/checklists/hardware-checklists'
-          },
-          {
-            text: 'Donanım Seçimi',
-            link: '/tr/installation/checklists/hardware-selection'
-          },
-          {
-            text: 'Ağ Kontrolü',
-            link: '/tr/installation/checklists/network-checklists'
-          },
-          {
-            text: 'Yazılım Kontrolü',
-            link: '/tr/installation/checklists/software-checklists'
-          },
-          {
-            text: 'Güvenlik Kontrolü',
-            link: '/tr/installation/checklists/security-checklists'
-          }
-        ]
-  },  
+    text: 'Kurulum Kontrol Listesi',
+    // collapsed: true,
+    home: true,
+    items: [
+      {
+        text: 'Donanım Gereksinimleri',
+        link: '/tr/installation/checklists/hardware-checklists'
+      },
+      {
+        text: 'Donanım Seçimi',
+        link: '/tr/installation/checklists/hardware-selection'
+      },
+      {
+        text: 'Ağ Kontrolü',
+        link: '/tr/installation/checklists/network-checklists'
+      },
+      {
+        text: 'Yazılım Kontrolü',
+        link: '/tr/installation/checklists/software-checklists'
+      },
+      {
+        text: 'Güvenlik Kontrolü',
+        link: '/tr/installation/checklists/security-checklists'
+      }
+    ]
+  },
   {
     text: 'RustFS Performans ve Framework',
     // collapsed: true,
@@ -165,11 +165,11 @@ export const zhSidebar = [
       },
       {
         text: 'Nesne Kontrol ve Otomatik Kurtarma',
-        link: '/tr/troubleshooting/healing'      
+        link: '/tr/troubleshooting/healing'
       },
       {
         text: 'Düğüm Hatası',
-        link: '/tr/troubleshooting/node'      
+        link: '/tr/troubleshooting/node'
       }
     ]
   },
@@ -185,7 +185,7 @@ export const zhSidebar = [
         items: [
           {
             text: 'Erişim Belirteci',
-            link: '/tr/administration/iam/access-token'  
+            link: '/tr/administration/iam/access-token'
           }
         ]
       }
@@ -196,14 +196,14 @@ export const zhSidebar = [
     // collapsed: true,
     home: true,
     items: [
-         {
-          text: 'Nginx Reverse Proxy Yapılandırması',
-          link: '/tr/integration/nginx'
-         },
-         {
-          text: 'Sanal Host Modu Yapılandırması',
-          link: '/tr/integration/virtual'
-        },
+      {
+        text: 'Nginx Reverse Proxy Yapılandırması',
+        link: '/tr/integration/nginx'
+      },
+      {
+        text: 'Sanal Host Modu Yapılandırması',
+        link: '/tr/integration/virtual'
+      },
       {
         text: 'TLS Yapılandırması',
         link: '/tr/integration/tls-configured'
@@ -213,7 +213,7 @@ export const zhSidebar = [
   {
     text: 'Geliştirici',
     // collapsed: true,
-    home: true, 
+    home: true,
     items: [
       {
         text: 'MCP',
@@ -269,37 +269,37 @@ export const zhSidebar = [
     // collapsed: true,
     home: true,
     items: [
-      { 
-        text: 'Dağıtık', 
-        link: '/tr/features/distributed/' 
+      {
+        text: 'Dağıtık',
+        link: '/tr/features/distributed/'
       },
-      { 
-        text: 'Log Yönetimi', 
-        link: '/tr/features/logging/' 
+      {
+        text: 'Log Yönetimi',
+        link: '/tr/features/logging/'
       },
-      { 
-        text: 'Sürüm Kontrolü', 
-        link: '/tr/features/versioning/' 
+      {
+        text: 'Sürüm Kontrolü',
+        link: '/tr/features/versioning/'
       },
-      { 
-        text: 'S3 Uyumluluğu', 
-        link: '/tr/features/s3-compatibility/' 
+      {
+        text: 'S3 Uyumluluğu',
+        link: '/tr/features/s3-compatibility/'
       },
-      { 
-        text: 'Nesne Seviyesi ve Salt Okunur', 
-        link: '/tr/features/worm/' 
+      {
+        text: 'Nesne Seviyesi ve Salt Okunur',
+        link: '/tr/features/worm/'
       },
-      { 
-        text: 'Çapraz Bölge Çoğaltma', 
-        link: '/tr/features/replication/' 
+      {
+        text: 'Çapraz Bölge Çoğaltma',
+        link: '/tr/features/replication/'
       },
-      { 
-        text: 'Şifreleme', 
-        link: '/tr/features/encryption/' 
+      {
+        text: 'Şifreleme',
+        link: '/tr/features/encryption/'
       },
-      { 
-        text: 'Yaşam Döngüsü Yönetimi', 
-        link: '/tr/features/lifecycle/' 
+      {
+        text: 'Yaşam Döngüsü Yönetimi',
+        link: '/tr/features/lifecycle/'
       },
     ],
   },
@@ -308,45 +308,45 @@ export const zhSidebar = [
     // collapsed: true,
     home: true,
     items: [
-      { 
-        text: 'Modern Veri Gölü', 
-        link: '/tr/features/data-lake/' 
+      {
+        text: 'Modern Veri Gölü',
+        link: '/tr/features/data-lake/'
       },
-      { 
-        text: 'AI ve Makine Öğrenimi', 
-        link: '/tr/features/ai/' 
+      {
+        text: 'AI ve Makine Öğrenimi',
+        link: '/tr/features/ai/'
       },
-      { 
-        text: 'Cloud Native', 
-        link: '/tr/features/cloud-native/' 
+      {
+        text: 'Cloud Native',
+        link: '/tr/features/cloud-native/'
       },
-      { 
-        text: 'Büyük Veri Hesaplama Depolama Ayrımı', 
-        link: '/tr/features/hdfs/' 
+      {
+        text: 'Büyük Veri Hesaplama Depolama Ayrımı',
+        link: '/tr/features/hdfs/'
       },
-      { 
-        text: 'SQL Desteği', 
-        link: '/tr/features/sql-server/' 
+      {
+        text: 'SQL Desteği',
+        link: '/tr/features/sql-server/'
       },
-      { 
-        text: 'Nicel Ticaret', 
-        link: '/tr/features/quantitative-trading/' 
+      {
+        text: 'Nicel Ticaret',
+        link: '/tr/features/quantitative-trading/'
       },
-      { 
-        text: 'İmalat Maliyet Azaltma', 
-        link: '/tr/features/industry/' 
+      {
+        text: 'İmalat Maliyet Azaltma',
+        link: '/tr/features/industry/'
       },
-      { 
-        text: 'Soğuk Arşiv Depolama', 
-        link: '/tr/features/cold-archiving/' 
+      {
+        text: 'Soğuk Arşiv Depolama',
+        link: '/tr/features/cold-archiving/'
       },
-      { 
-        text: 'Video Depolama Çözümü', 
-        link: '/tr/features/video/' 
+      {
+        text: 'Video Depolama Çözümü',
+        link: '/tr/features/video/'
       },
-      { 
-        text: 'Yerli İnovasyon ve SM Çözümü', 
-        link: '/tr/features/domestic/' 
+      {
+        text: 'Yerli İnovasyon ve SM Çözümü',
+        link: '/tr/features/domestic/'
       },
     ],
   },

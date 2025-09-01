@@ -1,4 +1,4 @@
-export const zhSidebar = [
+export const sidebar = [
   {
     text: 'Руководство по установке RustFS',
     // collapsed: true,
@@ -41,32 +41,32 @@ export const zhSidebar = [
     ]
   },
   {
-        text: 'Контрольный список установки',
-        // collapsed: true,
-        home: true,
-        items: [
-          {
-            text: 'Требования к аппаратному обеспечению',
-            link: '/ru/installation/checklists/hardware-checklists'
-          },
-          {
-            text: 'Выбор аппаратного обеспечения',
-            link: '/ru/installation/checklists/hardware-selection'
-          },
-          {
-            text: 'Проверка сети',
-            link: '/ru/installation/checklists/network-checklists'
-          },
-          {
-            text: 'Проверка программного обеспечения',
-            link: '/ru/installation/checklists/software-checklists'
-          },
-          {
-            text: 'Проверка безопасности',
-            link: '/ru/installation/checklists/security-checklists'
-          }
-        ]
-  },  
+    text: 'Контрольный список установки',
+    // collapsed: true,
+    home: true,
+    items: [
+      {
+        text: 'Требования к аппаратному обеспечению',
+        link: '/ru/installation/checklists/hardware-checklists'
+      },
+      {
+        text: 'Выбор аппаратного обеспечения',
+        link: '/ru/installation/checklists/hardware-selection'
+      },
+      {
+        text: 'Проверка сети',
+        link: '/ru/installation/checklists/network-checklists'
+      },
+      {
+        text: 'Проверка программного обеспечения',
+        link: '/ru/installation/checklists/software-checklists'
+      },
+      {
+        text: 'Проверка безопасности',
+        link: '/ru/installation/checklists/security-checklists'
+      }
+    ]
+  },
   {
     text: 'Производительность и фреймворк RustFS',
     // collapsed: true,
@@ -165,11 +165,11 @@ export const zhSidebar = [
       },
       {
         text: 'Проверка объектов и автоматическое восстановление',
-        link: '/ru/troubleshooting/healing'      
+        link: '/ru/troubleshooting/healing'
       },
       {
         text: 'Отказ узла',
-        link: '/ru/troubleshooting/node'      
+        link: '/ru/troubleshooting/node'
       }
     ]
   },
@@ -185,7 +185,7 @@ export const zhSidebar = [
         items: [
           {
             text: 'Токен доступа',
-            link: '/ru/administration/iam/access-token'  
+            link: '/ru/administration/iam/access-token'
           }
         ]
       }
@@ -196,14 +196,14 @@ export const zhSidebar = [
     // collapsed: true,
     home: true,
     items: [
-         {
-          text: 'Конфигурация обратного прокси Nginx',
-          link: '/ru/integration/nginx'
-         },
-         {
-          text: 'Конфигурация режима виртуального хоста',
-          link: '/ru/integration/virtual'
-        },
+      {
+        text: 'Конфигурация обратного прокси Nginx',
+        link: '/ru/integration/nginx'
+      },
+      {
+        text: 'Конфигурация режима виртуального хоста',
+        link: '/ru/integration/virtual'
+      },
       {
         text: 'Конфигурация TLS',
         link: '/ru/integration/tls-configured'
@@ -213,7 +213,7 @@ export const zhSidebar = [
   {
     text: 'Разработчик',
     // collapsed: true,
-    home: true, 
+    home: true,
     items: [
       {
         text: 'MCP',
@@ -269,37 +269,37 @@ export const zhSidebar = [
     // collapsed: true,
     home: true,
     items: [
-      { 
-        text: 'Распределенный', 
-        link: '/ru/features/distributed/' 
+      {
+        text: 'Распределенный',
+        link: '/ru/features/distributed/'
       },
-      { 
-        text: 'Управление логами', 
-        link: '/ru/features/logging/' 
+      {
+        text: 'Управление логами',
+        link: '/ru/features/logging/'
       },
-      { 
-        text: 'Контроль версий', 
-        link: '/ru/features/versioning/' 
+      {
+        text: 'Контроль версий',
+        link: '/ru/features/versioning/'
       },
-      { 
-        text: 'Совместимость S3', 
-        link: '/ru/features/s3-compatibility/' 
+      {
+        text: 'Совместимость S3',
+        link: '/ru/features/s3-compatibility/'
       },
-      { 
-        text: 'Уровень объекта и только для чтения', 
-        link: '/ru/features/worm/' 
+      {
+        text: 'Уровень объекта и только для чтения',
+        link: '/ru/features/worm/'
       },
-      { 
-        text: 'Кросс-региональная репликация', 
-        link: '/ru/features/replication/' 
+      {
+        text: 'Кросс-региональная репликация',
+        link: '/ru/features/replication/'
       },
-      { 
-        text: 'Шифрование', 
-        link: '/ru/features/encryption/' 
+      {
+        text: 'Шифрование',
+        link: '/ru/features/encryption/'
       },
-      { 
-        text: 'Управление жизненным циклом', 
-        link: '/ru/features/lifecycle/' 
+      {
+        text: 'Управление жизненным циклом',
+        link: '/ru/features/lifecycle/'
       },
     ],
   },
@@ -308,45 +308,45 @@ export const zhSidebar = [
     // collapsed: true,
     home: true,
     items: [
-      { 
-        text: 'Современное озеро данных', 
-        link: '/ru/features/data-lake/' 
+      {
+        text: 'Современное озеро данных',
+        link: '/ru/features/data-lake/'
       },
-      { 
-        text: 'ИИ и машинное обучение', 
-        link: '/ru/features/ai/' 
+      {
+        text: 'ИИ и машинное обучение',
+        link: '/ru/features/ai/'
       },
-      { 
-        text: 'Cloud Native', 
-        link: '/ru/features/cloud-native/' 
+      {
+        text: 'Cloud Native',
+        link: '/ru/features/cloud-native/'
       },
-      { 
-        text: 'Разделение вычислений и хранения больших данных', 
-        link: '/ru/features/hdfs/' 
+      {
+        text: 'Разделение вычислений и хранения больших данных',
+        link: '/ru/features/hdfs/'
       },
-      { 
-        text: 'Поддержка SQL', 
-        link: '/ru/features/sql-server/' 
+      {
+        text: 'Поддержка SQL',
+        link: '/ru/features/sql-server/'
       },
-      { 
-        text: 'Количественная торговля', 
-        link: '/ru/features/quantitative-trading/' 
+      {
+        text: 'Количественная торговля',
+        link: '/ru/features/quantitative-trading/'
       },
-      { 
-        text: 'Снижение затрат в производстве', 
-        link: '/ru/features/industry/' 
+      {
+        text: 'Снижение затрат в производстве',
+        link: '/ru/features/industry/'
       },
-      { 
-        text: 'Холодное архивное хранилище', 
-        link: '/ru/features/cold-archiving/' 
+      {
+        text: 'Холодное архивное хранилище',
+        link: '/ru/features/cold-archiving/'
       },
-      { 
-        text: 'Решение для хранения видео', 
-        link: '/ru/features/video/' 
+      {
+        text: 'Решение для хранения видео',
+        link: '/ru/features/video/'
       },
-      { 
-        text: 'Отечественное инновационное и SM решение', 
-        link: '/ru/features/domestic/' 
+      {
+        text: 'Отечественное инновационное и SM решение',
+        link: '/ru/features/domestic/'
       },
     ],
   },

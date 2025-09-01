@@ -1,4 +1,4 @@
-export const koSidebar = [
+export const sidebar = [
   {
     text: '소개',
     collapsed: true,
@@ -95,7 +95,7 @@ export const koSidebar = [
       },
     ]
   },
-    {
+  {
     text: '기능 사용 가이드',
     collapsed: true,
     home: true,

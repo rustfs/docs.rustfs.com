@@ -1,5 +1,5 @@
 import { defineAdditionalConfig } from 'vitepress'
-import { zhSidebar } from './sidebar'
+import { sidebar } from './sidebar'
 
 export default defineAdditionalConfig({
   lang: 'zh-Hans',
@@ -16,7 +16,7 @@ export default defineAdditionalConfig({
     ],
 
     sidebar: {
-      '/zh/': zhSidebar,
+      '/zh/': sidebar,
     },
 
     editLink: {

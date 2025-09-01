@@ -1,4 +1,4 @@
-export const enSidebar = [
+export const sidebar = [
   {
     text: 'Introduction',
     collapsed: true,
@@ -10,7 +10,7 @@ export const enSidebar = [
       { text: 'Common Terminology', link: '/en/concepts/glossary' },
       { text: 'Usage Limitations', link: '/en/concepts/limit' },
       {
-        text: 'Core Concepts', 
+        text: 'Core Concepts',
         link: '/en/concepts/principle/index',
         items: [
           { text: 'Erasure Coding', link: '/en/concepts/principle/erasure-coding' },

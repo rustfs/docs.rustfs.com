@@ -1,9 +1,7 @@
 ---
-title: "한국어 문서"
-description: "이 문서는 중국어에서 한국어로 번역되고 있습니다"
+title: "RustFS 클라우드 네이티브 설치 가이드"
+description: "Helm Chart 또는 Operator를 사용하여 Kubernetes에 RustFS 설치 및 배포."
 ---
 
-# 한국어 문서
-
-이 섹션에는 한국어로 번역된 RustFS 문서가 포함되어 있습니다.
+# RustFS 클라우드 네이티브 설치 가이드
 

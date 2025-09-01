@@ -1,9 +1,7 @@
 ---
-title: "日本語ドキュメント"
-description: "このドキュメントは中国語から日本語に翻訳されています"
+title: "RustFS クラウドネイティブインストールガイド"
+description: "Helm ChartまたはOperatorを使用してKubernetes上でRustFSをインストール・デプロイ。"
 ---
 
-# 日本語ドキュメント
-
-このセクションには、日本語に翻訳されたRustFSドキュメントが含まれています。
+# RustFS クラウドネイティブインストールガイド
 

@@ -4,7 +4,7 @@ sidebar: false
 ---
 
 <script setup>
-import { ruSidebar } from './sidebar';
+import { sidebar } from './sidebar';
 </script>
 
-<Home :sidebar="ruSidebar" title="Центр документации RustFS" />
+<Home :sidebar="sidebar" title="Центр документации RustFS" />

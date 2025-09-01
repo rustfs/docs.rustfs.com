@@ -1,9 +1,7 @@
 ---
-title: "Documentation Française"
-description: "Cette documentation est en cours de traduction du chinois vers le français"
+title: "Guide d'installation cloud-native RustFS"
+description: "Installation et déploiement de RustFS sur Kubernetes avec Helm Chart ou Operator."
 ---
 
-# Documentation Française
-
-Cette section contient la documentation RustFS traduite en français.
+# Guide d'installation cloud-native RustFS
 

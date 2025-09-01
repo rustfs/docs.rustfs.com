@@ -1,4 +1,4 @@
-export const zhSidebar = [
+export const sidebar = [
   {
     text: 'RustFS 安装指南',
     // collapsed: true,
@@ -37,41 +37,41 @@ export const zhSidebar = [
       {
         text: 'Docker 安装',
         link: '/zh/installation/docker/index'
-      }, 
+      },
       // {
       //   text: '云原生安装',
       //   link: '/zh/installation/cloud-native/index'
-      // },   
-      
+      // },
+
     ]
   },
   {
-        text: '安装检查清单',
-        // collapsed: true,
-        home: true,
-        items: [
-          {
-            text: '硬件要求',
-            link: '/zh/installation/checklists/hardware-checklists'
-          },
-          {
-            text: '硬件选择',
-            link: '/zh/installation/checklists/hardware-selection'
-          },
-          {
-            text: '网络检查',
-            link: '/zh/installation/checklists/network-checklists'
-          },
-          {
-            text: '软件检查',
-            link: '/zh/installation/checklists/software-checklists'
-          },
-          {
-            text: '安全检查',
-            link: '/zh/installation/checklists/security-checklists'
-          }
-        ]
-  },  
+    text: '安装检查清单',
+    // collapsed: true,
+    home: true,
+    items: [
+      {
+        text: '硬件要求',
+        link: '/zh/installation/checklists/hardware-checklists'
+      },
+      {
+        text: '硬件选择',
+        link: '/zh/installation/checklists/hardware-selection'
+      },
+      {
+        text: '网络检查',
+        link: '/zh/installation/checklists/network-checklists'
+      },
+      {
+        text: '软件检查',
+        link: '/zh/installation/checklists/software-checklists'
+      },
+      {
+        text: '安全检查',
+        link: '/zh/installation/checklists/security-checklists'
+      }
+    ]
+  },
   {
     text: 'RustFS 性能和框架',
     // collapsed: true,
@@ -334,11 +334,11 @@ export const zhSidebar = [
       },
       {
         text: '对象检查与自动恢复',
-        link: '/zh/troubleshooting/healing'      
+        link: '/zh/troubleshooting/healing'
       },
       {
         text: '节点故障',
-        link: '/zh/troubleshooting/node'      
+        link: '/zh/troubleshooting/node'
       }
     ]
   },
@@ -366,15 +366,15 @@ export const zhSidebar = [
           // },
           // {
           //   text: 'Policy',
-          //   link: '/zh/administration/policy'  
+          //   link: '/zh/administration/policy'
           // },
           // {
           //   text: '桶策略',
-          //   link: '/zh/administration/bucket-policy'  
+          //   link: '/zh/administration/bucket-policy'
           // },
           {
             text: '访问令牌',
-            link: '/zh/administration/iam/access-token'  
+            link: '/zh/administration/iam/access-token'
           }
         ]
       },
@@ -403,14 +403,14 @@ export const zhSidebar = [
     // collapsed: true,
     home: true,
     items: [
-         {
-          text: 'Nginx反向代理配置',
-          link: '/zh/integration/nginx'
-         },
-         {
-          text: '虚拟主机模式配置',
-          link: '/zh/integration/virtual'
-        },
+      {
+        text: 'Nginx反向代理配置',
+        link: '/zh/integration/nginx'
+      },
+      {
+        text: '虚拟主机模式配置',
+        link: '/zh/integration/virtual'
+      },
       // {
       //   text: 'GitLab',
       //   link: '/zh/integration/gitlab',
@@ -432,7 +432,7 @@ export const zhSidebar = [
   {
     text: '开发者',
     // collapsed: true,
-    home: true, 
+    home: true,
     items: [
       // {
       //   text: 'STS',
@@ -492,37 +492,37 @@ export const zhSidebar = [
     // collapsed: true,
     home: true,
     items: [
-      { 
-        text: '分布式', 
-        link: '/zh/features/distributed/' 
+      {
+        text: '分布式',
+        link: '/zh/features/distributed/'
       },
-      { 
-        text: '日志管理', 
-        link: '/zh/features/logging/' 
+      {
+        text: '日志管理',
+        link: '/zh/features/logging/'
       },
-      { 
-        text: '版本控制', 
-        link: '/zh/features/versioning/' 
+      {
+        text: '版本控制',
+        link: '/zh/features/versioning/'
       },
-      { 
-        text: 'S3 兼容', 
-        link: '/zh/features/s3-compatibility/' 
+      {
+        text: 'S3 兼容',
+        link: '/zh/features/s3-compatibility/'
       },
-      { 
-        text: '对象级与只读', 
-        link: '/zh/features/worm/' 
+      {
+        text: '对象级与只读',
+        link: '/zh/features/worm/'
       },
-      { 
-        text: '跨区域复制', 
-        link: '/zh/features/replication/' 
+      {
+        text: '跨区域复制',
+        link: '/zh/features/replication/'
       },
-      { 
-        text: '加密', 
-        link: '/zh/features/encryption/' 
+      {
+        text: '加密',
+        link: '/zh/features/encryption/'
       },
-      { 
-        text: '生命周期管理', 
-        link: '/zh/features/lifecycle/' 
+      {
+        text: '生命周期管理',
+        link: '/zh/features/lifecycle/'
       },
     ],
   },
@@ -531,45 +531,45 @@ export const zhSidebar = [
     // collapsed: true,
     home: true,
     items: [
-      { 
-        text: '现代数据湖', 
-        link: '/zh/features/data-lake/' 
+      {
+        text: '现代数据湖',
+        link: '/zh/features/data-lake/'
       },
-      { 
-        text: 'AI 和机器学习', 
-        link: '/zh/features/ai/' 
+      {
+        text: 'AI 和机器学习',
+        link: '/zh/features/ai/'
       },
-      { 
-        text: '云原生', 
-        link: '/zh/features/cloud-native/' 
+      {
+        text: '云原生',
+        link: '/zh/features/cloud-native/'
       },
-      { 
-        text: '大数据计算存储分离', 
-        link: '/zh/features/hdfs/' 
+      {
+        text: '大数据计算存储分离',
+        link: '/zh/features/hdfs/'
       },
-      { 
-        text: 'SQL 支持', 
-        link: '/zh/features/sql-server/' 
+      {
+        text: 'SQL 支持',
+        link: '/zh/features/sql-server/'
       },
-      { 
-        text: '量化交易', 
-        link: '/zh/features/quantitative-trading/' 
+      {
+        text: '量化交易',
+        link: '/zh/features/quantitative-trading/'
       },
-      { 
-        text: '制造业降本', 
-        link: '/zh/features/industry/' 
+      {
+        text: '制造业降本',
+        link: '/zh/features/industry/'
       },
-      { 
-        text: '冷归档存储', 
-        link: '/zh/features/cold-archiving/' 
+      {
+        text: '冷归档存储',
+        link: '/zh/features/cold-archiving/'
       },
-      { 
-        text: '视频存储方案', 
-        link: '/zh/features/video/' 
+      {
+        text: '视频存储方案',
+        link: '/zh/features/video/'
       },
-      { 
-        text: '国产信创和 SM 解决方案', 
-        link: '/zh/features/domestic/' 
+      {
+        text: '国产信创和 SM 解决方案',
+        link: '/zh/features/domestic/'
       },
     ],
   },

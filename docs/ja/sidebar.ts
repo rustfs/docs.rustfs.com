@@ -1,4 +1,4 @@
-export const jaSidebar = [
+export const sidebar = [
   {
     text: '紹介',
     collapsed: true,
@@ -113,7 +113,7 @@ export const jaSidebar = [
       { text: '開発者ガイド', link: '/ja/developer/' },
     ]
   },
-    {
+  {
     text: '機能使用ガイド',
     collapsed: true,
     home: true,

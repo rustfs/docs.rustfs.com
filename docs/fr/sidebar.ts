@@ -1,4 +1,4 @@
-export const frSidebar = [
+export const sidebar = [
   {
     text: 'Introduction',
     collapsed: true,
@@ -10,7 +10,7 @@ export const frSidebar = [
       { text: 'Terminologie courante', link: '/fr/concepts/glossary' },
       { text: 'Limitations d\'utilisation', link: '/fr/concepts/limit' },
       {
-        text: 'Concepts fondamentaux', 
+        text: 'Concepts fondamentaux',
         link: '/fr/concepts/principle/index',
         items: [
           { text: 'Code d\'effacement', link: '/fr/concepts/principle/erasure-coding' },
