@@ -1,12 +1,12 @@
 # 韩语待翻译任务列表
 
-> 最后更新: 2025/9/2 07:08:39
-> 总计: 43 个文件待翻译
+> 最后更新: 2025/9/2 07:25:24
+> 总计: 41 个文件待翻译
 
 ## 📋 任务总览
 
 - **developer**: 4 个文件
-- **features**: 16 个文件
+- **features**: 14 个文件
 - **installation**: 8 个文件
 - **integration**: 3 个文件
 - **management**: 6 个文件
@@ -25,8 +25,6 @@
 
 ### features
 
-- [ ] [features/aliyun/index.md](./features/aliyun/index.md) (77 行)
-- [ ] [features/baremetal/index.md](./features/baremetal/index.md) (81 行)
 - [ ] [features/cloud-native/index.md](./features/cloud-native/index.md) (55 行)
 - [ ] [features/commvault/index.md](./features/commvault/index.md) (51 行)
 - [ ] [features/domestic/index.md](./features/domestic/index.md) (103 行)
