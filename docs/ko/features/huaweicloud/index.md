@@ -1,83 +1,13 @@
 ---
-title: "화웨이클라우드 CCE Kubernetes Service를 위한 RustFS"
-description: "RustFS는 화웨이클라우드 CCE와의 네이티브 통합을 통해 확장 가능한 고성능 객체 스토리지 솔루션을 제공합니다"
+title: "待翻译"
+description: "此页面待翻译"
+source: "features/huaweicloud/index.md"
 ---
 
-# 화웨이클라우드 CCE Kubernetes Service를 위한 RustFS
+# 待翻译
 
-## 고객이 화웨이클라우드에서 RustFS를 실행하는 세 가지 이유
+此页面内容尚未翻译，请参考[中文版本](../../zh/features/huaweicloud/index.md)。
 
-- RustFS는 하이브리드 클라우드 또는 멀티 클라우드 배포 시나리오에서 일관된 스토리지 레이어 역할을 합니다
-- RustFS는 퍼블릭 클라우드, 프라이빗 클라우드 및 엣지 클라우드 환경에서 예측 가능한 성능을 제공할 수 있는 Kubernetes 네이티브 고성능 제품입니다.
-- CCE에서 RustFS를 실행하면 소프트웨어 스택을 제어할 수 있고 클라우드 벤더락인을 피하는 데 필요한 유연성을 얻을 수 있습니다.
+---
 
-화웨이클라우드 CCE는 자체 Kubernetes 제어 평면이나 노드를 설치, 운영 및 유지 관리할 필요 없이 AWS에서 Kubernetes를 실행하는 데 사용할 수 있는 관리형 서비스입니다.
-
-RustFS는 모든 주요 Kubernetes 플랫폼(알리바바 클라우드 ACK, Tanzu, Azure, GCP, 화웨이클라우드 CCE)에서 휴대 가능한 고성능 객체 스토리지 시스템을 제공합니다. 화웨이클라우드에서 RustFS는 화웨이클라우드 CCE 서비스와 네이티브로 통합되어 대규모 멀티 테넌트 객체 스토리지를 서비스로 더 쉽게 운영할 수 있습니다. RustFS는 AWS S3 Storage-as-a-Service의 완전한 대체재입니다.
-
-![RustFS 아키텍처 다이어그램](images/sec1-1.png)
-
-AWS S3와 달리 RustFS는 비용이 많이 드는 소프트웨어 재작성이나 독점적 통합 없이 애플리케이션이 멀티 클라우드 및 하이브리드 클라우드 인프라에서 확장할 수 있도록 합니다. RustFS는 컨테이너화되고 Kubernetes 네이티브이기 때문에 대규모 스토리지 인프라 운영에 대한 전문 기술 없이도 이러한 플랫폼에 배포할 수 있습니다.
-
-## RustFS Operator는 화웨이클라우드 CCE 기능과 네이티브로 통합됩니다
-
-### 기능 개요
-
-- **스토리지 클래스 및 티어링**
-- **외부 로드 밸런싱**
-- **암호화 키 관리**
-- **신원 관리**
-- **인증서 관리**
-- **모니터링 및 경고**
-- **로깅 및 감사**
-
-## 스토리지 클래스 및 티어링
-
-텐센트 클라우드 TKE에서 RustFS를 대규모로 배포하는 핵심 요구사항은 스토리지 클래스(NVMe, HDD, 퍼블릭 클라우드)에서 계층화할 수 있는 능력입니다. 이를 통해 기업은 비용과 성능을 모두 관리할 수 있습니다.
-
-RustFS는 노화된 객체가 빠른 NVMe 계층에서 더 비용 효율적인 HDD 계층으로, 심지어 비용 최적화된 콜드 퍼블릭 클라우드 스토리지 계층으로 자동 전환되는 것을 지원합니다.
-
-계층화할 때 RustFS는 계층 전반에 걸쳐 통합된 네임스페이스를 제공합니다. 계층 간 이동은 애플리케이션에게 투명하며 고객이 결정한 정책에 의해 트리거됩니다.
-
-RustFS는 소스에서 객체를 암호화하여 알리바바 클라우드 ACK 하이브리드 클라우드에서 보안 스토리지를 제공하며, 고객이 항상 데이터에 대한 완전한 제어권을 갖도록 보장합니다. 알리바바 클라우드 ACK가 퍼블릭 클라우드에 배포될 때, 계층화 기능은 ACK가 영구 블록 스토리지와 더 저렴한 객체 스토리지 계층에 걸쳐 데이터를 효과적으로 관리하는 데 도움이 됩니다.
-
-**더 알아보기:**
-
-## 외부 로드 밸런싱
-
-RustFS의 모든 통신은 HTTP, RESTful API를 기반으로 하며 모든 표준 Kubernetes 호환 인그레스 컨트롤러를 지원합니다. 여기에는 하드웨어 및 소프트웨어 정의 솔루션이 포함됩니다. 가장 인기 있는 선택은 NGINX입니다. OperatorHub 또는 OpenShift Marketplace를 사용하여 설치한 다음 주석을 사용하여 RustFS 테넌트를 노출하세요.
-
-## 암호화 키 관리
-
-네이티브 OpenShift 키 관리 기능은 없습니다. 따라서 RustFS는 객체 스토리지 시스템 외부에 키를 저장하기 위해 HashiCorp Vault 사용을 권장합니다. 이는 클라우드 네이티브 애플리케이션의 모범 사례입니다.
-
-모든 프로덕션 환경의 경우 기본적으로 모든 버킷에서 암호화를 활성화할 것을 권장합니다. RustFS는 AES-256-GCM 또는 ChaCha20-Poly1305 암호화를 사용하여 성능에 무시할 수 있는 영향으로 데이터 무결성과 기밀성을 보호합니다.
-
-RustFS는 세 가지 서버측 암호화(SSE-KMS, SSE-S3 및 SSE-C) 모드를 모두 지원합니다. SSE-S3 및 SSE-KMS는 서버측에서 KMS와 통합되는 반면, SSE-C는 클라이언트 제공 키를 사용합니다.
-
-RustFS는 이 KMS를 사용하여 고성능 객체별 암호화를 위한 내부 키 암호화 서버(KES 서비스)를 부트스트랩합니다. 각 테넌트는 격리된 네임스페이스에서 자체 KES 서버를 실행합니다.
-
-## 신원 관리
-
-OpenShift에서 RustFS를 실행할 때, 고객은 Keycloak, Okta/Auth0, Google, Facebook, ActiveDirectory 및 OpenLDAP와 같은 타사 OpenID Connect/LDAP 호환 신원 제공업체를 통해 단일 로그인(SSO)을 관리할 수 있습니다. RustFS는 OpenID Connect 호환 Keycloak IDP를 권장합니다.
-
-외부 IDP를 통해 관리자는 사용자/애플리케이션 신원을 중앙에서 관리할 수 있습니다. RustFS는 IDP 위에 구축되어 AWS IAM 스타일의 사용자, 그룹, 역할, 정책 및 토큰 서비스 API를 제공합니다. 인프라 독립적인 통합 신원 및 액세스 관리(IAM) 계층의 능력은 상당한 아키텍처 유연성을 제공합니다.
-
-## 인증서 관리
-
-애플리케이션에서 RustFS로의 모든 트래픽(노드 간 트래픽 포함)은 TLS를 사용하여 암호화됩니다. TLS 인증서는 네트워크 통신을 보안하고 RustFS 서버 도메인과 같은 네트워크 연결 리소스의 신원을 설정하는 데 사용됩니다.
-
-RustFS는 OpenShift Certificate Manager와 통합되므로 RustFS 운영자를 사용하여 RustFS 테넌트용 인증서를 자동으로 프로비저닝, 구성, 관리 및 업데이트할 수 있습니다. 테넌트는 자체 Kubernetes 네임스페이스에서 서로 완전히 격리되어 보안 강화를 위해 자체 인증서를 가집니다.
-
-## 모니터링 및 경고
-
-RustFS는 Grafana, openshift-user-workload-monitoring 프로젝트에 설치된 플랫폼 모니터링 구성 요소 또는 기타 OpenShift 컨테이너 모니터링 도구를 사용하여 RustFS에 연결할 것을 권장합니다. RustFS는 버킷 용량부터 액세스 메트릭까지 상상할 수 있는 모든 스토리지 관련 Prometheus 메트릭을 게시합니다. 이러한 메트릭은 Prometheus 호환 도구나 RustFS 콘솔에서 수집하고 시각화할 수 있습니다.
-
-외부 모니터링 솔루션은 정기적으로 RustFS Prometheus 엔드포인트를 스크래핑합니다. RustFS는 Grafana나 openshift-user-workload-monitoring 프로젝트에 설치된 플랫폼 모니터링 구성 요소를 사용하여 RustFS에 연결할 것을 권장합니다. 이러한 동일한 도구를 사용하여 기준선을 설정하고 알림 경고 임계값을 설정한 다음 PagerDuty, Freshservice 또는 SNMP와 같은 알림 플랫폼으로 라우팅할 수 있습니다.
-
-## 로깅 및 감사
-
-RustFS 감사를 활성화하면 객체 스토리지 클러스터의 모든 작업에 대한 로그가 생성됩니다. 감사 로그 외에도 RustFS는 운영 문제 해결을 위해 콘솔 오류도 로깅합니다.
-
-RustFS는 분석 및 경고를 위해 Elastic Stack(또는 타사)으로의 로그 출력을 지원합니다.
-
+*This page is pending translation. Please refer to the [Chinese version](../../zh/features/huaweicloud/index.md).*

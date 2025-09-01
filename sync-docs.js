@@ -33,6 +33,23 @@ function getFileModTime(filePath) {
 }
 
 /**
+ * 获取文件的行数（去掉头尾空白行）
+ */
+function getFileLineCount(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, 'utf-8')
+    // 去掉头尾空白，然后按行分割
+    const trimmedContent = content.trim()
+    if (trimmedContent === '') {
+      return 0
+    }
+    return trimmedContent.split('\n').length
+  } catch (err) {
+    return null
+  }
+}
+
+/**
  * 递归创建目录
  */
 function mkdirRecursive(dir) {
@@ -153,15 +170,29 @@ function syncDirectory(sourceDir, targetDir, langCode, stats) {
           // 目标文件不存在，创建占位符
           createPlaceholder(targetPath, relativePath)
           stats.created++
-        } else if (targetModTime && sourceModTime > targetModTime) {
-          // 中文版本更新，需要提示
-          console.log(`  ⚠ 需要更新: ${path.relative(DOCS_DIR, targetPath)}`)
-          console.log(`    中文版本更新时间: ${sourceModTime.toLocaleString()}`)
-          console.log(`    目标版本更新时间: ${targetModTime.toLocaleString()}`)
-          stats.needUpdate++
         } else {
-          // 目标文件已存在且是最新的
-          stats.upToDate++
+          // 文件存在，检查是否需要更新
+          const sourceLines = getFileLineCount(sourcePath)
+          const targetLines = getFileLineCount(targetPath)
+          const lineDiff = Math.abs(sourceLines - targetLines)
+
+          if (lineDiff > 5) {
+            // 行数差异大于5行，用占位符覆盖
+            createPlaceholder(targetPath, relativePath)
+            console.log(`  ⚠ 已重置为待翻译: ${path.relative(DOCS_DIR, targetPath)}`)
+            console.log(`    行数差异: 中文 ${sourceLines} 行 vs 目标 ${targetLines} 行 (差异: ${lineDiff} 行)`)
+            stats.needUpdate++
+          } else if (targetModTime && sourceModTime > targetModTime) {
+            // 时间戳不一致，也用占位符覆盖
+            createPlaceholder(targetPath, relativePath)
+            console.log(`  ⚠ 已重置为待翻译: ${path.relative(DOCS_DIR, targetPath)}`)
+            console.log(`    中文版本更新时间: ${sourceModTime.toLocaleString()}`)
+            console.log(`    目标版本更新时间: ${targetModTime.toLocaleString()}`)
+            stats.needUpdate++
+          } else {
+            // 目标文件已存在且是最新的
+            stats.upToDate++
+          }
         }
       } else {
         // 非 Markdown 文件，直接复制

@@ -1,50 +1,13 @@
 ---
-title: "RustFS 설치 가이드"
-description: "다양한 운영체제 및 배포 방식에서 RustFS 설치 가이드."
+title: "待翻译"
+description: "此页面待翻译"
+source: "installation/index.md"
 ---
 
-# RustFS 소개
+# 待翻译
 
-RustFS는 현재 전 세계에서 가장 인기 있고 메모리 안전한 Rust 언어를 사용하여 개발된 `고성능`, `분산` 객체 스토리지 소프트웨어입니다. RustFS는 단순성과 효율성을 모두 갖추고 있으며, 로컬 프라이빗 클라우드 배포가 가능한 효율적이고 오픈소스이며 자유로운 객체 스토리지 솔루션이기도 합니다. RustFS는 S3 프로토콜과 100% 호환되며 Apache2 라이선스로 배포되는 오픈소스 소프트웨어입니다. RustFS는 현재 전 세계에서 가장 인기 있고 메모리 안전한 Rust 언어로 작성되었습니다. 이는 전 세계의 우수한 엔지니어들이 참여하고 기여한 상업적으로 친화적인 분산 객체 스토리지 제품입니다. RustFS는 비우호적인 오픈소스 라이선스를 가진 많은 객체 스토리지 제품을 대체할 수 있습니다.
+此页面内容尚未翻译，请参考[中文版本](../../zh/installation/index.md)。
 
-RustFS는 곧 상업적 애플리케이션에서 오픈소스로 전환되어 전 세계에 출시될 예정이며, 전 세계가 스토리지 비용을 절감하고 데이터 보안을 향상시키는 데 도움이 될 것입니다.
+---
 
-## 1. 지원하는 CPU 및 운영체제
-
-다음과 같은 거의 모든 CPU와 운영체제에서 RustFS를 실행할 수 있습니다:
-- Linux
-- Unix
-- Windows
-- MacOS
-- FreeBSD
-- Docker
-- 심지어 에지 게이트웨이에서도.
-
-어디든 RustFS를 실행할 수 있습니다. CPU 아키텍처 지원: X86, ARM, RISC-V 등 다양한 CPU 아키텍처.
-
-## 2. RustFS 설치 모드
-
-본 장에서는 다양한 운영체제 및 배포 방식에서 RustFS 설치 가이드를 포함합니다. 구체적으로:
-
-- [Linux 빠른 설치](./linux/quick-start.md)
-- [Linux에 RustFS 설치](./linux/index.md)
-- [Docker 컨테이너에 RustFS 설치](./docker/index.md)
-- [Windows에 RustFS 설치](./windows/index.md)
-- [macOS에 RustFS 설치](./macos/index.md)
-
-## 3. RustFS의 특징
-
-- S3 호환: S3 프로토콜과 100% 호환, 빅데이터, 데이터 레이크, 백업 소프트웨어, 이미지 처리 소프트웨어, 산업 생산 소프트웨어와의 뛰어난 호환성;
-- 분산: RustFS는 분산 객체 스토리지이므로 다양한 요구사항을 충족할 수 있습니다;
-- 상업적 친화적: RustFS는 100% 오픈소스 소프트웨어이며 Apache v2.0 라이선스로 배포되므로 상업적으로 친화적입니다;
-- 빠름: Rust 개발 언어의 성능은 C 언어의 속도에 무한히 근접합니다. 따라서 RustFS의 성능은 매우 강력합니다;
-- 안전: RustFS는 메모리 안전한 Rust 언어로 작성되어 100% 안전합니다;
-- 크로스 플랫폼: RustFS는 Windows, macOS, Linux에서 작동합니다;
-- 확장 가능: RustFS는 커스텀 플러그인을 지원하므로 다양한 요구사항을 충족할 수 있습니다;
-- 커스터마이징 가능: 오픈소스 특성으로 인해 다양한 플러그인을 커스터마이징할 수 있어 다양한 요구사항을 충족할 수 있습니다;
-- 클라우드 네이티브: RustFS는 Docker 등의 배포 방식을 지원하여 클라우드 네이티브 환경에서 빠르게 배포할 수 있습니다.
-
-## 4. RustFS 가치관
-
-전 인류가 데이터 보안을 향상시키고 스토리지 비용을 절감할 수 있도록 돕는 것입니다.
-
+*This page is pending translation. Please refer to the [Chinese version](../../zh/installation/index.md).*

@@ -1,9 +1,13 @@
 ---
-title: "한국어 문서"
-description: "이 문서는 중국어에서 한국어로 번역되고 있습니다"
+title: "待翻译"
+description: "此页面待翻译"
+source: "management/bucket/deletion.md"
 ---
 
-# 한국어 문서
+# 待翻译
 
-이 섹션에는 한국어로 번역된 RustFS 문서가 포함되어 있습니다.
+此页面内容尚未翻译，请参考[中文版本](../../zh/management/bucket/deletion.md)。
 
+---
+
+*This page is pending translation. Please refer to the [Chinese version](../../zh/management/bucket/deletion.md).*

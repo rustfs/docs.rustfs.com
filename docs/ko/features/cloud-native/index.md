@@ -1,9 +1,13 @@
 ---
 title: "待翻译"
-description: "此文档正在翻译中"
+description: "此页面待翻译"
+source: "features/cloud-native/index.md"
 ---
 
-# 此文档正在翻译中
+# 待翻译
 
-请稍后查看更新。
+此页面内容尚未翻译，请参考[中文版本](../../zh/features/cloud-native/index.md)。
 
+---
+
+*This page is pending translation. Please refer to the [Chinese version](../../zh/features/cloud-native/index.md).*
