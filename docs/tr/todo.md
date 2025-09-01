@@ -1,14 +1,13 @@
 # 土耳其语待翻译任务列表
 
-> 最后更新: 2025/9/2 01:32:02
-> 总计: 16 个文件待翻译
+> 最后更新: 2025/9/2 07:08:39
+> 总计: 14 个文件待翻译
 
 ## 📋 任务总览
 
 - **concepts**: 1 个文件
 - **developer**: 5 个文件
 - **installation**: 7 个文件
-- **troubleshooting**: 2 个文件
 - **upgrade-scale**: 1 个文件
 
 ## 📝 待翻译文件列表
@@ -34,11 +33,6 @@
 - [ ] [installation/checklists/software-checklists.md](./installation/checklists/software-checklists.md) (74 行)
 - [ ] [installation/docker/index.md](./installation/docker/index.md) (219 行)
 - [ ] [installation/linux/multiple-node-multiple-disk.md](./installation/linux/multiple-node-multiple-disk.md) (359 行)
-
-### troubleshooting
-
-- [ ] [troubleshooting/driver.md](./troubleshooting/driver.md) (154 行)
-- [ ] [troubleshooting/node.md](./troubleshooting/node.md) (95 行)
 
 ### upgrade-scale
 

@@ -1,12 +1,12 @@
 # 韩语待翻译任务列表
 
-> 最后更新: 2025/9/2 01:32:02
-> 总计: 48 个文件待翻译
+> 最后更新: 2025/9/2 07:08:39
+> 总计: 43 个文件待翻译
 
 ## 📋 任务总览
 
 - **developer**: 4 个文件
-- **features**: 21 个文件
+- **features**: 16 个文件
 - **installation**: 8 个文件
 - **integration**: 3 个文件
 - **management**: 6 个文件
@@ -29,23 +29,18 @@
 - [ ] [features/baremetal/index.md](./features/baremetal/index.md) (81 行)
 - [ ] [features/cloud-native/index.md](./features/cloud-native/index.md) (55 行)
 - [ ] [features/commvault/index.md](./features/commvault/index.md) (51 行)
-- [ ] [features/data-lake/index.md](./features/data-lake/index.md) (73 行)
 - [ ] [features/domestic/index.md](./features/domestic/index.md) (103 行)
 - [ ] [features/hdfs/index.md](./features/hdfs/index.md) (154 行)
 - [ ] [features/huaweicloud/index.md](./features/huaweicloud/index.md) (77 行)
 - [ ] [features/industry/index.md](./features/industry/index.md) (86 行)
 - [ ] [features/integration/index.md](./features/integration/index.md) (99 行)
-- [ ] [features/lifecycle/index.md](./features/lifecycle/index.md) (41 行)
-- [ ] [features/logging/index.md](./features/logging/index.md) (57 行)
 - [ ] [features/openshift/index.md](./features/openshift/index.md) (77 行)
 - [ ] [features/qcloud/index.md](./features/qcloud/index.md) (77 行)
 - [ ] [features/quantitative-trading/index.md](./features/quantitative-trading/index.md) (93 行)
-- [ ] [features/replication/index.md](./features/replication/index.md) (80 行)
 - [ ] [features/small-file/index.md](./features/small-file/index.md) (35 行)
 - [ ] [features/sql-server/index.md](./features/sql-server/index.md) (504 行)
 - [ ] [features/tanzu/index.md](./features/tanzu/index.md) (77 行)
 - [ ] [features/video/index.md](./features/video/index.md) (109 行)
-- [ ] [features/worm/index.md](./features/worm/index.md) (41 行)
 
 ### installation
 

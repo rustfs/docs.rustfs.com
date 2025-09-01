@@ -1,6 +1,6 @@
 ---
-title: "待翻译"
-description: "此文档正在翻译中"
+title: "Téléchargement et utilisation des marques commerciales"
+description: "Guide officiel pour le téléchargement et l'utilisation appropriée des marques commerciales RustFS"
 ---
 
 # Téléchargement et utilisation des marques commerciales

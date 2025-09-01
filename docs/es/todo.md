@@ -1,21 +1,18 @@
 # 西班牙语待翻译任务列表
 
-> 最后更新: 2025/9/2 01:32:02
-> 总计: 6 个文件待翻译
+> 最后更新: 2025/9/2 07:08:39
+> 总计: 3 个文件待翻译
 
 ## 📋 任务总览
 
-- **features**: 5 个文件
+- **features**: 2 个文件
 - **trademark**: 1 个文件
 
 ## 📝 待翻译文件列表
 
 ### features
 
-- [ ] [features/domestic/index.md](./features/domestic/index.md) (103 行)
 - [ ] [features/hdfs/index.md](./features/hdfs/index.md) (154 行)
-- [ ] [features/industry/index.md](./features/industry/index.md) (86 行)
-- [ ] [features/replication/index.md](./features/replication/index.md) (80 行)
 - [ ] [features/sql-server/index.md](./features/sql-server/index.md) (504 行)
 
 ### trademark
