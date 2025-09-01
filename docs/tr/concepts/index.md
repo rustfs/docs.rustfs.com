@@ -1,9 +1,14 @@
 ---
-title: "Türkçe Dokümantasyon"
-description: "Bu dokümantasyon Çince'den Türkçe'ye çevriliyor"
+title: "RustFS Mimari Tasarım ve Temel Kavramlar Detayları"
+description: "Bu makale nesne depolamada sıkça kullanılan terimleri tanıtır, kullanıcıların nesne depolamayı hızlıca anlamalarını sağlar"
 ---
 
-# Türkçe Dokümantasyon
+Bu bölüm aşağıdaki içerikleri kapsar:
 
-Bu bölüm, Türkçe'ye çevrilmiş RustFS dokümantasyonunu içerir.
+- [RustFS Tanıtımı](./introduction.md)
+- [RustFS Tasarım Mimarisi](./architecture.md)
+- [Ana Akım Depolama Ürünleri Karşılaştırması](./comparison.md)
+- [Yaygın Terimler](./glossary.md)
+- [Temel Kavramlar](./principle/index.md)
+- [Kullanım Kısıtlamaları](./limit.md)
 

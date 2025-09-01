@@ -1,8 +1,13 @@
 ---
-title: "Documentação em Português"
-description: "Esta documentação está sendo traduzida do chinês para o português"
+title: "Arquitetura de Design do RustFS e Explicação dos Conceitos Fundamentais"
+description: "Este artigo apresenta vocabulário frequentemente usado em armazenamento de objetos, ajudando usuários a entender rapidamente o armazenamento de objetos"
 ---
 
-# Documentação em Português
+Este capítulo contém o seguinte conteúdo:
 
-Esta seção contém a documentação traduzida do RustFS em português.
+- [Introdução ao RustFS](./introduction.md)
+- [Arquitetura de Design do RustFS](./architecture.md)
+- [Comparação de Produtos de Armazenamento Mainstream](./comparison.md)
+- [Terminologia Comum](./glossary.md)
+- [Conceitos Fundamentais](./principle/index.md)
+- [Limitações de Uso](./limit.md)

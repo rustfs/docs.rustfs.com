@@ -1,9 +1,13 @@
 ---
-title: "Documentation Française"
-description: "Cette documentation est en cours de traduction du chinois vers le français"
+title: "Guide de Résolution de Problèmes RustFS"
+description: "Diagnostiquer les problèmes rencontrés lors de l'utilisation de RustFS et fournir des solutions de réparation pour permettre aux instances RustFS de récupérer rapidement des pannes."
 ---
 
-# Documentation Française
+# Guide de Résolution de Problèmes RustFS
 
-Cette section contient la documentation RustFS traduite en français.
+Ce chapitre comprend le contenu suivant :
+
+- [Pannes de Nœuds](./node.md)
+- [Pannes de Pilotes](./driver.md)
+- [Vérification d'Objets et Récupération Automatique](./healing.md)
 

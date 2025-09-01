@@ -1,9 +1,13 @@
 ---
-title: "Türkçe Dokümantasyon"
-description: "Bu dokümantasyon Çince'den Türkçe'ye çevriliyor"
+title: "RustFS Sorun Giderme Rehberi"
+description: "RustFS kullanım sürecinde karşılaşılan problemleri teşhis edip düzeltme çözümleri sunar, RustFS örneklerinin arızalardan hızla kurtulmasını sağlar."
 ---
 
-# Türkçe Dokümantasyon
+# RustFS Sorun Giderme Rehberi
 
-Bu bölüm, Türkçe'ye çevrilmiş RustFS dokümantasyonunu içerir.
+Bu bölüm aşağıdaki içerikleri kapsar:
+
+- [Düğüm Arızaları](./node.md)
+- [Sürücü Arızaları](./driver.md)
+- [Nesne Kontrolü ve Otomatik Kurtarma](./healing.md)
 

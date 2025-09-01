@@ -1,13 +1,10 @@
 ---
-title: "待翻译"
-description: "此页面待翻译"
-source: "index.md"
+layout: page
+sidebar: false
 ---
 
-# 待翻译
+<script setup>
+import { sidebar } from './sidebar';
+</script>
 
-此页面内容尚未翻译，请参考[中文版本](../../zh/index.md)。
-
----
-
-*This page is pending translation. Please refer to the [Chinese version](../../zh/index.md).*
+<Home :sidebar="sidebar" title="RustFS 문서 센터" />

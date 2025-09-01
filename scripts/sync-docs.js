@@ -14,7 +14,7 @@ const fs = require('fs')
 const path = require('path')
 
 // 配置
-const DOCS_DIR = path.join(__dirname, 'docs')
+const DOCS_DIR = path.join(__dirname, '..', 'docs')
 const SOURCE_LANG = 'zh'
 
 // 获取命令行参数
@@ -120,7 +120,7 @@ function syncDirectory(sourceDir, targetDir, langCode, stats) {
     const targetFiles = fs.readdirSync(targetDir)
     targetFiles.forEach(file => {
       // 跳过配置文件和特殊文件
-      if (file === 'config.ts' || file === 'sidebar.ts' || file.startsWith('.')) {
+      if (file === 'config.ts' || file === 'sidebar.ts' || file === 'todo.md' || file.startsWith('.')) {
         return
       }
 
