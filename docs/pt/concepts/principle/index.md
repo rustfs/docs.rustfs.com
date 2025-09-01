@@ -1,8 +1,12 @@
 ---
-title: "Documentação em Português"
-description: "Esta documentação está sendo traduzida do chinês para o português"
+title: "Interpretação dos Conceitos Fundamentais do RustFS"
+description: "Explicação detalhada dos conceitos fundamentais do RustFS, incluindo código de apagamento, stripes, Data Scanner, auto-cura de dados, etc. Permitindo aos usuários uma compreensão mais profunda do RustFS."
 ---
 
-# Documentação em Português
+Este capítulo contém o seguinte conteúdo:
 
-Esta seção contém a documentação traduzida do RustFS em português.
+- [Código de Apagamento](./erasure-coding.md)
+- Stripes
+- Data Scanner
+- Auto-cura de Dados
+- Stripes

@@ -1,9 +1,13 @@
 ---
-title: "Türkçe Dokümantasyon"
-description: "Bu dokümantasyon Çince'den Türkçe'ye çevriliyor"
+title: "RustFS IAM Yönetimi"
+description: "RustFS'de kullanıcı/kullanıcı grubu/politika/AK&SK vb. içeriklerin detaylı açıklaması."
 ---
 
-# Türkçe Dokümantasyon
+Bu bölüm aşağıdaki içerikleri kapsar:
 
-Bu bölüm, Türkçe'ye çevrilmiş RustFS dokümantasyonunu içerir.
+- Kullanıcı Yönetimi
+- Kullanıcı Grubu Yönetimi
+- Politika Yönetimi
+- Depolama Kovası Politikası
+- AK/SK
 

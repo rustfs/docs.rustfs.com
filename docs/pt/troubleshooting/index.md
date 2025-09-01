@@ -1,8 +1,12 @@
 ---
-title: "index"
-description: "Documentação em Português para index"
+title: "Guia de Solução de Problemas do RustFS"
+description: "Diagnostica problemas encontrados durante o uso do RustFS e fornece soluções de reparo, permitindo que instâncias RustFS se recuperem rapidamente de falhas."
 ---
 
-# index
+# Guia de Solução de Problemas do RustFS
 
-Esta documentação está sendo traduzida para o português.
+Este capítulo inclui o seguinte conteúdo:
+
+- [Falhas de Nó](./node.md)
+- [Falhas de Driver](./driver.md)
+- [Verificação de Objetos e Recuperação Automática](./healing.md)

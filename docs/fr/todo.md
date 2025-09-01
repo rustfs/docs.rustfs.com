@@ -1,24 +1,18 @@
 # 法语待翻译任务列表
 
-> 最后更新: 2025/9/2 00:54:55
-> 总计: 19 个文件待翻译
+> 最后更新: 2025/9/2 01:10:38
+> 总计: 17 个文件待翻译
 
 ## 📋 任务总览
 
-- **concepts**: 1 个文件
-- **features**: 17 个文件
+- **features**: 16 个文件
 - **trademark**: 1 个文件
 
 ## 📝 待翻译文件列表
 
-### concepts
-
-- [ ] [concepts/limit.md](./concepts/limit.md) (71 行)
-
 ### features
 
 - [ ] [features/aliyun/index.md](./features/aliyun/index.md) (77 行)
-- [ ] [features/aws-elastic/index.md](./features/aws-elastic/index.md) (77 行)
 - [ ] [features/commvault/index.md](./features/commvault/index.md) (51 行)
 - [ ] [features/domestic/index.md](./features/domestic/index.md) (103 行)
 - [ ] [features/hdfs/index.md](./features/hdfs/index.md) (154 行)

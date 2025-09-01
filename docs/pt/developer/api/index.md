@@ -1,8 +1,11 @@
 ---
-title: "Documentação em Português"
-description: "Esta documentação está sendo traduzida do chinês para o português"
+title: "Guia de Uso da API RustFS"
+description: "Apresenta o uso da API RustFS, ajudando usuários a operar instâncias/buckets/objetos/usuários etc. do RustFS através da API."
 ---
 
-# Documentação em Português
+APIs ricas são fundamentais para o uso amplo de uma aplicação. O RustFS fornece APIs ricas (totalmente compatíveis com S3) para operar instâncias RustFS, buckets, objetos, usuários, políticas etc. Os tópicos inclusos neste capítulo incluem:
 
-Esta seção contém a documentação traduzida do RustFS em português.
+- API de Usuários
+- API de Buckets
+- API de Objetos
+- API de Políticas

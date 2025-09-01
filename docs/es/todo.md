@@ -1,26 +1,17 @@
 # 西班牙语待翻译任务列表
 
-> 最后更新: 2025/9/2 00:54:55
-> 总计: 18 个文件待翻译
+> 最后更新: 2025/9/2 01:09:48
+> 总计: 13 个文件待翻译
 
 ## 📋 任务总览
 
-- **concepts**: 1 个文件
-- **features**: 16 个文件
+- **features**: 12 个文件
 - **trademark**: 1 个文件
 
 ## 📝 待翻译文件列表
 
-### concepts
-
-- [ ] [concepts/limit.md](./concepts/limit.md) (71 行)
-
 ### features
 
-- [ ] [features/aliyun/index.md](./features/aliyun/index.md) (77 行)
-- [ ] [features/baremetal/index.md](./features/baremetal/index.md) (81 行)
-- [ ] [features/cloud-native/index.md](./features/cloud-native/index.md) (55 行)
-- [ ] [features/commvault/index.md](./features/commvault/index.md) (51 行)
 - [ ] [features/data-lake/index.md](./features/data-lake/index.md) (73 行)
 - [ ] [features/domestic/index.md](./features/domestic/index.md) (103 行)
 - [ ] [features/hdfs/index.md](./features/hdfs/index.md) (154 行)

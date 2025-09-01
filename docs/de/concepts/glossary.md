@@ -1,110 +1,110 @@
 ---
 title: "Glossar"
-description: "Dieser Artikel stellt häufig verwendete Begriffe im Bereich Objektspeicher vor, um Benutzern beim schnellen Verständnis von Objektspeicher zu helfen"
+description: "Dieses Dokument stellt Begriffe vor, die häufig in der Objektspeicherung verwendet werden, um Benutzern zu helfen, die Objektspeicherung schnell zu verstehen"
 ---
 
-# Objektspeicher Kernvokabular-Sammlung (100 Begriffe)
+# Vollständiges Glossar der Kernbegriffe der Objektspeicherung (100 Begriffe)
 
-| Nr. | Begriff | Chinesisch | Beschreibung |
-|------|--------------------------|------------------------------|--------------------------------------------------------------------------|
-| 1 | Object Storage | 对象存储 | Eine Architektur, bei der Daten als Objekte gespeichert werden, um herkömmliche Datei-Hierarchiestrukturen zu ersetzen |
-| 2 | Bucket | 存储桶 | Ein Container zur Speicherung von Objekten mit global eindeutigem Namensraum |
-| 3 | Object | 对象 | Grundlegende Speichereinheit mit Daten, Metadaten und eindeutigem Bezeichner (Object Key) |
-| 4 | Metadata | 元数据 | Schlüssel-Wert-Paar-Informationen, die Objektattribute beschreiben (wie Dateityp, Erstellungszeit) |
-| 5 | S3-Compatible | S3 兼容 | Speicherdienste, die mit Amazon S3 API-Standards kompatibel sind |
-| 6 | Data Durability | 数据持久性 | Wahrscheinlichkeit, dass Daten langfristig ohne Verlust im System erhalten bleiben (z.B. 99,999999999%) |
-| 7 | Replication | 多副本 | Redundanztechnologie, die Datensicherheit durch mehrere Kopien gewährleistet |
-| 8 | Erasure Coding | 纠删码 | Technologie, die Daten fragmentiert und kodiert für hohe Zuverlässigkeit mit weniger Speicherplatz |
-| 9 | Cold Storage | 冷存储 | Kostengünstiger Speichertyp für selten zugreifbare Daten (wie archivierte Daten) |
-| 10 | Lifecycle Management | 生命周期管理 | Richtlinien zur automatischen Überführung/Löschung von Objekten (z.B. nach 30 Tagen zu Cold Storage verschieben) |
-| 11 | Versioning | 版本控制 | Aufbewahrung historischer Versionen von Objekten zur Vermeidung von Überschreibung |
-| 12 | Storage Class | 存储类型 | Verschiedene Leistungs-/Kosten-Speicherstufen (Standard, Seltener Zugriff, Archiv) |
-| 13 | Access Key | 访问密钥 | Authentifizierungsschlüssel für API-Anfragen (Access Key ID + Secret Access Key) |
-| 14 | Region | 区域 | Geografischer Standort der Speicherinfrastruktur (z.B. Ostchina 1, US West) |
-| 15 | Availability Zone (AZ) | 可用区 | Isolierte Rechenzentren mit unabhängiger Strom-/Netzwerkversorgung innerhalb derselben Region |
-| 16 | Endpoint | 端点 | Domain-Adresse für den Zugriff auf Speicherdienst (z.B. us-east1.rustfs.com) |
-| 17 | RESTful API | RESTful API | API-Designspezifikation basierend auf HTTP-Protokoll |
-| 18 | Multipart Upload | 分片上传 | Mechanismus zur Aufteilung großer Dateien für Upload und Zusammenführung |
-| 19 | Pre-Signed URL | 预签名 URL | Temporäre Zugangslinks mit zeitlicher Gültigkeit |
-| 20 | Server-Side Encryption (SSE) | 服务端加密 | Automatische Datenverschlüsselung auf Serverseite (SSE-S3/SSE-KMS/SSE-C) |
-| 21 | Client-Side Encryption (CSE) | 客户端加密 | Lokale Verschlüsselung auf Client-Seite vor dem Upload |
-| 22 | Cross-Region Replication | 跨区域复制 | Automatische Objektreplikation über geografische Regionen hinweg |
-| 23 | Access Control List (ACL) | 访问控制列表 | Regelliste zur Kontrolle von Zugriffsberechtigungen für Buckets/Objekte |
-| 24 | Bucket Policy | 存储桶策略 | JSON-basierte feinkörnige Berechtigungskontroll-Richtlinien |
-| 25 | IAM | IAM | Identity and Access Management System für zentralisierte Benutzer-/Rollen-Berechtigungsverwaltung |
-| 26 | Event Notification | 事件通知 | Senden von Benachrichtigungen an Nachrichtenwarteschlangen/Function Computing bei Ereignisauslösung |
-| 27 | Data Lake | 数据湖 | Repository für zentralisierte Speicherung strukturierter/unstrukturierter Daten |
-| 28 | Compliance | 合规性 | Erfüllung regulatorischer Anforderungen für Datenspeicherung wie GDPR, HIPAA |
-| 29 | Logging & Audit | 日志审计 | Aufzeichnung aller API-Operationslogs für Auditierung |
-| 30 | Monitoring & Alerting | 监控告警 | Echtzeitüberwachung der Speichernutzung/Anfragen mit Alarmierung |
-| 31 | CORS | 跨域资源共享 | Regeln zur Kontrolle des browserbasierten Cross-Origin-Ressourcenzugriffs |
-| 32 | Transfer Acceleration | 传输加速 | Optimierung der Upload-/Download-Geschwindigkeit durch Edge-Nodes |
-| 33 | CDN Integration | CDN 加速 | Kombination mit Content Delivery Network für Caching-Beschleunigung |
-| 34 | Data Export | 数据导出 | Prozess der Datenmigration zu anderen Speichersystemen |
-| 35 | Data Import | 数据导入 | Batch-Datenmigration von externen Systemen zu Objektspeicher |
-| 36 | Static Website Hosting | 静态网站托管 | Direktes Hosting von HTML/CSS/JS-statischen Dateien durch Buckets |
-| 37 | Hotlink Protection | 防盗链 | Technologie zur Verhinderung des Diebstahls von Ressourcenlinks durch externe Websites |
-| 38 | Request Rate Limiting | 请求速率限制 | Kontrolle der API-Anfragefrequenz pro Benutzer/IP |
-| 39 | Tagging | 标签 | Hinzufügen von Klassifizierungs-Tags zu Buckets/Objekten für Verwaltung |
-| 40 | Inventory Report | 清单报告 | Periodisch generierte CSV/ORC-Dateien, die Speicherobjekte auflisten |
-| 41 | Data Restoration | 数据恢复 | Wiederherstellung von Daten aus Archivspeicher in zugänglichen Zustand |
-| 42 | Storage Gateway | 存储网关 | Zugangsschicht, die Objektspeicher als lokales Dateisystem abbildet |
-| 43 | Data Compression | 数据压缩 | Komprimierung von Daten vor Upload zur Speicherplatz-Einsparung |
-| 44 | Data Deduplication | 数据去重 | Eliminierung doppelter Daten zur Reduzierung der Speichernutzung |
-| 45 | Direct Read Archive | 直读归档 | Technologie zum direkten Lesen archivierter Daten ohne Wiederherstellung |
-| 46 | Bandwidth Control | 流量控制 | Begrenzung der Download-Bandbreite zur Vermeidung von Netzwerküberlastung |
-| 47 | Concurrent Connections | 并发连接数 | Anzahl gleichzeitiger Datenübertragungsverbindungen |
-| 48 | Data Migration Service | 数据迁移服务 | Automatisierte Migrationswerkzeuge (z.B. AWS Snowball) |
-| 49 | Client SDK | 客户端 SDK | Entwickler-Toolkits zur Integration von Speicherdiensten (z.B. Python/Java SDK) |
-| 50 | CLI | 命令行工具 | Befehlszeilen-Verwaltungstools (z.B. aws s3 cp) |
-| 51 | Web Console | 图形化控制台 | Web-basierte Verwaltungsschnittstelle |
-| 52 | Data Integrity Check | 数据校验 | Verifizierung der Übertragungsintegrität durch MD5/SHA |
-| 53 | Resumable Upload/Download | 断点续传 | Fortsetzung der Übertragung vom Unterbrechungspunkt nach Netzwerkstörung |
-| 54 | Mirror Back to Source | 镜像回源 | Abrufen und Speichern von spezifizierten Quellen, wenn angefragtes Objekt nicht existiert |
-| 55 | Canary Release | 灰度发布 | Release-Strategie, die neue Features schrittweise für einige Benutzer öffnet |
-| 56 | Soft Delete | 软删除 | Markierung von Objekten zur Löschung mit Aufrechterhaltung einer Wiederherstellungsperiode |
-| 57 | Object Lock | 对象锁定 | Compliance-Schutzmechanismus zur Verhinderung der Objektlöschung oder Überschreibung |
-| 58 | Watermarking | 水印 | Hinzufügen von Identifikationsinformationen zu Bildern/Videos |
-| 59 | Thumbnail Generation | 缩略图生成 | Automatische Erstellung von Vorschauversionen von Bildern |
-| 60 | Image Processing | 图片处理 | Online-Zuschneiden/Skalieren/Rotieren-Verarbeitungsfunktionen |
-| 61 | Video Transcoding | 视频转码 | Konvertierung von Videoformaten/Auflösungen für verschiedene Geräte |
-| 62 | Content Moderation | 内容审核 | Automatische Erkennung unangemessener Bilder/Videos/Texte |
-| 63 | Cost Analysis | 成本分析 | Kostenberechnung nach Speichertyp/Anfragezahl-Dimensionen |
-| 64 | Usage Monitoring | 用量监控 | Echtzeit-Dashboard zur Anzeige von Speicher-/Traffic-/Anfragezählern |
-| 65 | Storage Analytics | 存储分析 | Tools zur Analyse von Speichermustern zur Kostenoptimierung |
-| 66 | Requester Pays | 请求者付费 | Abrechnungsmodell, bei dem der Daten-Downloader die Kosten trägt |
-| 67 | Tiered Storage | 数据分层 | Automatische Verschiebung von Daten zu kostengünstigeren Speicherstufen |
-| 68 | Intelligent Tiering | 智能分层 | Automatische Auswahl des optimalen Speichertyps basierend auf Zugriffsmustern |
-| 69 | PrivateLink | 私有链接 | Zugriff auf Objektspeicher über internes Netzwerk zur Vermeidung öffentlicher Exposition |
-| 70 | VPC Endpoint | VPC 端点 | Einstiegspunkt für sicheren Zugriff auf Speicherdienste innerhalb Virtual Private Cloud |
-| 71 | SSL/TLS | 传输加密 | Verschlüsselung der Datenübertragung durch HTTPS-Protokoll |
-| 72 | Client-Side Encryption | 客户端加密 | Benutzer verschlüsseln Daten selbst vor dem Upload |
-| 73 | KMS | KMS | Key Management Service für zentralisierte Verschlüsselungsschlüssel-Verwaltung |
-| 74 | Permission Boundary | 权限边界 | Begrenzung des maximalen Berechtigungsumfangs von IAM-Rollen/Benutzern |
-| 75 | Temporary Credentials | 临时凭证 | Kurzzeitig gültige Zugangs-Token (z.B. STS Token) |
-| 76 | MFA Delete | MFA 删除保护 | Erforderung einer Multi-Faktor-Authentifizierung zur Datenlöschung |
-| 77 | Immutability | 数据不可变性 | Eigenschaft zur Verhinderung von Datenmanipulation (kombiniert mit WORM-Modell) |
-| 78 | Legal Hold | 法律保留 | Obligatorischer Schutz, der Datenlöschung/-änderung in Compliance-Szenarien verbietet |
-| 79 | Cross-Account Sharing | 跨账户共享 | Erlaubnis für andere Cloud-Konten, auf spezifizierte Speicherressourcen zuzugreifen |
-| 80 | Prefetch Policy | 预取策略 | Vorladen von Daten in Cache zur Beschleunigung nachfolgender Zugriffe |
-| 81 | Cache-Control | 缓存控制 | Spezifizierung des Browser-/CDN-Caching-Verhaltens durch HTTP-Header |
-| 82 | Delayed Deletion | 延迟删除 | Verzögerung von Löschoperationen zur Verhinderung versehentlicher Aktionen |
-| 83 | Batch Operations | 批量操作 | Durchführung einheitlicher Operationen auf mehreren Objekten (löschen/kopieren/wiederherstellen) |
-| 84 | Data Lineage | 数据血缘 | Metadaten-Aufzeichnungen zur Verfolgung von Datenquellen und Änderungshistorie |
-| 85 | Data Catalog | 数据目录 | Abrufsystem zur Speicherung von Metadaten-Informationen |
-| 86 | Storage Gateway | 存储网关 | Hybrid-Cloud-Lösung, die lokale Systeme mit Cloud-Speicher verbindet |
-| 87 | Hybrid Cloud Storage | 混合云存储 | Architektur mit sowohl lokalem Speicher als auch Cloud-Speicher |
-| 88 | Edge Storage | 边缘存储 | Bereitstellung von Speicherdiensten an Edge-Nodes nahe den Datenquellen |
-| 89 | Multi-Cloud Storage | 多云存储 | Speicherlösungen über verschiedene Cloud-Service-Anbieter hinweg |
-| 90 | Storage Federation | 存储联盟 | Abstraktionsschicht für einheitliche Verwaltung mehrerer Speichersysteme |
-| 91 | Object Tag | 对象标签 | Hinzufügen benutzerdefinierter Klassifizierungs-Tags zu Objekten |
-| 92 | Bucket Tag | 存储桶标签 | Hinzufügen verwaltungs-/abrechnungsrelevanter Tags zu Buckets |
-| 93 | Storage Quota | 存储配额 | Begrenzung der maximalen Kapazität von Buckets |
-| 94 | Request Throttling | 请求限速 | Begrenzung der API-Anfragen pro Zeiteinheit |
-| 95 | SLA | 服务等级协议 | Service Level Agreement-Verpflichtungen für Verfügbarkeit/Haltbarkeit (z.B. 99,9% Verfügbarkeit) |
-| 96 | Disaster Recovery | 灾难恢复 | Gewährleistung der Geschäftskontinuität durch regionsübergreifende Backups |
-| 97 | Storage Topology | 存储拓扑 | Verteilungsstruktur von Daten auf physischer/logischer Ebene |
-| 98 | Proximity Access | 就近访问 | Weiterleitung von Benutzeranfragen an nächstgelegene Speicherknoten |
-| 99 | Global Namespace | 全球统一命名空间 | Einheitliche Ansichtsverwaltung regionsübergreifender Buckets |
-| 100 | Zero-Copy Migration | 零拷贝迁移 | Schnelle Datenmigration durch Metadaten-Operationen |
+| Nr. | Begriff | Englisch | Erläuterung |
+|-----|------------------------|------------------------------|--------------------------------------------------------------------------|
+| 1 | Objektspeicher | Object Storage | Architektur zur Speicherung von Daten als Objekte anstelle traditioneller Dateihierarchien |
+| 2 | Bucket | Bucket | Container zur Aufbewahrung von Objekten mit global eindeutigem Namensraum |
+| 3 | Objekt | Object | Grundlegende Speichereinheit bestehend aus Daten, Metadaten und eindeutiger Kennung (Object Key) |
+| 4 | Metadaten | Metadata | Schlüssel-Wert-Paar-Informationen zur Beschreibung von Objekteigenschaften (wie Dateityp, Erstellungszeit) |
+| 5 | S3-kompatibel | S3-Compatible | Speicherdienst, der mit Amazon S3 API-Standards kompatibel ist |
+| 6 | Datenhaltbarkeit | Data Durability | Wahrscheinlichkeit der langfristigen Aufbewahrung von Daten im System ohne Verlust (z.B. 99,999999999%) |
+| 7 | Mehrfachkopien | Replication | Redundanztechnik zum Datenschutz durch mehrere Kopien |
+| 8 | Löschkodierung | Erasure Coding | Fragmentierung und Kodierung von Daten für hohe Zuverlässigkeit mit weniger Speicherplatz |
+| 9 | Kalte Speicherung | Cold Storage | Kostengünstiger Speichertyp für selten zugreifbare Daten (wie Archivdaten) |
+| 10 | Lebenszyklus-Management | Lifecycle Management | Richtlinien zur automatischen Übertragung/Löschung von Objekten (z.B. nach 30 Tagen in kalte Speicherung) |
+| 11 | Versionsverwaltung | Versioning | Beibehaltung historischer Objektversionen zum Schutz vor Überschreibung |
+| 12 | Speicherklasse | Storage Class | Verschiedene Leistungs-/Kosten-Speicherschichten (Standard, Selten, Archiv) |
+| 13 | Zugriffsschlüssel | Access Key | Authentifizierungsschlüssel für API-Anfragen (Access Key ID + Secret Access Key) |
+| 14 | Region | Region | Geografischer Standort der Speicherinfrastruktur (z.B. Ostchina 1, Westamerika) |
+| 15 | Verfügbarkeitszone | Availability Zone (AZ) | Isolierte Rechenzentren mit unabhängiger Strom-/Netzwerkversorgung in derselben Region |
+| 16 | Endpunkt | Endpoint | Domain-Adresse für Speicherdienst-Zugang (z.B. us-east1.rustfs.com) |
+| 17 | RESTful API | RESTful API | API-Designnorm basierend auf HTTP-Protokoll |
+| 18 | Mehrteilige Übertragung | Multipart Upload | Mechanismus zur Segmentierung und Zusammenführung großer Dateien |
+| 19 | Vorsignierte URL | Pre-Signed URL | Temporärer Zugriffslink mit Zeitbegrenzung |
+| 20 | Serverseitige Verschlüsselung | SSE | Automatische serverseitige Datenverschlüsselung (SSE-S3/SSE-KMS/SSE-C) |
+| 21 | Clientseitige Verschlüsselung | CSE | Lokale Verschlüsselung vor Upload durch Client |
+| 22 | Regionsübergreifende Replikation | Cross-Region Replication | Automatische Objektreplikation über geografische Regionen hinweg |
+| 23 | Zugriffskontrollliste | ACL | Regelliste zur Kontrolle von Bucket/Objekt-Zugriffsberechtigungen |
+| 24 | Bucket-Richtlinie | Bucket Policy | JSON-basierte granulare Berechtigungskontrollrichtlinie |
+| 25 | IAM | Identity and Access Management | Zentralisiertes System zur Verwaltung von Benutzer-/Rollenzugriffsberechtigungen |
+| 26 | Ereignisbenachrichtigung | Event Notification | Benachrichtigung an Nachrichtenwarteschlange/Funktionsberechnung bei Ereignisauslösung |
+| 27 | Data Lake | Data Lake | Zentrales Repository zur Speicherung strukturierter/unstrukturierter Daten |
+| 28 | Compliance | Compliance | Einhaltung von Datenspeicherungsvorschriften wie GDPR, HIPAA |
+| 29 | Protokollierung und Audit | Logging & Audit | Aufzeichnung aller API-Operationen zur Prüfung |
+| 30 | Überwachung und Alarmierung | Monitoring & Alerting | Echtzeitüberwachung von Speichernutzung/Anfragezahlen mit Alarmauslösung |
+| 31 | Cross-Origin Resource Sharing | CORS | Regeln zur Kontrolle des domänenübergreifenden Ressourcenzugriffs durch Browser |
+| 32 | Übertragungsbeschleunigung | Transfer Acceleration | Upload-/Download-Geschwindigkeitsoptimierung durch Edge-Knoten |
+| 33 | CDN-Integration | CDN Integration | Kombination mit Content Delivery Network für Cache-Beschleunigung |
+| 34 | Datenexport | Data Export | Prozess der Datenmigration zu anderen Speichersystemen |
+| 35 | Datenimport | Data Import | Massenmigration von Daten aus externen Systemen zum Objektspeicher |
+| 36 | Statisches Website-Hosting | Static Website Hosting | Direktes Hosting von HTML/CSS/JS-Dateien durch Buckets |
+| 37 | Hotlink-Schutz | Hotlink Protection | Technik zum Schutz vor unbefugter Nutzung von Ressourcenlinks durch externe Websites |
+| 38 | Anfragerate-Begrenzung | Request Rate Limiting | Kontrolle der API-Anfragefrequenz pro Benutzer/IP |
+| 39 | Tagging | Tagging | Hinzufügung von Klassifikationstags zu Buckets/Objekten zur einfacheren Verwaltung |
+| 40 | Inventarbericht | Inventory Report | Regelmäßige Generierung von CSV/ORC-Dateien mit Objektlisten |
+| 41 | Datenwiederherstellung | Data Restoration | Wiederherstellung von Daten aus Archivspeicher in zugänglichen Zustand |
+| 42 | Storage Gateway | Storage Gateway | Zugriffsschicht zur Abbildung von Objektspeicher als lokales Dateisystem |
+| 43 | Datenkompression | Data Compression | Kompression von Daten vor Upload zur Speicherplatzersparnis |
+| 44 | Deduplikation | Data Deduplication | Eliminierung doppelter Daten zur Reduktion der Speicherbelegung |
+| 45 | Direktes Archiv-Lesen | Direct Read Archive | Technik zum direkten Lesen von Archivdaten ohne Wiederherstellung |
+| 46 | Bandbreitenkontrolle | Bandwidth Control | Begrenzung der Download-Bandbreite zur Vermeidung von Netzwerkstaus |
+| 47 | Gleichzeitige Verbindungen | Concurrent Connections | Anzahl gleichzeitig verarbeiteter Datenübertragungsverbindungen |
+| 48 | Datenmigrationsdienst | Data Migration Service | Automatisierte Migrationstools (wie AWS Snowball) |
+| 49 | Client-SDK | Client SDK | Entwickler-Toolkit zur Integration von Speicherdiensten (z.B. Python/Java SDK) |
+| 50 | CLI-Tool | Command Line Interface | Kommandozeilen-Verwaltungstool (z.B. aws s3 cp) |
+| 51 | Grafische Konsole | Web Console | Webbasierte Verwaltungsoberfläche |
+| 52 | Datenvalidierung | Data Integrity Check | Überprüfung der Übertragungsintegrität durch MD5/SHA |
+| 53 | Fortsetzbare Übertragung | Resumable Upload/Download | Fortsetzung der Übertragung vom Unterbrechungspunkt nach Netzwerkausfall |
+| 54 | Mirror Back to Source | Mirror Back to Source | Abruf und Speicherung von nicht vorhandenen Objekten von angegebener Quelle |
+| 55 | Canary-Release | Canary Release | Veröffentlichungsstrategie zur schrittweisen Freigabe neuer Funktionen für Teile der Benutzer |
+| 56 | Soft Delete | Soft Delete | Markierung gelöschter Objekte mit beibehaltener Wiederherstellungsperiode |
+| 57 | Objektsperre | Object Lock | Compliance-Schutzmechanismus gegen Löschung oder Überschreibung von Objekten |
+| 58 | Wasserzeichen | Watermarking | Hinzufügung von Identifikationsinformationen in Bildern/Videos |
+| 59 | Thumbnail-Generierung | Thumbnail Generation | Automatische Erstellung von Miniaturversionen von Bildern |
+| 60 | Bildverarbeitung | Image Processing | Online-Funktionen zum Zuschneiden/Skalieren/Drehen |
+| 61 | Video-Transkodierung | Video Transcoding | Konvertierung von Videoformat/-auflösung für verschiedene Geräte |
+| 62 | Inhaltsmoderation | Content Moderation | Automatische Erkennung regelwidriger Bilder/Videos/Texte |
+| 63 | Kostenanalyse | Cost Analysis | Kostenstatistik nach Speichertyp/Anfrageanzahl und anderen Dimensionen |
+| 64 | Nutzungsüberwachung | Usage Monitoring | Echtzeit-Dashboard für Speichervolumen/Traffic/Anfrageanzahl |
+| 65 | Speicheranalyse | Storage Analytics | Tool zur Analyse von Speichermustern zur Kostenoptimierung |
+| 66 | Anfragerzahlung | Requester Pays | Abrechnungsmodell, bei dem der Datendownloader die Kosten trägt |
+| 67 | Datenschichtung | Tiered Storage | Automatische Datenübertragung zu kostengünstigeren Speicherschichten |
+| 68 | Intelligente Schichtung | Intelligent Tiering | Automatische Auswahl des besten Speichertyps basierend auf Zugriffsmustern |
+| 69 | Private Link | PrivateLink | Direkter Objektspeicher-Zugang über Intranet ohne öffentliche Netzwerkexposition |
+| 70 | VPC-Endpunkt | VPC Endpoint | Eingang für sicheren Speicherdienst-Zugang innerhalb der Virtual Private Cloud |
+| 71 | Übertragungsverschlüsselung | SSL/TLS | Verschlüsselte Datenübertragung über HTTPS-Protokoll |
+| 72 | Clientseitige Verschlüsselung | Client-Side Encryption | Benutzerseitige Datenverschlüsselung vor Upload |
+| 73 | KMS | Key Management Service | Zentralisierter Service zur Verwaltung von Verschlüsselungsschlüsseln |
+| 74 | Berechtigungsgrenze | Permission Boundary | Begrenzung des maximalen Berechtigungsumfangs für IAM-Rollen/Benutzer |
+| 75 | Temporäre Zugangsdaten | Temporary Credentials | Kurzfristig gültige Zugriffstoken (wie STS Token) |
+| 76 | MFA-Löschschutz | MFA Delete | Erfordernis einer Mehrfaktor-Authentifizierung zur Datenlöschung |
+| 77 | Datenunveränderlichkeit | Immutability | Eigenschaft zur Verhinderung von Datenmanipulation (kombiniert mit WORM-Modell) |
+| 78 | Rechtliche Aufbewahrung | Legal Hold | Zwangsschutz gegen Datenlöschung/-änderung in Compliance-Szenarien |
+| 79 | Kontenübergreifende Freigabe | Cross-Account Sharing | Zugriff anderer Cloud-Konten auf bestimmte Speicherressourcen |
+| 80 | Vorab-Laderichtlinie | Prefetch Policy | Vorheriges Laden von Daten in Cache zur Beschleunigung nachfolgender Zugriffe |
+| 81 | Cache-Kontrolle | Cache-Control | Spezifikation von Browser-/CDN-Cache-Verhalten über HTTP-Header |
+| 82 | Verzögerte Löschung | Delayed Deletion | Verzögerte Ausführung von Löschoperationen zur Vermeidung versehentlicher Aktionen |
+| 83 | Batch-Operationen | Batch Operations | Einheitliche Operationen auf mehrere Objekte (Löschen/Kopieren/Wiederherstellen) |
+| 84 | Datenherkunft | Data Lineage | Metadaten-Aufzeichnung zur Verfolgung von Datenquelle und Änderungshistorie |
+| 85 | Datenkatalog | Data Catalog | Suchsystem zur Speicherung von Metadaten-Informationen |
+| 86 | Storage Gateway | Storage Gateway | Hybrid-Cloud-Lösung zur Verbindung lokaler Systeme mit Cloud-Speicher |
+| 87 | Hybrid-Cloud-Speicher | Hybrid Cloud Storage | Architektur mit gleichzeitiger Nutzung von lokalem und Cloud-Speicher |
+| 88 | Edge-Speicher | Edge Storage | Speicherdienst an Edge-Knoten nahe der Datenquelle |
+| 89 | Multi-Cloud-Speicher | Multi-Cloud Storage | Speicherlösung über verschiedene Cloud-Anbieter hinweg |
+| 90 | Speicher-Föderation | Storage Federation | Abstraktionsschicht zur einheitlichen Verwaltung mehrerer Speichersysteme |
+| 91 | Objekt-Tag | Object Tag | Hinzufügung benutzerdefinierter Klassifikationstags zu Objekten |
+| 92 | Bucket-Tag | Bucket Tag | Hinzufügung verwaltungs-/abrechnungsbezogener Tags zu Buckets |
+| 93 | Speicherkontingent | Storage Quota | Begrenzung der maximalen Bucket-Kapazität |
+| 94 | Anfrageratenbegrenzung | Request Throttling | Begrenzung der API-Anfragen pro Zeiteinheit |
+| 95 | Service Level Agreement | SLA | Verpflichtungsmetriken für Dienstverfügbarkeit/-haltbarkeit (z.B. 99,9% Verfügbarkeit) |
+| 96 | Notfallwiederherstellung | Disaster Recovery | Gewährleistung der Geschäftskontinuität durch regionsübergreifende Backups |
+| 97 | Speichertopologie | Storage Topology | Verteilungsstruktur von Daten auf physischer/logischer Ebene |
+| 98 | Nähe-Zugriff | Proximity Access | Routing von Benutzeranfragen zum nächstgelegenen Speicherknoten |
+| 99 | Globaler einheitlicher Namensraum | Global Namespace | Einheitliche Ansichtsverwaltung regionsübergreifender Buckets |
+| 100 | Zero-Copy-Migration | Zero-Copy Migration | Schnelle Datenmigration durch Metadatenoperationen |
 
