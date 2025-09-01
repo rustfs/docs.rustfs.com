@@ -6,8 +6,8 @@ source: "features/replication/index.md"
 
 # 待翻译
 
-此页面内容尚未翻译，请参考[中文版本](../../zh/features/replication/index.md)。
+此页面内容尚未翻译，请参考[中文版本](../../../zh/features/replication/index.md)。
 
 ---
 
-*This page is pending translation. Please refer to the [Chinese version](../../zh/features/replication/index.md).*
+*This page is pending translation. Please refer to the [Chinese version](../../../zh/features/replication/index.md).*

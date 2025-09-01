@@ -6,8 +6,8 @@ source: "installation/linux/single-node-single-disk.md"
 
 # 待翻译
 
-此页面内容尚未翻译，请参考[中文版本](../../zh/installation/linux/single-node-single-disk.md)。
+此页面内容尚未翻译，请参考[中文版本](../../../zh/installation/linux/single-node-single-disk.md)。
 
 ---
 
-*This page is pending translation. Please refer to the [Chinese version](../../zh/installation/linux/single-node-single-disk.md).*
+*This page is pending translation. Please refer to the [Chinese version](../../../zh/installation/linux/single-node-single-disk.md).*

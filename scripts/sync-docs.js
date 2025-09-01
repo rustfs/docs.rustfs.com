@@ -91,6 +91,11 @@ function copyFile(src, dest) {
 function createPlaceholder(dest, relativePath) {
   mkdirRecursive(path.dirname(dest))
 
+  // 计算从目标文件到中文版本的相对路径
+  const destDir = path.dirname(dest)
+  const zhFilePath = path.join(DOCS_DIR, SOURCE_LANG, relativePath)
+  const relativeToZh = path.relative(destDir, zhFilePath).replace(/\\/g, '/')
+
   // 为占位符内容添加原始文件路径信息
   const content = `---
 title: "待翻译"
@@ -100,11 +105,11 @@ source: "${relativePath}"
 
 # 待翻译
 
-此页面内容尚未翻译，请参考[中文版本](../../zh/${relativePath})。
+此页面内容尚未翻译，请参考[中文版本](${relativeToZh})。
 
 ---
 
-*This page is pending translation. Please refer to the [Chinese version](../../zh/${relativePath}).*
+*This page is pending translation. Please refer to the [Chinese version](${relativeToZh}).*
 `
 
   fs.writeFileSync(dest, content)

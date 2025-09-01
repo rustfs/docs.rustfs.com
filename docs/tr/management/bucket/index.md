@@ -1,9 +1,14 @@
 ---
-title: "Türkçe Dokümantasyon"
-description: "Bu dokümantasyon Çince'den Türkçe'ye çevriliyor"
+title: "RustFS Depolama Kovası Yönetimi"
+description: "Depolama kovası RustFS'deki önemli konseptir, veri depolamanın temel konteyneridır. Depolama kovası yönetimi oluşturma/silme, kopyalama vb. içerir."
 ---
 
-# Türkçe Dokümantasyon
+# RustFS Depolama Kovası Yönetimi
 
-Bu bölüm, Türkçe'ye çevrilmiş RustFS dokümantasyonunu içerir.
+Depolama kovası (Bucket), RustFS'de veri düzenlemek ve yönetmek için kullanılan temel konteynerdir. Her depolama kovasının benzersiz bir adı vardır ve birden fazla nesne (Object) içerebilir. Depolama kovaları verinin mantıksal gruplandırmasını sağlar, böylece kullanıcılar verileri kolayca yönetebilir ve erişebilir.
+
+
+- [Depolama Kovası Oluşturma](./creation.md)
+- [Depolama Kovası Silme](./deletion.md)
+- Kova Kopyalama
 

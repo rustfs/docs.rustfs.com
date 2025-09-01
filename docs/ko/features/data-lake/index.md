@@ -6,8 +6,8 @@ source: "features/data-lake/index.md"
 
 # 待翻译
 
-此页面内容尚未翻译，请参考[中文版本](../../zh/features/data-lake/index.md)。
+此页面内容尚未翻译，请参考[中文版本](../../../zh/features/data-lake/index.md)。
 
 ---
 
-*This page is pending translation. Please refer to the [Chinese version](../../zh/features/data-lake/index.md).*
+*This page is pending translation. Please refer to the [Chinese version](../../../zh/features/data-lake/index.md).*
