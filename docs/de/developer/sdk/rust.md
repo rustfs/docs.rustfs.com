@@ -72,7 +72,7 @@ async fn create_bucket(client: &Client, bucket_name: &str) -> Result<()> {
         .bucket(bucket_name)
         .send()
         .await?;
-    
+
     println!("Bucket erstellt: {:?}", response);
     Ok(())
 }
@@ -87,7 +87,7 @@ async fn delete_bucket(client: &Client, bucket_name: &str) -> Result<()> {
         .bucket(bucket_name)
         .send()
         .await?;
-    
+
     println!("Bucket gelöscht: {:?}", response);
     Ok(())
 }
@@ -104,7 +104,7 @@ async fn upload_object(client: &Client, bucket_name: &str, key: &str, body: &str
         .body(body.as_bytes().to_vec().into())
         .send()
         .await?;
-    
+
     println!("Objekt hochgeladen: {:?}", response);
     Ok(())
 }
@@ -120,10 +120,10 @@ async fn download_object(client: &Client, bucket_name: &str, key: &str) -> Resul
         .key(key)
         .send()
         .await?;
-    
+
     let body = response.body.collect().await?;
     let content = String::from_utf8(body.into_bytes())?;
-    
+
     println!("Objekt-Inhalt: {}", content);
     Ok(content)
 }
@@ -139,7 +139,7 @@ async fn delete_object(client: &Client, bucket_name: &str, key: &str) -> Result<
         .key(key)
         .send()
         .await?;
-    
+
     println!("Objekt gelöscht: {:?}", response);
     Ok(())
 }
@@ -154,13 +154,13 @@ async fn list_objects(client: &Client, bucket_name: &str) -> Result<()> {
         .bucket(bucket_name)
         .send()
         .await?;
-    
+
     if let Some(contents) = response.contents {
         for object in contents {
             println!("Objekt: {}", object.key.unwrap_or_default());
         }
     }
-    
+
     Ok(())
 }
 ```
@@ -175,7 +175,7 @@ async fn generate_presigned_url(client: &Client, bucket_name: &str, key: &str) -
         .key(key)
         .presigned(PresigningConfig::expires_in(Duration::from_secs(3600))?)
         .await?;
-    
+
     println!("Presigned URL: {}", presigned_request.uri());
     Ok(presigned_request.uri().to_string())
 }
@@ -207,7 +207,7 @@ async fn handle_errors(client: &Client, bucket_name: &str, key: &str) -> Result<
             println!("Unbekannter Fehler: {}", e);
         }
     }
-    
+
     Ok(())
 }
 ```
@@ -223,7 +223,7 @@ use std::time::Duration;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = Config::from_env()?;
-    
+
     let credentials = Credentials::new(
         config.access_key_id,
         config.secret_access_key,
@@ -231,42 +231,42 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         None,
         "rustfs",
     );
-    
+
     let s3_config = S3Config::builder()
         .region(Region::new(config.region))
         .credentials_provider(credentials)
         .endpoint_url(config.endpoint_url)
         .build();
-    
+
     let client = Client::from_conf(s3_config);
-    
+
     let bucket_name = "my-bucket";
     let key = "my-object";
     let body = "Hello, RustFS!";
-    
+
     // Bucket erstellen
     create_bucket(&client, bucket_name).await?;
-    
+
     // Objekt hochladen
     upload_object(&client, bucket_name, key, body).await?;
-    
+
     // Objekt herunterladen
     let content = download_object(&client, bucket_name, key).await?;
     println!("Heruntergeladener Inhalt: {}", content);
-    
+
     // Objekte auflisten
     list_objects(&client, bucket_name).await?;
-    
+
     // Presigned URL generieren
     let presigned_url = generate_presigned_url(&client, bucket_name, key).await?;
     println!("Presigned URL: {}", presigned_url);
-    
+
     // Objekt löschen
     delete_object(&client, bucket_name, key).await?;
-    
+
     // Bucket löschen
     delete_bucket(&client, bucket_name).await?;
-    
+
     Ok(())
 }
 ```

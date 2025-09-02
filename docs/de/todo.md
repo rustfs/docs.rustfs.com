@@ -1,22 +1,17 @@
 # 德语待翻译任务列表
 
-> 最后更新: 2025/9/3 00:35:58
-> 总计: 2 个文件待翻译
+> 最后更新: 2025/9/3 00:37:25
+> 总计: 1 个文件待翻译
 
 ## 📋 任务总览
 
 - **features**: 1 个文件
-- **upgrade-scale**: 1 个文件
 
 ## 📝 待翻译文件列表
 
 ### features
 
 - [ ] [features/sql-server/index.md](./features/sql-server/index.md) (504 行)
-
-### upgrade-scale
-
-- [ ] [upgrade-scale/availability-and-resiliency.md](./upgrade-scale/availability-and-resiliency.md) (138 行)
 
 ## 📖 使用说明
 
