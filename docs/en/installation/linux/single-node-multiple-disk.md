@@ -1,9 +1,13 @@
 ---
-title: "English Documentation"
-description: "This documentation is being translated from Chinese to English"
+title: "待翻译"
+description: "此页面待翻译"
+source: "installation/linux/single-node-multiple-disk.md"
 ---
 
-# English Documentation
+# 待翻译
 
-This section contains the RustFS documentation translated into English.
+此页面内容尚未翻译，请参考[中文版本](../../../zh/installation/linux/single-node-multiple-disk.md)。
 
+---
+
+*This page is pending translation. Please refer to the [Chinese version](../../../zh/installation/linux/single-node-multiple-disk.md).*

@@ -1,304 +1,82 @@
-# AWS Integration
+---
+title: "RustFS for VMware Tanzu Container Platform"
+description: "RustFS provides high-performance object storage for VMware Tanzu with enterprise-grade features and multi-cloud capabilities."
+---
 
-RustFS provides native integration with Amazon Web Services, enabling seamless hybrid cloud and multi-cloud storage solutions with enterprise-grade performance and reliability.
+# RustFS for VMware Tanzu Container Platform
 
-## Overview
+## Three Reasons Customers Run RustFS on VMware Tanzu
 
-![AWS Integration](./images/sec1-1.png)
+- RustFS serves as a consistent storage layer in hybrid cloud or multi-cloud deployment scenarios
+- RustFS is a Kubernetes-native high-performance product that can provide predictable performance in public cloud, private cloud, and edge cloud environments.
+- Running RustFS on EKS provides control over the software stack with the flexibility needed to avoid cloud lock-in.
 
-RustFS on AWS delivers:
+VMware Tanzu is an enterprise-grade Kubernetes container platform with full-stack automated operations capabilities that can manage hybrid cloud, multi-cloud, and edge deployments. VMware Tanzu includes enterprise-grade Linux operating systems, container runtimes, networking, monitoring, registries, and authentication and authorization solutions.
 
-- **Native AWS Integration**: Deep integration with AWS services and APIs
-- **Hybrid Cloud**: Seamless bridge between on-premises and AWS cloud
-- **Cost Efficiency**: Intelligent storage tiering and lifecycle management
-- **Enterprise Scale**: Support for petabyte-scale deployments
+RustFS natively integrates with VMware Tanzu, making it easier to operate your own large-scale multi-tenant object storage as a service. RustFS Operator works with VMware Tanzu toolchain (such as VMware Tanzu Cluster Manager CLI and Quay container registry) to ensure you get maximum return on investment from the VMware Tanzu ecosystem.
 
-## Core AWS Integrations
+![RustFS Architecture Diagram](images/sec1-1.png)
 
-### Compute Services
+RustFS provides consistent, high-performance, and scalable object storage because it is Kubernetes-native by design and S3-compatible from the start. Developers can easily obtain Amazon S3-compatible persistent storage services for all cloud-native applications running on VMware Tanzu. Unlike AWS S3, RustFS enables applications to scale across any multi-cloud and hybrid cloud infrastructure while still being manageable within the VMware Tanzu ecosystem without public cloud lock-in.
 
-#### Amazon EC2
+## RustFS Operator Natively Integrates with VMware Tanzu Features
 
-- **Optimized AMIs**: Pre-configured Amazon Machine Images for RustFS
-- **Instance Types**: Recommendations for storage-optimized instances
-- **Auto Scaling**: Automatic scaling based on storage demand
-- **Placement Groups**: Optimize network performance with placement groups
+### Feature Overview
 
-#### Amazon EKS (Elastic Kubernetes Service)
+- **Storage Classes and Tiering**
+- **External Load Balancing**
+- **Encryption Key Management**
+- **Identity Management**
+- **Certificate Management**
+- **Monitoring and Alerting**
+- **Logging and Auditing**
 
-- **Container Deployment**: Deploy RustFS on managed Kubernetes
-- **Persistent Volumes**: Integration with EBS and EFS for persistent storage
-- **Service Mesh**: Integration with AWS App Mesh
-- **CI/CD Integration**: Native integration with AWS CodePipeline
+## Storage Classes and Tiering
 
-### Storage Services
+A key requirement for deploying RustFS at scale on Tencent Cloud TKE is capability tiers across storage classes (NVMe, HDD, public cloud). This enables enterprises to manage both cost and performance simultaneously.
 
-#### Amazon S3 Integration
+RustFS supports automatic transition of aging objects from fast NVMe tiers to more cost-effective HDD tiers, and even to cost-optimized cold public cloud storage tiers.
 
-- **S3 Gateway**: Transparent S3 API compatibility
-- **Intelligent Tiering**: Automatic movement to S3 IA and Glacier
-- **Cross-Region Replication**: Multi-region data replication
-- **S3 Transfer Acceleration**: Accelerated data transfer to S3
+When tiering, RustFS provides a unified namespace across tiers. Movement across tiers is transparent to applications and triggered by customer-determined policies.
 
-#### Amazon EBS (Elastic Block Store)
+RustFS provides secure storage in Alibaba Cloud ACK hybrid clouds by encrypting objects at the source, ensuring customers always have complete control over data. When Alibaba Cloud ACK is deployed in public clouds, tiering capabilities help Alibaba Cloud ACK effectively manage data across persistent block storage and cheaper object storage tiers.
 
-- **High-Performance Storage**: GP3 and io2 volumes for optimal performance
-- **Snapshot Integration**: Automated EBS snapshot management
-- **Encryption**: EBS encryption with AWS KMS
-- **Multi-Attach**: Shared storage across multiple instances
+**Learn More:**
 
-#### Amazon EFS (Elastic File System)
+## External Load Balancing
 
-- **NFS Compatibility**: POSIX-compliant file system interface
-- **Performance Modes**: General Purpose and Max I/O performance modes
-- **Throughput Modes**: Provisioned and Bursting throughput
-- **Backup Integration**: Automated backup to AWS Backup
+All RustFS communication is based on HTTP, RESTful APIs, and will support any standard Kubernetes-compatible ingress controller. This includes hardware and software-defined solutions. The most popular choice is NGINX. Install using OperatorHub or OpenShift Marketplace, then expose RustFS tenants using annotations.
 
-### Network Services
+## Encryption Key Management
 
-#### Amazon VPC (Virtual Private Cloud)
+There are no native OpenShift key management capabilities. Therefore, RustFS recommends using HashiCorp Vault to store keys outside the object storage system. This is a best practice for cloud-native applications.
 
-- **Network Isolation**: Deploy in isolated virtual network
-- **Subnets**: Multi-AZ deployment across availability zones
-- **Security Groups**: Fine-grained network access control
-- **VPC Endpoints**: Private connectivity to AWS services
+For all production environments, we recommend enabling encryption on all buckets by default. RustFS uses AES-256-GCM or ChaCha20-Poly1305 encryption to protect data integrity and confidentiality with negligible performance impact.
 
-#### AWS Direct Connect
+RustFS supports all three server-side encryption (SSE-KMS, SSE-S3, and SSE-C) modes. SSE-S3 and SSE-KMS integrate with server-side KMS, while SSE-C uses client-provided keys.
 
-- **Dedicated Connectivity**: Dedicated network connection to AWS
-- **Consistent Performance**: Predictable network performance
-- **Bandwidth Options**: Multiple bandwidth options available
-- **Hybrid Connectivity**: Seamless hybrid cloud connectivity
+RustFS will use this KMS to bootstrap its internal key encryption server (KES service) for high-performance per-object encryption. Each tenant runs its own KES server in an isolated namespace.
 
-#### Amazon CloudFront
+## Identity Management
 
-- **Global CDN**: Accelerate content delivery worldwide
-- **Edge Locations**: 400+ edge locations globally
-- **Origin Shield**: Additional caching layer for origin protection
-- **Real-time Metrics**: Detailed performance and usage metrics
+When running RustFS on OpenShift, customers can manage single sign-on (SSO) through third-party OpenID Connect/LDAP compatible identity providers (such as Keycloak, Okta/Auth0, Google, Facebook, ActiveDirectory, and OpenLDAP). RustFS recommends OpenID Connect compatible Keycloak IDP.
 
-## Security Integration
+External IDPs allow administrators to centrally manage user/application identities. RustFS builds on top of IDPs to provide AWS IAM-style user, group, role, policy, and token service APIs. The ability to have a unified identity and access management (IAM) layer independent of infrastructure provides significant architectural flexibility.
 
-### AWS Identity and Access Management (IAM)
+## Certificate Management
 
-- **Fine-grained Permissions**: Precise access control policies
-- **Role-based Access**: IAM roles for service-to-service access
-- **Multi-Factor Authentication**: Enhanced security with MFA
-- **Cross-Account Access**: Secure access across AWS accounts
+All traffic from applications to RustFS, including inter-node traffic, is encrypted using TLS. TLS certificates are used to secure network communications and establish the identity of network connection resources, such as RustFS server domains.
 
-### AWS Key Management Service (KMS)
+RustFS integrates with OpenShift certificate manager, so you can use the RustFS operator to automatically provision, configure, manage, and update certificates for RustFS tenants. Tenants are completely isolated from each other in their own Kubernetes namespaces with their own certificates for enhanced security.
 
-- **Encryption Key Management**: Centralized encryption key management
-- **Hardware Security Modules**: HSM-backed key protection
-- **Key Policies**: Fine-grained key usage policies
-- **Audit Trail**: Complete key usage audit logs
+## Monitoring and Alerting
 
-### AWS CloudTrail
+RustFS recommends using Grafana, platform monitoring components installed in the OpenShift-user-workload-monitoring project, or any other OpenShift container monitoring tools to connect to RustFS. RustFS publishes all imaginable storage-related Prometheus metrics, from bucket capacity to access metrics. These metrics can be collected and visualized in any Prometheus-compatible tool or RustFS console.
 
-- **API Auditing**: Complete audit trail of all API calls
-- **Compliance**: Meet regulatory compliance requirements
-- **Security Analysis**: Analyze security events and patterns
-- **Integration**: Integration with SIEM and monitoring tools
-
-### AWS Config
-
-- **Configuration Compliance**: Monitor resource configuration compliance
-- **Change Tracking**: Track configuration changes over time
-- **Compliance Rules**: Automated compliance rule evaluation
-- **Remediation**: Automated remediation of compliance violations
-
-## Monitoring and Operations
-
-### Amazon CloudWatch
-
-- **Performance Monitoring**: Monitor storage performance metrics
-- **Custom Metrics**: Create custom metrics for specific workloads
-- **Alarms**: Set up alarms for critical thresholds
-- **Dashboards**: Create custom monitoring dashboards
-
-### AWS X-Ray
-
-- **Distributed Tracing**: Trace requests across distributed systems
-- **Performance Analysis**: Analyze application performance bottlenecks
-- **Service Map**: Visualize service dependencies
-- **Error Analysis**: Identify and analyze errors and exceptions
-
-### AWS Systems Manager
-
-- **Patch Management**: Automated patch management
-- **Configuration Management**: Centralized configuration management
-- **Operational Insights**: Operational insights and recommendations
-- **Automation**: Automated operational tasks and workflows
+External monitoring solutions periodically scrape RustFS Prometheus endpoints. RustFS recommends using Grafana or platform monitoring components installed in the openshift-user-workload-monitoring project to connect to RustFS. These same tools can also be used to establish baselines and set notification alert thresholds, which can then be routed to notification platforms like PagerDuty, Freshservice, or even SNMP.
 
-## Deployment Architectures
-
-### Single-Region Deployment
+## Logging and Auditing
 
-```
-┌─────────────────┐
-│   AWS Region    │
-│                 │
-│  ┌─────────────┐│
-│  │     AZ-A    ││
-│  │   RustFS    ││
-│  │   Node 1-2  ││
-│  └─────────────┘│
-│                 │
-│  ┌─────────────┐│
-│  │     AZ-B    ││
-│  │   RustFS    ││
-│  │   Node 3-4  ││
-│  └─────────────┘│
-└─────────────────┘
-```
+Enabling RustFS auditing generates logs for every operation on the object storage cluster. In addition to audit logs, RustFS also logs console errors for operational troubleshooting.
 
-### Multi-Region Deployment
-
-```
-┌─────────────────┐    ┌─────────────────┐
-│   Primary       │    │   Secondary     │
-│   Region        │◄──►│   Region        │
-│                 │    │                 │
-│ • Active Data   │    │ • Replica Data  │
-│ • Read/Write    │    │ • Read Only     │
-│ • Low Latency   │    │ • DR Ready      │
-└─────────────────┘    └─────────────────┘
-```
-
-### Hybrid Cloud Architecture
-
-```
-┌─────────────────┐    ┌─────────────────┐
-│   On-Premises   │    │      AWS        │
-│     RustFS      │◄──►│     RustFS      │
-│                 │    │                 │
-│ • Primary Data  │    │ • Backup Data   │
-│ • Hot Storage   │    │ • Cold Storage  │
-│ • Low Latency   │    │ • Cost Optimized│
-└─────────────────┘    └─────────────────┘
-```
-
-## Cost Optimization
-
-### AWS Cost Management
-
-- **Cost Explorer**: Analyze and optimize AWS costs
-- **Budgets**: Set up budgets and cost alerts
-- **Reserved Instances**: Purchase reserved capacity for cost savings
-- **Spot Instances**: Use spot instances for non-critical workloads
-
-### Storage Cost Optimization
-
-- **Intelligent Tiering**: Automatic movement to lower-cost storage tiers
-- **Lifecycle Policies**: Automated data lifecycle management
-- **Compression**: Built-in compression to reduce storage costs
-- **Deduplication**: Eliminate duplicate data to optimize storage
-
-### Compute Cost Optimization
-
-- **Right-sizing**: Optimize instance sizes for workloads
-- **Auto Scaling**: Scale resources based on demand
-- **Scheduled Scaling**: Scale resources based on predictable patterns
-- **Resource Tagging**: Tag resources for cost allocation and tracking
-
-## Migration Services
-
-### AWS Migration Hub
-
-- **Migration Tracking**: Track migration progress across tools
-- **Application Discovery**: Discover and assess applications
-- **Migration Planning**: Plan and coordinate migrations
-- **Progress Monitoring**: Monitor migration progress and status
-
-### AWS DataSync
-
-- **Data Transfer**: High-speed data transfer to AWS
-- **Scheduling**: Schedule regular data synchronization
-- **Bandwidth Control**: Control bandwidth usage during transfer
-- **Monitoring**: Monitor transfer progress and performance
-
-### AWS Database Migration Service
-
-- **Database Migration**: Migrate databases to AWS
-- **Continuous Replication**: Continuous data replication
-- **Schema Conversion**: Convert database schemas
-- **Minimal Downtime**: Minimize downtime during migration
-
-## Best Practices
-
-### Architecture Best Practices
-
-1. **Multi-AZ Deployment**: Deploy across multiple availability zones
-2. **Auto Scaling**: Implement auto scaling for high availability
-3. **Load Balancing**: Use Elastic Load Balancing for traffic distribution
-4. **Backup Strategy**: Implement comprehensive backup and recovery
-
-### Security Best Practices
-
-1. **Principle of Least Privilege**: Grant minimum required permissions
-2. **Encryption**: Enable encryption for data at rest and in transit
-3. **Network Security**: Use VPC and security groups for isolation
-4. **Monitoring**: Implement comprehensive security monitoring
-
-### Performance Best Practices
-
-1. **Instance Optimization**: Choose appropriate instance types
-2. **Storage Optimization**: Use appropriate storage types and configurations
-3. **Network Optimization**: Optimize network configuration for performance
-4. **Caching**: Implement caching strategies for better performance
-
-### Cost Optimization Best Practices
-
-1. **Resource Tagging**: Tag all resources for cost tracking
-2. **Regular Reviews**: Regularly review and optimize costs
-3. **Reserved Capacity**: Purchase reserved instances for predictable workloads
-4. **Automated Policies**: Implement automated cost optimization policies
-
-## Support and Services
-
-### AWS Support Plans
-
-- **Basic Support**: Basic support included with all AWS accounts
-- **Developer Support**: Business hours email support
-- **Business Support**: 24/7 phone and email support
-- **Enterprise Support**: Dedicated Technical Account Manager
-
-### AWS Professional Services
-
-- **Architecture Review**: Review and optimize architecture
-- **Migration Services**: End-to-end migration services
-- **Training**: Comprehensive AWS training programs
-- **Optimization**: Ongoing optimization and best practices
-
-### AWS Partner Network
-
-- **Consulting Partners**: Access to certified AWS consulting partners
-- **Technology Partners**: Integration with AWS technology partners
-- **Training Partners**: Access to AWS training partners
-- **Marketplace**: AWS Marketplace for third-party solutions
-
-## Getting Started
-
-### Prerequisites
-
-1. **AWS Account**: Set up AWS account with appropriate permissions
-2. **VPC Configuration**: Configure Virtual Private Cloud
-3. **Security Setup**: Configure security groups and IAM roles
-4. **Network Connectivity**: Set up network connectivity
-
-### Quick Start Guide
-
-1. **Launch EC2 Instances**: Launch compute instances for RustFS
-2. **Configure Storage**: Attach and configure EBS volumes
-3. **Install RustFS**: Install and configure RustFS software
-4. **Network Configuration**: Configure networking and security
-5. **Testing**: Test functionality and performance
-6. **Production Deployment**: Deploy to production environment
-
-### Next Steps
-
-- **Monitoring**: Set up CloudWatch monitoring and alarms
-- **Backup**: Configure backup and disaster recovery
-- **Optimization**: Optimize performance and costs
-- **Security**: Implement additional security measures
-- **Scaling**: Plan for future scaling requirements
+RustFS supports outputting logs to Elastic Stack (or third-party) for analysis and alerting.

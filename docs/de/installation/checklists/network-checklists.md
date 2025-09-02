@@ -8,6 +8,7 @@ description: "RustFS Unternehmensbereitstellungs-Netzwerk-Checkliste"
 ## 1. Netzwerkarchitektur-Design
 
 ### Grundlegende Netzwerkplanung
+
 - **Topologie-Validierung**
  Bestätigen Sie, ob die Bereitstellungsarchitektur (Stern-/Ring-/Netzwerkstruktur) die Hochverfügbarkeitsanforderungen des verteilten Speichers erfüllt
 - **Redundanzpfad-Überprüfung**
@@ -16,6 +17,7 @@ description: "RustFS Unternehmensbereitstellungs-Netzwerk-Checkliste"
  Berechnen Sie den geschätzten Datenverkehr: Objektspeicher-Lese-/Schreibbandbreite × Anzahl der Knoten × Anzahl der Replikate + 20% Redundanz
 
 ### IP-Planung
+
 - [ ] Verwaltungsnetzwerk und Datennetzwerk trennen
 - [ ] Kontinuierliche IP-Bereiche für Speicherknoten zuweisen (empfohlen /24 Subnetz)
 - [ ] Mindestens 15% der IP-Adressen für Erweiterungen reservieren
@@ -23,7 +25,9 @@ description: "RustFS Unternehmensbereitstellungs-Netzwerk-Checkliste"
 ---
 
 ## 2. Hardware-Geräteanforderungen
+
 ### Switch-Konfiguration
+
 | Prüfpunkt | Standardanforderung |
 |-----------|-------------------|
 | Backplane-Bandbreite | ≥ Vollport-Linienrate-Forwarding-Fähigkeit × 1.2 |
@@ -32,6 +36,7 @@ description: "RustFS Unternehmensbereitstellungs-Netzwerk-Checkliste"
 | Spanning Tree Protocol | RSTP/MSTP schnelle Konvergenz aktivieren |
 
 ### Physische Verbindungen
+
 - [ ] Glasfaser-Dämpfungstest (Einmodus ≤0.35dB/km)
 - [ ] Port-Fehlausrichtung-Verbindungsprüfung (Knoten A eth0 ↔ Knoten B eth0)
 - [ ] Kabel-Etikettierungssystem (enthält Quell-/Ziel-IP + Portnummer)
@@ -39,7 +44,9 @@ description: "RustFS Unternehmensbereitstellungs-Netzwerk-Checkliste"
 ---
 
 ## 3. Betriebssystem-Netzwerkkonfiguration
+
 ### Kernel-Parameter-Optimierung
+
 ```bash
 # Überprüfen Sie die folgenden Parameter-Einstellungen
 net.core.rmem_max = 16777216
@@ -49,6 +56,7 @@ net.ipv4.tcp_slow_start_after_idle = 0
 ```
 
 ### Netzwerkkarten-Konfiguration
+
 - [ ] Jumbo-Frames aktivieren (MTU=9000, erfordert Unterstützung des gesamten Pfads)
 - [ ] Netzwerkkarten-Bindungsmodus validieren (empfohlen LACP mode4)
 - [ ] IPv6 deaktivieren (falls nicht benötigt)
@@ -56,7 +64,9 @@ net.ipv4.tcp_slow_start_after_idle = 0
 ---
 
 ## 4. Sicherheitsstrategien
+
 ### Firewall-Regeln
+
 ```bash
 # Notwendige offene Ports
 - TCP 443 (HTTPS API)
@@ -66,6 +76,7 @@ net.ipv4.tcp_slow_start_after_idle = 0
 ```
 
 ### Zugriffskontrolle
+
 - Switch-Port-Sicherheit MAC-Beschränkung
 - IPSec-Tunnel-Verschlüsselung zwischen Speicherknoten
 - Verwaltungsschnittstelle TLS 1.3 aktivieren
@@ -73,12 +84,15 @@ net.ipv4.tcp_slow_start_after_idle = 0
 ---
 
 ## 5. Leistungsvalidierungstests
+
 ### Benchmark-Testpunkte
+
 1. Knoten-zu-Knoten-Latenztest: `iperf3 -s 8972 <Ziel-IP>`
 2. Rack-übergreifender Bandbreitentest: `iperf3 -c <Ziel-IP> -P 8 -t 30`
 3. Failover-Test: Zufälliges Trennen der Kernverbindung und Beobachten der Wiederherstellungszeit
 
 ### Akzeptanzkriterien
+
 | Metrik | Anforderung |
 |--------|-------------|
 | Knotenlatenz | ≤1ms (gleicher Raum) / ≤5ms (AZ-übergreifend) |
@@ -88,6 +102,7 @@ net.ipv4.tcp_slow_start_after_idle = 0
 ---
 
 ## 6. Dokumentationsanforderungen
+
 1. Netzwerk-Topologie-Diagramm (enthält physische Verbindungen und logische IPs)
 2. Switch-Konfigurations-Backup-Datei (enthält Zeitstempel)
 3. Baseline-Testbericht (enthält Rohdaten)

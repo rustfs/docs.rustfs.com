@@ -1,9 +1,14 @@
 ---
-title: "English Documentation"
-description: "This documentation is being translated from Chinese to English"
+title: "Availability and Scalability Description"
+description: "This article will detail the technology and description related to RustFS scaling."
 ---
 
-# English Documentation
+# RustFS Upgrade and Scaling Overview
 
-This section contains the RustFS documentation translated into English.
+This chapter shares content related to RustFS upgrades and scaling, including:
 
+- [Availability and Resiliency Description](./availability-and-resiliency.md)
+- [Upgrade](./upgrade.md)
+- Scaling
+- Retirement
+- Rebalancing

@@ -1,256 +1,99 @@
-# Quantitative Trading Storage Solutions
+---
+title: "待翻译"
+description: "此页面待翻译"
+source: "features/quantitative-trading/index.md"
+---
 
-Ultra-low latency, high-throughput object storage specifically designed for quantitative trading and financial markets
+# Quantitative Trading File Storage Solution
 
-## Core Pain Points in Quantitative Trading
+Intelligent storage architecture designed specifically for high-frequency trading and quantitative strategy backtesting, supporting million-level IOPS order flow processing per second, meeting millisecond access requirements for Tick-level data
 
-### Traditional Storage Limitations
+## Industry Challenges and Pain Points
 
-- **High Latency**: Traditional storage systems have millisecond-level latency, unable to meet microsecond trading requirements
-- **Limited Throughput**: Cannot handle massive concurrent read/write operations during market peak hours
-- **Scalability Issues**: Difficult to scale storage capacity and performance during market volatility
-- **Data Integrity**: Risk of data loss or corruption affecting trading decisions
-- **Compliance Challenges**: Difficulty meeting financial regulatory requirements for data retention and audit
+| Category | Traditional Solution Defects | Quantitative Requirements | Business Impact |
+|------|-------------|----------|----------|
+| **Data Management** | Single protocol storage (S3 only/POSIX only) | Cross-protocol unified access (S3+POSIX+NFS) | Strategy iteration cycle ↑20% |
+| **Performance Metrics** | ≤500k IOPS (small file random read) | 3M+ IOPS <0.5ms latency | High-frequency strategy slippage ↓0.3bps |
+| **Storage Cost** | Cold data > $0.05/GB/month | Intelligent tiering ≤$0.015/GB/month | Annual storage budget growth ↓65% |
 
-### Business Impact
+## Why Choose Us
 
-- **Trading Opportunities**: High latency leads to missed trading opportunities, directly impacting profitability
-- **Risk Management**: Slow data access affects real-time risk assessment and control
-- **Regulatory Compliance**: Inadequate data management leads to compliance violations and penalties
-- **Operational Costs**: Inefficient storage increases infrastructure and operational costs
+### Ultra-Fast Response
 
-## RustFS Quantitative Trading Solutions
+- Adopts RDMA network acceleration and GPU direct storage, latency ≤500μs, throughput up to 200 Gbps
+- High-frequency trading backtesting speed improved by 300%
 
-### Ultra-Low Latency Performance
+### Massive File Support
 
-![Speed Icon](./images/speed-icon.png)
+- Intelligently aggregates small files into logical large objects, single cluster supports 400 billion files
+- Metadata retrieval efficiency improved by 40%
 
-#### Microsecond-Level Response
+### Elastic Scaling
 
-- **Sub-100μs Latency**: Average read latency under 100 microseconds
-- **Parallel Processing**: Massive parallel I/O operations support
-- **Memory Optimization**: Intelligent memory caching for hot data
-- **Network Optimization**: Kernel bypass and RDMA support
+- Supports hybrid cloud deployment, hot data local SSD acceleration, cold data automatic cloud archiving
+- Capacity can linearly scale to EB level
 
-### High-Frequency Data Processing
+### Financial Security
 
-![Files Icon](./images/files-icon.png)
+- National security SM4 hardware encryption, performance loss <3%
+- Supports three-region five-center disaster recovery, RTO <1 minute
 
-#### Massive Concurrent Operations
+## Scenario-Based Solutions
 
-- **Million-Level IOPS**: Support for over 1 million IOPS per node
-- **Concurrent Connections**: Handle 10,000+ concurrent client connections
-- **Batch Operations**: Optimized batch read/write operations
-- **Stream Processing**: Real-time data streaming and processing
+### High-Frequency Strategy Development
 
-### Intelligent Scaling
+Provides memory-mapped file interface (mmap), supporting C++/Python strategy code direct access to raw trading data
 
-![Scaling Icon](./images/scaling-icon.png)
+#### Measured Metrics
 
-#### Dynamic Resource Allocation
-
-- **Auto-Scaling**: Automatic scaling based on market conditions
-- **Load Balancing**: Intelligent load distribution across nodes
-- **Resource Prioritization**: Priority-based resource allocation
-- **Predictive Scaling**: AI-driven capacity planning
-
-### Enterprise Security
-
-![Security Icon](./images/security-icon.png)
-
-#### Multi-Layer Protection
-
-- **End-to-End Encryption**: AES-256 encryption for all data
-- **Access Control**: Fine-grained permission management
-- **Audit Logging**: Complete audit trails for compliance
-- **Data Integrity**: Checksums and verification for data integrity
-
-## Specialized Features for Trading
-
-### High-Frequency Trading (HFT) Strategy
-
-![HFT Strategy](./images/hft-strategy.png)
-
-#### Optimized for Speed
-
-- **Co-location Support**: Deploy storage close to trading engines
-- **Direct Memory Access**: Bypass operating system for faster access
-- **Custom Protocols**: Optimized protocols for trading data
-- **Hardware Acceleration**: Support for FPGA and GPU acceleration
+Single strategy backtesting of 1 billion order data takes only 4 hours (traditional solutions require 24+ hours)
 
 ### AI Factor Mining
 
-![AI Factor Mining](./images/ai-factor-mining.png)
+Integrates TensorFlow/PyTorch plugins, automatically mapping feature datasets to S3 object storage paths
 
-#### Advanced Analytics
+#### Case Study
 
-- **Real-time Analytics**: Process market data in real-time
-- **Machine Learning**: Built-in ML capabilities for pattern recognition
-- **Factor Discovery**: Automated factor mining and validation
-- **Backtesting**: High-speed historical data analysis
+Jufund achieved 3000+ factor parallel computing, storage throughput improved 8x
 
-### Regulatory Compliance
+### Regulatory Compliance Storage
 
-![Regulatory Compliance](./images/regulatory-compliance.png)
+Built-in WORM (Write Once Read Many) mode, meeting non-tamperable trading record requirements
 
-#### Financial Regulations
+Automatically generates CFCA-compatible audit logs (processing 100k+ operation records per second)
 
-- **MiFID II Compliance**: Meet European financial regulations
-- **CFTC Requirements**: Comply with US commodity trading regulations
-- **Chinese Regulations**: Support for domestic financial regulations
-- **Audit Ready**: Pre-configured audit and reporting capabilities
+## Industry Compliance and Security
 
-## Architecture and Deployment
+### Financial-Grade Encryption **(Required)**
 
-### Multi-Tier Storage Architecture
+FIPS 140-2 certified national security dual algorithm support
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Hot Tier      │    │   Warm Tier     │    │   Cold Tier     │
-│   NVMe SSD      │    │   SATA SSD      │    │   HDD/Tape      │
-│   <1ms access   │    │   <10ms access  │    │   Archive       │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
+### Cross-Regional Synchronization **(Required)**
 
-### Network Architecture
+Meets SEC 17a-4 off-site disaster recovery specifications
 
-- **10Gb/40Gb Ethernet**: High-bandwidth network connectivity
-- **InfiniBand**: Ultra-low latency interconnect
-- **RDMA**: Remote Direct Memory Access for fastest data transfer
-- **Network Bonding**: Redundant network paths for reliability
+### Audit Interface **(Required)**
 
-### Deployment Options
+Direct integration with Splunk, Elastic regulatory modules
 
-#### On-Premises Deployment
+## Core Advantage Comparison
 
-- **Dedicated Hardware**: Optimized hardware for trading workloads
-- **Co-location**: Deploy in financial data centers
-- **Private Network**: Isolated network for security and performance
-- **Custom Configuration**: Tailored to specific trading requirements
+| Dimension | Traditional Solutions | rustFS Solutions | Business Value Manifestation |
+|------|----------|------------|--------------|
+| **Order Flow Processing** | ≤500k IOPS | ✅ 2.3M IOPS | Eliminates order accumulation risk during market peaks |
+| **Data Compression Ratio** | 3:1 | ✅ 11:1 (ZSTD+FPGA acceleration) | PB-level backtesting data storage cost reduced by 67% |
+| **Failover Time** | 15–30 seconds | ✅ 82ms | Avoids SEC regulation penalties for system interruptions |
 
-#### Hybrid Cloud
+## Service Guarantee System
 
-- **Primary On-Premises**: Core trading data on-premises
-- **Cloud Backup**: Backup and disaster recovery in cloud
-- **Burst Capacity**: Scale to cloud during peak periods
-- **Data Synchronization**: Real-time sync between environments
+### Deployment Services
 
-## Performance Benchmarks
+Provides storage-computing integrated machines (pre-installed RustFS) or pure software delivery
 
-### Latency Performance
+### Performance Optimization
 
-| Operation | Average Latency | 99th Percentile |
-|-----------|----------------|-----------------|
-| Small Object Read (4KB) | 85μs | 150μs |
-| Small Object Write (4KB) | 95μs | 180μs |
-| Large Object Read (1MB) | 2.1ms | 4.5ms |
-| Large Object Write (1MB) | 2.8ms | 5.2ms |
+Free provision of "Quantitative Data Lake Design White Paper" and data governance consulting services
 
-### Throughput Performance
+### Ecosystem Cooperation
 
-| Workload | Throughput | IOPS |
-|----------|------------|------|
-| Random Read (4KB) | 8.5 GB/s | 2.2M |
-| Random Write (4KB) | 6.2 GB/s | 1.6M |
-| Sequential Read (1MB) | 45 GB/s | 45K |
-| Sequential Write (1MB) | 38 GB/s | 38K |
-
-### Scalability Metrics
-
-- **Linear Scaling**: Performance scales linearly with node count
-- **Maximum Nodes**: Support up to 1000 nodes per cluster
-- **Storage Capacity**: Scale to 100+ PB per cluster
-- **Concurrent Users**: Support 100,000+ concurrent connections
-
-## Use Cases
-
-### Market Data Management
-
-- **Real-time Feeds**: Store and serve real-time market data feeds
-- **Historical Data**: Manage years of historical trading data
-- **Reference Data**: Store and manage reference data efficiently
-- **Data Validation**: Ensure data quality and consistency
-
-### Risk Management
-
-- **Position Monitoring**: Real-time position and exposure monitoring
-- **Stress Testing**: Store and analyze stress test scenarios
-- **Compliance Reporting**: Generate regulatory compliance reports
-- **Audit Trails**: Maintain complete audit trails for all trades
-
-### Research and Development
-
-- **Strategy Backtesting**: High-speed backtesting of trading strategies
-- **Factor Research**: Store and analyze factor research data
-- **Model Development**: Support for quantitative model development
-- **Performance Analytics**: Analyze trading performance and attribution
-
-## Implementation Services
-
-### Assessment and Planning
-
-1. **Requirements Analysis**: Understand specific trading requirements
-2. **Performance Modeling**: Model expected performance and capacity
-3. **Architecture Design**: Design optimal storage architecture
-4. **Migration Planning**: Plan migration from existing systems
-
-### Deployment and Integration
-
-1. **Hardware Setup**: Install and configure optimized hardware
-2. **Software Installation**: Deploy and configure RustFS
-3. **Integration**: Integrate with existing trading systems
-4. **Testing**: Comprehensive performance and functionality testing
-
-### Optimization and Tuning
-
-1. **Performance Tuning**: Optimize for specific workloads
-2. **Monitoring Setup**: Deploy monitoring and alerting
-3. **Capacity Planning**: Plan for future growth and scaling
-4. **Best Practices**: Implement operational best practices
-
-## Support and Maintenance
-
-### 24/7 Support
-
-- **Financial Markets Expertise**: Support team with trading domain knowledge
-- **Rapid Response**: Sub-hour response times for critical issues
-- **Proactive Monitoring**: Continuous monitoring and alerting
-- **Performance Optimization**: Ongoing performance tuning
-
-### Maintenance Services
-
-- **Regular Updates**: Non-disruptive software updates
-- **Hardware Maintenance**: Preventive hardware maintenance
-- **Capacity Management**: Proactive capacity planning and expansion
-- **Disaster Recovery**: Regular DR testing and validation
-
-### Training and Documentation
-
-- **Technical Training**: Training for IT and operations teams
-- **Best Practices**: Documentation of operational best practices
-- **Troubleshooting Guides**: Comprehensive troubleshooting documentation
-- **Performance Tuning**: Guidelines for performance optimization
-
-## Getting Started
-
-### Evaluation Process
-
-1. **Initial Consultation**: Discuss requirements and use cases
-2. **Proof of Concept**: Deploy small-scale pilot system
-3. **Performance Validation**: Validate performance requirements
-4. **Business Case**: Develop business case and ROI analysis
-
-### Implementation Timeline
-
-- **Week 1-2**: Requirements gathering and architecture design
-- **Week 3-4**: Hardware procurement and setup
-- **Week 5-6**: Software deployment and configuration
-- **Week 7-8**: Integration and testing
-- **Week 9**: Go-live and production deployment
-
-### Success Metrics
-
-- **Latency Reduction**: Achieve target latency requirements
-- **Throughput Improvement**: Meet or exceed throughput targets
-- **Cost Optimization**: Reduce total cost of ownership
-- **Operational Efficiency**: Improve operational efficiency and reliability
+Already completed certification with 20+ quantitative platforms (including JoinQuant, Nuggets Quantitative, etc.)

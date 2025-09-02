@@ -18,7 +18,7 @@ RustFS unterstützt den Zugriff auf und die Verwendung von RustFS-Instanzen auf 
 
 ### Konfigurationsschritte
 
-* Linux-Installation
+- Linux-Installation
 
 1. Bearbeiten Sie die Konfigurationsdatei der RustFS-Instanz (Standarddatei ist `/etc/default/rustfs`), fügen Sie die Umgebungsvariable `RUSTFS_TLS_PATH` hinzu.
 
@@ -40,7 +40,7 @@ RustFS unterstützt den Zugriff auf und die Verwendung von RustFS-Instanzen auf 
 
 Greifen Sie über `https://rustfs.example.com:9000` auf die Instanz zu.
 
-* Docker-Installation
+- Docker-Installation
 
 1. Mounten Sie den Zertifikatspfad über den `-v`-Parameter und geben Sie die Umgebungsvariable `RUSTFS_TLS_PATH` über den `-e`-Parameter an.
 

@@ -18,13 +18,13 @@ Warum?
 
 Weil RustFS in seinem grundlegenden I/O-Modell priorisiert die Linux **io_uring**-Technologie verwendet, und io_uring wurde ab Linux 5.1 eingeführt und wird in Version 5.10+ reifer und stabiler. Im Vergleich zu traditionellem epoll oder Thread-Pools bietet io_uring effizientere, niedrigere Latenz asynchrone I/O-Fähigkeiten, die sehr gut für Szenarien mit hoher Parallelität im Objektspeicher geeignet sind.
 
-### Empfehlungen:
+### Empfehlungen
 
 - Verwenden Sie Versionen mit 5.x Kernel in Mainstream-Unternehmens-Distributionen, zum Beispiel:
- - Ubuntu 20.04 LTS (kann HWE-Kernel installieren, um 5.15+ zu erhalten)
- - Ubuntu 22.04 LTS (Standard 5.15+)
- - CentOS Stream 9 / RHEL 9
- - Debian 12 (Standard 6.x, stärker)
+- Ubuntu 20.04 LTS (kann HWE-Kernel installieren, um 5.15+ zu erhalten)
+- Ubuntu 22.04 LTS (Standard 5.15+)
+- CentOS Stream 9 / RHEL 9
+- Debian 12 (Standard 6.x, stärker)
 
 - Wenn Sie noch alte Kernel verwenden (wie 4.x), wird empfohlen, zu aktualisieren oder Distributionen zu verwenden, die benutzerdefinierte Kernel unterstützen, um die Leistungsvorteile von RustFS voll auszuschöpfen.
 

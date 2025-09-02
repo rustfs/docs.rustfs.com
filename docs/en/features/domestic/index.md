@@ -1,203 +1,109 @@
-# Domestic Cloud Solutions
+---
+title: "待翻译"
+description: "此页面待翻译"
+source: "features/domestic/index.md"
+---
 
-RustFS provides comprehensive solutions for domestic cloud environments, supporting major Chinese cloud providers and meeting compliance requirements for data sovereignty.
+# Domestic Innovation Solutions
 
-## Core Advantages
+We provide complete storage compliance and innovation solutions from hardware and operating systems to classified and encryption systems.
 
-![Domestic Cloud Icon 1](./images/icon-1.png)
+## Pain Points in Innovation Storage Implementation
 
-### Regulatory Compliance
+### Traditional Solution Defects
 
-- **Data Sovereignty**: Full compliance with Chinese data protection laws
-- **Industry Standards**: Meets GB/T standards and industry regulations
-- **Audit Support**: Complete audit trails and compliance reporting
-- **Certification**: Supports various certification requirements
+- Domestic chip adaptation rate less than 30%
+- Performance degradation in innovation environments reaches 40-60%
+- High expansion costs for centralized architectures
 
-![Domestic Cloud Icon 2](./images/icon-2.png)
+### Our Technical Implementation
 
-### Localized Support
+- Complete adaptation of 6 major domestic chips (Kunpeng/Haiguang/Feiteng/Loongson/Shenwei/Zhaoxin)
+- Self-developed RDMA acceleration protocol with IOPS performance reaching 32.4 million and latency <20μs
+- Distributed metadata cluster design supporting EB-level expansion in single clusters
 
-- **24/7 Chinese Support**: Native Chinese technical support team
-- **Local Deployment**: Support for on-premises and hybrid deployments
-- **Regional Optimization**: Optimized for Chinese network conditions
-- **Documentation**: Complete Chinese documentation and training materials
+## Why Choose Us
 
-![Domestic Cloud Icon 3](./images/icon-3.png)
+### Full-Stack Innovation Adaptation
 
-### Technology Independence
+Supports 6 major domestic chip platforms
+Hardware performance loss rate <5%
+MIIT certification compatibility 100%
 
-- **Independent Architecture**: No dependency on foreign technology stacks
-- **Open Source**: Transparent and auditable codebase
-- **Customizable**: Flexible architecture for specific requirements
-- **Future-Proof**: Continuous innovation and development
+### Zero-Decay Performance Guarantee
 
-![Domestic Cloud Icon 4](./images/icon-4.png)
+Self-developed RDMA acceleration protocol
+Single node 16.2 million IOPS
+Latency <20μs
 
-### Cost Effectiveness
+### National Security-Level Security System
 
-- **Competitive Pricing**: Optimized for Chinese market conditions
-- **Flexible Licensing**: Various licensing models available
-- **ROI Optimization**: Proven cost savings and efficiency gains
-- **Scalable Investment**: Pay-as-you-grow pricing models
+Full support for SM2/SM4/SM9
+Encryption throughput ≥8 GB/s
+60% domestic equity structure
 
-## Solution Architecture
+### Deep Ecosystem Compatibility
 
-![Solution Architecture Arrow](./images/arrow.png)
+Adapts to 18 types of innovation operating systems
+200+ ISV joint certifications
+30 ministerial-level application verifications
 
-### Multi-Cloud Integration
+## Solutions
 
-![Solution Item 1](./images/item-1.png)
+### Party and Government Innovation Replacement Acceleration Engine
 
-#### Hybrid Cloud Architecture
+**Covers full process of party and government office "three meetings and one meeting" (documents/meetings/supervision)**
+**Cross-bureau system mutual recognition mechanism (building 12 types of heterogeneous systems)**
 
-- **On-Premises Integration**: Seamless integration with existing infrastructure
-- **Cloud Bursting**: Automatic scaling to cloud resources when needed
-- **Data Mobility**: Easy data movement between environments
-- **Unified Management**: Single pane of glass for all environments
+- ✓ Provincial government cloud completed 8 system migrations in 3 months
+- ✓ Red-headed document circulation efficiency improved by 210%
+- ✓ 100% pass rate for Level 3 certification of Classified Protection 2.0
 
-### Industry Solutions
+### Financial-Grade Distributed Core System
 
-![Solution Item 2](./images/item-2.png)
+**Million-level TPS distributed main engine (supports ASM9 national security algorithms)**
+**Intelligent batch pipeline (automated container 40+ types of batch operations)**
 
-#### Financial Services
+- ✓ Joint-stock bank system latency reduced from 68ms to 9ms
+- ✓ Asset management credit saved 6.5 million/year in OIE license fees
+- ✓ Passed PBOC fintech certification + CBIRC penetration audit
 
-- **Regulatory Compliance**: Meet banking and financial regulations
-- **High Availability**: 99.99% uptime guarantees
-- **Security**: End-to-end encryption and access controls
-- **Performance**: Low-latency data access for trading systems
+### Large Enterprise Cross-Platform Cloud Brain Solution
 
-### Enterprise Features
+**Heterogeneous resource scheduling one-click smooth (x86/ARM/MIPS adaptation management)**
+**Technology stack seamless migration toolchain (Oracle one-stop migration efficiency improved 6x)**
 
-![Solution Item 3](./images/item-3.png)
+- ✓ Heterogeneous management IT operations cost reduced by 37%
+- ✓ Centralized R&D system downtime cycle shortened by 82%
+- ✓ Supports future deep integration and expansion of East-West Computing
 
-#### Government and Public Sector
+## Core Function Comparison Table
 
-- **Security Clearance**: Meet government security requirements
-- **Data Residency**: Ensure data stays within national boundaries
-- **Disaster Recovery**: Comprehensive backup and recovery solutions
-- **Integration**: Compatible with existing government systems
+| Function Dimension | Traditional Storage Solutions | rustFS Innovation Solutions | Advantage Improvement |
+|---------|------------|--------------|----------|
+| Protocol Support | Mainly FC/iSCSI | ✓ Full protocol support (NVMe-oF/S3/NFSv4) | Protocol compatibility improved by 200% ↑ |
+| Data Protection | Dual controller + RAID | ✓ Cross-room 3 replicas + sub-node erasure coding | RTO shortened from hours to minutes |
+| Performance Benchmark | Single node IOPS ≤500k | ✓ Single node 16.2M IOPS, throughput 144 GB/s | Single machine performance improved 32x ↑ |
 
-## Key Features
+## Service Guarantee System
 
-### Data Security
+### Adaptation Verification
 
-- **Encryption at Rest**: AES-256 encryption for stored data
-- **Encryption in Transit**: TLS 1.3 for all data transfers
-- **Key Management**: Integration with domestic KMS solutions
-- **Access Control**: Fine-grained permissions and audit logging
+Time cycle: 5-7 working days
 
-### Performance Optimization
+Hardware compatibility test report
+Performance tuning solutions
 
-- **Network Optimization**: Optimized for Chinese internet infrastructure
-- **Edge Computing**: Support for edge deployments
-- **Caching**: Intelligent caching for improved performance
-- **Load Balancing**: Automatic load distribution
+### Deployment Implementation
 
-### Compliance and Governance
+Time cycle: 3 days/PB level
 
-- **Data Classification**: Automatic data classification and labeling
-- **Retention Policies**: Configurable data retention and deletion
-- **Audit Logging**: Comprehensive audit trails
-- **Reporting**: Automated compliance reporting
+Dual-active architecture setup
+Data lossless migration
 
-## Deployment Options
+### Continuous Operations
 
-### Public Cloud Integration
+Service level: 7x24 monitoring
 
-- **Alibaba Cloud**: Native integration with Alibaba Cloud services
-- **Tencent Cloud**: Optimized for Tencent Cloud infrastructure
-- **Huawei Cloud**: Certified compatibility with Huawei Cloud
-- **Baidu Cloud**: Support for Baidu Cloud AI services
-
-### Private Cloud Solutions
-
-- **On-Premises**: Complete on-premises deployment
-- **Hybrid**: Combination of on-premises and cloud
-- **Edge**: Distributed edge computing support
-- **Air-Gapped**: Support for isolated environments
-
-### Industry-Specific Solutions
-
-- **Manufacturing**: IoT data management and analytics
-- **Healthcare**: HIPAA-equivalent compliance for medical data
-- **Education**: Student data protection and management
-- **Government**: Classified data handling capabilities
-
-## Migration Services
-
-### Assessment and Planning
-
-- **Current State Analysis**: Comprehensive assessment of existing systems
-- **Migration Strategy**: Detailed migration planning and timeline
-- **Risk Assessment**: Identification and mitigation of migration risks
-- **Training**: Staff training and knowledge transfer
-
-### Data Migration
-
-- **Automated Tools**: Automated data migration utilities
-- **Validation**: Data integrity verification and validation
-- **Rollback**: Safe rollback procedures if needed
-- **Monitoring**: Real-time migration monitoring and reporting
-
-### Post-Migration Support
-
-- **Optimization**: Performance tuning and optimization
-- **Monitoring**: Continuous monitoring and alerting
-- **Support**: Dedicated support team for post-migration issues
-- **Training**: Ongoing training and best practices
-
-## Success Stories
-
-### Large Enterprise Deployment
-
-- **Scale**: 10PB+ data storage
-- **Performance**: 50% improvement in data access speed
-- **Cost**: 40% reduction in storage costs
-- **Compliance**: Full regulatory compliance achieved
-
-### Government Implementation
-
-- **Security**: Meet all government security requirements
-- **Availability**: 99.99% uptime achieved
-- **Integration**: Seamless integration with existing systems
-- **Support**: 24/7 local support provided
-
-### Financial Services Case
-
-- **Latency**: Sub-millisecond data access
-- **Compliance**: Full financial regulatory compliance
-- **Scalability**: Support for peak trading volumes
-- **Disaster Recovery**: Multi-site disaster recovery
-
-## Getting Started
-
-### Evaluation Process
-
-1. **Requirements Assessment**: Understanding your specific needs
-2. **Proof of Concept**: Small-scale pilot implementation
-3. **Performance Testing**: Validation of performance requirements
-4. **Security Review**: Security assessment and validation
-
-### Implementation Steps
-
-1. **Planning**: Detailed implementation planning
-2. **Infrastructure**: Hardware and network setup
-3. **Deployment**: Software installation and configuration
-4. **Testing**: Comprehensive testing and validation
-5. **Go-Live**: Production deployment and monitoring
-
-### Support and Maintenance
-
-- **24/7 Support**: Round-the-clock technical support
-- **Regular Updates**: Automatic updates and patches
-- **Health Monitoring**: Proactive system monitoring
-- **Performance Optimization**: Ongoing optimization services
-
-## Contact Information
-
-For more information about domestic cloud solutions:
-
-- **Sales**: Contact our sales team for pricing and licensing
-- **Technical**: Speak with our technical experts
-- **Support**: Access our support resources
-- **Training**: Learn about our training programs
+Annual health checks
+SLA 99.99% guarantee

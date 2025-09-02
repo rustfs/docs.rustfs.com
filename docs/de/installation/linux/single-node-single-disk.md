@@ -13,7 +13,7 @@ Dieses Dokument enthält den RustFS Einzelmaschine-Einzeldatenträger-Bereitstel
 
     - [Einzelmaschine-Einzeldatenträger-Modus (SNSD)](./single-node-single-disk.md)    (aktuelles Dokument)
     - [Einzelmaschine-Mehrere-Datenträger-Modus (SNMD)](./single-node-multiple-disk.md)
-    - [Mehrere-Maschinen-Mehrere-Datenträger-Modus (MNMD)](./multiple-node-multiple-disk.md)   
+    - [Mehrere-Maschinen-Mehrere-Datenträger-Modus (MNMD)](./multiple-node-multiple-disk.md)
 
 2. [Prüfung vor Installation](../checklists/index.md), um sicherzustellen, dass alle Indikatoren den Produktionsrichtlinien entsprechen. Diese Anleitung kann übersprungen werden, falls kein Produktionsstandard erforderlich ist;
 
@@ -93,10 +93,10 @@ Bei der Planung der Objektspeicherkapazität empfehlen wir Ihnen, basierend auf:
 EC (Erasure Code) Planung ist wie folgt:
 
 | Szenario | Empfohlener Prüflevel | Erklärung |
-|  -  |  - |  - | 
-| Standard-Produktionsumgebung | EC:4 | Kann maximal 4 Datenträger (oder Knoten) Ausfälle tolerieren, bietet ein gutes Gleichgewicht zwischen Zuverlässigkeit und Speichereffizienz. | 
-| Hohe Verfügbarkeitsanforderungen | EC:4 - 8 | Oder höher, geeignet für Szenarien mit extrem hohen Datenverfügbarkeitsanforderungen, aber opfert mehr Speicherplatz. | 
-| Entwicklungs-/Testumgebung | EC:2 | Bietet grundlegende Redundanzschutz, geeignet für nicht-kritische Geschäfte. | 
+|  -  |  - |  - |
+| Standard-Produktionsumgebung | EC:4 | Kann maximal 4 Datenträger (oder Knoten) Ausfälle tolerieren, bietet ein gutes Gleichgewicht zwischen Zuverlässigkeit und Speichereffizienz. |
+| Hohe Verfügbarkeitsanforderungen | EC:4 - 8 | Oder höher, geeignet für Szenarien mit extrem hohen Datenverfügbarkeitsanforderungen, aber opfert mehr Speicherplatz. |
+| Entwicklungs-/Testumgebung | EC:2 | Bietet grundlegende Redundanzschutz, geeignet für nicht-kritische Geschäfte. |
 
 ### 2.6 Datenträgerplanung
 
@@ -146,6 +146,7 @@ sudo mkfs.xfs  -i size=512 -n ftype=1 -L RUSTFS0 /dev/sdb
 ```
 
 Wir können bei der Formatierung einige empfohlene Optionen hinzufügen, um die Leistung zu optimieren:
+
 - -L \<label\>: Setzt einen Tag (Label) für das Dateisystem, bequem für nachfolgende Erkennung und Einbindung.
 - -i size=512: RustFS offiziell empfiehlt, die Inode-Größe auf 512 Bytes zu setzen, was für Szenarien mit vielen kleinen Objekten (Metadaten) Leistungsvorteile hat.
 - -n ftype=1: Aktiviert die ftype-Funktion. Das ermöglicht dem Dateisystem, Dateitypen in der Verzeichnisstruktur zu protokollieren, kann die Leistung von Operationen wie readdir und unlink verbessern, was für RustFS sehr vorteilhaft ist.
@@ -160,7 +161,7 @@ LABEL=RUSTFS0 /data/rustfs0   xfs   defaults,noatime,nodiratime   0   0
 #speichern & beenden
 
 # Datenträger einbinden
-sudo mount -a 
+sudo mount -a
 ```
 
 ## III. Benutzernamen konfigurieren
@@ -179,6 +180,7 @@ chown rustfs-user:rustfs-user  /data/rustfs*
 ```
 
 Hinweise:
+
 - Wenn rustfs-user Benutzer und Gruppe erstellt wurden, müssen Sie User und Group in `/etc/systemd/system/rustfs.service` zu `rustfs-user` ändern;
 - Passen Sie `/data/rustfs*` an das angegebene Einbindungsverzeichnis an.
 
@@ -212,12 +214,14 @@ EOF
 ```
 
 2. Speicherverzeichnis erstellen
+
 ```bash
 sudo mkdir -p /data/rustfs0 /var/logs/rustfs /opt/tls
 sudo chmod -R 750 /data/rustfs* /var/logs/rustfs
 ```
 
 ### VII. Systemdienst konfigurieren
+
 1. systemd-Dienstdatei erstellen
 
 ```bash
@@ -273,27 +277,33 @@ EOF
 ```
 
 2. Dienstkonfiguration neu laden
+
 ```bash
 sudo systemctl daemon-reload
 ```
 
 ### VIII. Dienst starten und verifizieren
+
 1. Dienst starten und Autostart einrichten
+
 ```bash
 sudo systemctl enable --now rustfs
 ```
 
 2. Dienststatus verifizieren
+
 ```bash
 systemctl status rustfs
 ```
 
 3. Dienstport überprüfen
+
 ```bash
 netstat -ntpl
 ```
 
 4. Logdateien anzeigen
+
 ```bash
 tail -f /var/logs/rustfs/rustfs*.log
 ```

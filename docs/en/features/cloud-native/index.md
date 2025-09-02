@@ -1,384 +1,61 @@
-# Cloud-Native Deployment
+---
+title: "待翻译"
+description: "此页面待翻译"
+source: "features/cloud-native/index.md"
+---
 
-RustFS is designed for cloud-native environments, providing seamless integration with Kubernetes, container orchestration, and modern DevOps workflows.
+# Hybrid/Multi-Cloud Object Storage
 
-## Multi-Cloud Architecture
+Hybrid/multi-cloud architecture enables consistent performance, security, and economics. Any discussion of multi-cloud needs to start with a definition. It's not just a single public cloud and on-premises.
 
-![Multi-Cloud Architecture](./images/multi-cloud-architecture.png)
+## Successful multi-cloud storage strategies leverage architectures and tools that can run in various environments
 
-RustFS supports deployment across multiple cloud providers, enabling:
+### Public Cloud
 
-- **Vendor Independence**: Avoid cloud provider lock-in
-- **Cost Optimization**: Leverage best pricing across providers
-- **Geographic Distribution**: Deploy closer to users worldwide
-- **Risk Mitigation**: Reduce dependency on single provider
+This is an increasingly large field, but start with AWS, Azure, GCP, IBM, Alibaba, Tencent, and government clouds. Your hybrid/multi-cloud storage software needs to run wherever the application stack runs. Even companies claiming to run on a single cloud don't - there are always other clouds. RustFS provides storage consistency for each public cloud provider, avoiding the need to rewrite applications when expanding to new clouds.
 
-## Kubernetes Integration
+### Private Cloud
 
-### Helm Chart Deployment
+Kubernetes is the primary software architecture for modern private clouds. This includes all Kubernetes distributions such as VMware (Tanzu), RedHat (OpenShift), Rancher/SUSE, HP (Ezmeral), and Rafay. Multi-cloud Kubernetes requires software-defined and cloud-native object storage. Private clouds also include more traditional bare metal instances, but enterprise workloads are increasingly containerized and orchestrated.
 
-```bash
-# Add RustFS Helm repository
-helm repo add rustfs https://charts.rustfs.com
-helm repo update
+### Edge
 
-# Install RustFS cluster
-helm install rustfs rustfs/rustfs \
-  --set replicas=4 \
-  --set storage.size=100Gi \
-  --set storage.storageClass=fast-ssd
-```
+Edge is about moving computation to where data is generated. After processing, data moves to more centralized locations. Edge storage solutions must be lightweight, powerful, cloud-native, and resilient to operate in such multi-cloud architectures. This is very difficult to achieve, which is why few vendors discuss it - they don't have a good answer, not even Amazon.
 
-### Operator Deployment
+## Multi-Cloud Architecture with RustFS
 
-```yaml
-apiVersion: rustfs.io/v1
-kind: RustFSCluster
-metadata:
-  name: rustfs-cluster
-spec:
-  replicas: 4
-  storage:
-    size: 100Gi
-    storageClass: fast-ssd
-  resources:
-    requests:
-      memory: "2Gi"
-      cpu: "1"
-    limits:
-      memory: "4Gi"
-      cpu: "2"
-```
+![Multi-Cloud Architecture](images/multi-cloud-architecture.png)
 
-## Container Orchestration
+## Properties of Hybrid/Multi-Cloud Storage
 
-### Docker Compose
+Multi-cloud storage follows patterns established by public clouds, where public cloud providers consistently adopt cloud-native object storage. The success of public clouds has effectively made file and block storage obsolete. Every new application is written for AWS S3 API, not POSIX. To scale and perform like cloud-native technologies, older applications must be rewritten for S3 API and refactored into microservices to be container-compatible.
 
-```yaml
-version: '3.8'
-services:
-  rustfs:
-    image: rustfs/rustfs:latest
-    ports:
-      - "9000:9000"
-    volumes:
-      - data1:/data1
-      - data2:/data2
-      - data3:/data3
-      - data4:/data4
-    command: server /data{1...4} 
-    environment:
-      - RUSTFS_ROOT_USER=admin
-      - RUSTFS_ROOT_PASSWORD=password123
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/rustfs/health/live"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+### Kubernetes-Native
 
-volumes:
-  data1:
-  data2:
-  data3:
-  data4:
-```
+Kubernetes-native design requires operator services to configure and manage multi-tenant object storage as a service infrastructure. Each of these tenants runs in their own independent namespace while sharing underlying hardware resources. The operator pattern extends Kubernetes' familiar declarative API model through Custom Resource Definitions (CRDs) to perform common operations like resource orchestration, non-disruptive upgrades, cluster scaling, etc., and maintain high availability.
 
-### Docker Swarm
+RustFS is built to fully leverage Kubernetes architecture. Due to fast and lightweight server binaries, RustFS Operator can densely co-locate multiple tenants without exhausting resources. Leverage the advantages of Kubernetes and related ecosystems to gain multi-cloud benefits with portable Kubernetes-native storage.
 
-```yaml
-version: '3.8'
-services:
-  rustfs:
-    image: rustfs/rustfs:latest
-    ports:
-      - "9000:9000"
-    volumes:
-      - rustfs_data:/data
-    deploy:
-      replicas: 4
-      placement:
-        constraints:
-          - node.role == worker
-      resources:
-        limits:
-          memory: 4G
-        reservations:
-          memory: 2G
-    command: server http://rustfs_rustfs:9000/data 
-    networks:
-      - rustfs_network
+### Consistent
 
-networks:
-  rustfs_network:
-    driver: overlay
-    attachable: true
+Hybrid/multi-cloud storage must be consistent in API compatibility, performance, security, and compliance. It needs to execute consistently and independently of underlying hardware. Any variation, even small ones, can break applications, creating enormous operational burden.
 
-volumes:
-  rustfs_data:
-    driver: local
-```
+Since RustFS is very lightweight, we can roll out non-disruptive updates across public, private, and edge in minutes, maintaining consistent experience. RustFS abstracts fundamental differences between these architectures, including key management, identity management, access policies, and hardware/OS differences.
 
-## Service Mesh Integration
+### Performance
 
-### Istio Integration
+Since object storage serves as both primary and secondary storage, it needs to deliver performance at scale. From mobile/web applications to AI/ML, data-intensive workloads require exceptional performance from underlying object storage. Even data protection workloads need high-performance deduplication and snapshot access. No enterprise can afford slow recovery processes. Traditionally, these workloads required bare metal performance. Now, all these workloads can be containerized - as proven by public cloud providers' success.
 
-```yaml
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: rustfs-vs
-spec:
-  hosts:
-  - rustfs.example.com
-  gateways:
-  - rustfs-gateway
-  http:
-  - match:
-    - uri:
-        prefix: /
-    route:
-    - destination:
-        host: rustfs-service
-        port:
-          number: 9000
-      weight: 100
-    fault:
-      delay:
-        percentage:
-          value: 0.1
-        fixedDelay: 5s
-```
+RustFS is the world's fastest object storage, with read/write speeds of 325 GiB/s and 171 GiB/s on NVMe, and 11 GiB/s and 9 GiB/s on HDD. At such speeds, every workload can be achieved in any multi-cloud architecture running on any infrastructure.
 
-### Linkerd Integration
+### Scalable
 
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: rustfs-service
-  annotations:
-    linkerd.io/inject: enabled
-spec:
-  selector:
-    app: rustfs
-  ports:
-  - name: api
-    port: 9000
-    targetPort: 9000
+Many people think scale only refers to how large a system can become. However, this thinking ignores the importance of operational efficiency as environments evolve. Multi-cloud object storage solutions must scale efficiently and transparently regardless of underlying environment, with minimal human interaction and maximum automation. This can only be achieved through API-driven platforms built on simple architectures.
 
-```
+RustFS's relentless focus on simplicity means large-scale, multi-petabyte data infrastructure can be managed with minimal human resources. This is a function of APIs and automation, creating an environment on which scalable multi-cloud storage can be built.
 
-## Observability
+### Software-Defined
 
-### Prometheus Monitoring
+The only way to succeed in multi-cloud is with software-defined storage. The reason is simple. Hardware appliances don't run on public clouds or Kubernetes. Public cloud storage service offerings aren't designed to run on other public clouds, private clouds, or Kubernetes platforms. Even if they did, bandwidth costs would exceed storage costs because they weren't developed for cross-network replication. Admittedly, software-defined storage can run on public clouds, private clouds, and edge.
 
-```yaml
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: rustfs-monitor
-spec:
-  selector:
-    matchLabels:
-      app: rustfs
-  endpoints:
-  - port: metrics
-    interval: 30s
-    path: /rustfs/v2/metrics/cluster
-```
-
-### Grafana Dashboards
-
-Key metrics to monitor:
-
-- **Cluster Health**: Node status, quorum health
-- **Performance**: Request latency, throughput
-- **Storage**: Capacity utilization, I/O metrics
-- **Network**: Bandwidth, connection count
-
-### Distributed Tracing
-
-```yaml
-# Jaeger integration
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: rustfs-tracing
-data:
-  tracing.yaml: |
-    jaeger:
-      endpoint: http://jaeger-collector:14268/api/traces
-      service_name: rustfs
-      sample_rate: 0.1
-```
-
-## CI/CD Integration
-
-### GitOps with ArgoCD
-
-```yaml
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: rustfs-app
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/company/rustfs-config
-    targetRevision: HEAD
-    path: kubernetes
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: rustfs
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-```
-
-### Jenkins Pipeline
-
-```groovy
-pipeline {
-    agent any
-    stages {
-        stage('Build') {
-            steps {
-                sh 'docker build -t rustfs:${BUILD_NUMBER} .'
-            }
-        }
-        stage('Test') {
-            steps {
-                sh 'docker run --rm rustfs:${BUILD_NUMBER} test'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                sh '''
-                    helm upgrade --install rustfs ./helm-chart \
-                        --set image.tag=${BUILD_NUMBER} \
-                        --namespace rustfs
-                '''
-            }
-        }
-    }
-}
-```
-
-## Security
-
-### Pod Security Standards
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: rustfs-pod
-spec:
-  securityContext:
-    runAsNonRoot: true
-    runAsUser: 1000
-    fsGroup: 1000
-  containers:
-  - name: rustfs
-    image: rustfs/rustfs:latest
-    securityContext:
-      allowPrivilegeEscalation: false
-      capabilities:
-        drop:
-        - ALL
-      readOnlyRootFilesystem: true
-```
-
-### Network Policies
-
-```yaml
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: rustfs-network-policy
-spec:
-  podSelector:
-    matchLabels:
-      app: rustfs
-  policyTypes:
-  - Ingress
-  - Egress
-  ingress:
-  - from:
-    - podSelector:
-        matchLabels:
-          app: client
-    ports:
-    - protocol: TCP
-      port: 9000
-```
-
-## Best Practices
-
-### Resource Management
-
-1. **Resource Limits**
-   - Set appropriate CPU and memory limits
-   - Use resource quotas at namespace level
-   - Monitor resource utilization trends
-
-2. **Storage Classes**
-   - Use fast SSDs for high-performance workloads
-   - Consider regional persistent disks for durability
-   - Implement automated backup strategies
-
-### High Availability
-
-1. **Multi-Zone Deployment**
-
-   ```yaml
-   spec:
-     affinity:
-       podAntiAffinity:
-         requiredDuringSchedulingIgnoredDuringExecution:
-         - labelSelector:
-             matchExpressions:
-             - key: app
-               operator: In
-               values:
-               - rustfs
-           topologyKey: topology.kubernetes.io/zone
-   ```
-
-2. **Health Checks**
-
-   ```yaml
-   livenessProbe:
-     httpGet:
-       path: /rustfs/health/live
-       port: 9000
-     initialDelaySeconds: 30
-     periodSeconds: 10
-
-   readinessProbe:
-     httpGet:
-       path: /rustfs/health/ready
-       port: 9000
-     initialDelaySeconds: 10
-     periodSeconds: 5
-   ```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Pod Startup Issues**
-   - Check resource constraints
-   - Verify storage class availability
-   - Review security contexts
-
-2. **Network Connectivity**
-   - Validate service discovery
-   - Check network policies
-   - Monitor DNS resolution
-
-3. **Performance Issues**
-   - Analyze resource utilization
-   - Check storage I/O patterns
-   - Review network bandwidth
+RustFS was born in software and is portable across various operating systems and hardware architectures. Evidence can be found in our 2M+ IPs running across AWS, GCP, and Azure.

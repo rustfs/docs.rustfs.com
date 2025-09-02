@@ -21,6 +21,7 @@ http://rustfs.com/test
 ~~~
 
 Hinweise:
+
 - Standardmäßig Path-Style
 - Benutzer müssen keine Einstellungen vornehmen, es ist automatisch Path-Style-Modus
 

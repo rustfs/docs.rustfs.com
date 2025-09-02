@@ -1,30 +1,22 @@
 ---
-title: "Rust SDK"
-description: "This document mainly explains the use of Rust SDK in RustFS."
+title: "RustFS Rust SDK Usage Guide"
+description: "Operating RustFS instances through Rust SDK, including creation and deletion of buckets and objects."
 ---
 
 # RustFS Rust SDK
 
-Since RustFS is a fully S3-compatible object storage system, it's possible to build a Rust SDK suitable for RustFS by wrapping the S3 Rust SDK. Through the SDK, RustFS operations can be performed, including bucket/object creation and deletion, as well as file upload and download.
+Since RustFS is a fully S3-compatible object storage system, you can build a Rust SDK suitable for RustFS by wrapping the S3 Rust SDK. Through the SDK, you can operate RustFS, including creation and deletion of buckets/objects, file upload and download, etc.
 
 ## Prerequisites
 
-- An available RustFS instance (refer to the [Installation Guide](../../installation/index.md) for installation).
+- An available RustFS instance (refer to [Installation Guide](../../installation/index.md) for installation).
 - Access keys (refer to [Access Key Management](../../administration/iam/access-token.md) for creation).
 
 ## RustFS Rust SDK Construction
 
-Construct a Config data structure from `region`, `access_key_id`, `secret_access_key`, and `endpoint_url`, and read the corresponding information from environment variables:
+Construct `region`, `access_key_id`, `secret_access_key`, and `endpoint_url` into a Config data structure, and read corresponding information from environment variables:
 
 ```rust
-use std::env;
-use aws_sdk_s3::{Client, Config as AwsConfig};
-use aws_config::BehaviorVersion;
-use aws_credential_types::Credentials;
-use aws_types::region::Region;
-use aws_smithy_types::byte_stream::ByteStream;
-use tokio::fs;
-
 pub struct Config {
     pub region: String,
     pub access_key_id: String,
@@ -33,7 +25,7 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn from_env() -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn from_env() -> Result<Self> {
         let region = env::var("RUSTFS_REGION")?;
         let access_key_id = env::var("RUSTFS_ACCESS_KEY_ID")?;
         let secret_access_key = env::var("RUSTFS_SECRET_ACCESS_KEY")?;
@@ -49,7 +41,7 @@ impl Config {
 }
 ```
 
-Use the Config constructed above with `aws_sdk_s3::Client` to build the RustFS client:
+Using the constructed Config above, construct RustFS Client with `aws_sdk_s3::Client`:
 
 ```rust
 let config = Config::from_env()?;
@@ -63,19 +55,20 @@ let credentials = Credentials::new(
 );
 
 let region = Region::new(config.region);
+
 let endpoint_url = config.endpoint_url;
 
-let shared_config = aws_config::defaults(BehaviorVersion::latest())
+let shard_config = aws_config::defaults(BehaviorVersion::latest())
     .region(region)
     .credentials_provider(credentials)
     .endpoint_url(endpoint_url)
     .load()
     .await;
 
-let rustfs_client = Client::new(&shared_config);
+let rustfs_client = Client::new(&shard_config);
 ```
 
-Then use the constructed `rustfs_client` to perform corresponding operations.
+Then use the constructed `rustfs_client` for corresponding operations.
 
 ## Create Bucket
 
@@ -101,7 +94,7 @@ match rustfs_client
 ```rust
 match rustfs_client
     .delete_bucket()
-    .bucket("your-bucket-name")
+    .bucket("cn-east-1rust-sdk")
     .send()
     .await
 {
@@ -120,7 +113,7 @@ match rustfs_client
 ```rust
 match rustfs_client.list_buckets().send().await {
     Ok(res) => {
-        println!("Total number of buckets: {:?}", res.buckets().len());
+        println!("Total buckets number is {:?}", res.buckets().len());
         for bucket in res.buckets() {
             println!("Bucket: {:?}", bucket.name());
         }
@@ -142,7 +135,7 @@ match rustfs_client
     .await
 {
     Ok(res) => {
-        println!("Total number of objects: {:?}", res.contents().len());
+        println!("Total objects number is {:?}", res.contents().len());
         for object in res.contents() {
             println!("Object: {:?}", object.key());
         }
@@ -157,7 +150,7 @@ match rustfs_client
 ## Upload File
 
 ```rust
-let data = fs::read("/file-path/1.txt").await.expect("Cannot open the file");
+let data = fs::read("/file-path/1.txt").await.expect("can not open the file");
 
 match rustfs_client
     .put_object()
@@ -168,7 +161,7 @@ match rustfs_client
     .await
 {
     Ok(res) => {
-        println!("Object uploaded successfully, response: {:?}", res);
+        println!("Object uploaded successfully, res: {:?}", res);
     }
     Err(e) => {
         println!("Error uploading object: {:?}", e);
@@ -188,12 +181,7 @@ match rustfs_client
     .await
 {
     Ok(res) => {
-        println!("Object downloaded successfully, response: {:?}", res);
-        
-        // Write object data to file
-        let mut body = res.body.collect().await?;
-        let data = body.into_bytes();
-        fs::write("/local-path/downloaded-1.txt", data).await?;
+        println!("Object downloaded successfully, res: {:?}", res);
     }
     Err(e) => {
         println!("Error downloading object: {:?}", e);
@@ -202,15 +190,4 @@ match rustfs_client
 }
 ```
 
-## Additional Usage
-
-For other uses, you can explore on your own. The Rust SDK provides complete type safety and memory safety, making it ideal for production environments. With Rust, you get:
-
-- Zero-cost abstractions
-- Memory safety without garbage collection
-- Concurrency without data races
-- Minimal runtime overhead
-- Excellent performance
-
-All advanced S3 features are supported, including multipart uploads, presigned URLs, and bucket policies.
-
+For other usage, you can explore on your own. If you use Vibe Coding, it becomes even simpler!

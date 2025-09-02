@@ -1,26 +1,22 @@
 ---
-title: "TypeScript SDK"
-description: "This document mainly explains the use of TypeScript SDK in RustFS."
+title: "RustFS TypeScript SDK Usage Guide"
+description: "Operating RustFS instances through TypeScript SDK, including creation and deletion of buckets and objects."
 ---
 
 # TypeScript Rust SDK
 
-Since RustFS is a fully S3-compatible object storage system, it's possible to build a TypeScript SDK suitable for RustFS by wrapping the S3 TypeScript SDK. Through the SDK, RustFS operations can be performed, including bucket/object creation and deletion, as well as file upload and download.
+Since RustFS is a fully S3-compatible object storage system, you can build a TypeScript SDK suitable for RustFS by wrapping the S3 TypeScript SDK. Through the SDK, you can operate RustFS, including creation and deletion of buckets/objects, file upload and download, etc.
 
 ## Prerequisites
 
-- An available RustFS instance (refer to the [Installation Guide](../../installation/index.md) for installation).
+- An available RustFS instance (refer to [Installation Guide](../../installation/index.md) for installation).
 - Access keys (refer to [Access Key Management](../../administration/iam/access-token.md) for creation).
 
 ## RustFS TypeScript SDK Construction
 
-With the help of TypeScript's S3Client, use `region`, `access_key_id`, `secret_access_key`, and `endpoint_url` to construct a RustFS client:
+Using TypeScript's S3Client, construct a RustFS client with `region`, `access_key_id`, `secret_access_key`, and `endpoint_url`:
 
 ```typescript
-import { S3Client, CreateBucketCommand, DeleteBucketCommand, ListBucketsCommand } from "@aws-sdk/client-s3";
-import { ListObjectsV2Command, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
-import * as fs from "fs";
-
 const rustfs_client = new S3Client({
     region: "cn-east-1",
     credentials: {
@@ -28,23 +24,22 @@ const rustfs_client = new S3Client({
         secretAccessKey: process.env.RUSTFS_SECRET_ACCESS_KEY!,
     },
     endpoint: process.env.RUSTFS_ENDPOINT_URL!,
-    forcePathStyle: true,
 });
 ```
 
-Then use the constructed `rustfs_client` to perform corresponding operations.
+Then use the constructed `rustfs_client` for corresponding operations.
 
 ## Create Bucket
 
 ```typescript
-async function createBucket(): Promise<void> {
+async function createBucket() {
     try {
         const response = await rustfs_client.send(new CreateBucketCommand({
             Bucket: "my-bucket",
         }));
-        console.log("Bucket created successfully:", response);
+        console.log(response);
     } catch (error) {
-        console.error("Error creating bucket:", error);
+        console.log(error);
     }
 }
 ```
@@ -52,14 +47,14 @@ async function createBucket(): Promise<void> {
 ## Delete Bucket
 
 ```typescript
-async function deleteBucket(): Promise<void> {
+async function deleteBucket() {
     try {
         const response = await rustfs_client.send(new DeleteBucketCommand({
             Bucket: "my-bucket",
         }));
-        console.log("Bucket deleted successfully:", response);
+        console.log(response);
     } catch (error) {
-        console.error("Error deleting bucket:", error);
+        console.log(error);
     }
 }
 ```
@@ -67,15 +62,12 @@ async function deleteBucket(): Promise<void> {
 ## List Buckets
 
 ```typescript
-async function listBuckets(): Promise<void> {
+async function listBuckets() {
     try {
         const response = await rustfs_client.send(new ListBucketsCommand({}));
-        console.log("Available buckets:");
-        response.Buckets?.forEach(bucket => {
-            console.log(`- ${bucket.Name} (created: ${bucket.CreationDate})`);
-        });
+        console.log(response);
     } catch (error) {
-        console.error("Error listing buckets:", error);
+        console.log(error);
     }
 }
 ```
@@ -83,17 +75,14 @@ async function listBuckets(): Promise<void> {
 ## List Objects
 
 ```typescript
-async function listObjects(): Promise<void> {
+async function listObjects() {
     try {
         const response = await rustfs_client.send(new ListObjectsV2Command({
-            Bucket: "my-bucket",
+            Bucket: "rust-sdk-demo",
         }));
-        console.log("Objects in bucket:");
-        response.Contents?.forEach(obj => {
-            console.log(`- ${obj.Key} (${obj.Size} bytes, ${obj.LastModified})`);
-        });
+        console.log(response);
     } catch (error) {
-        console.error("Error listing objects:", error);
+        console.log(error);
     }
 }
 ```
@@ -101,18 +90,15 @@ async function listObjects(): Promise<void> {
 ## Upload File
 
 ```typescript
-async function uploadFile(): Promise<void> {
+async function uploadFile() {
     try {
-        const fileStream = fs.createReadStream("/path/to/local/file.txt");
         const response = await rustfs_client.send(new PutObjectCommand({
             Bucket: "my-bucket",
-            Key: "uploaded-file.txt",
-            Body: fileStream,
-            ContentType: "text/plain",
+            Key: "/test/1.txt",
+            Body: fs.createReadStream("/Users/jhma/Desktop/1.txt"),
         }));
-        console.log("File uploaded successfully:", response.ETag);
     } catch (error) {
-        console.error("Error uploading file:", error);
+        console.log(error);
     }
 }
 ```
@@ -120,39 +106,26 @@ async function uploadFile(): Promise<void> {
 ## Download Object
 
 ```typescript
-async function getObject(): Promise<void> {
+async function getObject() {
     try {
         const response = await rustfs_client.send(new GetObjectCommand({
-            Bucket: "my-bucket",
-            Key: "uploaded-file.txt",
+            Bucket: "rust-sdk-demo",
+            Key: "1.txt",
         }));
-        
-        // Get object content
+
+        // get object content
         if (response.Body) {
             const chunks: Buffer[] = [];
-            const stream = response.Body as NodeJS.ReadableStream;
-            
-            for await (const chunk of stream) {
+            for await (const chunk of response.Body as any) {
                 chunks.push(chunk as Buffer);
             }
-            
             const data = Buffer.concat(chunks).toString("utf-8");
             console.log("Object content:", data);
         }
     } catch (error) {
-        console.error("Error downloading object:", error);
+        console.log(error);
     }
 }
 ```
 
-## Additional Usage
-
-For other uses, you can explore on your own. With TypeScript, you get complete type safety and IntelliSense support for all RustFS operations. The SDK also supports advanced features such as:
-
-- Presigned URLs for temporary access
-- Multipart uploads for large files
-- Bucket policies and ACL management
-- Object metadata and tags
-
-All these features can be used through the standard AWS SDK v3 TypeScript interfaces.
-
+For other usage, you can explore on your own. If you use Vibe Coding, it becomes even simpler!

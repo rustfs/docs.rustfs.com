@@ -28,11 +28,12 @@ curl -O https://rustfs.com/install_rustfs.sh && bash install_rustfs.sh
 ~~~
 
 Hinweise:
+
 1. Der Standard-Installationsport ist Port `9000`;
 2. Der Standard-Installationspfad ist `/data/rustfs0`. Wenn Sie unabhängige Datenträger haben, binden Sie diese bitte vorher ein;
 3. Installieren Sie bitte vorher `unzip`, um sicherzustellen, dass das RustFS-Zip-Installationspaket ordnungsgemäß entpackt werden kann.
 
-Die GitHub-Adresse für die Schnellinstallation ist: https://github.com/rustfs/rustfs.com/blob/main/public/install_rustfs.sh
+Die GitHub-Adresse für die Schnellinstallation ist: <https://github.com/rustfs/rustfs.com/blob/main/public/install_rustfs.sh>
 
 ## III. Andere wichtige Punkte
 

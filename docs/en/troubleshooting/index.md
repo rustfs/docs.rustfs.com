@@ -1,9 +1,13 @@
 ---
-title: "English Documentation"
-description: "This documentation is being translated from Chinese to English"
+title: "RustFS Troubleshooting Guide"
+description: "Diagnose issues encountered while using RustFS and provide repair solutions to help RustFS instances quickly recover from failures."
 ---
 
-# English Documentation
+# RustFS Troubleshooting Guide
 
-This section contains the RustFS documentation translated into English.
+This chapter includes the following content:
+
+- [Node Failures](./node.md)
+- [Driver Failures](./driver.md)
+- [Object Inspection and Auto-Recovery](./healing.md)
 

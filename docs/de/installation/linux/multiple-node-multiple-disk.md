@@ -11,7 +11,7 @@ Dieses Dokument enthält den RustFS Mehrere-Maschinen-Mehrere-Datenträger-Berei
 
 1. Bitte klären Sie Ihre drei Installationsmodi:
 
-     - [Einzelmaschine-Einzeldatenträger-Modus (SNSD)](./single-node-single-disk.md)   
+     - [Einzelmaschine-Einzeldatenträger-Modus (SNSD)](./single-node-single-disk.md)
      - [Einzelmaschine-Mehrere-Datenträger-Modus (SNMD)](./single-node-multiple-disk.md)
      - [Mehrere-Maschinen-Mehrere-Datenträger-Modus (MNMD)](./multiple-node-multiple-disk.md)  (aktuelles Dokument)
 
