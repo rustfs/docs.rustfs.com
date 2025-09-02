@@ -1,25 +1,40 @@
+---
+title: "Küçük Dosya Optimizasyonu"
+description: "Ultra yüksek performanslı iş yükleri için bellek nesne depolama"
+---
+
 # Küçük Dosya Optimizasyonu
-> Ultra Yüksek Performanslı İş Yükleri için Bellek Nesne Depolama Oluşturma
-IOPS ve aktarım performansı gerektiren iş yükleri için sunucu DRAM'ini kullanarak dağıtılmış paylaşılan bellek havuzları oluşturun.
+
+> Ultra yüksek performanslı iş yükleri için bellek nesne depolama oluşturun
+
+Sunucu DRAM'ini kullanarak, yüksek IOPS ve verim performansı gerektiren iş yükleri için dağıtık paylaşılan bellek havuzu oluşturun.
 
 ## Arka Plan
-RustFS küçük dosya optimizasyonu, IOPS ve aktarım performansı gerektiren iş yükleri için idealdir. Modern mimarilerde, bu giderek daha fazla AI/ML iş yüklerini ifade etmektedir. Önbellekleme olmadan, G/Ç GPU'lar için bir darboğaz haline gelebilir.
-Kurumsal önbellekleme kullanarak, eğitim, doğrulama ve test veri setlerini içeren kovaları bellekte tutmak için kullanılır.
+
+RustFS küçük dosya optimizasyonu, IOPS ve verim performansı gerektiren iş yükleri için mükemmeldir. Modern mimarilerde, bu giderek AI/ML iş yükleri anlamına gelir. Önbellek olmadan, I/O GPU için darboğaz haline gelebilir.
+
+Kurumsal önbellek kullanarak, eğitim, doğrulama ve test veri setlerini içeren depolama kovaları, bellek tabanlı sağlama için bellekte saklanabilir.
 
 ## Özellikler
+
 ### 🗃️ Özel Nesne Önbelleği
-RustFS küçük dosya optimizasyonu, özellikle dosya nesnelerini önbelleklemek için tasarlanmıştır.
-Mevcut nesne önbelleğinde bir nesne bulunamazsa, nesneyi otomatik olarak alacak, gelecekteki istekler için önbelleğe alacak ve nesneyi çağrıyı yapan kişiye iade edecektir.
 
-### 💾 Tutarlı Karmalaşma Algoritması
-RustFS'nin küçük dosya optimizasyonu içeriğe öncelik verir.
-Tutarlı karma algoritmaları kullanarak önbelleğe alınmış nesne verilerini önbellek düğümleri (akranlar olarak adlandırılır) kümesi boyunca dağıtır. Tutarlı karma, nesnelerin nesnenin anahtarı temelinde kolayca bulunmasını sağlar. Bu, nesnenin anahtar değeri ile önbelleğe alınmış nesneyi tutan düğüm arasında bire bir ilişki oluşturur. Ayrıca, düğümlerin aynı miktarda veriyi içermesini sağlayarak, bir düğümün aşırı yüklenmesini ve diğerlerinin boş kalmasını önler. Daha da önemlisi, düğümler eklenirse veya çıkarılırsa, sistemi hizalamak için yalnızca minimum düzeyde yeniden düzenleme gerektirir.
+RustFS küçük dosya optimizasyonu, dosya nesnelerini önbelleğe almak için özel olarak tasarlanmıştır.
+Eğer bir nesne mevcut nesne önbelleğinde bulunamazsa, otomatik olarak o nesneyi alacak, gelecekteki istekler için önbelleğe alacak ve o nesneyi çağırana geri döndürecektir.
 
-### 🧹 Yuvarlak Önbellek Bellek Yönetimi
-RustFS, bellek yönetimi için yuvarlak önbellek kullanır. RustFS, toplam önbellek boyutunu küçük dosya optimizasyon yapılandırmasında belirtilen sınırlar içinde tutmak için yuvarlak önbellek kullanır. Yeni nesneler eklenmesi önbellek boyutunun belirtilen sınırı aşmasına neden olursa, bir veya daha fazla nesne, nesnenin son isteğinin zaman damgasına göre kaldırılır.
+### 💾 Tutarlı Hash Algoritması
 
-### 🔄 Otomatik Sürüm Güncellemeleri
-Yeni nesne sürümlerini otomatik olarak günceller. Önbelleğe alınmış bir nesne güncellenmişse, RustFS nesne depolama alanı otomatik olarak önbelleği yeni nesne sürümüyle günceller.
+RustFS'in küçük dosya optimizasyonu, içeriği öncelik olarak kullanır.
+Tutarlı hash algoritması kullanarak önbellek nesne verilerini önbellek düğümleri kümesine (eş düğümler olarak adlandırılır) dağıtır. Tutarlı hash, nesnelerin anahtarlarına göre kolayca bulunmasını sağlar. Bu, nesnelerin anahtar değerleri ile önbellek nesnelerini saklayan düğümler arasında bire bir ilişki oluşturur. Ayrıca düğümlerin aynı miktarda veri içermesini sağlar, böylece bir düğüm aşırı yüklenirken diğer düğümler boşta kalmaz. Ancak daha da önemlisi, nesneleri öyle bir şekilde dağıtır ki, eğer düğümler eklenir veya çıkarılırsa, sistemi hizalamak için sadece minimal yeniden düzenleme gerekir.
+
+### 🧹 Kayan Önbellek Bellek Yönetimi
+
+RustFS, bellek yönetimi için kayan önbellek kullanır. RustFS, önbelleğin toplam boyutunu küçük dosya optimizasyon yapılandırmasında belirtilen sınırlar içinde tutmak için kayan önbellek kullanır. Eğer yeni bir nesne eklemek önbellek boyutunun belirtilen sınırı aşmasına neden olursa, o nesnenin son kez istendiği zaman damgasına göre bir veya daha fazla nesne silinir.
+
+### 🔄 Otomatik Sürüm Güncelleme
+
+Yeni nesne sürümlerini otomatik olarak günceller. Eğer önbellek nesnesi güncellenmişse, RustFS nesne depolama otomatik olarak önbelleği yeni nesne sürümü ile güncelleyecektir.
 
 ### 🧩 Sorunsuz API Entegrasyonu
-RustFS küçük dosya optimizasyonu, RustFS'nin arka planda çalışan bir uzantısıdır. Küçük dosya optimizasyonu RustFS'nin bir uzantısı olduğu için, geliştiricilerin yeni API'ler öğrenmesine gerek yoktur. Geliştiriciler, öncekiyle aynı API'leri kullanmaya devam eder. İstenen nesne önbellekteyse, RustFS otomatik olarak önbellekten alacaktır. Bir nesne önbelleğe alınmalı ve ilk kez isteniyorsa, RustFS nesneyi nesne depolama alanından alacak, çağrıyı yapan kişiye iade edecek ve sonraki istekler için önbelleğe alacaktır.
+
+RustFS küçük dosya optimizasyonu, RustFS'in arka planda çalışan bir uzantısıdır. Küçük dosya optimizasyonu RustFS'in bir uzantısı olduğu için, geliştiriciler yeni API'ler öğrenmek zorunda değildir. Geliştiriciler öncekiyle aynı API'leri kullanır. Eğer istenen nesne önbellekte ise, RustFS otomatik olarak onu önbellekten alacaktır. Eğer bir nesne önbellekte olmalıysa ve ilk kez isteniyorsa, RustFS onu nesne depolamadan alacak, çağırana geri döndürecek ve sonraki istekler için önbelleğe koyacaktır.

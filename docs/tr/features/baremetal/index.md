@@ -1,133 +1,86 @@
-# Bare Metal Dağıtımı
+---
+title: "Windows/Linux Destekli Çıplak Metal ve Sanallaştırma Dağıtımı"
+description: "Açık kaynak, S3 uyumlu, kurumsal güçlendirilmiş ve çok hızlı"
+---
 
-RustFS'ı çıplak metal sunuculara dağıttığınızda, donanım performansını en üst düzeye çıkarabilir ve en iyi depolama verimliliğini elde edebilirsiniz. Bu kılavuz, çıplak metal dağıtımı en iyi uygulamalarını kapsar.
+# Windows/Linux Destekli Çıplak Metal ve Sanallaştırma Dağıtımı
 
-## Donanım Gereksinimleri
+Açık kaynak, S3 uyumlu, kurumsal güçlendirilmiş ve çok hızlı.
 
-### Minimum Yapılandırma
+RustFS, yüksek performanslı dağıtık nesne depolama sistemidir. Yazılım tanımlıdır, endüstri standardı donanımda çalışır ve %100 açık kaynaktır, ana lisans Apache V2.0 açık kaynak lisansıdır.
 
-- **İşlemci**: 4 çekirdek, 2.4GHz veya daha yüksek
-- **Bellek**: 8GB RAM minimum, 16GB önerilir
-- **Depolama**: Silme kodlaması için en az 4 sürücü
-- **Ağ**: Gigabit Ethernet
+RustFS'in farkı, baştan itibaren özel bulut/hibrit bulut nesne depolama standardı olarak tasarlanmış olmasıdır. RustFS sadece nesne hizmet vermek için özel olarak inşa edildiği için, tek katmanlı mimari tüm gerekli işlevleri performansı etkilemeden gerçekleştirebilir. Sonuç, aynı zamanda yüksek performans, ölçeklenebilirlik ve hafiflik özelliklerine sahip bulut native nesne sunucusudur.
 
-### Önerilen Yapılandırma
+RustFS, ikincil depolama, felaket kurtarma ve arşivleme gibi geleneksel nesne depolama kullanım durumlarında mükemmel performans gösterirken, makine öğrenimi, analiz ve bulut native uygulama iş yükleriyle ilgili zorlukları aşmada benzersizdir.
 
-- **İşlemci**: 16+ çekirdek, 3.0GHz veya daha yüksek
-- **Bellek**: 32GB+ RAM
-- **Depolama**: Katmanlandırma için 8+ sürücü, karışık SSD/HDD
-- **Ağ**: 10Gb Ethernet veya daha yüksek
+## Temel Özellikler
 
-## Dağıtım Mimarisi
+### Silme Kodları
 
-![Çıplak Metal Mimarisi 1](./images/sec2-1.png)
+RustFS, mümkün olan en yüksek performansı sağlamak için her nesne için satır içi silme kodlaması kullanarak verileri korur. RustFS, Reed-Solomon kodlarını kullanarak nesneleri kullanıcı tarafından yapılandırılabilir yedeklilik seviyelerine sahip veri ve parite bloklarına şeritler. RustFS'in silme kodlaması nesne seviyesinde onarım gerçekleştirir ve birden fazla nesneyi bağımsız olarak onarabilir.
 
-### Tek Düğüm Modu (SNSD)
+N/2 maksimum parite altında, RustFS'in uygulaması, dağıtımda sadece ((N/2)+1) operasyonel sürücü kullanarak kesintisiz okuma ve yazma işlemlerini garanti edebilir. Örneğin, 12 sürücü kurulumunda, RustFS nesneleri 6 veri sürücüsü ve 6 parite sürücüsü arasında parçalar ve dağıtımda sadece 7 sürücü kaldığında yeni nesneleri güvenilir bir şekilde yazabilir veya mevcut nesneleri yeniden oluşturabilir.
 
-Geliştirme ve test ortamları için uygundur:
+![Silme Kodları](./images/sec2-1.png)
 
-```bash
-# Tek sürücü ile tek düğüm
-rustfs server /data
-```
+### Bitrot Koruması
 
-![Çıplak Metal Mimarisi 2](./images/sec2-2.png)
+Sessiz veri bozulması veya bitrot, disk sürücülerinin karşılaştığı, kullanıcının bilgisi olmadan veri bozulmasına neden olan ciddi bir sorundur. Nedenler çeşitlidir (sürücü yaşlanması, akım zirveleri, disk firmware hataları, hayalet yazma, yanlış yönlendirilmiş okuma/yazma, sürücü hataları, beklenmedik üzerine yazma) ancak sonuç aynıdır - veri sızıntısı.
 
-### Çok Düğüm Modu (MNMD)
+RustFS'in HighwayHash algoritmasının optimize edilmiş uygulaması, asla bozuk veri okumayacağını garanti eder - bozuk nesneleri anında yakalayabilir ve onarabilir. READ üzerinde hash hesaplayarak ve WRITE üzerinde uygulamadan, ağdan belleğe/sürücüye doğrulayarak, uçtan uca bütünlüğü sağlar. Uygulama hız için tasarlanmıştır ve Intel CPU'daki tek çekirdekte saniyede 10 GB'dan fazla hash hızı elde edebilir.
 
-Üretim ortamları için önerilir:
+![Bitrot Koruması](./images/sec2-2.png)
 
-```bash
-# Düğüm 1
-rustfs server http://server{1...4}/data{1...4}
+### Sunucu Tarafı Şifreleme
 
-# Düğüm 2-4 (benzer yapılandırma)
-```
+Veriyi uçuşta şifrelemek bir şeydir; durağan veriyi korumak başka bir şeydir. RustFS, veriyi korumak için çeşitli gelişmiş sunucu tarafı şifreleme şemalarını destekler - veri nerede olursa olsun. RustFS'in yaklaşımı, gizlilik, bütünlük ve gerçekliği garanti eder, performans maliyeti ihmal edilebilir düzeydedir. AES-256-GCM, ChaCha20-Poly1305 ve AES-CBC ile sunucu tarafı ve istemci tarafı şifreleme desteği.
 
-![Çıplak Metal Mimarisi 3](./images/sec2-3.png)
+Şifrelenmiş nesneler, değişiklik koruması için AEAD sunucu tarafı şifreleme kullanır. Ayrıca, RustFS tüm yaygın anahtar yönetimi çözümleriyle (örneğin HashiCorp Vault) uyumludur ve test edilmiştir. RustFS, SSE-S3'ü desteklemek için anahtar yönetimi sistemi (KMS) kullanır.
 
-## Performans Optimizasyonu
+Eğer istemci SSE-S3 isterse veya otomatik şifreleme etkinleştirilirse, RustFS sunucusu her nesneyi KMS tarafından yönetilen ana anahtar tarafından korunan benzersiz nesne anahtarı ile şifreler. Maliyet çok düşük olduğu için, her uygulama ve örnek için otomatik şifreleme etkinleştirilebilir.
 
-### Depolama Yapılandırması
+![Sunucu Tarafı Şifreleme](./images/sec2-3.png)
 
-1. **Sürücü Seçimi**
-   - Üretim için kurumsal sınıf sürücüler kullanın
-   - Yüksek performanslı iş yükleri için NVMe SSD'leri düşünün
-   - İşletim sistemi ve veri sürücülerini ayırın
+### WORM (Bir Kez Yaz Çok Kez Oku)
 
-2. **RAID Yapılandırması**
-   - Nesne depolama için donanım RAID'ini devre dışı bırakın
-   - JBOD (Just a Bunch of Disks) modunu kullanın
-   - Yedekliliği RustFS'ın yönetmesine izin verin
+#### Kimlik Yönetimi
 
-### Ağ Optimizasyonu
+RustFS, kimlik yönetimindeki en gelişmiş standartları destekler ve OpenID connect uyumlu sağlayıcılar ve ana harici IDP tedarikçileri ile entegre olabilir. Bu, erişimin merkezi olduğu, şifrelerin geçici ve döndürüldüğü, yapılandırma dosyalarında ve veritabanlarında saklanmadığı anlamına gelir. Ayrıca, erişim politikaları ince taneli ve yüksek düzeyde yapılandırılabilir, bu da çok kiracılı ve çok örnekli dağıtımları desteklemenin basit hale geldiği anlamına gelir.
 
-1. **Ağ Bağlama**
+#### Sürekli Çoğaltma
 
-   ```bash
-   # Yedeklilik için ağ bağlama yapılandırma
-   sudo modprobe bonding
-   echo "balance-rr" > /sys/class/net/bond0/bonding/mode
-   ```
+Geleneksel çoğaltma yöntemlerinin zorluğu, birkaç yüz TiB'nin üzerine etkili bir şekilde ölçeklenememeleridir. Bununla birlikte, herkesin felaket kurtarmayı desteklemek için bir çoğaltma stratejisine ihtiyacı vardır ve bu strateji coğrafi konumlar, veri merkezleri ve bulut genelinde uzanmalıdır.
 
-2. **Jumbo Çerçeveler**
+RustFS'in sürekli çoğaltması, büyük ölçekli, veri merkezleri arası dağıtımlar için tasarlanmıştır. Lambda hesaplama bildirimlerini ve nesne metadata'sını kullanarak, deltaları verimli ve hızlı bir şekilde hesaplayabilir. Lambda bildirimleri, geleneksel toplu işlem modu yerine değişikliklerin anında yayılmasını sağlar.
 
-   ```bash
-   # Daha iyi aktarım hızı için jumbo çerçeveleri etkinleştir
-   sudo ip link set dev eth0 mtu 9000
-   ```
+Sürekli çoğaltma, bir hata meydana geldiğinde veri kaybının minimum seviyede tutulacağı anlamına gelir - yüksek dinamik veri setleriyle karşı karşıya olsa bile. Son olarak, RustFS'in yaptığı her şey gibi, sürekli çoğaltma çok tedarikçilidir, bu da yedekleme konumunuzun NAS'tan genel buluta kadar herhangi bir yer olabileceği anlamına gelir.
 
-![Çıplak Metal Mimarisi 4](./images/sec2-4.png)
+#### Küresel Federasyon
 
-## İzleme ve Bakım
+Modern işletmelerin verileri her yerde. RustFS, bu farklı örnekleri birleşik küresel ad alanı oluşturmak için bir araya getirmenize izin verir. Özellikle, herhangi bir sayıda RustFS sunucusu dağıtık mod setlerine birleştirilebilir, birden fazla dağıtık mod seti RustFS sunucu federasyonuna birleştirilebilir. Her RustFS sunucu federasyonu birleşik yönetici ve ad alanı sağlar.
 
-### Sağlık İzleme
+RustFS federasyon sunucuları sınırsız sayıda dağıtık mod setini destekler. Bu yaklaşımın etkisi, nesne depolamanın coğrafi olarak dağınık büyük işletmeler için büyük ölçekte ölçeklenebilmesi, aynı zamanda tek bir konsoldan çeşitli uygulamaları (Splunk, Teradata, Spark, Hive, Presto, TensorFlow, H20) barındırma yeteneğini korumasıdır.
 
-- SMART araçları ile sürücü sağlığını izleyin
-- Ağ kullanımını ve gecikmeyi takip edin
-- Donanım arızaları için uyarılar ayarlayın
+#### Çoklu Bulut Ağ Geçidi
 
-### Bakım Prosedürleri
+Tüm işletmeler çoklu bulut stratejisi benimsiyor. Bu aynı zamanda özel bulutu da içerir. Bu nedenle, çıplak metal sanallaştırma container'larınız ve genel bulut hizmetleriniz (Google, Microsoft ve Alibaba gibi S3 olmayan tedarikçiler dahil) aynı görünmelidir. Modern uygulamalar yüksek düzeyde taşınabilir olsa da, bu uygulamaları destekleyen veri öyle değildir.
 
-1. **Sürücü Değiştirme**
-   - Arızalı sürücüleri sıcak takas yapın
-   - İyileştirme sürecini izleyin
-   - Veri bütünlüğünü doğrulayın
+Veri nerede olursa olsun, bu veriyi sağlamak RustFS'in çözdüğü ana zorluktur. RustFS çıplak metalde, ağa bağlı depolamada ve her genel bulutta çalışır. Daha da önemlisi, RustFS, Amazon S3 API aracılığıyla uygulama ve yönetim açısından bu verinin görünümünün tamamen aynı görünmesini sağlar.
 
-2. **Düğüm Bakımı**
-   - Düğümü düzgün bir şekilde kapatın
-   - Yuvarlak güncellemeler yapın
-   - Kapasite planlaması yapın
+RustFS daha da ileri gidebilir, mevcut depolama altyapınızı Amazon S3 ile uyumlu hale getirir. Etkisi derindir. Artık organizasyonlar veri altyapılarını gerçekten birleştirebilir - dosyalardan bloklara, tüm veri migrasyon olmadan Amazon S3 API aracılığıyla erişilebilir nesneler olarak görünür.
 
-## Güvenlik Hususları
+WORM etkinleştirildiğinde, RustFS nesne verilerini ve metadata'sını değiştirebilecek tüm API'leri devre dışı bırakır. Bu, verinin bir kez yazıldıktan sonra değişiklik korumalı hale geldiği anlamına gelir. Bu, birçok farklı düzenleyici gereksinimde pratik uygulamaya sahiptir.
 
-### Fiziksel Güvenlik
+![WORM Özelliği](./images/sec2-4.png)
 
-- Sunucu odası erişimini güvence altına alın
-- Çevresel izleme yapın
-- Güç yedekliliği sağlayın
+## Sistem Mimarisi
 
-### Ağ Güvenliği
+RustFS bulut native olarak tasarlanmıştır ve Kubernetes gibi harici orkestrasyon hizmetleri tarafından yönetilen hafif container'lar olarak çalışabilir. Tüm sunucu yaklaşık 40 MB'lık statik bir binary dosyadır ve yüksek yük altında bile CPU ve bellek kaynaklarını verimli bir şekilde kullanır. Sonuç olarak, paylaşılan donanımda çok sayıda kiracıyı birlikte barındırabilirsiniz.
 
-- Güvenlik duvarı yapılandırması
-- Ağ segmentasyonu
-- İstemci bağlantılar için TLS şifreleme
+RustFS, yerel bağlı sürücüleri (JBOD/JBOF) olan ticari sunucularda çalışır. Kümedeki tüm sunucular işlevsel olarak eşittir (tamamen simetrik mimari). Ad düğümü veya metadata sunucusu yoktur.
 
-## Sorun Giderme
+RustFS veri ve metadata'yı metadata veritabanı olmadan nesneler olarak birlikte yazar. Ayrıca, RustFS tüm işlevleri (silme kodlama, bitrot kontrolü, şifreleme) satır içi, katı tutarlı işlemler olarak gerçekleştirir. Sonuç olarak, RustFS olağanüstü esnekliğe sahiptir.
 
-### Yaygın Sorunlar
+Her RustFS kümesi, her düğümde bir işlem olan dağıtık RustFS sunucularının bir koleksiyonudur. RustFS kullanıcı alanında tek bir işlem olarak çalışır ve yüksek eşzamanlılık için hafif coroutine'ler kullanır. Sürücüler silme kodları setlerine gruplandırılır (varsayılan olarak her set 16 sürücü) ve nesneleri bu setlere yerleştirmek için deterministik hash algoritması kullanılır.
 
-1. **Sürücü Arızaları**
-   - SMART durumunu kontrol edin
-   - Arızalı sürücüleri derhal değiştirin
-   - İyileştirme ilerlemesini izleyin
-
-2. **Ağ Sorunları**
-   - Ağ bağlantısını doğrulayın
-   - Bant genişliği kullanımını kontrol edin
-   - Paket kaybı için izleme yapın
-
-3. **Performans Sorunları**
-   - G/Ç kalıplarını analiz edin
-   - İşlemci/bellek darboğazları için kontrol edin
-   - Sürücü düzenini optimize edin
+RustFS, büyük ölçekli, çoklu veri merkezi bulut depolama hizmetleri için tasarlanmıştır. Her kiracı kendi RustFS kümesini çalıştırır ve diğer kiracılardan tamamen izole edilir, bu da onları yükseltmeler, güncellemeler ve güvenlik olaylarından kaynaklanan herhangi bir kesintiden korumalarını sağlar. Her kiracı, coğrafi konumlar genelinde federasyon kümeleri aracılığıyla bağımsız olarak ölçeklenir.

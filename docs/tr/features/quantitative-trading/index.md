@@ -1,256 +1,98 @@
-# Kantitatif Ticaret Depolama Çözümleri
+---
+title: "Kantitatif Ticaret Dosya Depolama Çözümü"
+description: "Yüksek frekanslı ticaret ve kantitatif strateji geri testi için özel olarak tasarlanmış akıllı depolama mimarisi"
+---
 
-Mikrosaniye seviyesinde gecikme süresi ve yüksek verimlilikte nesne depolama, özellikle kantitatif ticaret ve finansal piyasalar için tasarlanmıştır.
+# Kantitatif Ticaret Dosya Depolama Çözümü
 
-## Kantitatif Ticaretteki Temel Sorunlar
+Yüksek frekanslı ticaret, kantitatif strateji geri testi için özel olarak tasarlanmış akıllı depolama mimarisi, saniyede milyonlarca IOPS sipariş akışı işlemeyi destekler, Tick seviyesi veri milisaniye erişim ihtiyaçlarını karşılar
 
-### Geleneksel Depolamanın Sınırlamaları
+## Sektör Zorlukları ve Ağrı Noktaları
 
-- **Yüksek Gecikme Süresi**: Geleneksel depolama sistemleri milisaniye seviyesinde gecikme süresine sahiptir ve mikrosaniye seviyesindeki ticaret gereksinimlerini karşılayamaz.
-- **Sınırlı Verimlilik**: Piyasa zirve saatlerinde büyük eşzamanlı okuma/yazma işlemlerini işleyemez.
-- **Ölçeklenebilirlik Sorunları**: Piyasa oynaklığı sırasında depolama kapasitesini ve performansını ölçeklendirmek zordur.
-- **Veri Bütünlüğü**: Ticaret kararlarını etkileyen veri kaybı veya bozulma riski vardır.
-- **Uyumluluk Zorlukları**: Finansal düzenleyici gereksinimleri karşılamada zorluklar yaşanır.
+| Kategori | Geleneksel Çözüm Kusurları | Kantitatif İhtiyaçlar | İş Etkisi |
+|------|-------------|----------|----------|
+| **Veri Yönetimi** | Tek protokol depolama (sadece S3/sadece POSIX) | Protokoller arası birleşik erişim (S3+POSIX+NFS) | Strateji yineleme döngüsü ↑20% |
+| **Performans Metrikleri** | ≤500K IOPS (küçük dosya rastgele okuma) | 3M+ IOPS <0.5ms gecikme | Yüksek frekanslı strateji kayması ↓0.3bps |
+| **Depolama Maliyeti** | Soğuk veri > $0.05/GB/ay | Akıllı katmanlama ≤$0.015/GB/ay | Yıllık depolama bütçesi artışı ↓65% |
 
-### İş Etkisi
+## Neden Bizi Seçmelisiniz
 
-- **Ticaret Fırsatları**: Yüksek gecikme süresi, ticaret fırsatlarının kaçırılmasına ve doğrudan karlılığı etkilemesine neden olur.
-- **Risk Yönetimi**: Yavaş veri erişimi, gerçek zamanlı risk değerlendirme ve kontrolünü etkiler.
-- **Düzenleyici Uyumluluk**: Yetersiz veri yönetimi, uyumluluk ihlallerine ve cezalara yol açar.
-- **Operasyonel Maliyetler**: Verimsiz depolama, altyapı ve operasyonel maliyetleri artırır.
+### Ultra Hızlı Yanıt
 
-## RustFS Kantitatif Ticaret Çözümleri
+- RDMA ağ hızlandırma ve GPU doğrudan bağlı depolama kullanarak, gecikme ≤500μs, verim 200 Gbps'ye kadar
+- Yüksek frekanslı ticaret geri testi 300% hızlandırma
 
-### Ultra Düşük Gecikme Süresi Performansı
+### Büyük Hacimli Dosyalar
 
-![Hız İkonu](./images/speed-icon.png)
+- Küçük dosyaları mantıksal büyük nesneler olarak akıllıca toplama, tek küme 400 milyar dosya desteği
+- Metadata arama verimliliği 40% artış
 
-#### Mikrosaniye Seviyesinde Yanıt
+### Esnek Ölçeklendirme
 
-- **100μs Altı Gecikme Süresi**: Ortalama okuma gecikme süresi 100 mikrosaniyenin altında
-- **Paralel İşleme**: Kütle paralel G/Ç işlemleri desteği
-- **Bellek Optimizasyonu**: Sık kullanılan veriler için akıllı bellek önbellekleme
-- **Ağ Optimizasyonu**: Çekirdek atlama ve RDMA desteği
+- Hibrit bulut dağıtımını destekler, sıcak veri yerel SSD hızlandırma, soğuk veri otomatik bulut arşivleme
+- Kapasite EB seviyesine kadar doğrusal olarak ölçeklenebilir
 
-### Yüksek Frekanslı Veri İşleme
+### Finansal Güvenlik
 
-![Dosyalar İkonu](./images/files-icon.png)
+- Ulusal şifreleme SM4 donanım şifreleme, performans kaybı <3%
+- Üç yer beş merkez felaket kurtarma desteği, RTO <1 dakika
 
-#### Kütle Eşzamanlı İşlemler
+## Senaryo Bazlı Çözümler
 
-- **Milyon Seviyesi IOPS**: Düğüm başına 1 milyondan fazla IOPS desteği
-- **Eşzamanlı Bağlantılar**: 10.000'den fazla eşzamanlı istemci bağlantısı işleme
-- **Toplu İşlemler**: Optimize edilmiş toplu okuma/yazma işlemleri
-- **Akış İşleme**: Gerçek zamanlı veri akışı ve işleme
+### Yüksek Frekanslı Strateji Geliştirme
 
-### Akıllı Ölçeklendirme
+Bellek eşleme dosya arayüzü (mmap) sağlar, C++/Python strateji kodunun ham ticaret verilerine doğrudan erişimini destekler
 
-![Ölçeklendirme İkonu](./images/scaling-icon.png)
+#### Gerçek Test Metrikleri
 
-#### Dinamik Kaynak Tahsisi
-
-- **Otomatik Ölçeklendirme**: Piyasa koşullarına dayalı otomatik ölçeklendirme
-- **Yük Dengeleme**: Düğümler arasında akıllı yük dağılımı
-- **Kaynak Önceliklendirme**: Öncelik tabanlı kaynak tahsisi
-- **Tahmine Dayalı Ölçeklendirme**: AI destekli kapasite planlama
-
-### Kurumsal Güvenlik
-
-![Güvenlik İkonu](./images/security-icon.png)
-
-#### Çok Katmanlı Koruma
-
-- **Uçtan Uca Şifreleme**: Tüm veriler için AES-256 şifreleme
-- **Erişim Kontrolü**: İnce taneli izin yönetimi
-- **Denetim Günlükleri**: Uyumluluk için tam denetim izleri
-- **Veri Bütünlüğü**: Veri bütünlüğü için checksum'lar ve doğrulama
-
-## Ticaret İçin Özel Özellikler
-
-### Yüksek Frekanslı Ticaret (HFT) Stratejisi
-
-![HFT Stratejisi](./images/hft-strategy.png)
-
-#### Hız İçin Optimize Edilmiş
-
-- **Co-location Desteği**: Ticaret motorlarına yakın depolama dağıtımı
-- **Doğrudan Bellek Erişimi**: İşletim sistemini atlayarak daha hızlı erişim
-- **Özel Protokoller**: Ticaret verileri için optimize edilmiş protokoller
-- **Donanım Hızlandırma**: FPGA ve GPU hızlandırma desteği
+Tek strateji geri testi 1 milyar seviyesi sipariş verisi sadece 4 saat gerektirir (geleneksel çözüm 24+ saat gerektirir)
 
 ### AI Faktör Madenciliği
 
-![AI Faktör Madenciliği](./images/ai-factor-mining.png)
+TensorFlow/PyTorch eklentilerini entegre eder, özellik veri setlerini otomatik olarak S3 nesne depolama yollarına eşler
 
-#### Gelişmiş Analitik
+#### Vaka Çalışması
 
-- **Gerçek Zamanlı Analitik**: Piyasa verilerini gerçek zamanlı olarak işleme
-- **Makine Öğrenimi**: Desen tanıma için yerleşik ML yetenekleri
-- **Faktör Keşfi**: Otomatik faktör madenciliği ve doğrulama
-- **Geri Test**: Yüksek hızlı tarihsel veri analizi
+Jufund 3000+ faktör paralel hesaplama gerçekleştirir, depolama verimi 8 kat artış
 
-### Düzenleyici Uyumluluk
+### Düzenleyici Uyumlu Depolama
 
-![Düzenleyici Uyumluluk](./images/regulatory-compliance.png)
+Yerleşik WORM (bir kez yaz çok kez oku) modu, ticaret kayıtlarının değiştirilemez olması gereksinimini karşılar
 
-#### Finansal Düzenlemeler
+CFCA uyumlu denetim günlüklerini otomatik olarak oluşturur (saniyede 100K+ işlem kaydı işler)
 
-- **MiFID II Uyumluluğu**: Avrupa finansal düzenlemelerini karşılama
-- **CFTC Gereksinimleri**: ABD emtia ticaret düzenlemelerine uyma
-- **Çin Düzenlemeleri**: Yerel finansal düzenlemeler için destek
-- **Denetim Hazırlığı**: Önceden yapılandırılmış denetim ve raporlama yetenekleri
+## Sektör Uyumluluğu ve Güvenliği
 
-## Mimari ve Dağıtım
+### Finansal Seviye Şifreleme **(Gerekli)**
 
-### Çok Katmanlı Depolama Mimarisi
+FIPS 140-2 sertifikalı ulusal şifreleme çift algoritma desteği
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Hot Tier      │    │   Warm Tier     │    │   Cold Tier     │
-│   NVMe SSD      │    │   SATA SSD      │    │   HDD/Tape      │
-│   <1ms access   │    │   <10ms access  │    │   Archive       │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
+### Çapraz Coğrafi Senkronizasyon **(Gerekli)**
 
-### Ağ Mimarisi
+SEC 17a-4 uzak felaket kurtarma spesifikasyonlarını karşılar
 
-- **10Gb/40Gb Ethernet**: Yüksek bant genişliği ağ bağlantısı
-- **InfiniBand**: Ultra düşük gecikme süresi bağlantı
-- **RDMA**: En hızlı veri transferi için Uzaktan Doğrudan Bellek Erişimi
-- **Ağ Bağlama**: Yedek ağ yolları için güvenilirlik
+### Denetim Arayüzü **(Gerekli)**
 
-### Dağıtım Seçenekleri
+Splunk, Elastic düzenleyici modüllerine doğrudan bağlantı
 
-#### Yerel Dağıtım
+## Temel Avantaj Karşılaştırması
 
-- **Özel Donanım**: Ticaret iş yükleri için optimize edilmiş donanım
-- **Co-location**: Finansal veri merkezlerinde dağıtım
-- **Özel Ağ**: Güvenlik ve performans için izole ağ
-- **Özel Yapılandırma**: Belirli ticaret gereksinimlerine göre uyarlanmış
+| Boyut | Geleneksel Çözüm | rustFS Çözümü | İş Değeri Görünümü |
+|------|----------|------------|--------------|
+| **Sipariş Akışı İşleme** | ≤500K IOPS | ✅ 2.3M IOPS | Piyasa zirve dönemlerinde sipariş birikimi riskini ortadan kaldırır |
+| **Veri Sıkıştırma Oranı** | 3:1 | ✅ 11:1 (ZSTD+FPGA hızlandırma) | PB seviyesi geri test veri depolama maliyeti 67% düşüş |
+| **Hata Geçiş Süresi** | 15–30 saniye | ✅ 82ms | SEC düzenlemelerinde belirtilen sistem kesintisi cezalarından kaçınır |
 
-#### Hibrit Bulut
+## Hizmet Garanti Sistemi
 
-- **Birincil Yerel**: Çekirdek ticaret verileri yerel olarak
-- **Bulut Yedekleme**: Bulutta yedekleme ve felaket kurtarma
-- **Patlama Kapasitesi**: Zirve dönemlerinde buluta ölçeklendirme
-- **Veri Eşzamanlama**: Ortamlar arasında gerçek zamanlı senkronizasyon
+### Dağıtım Hizmeti
 
-## Performans Karşılaştırmaları
+Depolama-hesaplama birleşik makinesi (önceden yüklenmiş RustFS) veya saf yazılım teslimi sağlar
 
-### Gecikme Süresi Performansı
+### Verimlilik Optimizasyonu
 
-| İşlem | Ortalama Gecikme Süresi | 99. Yüzde Dilim |
-|-----------|----------------|-----------------|
-| Küçük Nesne Okuma (4KB) | 85μs | 150μs |
-| Küçük Nesne Yazma (4KB) | 95μs | 180μs |
-| Büyük Nesne Okuma (1MB) | 2.1ms | 4.5ms |
-| Büyük Nesne Yazma (1MB) | 2.8ms | 5.2ms |
+Ücretsiz "Kantitatif Veri Gölü Tasarım Beyaz Kağıdı" ve veri yönetişimi danışmanlık hizmeti sağlar
 
-### Verimlilik Performansı
+### Ekosistem İşbirliği
 
-| İş Yükü | Verimlilik | IOPS |
-|----------|------------|------|
-| Rastgele Okuma (4KB) | 8.5 GB/s | 2.2M |
-| Rastgele Yazma (4KB) | 6.2 GB/s | 1.6M |
-| Sıralı Okuma (1MB) | 45 GB/s | 45K |
-| Sıralı Yazma (1MB) | 38 GB/s | 38K |
-
-### Ölçeklenebilirlik Metrikleri
-
-- **Doğrusal Ölçeklendirme**: Performans düğüm sayısıyla doğrusal olarak ölçeklenir
-- **Maksimum Düğümler**: Küme başına 1000 düğüm desteği
-- **Depolama Kapasitesi**: Küme başına 100+ PB ölçeklendirme
-- **Eşzamanlı Kullanıcılar**: 100.000'den fazla eşzamanlı bağlantı desteği
-
-## Kullanım Örnekleri
-
-### Piyasa Verisi Yönetimi
-
-- **Gerçek Zamanlı Veri Akışları**: Gerçek zamanlı piyasa veri akışlarını depolama ve sunma
-- **Tarihsel Veri**: Yıllarca süren tarihsel ticaret verilerini yönetme
-- **Referans Verisi**: Referans verilerini verimli bir şekilde depolama ve yönetme
-- **Veri Doğrulama**: Veri kalitesini ve tutarlılığını sağlama
-
-### Risk Yönetimi
-
-- **Pozisyon İzleme**: Gerçek zamanlı pozisyon ve maruziyet izleme
-- **Stress Testi**: Stres test senaryolarını depolama ve analiz etme
-- **Uyumluluk Raporlaması**: Düzenleyici uyumluluk raporları oluşturma
-- **Denetim İzleri**: Tüm işlemler için tam denetim izleri tutma
-
-### Araştırma ve Geliştirme
-
-- **Strateji Geri Testi**: Ticaret stratejilerinin yüksek hızlı geri testleri
-- **Faktör Araştırması**: Faktör araştırma verilerini depolama ve analiz etme
-- **Model Geliştirme**: Kantitatif model geliştirme desteği
-- **Performans Analitiği**: Ticaret performansını ve atfını analiz etme
-
-## Uygulama Hizmetleri
-
-### Değerlendirme ve Planlama
-
-1. **Gereksinim Analizi**: Belirli ticaret gereksinimlerini anlama
-2. **Performans Modelleme**: Beklenen performans ve kapasiteyi modelleme
-3. **Mimari Tasarım**: Optimal depolama mimarisini tasarlama
-4. **Geçiş Planlama**: Mevcut sistemlerden geçişi planlama
-
-### Dağıtım ve Entegrasyon
-
-1. **Donanım Kurulumu**: Optimize edilmiş donanımı kurma ve yapılandırma
-2. **Yazılım Kurulumu**: RustFS'yi dağıtma ve yapılandırma
-3. **Entegrasyon**: Mevcut ticaret sistemleriyle entegrasyon
-4. **Test Etme**: Kapsamlı performans ve işlevsellik testi
-
-### Optimizasyon ve Ayarlama
-
-1. **Performans Ayarlama**: Belirli iş yükleri için optimize etme
-2. **İzleme Kurulumu**: İzleme ve uyarı sistemini dağıtma
-3. **Kapasite Planlama**: Gelecekteki büyüme ve ölçeklendirme için planlama
-4. **En İyi Uygulamalar**: Operasyonel en iyi uygulamaları uygulama
-
-## Destek ve Bakım
-
-### 7/24 Destek
-
-- **Finansal Piyasalar Uzmanlığı**: Ticaret alan bilgisine sahip destek ekibi
-- **Hızlı Yanıt**: Kritik sorunlar için bir saatten kısa yanıt süreleri
-- **Proaktif İzleme**: Sürekli izleme ve uyarılar
-- **Performans Optimizasyonu**: Sürekli performans ayarlama
-
-### Bakım Hizmetleri
-
-- **Düzenli Güncellemeler**: Kesintisiz yazılım güncellemeleri
-- **Donanım Bakımı**: Önleyici donanım bakımı
-- **Kapasite Yönetimi**: Proaktif kapasite planlama ve genişletme
-- **Felaket Kurtarma**: Düzenli felaket kurtarma testi ve doğrulama
-
-### Eğitim ve Dokümantasyon
-
-- **Teknik Eğitim**: BT ve operasyon ekipleri için eğitim
-- **En İyi Uygulamalar**: Operasyonel en iyi uygulamaların dokümantasyonu
-- **Sorun Giderme Kılavuzları**: Kapsamlı sorun giderme dokümantasyonu
-- **Performans Ayarlama**: Performans optimizasyonu için kılavuzlar
-
-## Başlarken
-
-### Değerlendirme Süreci
-
-1. **İlk Danışma**: Gereksinimleri ve kullanım durumlarını tartışma
-2. **Kavram Kanıtı**: Küçük ölçekli pilot sistem dağıtma
-3. **Performans Doğrulama**: Performans gereksinimlerini doğrulama
-4. **İş Durumu**: İş durumu ve YG analizi geliştirme
-
-### Uygulama Zaman Çizelgesi
-
-- **1-2. Hafta**: Gereksinim toplama ve mimari tasarım
-- **3-4. Hafta**: Donanım temini ve kurulumu
-- **5-6. Hafta**: Yazılım dağıtımı ve yapılandırma
-- **7-8. Hafta**: Entegrasyon ve test
-- **9. Hafta**: Canlıya geçiş ve üretim dağıtımı
-
-### Başarı Metrikleri
-
-- **Gecikme Süresi Azaltma**: Hedef gecikme süresi gereksinimlerini karşılama
-- **Verimlilik İyileştirme**: Verimlilik hedeflerini karşılama veya aşma
-- **Maliyet Optimizasyonu**: Toplam sahip olma maliyetini azaltma
-- **Operasyonel Verimlilik**: Operasyonel verimliliği ve güvenilirliği iyileştirme
+20+ kantitatif platform ile sertifikasyon tamamlandı (Jufund, Juejin Quantification dahil)

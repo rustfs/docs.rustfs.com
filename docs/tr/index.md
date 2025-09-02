@@ -7,4 +7,4 @@ sidebar: false
 import { sidebar } from './sidebar';
 </script>
 
-<Home :sidebar="sidebar" title="RustFS Dökümantasyon" />
+<Home :sidebar="sidebar" title="RustFS Dokümantasyon Merkezi" />

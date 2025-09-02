@@ -1,383 +1,60 @@
-# Bulut Yerel Dağıtım
+---
+title: "Hibrit/Çoklu Bulut Nesne Depolama"
+description: "Hibrit ve çoklu bulut mimarisi ile tutarlı performans, güvenlik ve ekonomiklik"
+---
 
-RustFS, bulut yerel ortamlar için tasarlanmıştır ve Kubernetes, konteyner orkestrasyonu ve modern DevOps iş akışları ile sorunsuz entegrasyon sağlar.
+# Hibrit/Çoklu Bulut Nesne Depolama
 
-## Çoklu Bulut Mimarisi
+Hibrit/çoklu bulut mimarisi, tutarlı performans, güvenlik ve ekonomiklik sağlar. Çoklu bulut hakkındaki herhangi bir tartışma bir tanımla başlamalıdır. Bu sadece tek bir genel bulut ve şirket içi değildir.
 
-![Çoklu Bulut Mimarisi](./images/multi-cloud-architecture.png)
+## Başarılı çoklu bulut depolama stratejisi, çeşitli ortamlarda çalışabilen mimari ve araçları kullanır
 
-RustFS, birden fazla bulut sağlayıcıya dağıtımı destekleyerek şunları sağlar:
+### Genel Bulut
 
-- **Satıcı Bağımsızlığı**: Bulut sağlayıcı kilidinden kaçının
-- **Maliyet Optimizasyonu**: Sağlayıcılar arasında en iyi fiyatlandırmayı kullanın
-- **Coğrafi Dağılım**: Dünya çapında kullanıcılara daha yakın dağıtım yapın
-- **Risk Azaltma**: Tek sağlayıcıya olan bağımlılığı azaltın
+Bu giderek büyüyen bir alandır, ancak AWS, Azure, GCP, IBM, Alibaba, Tencent ve hükümet bulutları ile başlar. Hibrit/çoklu bulut depolama yazılımınızın, uygulama yığınının çalıştığı her yerde çalışması gerekir. Tek bir bulutta çalıştığını iddia eden şirketler bile yapmaz - her zaman başka bulutlar vardır. RustFS, her genel bulut sağlayıcısı için depolama tutarlılığı sağlar, yeni bulutlara genişlerken uygulamaları yeniden yazma ihtiyacını önler.
 
-## Kubernetes Entegrasyonu
+### Özel Bulut
 
-### Helm Chart Dağıtımı
+Kubernetes, modern özel bulutun ana yazılım mimarisidir. Bu, VMware (Tanzu), RedHat (OpenShift), Rancher/SUSE, HP (Ezmeral) ve Rafay gibi tüm Kubernetes dağıtımlarını içerir. Çoklu bulut Kubernetes, yazılım tanımlı ve bulut native nesne depolama gerektirir. Özel bulut ayrıca daha geleneksel çıplak metal örneklerini de içerir, ancak kurumsal iş yükleri giderek containerize edilir ve orkestrasyon yapılır.
 
-```bash
-# RustFS Helm deposunu ekleyin
-helm repo add rustfs https://charts.rustfs.com
-helm repo update
+### Kenar
 
-# RustFS kümesini yükleyin
-helm install rustfs rustfs/rustfs \
-  --set replicas=4 \
-  --set storage.size=100Gi \
-  --set storage.storageClass=fast-ssd
-```
+Kenar, hesaplamayı veri üretilen yere taşımakla ilgilidir. İşlendikten sonra, veri daha merkezi konumlara taşınır. Kenar depolama çözümleri, bu çoklu bulut mimarisinde çalışmak için hafif, güçlü, bulut native ve esnek olmalıdır. Bunu yapmak çok zordur, bu yüzden çok az tedarikçi bunu tartışır, iyi bir cevapları yoktur - Amazon bile.
 
-### Operatör Dağıtımı
+## RustFS ile Çoklu Bulut Mimarisi
 
-```yaml
-apiVersion: rustfs.io/v1
-kind: RustFSCluster
-metadata:
-  name: rustfs-cluster
-spec:
-  replicas: 4
-  storage:
-    size: 100Gi
-    storageClass: fast-ssd
-  resources:
-    requests:
-      memory: "2Gi"
-      cpu: "1"
-    limits:
-      memory: "4Gi"
-      cpu: "2"
-```
+![Çoklu Bulut Mimarisi](images/multi-cloud-architecture.png)
 
-## Konteyner Orkestrasyonu
+## Hibrit/Çoklu Bulut Depolama Özellikleri
 
-### Docker Compose
+Çoklu bulut depolama, genel bulut sağlayıcılarının tutarlı bir şekilde benimsediği genel bulut tarafından kurulan modelleri takip eder. Genel bulutun başarısı, dosya ve blok depolamayı etkili bir şekilde eski hale getirdi. Her yeni uygulama POSIX için değil, AWS S3 API için yazılmıştır. Bulut native teknolojiler gibi ölçeklenmek ve performans göstermek için, eski uygulamalar S3 API için yeniden yazılmalı ve container uyumlu olacak şekilde mikro hizmetlere yeniden yapılandırılmalıdır.
 
-```yaml
-version: '3.8'
-services:
-  rustfs:
-    image: rustfs/rustfs:latest
-    ports:
-      - "9000:9000"
-    volumes:
-      - data1:/data1
-      - data2:/data2
-      - data3:/data3
-      - data4:/data4
-    command: server /data{1...4}
-    environment:
-      - RUSTFS_ROOT_USER=admin
-      - RUSTFS_ROOT_PASSWORD=password123
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/rustfs/health/live"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+### Kubernetes-Native
 
-volumes:
-  data1:
-  data2:
-  data3:
-  data4:
-```
+Kubernetes native tasarım, çok kiracılı nesne depolama hizmeti altyapısını yapılandırmak ve yönetmek için operatör hizmetleri gerektirir. Bu kiracıların her biri, temel donanım kaynaklarını paylaşırken kendi bağımsız ad alanlarında çalışır. Operatör modeli, kaynak orkestrasyonu, kesintisiz yükseltme, küme genişletme gibi yaygın işlemleri gerçekleştirmek ve yüksek kullanılabilirliği korumak için Kubernetes'in tanıdık deklaratif API modelini özel kaynak tanımları (CRD) ile genişletir.
 
-### Docker Swarm
+RustFS, Kubernetes mimarisinden tam olarak yararlanmak için inşa edilmiştir. Sunucu binary dosyası hızlı ve hafif olduğu için, RustFS Operator birden fazla kiracıyı kaynakları tüketmeden yoğun bir şekilde birlikte yerleştirebilir. Kubernetes ve ilgili ekosistemin avantajlarından yararlanarak, taşınabilir Kubernetes native depolama ile çoklu bulut avantajları elde edin.
 
-```yaml
-version: '3.8'
-services:
-  rustfs:
-    image: rustfs/rustfs:latest
-    ports:
-      - "9000:9000"
-    volumes:
-      - rustfs_data:/data
-    deploy:
-      replicas: 4
-      placement:
-        constraints:
-          - node.role == worker
-      resources:
-        limits:
-          memory: 4G
-        reservations:
-          memory: 2G
-    command: server http://rustfs_rustfs:9000/data
-    networks:
-      - rustfs_network
+### Tutarlı
 
-networks:
-  rustfs_network:
-    driver: overlay
-    attachable: true
+Hibrit/çoklu bulut depolama, API uyumluluğu, performans, güvenlik ve uyumluluk açısından tutarlı olmalıdır. Tutarlı ve temel donanımdan bağımsız olarak çalışması gerekir. Herhangi bir değişiklik, çok küçük olsa bile, uygulamaları bozabilir ve büyük operasyonel yük yaratabilir.
 
-volumes:
-  rustfs_data:
-    driver: local
-```
+RustFS çok hafif olduğu için, genel, özel ve kenar ortamlarında tutarlı deneyimi koruyarak dakikalar içinde kesintisiz güncellemeler yapabiliriz. RustFS, anahtar yönetimi, kimlik yönetimi, erişim politikaları ve donanım/işletim sistemi farklılıkları dahil olmak üzere bu mimariler arasındaki temel farklılıkları soyutlar.
 
-## Servis Ağı Entegrasyonu
+### Performans
 
-### Istio Entegrasyonu
+Nesne depolama hem birincil hem de ikincil depolama olarak kullanıldığından, büyük ölçekte performans sağlaması gerekir. Mobil/web uygulamalarından AI/ML'ye kadar, veri yoğun iş yükleri temel nesne depolamanın mükemmel performansına ihtiyaç duyar. Hatta veri koruma iş yükleri bile yüksek performanslı yinelenen veri eliminasyonu ve anlık görüntü erişimi gerektirir. Hiçbir işletme yavaş kurtarma süreçlerini göze alamaz. Geleneksel olarak, bu iş yükleri çıplak metal performansı gerektirir. Artık, tüm bu iş yükleri containerize edilebilir - genel bulut sağlayıcılarının başarısının kanıtladığı gibi.
 
-```yaml
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: rustfs-vs
-spec:
-  hosts:
-  - rustfs.example.com
-  gateways:
-  - rustfs-gateway
-  http:
-  - match:
-    - uri:
-        prefix: /
-    route:
-    - destination:
-        host: rustfs-service
-        port:
-          number: 9000
-      weight: 100
-    fault:
-      delay:
-        percentage:
-          value: 0.1
-        fixedDelay: 5s
-```
+RustFS, dünyanın en hızlı nesne depolama sistemidir, NVMe için okuma/yazma hızları sırasıyla 325 GiB/s ve 171 GiB/s, HDD için okuma/yazma hızları sırasıyla 11 GiB/s ve 9 GiB/s'dir. Bu hızlarda, her iş yükü herhangi bir çoklu bulut mimarisinde, herhangi bir altyapıda çalışabilir.
 
-### Linkerd Entegrasyonu
+### Ölçeklenebilir
 
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: rustfs-service
-  annotations:
-    linkerd.io/inject: enabled
-spec:
-  selector:
-    app: rustfs
-  ports:
-  - name: api
-    port: 9000
-    targetPort: 9000
-```
+Birçok kişi ölçeğin sadece sistemin ne kadar büyük olabileceği anlamına geldiğini düşünür. Ancak bu düşünce, ortam geliştikçe operasyonel verimliliğin önemini göz ardı eder. Temel altyapı ne olursa olsun, çoklu bulut nesne depolama çözümü verimli, şeffaf bir şekilde ölçeklenmelidir ve sadece minimal insan etkileşimi ve maksimum otomasyon ile gerçekleştirilmelidir. Bu sadece basit mimari üzerine inşa edilmiş API odaklı platform ile mümkündür.
 
-## Gözlemleme
+RustFS'in basitliğe olan kararlı odaklanması, büyük ölçekli, çoklu PB veri altyapısının minimal insan kaynağı ile yönetilebileceği anlamına gelir. Bu API ve otomasyonun işlevidir ve üzerinde ölçeklenebilir çoklu bulut depolama oluşturulabilecek bir ortam yaratır.
 
-### Prometheus İzleme
+### Yazılım Tanımlı
 
-```yaml
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: rustfs-monitor
-spec:
-  selector:
-    matchLabels:
-      app: rustfs
-  endpoints:
-  - port: metrics
-    interval: 30s
-    path: /rustfs/v2/metrics/cluster
-```
+Çoklu bulutta başarılı olmanın tek yolu yazılım tanımlı depolama kullanmaktır. Neden basit. Donanım cihazları genel bulutta veya Kubernetes'te çalışmaz. Genel bulut depolama hizmeti ürünleri, diğer genel bulut, özel bulut veya Kubernetes platformlarında çalışmak için tasarlanmamıştır. Bunu yapsalar bile, bant genişliği maliyeti depolama maliyetinden daha yüksek olur çünkü ağ genelinde kopyalamak için geliştirilmemişlerdir. Kuşkusuz, yazılım tanımlı depolama genel bulut, özel bulut ve kenarda çalışabilir.
 
-### Grafana Panoları
-
-İzlenmesi gereken temel metrikler:
-
-- **Küme Sağlığı**: Düğüm durumu, kuorum sağlığı
-- **Performans**: İstek gecikmesi, aktarım hızı
-- **Depolama**: Kapasite kullanımı, G/Ç metrikleri
-- **Ağ**: Bant genişliği, bağlantı sayısı
-
-### Dağıtık İzleme
-
-```yaml
-# Jaeger entegrasyonu
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: rustfs-tracing
-data:
-  tracing.yaml: |
-    jaeger:
-      endpoint: http://jaeger-collector:14268/api/traces
-      service_name: rustfs
-      sample_rate: 0.1
-```
-
-## CI/CD Entegrasyonu
-
-### GitOps ile ArgoCD
-
-```yaml
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: rustfs-app
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/company/rustfs-config
-    targetRevision: HEAD
-    path: kubernetes
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: rustfs
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-```
-
-### Jenkins Boru Hattı
-
-```groovy
-pipeline {
-    agent any
-    stages {
-        stage('Build') {
-            steps {
-                sh 'docker build -t rustfs:${BUILD_NUMBER} .'
-            }
-        }
-        stage('Test') {
-            steps {
-                sh 'docker run --rm rustfs:${BUILD_NUMBER} test'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                sh '''
-                    helm upgrade --install rustfs ./helm-chart \
-                        --set image.tag=${BUILD_NUMBER} \
-                        --namespace rustfs
-                '''
-            }
-        }
-    }
-}
-```
-
-## Güvenlik
-
-### Pod Güvenlik Standartları
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: rustfs-pod
-spec:
-  securityContext:
-    runAsNonRoot: true
-    runAsUser: 1000
-    fsGroup: 1000
-  containers:
-  - name: rustfs
-    image: rustfs/rustfs:latest
-    securityContext:
-      allowPrivilegeEscalation: false
-      capabilities:
-        drop:
-        - ALL
-      readOnlyRootFilesystem: true
-```
-
-### Ağ Politikaları
-
-```yaml
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: rustfs-network-policy
-spec:
-  podSelector:
-    matchLabels:
-      app: rustfs
-  policyTypes:
-  - Ingress
-  - Egress
-  ingress:
-  - from:
-    - podSelector:
-        matchLabels:
-          app: client
-    ports:
-    - protocol: TCP
-      port: 9000
-```
-
-## En İyi Uygulamalar
-
-### Kaynak Yönetimi
-
-1. **Kaynak Limitleri**
-   - Uygun CPU ve bellek limitleri ayarlayın
-   - Ad alanları düzeyinde kaynak kotaları kullanın
-   - Kaynak kullanım eğilimlerini izleyin
-
-2. **Depolama Sınıfları**
-   - Yüksek performanslı iş yükleri için hızlı SSD'ler kullanın
-   - Dayanıklılık için bölgesel kalıcı diskleri düşünün
-   - Otomatik yedekleme stratejileri uygulayın
-
-### Yüksek Kullanılabilirlik
-
-1. **Çoklu Bölge Dağıtımı**
-
-   ```yaml
-   spec:
-     affinity:
-       podAntiAffinity:
-         requiredDuringSchedulingIgnoredDuringExecution:
-         - labelSelector:
-             matchExpressions:
-             - key: app
-               operator: In
-               values:
-               - rustfs
-           topologyKey: topology.kubernetes.io/zone
-   ```
-
-2. **Sağlık Kontrolleri**
-
-   ```yaml
-   livenessProbe:
-     httpGet:
-       path: /rustfs/health/live
-       port: 9000
-     initialDelaySeconds: 30
-     periodSeconds: 10
-
-   readinessProbe:
-     httpGet:
-       path: /rustfs/health/ready
-       port: 9000
-     initialDelaySeconds: 10
-     periodSeconds: 5
-   ```
-
-## Sorun Giderme
-
-### Yaygın Sorunlar
-
-1. **Pod Başlatma Sorunları**
-   - Kaynak kısıtlamalarını kontrol edin
-   - Depolama sınıfı kullanılabilirliğini doğrulayın
-   - Güvenlik bağlamlarını gözden geçirin
-
-2. **Ağ Bağlantısı**
-   - Servis keşfini doğrulayın
-   - Ağ politikalarını kontrol edin
-   - DNS çözümlemesini izleyin
-
-3. **Performans Sorunları**
-   - Kaynak kullanımını analiz edin
-   - Depolama G/Ç kalıplarını kontrol edin
-   - Ağ bant genişliğini gözden geçirin
+RustFS yazılımda doğmuştur ve çeşitli işletim sistemleri ve donanım mimarileri genelinde taşınabilir. Kanıt, AWS, GCP ve Azure genelinde çalışan 2M+ IP'mizde bulunabilir.

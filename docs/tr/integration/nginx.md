@@ -1,29 +1,32 @@
 ---
 title: "RustFS Nginx Ters Proxy Yapılandırması"
-description: "RustFS için Nginx ters proxy yapılandırmasının uygulanması"
+description: "RustFS için Nginx ters proxy yapılandırması"
 ---
+
 
 # RustFS ile Nginx Entegrasyonu
 
 RustFS ile Nginx entegrasyonu sayesinde aşağıdaki işlevler gerçekleştirilebilir:
 
-1. Kapsamlı log toplama;
+1. Günlüklerin kapsamlı toplanması;
 2. Yük dengeleme yapılandırması;
 3. Özel URL yönlendirme ve çözümleme;
-4. Özel URL engelleme.
+4. Özel URL yasaklama。
 
-## Bir. RustFS Nginx Ön Koşulları
+## Bir、RustFS Nginx Ön Koşulları
 
 Entegrasyonun sorunsuz ilerlemesi için önceden hazırlamanız gerekenler:
 
-1. RustFS Server normal şekilde kurulmuş ve doğru başlatılmış olmalı;
-2. RustFS portunu belirleyin;
-3. Nginx tanımlaması doğru olmalı;
-4. RustFS tek makine veya cluster IP adreslerini onaylayın.
+1. RustFS Server normal kurulmuş ve doğru şekilde başlatılmış olmalı;
+2. RustFS'in portu belirlenmiş olmalı;
+3. Nginx doğru tanımlanmış olmalı;
+4. RustFS tek makine veya küme IP adresleri onaylanmış olmalı。
 
-## İki. Yapılandırma Dosyası
+## İki、Yapılandırma Dosyası
 
 ~~~
+
+
 upstream rustfs {
    least_conn;
    server 127.0.0.1:9000;
@@ -33,12 +36,12 @@ server {
    listen  [::]:8000;
    server_name  _;
 
-   # Allow special characters in headers
+   # Başlıklarda özel karakterlere izin ver
    ignore_invalid_headers off;
-   # Allow any size file to be uploaded.
-   # Set to a value such as 1000m; to restrict file size to a specific value
+   # Herhangi bir boyutta dosyanın yüklenmesine izin ver.
+   # Dosya boyutunu belirli bir değerle sınırlamak için 1000m gibi bir değere ayarlayın
    client_max_body_size 0;
-   # Disable buffering
+   # Tamponlamayı devre dışı bırak
    proxy_buffering off;
    proxy_request_buffering off;
 
@@ -49,7 +52,7 @@ server {
       proxy_set_header X-Forwarded-Proto $scheme;
 
       proxy_connect_timeout 300;
-      # Default is HTTP/1, keepalive is only enabled in HTTP/1.1
+      # Varsayılan HTTP/1'dir, keepalive sadece HTTP/1.1'de etkindir
       proxy_http_version 1.1;
       proxy_set_header Connection "";
       chunked_transfer_encoding off;
@@ -57,14 +60,18 @@ server {
       proxy_set_header Upgrade $http_upgrade;
       proxy_set_header Connection "upgrade";
 
-      proxy_pass http://rustfs; # This uses the upstream directive definition to load balance
+
+
+
+      proxy_pass http://rustfs; # Bu, yük dengeleme için upstream direktif tanımını kullanır
    }
 }
+
 ~~~
 
-## Üç. Çok Makineli Yük Dengeleme
+## Üç、Çok Makineli Yük Dengeleme
 
-Dağıtılmış ortamda birden fazla RustFS sunucusu eklemeniz gerekiyorsa, DNS çözümlemesi veya yerel Hosts adreslerini önceden ayarlayın, server'ları değiştirin ve ekleyin.
+Dağıtık ortamda birden fazla RustFS sunucusu eklemek istiyorsanız, lütfen önceden DNS çözümlemesini veya yerel Hosts adreslerini ayarlayın, server'ı değiştirin ve artırın.
 
 ~~~
 upstream rustfs {

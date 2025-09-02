@@ -1,63 +1,69 @@
 ---
-title: "Kullanım Limitleri"
-description: "RustFS, basit, verimli, dağıtık bir nesne depolama sistemidir. Tamamen S3 uyumludur ve Apache2 lisansı altında açık kaynaklı bir yazılımdır."
+title: "Kullanım Sınırlamaları"
+description: "RustFS, basit, verimli ve dağıtık bir nesne depolama sistemidir. %100 S3 uyumludur ve Apache2 lisansı altında yayınlanan açık kaynak yazılımdır."
 ---
-# Kullanım Limitleri
 
-## 1. S3 API Limitleri
+# Kullanım Sınırlamaları
 
-> Aşağıdaki standartlar, spesifikasyon için S3 protokol standartlarını sıkı bir şekilde takip eder.
+## I. S3 API Sınırlamaları
 
-| Öğe | Spesifikasyon |
+> Aşağıdaki standartlar S3 protokol standartlarına sıkı sıkıya uygun olarak belirlenmiştir.
+
+| Öğe | Özellik |
 | --------------------- | ---------------------------------- |
 | Maksimum nesne boyutu | 5 TiB |
 | Minimum nesne boyutu | 0 B |
-| Tekil PUT işlemi için maksimum nesne boyutu | Çok parçalı olmayan yükleme: 500 GiB; Çok parçalı yükleme: 5 TiB |
-| Yükleme başına maksimum parça sayısı | 10,000 |
-| Parça boyutu aralığı | 5 MiB ile 5 GiB; son parça 0 B ile 5 GiB olabilir |
-| Liste parçaları isteği başına döndürülen maksimum parça sayısı | 10,000 |
-| Liste nesneleri isteği başına döndürülen maksimum nesne sayısı | 1,000 |
-| Liste çok parçalı yüklemeler isteği başına döndürülen maksimum çok parçalı yükleme sayısı | 1,000 |
-| Kovası adı maksimum uzunluğu | 63 karakter |
-| Nesne adı maksimum uzunluğu | 1024 karakter |
-| Her `/` ile ayrılmış nesne adı segmentinin maksimum uzunluğu | 255 karakter |
-| Tekil nesne başına maksimum sürüm sayısı | 10,000 (yapılandırılabilir) |
+| Tek PUT işlemi için maksimum nesne boyutu | Parça yükleme olmayan: 500 GiB; Parça yükleme: 5 TiB |
+| Her yükleme için maksimum parça sayısı | 10,000 |
+| Parça boyutu aralığı | 5 MiB ile 5 GiB arası; son parça 0 B ile 5 GiB arası olabilir |
+| Her parça listesi isteği için dönen maksimum parça sayısı | 10,000 |
+| Her nesne listesi isteği için dönen maksimum nesne sayısı | 1,000 |
+| Her parça yükleme listesi isteği için dönen maksimum parça yükleme sayısı | 1,000 |
+| Depolama kovası adının maksimum uzunluğu | 63 karakter |
+| Nesne adının maksimum uzunluğu | 1024 karakter |
+| Her `/` ile ayrılan nesne adı segmentinin maksimum uzunluğu | 255 karakter |
+| Tek nesne için maksimum sürüm sayısı | 10,000 (yapılandırılabilir) |
 
-## 2. Silme Kodlama Limitleri
+---
 
-> EC parametreleri, Reed-Solomon matris EC algoritmasına göre yapılandırılır. Gerçek EC parametre yapılandırmasına tabidir.
+## II. Silme Kodlama Sınırlamaları
 
-| Öğe | Spesifikasyon |
+> EC parametreleri, Reed-Solomon matrisine dayalı EC algoritmasına göre yapılandırılır. Gerçek EC parametre yapılandırmasına göre belirlenir.
+
+| Öğe | Özellik |
 | ---------------------------- | ------------------------------ |
-| Küme başına maksimum sunucu sayısı | Sınırsız |
+| Her küme için maksimum sunucu sayısı | Sınırsız |
 | Minimum sunucu sayısı | 1 |
-| Sunucu sayısı 1 olduğunda, sunucu başına minimum sürücü sayısı | 1 (tek düğüm tek sürücü dağıtımı, ek güvenilirlik veya kullanılabilirlik sağlayamaz) |
-| Sunucu sayısı 2 veya daha fazla olduğunda, sunucu başına minimum sürücü sayısı | 1 |
-| Sunucu başına maksimum sürücü sayısı | Sınırsız |
+| Sunucu sayısı 1 olduğunda, her sunucu için minimum sürücü sayısı | 1 (tek düğüm tek sürücü dağıtımı için uygundur, ek güvenilirlik veya kullanılabilirlik sağlayamaz) |
+| Sunucu sayısı 2 veya daha fazla olduğunda, her sunucu için minimum sürücü sayısı | 1 |
+| Her sunucu için maksimum sürücü sayısı | Sınırsız |
 | Okuma quorum sayısı | N/2 |
 | Yazma quorum sayısı | (N/2) + 1 |
 
-## 3. Nesne Adlandırma Limitleri
+---
 
-### Dosya Sistemi ve İşletim Sistemi Limitleri
+## III. Nesne Adlandırma Sınırlamaları
 
-RustFS'deki nesne adları, temel işletim sistemi ve dosya sistemi tarafından sınırlandırılır. Örneğin, Windows ve bazı diğer işletim sistemleri `^`, `*`, `|`, `\`, `/`, `&`, `"`, veya `;` gibi belirli özel karakterlerin kullanımını kısıtlar.
+### Dosya Sistemi ve İşletim Sistemi Sınırlamaları
 
-Kullandığınız özel işletim sistemi ve dosya sistemine göre kısıtlamaların tam listesini ilgili belgelerden kontrol edin.
+RustFS'deki nesne adları, temel işletim sistemi ve dosya sistemi sınırlamalarına tabidir. Örneğin, Windows ve diğer bazı işletim sistemleri `^`, `*`, `|`, `\`, `/`, `&`, `"` veya `;` gibi belirli özel karakterlerin kullanımını kısıtlar.
 
-RustFS, üretim ortamlarında daha iyi performans ve uyumluluk için XFS dosya sistemine dayalı Linux işletim sistemlerini kullanmanızı önerir.
+Lütfen işletim sisteminiz ve dosya sisteminizin özel durumuna göre, tam kısıtlama listesi için ilgili dokümantasyona başvurun.
 
-### Ad Çakışması Yönetimi
+RustFS, daha iyi performans ve uyumluluk için üretim ortamında XFS dosya sistemi tabanlı Linux işletim sistemi kullanmanızı önerir.
 
-RustFS'de, uygulamalar tüm nesnelere benzersiz ve çakışmayan anahtarlar atamalıdır. Bu, ebeveyn nesne veya kardeş nesne adlarıyla çakışabilecek nesnelerin oluşturulmasından kaçınmayı içerir. RustFS, çakışmaların meydana geldiği konumlarda LIST işlemleri gerçekleştirirken boş bir küme döndürecektir.
+### Adlandırma Çakışması İşleme
 
-Örneğin, aşağıdaki işlemler ad alanı çakışmalarına neden olur:
+RustFS'de, uygulamalar tüm nesneler için benzersiz ve çakışmayan anahtarlar atamalıdır. Bu, ebeveyn nesne veya kardeş nesne adlarıyla çakışabilecek adlara sahip nesneler oluşturmaktan kaçınmayı içerir. RustFS, çakışma meydana gelen konumda LIST işlemi gerçekleştirirken boş küme döndürür.
+
+Örneğin, aşağıdaki işlemler ad alanı çakışmasına neden olur:
 
 ```bash
 PUT data/hello/2025/first/a.csv
-PUT data/hello/2025/first # Mevcut nesne önekiyle çakışır
+PUT data/hello/2025/first # Mevcut nesne öneki ile çakışma
+
 PUT data/hello/2025/first/
-PUT data/hello/2025/first/vendors.csv # Mevcut nesneyle çakışır
+PUT data/hello/2025/first/vendors.csv # Mevcut nesne ile çakışma
 ```
 
-Bu nesneler üzerinde GET veya HEAD işlemleri gerçekleştirebilirsiniz, ancak ad çakışmaları `hello/2025/first/` yolunda yürütülen LIST işlemlerinin boş sonuç setleri döndürmesine neden olacaktır.
+Bu nesneler üzerinde GET veya HEAD işlemleri gerçekleştirebilmenize rağmen, ad çakışması `hello/2025/first/` yolunda LIST işlemi gerçekleştirirken boş sonuç kümesi döndürülmesine neden olur.

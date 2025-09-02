@@ -1,43 +1,50 @@
 ---
 title: "Windows'ta RustFS Kurulumu"
-description: "Windows kullanarak RustFS'nin tek tıklama ile başlatılması."
+description: "Windows'ta tek tıkla RustFS başlatın."
 ---
+
 # Windows'ta RustFS Kurulumu
 
-## 1. Hazırlık
+## Bir、Hazırlık Çalışması
 
-Lütfen anlayın:
-> Windows başlangıç **modu** yalnızca tek düğüm tek disk modunu destekler, daha çok geliştirme, hata ayıklama ve test ortamları için uygundur.
+Lütfen bilgi edinin:
 
-1. Windows başlangıç modu hakkında detaylı bilgi için lütfen [Başlangıç Modları](../mode/) bölümüne bakın;
-2. Kurulum paketini indirin, izinleri değiştirin ve başlatın.
+> Windows başlatma **modu** sadece tek makine tek disk modunu destekler, geliştirme, hata ayıklama ve test ortamları için daha uygundur。
 
-## 2. İndirme
+1. Windows başlatma modları hakkında detaylı bilgi için lütfen [Başlatma Modları](../linux/index.md#mode)'na bakın;
 
-Resmi web sitesi indirme sayfasına gidin ve en son RustFS kurulum paketini indirin.
+2. Kurulum paketini indirin, izinleri değiştirin ve başlatın。
 
-## 3. İzinleri Değiştirme
+## İki、İndirme
 
-Lütfen bu programın Windows işletim sisteminde ilgili yürütme izinlerine sahip olduğunu doğrulayın.
+Resmi web sitesinin indirme sayfasına gidin ve en son RustFS kurulum paketini indirin。
 
-## Başlatma Simgesine Çift Tıklayın
+## Üç、İzin Değiştirme
+
+Lütfen Windows işletim sisteminde bu programın ilgili yürütme izinlerine sahip olduğundan emin olun。
+
+## Başlatma Simgesine Çift Tıklama
 
 1. Başlatma simgesine çift tıklayın;
-2. Disk yapılandırmasını değiştirin;
-3. "Servisi Başlat"a tıklayın, RustFS servisi başarıyla başlar.
 
-<img src="./images/windows-setup.jpg" alt="Windows başlangıç" />
+2. Disk yapılandırmasına tıklayın;
 
-## 4. Yapılandırmayı Değiştirme
+3. "Start Service"e tıklayın, RustFS servisi başarıyla başlatılır。
 
-Sağ üst köşedeki değiştirme düğmesine (dişli şeklinde düğme) tıklayarak aşağıdakileri değiştirin:
+<img src="./images/windows-setup.jpg" alt="windows başlatma" />
+
+## Dört、Yapılandırma Değiştirme
+
+Sağ üst köşedeki değiştirme düğmesine (dişli şeklindeki düğme) tıklayarak şunları değiştirebilirsiniz:
 
 1. Sunucu varsayılan portu;
+
 2. Varsayılan yönetici kullanıcı adı ve şifresi;
+
 3. Belirtilen disk dizini;
 
-<img src="./images/setting.jpg" alt="RustFS Windows yapılandırması" />
+<img src="./images/setting.jpg" alt="RustFS windows yapılandırması" />
 
-## 5. Konsola Erişim
+## Beş、Konsola Erişim
 
-Başarılı bir şekilde başlatıldıktan sonra, `http://127.0.0.1:7001` adresini ziyaret ederek konsola erişin.
+Başarıyla başlatıldıktan sonra, `http://127.0.0.1:7001` adresine giderek konsola erişebilirsiniz。

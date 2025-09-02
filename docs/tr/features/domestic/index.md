@@ -1,203 +1,108 @@
-# Yerel Bulut Çözümleri
+---
+title: "Yerli Teknoloji Yenilik Çözümü"
+description: "Donanımdan işletim sistemine, gizlilik ve şifrelemeye kadar tam depolama uyumluluğu ve teknoloji yenilik çözümleri"
+---
 
-RustFS, Çin'in önde gelen bulut sağlayıcılarıyla uyumlu olarak, veri egemenliği gereksinimlerini karşılayan yerel bulut ortamları için kapsamlı çözümler sunar.
+# Yerli Teknoloji Yenilik Çözümü
 
-## Temel Avantajlar
+Donanımdan işletim sistemine, gizlilik ve şifrelemeye kadar tam depolama uyumluluğu ve teknoloji yenilik çözümleri sunuyoruz
 
-![Yerel Bulut İkon 1](./images/icon-1.png)
+## Teknoloji Yenilik Depolama Uygulama Ağrı Noktaları
 
-### Düzenleyici Uyumluluk
+### Geleneksel Çözüm Kusurları
 
-- **Veri Egemenliği**: Çin veri koruma yasalarına tam uyum
-- **Endüstri Standartları**: GB/T standartlarını ve endüstri düzenlemelerini karşılar
-- **Denetim Desteği**: Tam denetim izleri ve uyumluluk raporlaması
-- **Sertifikasyon**: Çeşitli sertifikasyon gereksinimlerini destekler
+- Yerli çip uyumluluk oranı %30'dan az
+- Teknoloji yenilik ortamında performans düşüşü %40-60'a kadar
+- Merkezi mimari genişletme maliyeti yüksek
 
-![Yerel Bulut İkon 2](./images/icon-2.png)
+### Teknik Uygulamamız
 
-### Yerelleştirilmiş Destek
+- 6 büyük yerli çip tam uyumluluğu tamamlandı (Kunpeng/Hygon/Phytium/Loongson/Shenwei/Zhaoxin)
+- Kendi geliştirdiğimiz RDMA hızlandırma protokolü, IOPS performansı 32.4 milyon, gecikme <20μs
+- Dağıtık metadata küme tasarımı, tek küme EB seviyesi genişletme desteği
 
-- **7/24 Çin Desteği**: Yerel Çin teknik destek ekibi
-- **Yerel Dağıtım**: Şirket içi ve hibrit dağıtımlar için destek
-- **Bölgesel Optimizasyon**: Çin ağ koşulları için optimize edilmiştir
-- **Dokümantasyon**: Tam Çin dokümantasyonu ve eğitim materyalleri
+## Neden Bizi Seçmelisiniz
 
-![Yerel Bulut İkon 3](./images/icon-3.png)
+### Tam Yığın Teknoloji Yenilik Uyumluluğu
 
-### Teknoloji Bağımsızlığı
+6 büyük yerli çip platformunu destekler
+Donanım performans kaybı <5%
+Sanayi ve Bilgi Teknolojileri Bakanlığı sertifikalı uyumluluk %100
 
-- **Bağımsız Mimari**: Yabancı teknoloji yığınlarına bağımlılık yok
-- **Açık Kaynak**: Şeffaf ve denetlenebilir kod tabanı
-- **Özelleştirilebilir**: Belirli gereksinimler için esnek mimari
-- **Geleceğe Hazır**: Sürekli yenilik ve geliştirme
+### Sıfır Performans Kaybı Garantisi
 
-![Yerel Bulut İkon 4](./images/icon-4.png)
+Kendi geliştirdiğimiz RDMA hızlandırma protokolü
+Tek düğüm 16.2 milyon IOPS
+Gecikme <20μs
 
-### Maliyet Etkinliği
+### Ulusal Şifreleme Seviyesi Güvenlik Sistemi
 
-- **Rekabetçi Fiyatlandırma**: Çin pazar koşulları için optimize edilmiştir
-- **Esnek Lisanslama**: Çeşitli lisanslama modelleri mevcut
-- **Yatırım Getirisi Optimizasyonu**: Kanıtlanmış maliyet tasarrufu ve verimlilik kazanımları
-- **Ölçeklenebilir Yatırım**: Büyüdükçe öde fiyatlandırma modelleri
+SM2/SM4/SM9 tam desteği
+Şifreleme verimi ≥8 GB/s
+%60 yerli sermaye yapısı
 
-## Çözüm Mimarisi
+### Ekosistem Derin Uyumluluğu
 
-![Çözüm Mimarisi Ok](./images/arrow.png)
+18 kategori teknoloji yenilik işletim sistemi uyumluluğu
+200+ ISV ortak sertifikasyonu
+30 bakanlık seviyesi uygulama doğrulaması
 
-### Çoklu Bulut Entegrasyonu
+## Çözümler
 
-![Çözüm Öğesi 1](./images/item-1.png)
+### Parti ve Devlet Organları Teknoloji Yenilik Alternatif Hızlandırma Motoru
 
-#### Hibrit Bulut Mimarisi
+**Parti ve devlet ofis "üç toplantı bir toplantı" tam süreç kapsaması (resmi belge/toplantı/denetim)**
+**Genel şube sistemi karşılıklı tanıma mekanizması (12 kategori heterojen sistem oluşturma)**
 
-- **Şirket İçi Entegrasyon**: Mevcut altyapıyla sorunsuz entegrasyon
-- **Bulut Patlaması**: Gerektiğinde bulut kaynaklarına otomatik ölçeklendirme
-- **Veri Hareketliliği**: Ortamlar arasında kolay veri hareketi
-- **Birleşik Yönetim**: Tüm ortamlar için tek bir yönetim arayüzü
+- ✓ Bir eyalet seviyesi e-devlet bulutu 3 ayda 8 sistem migrasyonu tamamlandı
+- ✓ Resmi belge akış verimliliği %210 artış
+- ✓ Güvenlik seviyesi 2.0 üçüncü seviye sertifikasyon geçiş oranı %100
 
-### Endüstri Çözümleri
+### Finansal Seviye Dağıtık Çekirdek Sistemi
 
-![Çözüm Öğesi 2](./images/item-2.png)
+**Milyon seviyesi TPS dağıtık ana motor (ASM9 ulusal şifreleme algoritması desteği)**
+**Akıllı toplu işlem boru hattı (otomatik container 40+ kategori toplu işlem)**
 
-#### Finansal Hizmetler
+- ✓ Bir anonim banka sistemi gecikmesi 68ms'den 9ms'ye düştü
+- ✓ Bir varlık yönetimi kredisi yılda 6.5 milyon OIE lisans ücreti tasarrufu
+- ✓ Merkez Bankası fintech sertifikasyonu + Bankacılık Düzenleme ve Denetleme Kurumu nüfuz denetimi geçti
 
-- **Düzenleyici Uyumluluk**: Bankacılık ve finans düzenlemelerini karşılar
-- **Yüksek Kullanılabilirlik**: %99,99 çalışma süresi garantisi
-- **Güvenlik**: Uçtan uca şifreleme ve erişim kontrolleri
-- **Performans**: Ticaret sistemleri için düşük gecikmeli veri erişimi
+### Büyük İşletmeler Çapraz Platform Bulut Beyin Çözümü
 
-### Kurumsal Özellikler
+**Heterojen kaynak planlama tek tıkla sorunsuz (x86/ARM/MIPS uyumluluk yönetimi)**
+**Teknoloji yığını fark ettirmeden migrasyon araç zinciri (Oracle tek durak migrasyon verimliliği 6 kat artış)**
 
-![Çözüm Öğesi 3](./images/item-3.png)
+- ✓ Heterojen yönetim yüzeyi IT operasyon maliyeti %37 düşüş
+- ✓ Merkezi araştırma ve geliştirme sistemi kesinti döngüsü %82 kısaldı
+- ✓ Gelecekteki doğu veri batı hesaplama derin entegrasyonu ve genişletme desteği
 
-#### Hükümet ve Kamu Sektörü
+## Temel Fonksiyon Karşılaştırma Tablosu
 
-- **Güvenlik Onayı**: Hükümet güvenlik gereksinimlerini karşılar
-- **Veri İkameti**: Verilerin ulusal sınırlar içinde kalmasını sağlar
-- **Felaket Kurtarma**: Kapsamlı yedekleme ve kurtarma çözümleri
-- **Entegrasyon**: Mevcut hükümet sistemleriyle uyumlu
+| Fonksiyon Boyutu | Geleneksel Çözüm Depolama | rustFS Teknoloji Yenilik Çözümü | Avantaj Artışı |
+|---------|------------|--------------|----------|
+| Protokol Desteği | FC/iSCSI ana | ✓ Tam protokol desteği (NVMe-oF/S3/NFSv4) | Protokol uyumluluğu %200 artış ↑ |
+| Veri Koruması | Çift kontrolcü + RAID | ✓ Çapraz veri merkezi 3 kopya + alt düğüm silme kodları | RTO saat seviyesinden dakika seviyesine kısaldı |
+| Performans Temeli | Tek düğüm IOPS ≤500K | ✓ Tek düğüm IOPS 16.2M, verim 144 GB/s | Tek makine performansı 32 kat artış ↑ |
 
-## Ana Özellikler
+## Hizmet Garanti Sistemi
 
-### Veri Güvenliği
+### Uyumluluk Doğrulama
 
-- **Dinlenme Halinde Şifreleme**: Depolanan veriler için AES-256 şifreleme
-- **Aktarım Halinde Şifreleme**: Tüm veri transferleri için TLS 1.3
-- **Anahtar Yönetimi**: Yerel KMS çözümleriyle entegrasyon
-- **Erişim Kontrolü**: İnce ayarlı izinler ve denetim günlükleri
+Zaman döngüsü: 5-7 iş günü
 
-### Performans Optimizasyonu
+Donanım uyumluluk test raporu
+Performans optimizasyon planı
 
-- **Ağ Optimizasyonu**: Çin internet altyapısı için optimize edilmiştir
-- **Kenar Bilgi İşlem**: Kenar dağıtımları için destek
-- **Önbellekleme**: Geliştirilmiş performans için akıllı önbellekleme
-- **Yük Dengeleme**: Otomatik yük dağılımı
+### Dağıtım Uygulama
 
-### Uyumluluk ve Yönetişim
+Zaman döngüsü: 3 gün/PB seviyesi
 
-- **Veri Sınıflandırma**: Otomatik veri sınıflandırma ve etiketleme
-- **Saklama Politikaları**: Yapılandırılabilir veri saklama ve silme
-- **Denetim Günlükleri**: Kapsamlı denetim izleri
-- **Raporlama**: Otomatik uyumluluk raporlaması
+Çift aktif mimari kurulum
+Veri kayıpsız migrasyon
 
-## Dağıtım Seçenekleri
+### Sürekli Operasyon
 
-### Genel Bulut Entegrasyonu
+Hizmet seviyesi: 7x24 izleme
 
-- **Alibaba Cloud**: Alibaba Cloud hizmetleriyle yerel entegrasyon
-- **Tencent Cloud**: Tencent Cloud altyapısı için optimize edilmiştir
-- **Huawei Cloud**: Huawei Cloud ile sertifikalı uyumluluk
-- **Baidu Cloud**: Baidu Cloud AI hizmetleri için destek
-
-### Özel Bulut Çözümleri
-
-- **Şirket İçi**: Tam şirket içi dağıtım
-- **Hibrit**: Şirket içi ve bulutun kombinasyonu
-- **Kenar**: Dağıtılmış kenar bilgi işlem desteği
-- **Hava Boşluğunda**: İzole edilmiş ortamlar için destek
-
-### Sektöre Özel Çözümler
-
-- **İmalat**: IoT veri yönetimi ve analitiği
-- **Sağlık Hizmetleri**: Tıbbi veri için HIPAA eşdeğeri uyumluluk
-- **Eğitim**: Öğrenci veri koruma ve yönetimi
-- **Hükümet**: Sınıflandırılmış veri işleme yetenekleri
-
-## Göç Hizmetleri
-
-### Değerlendirme ve Planlama
-
-- **Mevcut Durum Analizi**: Mevcut sistemlerin kapsamlı değerlendirmesi
-- **Göç Stratejisi**: Detaylı göç planlaması ve zaman çizelgesi
-- **Risk Değerlendirmesi**: Göç risklerinin belirlenmesi ve azaltılması
-- **Eğitim**: Personel eğitimi ve bilgi transferi
-
-### Veri Göçü
-
-- **Otomatik Araçlar**: Otomatik veri göç yardımcı programları
-- **Doğrulama**: Veri bütünlüğü doğrulama ve geçerlilik
-- **Geri Alma**: Gerektiğinde güvenli geri alma prosedürleri
-- **İzleme**: Gerçek zamanlı göç izleme ve raporlama
-
-### Göç Sonrası Destek
-
-- **Optimizasyon**: Performans ayarlama ve optimizasyon
-- **İzleme**: Sürekli izleme ve uyarı
-- **Destek**: Göç sonrası sorunlar için özel destek ekibi
-- **Eğitim**: Devam eden eğitim ve en iyi uygulamalar
-
-## Başarı Hikayeleri
-
-### Büyük Kurumsal Dağıtım
-
-- **Ölçek**: 10PB+ veri depolama
-- **Performans**: Veri erişim hızında %50 iyileştirme
-- **Maliyet**: Depolama maliyetlerinde %40 azalma
-- **Uyumluluk**: Tam düzenleyici uyumluluk sağlandı
-
-### Hükümet Uygulaması
-
-- **Güvenlik**: Tüm hükümet güvenlik gereksinimlerini karşılar
-- **Kullanılabilirlik**: %99,99 çalışma süresi sağlandı
-- **Entegrasyon**: Mevcut sistemlerle sorunsuz entegrasyon
-- **Destek**: 7/24 yerel destek sağlandı
-
-### Finansal Hizmetler Vakası
-
-- **Gecikme**: Milisaniyenin altında veri erişimi
-- **Uyumluluk**: Tam finansal düzenleyici uyumluluk
-- **Ölçeklenebilirlik**: Zirve ticaret hacimleri için destek
-- **Felaket Kurtarma**: Çoklu site felaket kurtarma
-
-## Başlarken
-
-### Değerlendirme Süreci
-
-1. **Gereksinim Değerlendirmesi**: Özel ihtiyaçlarınızın anlaşılması
-2. **Kavram Kanıtı**: Küçük ölçekli pilot uygulama
-3. **Performans Testi**: Performans gereksinimlerinin doğrulanması
-4. **Güvenlik İncelemesi**: Güvenlik değerlendirmesi ve doğrulaması
-
-### Uygulama Adımları
-
-1. **Planlama**: Detaylı uygulama planlaması
-2. **Altyapı**: Donanım ve ağ kurulumu
-3. **Dağıtım**: Yazılım kurulumu ve yapılandırma
-4. **Test**: Kapsamlı test ve doğrulama
-5. **Canlıya Alma**: Üretim dağıtımı ve izleme
-
-### Destek ve Bakım
-
-- **7/24 Destek**: Kesintisiz teknik destek
-- **Düzenli Güncellemeler**: Otomatik güncellemeler ve yamalar
-- **Sağlık İzleme**: Proaktif sistem izleme
-- **Performans Optimizasyonu**: Devam eden optimizasyon hizmetleri
-
-## İletişim Bilgileri
-
-Yerel bulut çözümleri hakkında daha fazla bilgi için:
-
-- **Satış**: Fiyatlandırma ve lisanslama için satış ekibimizle iletişime geçin
-- **Teknik**: Teknik uzmanlarımızla konuşun
-- **Destek**: Destek kaynaklarımıza erişin
-- **Eğitim**: Eğitim programlarımız hakkında bilgi edinin
+Yıllık sağlık kontrolü
+SLA %99.99 garanti

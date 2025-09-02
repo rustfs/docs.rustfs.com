@@ -1,50 +1,58 @@
 ---
-title: "macOS'ta RustFS Kurulumu"
-description: "Bu belge, RustFS'nin macOS'ta hızlı başlatma yöntemini açıklar."
+title: "MacOS'ta RustFS Kurulumu"
+description: "Bu makale, RustFS'in MacOS altındaki hızlı başlatma yöntemlerini açıklar"
 ---
-# macOS'ta RustFS Kurulumu
 
-macOS'ta, kurulum için üç yöntem kullanabilirsiniz:
+# MacOS'ta RustFS Kurulumu
+
+MacOS altında üç yöntem kullanılabilir:
+
 1. Docker
-2. Grafiksel tek tıklama başlangıç paketi
+2. Grafiksel tek tıkla başlatma paketi
 3. İkili paket
 
-> Bu belge, RustFS **grafiksel tek tıklama başlangıç paketi** kullanarak hızlı RustFS başlatmayı açıklar.
+> Bu makale, RustFS'i hızlı bir şekilde başlatmak için **grafiksel tek tıkla başlatma paketi** kullanma modunu açıklar。
 
-## 1. Hazırlık
+## Bir、Hazırlık Çalışması
 
-Lütfen anlayın:
-> **Grafiksel başlangıç modu** yalnızca tek düğüm tek disk modunu destekler, daha çok geliştirme, hata ayıklama ve test ortamları için uygundur.
+Lütfen bilgi edinin:
 
-1. Başlangıç modları hakkında detaylı bilgi için lütfen [Başlangıç Modları](../mode/) bölümüne bakın;
-2. Kurulum paketini indirin, izinleri değiştirin ve başlatın.
+> **Grafiksel başlatma modu** sadece tek makine tek disk modunu destekler, geliştirme, hata ayıklama ve test ortamları için daha uygundur。
 
-## 2. İndirme
+1. Başlatma modları hakkında detaylı bilgi için lütfen [Başlatma Modları](../linux/index.md#mode)'na bakın;
 
-Resmi web sitesi indirme sayfasına gidin ve en son RustFS kurulum paketini indirin.
+2. Kurulum paketini indirin, izinleri değiştirin ve başlatın。
 
-## 3. İzinleri Değiştirme
+## İki、İndirme
 
-Lütfen bu programın macOS işletim sisteminde ilgili yürütme izinlerine sahip olduğunu doğrulayın.
+Resmi web sitesinin indirme sayfasına gidin ve en son RustFS kurulum paketini indirin。
 
-## Başlatma Simgesine Çift Tıklayın
+## Üç、İzin Değiştirme
+
+Lütfen MacOS işletim sisteminde bu programın ilgili yürütme izinlerine sahip olduğundan emin olun。
+
+## Başlatma Simgesine Çift Tıklama
 
 1. Başlatma simgesine çift tıklayın;
-2. Disk yapılandırmasını değiştirin;
-3. "Servisi Başlat"a tıklayın, RustFS servisi başarıyla başlar.
 
-<img src="./images/macos-setup.jpg" alt="macOS başlangıç" />
+2. Disk yapılandırmasına tıklayın;
 
-## 4. Yapılandırmayı Değiştirme
+3. "Start Service"e tıklayın, RustFS servisi başarıyla başlatılır。
 
-Sağ üst köşedeki değiştirme düğmesine (dişli şeklinde düğme) tıklayarak aşağıdakileri değiştirin:
+<img src="./images/macos-setup.jpg" alt="macos başlatma" />
+
+## Dört、Yapılandırma Değiştirme
+
+Sağ üst köşedeki değiştirme düğmesine (dişli şeklindeki düğme) tıklayarak şunları değiştirebilirsiniz:
 
 1. Sunucu varsayılan portu;
+
 2. Varsayılan yönetici kullanıcı adı ve şifresi;
+
 3. Belirtilen disk dizini;
 
-<img src="./images/setting.jpg" alt="RustFS macOS yapılandırması" />
+<img src="./images/setting.jpg" alt="RustFS windows yapılandırması" />
 
-## 5. Konsola Erişim
+## Beş、Konsola Erişim
 
-Başarılı bir şekilde başlatıldıktan sonra, `http://127.0.0.1:7001` adresini ziyaret ederek konsola erişin.
+Başarıyla başlatıldıktan sonra, `http://127.0.0.1:7001` adresine giderek konsola erişebilirsiniz。

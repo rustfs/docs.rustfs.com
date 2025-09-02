@@ -1,278 +1,82 @@
-# AWS Entegrasyonu
+---
+title: "VMWare Tanzu Container Platform için RustFS"
+description: "VMWare Tanzu üzerinde RustFS çalıştırma kılavuzu"
+---
 
-RustFS, Amazon Web Services ile yerel entegrasyon sağlayarak, kurumsal sınıf performans ve güvenilirlikle sorunsuz hibrit bulut ve çoklu bulut depolama çözümleri sunar.
+# VMWare Tanzu Container Platform için RustFS
 
-## Genel Bakış
+## Müşterilerin VMWare Tanzu'da RustFS çalıştırmasının üç nedeni var
 
-![AWS Entegrasyonu](./images/sec1-1.png)
+- RustFS, hibrit bulut veya çoklu bulut dağıtım senaryolarında tutarlı bir depolama katmanı olarak görev yapar
+- RustFS, Kubernetes native yüksek performanslı bir üründür ve genel bulut, özel bulut ve kenar bulut ortamlarında öngörülebilir performans sağlayabilir
+- EKS'de RustFS çalıştırmak, yazılım yığınını kontrol etmenizi sağlar ve bulut kilidinden kaçınmak için gereken esnekliğe sahiptir
 
-AWS üzerindeki RustFS şunları sunar:
+VMWare Tanzu, hibrit bulut, çoklu bulut ve kenar dağıtımlarını yönetebilen tam yığın otomatik operasyon ve bakım özelliklerine sahip kurumsal seviye Kubernetes container platformudur. VMWare Tanzu, kurumsal seviye Linux işletim sistemi, container runtime, ağ, izleme, kayıt defteri ve kimlik doğrulama ve yetkilendirme çözümlerini içerir.
 
-- **Yerel AWS Entegrasyonu**: AWS hizmetleri ve API'leri ile derin entegrasyon
-- **Hibrit Bulut**: Şirket içi ve AWS bulutu arasında sorunsuz köprü
-- **Maliyet Verimliliği**: Akıllı depolama katmanlandırma ve yaşam döngüsü yönetimi
-- **Kurumsal Ölçek**: Petabayt ölçekli dağıtımlar için destek
+RustFS, VMWare Tanzu ile native olarak entegre olur, böylece kendi büyük ölçekli çok kiracılı nesne depolama hizmetini daha kolay bir şekilde çalıştırabilirsiniz. RustFS Operator, VMWare Tanzu araç zinciri (örneğin VMWare Tanzu Cluster Manager CLI ve Quay container kayıt defteri) ile çalışabilir, VMWare Tanzu ekosistemine yapılan yatırımdan maksimum değer elde etmenizi sağlar.
 
-## Temel AWS Entegrasyonları
+![RustFS Mimari Diyagramı](images/sec1-1.png)
 
-### Hesaplama Hizmetleri
+RustFS, tasarımında Kubernetes native olduğu ve baştan itibaren S3 uyumlu olduğu için tutarlı, yüksek performanslı ve ölçeklenebilir nesne depolama sağlar. Geliştiriciler, VMWare Tanzu'da çalışan tüm bulut native uygulamalar için Amazon S3 uyumlu kalıcı depolama hizmetini kolayca elde edebilir. AWS S3'ten farklı olarak, RustFS, uygulamaların herhangi bir çoklu bulut ve hibrit bulut altyapısı genelinde ölçeklenmesini sağlar ve hala VMWare Tanzu ekosisteminde yönetilebilir, genel bulut kilidinden etkilenmez.
 
-#### Amazon EC2
+## RustFS Operator, VMWare Tanzu Özellikleri ile Native Olarak Entegre Olur
 
-- **Optimize Edilmiş AMİ'ler**: RustFS için önceden yapılandırılmış Amazon Makine Görüntüleri
-- **Örnek Türleri**: Depolama için optimize edilmiş örnek önerileri
-- **Oto Ölçeklendirme**: Depolama talebine göre otomatik ölçeklendirme
-- **Yerleştirme Grupları**: Yerleştirme grupları ile ağ performansını optimize etme
+### Özellik Genel Bakışı
 
-#### Amazon EKS (Elastic Kubernetes Service)
+- **Depolama sınıfları ve katmanlama**
+- **Harici yük dengeleme**
+- **Şifreleme anahtarı yönetimi**
+- **Kimlik yönetimi**
+- **Sertifika yönetimi**
+- **İzleme ve uyarılar**
+- **Günlük kaydı ve denetim**
 
-- **Konteyner Dağıtımı**: Yönetilen Kubernetes üzerinde RustFS dağıtımı
-- **Kalıcı Birimler**: Kalıcı depolama için EBS ve EFS ile entegrasyon
-- **Servis Ağı**: AWS App Mesh ile entegrasyon
-- **CI/CD Entegrasyonu**: AWS CodePipeline ile yerel entegrasyon
+## Depolama Sınıfları ve Katmanlama
 
-### Depolama Hizmetleri
+Tencent Cloud TKE'de RustFS'i büyük ölçekte dağıtmanın anahtar gereksinimi, depolama sınıfları (NVMe, HDD, genel bulut) genelinde katmanlama yeteneğidir. Bu, işletmelerin maliyet ve performansı aynı anda yönetmesini sağlar.
 
-#### Amazon S3 Entegrasyonu
+RustFS, eski nesnelerin hızlı NVMe katmanından daha maliyet etkin HDD katmanına ve hatta maliyet optimize edilmiş soğuk genel bulut depolama katmanına otomatik geçişini destekler.
 
-- **S3 Ağ Geçidi**: Şeffaf S3 API uyumluluğu
-- **Akıllı Katmanlandırma**: S3 IA ve Glacier'a otomatik hareket
-- **Çok Bölgeli Çoğaltma**: Çok bölgeli veri çoğaltma
-- **S3 Transfer Hızlandırma**: S3'e hızlandırılmış veri transferi
+Katmanlama sırasında, RustFS katmanlar genelinde birleşik bir ad alanı sağlar. Katmanlar arası hareket uygulamalar için şeffaftır ve müşteri tarafından belirlenen politikalar tarafından tetiklenir.
 
-#### Amazon EBS (Elastic Block Store)
+RustFS, nesneleri kaynakta şifreleyerek Alibaba Cloud ACK hibrit bulutunda güvenli depolama sağlar, müşterilerin verileri üzerinde her zaman tam kontrol sahibi olmasını garanti eder. Alibaba Cloud ACK genel bulutta dağıtıldığında, katmanlama özelliği, Alibaba Cloud ACK'nin kalıcı blok depolama ve daha ucuz nesne depolama katmanları genelinde verileri etkili bir şekilde yönetmesine yardımcı olur.
 
-- **Yüksek Performanslı Depolama**: Optimal performans için GP3 ve io2 birimleri
-- **Anlık Görüntü Entegrasyonu**: Otomatik EBS anlık görüntü yönetimi
-- **Şifreleme**: AWS KMS ile EBS şifreleme
-- **Çoklu Ekleme**: Birden fazla örnek arasında paylaşılan depolama
+**Daha fazla bilgi edin:**
 
-#### Amazon EFS (Elastic File System)
+## Harici Yük Dengeleme
 
-- **NFS Uyumluluğu**: POSIX uyumlu dosya sistemi arayüzü
-- **Performans Modları**: Genel Amaçlı ve Maksimum G/Ç performans modları
-- **İletim Modları**: Sağlanan ve Patlama iletim modları
-- **Yedekleme Entegrasyonu**: AWS Backup'e otomatik yedekleme
+RustFS'in tüm iletişimi HTTP, RESTful API tabanlıdır ve herhangi bir standart Kubernetes uyumlu giriş kontrolcüsünü destekleyecektir. Bu, donanım ve yazılım tanımlı çözümleri içerir. En popüler seçenek NGINX'tir. OperatorHub veya OpenShift Marketplace kullanarak kurulum yapın, ardından RustFS kiracısını açmak için açıklamalar kullanın.
 
-### Ağ Hizmetleri
+## Şifreleme Anahtarı Yönetimi
 
-#### Amazon VPC (Virtual Private Cloud)
+Native OpenShift anahtar yönetimi özelliği yoktur. Bu nedenle, RustFS, anahtarları nesne depolama sistemi dışında saklamak için HashiCorp Vault kullanmayı önerir. Bu, bulut native uygulamalar için en iyi uygulamadır.
 
-- **Ağ İzolasyonu**: İzole sanallaştırılmış ağda dağıtım
-- **Alt Ağlar**: Kullanılabilirlik bölgeleri arasında çoklu AZ dağıtımı
-- **Güvenlik Grupları**: İnce ayarlı ağ erişim kontrolü
-- **VPC Uç Noktaları**: AWS hizmetlerine özel bağlantı
+Tüm üretim ortamları için, varsayılan olarak tüm depolama kovalarında şifrelemeyi etkinleştirmenizi öneririz. RustFS, veri bütünlüğünü ve gizliliğini korumak için AES-256-GCM veya ChaCha20-Poly1305 şifreleme kullanır, performans üzerindeki etki ihmal edilebilir düzeydedir.
 
-#### AWS Direct Connect
+RustFS, üç sunucu tarafı şifreleme (SSE-KMS, SSE-S3 ve SSE-C) modunun tümünü destekler. SSE-S3 ve SSE-KMS, sunucu tarafı KMS entegrasyonu ile, SSE-C ise istemci tarafından sağlanan anahtarları kullanır.
 
-- **Özel Bağlantı**: AWS'ye özel ağ bağlantısı
-- **Tutarlı Performans**: Öngörülebilir ağ performansı
-- **Bant Genişliği Seçenekleri**: Kullanılabilir çoklu bant genişliği seçenekleri
-- **Hibrit Bağlantı**: Sorunsuz hibrit bulut bağlantısı
+RustFS, yüksek performanslı nesne başına şifreleme için bu KMS'i kendi dahili anahtar şifreleme sunucusunu (KES hizmeti) başlatmak için kullanacaktır. Her kiracı, kendi KES sunucusunu izole edilmiş bir ad alanında çalıştırır.
 
-#### Amazon CloudFront
+## Kimlik Yönetimi
 
-- **Küresel CDN**: Dünya çapında içerik dağıtımını hızlandırma
-- **Kenar Konumları**: Küresel olarak 400'den fazla kenar konumu
-- **Origin Shield**: Köken koruması için ek önbellek katmanı
-- **Gerçek Zamanlı Metrikler**: Detaylı performans ve kullanım metrikleri
+OpenShift'te RustFS çalıştırırken, müşteriler üçüncü taraf OpenID Connect/LDAP uyumlu kimlik sağlayıcıları (Keycloak, Okta/Auth0, Google, Facebook, ActiveDirectory ve OpenLDAP gibi) kullanarak tek oturum açma (SSO) yönetebilir. RustFS, OpenID Connect uyumlu Keycloak IDP'yi önerir.
 
-## Güvenlik Entegrasyonu
+Harici IDP, yöneticilerin kullanıcı/uygulama kimliklerini merkezi olarak yönetmesine izin verir. RustFS, IDP üzerine inşa edilir ve AWS IAM tarzı kullanıcı, grup, rol, politika ve token hizmet API'leri sağlar. Altyapıdan bağımsız birleşik kimlik ve erişim yönetimi (IAM) katmanı yeteneği, önemli mimari esneklik sağlar.
 
-### AWS Identity and Access Management (IAM)
+## Sertifika Yönetimi
 
-- **İnce Ayarlı İzinler**: Kesin erişim kontrol politikaları
-- **Rol Tabanlı Erişim**: Hizmetten hizmete erişim için IAM rolleri
-- **Çok Faktörlü Kimlik Doğrulama**: MFA ile artırılmış güvenlik
-- **Çapraz Hesap Erişimi**: AWS hesapları arasında güvenli erişim
+Uygulamalardan RustFS'e kadar olan tüm trafik, düğümler arası trafik dahil, TLS şifrelemesi kullanır. TLS sertifikaları, ağ iletişimini korumak ve RustFS sunucu alanı gibi ağ bağlantı kaynaklarının kimliğini kurmak için kullanılır.
 
-### AWS Key Management Service (KMS)
+RustFS, OpenShift sertifika yöneticisi ile entegre olur, böylece RustFS operatörünü kullanarak RustFS kiracıları için sertifikaları otomatik olarak yapılandırabilir, yapılandırabilir, yönetebilir ve güncelleyebilirsiniz. Kiracılar, güvenliği artırmak için kendi sertifikalarına sahip olarak kendi Kubernetes ad alanlarında tamamen birbirinden izole edilir.
 
-- **Şifreleme Anahtarı Yönetimi**: Merkezi şifreleme anahtarı yönetimi
-- **Donanım Güvenlik Modülleri**: HSM destekli anahtar koruması
-- **Anahtar Politikaları**: İnce ayarlı anahtar kullanım politikaları
-- **Denetim İzi**: Tam anahtar kullanım denetim kayıtları
+## İzleme ve Uyarılar
 
-### AWS CloudTrail
+RustFS, RustFS'e bağlanmak için Grafana, OpenShift-user-workload-monitoring projesinde kurulu platform izleme bileşenleri veya herhangi bir diğer OpenShift container izleme aracını kullanmayı önerir. RustFS, depolama kovası kapasitesinden erişim metriklerine kadar, hayal edilebilir tüm depolama ile ilgili Prometheus metriklerini yayınlar. Bu metrikler, herhangi bir Prometheus uyumlu araçta veya RustFS konsolunda toplanabilir ve görselleştirilebilir.
 
-- **API Denetimi**: Tüm API çağrıları için tam denetim izi
-- **Uyumluluk**: Düzenleyici uyumluluk gereksinimlerini karşıla
-- **Güvenlik Analizi**: Güvenlik olaylarını ve kalıpları analiz et
-- **Entegrasyon**: SIEM ve izleme araçlarıyla entegrasyon
-
-### AWS Config
-
-- **Yapılandırma Uyumluluğu**: Kaynak yapılandırma uyumluluğunu izle
-- **Değişiklik Takibi**: Zaman içinde yapılandırma değişikliklerini takip et
-- **Uyumluluk Kuralları**: Otomatik uyumluluk kuralı değerlendirmesi
-- **Düzeltme**: Uyumluluk ihlallerinin otomatik düzeltmesi
-
-## İzleme ve İşlemler
-
-### Amazon CloudWatch
-
-- **Performans İzleme**: Depolama performans metriklerini izle
-- **Özel Metrikler**: Belirli iş yükleri için özel metrikler oluştur
-- **Alarmlar**: Kritik eşikler için alarmlar ayarla
-- **Panolar**: Özel izleme panoları oluştur
-
-### AWS X-Ray
-
-- **Dağıtık İzleme**: Dağıtık sistemler arasında istekleri izle
-- **Performans Analizi**: Uygulama performans darboğazlarını analiz et
-- **Servis Haritası**: Servis bağımlılıklarını görselleştir
-- **Hata Analizi**: Hataları ve istisnaları belirle ve analiz et
-
-### AWS Systems Manager
-
-- **Yama Yönetimi**: Otomatik yama yönetimi
-- **Yapılandırma Yönetimi**: Merkezi yapılandırma yönetimi
-- **İşletimsel İçgörüler**: İşletimsel içgörüler ve öneriler
-- **Otomatikleştirme**: Otomatik işletimsel görevler ve iş akışları
+Harici izleme çözümleri, RustFS Prometheus endpoint'lerini düzenli olarak tarar. RustFS, RustFS'e bağlanmak için Grafana veya OpenShift-user-workload-monitoring projesinde kurulu platform izleme bileşenlerini kullanmayı önerir. Bu aynı araçlar, temel çizgiler oluşturmak ve bildirim uyarı eşikleri ayarlamak için de kullanılabilir, ardından bunlar PagerDuty, Freshservice ve hatta SNMP gibi bildirim platformlarına yönlendirilebilir.
 
-## Dağıtım Mimarileri
-
-### Tek Bölge Dağıtımı
+## Günlük Kaydı ve Denetim
 
-```
-┌─────────────────┐
-│   AWS Bölgesi    │
-│                 │
-│  ┌─────────────┐│
-│  │     AZ-A    ││
-│  │   RustFS    ││
-│  │   Düğüm 1-2 ││
-│  └─────────────┘│
-│                 │
-│  ┌─────────────┐│
-│  │     AZ-B    ││
-│  │   RustFS    ││
-│  │   Düğüm 3-4 ││
-│  └─────────────┘│
-└─────────────────┘
-```
+RustFS denetimini etkinleştirmek, nesne depolama kümesindeki her işlem için günlük oluşturur. Denetim günlüklerine ek olarak, RustFS, operasyonel sorun giderme için konsol hatalarını da kaydeder.
 
-### Çok Bölgeli Dağıtım
-
-```
-┌─────────────────┐    ┌─────────────────┐
-│   Birincil       │    │   İkincil       │
-│   Bölge          │◄──►│   Bölge         │
-│                  │    │                  │
-│ • Aktif Veri     │    │ • Replika Veri   │
-│ • Okuma/Yazma    │    │ • Salt Okunur    │
-│ • Düşük Gecikme │    │ • DR Hazır       │
-└─────────────────┘    └─────────────────┘
-```
-
-### Hibrit Bulut Mimarisi
-
-```
-┌─────────────────┐    ┌─────────────────┐
-│   Şirket İçi     │    │      AWS        │
-│     RustFS       │◄──►│     RustFS       │
-│                  │    │                  │
-│ • Birincil Veri  │    │ • Yedek Veri     │
-│ • Sıcak Depolama │    │ • Soğuk Depolama │
-│ • Düşük Gecikme │    │ • Maliyet Optimize│
-└─────────────────┘    └─────────────────┘
-```
-
-## Maliyet Optimizasyonu
-
-### AWS Maliyet Yönetimi
-
-- **Maliyet Gezgini**: AWS maliyetlerini analiz et ve optimize et
-- **Bütçeler**: Bütçeler ve maliyet uyarıları ayarla
-- **Rezerv Örnekler**: Maliyet tasarrufu için rezerv kapasite satın al
-- **Spot Örnekler**: Kritik olmayan iş yükleri için spot örnekler kullan
-
-### Depolama Maliyet Optimizasyonu
-
-- **Akıllı Katmanlandırma**: Daha düşük maliyetli depolama katmanlarına otomatik hareket
-- **Yaşam Döngüsü Politikaları**: Otomatik veri yaşam döngüsü yönetimi
-- **Sıkıştırma**: Depolama maliyetlerini düşürmek için yerleşik sıkıştırma
-- **Yinelenen Veri Ortadan Kaldırma**: Depolamayı optimize etmek için yinelenen verileri ortadan kaldır
-
-### Hesaplama Maliyet Optimizasyonu
-
-- **Doğru Boyutlandırma**: İş yükleri için örnek boyutlarını optimize et
-- **Oto Ölçeklendirme**: Talebe göre kaynakları ölçeklendir
-- **Zamanlanmış Ölçeklendirme**: Öngörülebilir kalıplara göre kaynakları ölçeklendir
-- **Kayıt Etiketleme**: Maliyet tahsisi ve takibi için kaynakları etiketle
-
-## Göç Hizmetleri
-
-### AWS Migration Hub
-
-- **Göç Takibi**: Araçlar arasında göç ilerlemesini takip et
-- **Uygulama Keşfi**: Uygulamaları keşfet ve değerlendir
-- **Göç Planlama**: Göçleri planla ve koordinasyon sağla
-- **İlerleme İzleme**: Göç ilerlemesini ve durumunu izle
-
-### AWS DataSync
-
-- **Veri Transferi**: AWS'ye yüksek hızlı veri transferi
-- **Zamanlama**: Düzenli veri senkronizasyonunu zamanla
-- **Bant Genişliği Kontrolü**: Transfer sırasında bant genişliği kullanımını kontrol et
-- **İzleme**: Transfer ilerlemesini ve performansını izle
-
-### AWS Database Migration Service
-
-- **Veritabanı Göçü**: Veritabanlarını AWS'ye göç et
-- **Sürekli Çoğaltma**: Sürekli veri çoğaltma
-- **Şema Dönüştürme**: Veritabanı şemalarını dönüştür
-- **Minimum Kesinti Süresi**: Göç sırasında kesinti süresini en aza indir
-
-## En İyi Uygulamalar
-
-### Mimari En İyi Uygulamaları
-
-1. **Çoklu AZ Dağıtımı**: Birden fazla kullanılabilirlik bölgesinde dağıtım yap
-2. **Oto Ölçeklendirme**: Yüksek kullanılabilirlik için oto ölçeklendirme uygula
-3. **Yük Dengeleme**: Trafik dağıtımı için Elastic Load Balancing kullan
-4. **Yedekleme Stratejisi**: Kapsamlı yedekleme ve kurtarma uygula
-
-### Güvenlik En İyi Uygulamaları
-
-1. **En Az Ayrıcalık Prensibi**: Minimum gerekli izinleri ver
-2. **Şifreleme**: Dinlenme halindeki ve aktarım halindeki veriler için şifreleme etkinleştir
-3. **Ağ Güvenliği**: İzolasyon için VPC ve güvenlik gruplarını kullan
-4. **İzleme**: Kapsamlı güvenlik izleme uygula
-
-### Performans En İyi Uygulamaları
-
-1. **Örnek Optimizasyonu**: Uygun örnek türlerini seç
-2. **Depolama Optimizasyonu**: Uygun depolama türlerini ve yapılandırmalarını kullan
-3. **Ağ Optimizasyonu**: Performans için ağ yapılandırmasını optimize et
-4. **Önbellekleme**: Daha iyi performans için önbellekleme stratejileri uygula
-
-### Maliyet Optimizasyonu En İyi Uygulamaları
-
-1. **Kayıt Etiketleme**: Maliyet takibi için tüm kaynakları etiketle
-2. **Düzenli İncelemeler**: Maliyetleri düzenli olarak gözden geçir ve optimize et
-3. **Rezerv Kapasite**: Öngörülebilir iş yükleri için rezerv örnekler satın al
-4. **Otomatik Politikalar**: Otomatik maliyet optimizasyonu politikaları uygula
-
-## Destek ve Hizmetler
-
-### AWS Destek Planları
-
-- **Temel Destek**: Tüm AWS hesaplarıyla birlikte gelen temel destek
-- **Geliştirici Desteği**: İş saatleri içinde e-posta desteği
-- **İş Desteği**: 7/24 telefon ve e-posta desteği
-- **Kurumsal Destek**: Özel Teknik Hesap Yöneticisi
-
-### AWS Profesyonel Hizmetleri
-
-- **Mimari İnceleme**: Mimariyi gözden geçir ve optimize et
-- **Göç Hizmetleri**: Baştan sona göç hizmetleri
-- **Eğitim**: Kapsamlı AWS eğitim programları
-- **Optimizasyon**: Sürekli optimizasyon ve en iyi uygulamalar
-
-### AWS Partner Ağı
-
-- **Danışmanlık Ortakları**: Sertifikalı AWS danışmanlık ortaklarına erişim
-- **Teknoloji Ortakları**: AWS teknoloji ortaklarıyla entegrasyon
-- **Eğitim Ortakları**: AWS eğitim ortaklarına erişim
-- **Marketplace**: Üçüncü taraf çözümler için AWS Marketplace
+RustFS, günlükleri analiz ve uyarı için elastik stack'e (veya üçüncü taraf) çıktı olarak vermeyi destekler.

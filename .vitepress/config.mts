@@ -12,6 +12,7 @@ export default defineConfig({
   rewrites: {
     'en/:rest*': ':rest*'
   },
+  ignoreDeadLinks: true,
   lastUpdated: true,
   cleanUrls: false,
   metaChunk: true,

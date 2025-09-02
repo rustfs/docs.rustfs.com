@@ -1,310 +1,82 @@
-# Tencent Cloud Entegrasyonu
+---
+title: "Tencent Cloud TKE Kubernetes Service için RustFS"
+description: "Tencent Cloud TKE'de RustFS çalıştırma kılavuzu"
+---
 
-RustFS, Tencent Cloud hizmetleriyle sorunsuz bir entegrasyon sağlayarak, modern uygulamalar için yüksek performanslı, ölçeklenebilir ve maliyet etkin depolama çözümleri sunar.
+# Tencent Cloud TKE Kubernetes Service için RustFS
 
-## Genel Bakış
+## Müşterilerin Tencent Cloud'da RustFS çalıştırmasının üç nedeni var
 
-![Tencent Cloud Entegrasyonu](./images/sec1-1.png)
+- RustFS, hibrit bulut veya çoklu bulut dağıtım senaryolarında tutarlı bir depolama katmanı olarak görev yapar
+- RustFS, Kubernetes native yüksek performanslı bir üründür ve genel bulut, özel bulut ve kenar bulut ortamlarında öngörülebilir performans sağlayabilir
+- EKS'de RustFS çalıştırmak, yazılım yığınını kontrol etmenizi sağlar ve bulut kilidinden kaçınmak için gereken esnekliğe sahiptir
 
-Tencent Cloud üzerindeki RustFS şunları sunar:
+Tencent Cloud TKE, AWS'de Kubernetes çalıştırmak için kullanılabilecek, kendi Kubernetes kontrol düzleminizi veya düğümlerinizi kurmanız, çalıştırmanız ve bakımını yapmanız gerekmeyen yönetilen bir hizmettir.
 
-- **Yerel Entegrasyon**: Tencent Cloud ekosistemiyle derin entegrasyon
-- **Oyun Optimizasyonu**: Oyun ve çoklu ortam iş yükleri için optimize edilmiştir
-- **AI/ML Desteği**: Yapay zeka ve makine öğrenimi uygulamaları için geliştirilmiş destek
-- **Küresel Erişim**: Kenar hızlandırmasıyla dünya çapında dağıtım
+RustFS, tüm ana Kubernetes platformlarında (Alibaba Cloud ACK, Tanzu, Azure, GCP, Tencent Cloud TKE) taşınabilir yüksek performanslı nesne depolama sistemi sağlar. Alibaba Cloud'da, RustFS, Tencent Cloud TKE hizmeti ile native olarak entegre olur, böylece kendi büyük ölçekli çok kiracılı nesne depolama hizmetini çalıştırmak daha kolay hale gelir. RustFS, AWS S3 depolama hizmetinin tam bir alternatifidir.
 
-## Temel Entegrasyonlar
+![RustFS Mimari Diyagramı](images/sec1-1.png)
 
-### Hesaplama Hizmetleri
+AWS S3'ten farklı olarak, RustFS, uygulamaların pahalı yazılım yeniden yazımı veya özel entegrasyon olmadan çoklu bulut ve hibrit bulut altyapısı genelinde ölçeklenmesini sağlar. RustFS containerized ve Kubernetes native olduğu için, büyük ölçekli depolama altyapısını çalıştırmak için özel beceriler gerektirmeden bu platformlarda devreye alınabilir.
 
-#### Bulut Sanal Makinesi (CVM)
+## RustFS Operator, Tencent Cloud TKE Özellikleri ile Native Olarak Entegre Olur
 
-- **Optimize Edilmiş Örnekler**: Depolama iş yükleri için önerilen örnek türleri
-- **Otomatik Ölçeklendirme**: Talebe dayalı otomatik ölçeklendirme
-- **Spot Örnekler**: Toplu iş yükleri için maliyet etkin spot örnekler
-- **GPU Örnekleri**: AI/ML iş yükleri için GPU hızlandırılmış örnekler
+### Özellik Genel Bakışı
 
-#### Tencent Kubernetes Motoru (TKE)
+- **Depolama sınıfları ve katmanlama**
+- **Harici yük dengeleme**
+- **Şifreleme anahtarı yönetimi**
+- **Kimlik yönetimi**
+- **Sertifika yönetimi**
+- **İzleme ve uyarılar**
+- **Günlük kaydı ve denetim**
 
-- **Kubernetes Dağıtımı**: Yönetilen Kubernetes üzerinde RustFS dağıtımı
-- **Sunucusuz Konteynerlar**: Sunucusuz konteyner dağıtımı
-- **Servis Ağı**: Tencent Servis Ağı ile entegrasyon
-- **CI/CD**: CODING DevOps platformu ile entegrasyon
+## Depolama Sınıfları ve Katmanlama
 
-#### Sunucusuz Bulut Fonksiyonu (SCF)
+Tencent Cloud TKE'de RustFS'i büyük ölçekte dağıtmanın anahtar gereksinimi, depolama sınıfları (NVMe, HDD, genel bulut) genelinde katmanlama yeteneğidir. Bu, işletmelerin maliyet ve performansı aynı anda yönetmesini sağlar.
 
-- **Olay Odaklı İşleme**: Sunucusuz fonksiyonlarla depolama olaylarını işleme
-- **Otomatik Ölçeklendirme**: Olaylara dayalı otomatik ölçeklendirme
-- **Maliyet Optimizasyonu**: Sadece çalışma süresi için ödeme
-- **Entegrasyon**: Depolama olaylarıyla sorunsuz entegrasyon
+RustFS, eski nesnelerin hızlı NVMe katmanından daha maliyet etkin HDD katmanına ve hatta maliyet optimize edilmiş soğuk genel bulut depolama katmanına otomatik geçişini destekler.
 
-### Depolama Hizmetleri
+Katmanlama sırasında, RustFS katmanlar genelinde birleşik bir ad alanı sağlar. Katmanlar arası hareket uygulamalar için şeffaftır ve müşteri tarafından belirlenen politikalar tarafından tetiklenir.
 
-#### Bulut Nesne Depolama (COS)
+RustFS, nesneleri kaynakta şifreleyerek Alibaba Cloud ACK hibrit bulutunda güvenli depolama sağlar, müşterilerin verileri üzerinde her zaman tam kontrol sahibi olmasını garanti eder. Alibaba Cloud ACK genel bulutta dağıtıldığında, katmanlama özelliği, Alibaba Cloud ACK'nin kalıcı blok depolama ve daha ucuz nesne depolama katmanları genelinde verileri etkili bir şekilde yönetmesine yardımcı olur.
 
-- **S3 Uyumluluğu**: Tam Amazon S3 API uyumluluğu
-- **Akıllı Katmanlandırma**: Maliyet optimizasyonu için otomatik veri katmanlandırma
-- **Küresel Hızlandırma**: Dünya çapında hızlandırılmış veri transferi
-- **Yaşam Döngüsü Yönetimi**: Otomatik veri yaşam döngüsü politikaları
+**Daha fazla bilgi edin:**
 
-#### Bulut Blok Depolama (CBS)
+## Harici Yük Dengeleme
 
-- **Yüksek Performanslı Depolama**: SSD ve Geliştirilmiş SSD hacimleri
-- **Anlık Görüntü Yönetimi**: Otomatik yedekleme ve anlık görüntü yönetimi
-- **Şifreleme**: KMS ile yerleşik şifreleme
-- **Çoklu Bağlantı**: Çoklu örnekler arasında paylaşılan depolama
+RustFS'in tüm iletişimi HTTP, RESTful API tabanlıdır ve herhangi bir standart Kubernetes uyumlu giriş kontrolcüsünü destekleyecektir. Bu, donanım ve yazılım tanımlı çözümleri içerir. En popüler seçenek NGINX'tir. OperatorHub veya OpenShift Marketplace kullanarak kurulum yapın, ardından RustFS kiracısını açmak için açıklamalar kullanın.
 
-#### Bulut Dosya Depolama (CFS)
+## Şifreleme Anahtarı Yönetimi
 
-- **NFS Protokolü**: POSIX uyumlu ağ dosya sistemi
-- **Performans Modları**: Standart ve Performans dosya sistemleri
-- **Kapasite Ölçeklendirme**: Otomatik kapasite ölçeklendirme
-- **Erişim Kontrolü**: İnce taneli erişim izinleri
+Native OpenShift anahtar yönetimi özelliği yoktur. Bu nedenle, RustFS, anahtarları nesne depolama sistemi dışında saklamak için HashiCorp Vault kullanmayı önerir. Bu, bulut native uygulamalar için en iyi uygulamadır.
 
-### Ağ Hizmetleri
+Tüm üretim ortamları için, varsayılan olarak tüm depolama kovalarında şifrelemeyi etkinleştirmenizi öneririz. RustFS, veri bütünlüğünü ve gizliliğini korumak için AES-256-GCM veya ChaCha20-Poly1305 şifreleme kullanır, performans üzerindeki etki ihmal edilebilir düzeydedir.
 
-#### Sanal Özel Bulut (VPC)
+RustFS, üç sunucu tarafı şifreleme (SSE-KMS, SSE-S3 ve SSE-C) modunun tümünü destekler. SSE-S3 ve SSE-KMS, sunucu tarafı KMS entegrasyonu ile, SSE-C ise istemci tarafından sağlanan anahtarları kullanır.
 
-- **Ağ İzolasyonu**: Güvenli izole ağ ortamı
-- **Çok Bölgeli Bağlantı**: Bölgeler arası VPC bağlantılar
-- **Güvenlik Grupları**: İnce taneli ağ erişim kontrolü
-- **Akış Günlükleri**: Ağ trafiği izleme ve analiz
+RustFS, yüksek performanslı nesne başına şifreleme için bu KMS'i kendi dahili anahtar şifreleme sunucusunu (KES hizmeti) başlatmak için kullanacaktır. Her kiracı, kendi KES sunucusunu izole edilmiş bir ad alanında çalıştırır.
 
-#### Bulut Yük Dengesleyici (CLB)
+## Kimlik Yönetimi
 
-- **Katman 4/7 Yük Dengeleme**: TCP/UDP ve HTTP/HTTPS desteği
-- **Sağlık Kontrolleri**: Otomatik sağlık izleme
-- **SSL Offloading**: SSL/TLS sonlandırma
-- **Küresel Yük Dengeleme**: Küresel trafik dağıtımı
+OpenShift'te RustFS çalıştırırken, müşteriler üçüncü taraf OpenID Connect/LDAP uyumlu kimlik sağlayıcıları (Keycloak, Okta/Auth0, Google, Facebook, ActiveDirectory ve OpenLDAP gibi) kullanarak tek oturum açma (SSO) yönetebilir. RustFS, OpenID Connect uyumlu Keycloak IDP'yi önerir.
 
-#### İçerik Dağıtım Ağı (CDN)
+Harici IDP, yöneticilerin kullanıcı/uygulama kimliklerini merkezi olarak yönetmesine izin verir. RustFS, IDP üzerine inşa edilir ve AWS IAM tarzı kullanıcı, grup, rol, politika ve token hizmet API'leri sağlar. Altyapıdan bağımsız birleşik kimlik ve erişim yönetimi (IAM) katmanı yeteneği, önemli mimari esneklik sağlar.
 
-- **Küresel Kenar Ağı**: Dünya çapında 2800'den fazla kenar düğümü
-- **Dinamik İçerik Hızlandırma**: Dinamik içerik hızlandırma
-- **Video Hızlandırma**: Video akışı için optimize edilmiştir
-- **Gerçek Zamanlı İzleme**: Performans analitiği ve izleme
+## Sertifika Yönetimi
 
-## Oyun ve Çoklu Ortam Optimizasyonu
+Uygulamalardan RustFS'e kadar olan tüm trafik, düğümler arası trafik dahil, TLS şifrelemesi kullanır. TLS sertifikaları, ağ iletişimini korumak ve RustFS sunucu alanı gibi ağ bağlantı kaynaklarının kimliğini kurmak için kullanılır.
 
-### Oyun Sunucu Motoru (GSE)
+RustFS, OpenShift sertifika yöneticisi ile entegre olur, böylece RustFS operatörünü kullanarak RustFS kiracıları için sertifikaları otomatik olarak yapılandırabilir, yapılandırabilir, yönetebilir ve güncelleyebilirsiniz. Kiracılar, güvenliği artırmak için kendi sertifikalarına sahip olarak kendi Kubernetes ad alanlarında tamamen birbirinden izole edilir.
 
-- **Oyun Sunucusu Barındırma**: Yönetilen oyun sunucusu barındırma
-- **Otomatik Ölçeklendirme**: Oyuncu talebine dayalı otomatik ölçeklendirme
-- **Küresel Dağıtım**: Dünya çapında oyun sunucuları dağıtma
-- **Düşük Gecikme Süresi**: Düşük gecikme süresi için optimize edilmiştir
+## İzleme ve Uyarılar
 
-### Video İsteğe Bağlı (VOD)
+RustFS, RustFS'e bağlanmak için Grafana, OpenShift-user-workload-monitoring projesinde kurulu platform izleme bileşenleri veya herhangi bir diğer OpenShift container izleme aracını kullanmayı önerir. RustFS, depolama kovası kapasitesinden erişim metriklerine kadar, hayal edilebilir tüm depolama ile ilgili Prometheus metriklerini yayınlar. Bu metrikler, herhangi bir Prometheus uyumlu araçta veya RustFS konsolunda toplanabilir ve görselleştirilebilir.
 
-- **Video İşleme**: Otomatik video dönüştürme ve işleme
-- **İçerik Dağıtımı**: Küresel video içerik dağıtımı
-- **DRM Koruması**: Dijital haklar yönetimi
-- **Analitik**: Video izleme analitiği ve içgörüleri
+Harici izleme çözümleri, RustFS Prometheus endpoint'lerini düzenli olarak tarar. RustFS, RustFS'e bağlanmak için Grafana veya OpenShift-user-workload-monitoring projesinde kurulu platform izleme bileşenlerini kullanmayı önerir. Bu aynı araçlar, temel çizgiler oluşturmak ve bildirim uyarı eşikleri ayarlamak için de kullanılabilir, ardından bunlar PagerDuty, Freshservice ve hatta SNMP gibi bildirim platformlarına yönlendirilebilir.
 
-### Canlı Video Yayıncılığı (LVB)
+## Günlük Kaydı ve Denetim
 
-- **Canlı Akış**: Gerçek zamanlı video akışı
-- **Akış İşleme**: Gerçek zamanlı akış işleme
-- **Kayıt**: Otomatik akış kaydı ve depolama
-- **CDN Hızlandırma**: Küresel canlı akış hızlandırma
+RustFS denetimini etkinleştirmek, nesne depolama kümesindeki her işlem için günlük oluşturur. Denetim günlüklerine ek olarak, RustFS, operasyonel sorun giderme için konsol hatalarını da kaydeder.
 
-## AI ve Makine Öğrenimi Entegrasyonu
-
-### TencentDB for AI
-
-- **Vektör Veritabanı**: Yüksek boyutlu vektörleri depolama ve sorgulama
-- **ML Model Depolama**: Makine öğrenimi modellerini depolama ve sürümleme
-- **Özellik Mağazası**: Merkezi özellik depolama ve sunma
-- **Veri Boru Hattı**: Otomatik veri işleme boru hatları
-
-### Tencent Makine Öğrenimi Platformu (TMLP)
-
-- **Model Eğitimi**: Dağıtık model eğitimi
-- **Model Servis**: Ölçeklenebilir model çıkarsama
-- **Veri İşleme**: Büyük ölçekli veri işleme
-- **Deney Yönetimi**: ML deney izleme
-
-### AI Hizmetleri Entegrasyonu
-
-- **Bilgisayar Görüşü**: Görüntü ve video analiz entegrasyonu
-- **Doğal Dil İşleme**: Metin işleme ve analiz
-- **Konuşma Tanıma**: Ses işleme ve transkripsiyon
-- **Öneri Motoru**: Kişiselleştirilmiş öneri sistemleri
-
-## Güvenlik Entegrasyonu
-
-### Bulut Erişim Yönetimi (CAM)
-
-- **Kimlik Yönetimi**: Merkezi kimlik ve erişim yönetimi
-- **Politika Tabanlı Erişim**: İnce taneli erişim kontrol politikaları
-- **Çok Faktörlü Kimlik Doğrulama**: MFA ile geliştirilmiş güvenlik
-- **Çapraz Hesap Erişimi**: Güvenli çapraz hesap erişimi
-
-### Anahtar Yönetim Hizmeti (KMS)
-
-- **Şifreleme Anahtarı Yönetimi**: Merkezi şifreleme anahtarı yönetimi
-- **Donanım Güvenlik Modülleri**: HSM destekli anahtar koruma
-- **Anahtar Döndürme**: Otomatik anahtar döndürme politikaları
-- **Uyumluluk**: Düzenleyici uyumluluk gereksinimlerini karşılama
-
-### Bulut Denetimi (CloudAudit)
-
-- **API Denetimi**: Tüm API çağrılarının tam denetim izi
-- **Uyumluluk Raporlaması**: Otomatik uyumluluk raporlaması
-- **Güvenlik İzleme**: Gerçek zamanlı güvenlik olay izleme
-- **Entegrasyon**: SIEM sistemleriyle entegrasyon
-
-### Web Uygulaması Güvenlik Duvarı (WAF)
-
-- **Uygulama Koruması**: Web saldırılarına karşı koruma
-- **Bot Koruması**: Otomatik bot tespiti ve azaltma
-- **DDoS Koruması**: Dağıtılmış hizmet reddi koruması
-- **Özel Kurallar**: Özel güvenlik kuralları ve politikaları
-
-## İzleme ve İşlemler
-
-### Bulut İzleme
-
-- **Performans İzleme**: Sistem ve uygulama metriklerini izleme
-- **Özel Metrikler**: Özel izleme metrikleri oluşturma
-- **Uyarılar**: Yapılandırılabilir uyarılar ve bildirimler
-- **Gösterge Panelleri**: Özel izleme gösterge panelleri
-
-### Bulut Günlük Hizmeti (CLS)
-
-- **Merkezi Günlükleme**: Tüm sistem günlüklerini toplama ve analiz etme
-- **Gerçek Zamanlı İşleme**: Gerçek zamanlı günlük işleme ve analiz
-- **Günlük Arama**: Güçlü günlük arama ve sorgulama yetenekleri
-- **Entegrasyon**: İzleme ve uyarı sistemleriyle entegrasyon
-
-### Uygulama Performans İzleme (APM)
-
-- **Dağıtık İzleme**: Mikroservisler arasında istekleri izleme
-- **Performans Analizi**: Uygulama performans darboğaz analizi
-- **Hata Takibi**: Hata tespiti ve analiz
-- **Kod Profil Oluşturma**: Kod düzeyi performans profil oluşturma
-
-## Maliyet Optimizasyonu
-
-### Fiyatlandırma Modelleri
-
-- **Kullandıkça Öde**: Sadece tüketilen kaynaklar için ödeme
-- **Rezerv Edilmiş Örnekler**: Öngörülebilir iş yükleri için rezerv kapasite
-- **Spot Örnekler**: Maliyet etkin spot örnekler
-- **Kaynak Paketleri**: Daha iyi fiyatlandırma için paketlenmiş kaynaklar
-
-### Oyun Maliyet Optimizasyonu
-
-- **Dinamik Ölçeklendirme**: Oyuncu sayısına dayalı oyun sunucularını ölçeklendirme
-- **Bölgesel Optimizasyon**: Maliyet etkin bölgelerde dağıtım
-- **Zirve Dışı Ölçeklendirme**: Zirve dışı saatlerde kaynakları azaltma
-- **Spot Örnekler**: Geliştirme ve test için spot örnekler kullanma
-
-### AI/ML Maliyet Optimizasyonu
-
-- **Öncelikli Eğitim**: Eğitim için öncelikli örnekler kullanma
-- **Model Sıkıştırma**: Depolama maliyetlerini azaltmak için modelleri sıkıştırma
-- **Toplu Çıkarsama**: Maliyet verimliliği için toplu çıkarsama
-- **Otomatik Ölçeklendirme**: Çıkarsama talebine dayalı otomatik ölçeklendirme
-
-## Geçiş Hizmetleri
-
-### Bulut Geçiş Hizmeti
-
-- **Değerlendirme**: Kapsamlı altyapı değerlendirmesi
-- **Planlama**: Detaylı geçiş planlaması ve stratejisi
-- **Yürütme**: Otomatik geçiş yürütme
-- **Doğrulama**: Geçiş sonrası doğrulama ve test
-
-### Veritabanı Geçiş Hizmeti (DMS)
-
-- **Veritabanı Geçişi**: Minimum kesinti süresiyle veritabanları geçişi
-- **Gerçek Zamanlı Eşzamanlama**: Gerçek zamanlı veri eşzamanlaması
-- **Şema Dönüştürme**: Otomatik şema dönüştürme
-- **İzleme**: Geçiş ilerleme izleme
-
-### Sunucu Geçiş Hizmeti
-
-- **Fizikselden Buluta**: Fiziksel sunucuları buluta geçirme
-- **VM Geçişi**: Sanal makineleri geçirme
-- **Konteynerleştirme**: Eski uygulamaları konteynerleştirme
-- **Test Etme**: Kapsamlı geçiş testi
-
-## En İyi Uygulamalar
-
-### Oyun En İyi Uygulamaları
-
-1. **Küresel Dağıtım**: Oyun sunucularını çoklu bölgelerde dağıtma
-2. **Otomatik Ölçeklendirme**: Oyuncu talebi için otomatik ölçeklendirme uygulama
-3. **Düşük Gecikme Süresi**: Düşük gecikme süresi için oyun deneyimini optimize etme
-4. **Veri Analitiği**: Oyuncu davranış analitiği uygulama
-
-### AI/ML En İyi Uygulamaları
-
-1. **Veri Boru Hattı**: Sağlam veri işleme boru hatları oluşturma
-2. **Model Sürümleme**: Model sürümleme ve geri alma uygulama
-3. **A/B Testi**: Model dağıtımı için A/B testi uygulama
-4. **İzleme**: Model performansını ve kaymasını izleme
-
-### Güvenlik En İyi Uygulamaları
-
-1. **Ağ Güvenliği**: VPC ve güvenlik gruplarını kullanma
-2. **Veri Şifreleme**: Dinlenme halinde ve aktarım halinde veri şifreleme
-3. **Erişim Kontrolü**: İnce taneli erişim kontrolü uygulama
-4. **Denetim Günlükleme**: Kapsamlı denetim günlükleme etkinleştirme
-
-## Destek ve Hizmetler
-
-### Teknik Destek
-
-- **7/24 Destek**: Kesintisiz teknik destek
-- **Oyun Uzmanlığı**: Oyun endüstrisi için özel destek
-- **AI/ML Uzmanlığı**: AI/ML için özel teknik destek
-- **Eğitim**: Kapsamlı eğitim programları
-
-### Profesyonel Hizmetler
-
-- **Mimari Tasarım**: Optimal bulut mimarisi tasarlama
-- **Oyun Çözümleri**: Oyun çözümleri için özel tasarım
-- **AI/ML Danışmanlığı**: AI/ML mimari danışmanlığı
-- **Geçiş Hizmetleri**: Baştan sona geçiş hizmetleri
-
-### Partner Ekosistemi
-
-- **Oyun Partnerleri**: Oyun endüstrisi partnerlerine erişim
-- **AI/ML Partnerleri**: AI/ML teknoloji partnerlerine erişim
-- **Sistem Entegratörleri**: Sertifikalı sistem entegrasyon partnerleri
-- **Marketplace**: Tencent Cloud Marketplace çözümleri
-
-## Başlarken
-
-### Ön Koşullar
-
-1. **Tencent Cloud Hesabı**: Uygun izinlerle hesap kurma
-2. **VPC Yapılandırması**: Sanal Özel Bulut yapılandırma
-3. **Güvenlik Kurulumu**: Güvenlik gruplarını ve CAM'ı yapılandırma
-4. **Ağ Planlama**: Ağ mimarisini planlama
-
-### Oyun İçin Hızlı Başlangıç
-
-1. **CVM Örneklerini Başlat**: Oyun için optimize edilmiş örnekler başlatma
-2. **GSE Yapılandırma**: Oyun Sunucu Motorunu kurma
-3. **RustFS Kur**: Depolamayı kur ve yapılandır
-4. **CDN Kurulumu**: İçerik dağıtımı için CDN yapılandırma
-5. **Test Etme**: Oyun performansını test etme
-6. **Üretim**: Üretim ortamına dağıtma
-
-### AI/ML İçin Hızlı Başlangıç
-
-1. **GPU Örneklerini Başlat**: GPU optimize edilmiş örnekler başlatma
-2. **TMLP Yapılandırma**: ML platformunu kurma
-3. **RustFS Kur**: Depolamayı kur ve yapılandır
-4. **Veri Boru Hattı**: Veri işleme boru hattını kurma
-5. **Model Eğitimi**: Model eğitimine başlama
-6. **Model Servis**: Çıkarsama için modelleri dağıtma
-
-### Sonraki Adımlar
-
-- **İzleme**: Kapsamlı izleme kurma
-- **Optimizasyon**: Performansı ve maliyetleri optimize etme
-- **Ölçeklendirme**: Gelecekteki büyüme için planlama
-- **Güvenlik**: Güvenlik en iyi uygulamalarını uygulama
+RustFS, günlükleri analiz ve uyarı için elastik stack'e (veya üçüncü taraf) çıktı olarak vermeyi destekler.
