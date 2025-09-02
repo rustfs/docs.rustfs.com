@@ -41,8 +41,8 @@ In verteilten RustFS-Clustern wird ein Erasure Coding-Mechanismus verwendet, um 
 
 * **Konfigurationsvalidierung**
 
- * Überprüfen Sie, ob die Cluster-Knotenliste (endpoints) in `config.yaml` den Hostname und Port des neuen Knotens enthält.
- * Stellen Sie sicher, dass alle Knoten dieselben Zugriffsschlüssel und Berechtigungskonfigurationen haben, um zu vermeiden, dass der neue Knoten aufgrund von Authentifizierungsfehlern nicht beitreten kann.
+* Überprüfen Sie, ob die Cluster-Knotenliste (endpoints) in `config.yaml` den Hostname und Port des neuen Knotens enthält.
+* Stellen Sie sicher, dass alle Knoten dieselben Zugriffsschlüssel und Berechtigungskonfigurationen haben, um zu vermeiden, dass der neue Knoten aufgrund von Authentifizierungsfehlern nicht beitreten kann.
 
 ## 4) Erneut zum Cluster beitreten und Datenheilung auslösen
 
@@ -50,19 +50,21 @@ In verteilten RustFS-Clustern wird ein Erasure Coding-Mechanismus verwendet, um 
   Starten Sie den RustFS-Service auf dem neuen Knoten. Der Service sollte automatisch erkannt werden und zum Cluster beitreten, wenn die Konfiguration korrekt ist.
 
 * **Cluster-Status überprüfen**
+
   ```bash
   # Cluster-Status überprüfen
   rustfs admin info
-  
+
   # Knoten-Status überprüfen
   rustfs admin node status
   ```
 
 * **Datenheilung auslösen**
+
   ```bash
   # Heilung für alle Buckets starten
   rustfs admin heal start --all
-  
+
   # Heilungsstatus überwachen
   rustfs admin heal status
   ```
@@ -70,25 +72,28 @@ In verteilten RustFS-Clustern wird ein Erasure Coding-Mechanismus verwendet, um 
 ## 5) Überwachung und nachfolgende Überprüfungen
 
 * **Heilungsfortschritt überwachen**
+
   ```bash
   # Heilungsfortschritt in Echtzeit überwachen
   watch -n 5 'rustfs admin heal status'
   ```
 
 * **Cluster-Integrität überprüfen**
+
   ```bash
   # Detaillierte Cluster-Informationen
   rustfs admin info
-  
+
   # Speicher-Status überprüfen
   rustfs admin storage info
   ```
 
 * **Systemprotokolle überprüfen**
+
   ```bash
   # RustFS-Protokolle überwachen
   journalctl -u rustfs -f
-  
+
   # System-Protokolle überprüfen
   dmesg | tail -50
   ```
@@ -98,6 +103,7 @@ In verteilten RustFS-Clustern wird ein Erasure Coding-Mechanismus verwendet, um 
 ### Problem: Neuer Knoten kann nicht zum Cluster beitreten
 
 **Lösung**: Überprüfen Sie die Konfiguration:
+
 ```bash
 # Konfigurationsdatei überprüfen
 cat /etc/rustfs/config.yaml
@@ -109,6 +115,7 @@ ping rustfs-node-1.example.net
 ### Problem: Heilung startet nicht
 
 **Lösung**: Manuell Heilung auslösen:
+
 ```bash
 rustfs admin heal start --bucket <bucket-name>
 ```
@@ -116,6 +123,7 @@ rustfs admin heal start --bucket <bucket-name>
 ### Problem: Unerwartete Leistungsprobleme
 
 **Lösung**: Überprüfen Sie die Systemressourcen:
+
 ```bash
 # CPU und Speicher überprüfen
 top
@@ -136,9 +144,9 @@ iostat -x 1
 
 RustFS bietet robuste Mechanismen zur Behandlung von Knotenfehlern:
 
-- ✅ **Automatische Heilung**: Daten werden automatisch nach Knotenersatz geheilt
-- ✅ **Kontinuierlicher Betrieb**: Cluster bleibt auch bei Knotenfehlern betriebsbereit
-- ✅ **Einfache Wartung**: Standardisierte Verfahren für Knotenersatz
-- ✅ **Überwachung**: Umfassende Tools zur Überwachung des Heilungsprozesses
+* ✅ **Automatische Heilung**: Daten werden automatisch nach Knotenersatz geheilt
+* ✅ **Kontinuierlicher Betrieb**: Cluster bleibt auch bei Knotenfehlern betriebsbereit
+* ✅ **Einfache Wartung**: Standardisierte Verfahren für Knotenersatz
+* ✅ **Überwachung**: Umfassende Tools zur Überwachung des Heilungsprozesses
 
 Durch Befolgen dieser Schritte können Sie Knotenfehler effektiv beheben und die Cluster-Integrität in Ihrem RustFS-System aufrechterhalten.
