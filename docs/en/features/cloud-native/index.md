@@ -1,7 +1,6 @@
 ---
-title: "待翻译"
-description: "此页面待翻译"
-source: "features/cloud-native/index.md"
+title: "Hybrid/Multi-Cloud Object Storage"
+description: "Hybrid/multi-cloud architecture enables consistent performance, security, and economics across different environments."
 ---
 
 # Hybrid/Multi-Cloud Object Storage

@@ -1,7 +1,6 @@
 ---
-title: "待翻译"
-description: "此页面待翻译"
-source: "features/quantitative-trading/index.md"
+title: "Quantitative Trading File Storage Solutions"
+description: "Intelligent storage architecture designed for high-frequency trading and quantitative strategy backtesting, supporting millions of IOPS per second for order flow processing."
 ---
 
 # Quantitative Trading File Storage Solution
