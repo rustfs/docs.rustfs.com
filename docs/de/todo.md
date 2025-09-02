@@ -1,12 +1,12 @@
 # 德语待翻译任务列表
 
-> 最后更新: 2025/9/3 00:13:21
-> 总计: 16 个文件待翻译
+> 最后更新: 2025/9/3 00:18:10
+> 总计: 14 个文件待翻译
 
 ## 📋 任务总览
 
-- **developer**: 4 个文件
-- **features**: 7 个文件
+- **developer**: 3 个文件
+- **features**: 6 个文件
 - **management**: 1 个文件
 - **troubleshooting**: 3 个文件
 - **upgrade-scale**: 1 个文件
@@ -16,13 +16,11 @@
 ### developer
 
 - [ ] [developer/sdk/other.md](./developer/sdk/other.md) (82 行)
-- [ ] [developer/sdk/python.md](./developer/sdk/python.md) (240 行)
 - [ ] [developer/sdk/rust.md](./developer/sdk/rust.md) (193 行)
 - [ ] [developer/sdk/typescript.md](./developer/sdk/typescript.md) (131 行)
 
 ### features
 
-- [ ] [features/hdfs/index.md](./features/hdfs/index.md) (154 行)
 - [ ] [features/huaweicloud/index.md](./features/huaweicloud/index.md) (77 行)
 - [ ] [features/openshift/index.md](./features/openshift/index.md) (77 行)
 - [ ] [features/qcloud/index.md](./features/qcloud/index.md) (77 行)

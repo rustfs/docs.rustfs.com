@@ -81,51 +81,62 @@ Fügen Sie den folgenden Eintrag zu Ihrer `claude_desktop_config.json` hinzu:
 ### Verfügbare Tools
 
 #### 1. `list_buckets`
+
 Listet alle verfügbaren S3-Speicher-Buckets auf.
 
 **Parameter**: Keine
 
 **Beispiel**:
+
 ```
 Liste alle verfügbaren Speicher-Buckets auf
 ```
 
 #### 2. `list_objects`
+
 Listet Objekte in einem Speicher-Bucket auf.
 
 **Parameter**:
+
 - `bucket_name` (string): Name des Speicher-Buckets
 - `prefix` (string, optional): Präfix zum Filtern von Objekten
 
 **Beispiel**:
+
 ```
 Liste alle Objekte im Speicher-Bucket "mein-bucket" auf
 ```
 
 #### 3. `upload_file`
+
 Lädt eine lokale Datei in einen S3-Speicher-Bucket hoch.
 
 **Parameter**:
+
 - `bucket_name` (string): Name des Ziel-Speicher-Buckets
 - `object_key` (string): Schlüssel für das Objekt im Speicher-Bucket
 - `file_path` (string): Pfad zur lokalen Datei
 - `content_type` (string, optional): MIME-Typ der Datei
 
 **Beispiel**:
+
 ```
 Lade die Datei "/pfad/zur/datei.txt" als "dokumente/datei.txt" in den Speicher-Bucket "mein-bucket" hoch
 ```
 
 #### 4. `get_object`
+
 Ruft ein Objekt aus S3-Speicher ab.
 
 **Parameter**:
+
 - `bucket_name` (string): Name des Speicher-Buckets
 - `object_key` (string): Schlüssel des Objekts
 - `mode` (string): "read" für Inhalt anzeigen oder "download" für Datei herunterladen
 - `output_path` (string, optional): Pfad für Download-Modus
 
 **Beispiel**:
+
 ```
 Lade das Objekt "dokumente/datei.txt" aus dem Speicher-Bucket "mein-bucket" herunter
 ```
@@ -133,11 +144,13 @@ Lade das Objekt "dokumente/datei.txt" aus dem Speicher-Bucket "mein-bucket" heru
 ## 🔒 Sicherheit
 
 ### Authentifizierung
+
 - Unterstützt AWS IAM-Rollen, Umgebungsvariablen und AWS CLI-Konfiguration
 - Sichere Übertragung von Anmeldedaten über Umgebungsvariablen
 - Keine Speicherung von Anmeldedaten in Konfigurationsdateien
 
 ### Berechtigungen
+
 - Minimal erforderliche Berechtigungen für S3-Operationen
 - Unterstützt Bucket-spezifische Richtlinien
 - Audit-freundliche Operationen
@@ -147,21 +160,27 @@ Lade das Objekt "dokumente/datei.txt" aus dem Speicher-Bucket "mein-bucket" heru
 ### Häufige Probleme
 
 #### 1. Authentifizierungsfehler
+
 ```
 Error: AWS credentials not found
 ```
+
 **Lösung**: Stellen Sie sicher, dass AWS-Anmeldedaten korrekt konfiguriert sind.
 
 #### 2. Endpoint-Fehler
+
 ```
 Error: Unable to connect to S3 endpoint
 ```
+
 **Lösung**: Überprüfen Sie die `AWS_ENDPOINT_URL` und Netzwerkkonnektivität.
 
 #### 3. Berechtigungsfehler
+
 ```
 Error: Access denied
 ```
+
 **Lösung**: Überprüfen Sie IAM-Berechtigungen für S3-Operationen.
 
 ### Debug-Modus
@@ -178,6 +197,7 @@ export RUST_LOG=debug
 ### S3-Operationen
 
 Alle Operationen verwenden die AWS SDK für Rust und sind vollständig kompatibel mit:
+
 - Amazon S3
 - MinIO
 - RustFS

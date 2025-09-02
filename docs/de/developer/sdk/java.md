@@ -62,7 +62,7 @@ public class RustfsS3Example {
     private static final String SECRET_KEY = "your-secret-key";
     private static final String ENDPOINT = "http://your-rustfs-endpoint:9000";
     private static final String REGION = "us-east-1";
-    
+
     public static void main(String[] args) {
         // S3-Client konfigurieren
         S3Client s3Client = S3Client.builder()
@@ -73,7 +73,7 @@ public class RustfsS3Example {
             ))
             .forcePathStyle(true) // Wichtig für S3-kompatible Dienste
             .build();
-            
+
         // Grundlegende Operationen durchführen
         listBuckets(s3Client);
         createBucket(s3Client);
@@ -81,7 +81,7 @@ public class RustfsS3Example {
         downloadObject(s3Client);
         deleteObject(s3Client);
         deleteBucket(s3Client);
-        
+
         s3Client.close();
     }
 }
@@ -108,12 +108,12 @@ private static void listBuckets(S3Client s3Client) {
 ```java
 private static void createBucket(S3Client s3Client) {
     String bucketName = "mein-test-bucket";
-    
+
     try {
         CreateBucketRequest request = CreateBucketRequest.builder()
             .bucket(bucketName)
             .build();
-            
+
         CreateBucketResponse response = s3Client.createBucket(request);
         System.out.println("Speicher-Bucket '" + bucketName + "' erfolgreich erstellt.");
     } catch (BucketAlreadyExistsException e) {
@@ -131,14 +131,14 @@ private static void uploadObject(S3Client s3Client) {
     String bucketName = "mein-test-bucket";
     String objectKey = "test-dokument.txt";
     String content = "Hallo, RustFS! Dies ist ein Test-Dokument.";
-    
+
     try {
         PutObjectRequest request = PutObjectRequest.builder()
             .bucket(bucketName)
             .key(objectKey)
             .contentType("text/plain")
             .build();
-            
+
         s3Client.putObject(request, RequestBody.fromString(content));
         System.out.println("Objekt '" + objectKey + "' erfolgreich hochgeladen.");
     } catch (S3Exception e) {
@@ -153,13 +153,13 @@ private static void uploadObject(S3Client s3Client) {
 private static void downloadObject(S3Client s3Client) {
     String bucketName = "mein-test-bucket";
     String objectKey = "test-dokument.txt";
-    
+
     try {
         GetObjectRequest request = GetObjectRequest.builder()
             .bucket(bucketName)
             .key(objectKey)
             .build();
-            
+
         GetObjectResponse response = s3Client.getObject(request);
         String content = response.readUtf8String();
         System.out.println("Objekt-Inhalt: " + content);
@@ -175,13 +175,13 @@ private static void downloadObject(S3Client s3Client) {
 private static void deleteObject(S3Client s3Client) {
     String bucketName = "mein-test-bucket";
     String objectKey = "test-dokument.txt";
-    
+
     try {
         DeleteObjectRequest request = DeleteObjectRequest.builder()
             .bucket(bucketName)
             .key(objectKey)
             .build();
-            
+
         s3Client.deleteObject(request);
         System.out.println("Objekt '" + objectKey + "' erfolgreich gelöscht.");
     } catch (S3Exception e) {
@@ -195,12 +195,12 @@ private static void deleteObject(S3Client s3Client) {
 ```java
 private static void deleteBucket(S3Client s3Client) {
     String bucketName = "mein-test-bucket";
-    
+
     try {
         DeleteBucketRequest request = DeleteBucketRequest.builder()
             .bucket(bucketName)
             .build();
-            
+
         s3Client.deleteBucket(request);
         System.out.println("Speicher-Bucket '" + bucketName + "' erfolgreich gelöscht.");
     } catch (S3Exception e) {
@@ -220,7 +220,7 @@ private static void getObjectMetadata(S3Client s3Client, String bucketName, Stri
             .bucket(bucketName)
             .key(objectKey)
             .build();
-            
+
         HeadObjectResponse response = s3Client.headObject(request);
         System.out.println("Objekt-Metadaten:");
         System.out.println("- Größe: " + response.contentLength() + " Bytes");
@@ -242,7 +242,7 @@ private static void listObjects(S3Client s3Client, String bucketName) {
             .bucket(bucketName)
             .maxKeys(10)
             .build();
-            
+
         ListObjectsV2Response response = s3Client.listObjectsV2(request);
         System.out.println("Objekte im Speicher-Bucket '" + bucketName + "':");
         for (S3Object object : response.contents()) {
@@ -263,14 +263,14 @@ private static void uploadObjectWithMetadata(S3Client s3Client, String bucketNam
         metadata.put("author", "RustFS Benutzer");
         metadata.put("version", "1.0");
         metadata.put("description", "Test-Dokument mit Metadaten");
-        
+
         PutObjectRequest request = PutObjectRequest.builder()
             .bucket(bucketName)
             .key(objectKey)
             .contentType("text/plain")
             .metadata(metadata)
             .build();
-            
+
         String content = "Dieses Objekt enthält benutzerdefinierte Metadaten.";
         s3Client.putObject(request, RequestBody.fromString(content));
         System.out.println("Objekt mit Metadaten erfolgreich hochgeladen.");
@@ -316,7 +316,7 @@ try (S3Client s3Client = S3Client.builder()
     ))
     .forcePathStyle(true)
     .build()) {
-    
+
     // S3-Operationen durchführen
     // ...
 } // Client wird automatisch geschlossen
