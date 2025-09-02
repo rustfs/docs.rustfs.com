@@ -1,34 +1,21 @@
 # 德语待翻译任务列表
 
-> 最后更新: 2025/9/2 23:40:57
-> 总计: 29 个文件待翻译
+> 最后更新: 2025/9/3 00:04:36
+> 总计: 23 个文件待翻译
 
 ## 📋 任务总览
 
-- **concepts**: 1 个文件
-- **deep**: 1 个文件
-- **developer**: 9 个文件
-- **features**: 11 个文件
+- **developer**: 6 个文件
+- **features**: 10 个文件
 - **management**: 3 个文件
 - **troubleshooting**: 3 个文件
 - **upgrade-scale**: 1 个文件
 
 ## 📝 待翻译文件列表
 
-### concepts
-
-- [ ] [concepts/architecture.md](./concepts/architecture.md) (53 行)
-
-### deep
-
-- [ ] [deep/nested/test-deep.md](./deep/nested/test-deep.md) (3 行)
-
 ### developer
 
-- [ ] [developer/license.md](./developer/license.md) (207 行)
-- [ ] [developer/mc.md](./developer/mc.md) (116 行)
 - [ ] [developer/mcp.md](./developer/mcp.md) (272 行)
-- [ ] [developer/sdk/index.md](./developer/sdk/index.md) (48 行)
 - [ ] [developer/sdk/java.md](./developer/sdk/java.md) (297 行)
 - [ ] [developer/sdk/other.md](./developer/sdk/other.md) (82 行)
 - [ ] [developer/sdk/python.md](./developer/sdk/python.md) (240 行)
@@ -37,7 +24,6 @@
 
 ### features
 
-- [ ] [features/cloud-native/index.md](./features/cloud-native/index.md) (55 行)
 - [ ] [features/commvault/index.md](./features/commvault/index.md) (51 行)
 - [ ] [features/domestic/index.md](./features/domestic/index.md) (103 行)
 - [ ] [features/hdfs/index.md](./features/hdfs/index.md) (154 行)

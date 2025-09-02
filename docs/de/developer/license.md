@@ -13,7 +13,7 @@ description: "RustFS wird unter der 100% kommerziell freundlichen Apache v2.0 Li
 ## Lizenzbedingungen
 
 _Version 2.0, Januar 2004_
-http://www.apache.org/licenses/
+<http://www.apache.org/licenses/>
 
 ### Bedingungen für Nutzung, Reproduktion und Verteilung
 
@@ -105,4 +105,4 @@ Diese Lizenz kann nur durch eine schriftliche Vereinbarung zwischen dem Lizenzge
 
 ---
 
-*Diese Lizenz ist eine Übersetzung der Apache License 2.0. Im Falle von Unstimmigkeiten zwischen der englischen und der deutschen Version hat die englische Version Vorrang.*
+_Diese Lizenz ist eine Übersetzung der Apache License 2.0. Im Falle von Unstimmigkeiten zwischen der englischen und der deutschen Version hat die englische Version Vorrang._
