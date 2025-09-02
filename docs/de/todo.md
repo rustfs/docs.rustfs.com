@@ -1,14 +1,13 @@
 # 德语待翻译任务列表
 
-> 最后更新: 2025/9/3 00:26:29
-> 总计: 11 个文件待翻译
+> 最后更新: 2025/9/3 00:29:57
+> 总计: 7 个文件待翻译
 
 ## 📋 任务总览
 
 - **developer**: 2 个文件
-- **features**: 5 个文件
-- **management**: 1 个文件
-- **troubleshooting**: 2 个文件
+- **features**: 3 个文件
+- **troubleshooting**: 1 个文件
 - **upgrade-scale**: 1 个文件
 
 ## 📝 待翻译文件列表
@@ -20,19 +19,12 @@
 
 ### features
 
-- [ ] [features/openshift/index.md](./features/openshift/index.md) (77 行)
 - [ ] [features/qcloud/index.md](./features/qcloud/index.md) (77 行)
 - [ ] [features/sql-server/index.md](./features/sql-server/index.md) (504 行)
 - [ ] [features/tanzu/index.md](./features/tanzu/index.md) (77 行)
-- [ ] [features/veeam/index.md](./features/veeam/index.md) (57 行)
-
-### management
-
-- [ ] [management/object/scanner.md](./management/object/scanner.md) (36 行)
 
 ### troubleshooting
 
-- [ ] [troubleshooting/healing.md](./troubleshooting/healing.md) (74 行)
 - [ ] [troubleshooting/node.md](./troubleshooting/node.md) (95 行)
 
 ### upgrade-scale
