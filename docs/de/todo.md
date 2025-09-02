@@ -1,13 +1,13 @@
 # 德语待翻译任务列表
 
-> 最后更新: 2025/9/3 00:11:59
-> 总计: 18 个文件待翻译
+> 最后更新: 2025/9/3 00:13:21
+> 总计: 16 个文件待翻译
 
 ## 📋 任务总览
 
 - **developer**: 4 个文件
-- **features**: 8 个文件
-- **management**: 2 个文件
+- **features**: 7 个文件
+- **management**: 1 个文件
 - **troubleshooting**: 3 个文件
 - **upgrade-scale**: 1 个文件
 
@@ -22,7 +22,6 @@
 
 ### features
 
-- [ ] [features/commvault/index.md](./features/commvault/index.md) (51 行)
 - [ ] [features/hdfs/index.md](./features/hdfs/index.md) (154 行)
 - [ ] [features/huaweicloud/index.md](./features/huaweicloud/index.md) (77 行)
 - [ ] [features/openshift/index.md](./features/openshift/index.md) (77 行)
@@ -33,7 +32,6 @@
 
 ### management
 
-- [ ] [management/object/deletion.md](./management/object/deletion.md) (59 行)
 - [ ] [management/object/scanner.md](./management/object/scanner.md) (36 行)
 
 ### troubleshooting
