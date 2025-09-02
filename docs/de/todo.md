@@ -1,11 +1,11 @@
 # 德语待翻译任务列表
 
-> 最后更新: 2025/9/3 00:06:58
-> 总计: 20 个文件待翻译
+> 最后更新: 2025/9/3 00:11:59
+> 总计: 18 个文件待翻译
 
 ## 📋 任务总览
 
-- **developer**: 6 个文件
+- **developer**: 4 个文件
 - **features**: 8 个文件
 - **management**: 2 个文件
 - **troubleshooting**: 3 个文件
@@ -15,8 +15,6 @@
 
 ### developer
 
-- [ ] [developer/mcp.md](./developer/mcp.md) (272 行)
-- [ ] [developer/sdk/java.md](./developer/sdk/java.md) (297 行)
 - [ ] [developer/sdk/other.md](./developer/sdk/other.md) (82 行)
 - [ ] [developer/sdk/python.md](./developer/sdk/python.md) (240 行)
 - [ ] [developer/sdk/rust.md](./developer/sdk/rust.md) (193 行)
