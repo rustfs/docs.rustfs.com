@@ -206,14 +206,16 @@ docker run -d \
 
 1. Üretim ortamı önerileri:
 
-- Çok düğümlü dağıtım mimarisi kullanın
+* Çok düğümlü dağıtım mimarisi kullanın
+
 * [TLS şifreli iletişimi etkinleştirin](../../integration/tls-configured.md)
 * Günlük rotasyon stratejisi yapılandırın
 * Düzenli yedekleme stratejisi ayarlayın
 
 2. Depolama önerileri:
 
-- Yerel SSD/NVMe depolama kullanın
+* Yerel SSD/NVMe depolama kullanın
+
 * Ağ dosya sistemi (NFS) kullanmaktan kaçının
 * Depolama dizininin özel erişimini garanti edin
 

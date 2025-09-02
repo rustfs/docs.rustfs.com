@@ -158,16 +158,19 @@ io_ops.inc()
 ## Migration Roadmap
 
 ### Phase 1: Evaluation (1-2 Wochen)
+
 - RustFS in Testumgebung bereitstellen
 - Kompatibilitätstests durchführen
 - Performance-Benchmarks erstellen
 
 ### Phase 2: Pilot (2-4 Wochen)
+
 - Kleine Datasets migrieren
 - Anwendungen testen
 - Betriebsprozesse anpassen
 
 ### Phase 3: Produktion (4-8 Wochen)
+
 - Vollständige Migration
 - Monitoring implementieren
 - Team schulen

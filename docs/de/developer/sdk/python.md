@@ -229,7 +229,7 @@ def multipart_upload(bucket_name, object_key, file_path, chunk_size=8*1024*1024)
             Key=object_key
         )
         upload_id = response['UploadId']
-        
+
         # Datei in Teile aufteilen und hochladen
         parts = []
         with open(file_path, 'rb') as f:
@@ -238,7 +238,7 @@ def multipart_upload(bucket_name, object_key, file_path, chunk_size=8*1024*1024)
                 chunk = f.read(chunk_size)
                 if not chunk:
                     break
-                
+
                 response = s3_client.upload_part(
                     Bucket=bucket_name,
                     Key=object_key,
@@ -251,7 +251,7 @@ def multipart_upload(bucket_name, object_key, file_path, chunk_size=8*1024*1024)
                     'PartNumber': part_number
                 })
                 part_number += 1
-        
+
         # Upload abschließen
         s3_client.complete_multipart_upload(
             Bucket=bucket_name,
@@ -260,7 +260,7 @@ def multipart_upload(bucket_name, object_key, file_path, chunk_size=8*1024*1024)
             MultipartUpload={'Parts': parts}
         )
         print(f"Multipart-Upload für '{object_key}' erfolgreich abgeschlossen!")
-        
+
     except Exception as e:
         # Upload abbrechen bei Fehlern
         s3_client.abort_multipart_upload(

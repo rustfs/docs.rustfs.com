@@ -173,6 +173,7 @@ sudo mkfs.xfs  -i size=512 -n ftype=1 -L RUSTFS0 /dev/sdb
 ```
 
 We can add some recommended options during formatting to optimize performance:
+
 - -L \<label\>: Set a label for the file system, convenient for subsequent identification and mounting.
 - -i size=512: RustFS officially recommends setting inode size to 512 bytes, which has performance advantages for scenarios storing large numbers of small objects (metadata).
 - -n ftype=1: Enable ftype functionality. This allows the file system to record file types in the directory structure, which can improve performance of operations like readdir and unlink, very beneficial for RustFS.
@@ -187,7 +188,7 @@ LABEL=RUSTFS0 /data/rustfs0   xfs   defaults,noatime,nodiratime   0   0
 #save & exit
 
 # mount disk
-sudo mount -a 
+sudo mount -a
 ```
 
 ## 3. Configure Username
@@ -206,6 +207,7 @@ chown rustfs-user:rustfs-user  /data/rustfs*
 ```
 
 Note:
+
 - If rustfs-user user and group are created, you need to change User and Group in `/etc/systemd/system/rustfs.service` to `rustfs-user`
 - Adjust `/data/rustfs*` to the specified mount directory.
 
