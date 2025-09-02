@@ -1,11 +1,11 @@
 # 德语待翻译任务列表
 
-> 最后更新: 2025/9/3 00:33:10
-> 总计: 4 个文件待翻译
+> 最后更新: 2025/9/3 00:34:05
+> 总计: 3 个文件待翻译
 
 ## 📋 任务总览
 
-- **developer**: 2 个文件
+- **developer**: 1 个文件
 - **features**: 1 个文件
 - **upgrade-scale**: 1 个文件
 
@@ -14,7 +14,6 @@
 ### developer
 
 - [ ] [developer/sdk/rust.md](./developer/sdk/rust.md) (193 行)
-- [ ] [developer/sdk/typescript.md](./developer/sdk/typescript.md) (131 行)
 
 ### features
 
