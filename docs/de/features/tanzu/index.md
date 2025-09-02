@@ -1,31 +1,13 @@
 ---
-title: "VMware Tanzu Integration"
-description: "RustFS bietet umfassende Integration mit VMware Tanzu Portfolio für moderne Anwendungsentwicklung und -bereitstellung"
+title: "待翻译"
+description: "此页面待翻译"
+source: "features/tanzu/index.md"
 ---
 
-# VMware Tanzu Integration
+# 待翻译
 
-RustFS bietet umfassende Integration mit VMware Tanzu Portfolio und ermöglicht moderne Anwendungsentwicklung und -bereitstellung mit unternehmensweiten Speicherfähigkeiten.
+此页面内容尚未翻译，请参考[中文版本](../../../zh/features/tanzu/index.md)。
 
-## Übersicht
+---
 
-![VMware Tanzu Integration](./images/sec1-1.png)
-
-RustFS mit VMware Tanzu bietet:
-
-- **Cloud-native Speicherung**: Speziell für Kubernetes und moderne Anwendungen entwickelt
-- **Enterprise-Integration**: Nahtlose Integration mit VMware-Ökosystem
-- **Multi-Cloud-Unterstützung**: Bereitstellung über vSphere, Public Clouds und Edge
-- **Entwicklererfahrung**: Vereinfachte Speicherung für Entwicklungsteams
-
-## Tanzu Portfolio Integration
-
-### Tanzu Kubernetes Grid (TKG)
-
-#### Kubernetes-Speicher
-
-- **CSI-Treiber**: Native Container Storage Interface-Treiber
-- **Dynamische Bereitstellung**: Automatische Speicherbereitstellung
-- **Storage Classes**: Mehrere Leistungsebenen und Richtlinien
-- **Volume-Management**: Vollständiges Lifecycle-Management
-
+*This page is pending translation. Please refer to the [Chinese version](../../../zh/features/tanzu/index.md).*

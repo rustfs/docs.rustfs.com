@@ -1,33 +1,13 @@
 ---
-title: "Veeam Integration"
-description: "RustFS bietet umfassende Integration mit Veeam Backup & Replication für unternehmensweite Backup- und Recovery-Lösungen"
+title: "待翻译"
+description: "此页面待翻译"
+source: "features/veeam/index.md"
 ---
 
-# Veeam Integration
+# 待翻译
 
-RustFS bietet umfassende Integration mit Veeam Backup & Replication und liefert unternehmensweite Backup- und Recovery-Lösungen mit überlegener Leistung und Zuverlässigkeit.
+此页面内容尚未翻译，请参考[中文版本](../../../zh/features/veeam/index.md)。
 
-## Übersicht
+---
 
-![Veeam Logo](./images/veeam-logo.png)
-
-RustFS mit Veeam bietet:
-
-- **Hochperformante Sicherung**: Ultraschnelle Backup- und Restore-Operationen
-- **Objektspeicher-Ziel**: S3-kompatible Objektspeicherung für Veeam-Repositories
-- **Unveränderliche Backups**: Ransomware-Schutz mit Object Lock
-- **Cloud-Integration**: Nahtlose Integration mit Cloud- und Hybrid-Umgebungen
-
-## Zentrale Vorteile
-
-### Backup-Performance-Exzellenz
-
-![Backup Performance](./images/backup-performance.png)
-
-#### Überlegener Durchsatz
-
-- **Parallelverarbeitung**: Massive parallele Backup-Streams
-- **Optimierte I/O**: Optimiert für Backup-Workload-Muster
-- **Deduplizierung**: Inline-Deduplizierung reduziert Speicheranforderungen
-- **Komprimierung**: Erweiterte Komprimierungsalgorithmen
-
+*This page is pending translation. Please refer to the [Chinese version](../../../zh/features/veeam/index.md).*

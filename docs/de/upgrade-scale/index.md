@@ -1,9 +1,14 @@
 ---
-title: "Deutsche Dokumentation"
-description: "Diese Dokumentation wird vom Chinesischen ins Deutsche übersetzt"
+title: "Verfügbarkeits- und Skalierbarkeitsbeschreibung"
+description: "Dieser Artikel beschreibt detailliert die Technologien und Erklärungen im Zusammenhang mit der Skalierung von RustFS."
 ---
 
-# Deutsche Dokumentation
+# RustFS Upgrade- und Skalierungsübersicht
 
-Dieser Abschnitt enthält die ins Deutsche übersetzte RustFS-Dokumentation.
+Dieses Kapitel teilt Inhalte im Zusammenhang mit RustFS-Upgrades und -Skalierung, einschließlich:
 
+- [Verfügbarkeits- und Skalierbarkeitsbeschreibung](./availability-and-resiliency.md)
+- [Upgrade] (./upgrade.md)
+- Skalierung
+- Außerbetriebnahme
+- Neubalancierung

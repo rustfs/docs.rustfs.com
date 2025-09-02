@@ -1,38 +1,13 @@
 ---
-title: "Tencent Cloud Integration"
-description: "RustFS bietet nahtlose Integration mit Tencent Cloud Services für hochperformante, skalierbare und kosteneffektive Speicherlösungen"
+title: "待翻译"
+description: "此页面待翻译"
+source: "features/qcloud/index.md"
 ---
 
-# Tencent Cloud Integration
+# 待翻译
 
-RustFS bietet nahtlose Integration mit Tencent Cloud Services und ermöglicht hochperformante, skalierbare und kosteneffektive Speicherlösungen für moderne Anwendungen.
+此页面内容尚未翻译，请参考[中文版本](../../../zh/features/qcloud/index.md)。
 
-## Übersicht
+---
 
-![Tencent Cloud Integration](./images/sec1-1.png)
-
-RustFS auf Tencent Cloud bietet:
-
-- **Native Integration**: Tiefe Integration mit Tencent Cloud-Ökosystem
-- **Gaming-Optimierung**: Optimiert für Gaming- und Multimedia-Workloads
-- **AI/ML-Unterstützung**: Erweiterte Unterstützung für AI- und Machine Learning-Anwendungen
-- **Globale Reichweite**: Weltweite Bereitstellung mit Edge-Beschleunigung
-
-## Zentrale Integrationen
-
-### Compute-Services
-
-#### Cloud Virtual Machine (CVM)
-
-- **Optimierte Instanzen**: Empfohlene Instanztypen für Speicher-Workloads
-- **Auto Scaling**: Automatische Skalierung basierend auf Nachfrage
-- **Spot-Instanzen**: Kosteneffektive Spot-Instanzen für Batch-Workloads
-- **GPU-Instanzen**: GPU-beschleunigte Instanzen für AI/ML-Workloads
-
-#### Tencent Kubernetes Engine (TKE)
-
-- **Kubernetes-Bereitstellung**: RustFS auf verwaltetem Kubernetes bereitstellen
-- **Serverless Container**: Serverlose Container-Bereitstellung
-- **Service Mesh**: Integration mit Tencent Service Mesh
-- **CI/CD**: Integration mit CODING DevOps-Plattform
-
+*This page is pending translation. Please refer to the [Chinese version](../../../zh/features/qcloud/index.md).*
