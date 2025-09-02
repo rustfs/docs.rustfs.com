@@ -161,6 +161,7 @@ rustfs admin maintenance stop
 ### 6.1 Häufige Probleme
 
 **Problem**: Knoten kann nicht zum Cluster beitreten
+
 ```bash
 # Lösung: Netzwerkkonnektivität prüfen
 ping node5
@@ -168,6 +169,7 @@ telnet node5 7000
 ```
 
 **Problem**: Unerwartete Leistungsprobleme
+
 ```bash
 # Lösung: Systemressourcen überprüfen
 top
