@@ -116,7 +116,7 @@ WITH (
 
 ```sql
 -- Abfrage über mehrere Cloud-Umgebungen
-SELECT 
+SELECT
     p.id,
     p.name,
     a.amount
@@ -166,7 +166,7 @@ WHERE created_date >= DATEADD(day, -30, GETDATE());
 
 ```sql
 -- Parallele Abfrage mit Hints
-SELECT /*+ PARALLEL(4) */ 
+SELECT /*+ PARALLEL(4) */
     COUNT(*)
 FROM external_data
 WHERE date_partition >= '2024-01-01';
@@ -207,7 +207,7 @@ TO FILE (FILEPATH = 'C:\Audit\');
 
 ```sql
 -- Abfrageleistung überwachen
-SELECT 
+SELECT
     query_text,
     execution_time,
     rows_returned
@@ -219,7 +219,7 @@ WHERE query_text LIKE '%external_data%';
 
 ```sql
 -- Verbindungsstatus prüfen
-SELECT 
+SELECT
     name,
     state_desc,
     create_date
