@@ -8,7 +8,9 @@ export default defineAdditionalConfig({
   themeConfig: {
     nav: [
       { text: 'Início', link: 'https://rustfs.com' },
+      { text: 'Documentação', link: '/pt/' },
       { text: 'Instalação', link: '/pt/installation/linux' },
+      { text: 'MCP', link: '/pt/developer/mcp/' },
       { text: 'SDK', link: '/pt/sdk' },
       { text: 'Demo', link: 'https://play.rustfs.com' },
       { text: 'Comunidade', link: 'https://github.com/rustfs/rustfs/discussions' },

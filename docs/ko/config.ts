@@ -8,7 +8,9 @@ export default defineAdditionalConfig({
   themeConfig: {
     nav: [
       { text: '홈', link: 'https://rustfs.com' },
+      { text: '문서', link: '/ko/' },
       { text: '설치', link: '/ko/installation/mode' },
+      { text: 'MCP', link: '/ko/developer/mcp/' },
       { text: 'SDK', link: '/ko/sdk' },
       { text: '데모', link: 'https://play.rustfs.com' },
       { text: '커뮤니티', link: 'https://github.com/rustfs/rustfs/discussions' },

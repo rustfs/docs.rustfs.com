@@ -3,25 +3,22 @@
 
 Willkommen in der RustFS-Community! Wir freuen uns sehr über Ihr Interesse an der Mitarbeit an unserer Dokumentation. Ihr Beitrag, sei es die Korrektur eines Tippfehlers oder die Übersetzung eines kompletten Leitfadens, ist uns wichtig. Dieser Leitfaden bietet Ihnen klare Anweisungen, damit Sie reibungslos an der gemeinsamen Erstellung der RustFS-Dokumentation mitwirken können.
 
-
-
 <p align="center">
-  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_ZH.md">English </a> |
+  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README.md">English</a> |
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_ZH.md">简体中文</a> |
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_JA.md">日本語</a> |
- (#deutsch) |
- <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_FR.md">rançais</a> |
- <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_TR.md">Türkçe</a>
+ Deutsch |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_FR.md">Français</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_TR.md">Türkçe</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_ES.md">Español</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_KO.md">한국어</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_PT.md">Português</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_RU.md">Русский</a>
 </p>
 
 ------
 
-
-
-
 ### Inhaltsverzeichnis
-
-
 
 1. (#1-was-ist-rustfs)
 2. (#2-unsere-mission-zugängliche--sichere-daten-für-alle)
@@ -37,39 +34,23 @@ Willkommen in der RustFS-Community! Wir freuen uns sehr über Ihr Interesse an d
    - (#51-danksagungen)
    - Inhaltslizenz
 
-
-
 ### 1. Was ist RustFS?
-
-
 
 RustFS ist eine einfache, hochleistungsfähige, verteilte Objektspeicherlösung. Es ist zu 100 % S3-kompatibel und wird unter der Apache-2.0-Lizenz veröffentlicht, was es zu einer kommerziell freundlichen Open-Source-Software macht.
 
 RustFS ist vollständig in Rust geschrieben – der modernen Programmiersprache, die für Speichersicherheit und außergewöhnliche Leistung bekannt ist.1 Es wird von einer globalen Gemeinschaft talentierter Ingenieure entwickelt und ist als leistungsstarke, zuverlässige Open-Source-Alternative konzipiert, die als direkter Ersatz für Produkte wie MinIO dienen kann.2
 
-
-
 ### 2. Unsere Mission: Zugängliche & sichere Daten für alle
-
-
 
 Wir glauben, dass Datenspeicherung für jeden und überall erschwinglich, zuverlässig und sicher sein sollte.
 
 Hochwertige, mehrsprachige Dokumentation ist für diese Mission von zentraler Bedeutung. Sie ist nicht nur ein Zusatz, sondern der Schlüssel, um die Eintrittsbarriere für Benutzer und Entwickler auf der ganzen Welt zu senken. Wenn Sie eine Anleitung übersetzen oder einen Fehler beheben, helfen Sie Menschen in verschiedenen Sprachgemeinschaften direkt dabei, einfacher robuste und kosteneffiziente Dateninfrastrukturen aufzubauen. Ihre Beiträge befähigen ein globales Publikum und verbessern gemeinsam die Datensicherheit und -souveränität. Dieser gemeinschaftsgetriebene Ansatz des Wissensaustauschs maximiert den Wert des Projekts und hilft uns, unsere Vision wirklich zu verwirklichen.4
 
-
-
 ### 3. Ihr Weg zum Beitrag
-
-
 
 Wir haben verschiedene Wege für unterschiedliche Arten von Mitwirkenden konzipiert. Ob Sie ein kleines Problem schnell beheben oder die gesamte Dokumentation systematisch übersetzen möchten, hier finden Sie die richtige Anleitung.
 
-
-
 #### 3.1 Erste Schritte: Ihr erster Beitrag
-
-
 
 Der einfachste Weg, um anzufangen, ist, kleine Änderungen direkt über die GitHub-Weboberfläche vorzunehmen. Diese Methode erfordert keine lokale Entwicklungsumgebung und ist perfekt für geringfügige Änderungen.6
 
@@ -91,24 +72,20 @@ Einfache Beiträge, die Sie leisten können, sind:
 
 Dieser Prozess dient als ausgezeichneter "Einstieg für Mitwirkende" und ermöglicht es Ihnen, sich ohne komplexe Einrichtung mit unserem Arbeitsablauf vertraut zu machen. Ein erfolgreicher kleiner Beitrag ist oft der erste Schritt zu einem tieferen Engagement.5
 
-
-
 #### 3.2 Übersetzung der Dokumentation: Eine neue Sprache hinzufügen
-
-
 
 Dies ist der Kernbereich, in dem wir die Hilfe der Community am dringendsten benötigen. Bitte befolgen Sie diese Schritte, um Übersetzungen hinzuzufügen oder zu verbessern.
 
 **Schritt 1: Koordination über GitHub Issues**
 
-Um doppelte Arbeit zu vermeiden und die Zusammenarbeit zu gewährleisten, besuchen Sie bitte unsere(https://github.com/rustfs/rustfs/issues), bevor Sie mit dem Übersetzen beginnen.
+Um doppelte Arbeit zu vermeiden und die Zusammenarbeit zu gewährleisten, besuchen Sie bitte unsere(<https://github.com/rustfs/rustfs/issues>), bevor Sie mit dem Übersetzen beginnen.
 
 - **Hinzufügen einer neuen Sprache**: Prüfen Sie, ob bereits jemand an der Sprache arbeitet, die Sie übersetzen möchten. Wenn nicht, erstellen Sie bitte ein neues Issue mit dem Titel `[i18n] Add <Language> (<lang-code>) Translation`, z. B. `[i18n] Add German (de) Translation`. Dies hilft uns, den Fortschritt zu verfolgen und die Zuständigkeit zuzuweisen.7
 - **Verbessern einer bestehenden Übersetzung**: Wenn Sie eine bestehende Übersetzung verbessern möchten, suchen Sie das entsprechende Issue oder erstellen Sie ein neues, in dem Sie die geplanten Verbesserungen detailliert beschreiben.
 
 **Schritt 2: Verstehen der Verzeichnisstruktur**
 
-Unsere Dokumentationsseite wird mit VitePress erstellt, das eine dateibasierte Verzeichnisstruktur zur Verwaltung mehrerer Sprachen verwendet.9 Alle Quelldateien befinden sich im Verzeichnis 
+Unsere Dokumentationsseite wird mit VitePress erstellt, das eine dateibasierte Verzeichnisstruktur zur Verwaltung mehrerer Sprachen verwendet.9 Alle Quelldateien befinden sich im Verzeichnis
 
 `docs/`.
 
@@ -143,7 +120,7 @@ docs/
    ```
    //.vitepress/config.ts
    import { defineConfig } from 'vitepress'
-   
+
    export default defineConfig({
      //... andere Konfigurationen
      locales: {
@@ -214,23 +191,15 @@ Um Konsistenz zu gewährleisten, verwenden Sie bitte die Standard-ISO-639-1-Code
 | Deutsch                  | `de`              |
 | Französisch              | `fr`              |
 
-
-
 ### 4. Der technische Arbeitsablauf
-
-
 
 Für Entwickler, die lokal umfangreichere Beiträge leisten möchten (z. B. das Hinzufügen eines neuen Sprachpakets oder umfangreiche Änderungen), befolgen Sie bitte diesen technischen Arbeitsablauf.
 
-
-
 #### 4.1 Voraussetzungen
-
-
 
 Bevor Sie beginnen, stellen Sie bitte sicher, dass die folgende Software auf Ihrem System installiert ist:
 
-- **Node.js**: Version `18.x` oder höher.14 Sie können es von der 
+- **Node.js**: Version `18.x` oder höher.14 Sie können es von der
 
   [offiziellen Node.js-Website](https://nodejs.org/) herunterladen.
 
@@ -238,11 +207,7 @@ Bevor Sie beginnen, stellen Sie bitte sicher, dass die folgende Software auf Ihr
 
 - **Git**: Ein Versionskontrollsystem. Sie können es von der [offiziellen Git-Website](https://git-scm.com/) herunterladen.
 
-
-
 #### 4.2 Lokale Entwicklungsumgebung einrichten
-
-
 
 Befolgen Sie diese Befehlssequenz, um den Entwicklungs-Server für die Dokumentation lokal auszuführen:
 
@@ -280,13 +245,9 @@ Befolgen Sie diese Befehlssequenz, um den Entwicklungs-Server für die Dokumenta
 
 4. Auf die Seite zugreifen
 
-   Nach erfolgreicher Ausführung sollten Sie in Ihrem Terminal eine Ausgabe ähnlich wie VitePress dev server running at: http://localhost:5173/ sehen. Öffnen Sie diese URL in Ihrem Browser, um die Dokumentationsseite zu sehen. Alle Änderungen, die Sie an den Markdown-Dateien vornehmen, werden sofort im Browser angezeigt.15
-
-
+   Nach erfolgreicher Ausführung sollten Sie in Ihrem Terminal eine Ausgabe ähnlich wie VitePress dev server running at: <http://localhost:5173/> sehen. Öffnen Sie diese URL in Ihrem Browser, um die Dokumentationsseite zu sehen. Alle Änderungen, die Sie an den Markdown-Dateien vornehmen, werden sofort im Browser angezeigt.15
 
 #### 4.3 Pull Request (PR) & Commit-Richtlinien
-
-
 
 Wir folgen einem standardisierten Arbeitsablauf, um Codequalität und eine saubere Projekthistorie zu gewährleisten.
 
@@ -324,11 +285,7 @@ Wir folgen einem standardisierten Arbeitsablauf, um Codequalität und eine saube
   - Wir können Änderungen anfordern. Bitte lassen Sie sich davon nicht entmutigen! Dies ist ein normaler Teil der kollaborativen Open-Source-Entwicklung, der darauf abzielt, die Qualität der Beiträge zu verbessern.
   - Sobald Ihr PR genehmigt ist und alle automatisierten Prüfungen bestanden hat, wird ein Maintainer ihn mergen.
 
-
-
 #### 4.4 Automatisierte Prüfungen & Bereitstellung
-
-
 
 Um die Qualität und Stabilität unserer Dokumentation zu gewährleisten, haben wir eine vollständig automatisierte CI/CD (Continuous Integration/Continuous Deployment)-Pipeline.
 
@@ -337,17 +294,9 @@ Um die Qualität und Stabilität unserer Dokumentation zu gewährleisten, haben 
 
 Indem wir diesen Prozess transparent machen, möchten wir das Vertrauen der Mitwirkenden in unseren Arbeitsablauf stärken. Sie müssen sich nicht um die Details der Bereitstellung kümmern; ein erfolgreicher Merge bedeutet eine erfolgreiche Bereitstellung. Dies gibt Ihnen einen klaren Überblick über den gesamten Lebenszyklus Ihres Beitrags, von der Einreichung bis zur Veröffentlichung.19
 
-
-
 ### 5. Community & Lizenzierung
 
-
-
-
-
 #### 5.1 Danksagungen
-
-
 
 Die RustFS-Dokumentation wird von der Community für die Community erstellt. Wir sind allen, die ihre Zeit und ihr Fachwissen beitragen, unglaublich dankbar.
 
@@ -355,11 +304,7 @@ Jeder Beitrag, egal wie klein, wird sehr geschätzt. Um alle Beiträge fair und 
 
 Sie können eine Liste all unserer großartigen Mitwirkenden im **[Contributors-Graph](https://github.com/rustfs/docs.rustfs.com/graphs/contributors)** sehen. Dieser automatisierte, skalierbare Ansatz stellt sicher, dass jeder Beitrag anerkannt wird und immer auf dem neuesten Stand ist.22
 
-
-
 #### 5.2 Inhaltslizenz
-
-
 
 Alle Dokumentationen in diesem Projekt sind unter der **Creative Commons Namensnennung 4.0 International Lizenz** lizenziert.23
 

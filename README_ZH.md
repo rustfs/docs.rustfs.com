@@ -1,27 +1,23 @@
 # RustFS 文档贡献指南
 
-
-
 欢迎来到 RustFS 社区！我们非常感谢您有兴趣为我们的文档做出贡献。您的每一份力量，无论是修正一个错字，还是翻译一整篇指南，都对我们至关重要。本指南旨在为您提供清晰的指引，帮助您顺利地参与到 RustFS 文档的共建中来。
 
 <p align="center">
-  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_ZH.md">English </a> |
+  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README.md">English</a> |
  简体中文 |
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_JA.md">日本語</a> |
- <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_DA.md">(#deutsch)</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_DA.md">Deutsch</a> |
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_FR.md">Français</a> |
- <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_TR.md">Türkçe</a>
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_TR.md">Türkçe</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_ES.md">Español</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_KO.md">한국어</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_PT.md">Português</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_RU.md">Русский</a>
 </p>
 
 ------
 
-
-
-
-
 ### 目录
-
-
 
 1. (#1-rustfs-是什么)
 2. 我们的使命：让数据存储更普惠、更安全
@@ -37,39 +33,23 @@
    - 致谢
    - 内容许可
 
-
-
 ### 1. RustFS 是什么？
-
-
 
 RustFS 是一款简单、高效、分布式的对象存储解决方案。它 100% 兼容 S3 协议，并基于 Apache 2.0 许可发行，是一款对商业应用友好的开源软件。
 
 RustFS 完全采用 Rust 语言编写——这门以内存安全和卓越性能著称的现代编程语言 1。由来自世界各地的优秀工程师共同参与和贡献，RustFS 致力于提供一个强大、可靠的开源替代方案，可作为 MinIO 等产品的直接平替 2。
 
-
-
 ### 2. 我们的使命：让数据存储更普惠、更安全
-
-
 
 我们坚信，无论身处何地，每个人都应享有经济、可靠且安全的数据存储。
 
 高质量、多语言的文档是我们实现这一使命的核心。它不仅仅是项目的附属品，更是降低全球用户和开发者使用门槛的关键。当您翻译一篇指南或修正一个错误时，您正在直接帮助不同语言社区的人们更轻松地构建稳健、经济高效的数据基础设施。您的贡献将赋能全球用户，共同提升数据安全和数据主权的水平。这种社区驱动的知识共享模式，能够将项目的价值最大化，从而真正实现我们的愿景 4。
 
-
-
 ### 3. 您的贡献之旅
-
-
 
 我们为不同类型的贡献者设计了不同的参与路径。无论您是想快速修复一个小问题，还是希望系统性地翻译整个文档，这里都有适合您的指引。
 
-
-
 #### 3.1 快速开始：您的第一个贡献
-
-
 
 对于新贡献者来说，最简单的参与方式是通过 GitHub 网页界面直接进行。这种方式无需在本地配置开发环境，非常适合进行小范围的修改 6。
 
@@ -91,11 +71,7 @@ RustFS 完全采用 Rust 语言编写——这门以内存安全和卓越性能�
 
 这个流程是一个极佳的“贡献者入口”，可以让您在无需任何复杂设置的情况下熟悉我们的协作流程。一次成功的轻量级贡献，往往是参与更深度贡献的开始 5。
 
-
-
 #### 3.2 翻译文档：添加一门新语言
-
-
 
 这是我们最需要社区帮助的核心领域。请遵循以下步骤来添加或改进翻译。
 
@@ -108,7 +84,7 @@ RustFS 完全采用 Rust 语言编写——这门以内存安全和卓越性能�
 
 **第二步：理解目录结构**
 
-我们的文档站使用 VitePress 构建，它通过基于文件的目录结构来管理多语言内容 9。所有文档源文件都位于 
+我们的文档站使用 VitePress 构建，它通过基于文件的目录结构来管理多语言内容 9。所有文档源文件都位于
 
 `docs/` 目录下。
 
@@ -143,7 +119,7 @@ docs/
    ```
    //.vitepress/config.ts
    import { defineConfig } from 'vitepress'
-   
+
    export default defineConfig({
      //... 其他配置
      locales: {
@@ -213,23 +189,15 @@ docs/
 | 德语        | `de`            |
 | 法语        | `fr`            |
 
-
-
 ### 4. 技术工作流程
-
-
 
 对于希望在本地进行更深度贡献（如添加新语言包或进行大量修改）的开发者，请遵循以下技术流程。
 
-
-
 #### 4.1 环境准备
-
-
 
 在开始之前，请确保您的系统中安装了以下软件：
 
-- **Node.js**: 版本 `18.x` 或更高 14。您可以从 
+- **Node.js**: 版本 `18.x` 或更高 14。您可以从
 
   [Node.js 官网](https://nodejs.org/) 下载。
 
@@ -237,11 +205,7 @@ docs/
 
 - **Git**: 版本控制系统。您可以从 [Git 官网](https://git-scm.com/) 下载。
 
-
-
 #### 4.2 本地开发设置
-
-
 
 请按照以下命令序列在本地启动文档开发服务器：
 
@@ -279,13 +243,9 @@ docs/
 
 4. 访问站点
 
-   执行成功后，您应该会在终端看到类似 VitePress dev server running at: http://localhost:5173/ 的输出。在浏览器中打开该地址，即可看到正在运行的文档站点。您对 Markdown 文件所做的任何修改都会即时反映在浏览器中 15。
-
-
+   执行成功后，您应该会在终端看到类似 VitePress dev server running at: <http://localhost:5173/> 的输出。在浏览器中打开该地址，即可看到正在运行的文档站点。您对 Markdown 文件所做的任何修改都会即时反映在浏览器中 15。
 
 #### 4.3 Pull Request (PR) 与提交规范
-
-
 
 我们遵循一套标准化的工作流程，以确保代码质量和项目历史的清晰度。
 
@@ -323,11 +283,7 @@ docs/
   - 我们可能会提出修改建议。请不要因此感到沮ら。这是开源协作中非常正常的一部分，旨在共同提升贡献的质量。
   - 一旦您的 PR 被批准且所有自动化检查都通过后，维护者会将其合并。
 
-
-
 #### 4.4 自动化检查与部署
-
-
 
 为了保证文档的质量和稳定性，我们建立了一套完全自动化的 CI/CD (持续集成/持续部署) 流程。
 
@@ -336,17 +292,9 @@ docs/
 
 通过明确这一自动化流程，我们希望建立贡献者对项目流程的信任。您无需担心部署的细节，一次成功的合并即代表着一次成功的上线。这让您能够清晰地看到自己贡献的完整生命周期，从提交代码到最终发布 19。
 
-
-
 ### 5. 社区与许可
 
-
-
-
-
 #### 5.1 致谢
-
-
 
 RustFS 的文档是由社区构建，并服务于社区的。我们对每一位贡献者付出的时间和专业知识表示由衷的感谢。
 
@@ -354,11 +302,7 @@ RustFS 的文档是由社区构建，并服务于社区的。我们对每一位�
 
 您可以在 **[贡献者图谱](https://github.com/rustfs/docs.rustfs.com/graphs/contributors)** 中查看我们所有杰出贡献者的列表。这种自动化、可扩展的方式确保了每一份贡献都能得到应有的认可，且永远保持最新 22。
 
-
-
 #### 5.2 内容许可
-
-
 
 本项目的所有文档内容均采用 **知识共享署名 4.0 国际许可协议 (Creative Commons Attribution 4.0 International License)** 进行许可 23。
 
