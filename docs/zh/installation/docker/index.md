@@ -37,26 +37,8 @@ docker pull rustfs/rustfs
 
 ---
 
-## 三、编写环境配置
 
-在宿主机创建配置文件 `/etc/rustfs/config.toml`，示例内容：
-
-```bash
-RUSTFS_ACCESS_KEY=rustfsadmin
-RUSTFS_SECRET_KEY=rustfsadmin
-RUSTFS_VOLUMES="/data/rustfs{0...3}"
-RUSTFS_ADDRESS=":9000"
-#RUSTFS_SERVER_DOMAINS="play.rustfs.com:7000"
-RUSTFS_CONSOLE_ENABLE=true
-RUSTFS_OBS_ENDPOINT=""
-RUSTFS_TLS_PATH="/opt/tls"
-```
-
-> **说明：** 配置项格式及默认值请参见官方 Linux 安装文档。
-
----
-
-## 四、运行 RustFS 容器
+## 三、运行 RustFS 容器
 
 RustFS SNSD Docker 运行方式，结合上述镜像与配置，执行：
 
@@ -175,7 +157,7 @@ docker run -d \
    -e RUSTFS_TLS_PATH=/certs \
    ```
 
-## 五、验证与访问
+## 四、验证与访问
 
 1. **查看容器状态与日志：**
 
@@ -198,7 +180,7 @@ docker run -d \
  如能成功创建并列举 bucket，则部署生效。
 
 
-## 六、其他建议
+## 五、其他建议
 
 1. 生产环境建议：
 - 使用多节点部署架构

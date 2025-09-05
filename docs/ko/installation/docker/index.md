@@ -37,26 +37,7 @@ docker pull rustfs/rustfs
 
 ---
 
-## III. 환경 구성 작성
-
-호스트 머신에 구성 파일 `/etc/rustfs/config.toml`을 생성하십시오. 예시 내용:
-
-```bash
-RUSTFS_ACCESS_KEY=rustfsadmin
-RUSTFS_SECRET_KEY=rustfsadmin
-RUSTFS_VOLUMES="/data/rustfs{0...3}"
-RUSTFS_ADDRESS=":9000"
-#RUSTFS_SERVER_DOMAINS="play.rustfs.com:7000"
-RUSTFS_CONSOLE_ENABLE=true
-RUSTFS_OBS_ENDPOINT=""
-RUSTFS_TLS_PATH="/opt/tls"
-```
-
-> **설명:** 구성 항목 형식 및 기본값에 대해서는 공식 Linux 설치 문서를 참조하십시오.
-
----
-
-## IV. RustFS 컨테이너 실행
+## III. RustFS 컨테이너 실행
 
 RustFS SNSD Docker 실행 방식, 위의 이미지와 구성을 결합하여 실행:
 
@@ -175,7 +156,7 @@ docker run -d \
    -e RUSTFS_TLS_PATH=/certs \
    ```
 
-## V. 검증 및 접근
+## IV. 검증 및 접근
 
 1. **컨테이너 상태와 로그 보기:**
 
@@ -198,7 +179,7 @@ docker run -d \
  버킷을 성공적으로 생성하고 나열할 수 있다면 배포가 효과적입니다.
 
 
-## VI. 기타 권장사항
+## V. 기타 권장사항
 
 1. 운영 환경 권장사항:
 - 다중 노드 배포 아키텍처 사용

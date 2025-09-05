@@ -37,26 +37,7 @@ docker pull rustfs/rustfs
 
 ---
 
-## III. Umgebungskonfiguration schreiben
-
-Erstellen Sie die Konfigurationsdatei `/etc/rustfs/config.toml` auf dem Host-Rechner, Beispielinhalt:
-
-```bash
-RUSTFS_ACCESS_KEY=rustfsadmin
-RUSTFS_SECRET_KEY=rustfsadmin
-RUSTFS_VOLUMES="/data/rustfs{0...3}"
-RUSTFS_ADDRESS=":9000"
-#RUSTFS_SERVER_DOMAINS="play.rustfs.com:7000"
-RUSTFS_CONSOLE_ENABLE=true
-RUSTFS_OBS_ENDPOINT=""
-RUSTFS_TLS_PATH="/opt/tls"
-```
-
-> **Erklärung:** Für Konfigurationselementformat und Standardwerte siehe offizielle Linux-Installationsdokumentation.
-
----
-
-## IV. RustFS-Container ausführen
+## III. RustFS-Container ausführen
 
 RustFS SNSD Docker-Ausführungsmethode, kombiniert mit oben genanntem Image und Konfiguration, ausführen:
 
@@ -175,7 +156,7 @@ docker run -d \
    -e RUSTFS_TLS_PATH=/certs \
    ```
 
-## V. Verifikation und Zugriff
+## IV. Verifikation und Zugriff
 
 1. **Container-Status und Logs anzeigen:**
 
@@ -198,7 +179,7 @@ docker run -d \
  Wenn Bucket erfolgreich erstellt und aufgelistet werden kann, ist die Bereitstellung wirksam.
 
 
-## VI. Weitere Empfehlungen
+## V. Weitere Empfehlungen
 
 1. Produktionsumgebungs-Empfehlungen:
 - Verwenden Sie Multi-Node-Bereitstellungsarchitektur
