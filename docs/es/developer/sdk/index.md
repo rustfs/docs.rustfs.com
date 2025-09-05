@@ -18,6 +18,7 @@ Actualmente, los SDK proporcionados por RustFS incluyen:
 - [SDK de Python](./python.md)
 - [SDK de Rust](./rust.md)
 - [SDK de TypeScript](./typescript.md)
+- [SDK de Golang](./go.md)
 
 ## Explicación de Terminología Antes de la Lectura
 

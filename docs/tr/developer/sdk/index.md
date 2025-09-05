@@ -18,6 +18,7 @@ RustFS, S3 protokolü ile %100 uyumlu dağıtık nesne depolama yazılımıdır.
 - [Python SDK](./python.md)
 - [Rust SDK](./rust.md)
 - [TypeScript SDK](./typescript.md)
+- [Golang SDK](./go.md)
 
 ## Okumadan Önce Terim Açıklamaları
 
@@ -31,8 +32,6 @@ Aşina olduğunuz SDK ve güvendiğiniz SDK üreticisinin ürünü varsa hepsini
 
 Çin bulut üreticileri birçok yerde "sihirli değişiklikler" yaptığı için. Birçok en yeni S3 teknolojisini desteklememektedirler. Bu nedenle, dünya çapında birçok nesne depolama ürünü Çin'deki birçok bulut üreticisinin SDK'sını pek önermemektedir.
 
-
-
 ## 2. MinIO SDK'sı RustFS ile Doğrudan İletişim Kurabilir mi?
 
 Evet.
@@ -41,9 +40,7 @@ MinIO SDK'sı için kapsamlı uyarlama ve uyumluluğu gerçekleştirdik.
 
 MinIO SDK'sını kullanıyorsanız, Endpoint ve AK, SK'yi değiştirdikten sonra doğrudan RustFS ile uyumlu olabilir.
 
-
 ## 3. Diğer Uyumlu Olmayan SDK'lar Olursa Ne Yapılır?
 
 Bir bulut üreticisinin SDK'sını kullanıyoruz, en yeni S3, MinIO ve RustFS'yi desteklemiyor nasıl işlem yapmalıyız?
 Lütfen mümkün olan en kısa sürede SDK'yı değiştirin, iş tarafında yeniden eşleştirme ve yükseltme yapın.
-

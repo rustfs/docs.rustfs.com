@@ -1,22 +1,22 @@
 ---
-title: "RustFS Golang SDK 使用指南"
-description: "通过 Golang SDK 来对 RustFS 实例进行操作,包括存储桶、对象的创建和删除."
+title: "RustFS Golang SDK Usage Guide"
+description: "Use the Golang SDK to operate on RustFS instances, including creating and deleting buckets and objects."
 ---
 
 # Golang SDK
 
-由于 RustFS 是完全兼容 S3 的对象存储系统，因此可以通过对 S3 的 TypeScript SDK 做一些封装来构建适用于 RustFS 的 Golang SDK，通过 SDK 对 RustFS 进行操作，包括存储桶/对象的创建和删除、文件的上传和下载等。
+Since RustFS is a fully S3-compatible object storage system, you can build a Golang SDK suitable for RustFS by wrapping the S3 TypeScript SDK. Through the SDK, you can operate on RustFS, including creating and deleting buckets/objects, uploading and downloading files, etc.
 
-## 前提条件
+## Prerequisites
 
-- 一个可用的 RustFS 实例（可参考[安装指南](../../installation/index.md)进行安装）。
-- 访问密钥（可参考[访问密钥管理](../../administration/iam/access-token.md)进行创建）。
+- A working RustFS instance (refer to [Installation Guide](../../installation/index.md) for installation).
+- Access keys (refer to [Access Key Management](../../administration/iam/access-token.md) for creation).
 
-## RustFS Golang SDK 构造
+## RustFS Golang SDK Construction
 
-利用 `RUSTFS_ACCESS_KEY_ID`、`RUSTFS_SECRET_ACCESS_KEY`、`RUSTFS_ENDPOINT_URL`、`RUSTFS_REGION` 构造一个 `aws.Config`，然后使用 Golang S3 SDK 中的 `s3.NewFromConfig` 构建一个 RustFS Client：
+Use `RUSTFS_ACCESS_KEY_ID`, `RUSTFS_SECRET_ACCESS_KEY`, `RUSTFS_ENDPOINT_URL`, `RUSTFS_REGION` to construct an `aws.Config`, then use `s3.NewFromConfig` from the Golang S3 SDK to build a RustFS Client:
 
-```go
+```
 region := os.Getenv("RUSTFS_REGION")
 access_key_id := os.Getenv("RUSTFS_ACCESS_KEY_ID")
 secret_access_key := os.Getenv("RUSTFS_SECRET_ACCESS_KEY")
@@ -44,11 +44,11 @@ client := s3.NewFromConfig(cfg, func(o *s3.Options) {
 })
 ```
 
-接着就可以使用构造好的 RustFS Client 进行存储桶、对象的操作了。
+Then you can use the constructed RustFS Client to perform bucket and object operations.
 
-## 创建存储桶
+## Create Bucket
 
-```go
+```
 _, err = client.CreateBucket(ctx, &s3.CreateBucketInput{
     Bucket: aws.String("go-sdk-rustfs"),
 })
@@ -57,9 +57,9 @@ if err != nil {
 }
 ```
 
-## 列出存储桶
+## List Buckets
 
-```go
+```
 resp, err := client.ListBuckets(ctx, &s3.ListBucketsInput{})
 if err != nil {
     log.Fatalf("list buckets failed: %v", err)
@@ -71,9 +71,9 @@ for _, b := range resp.Buckets {
 }
 ```
 
-## 删除存储桶
+## Delete Bucket
 
-```go
+```
 _, err = client.DeleteBucket(ctx, &s3.DeleteBucketInput{
     Bucket: aws.String("go-sdk-rustfs"),
 })
@@ -82,9 +82,9 @@ if err != nil {
 }
 ```
 
-## 列出存储对象
+## List Objects
 
-```go
+```
 resp, err := client.ListObjectsV2(ctx, &s3.ListObjectsV2Input{
     Bucket: aws.String("bucket-target"),
 })
@@ -96,9 +96,9 @@ for _, obj := range resp.Contents {
 }
 ```
 
-## 上传对象
+## Upload Object
 
-```go
+```
 _, err = client.PutObject(ctx, &s3.PutObjectInput{
     Bucket: aws.String("bucket-target"),
     Key:    aws.String("test.txt"),
@@ -109,9 +109,9 @@ if err != nil {
 }
 ```
 
-## 下载对象
+## Download Object
 
-```go
+```
 resp, err := client.GetObject(ctx, &s3.GetObjectInput{
     Bucket: aws.String("bucket-target"),
     Key:    aws.String("1.txt"),
@@ -129,4 +129,4 @@ if err != nil {
 fmt.Println("content is :", string(data))
 ```
 
-其他的使用，大家可以自行探索，如果借助 Vibe Coding，就更简单了！
+For other usage, you can explore on your own. It's even simpler with Vibe Coding!

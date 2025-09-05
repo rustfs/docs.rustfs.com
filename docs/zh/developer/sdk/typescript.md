@@ -27,7 +27,7 @@ const rustfs_client = new S3Client({
 });
 ```
 
-接着使用构造好的 `rustfs_client` 进行响应的操作。
+接着使用构造好的 `rustfs_client` 进行相应的操作。
 
 ## 创建存储桶
 
@@ -112,7 +112,7 @@ async function getObject() {
             Bucket: "rust-sdk-demo",
             Key: "1.txt",
         }));
-        
+
         // get object content
         if (response.Body) {
             const chunks: Buffer[] = [];

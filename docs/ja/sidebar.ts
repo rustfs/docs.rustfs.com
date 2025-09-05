@@ -246,6 +246,10 @@ export const sidebar = [
             link: '/ja/developer/sdk/typescript'
           },
           {
+            text: 'Golang',
+            link: '/ja/developer/sdk/go'
+          },
+          {
             text: 'その他のSDK',
             link: '/ja/developer/sdk/other'
           }
