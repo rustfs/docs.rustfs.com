@@ -5,7 +5,7 @@ description: "Use the Golang SDK to operate on RustFS instances, including creat
 
 # Golang SDK
 
-Since RustFS is a fully S3-compatible object storage system, you can build a Golang SDK suitable for RustFS by wrapping the S3 TypeScript SDK. Through the SDK, you can operate on RustFS, including creating and deleting buckets/objects, uploading and downloading files, etc.
+Since RustFS is a fully S3-compatible object storage system, you can build a Golang SDK suitable for RustFS by wrapping the S3 Golang SDK. Through the SDK, you can operate on RustFS, including creating and deleting buckets/objects, uploading and downloading files, etc.
 
 ## Prerequisites
 
