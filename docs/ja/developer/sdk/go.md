@@ -5,7 +5,7 @@ description: "Golang SDK を使用して RustFS インスタンスを操作し�
 
 # Golang SDK
 
-RustFS は完全に S3 互換のオブジェクトストレージシステムであるため、S3 の TypeScript SDK をラップして RustFS 用の Golang SDK を構築できます。SDK を通じて RustFS を操作し、バケット/オブジェクトの作成・削除、ファイルのアップロード・ダウンロードなどを行うことができます。
+RustFS は完全に S3 互換のオブジェクトストレージシステムであるため、S3 の Golang SDK をラップして RustFS 用の Golang SDK を構築できます。SDK を通じて RustFS を操作し、バケット/オブジェクトの作成・削除、ファイルのアップロード・ダウンロードなどを行うことができます。
 
 ## 前提条件
 

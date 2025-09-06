@@ -5,7 +5,7 @@ description: "Golang SDK kullanarak RustFS örneklerinde işlem yapın, bucket v
 
 # Golang SDK
 
-RustFS tamamen S3 uyumlu bir nesne depolama sistemi olduğu için, S3'nin TypeScript SDK'sını sarmalayarak RustFS için uygun bir Golang SDK oluşturabilirsiniz. SDK aracılığıyla RustFS üzerinde işlem yapabilir, bucket/nesne oluşturma ve silme, dosya yükleme ve indirme vb. işlemleri gerçekleştirebilirsiniz.
+RustFS tamamen S3 uyumlu bir nesne depolama sistemi olduğu için, S3'nin Golang SDK'sını sarmalayarak RustFS için uygun bir Golang SDK oluşturabilirsiniz. SDK aracılığıyla RustFS üzerinde işlem yapabilir, bucket/nesne oluşturma ve silme, dosya yükleme ve indirme vb. işlemleri gerçekleştirebilirsiniz.
 
 ## Önkoşullar
 
