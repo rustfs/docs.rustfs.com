@@ -5,7 +5,7 @@ description: "Verwenden Sie das Golang SDK, um RustFS-Instanzen zu verwalten, ei
 
 # Golang SDK
 
-Da RustFS ein vollständig S3-kompatibles Objektspeichersystem ist, können Sie durch das Wrapping des S3 TypeScript SDK ein für RustFS geeignetes Golang SDK erstellen. Über das SDK können Sie RustFS verwalten, einschließlich der Erstellung und Löschung von Buckets/Objekten, dem Hoch- und Herunterladen von Dateien usw.
+Da RustFS ein vollständig S3-kompatibles Objektspeichersystem ist, können Sie durch das Wrapping des S3 Golang SDK ein für RustFS geeignetes Golang SDK erstellen. Über das SDK können Sie RustFS verwalten, einschließlich der Erstellung und Löschung von Buckets/Objekten, dem Hoch- und Herunterladen von Dateien usw.
 
 ## Voraussetzungen
 

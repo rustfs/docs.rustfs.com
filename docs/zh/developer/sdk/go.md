@@ -5,7 +5,7 @@ description: "通过 Golang SDK 来对 RustFS 实例进行操作,包括存储桶
 
 # Golang SDK
 
-由于 RustFS 是完全兼容 S3 的对象存储系统，因此可以通过对 S3 的 TypeScript SDK 做一些封装来构建适用于 RustFS 的 Golang SDK，通过 SDK 对 RustFS 进行操作，包括存储桶/对象的创建和删除、文件的上传和下载等。
+由于 RustFS 是完全兼容 S3 的对象存储系统，因此可以通过对 S3 的 Golang SDK 做一些封装来构建适用于 RustFS 的 Golang SDK，通过 SDK 对 RustFS 进行操作，包括存储桶/对象的创建和删除、文件的上传和下载等。
 
 ## 前提条件
 
