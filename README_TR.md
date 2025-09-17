@@ -3,12 +3,16 @@
 RustFS topluluğuna hoş geldiniz! Dokümantasyonumuza katkıda bulunma ilginiz için gerçekten minnettarız. Bir yazım hatasını düzeltmek veya bir rehberin tamamını çevirmek olsun, katkınız bizim için önemlidir. Bu rehber, RustFS dokümantasyonunun ortak inşasına sorunsuz bir şekilde katılmanıza yardımcı olacak net talimatlar sunmayı amaçlamaktadır.
 
 <p align="center">
-English |
+<a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README.md">English</a> |
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_ZH.md">简体中文</a> |
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_JA.md">日本語</a> |
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_DA.md">Deutsch</a> |
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_FR.md">Français</a> |
- <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_TR.md">Türkçe</a>
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_ES.md">Español</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_KO.md">한국어</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_PT.md">Português</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_RU.md">Русский</a> |
+ Türkçe
 </p>
 
 ------
@@ -110,7 +114,7 @@ docs/
    ```
    //.vitepress/config.ts
    import { defineConfig } from 'vitepress'
-   
+
    export default defineConfig({
      //... diğer yapılandırmalar
      locales: {

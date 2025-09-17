@@ -1,34 +1,34 @@
-import { defineAdditionalConfig } from 'vitepress';
-import { sidebar } from './en/sidebar';
+import { defineAdditionalConfig } from 'vitepress'
+import { sidebar } from './sidebar'
 
 export default defineAdditionalConfig({
   lang: 'en-US',
-  description: 'RustFS - MinIO alternative, high-performance distributed storage',
+  description: 'RustFS - MinIO alternative, high-performance distributed storage solution',
 
   themeConfig: {
     nav: [
       { text: 'Home', link: 'https://rustfs.com' },
       { text: 'Docs', link: '/' },
-      { text: 'Installation', link: '/installation/linux' },
-      { text: 'MCP', link: '/developer/mcp/' },
-      { text: 'SDK', link: '/developer/sdk/' },
+      { text: 'Installation', link: '/en/installation/linux' },
+      { text: 'MCP', link: '/en/developer/mcp/' },
+      { text: 'SDK', link: '/en/sdk' },
       { text: 'Demo', link: 'https://play.rustfs.com' },
       { text: 'Community', link: 'https://github.com/rustfs/rustfs/discussions' },
-      { text: 'About', link: '/about' },
+      { text: 'About', link: '/en/about' },
     ],
 
     sidebar: {
-      '/': sidebar,
+      '/en/': sidebar,
     },
 
     editLink: {
       pattern: 'https://github.com/rustfs/docs.rustfs.com/edit/main/docs/:path',
-      text: 'Edit this page on GitHub',
+      text: 'Edit this page on GitHub'
     },
 
     footer: {
       message: 'Released under the Apache License 2.0.',
-      copyright: 'Copyright © 2025 RustFS',
-    },
-  },
-});
+      copyright: 'Copyright © 2025 RustFS'
+    }
+  }
+})

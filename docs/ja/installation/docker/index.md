@@ -37,26 +37,7 @@ docker pull rustfs/rustfs
 
 ---
 
-## III. 環境設定の作成
-
-ホストマシンに設定ファイル `/etc/rustfs/config.toml` を作成します。サンプル内容：
-
-```bash
-RUSTFS_ACCESS_KEY=rustfsadmin
-RUSTFS_SECRET_KEY=rustfsadmin
-RUSTFS_VOLUMES="/data/rustfs{0...3}"
-RUSTFS_ADDRESS=":9000"
-#RUSTFS_SERVER_DOMAINS="play.rustfs.com:7000"
-RUSTFS_CONSOLE_ENABLE=true
-RUSTFS_OBS_ENDPOINT=""
-RUSTFS_TLS_PATH="/opt/tls"
-```
-
-> **説明：** 設定項目の形式とデフォルト値については、公式Linuxインストールドキュメントを参照してください。
-
----
-
-## IV. RustFSコンテナの実行
+## III. RustFSコンテナの実行
 
 RustFS SNSD Docker実行方式、上記のイメージと設定を組み合わせて実行：
 
@@ -175,7 +156,7 @@ docker run -d \
    -e RUSTFS_TLS_PATH=/certs \
    ```
 
-## V. 検証とアクセス
+## IV. 検証とアクセス
 
 1. **コンテナ状態とログの確認：**
 
@@ -198,7 +179,7 @@ docker run -d \
  バケットが正常に作成・一覧表示できれば、デプロイが効果的です。
 
 
-## VI. その他の提案
+## V. その他の提案
 
 1. 本番環境の推奨事項：
 - マルチノードデプロイアーキテクチャを使用

@@ -37,26 +37,7 @@ docker pull rustfs/rustfs
 
 ---
 
-## III. Ortam Yapılandırması Yazma
-
-Ana bilgisayarda `/etc/rustfs/config.toml` yapılandırma dosyasını oluşturun, örnek içerik:
-
-```bash
-RUSTFS_ACCESS_KEY=rustfsadmin
-RUSTFS_SECRET_KEY=rustfsadmin
-RUSTFS_VOLUMES="/data/rustfs{0...3}"
-RUSTFS_ADDRESS=":9000"
-#RUSTFS_SERVER_DOMAINS="play.rustfs.com:7000"
-RUSTFS_CONSOLE_ENABLE=true
-RUSTFS_OBS_ENDPOINT=""
-RUSTFS_TLS_PATH="/opt/tls"
-```
-
-> **Not:** Yapılandırma öğesi formatı ve varsayılan değerler için lütfen resmi Linux kurulum belgelerine bakın.
-
----
-
-## IV. RustFS Konteynerini Çalıştırma
+## III. RustFS Konteynerini Çalıştırma
 
 RustFS SNSD Docker çalışma yöntemi, yukarıdaki görüntü ve yapılandırmayı birleştirerek:
 
@@ -180,7 +161,7 @@ docker run -d \
    -e RUSTFS_TLS_PATH=/certs \
    ```
 
-## V. Doğrulama ve Erişim
+## IV. Doğrulama ve Erişim
 
 1. **Konteyner durumunu ve günlüklerini görüntüleme:**
 
@@ -202,7 +183,7 @@ docker run -d \
 
  Bucket başarıyla oluşturulup listelenebiliyorsa, dağıtım etkili olmuştur.
 
-## VI. Diğer Öneriler
+## V. Diğer Öneriler
 
 1. Üretim ortamı önerileri:
 

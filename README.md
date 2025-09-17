@@ -6,19 +6,18 @@ Welcome to the RustFS community! We really appreciate your interest in contribut
 English |
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_ZH.md">简体中文</a> |
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_JA.md">日本語</a> |
- <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_DA.md">(#deutsch)</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_DA.md">Deutsch</a> |
  <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_FR.md">Français</a> |
- <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_TR.md">Türkçe</a>
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_TR.md">Türkçe</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_ES.md">Español</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_KO.md">한국어</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_PT.md">Português</a> |
+ <a href="https://github.com/rustfs/docs.rustfs.com/blob/main/README_RU.md">Русский</a>
 </p>
- 
+
 ------
 
-
-
-
 ### Table of Contents
-
-
 
 1. (#1-what-is-rustfs)
 2. (#2-our-mission-accessible--secure-data-for-everyone)
@@ -34,39 +33,23 @@ English |
    - Acknowledgements
    - Content License
 
-
-
 ### 1. What is RustFS?
-
-
 
 RustFS is a simple, high-performance, distributed object storage solution. It is 100% S3-compatible and released under the Apache 2.0 license, making it a commercially-friendly open-source software.
 
 Written entirely in Rust—the modern programming language known for memory safety and exceptional performance 1—RustFS is developed by a global community of talented engineers. It is designed to be a powerful, reliable open-source alternative and can serve as a direct replacement for products like MinIO.2
 
-
-
 ### 2. Our Mission: Accessible & Secure Data for Everyone
-
-
 
 We believe that data storage should be affordable, reliable, and secure for everyone, everywhere.
 
 High-quality, multilingual documentation is central to this mission. It's not just an add-on; it's key to lowering the barrier to entry for users and developers across the globe. When you translate a guide or fix an error, you are directly helping people in different linguistic communities to more easily build robust, cost-effective data infrastructure. Your contributions empower a global audience, collectively enhancing data security and sovereignty. This community-driven approach to knowledge sharing maximizes the project's value and helps us truly realize our vision.4
 
-
-
 ### 3. Your Contribution Journey
-
-
 
 We have designed different pathways for various types of contributors. Whether you want to quickly fix a small issue or systematically translate the entire documentation, you'll find the right guide here.
 
-
-
 #### 3.1 Getting Started: Your First Contribution
-
-
 
 The easiest way to get started is by making small edits directly through the GitHub web interface. This method requires no local development setup and is perfect for minor changes.6
 
@@ -88,11 +71,7 @@ Simple contributions you can make include:
 
 This process serves as an excellent "on-ramp for contributors," allowing you to familiarize yourself with our workflow without any complex setup. A successful lightweight contribution is often the first step toward deeper involvement.5
 
-
-
 #### 3.2 Translating the Documentation: Adding a New Language
-
-
 
 This is the core area where we most need community help. Please follow these steps to add or improve translations.
 
@@ -105,7 +84,7 @@ To avoid duplicated work and ensure collaboration, please visit our **[GitHub Is
 
 **Step 2: Understand the Directory Structure**
 
-Our documentation site is built with VitePress, which uses a file-based directory structure to manage multiple languages.9 All source files are located in the 
+Our documentation site is built with VitePress, which uses a file-based directory structure to manage multiple languages.9 All source files are located in the
 
 `docs/` directory.
 
@@ -140,7 +119,7 @@ docs/
    ```
    //.vitepress/config.ts
    import { defineConfig } from 'vitepress'
-   
+
    export default defineConfig({
      //... other configs
      locales: {
@@ -211,23 +190,15 @@ To ensure consistency, please use the standard ISO 639-1 codes from the table be
 | German               | `de`            |
 | French               | `fr`            |
 
-
-
 ### 4. The Technical Workflow
-
-
 
 For developers who wish to make more substantial contributions locally (such as adding a new language pack or making extensive changes), please follow this technical workflow.
 
-
-
 #### 4.1 Prerequisites
-
-
 
 Before you begin, please ensure you have the following software installed on your system:
 
-- **Node.js**: Version `18.x` or higher.14 You can download it from the 
+- **Node.js**: Version `18.x` or higher.14 You can download it from the
 
   [official Node.js website](https://nodejs.org/).
 
@@ -235,11 +206,7 @@ Before you begin, please ensure you have the following software installed on you
 
 - **Git**: A version control system. You can download it from the [official Git website](https://git-scm.com/).
 
-
-
 #### 4.2 Local Development Setup
-
-
 
 Follow this sequence of commands to run the documentation development server locally:
 
@@ -277,13 +244,9 @@ Follow this sequence of commands to run the documentation development server loc
 
 4. Access the Site
 
-   After successful execution, you should see output in your terminal similar to VitePress dev server running at: http://localhost:5173/. Open this URL in your browser to see the documentation site. Any changes you make to the Markdown files will be reflected instantly in the browser.15
-
-
+   After successful execution, you should see output in your terminal similar to VitePress dev server running at: <http://localhost:5173/>. Open this URL in your browser to see the documentation site. Any changes you make to the Markdown files will be reflected instantly in the browser.15
 
 #### 4.3 Pull Request (PR) & Commit Guidelines
-
-
 
 We follow a standardized workflow to ensure code quality and a clean project history.
 
@@ -321,11 +284,7 @@ We follow a standardized workflow to ensure code quality and a clean project his
   - We may request changes. Please don't be discouraged! This is a normal part of collaborative open-source development aimed at improving the quality of contributions.
   - Once your PR is approved and all automated checks have passed, a maintainer will merge it.
 
-
-
 #### 4.4 Automated Checks & Deployment
-
-
 
 To ensure the quality and stability of our documentation, we have a fully automated CI/CD (Continuous Integration/Continuous Deployment) pipeline.
 
@@ -334,17 +293,9 @@ To ensure the quality and stability of our documentation, we have a fully automa
 
 By making this process transparent, we aim to build contributor trust in our workflow. You don't need to worry about the deployment details; a successful merge means a successful deployment. This gives you a clear view of the entire lifecycle of your contribution, from submission to publication.19
 
-
-
 ### 5. Community & Licensing
 
-
-
-
-
 #### 5.1 Acknowledgements
-
-
 
 The RustFS documentation is built by the community, for the community. We are incredibly grateful to everyone who contributes their time and expertise.
 
@@ -352,11 +303,7 @@ Every contribution, no matter how small, is highly valued. To fairly and transpa
 
 You can see a list of all our amazing contributors on the **[Contributors graph](https://github.com/rustfs/docs.rustfs.com/graphs/contributors)**. This automated, scalable approach ensures that every contribution is acknowledged and always up-to-date.22
 
-
-
 #### 5.2 Content License
-
-
 
 All documentation in this project is licensed under the **Creative Commons Attribution 4.0 International License**.23
 

@@ -303,7 +303,7 @@ export const sidebar = [
       {
         text: '升级',
         link: '/de/upgrade-scale/upgrade',
-     },
+      },
       // {
       //   text: '扩容',
       //   link: '/de/upgrade-scale/scale',
@@ -470,6 +470,10 @@ export const sidebar = [
           {
             text: 'TypeScript',
             link: '/de/developer/sdk/typescript'
+          },
+          {
+            text: 'Golang',
+            link: '/de/developer/sdk/go'
           },
           {
             text: '其他 SDK',

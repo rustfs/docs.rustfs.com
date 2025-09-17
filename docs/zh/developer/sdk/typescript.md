@@ -3,7 +3,7 @@ title: "RustFS TypeScript SDK 使用指南"
 description: "通过 TypeScript SDK 来对 RustFS 实例进行操作,包括存储桶、对象的创建和删除."
 ---
 
-# TypeScript Rust SDK
+# TypeScript SDK
 
 由于 RustFS 是完全兼容 S3 的对象存储系统，因此可以通过对 S3 的 TypeScript SDK 做一些封装来构建适用于 RustFS 的 TypeScript SDK，通过 SDK 对 RustFS 进行操作，包括存储桶/对象的创建和删除、文件的上传和下载等。
 
@@ -27,7 +27,7 @@ const rustfs_client = new S3Client({
 });
 ```
 
-接着使用构造好的 `rustfs_client` 进行响应的操作。
+接着使用构造好的 `rustfs_client` 进行相应的操作。
 
 ## 创建存储桶
 
@@ -112,7 +112,7 @@ async function getObject() {
             Bucket: "rust-sdk-demo",
             Key: "1.txt",
         }));
-        
+
         // get object content
         if (response.Body) {
             const chunks: Buffer[] = [];
