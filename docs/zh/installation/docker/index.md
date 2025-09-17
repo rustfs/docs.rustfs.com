@@ -1,6 +1,6 @@
 ---
 title: "Docker 安装 RustFS"
-description: "RustFS Docker 部署。"
+description: "使用 Docker 或 Docker Compose 安装部署 RustFS。"
 ---
 
 # Docker 安装 RustFS
@@ -175,7 +175,55 @@ docker run -d \
    -e RUSTFS_TLS_PATH=/certs \
    ```
 
-## 五、验证与访问
+### Docker Compose 安装
+
+RustFS 官方提供了 Docker Compose 的安装方式，[`docker-compose.yml`](https://github.com/rustfs/rustfs/blob/main/docker-compose.yml)文件中包含多个服务，包括 `grafana`、`prometheus`、`otel-collector`、`jaeger` 等，主要围绕可观测性。如果你想同时部署这些服务，克隆 [RustFS 代码仓库](https://github.com/rustfs/rustfs)到本地：
+
+```
+git clone git@github.com:rustfs/rustfs.git
+```
+
+然后在根目录下执行：
+
+```
+docker compose --profile observability up -d
+```
+
+会启动如下容器：
+
+```
+CONTAINER ID   IMAGE                                             COMMAND                  CREATED         STATUS                            PORTS                                                                                                                                     NAMES
+c13c23fe3d9d   rustfs/rustfs:latest                              "/entrypoint.sh rust…"   6 seconds ago   Up 5 seconds (health: starting)   0.0.0.0:9000-9001->9000-9001/tcp, :::9000-9001->9000-9001/tcp                                                                             rustfs-server
+e3f4fc4a83a2   grafana/grafana:latest                            "/run.sh"                7 seconds ago   Up 5 seconds                      0.0.0.0:3000->3000/tcp, :::3000->3000/tcp                                                                                                 grafana
+71ef1b8212cf   prom/prometheus:latest                            "/bin/prometheus --c…"   7 seconds ago   Up 5 seconds                      0.0.0.0:9090->9090/tcp, :::9090->9090/tcp                                                                                                 prometheus
+e7db806b2d6f   jaegertracing/all-in-one:latest                   "/go/bin/all-in-one-…"   7 seconds ago   Up 5 seconds                      4317-4318/tcp, 9411/tcp, 0.0.0.0:14250->14250/tcp, :::14250->14250/tcp, 14268/tcp, 0.0.0.0:16686->16686/tcp, :::16686->16686/tcp          jaeger
+1897830a2f1e   otel/opentelemetry-collector-contrib:latest       "/otelcol-contrib --…"   7 seconds ago   Up 5 seconds                      0.0.0.0:4317-4318->4317-4318/tcp, :::4317-4318->4317-4318/tcp, 0.0.0.0:8888-8889->8888-8889/tcp, :::8888-8889->8888-8889/tcp, 55679/tcp   otel-collector
+```
+
+如果你仅仅想安装 rustfs，不想启动其他服务，那么你需要在 `docker-compose.yml` 中注释掉：
+
+```
+#depends_on:
+#  - otel-collector
+```
+
+然后执行命令：
+
+```
+docker compose -f docker-compose.yml up -d rustfs
+```
+
+只启动了 `rustfs-server` 这一个服务：
+
+```
+docker ps
+CONTAINER ID   IMAGE                                             COMMAND                  CREATED         STATUS                           PORTS                                                           NAMES
+e07121ecdd39   rustfs/rustfs:latest                              "/entrypoint.sh rust…"   2 seconds ago   Up 1 second (health: starting)   0.0.0.0:9000-9001->9000-9001/tcp, :::9000-9001->9000-9001/tcp   rustfs-server
+```
+
+不管是单独启动 `rustfs-server` 还是和可观测性的服务一起启动，对于 RustFS 实例的访问都是通过 `http://localhost:9000`，并使用默认用户名和密码（均为 `rustfsadmin`）。
+
+## 四、验证与访问
 
 1. **查看容器状态与日志：**
 
@@ -198,7 +246,7 @@ docker run -d \
  如能成功创建并列举 bucket，则部署生效。
 
 
-## 六、其他建议
+## 五、其他建议
 
 1. 生产环境建议：
 - 使用多节点部署架构
