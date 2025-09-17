@@ -156,6 +156,54 @@ docker run -d \
    -e RUSTFS_TLS_PATH=/certs \
    ```
 
+### Docker Compose Installation
+
+RustFS officially provides a Docker Compose installation method. The [`docker-compose.yml`](https://github.com/rustfs/rustfs/blob/main/docker-compose.yml) file includes multiple services, such as `grafana`, `prometheus`, `otel-collector`, and `jaeger`, mainly for observability. If you want to deploy these services together, clone the [RustFS code repository](https://github.com/rustfs/rustfs) locally,
+
+```
+git clone git@github.com:rustfs/rustfs.git
+```
+
+Running the command under root directory,
+
+```
+docker compose --profile observability up -d
+```
+
+Started containers is as below,
+
+```
+CONTAINER ID   IMAGE                                             COMMAND                  CREATED         STATUS                            PORTS                                                                                                                                     NAMES
+c13c23fe3d9d   rustfs/rustfs:latest                              "/entrypoint.sh rust…"   6 seconds ago   Up 5 seconds (health: starting)   0.0.0.0:9000-9001->9000-9001/tcp, :::9000-9001->9000-9001/tcp                                                                             rustfs-server
+e3f4fc4a83a2   grafana/grafana:latest                            "/run.sh"                7 seconds ago   Up 5 seconds                      0.0.0.0:3000->3000/tcp, :::3000->3000/tcp                                                                                                 grafana
+71ef1b8212cf   prom/prometheus:latest                            "/bin/prometheus --c…"   7 seconds ago   Up 5 seconds                      0.0.0.0:9090->9090/tcp, :::9090->9090/tcp                                                                                                 prometheus
+e7db806b2d6f   jaegertracing/all-in-one:latest                   "/go/bin/all-in-one-…"   7 seconds ago   Up 5 seconds                      4317-4318/tcp, 9411/tcp, 0.0.0.0:14250->14250/tcp, :::14250->14250/tcp, 14268/tcp, 0.0.0.0:16686->16686/tcp, :::16686->16686/tcp          jaeger
+1897830a2f1e   otel/opentelemetry-collector-contrib:latest       "/otelcol-contrib --…"   7 seconds ago   Up 5 seconds                      0.0.0.0:4317-4318->4317-4318/tcp, :::4317-4318->4317-4318/tcp, 0.0.0.0:8888-8889->8888-8889/tcp, :::8888-8889->8888-8889/tcp, 55679/tcp   otel-collector
+```
+
+If you only want to install rustfs, do not want to deploy grafana,prometheus,etc, please comment below lines in `docker-compose.yml` file,
+
+```
+#depends_on:
+#  - otel-collector
+```
+
+Then, run the command,
+
+```
+docker compose -f docker-compose.yml up -d rustfs
+```
+
+This way will only install and start `rustfs-server` service, namely rustfs container,
+
+```
+docker ps
+CONTAINER ID   IMAGE                                             COMMAND                  CREATED         STATUS                           PORTS                                                           NAMES
+e07121ecdd39   rustfs/rustfs:latest                              "/entrypoint.sh rust…"   2 seconds ago   Up 1 second (health: starting)   0.0.0.0:9000-9001->9000-9001/tcp, :::9000-9001->9000-9001/tcp   rustfs-server
+```
+
+Whether you start only the `rustfs-server` or together with observability services, you can access the RustFS instance via `http://localhost:9000` using the default username and password (`rustfsadmin` for both).
+
 ## 4. Verification and Access
 
 1. **View Container Status and Logs:**
