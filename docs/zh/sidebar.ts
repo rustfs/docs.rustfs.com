@@ -411,10 +411,10 @@ export const sidebar = [
         text: '虚拟主机模式配置',
         link: '/zh/integration/virtual'
       },
-      // {
-      //   text: 'GitLab',
-      //   link: '/zh/integration/gitlab',
-      // },
+      {
+        text: 'Milvus 存储后端配置',
+        link: '/zh/integration/milvus',
+      },
       // {
       //   text: 'HDFS',
       //   link: '/zh/integration/hdfs'
