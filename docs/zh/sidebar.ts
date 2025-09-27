@@ -412,13 +412,13 @@ export const sidebar = [
         link: '/zh/integration/virtual'
       },
       {
-        text: 'Milvus 存储后端配置',
+        text: 'Milvus 对象存储配置',
         link: '/zh/integration/milvus',
       },
-      // {
-      //   text: 'HDFS',
-      //   link: '/zh/integration/hdfs'
-      // },
+      {
+        text: 'GitLab 对象存储配置',
+        link: '/zh/integration/gitlab'
+      },
       // {
       //   text: 'restic',
       //   link: '/zh/integration/restic'
