@@ -46,6 +46,7 @@ RustFS SNSD Docker 运行方式，结合上述镜像与配置，执行：
  docker run -d \
   --name rustfs_local \
   -p 9000:9000 \
+  -p 9001:9001 \
   -v /mnt/rustfs/data:/data \
   rustfs/rustfs:latest \
   /data
@@ -53,7 +54,8 @@ RustFS SNSD Docker 运行方式，结合上述镜像与配置，执行：
 
 各参数说明：
 
-* `-p 9000:9000`：映射宿主机 9000 端口到容器
+* `-p 9000:9000`：映射宿主机 9000 Endpoint端口到容器
+* `-p 9001:9001`：映射宿主机 9001 Console端口到容器
 * `-v /mnt/rustfs/data:/data`：挂载数据卷
 * `--name rustfs_local`：容器自定义名称
 * `-d`：后台运行
@@ -66,6 +68,7 @@ RustFS SNSD Docker 运行方式，结合上述镜像与配置，执行：
 docker run -d \
   --name rustfs_container \
   -p 9000:9000 \
+  -p 9001:9001 \
   -v /mnt/rustfs/data:/data \
   -e RUSTFS_ACCESS_KEY=rustfsadmin \
   -e RUSTFS_SECRET_KEY=rustfsadmin \
@@ -109,6 +112,7 @@ docker run -d \
    ```bash
    docker run -d \
      -p 9000:9000 \
+     -p 9001:9001 \
      -v /mnt/data:/data \
      rustfs/rustfs:latest \
      /data
@@ -118,10 +122,10 @@ docker run -d \
    ```bash
    docker run -d \
      -p 9000:9000 \
+     -p 9001:9001 \
      -v /mnt/data:/data \
      -e RUSTFS_CONSOLE_ENABLE=true \
      rustfs/rustfs:latest \
-     ./target/debug/rustfs \
      --console-enable \
      /data
    ```
@@ -130,11 +134,11 @@ docker run -d \
    ```bash
    docker run -d \
      -p 9000:9000 \
+     -p 9001:9001 \
      -v /mnt/data:/data \
      -e RUSTFS_ACCESS_KEY=rustfsadmin \
      -e RUSTFS_SECRET_KEY=rustfsadmin \
      rustfs/rustfs:latest \
-     ./target/debug/rustfs \
      --access-key rustfsadmin \
      --secret-key rustfsadmin \
      /data

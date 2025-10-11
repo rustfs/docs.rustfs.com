@@ -38,7 +38,7 @@ RustFS, [TLS yapılandırması](../integration/tls-configured.md) yoluyla RustFS
     systemctl restart rustfs
     ```
 
-`https://rustfs.example.com:9000` üzerinden örneğe erişin.
+`https://rustfs.example.com:9001` üzerinden örneğe erişin.
 
 * Docker Kurulumu
 
@@ -51,10 +51,11 @@ RustFS, [TLS yapılandırması](../integration/tls-configured.md) yoluyla RustFS
         -e RUSTFS_TLS_PATH="/opt/tls/"
         -v /opt/tls:/opt/tls \
         -p 9000:9000 \
+        -p 9001:9001 \
         -v /data:/data \
         rustfs/rustfs:latest
     ```
 
-1. RustFS örnek konteynerini yeniden başlatın, ardından `https://rustfs.example.com:9000` üzerinden örneğe erişin.
+1. RustFS örnek konteynerini yeniden başlatın, ardından `https://rustfs.example.com:9001` üzerinden örneğe erişin.
 
 **Not**: RustFS örnek konteyneri varsayılan olarak `rustfs` kullanıcısı ile çalıştığından, sertifika dosyalarının (`rustfs_key.pem` ve `rustfs_cert.pem`) kullanıcısının `rustfs` olduğundan emin olmalısınız, aksi takdirde izin sorunları nedeniyle RustFS örneği sertifika dosyalarını okuyamaz ve TLS yapılandırması başarısız olur.

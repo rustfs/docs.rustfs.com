@@ -38,7 +38,7 @@ RustFS 支持通过[配置 TLS](../integration/tls-configured.md)来以更加安
     systemctl restart rustfs
     ```
 
-通过 `https://rustfs.example.com:9000` 访问实例。
+通过 `https://rustfs.example.com:9001` 访问实例。
 
 
 * Docker 安装
@@ -52,10 +52,11 @@ RustFS 支持通过[配置 TLS](../integration/tls-configured.md)来以更加安
         -e RUSTFS_TLS_PATH="/opt/tls/"
         -v /opt/tls:/opt/tls \
         -p 9000:9000 \
+        -p 9001:9001 \
         -v /data:/data \
         rustfs/rustfs:latest
     ```
 
-1. 重启 RustFS 实例容器，然后通过 `https://rustfs.example.com:9000` 访问实例。
+1. 重启 RustFS 实例容器，然后通过 `https://rustfs.example.com:9001` 访问实例。
 
 **注意**：由于 RustFS 实例容器默认以 `rustfs` 用户运行，因此需要确保证书文件（`rustfs_key.pem` 和 `rustfs_cert.pem`）的用户为 `rustfs`，否则会出现 RustFS 实例因为权限问题而无法读取证书文件，导致 TLS 配置失败。

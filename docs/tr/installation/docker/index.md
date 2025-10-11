@@ -45,6 +45,7 @@ RustFS SNSD Docker çalışma yöntemi, yukarıdaki görüntü ve yapılandırma
  docker run -d \
   --name rustfs_local \
   -p 9000:9000 \
+  -p 9001:9001 \
   -v /mnt/rustfs/data:/data \
   rustfs/rustfs:latest \
   /data
@@ -65,6 +66,7 @@ Parametre açıklamaları:
 docker run -d \
   --name rustfs_container \
   -p 9000:9000 \
+  -p 9001:9001 \
   -v /mnt/rustfs/data:/data \
   -e RUSTFS_ACCESS_KEY=rustfsadmin \
   -e RUSTFS_SECRET_KEY=rustfsadmin \
@@ -111,6 +113,7 @@ docker run -d \
    ```bash
    docker run -d \
      -p 9000:9000 \
+     -p 9001:9001 \
      -v /mnt/data:/data \
      rustfs/rustfs:latest \
      /data
@@ -121,10 +124,10 @@ docker run -d \
    ```bash
    docker run -d \
      -p 9000:9000 \
+     -p 9001:9001 \
      -v /mnt/data:/data \
      -e RUSTFS_CONSOLE_ENABLE=true \
      rustfs/rustfs:latest \
-     ./target/debug/rustfs \
      --console-enable \
      /data
    ```
@@ -134,11 +137,11 @@ docker run -d \
    ```bash
    docker run -d \
      -p 9000:9000 \
+     -p 9001:9001 \
      -v /mnt/data:/data \
      -e RUSTFS_ACCESS_KEY=rustfsadmin \
      -e RUSTFS_SECRET_KEY=rustfsadmin \
      rustfs/rustfs:latest \
-     ./target/debug/rustfs \
      --access-key rustfsadmin \
      --secret-key rustfsadmin \
      /data

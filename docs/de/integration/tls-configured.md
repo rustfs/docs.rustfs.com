@@ -38,7 +38,7 @@ RustFS unterstützt den Zugriff auf und die Verwendung von RustFS-Instanzen auf 
     systemctl restart rustfs
     ```
 
-Greifen Sie über `https://rustfs.example.com:9000` auf die Instanz zu.
+Greifen Sie über `https://rustfs.example.com:9001` auf die Instanz zu.
 
 - Docker-Installation
 
@@ -55,6 +55,6 @@ Greifen Sie über `https://rustfs.example.com:9000` auf die Instanz zu.
         rustfs/rustfs:latest
     ```
 
-1. Starten Sie den RustFS-Instanz-Container neu, dann greifen Sie über `https://rustfs.example.com:9000` auf die Instanz zu.
+1. Starten Sie den RustFS-Instanz-Container neu, dann greifen Sie über `https://rustfs.example.com:9001` auf die Instanz zu.
 
 **Hinweis**: Da der RustFS-Instanz-Container standardmäßig als `rustfs`-Benutzer läuft, müssen Sie sicherstellen, dass die Zertifikatsdateien (`rustfs_key.pem` und `rustfs_cert.pem`) dem `rustfs`-Benutzer gehören, sonst kann die RustFS-Instanz aufgrund von Berechtigungsproblemen die Zertifikatsdateien nicht lesen, was zu einem TLS-Konfigurationsfehler führt.

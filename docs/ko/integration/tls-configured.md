@@ -38,7 +38,7 @@ RustFS는 [TLS 구성](../integration/tls-configured.md)을 통해 더욱 안전
     systemctl restart rustfs
     ```
 
-`https://rustfs.example.com:9000`을 통해 인스턴스에 액세스합니다.
+`https://rustfs.example.com:9001`을 통해 인스턴스에 액세스합니다.
 
 
 * Docker 설치
@@ -52,10 +52,11 @@ RustFS는 [TLS 구성](../integration/tls-configured.md)을 통해 더욱 안전
         -e RUSTFS_TLS_PATH="/opt/tls/"
         -v /opt/tls:/opt/tls \
         -p 9000:9000 \
+        -p 9001:9001 \
         -v /data:/data \
         rustfs/rustfs:latest
     ```
 
-1. RustFS 인스턴스 컨테이너를 재시작한 후, `https://rustfs.example.com:9000`을 통해 인스턴스에 액세스합니다.
+1. RustFS 인스턴스 컨테이너를 재시작한 후, `https://rustfs.example.com:9001`을 통해 인스턴스에 액세스합니다.
 
 **참고**: RustFS 인스턴스 컨테이너는 기본적으로 `rustfs` 사용자로 실행되므로, 인증서 파일(`rustfs_key.pem`과 `rustfs_cert.pem`)의 소유자가 `rustfs`인지 확인해야 합니다. 그렇지 않으면 권한 문제로 인해 RustFS 인스턴스가 인증서 파일을 읽을 수 없어 TLS 구성이 실패할 수 있습니다.
