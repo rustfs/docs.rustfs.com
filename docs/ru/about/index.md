@@ -2,7 +2,7 @@
 
 **RustFS стремится стать ведущей мировой компанией в области безопасности данных и снижения затрат на данные.**
 
-Организация хранения данных с открытым исходным кодом (Beijing Henghesa Technology Co., Ltd.), состоящая из выдающихся архитекторов хранения из таких компаний, как Baidu, Tencent, TAL Education Group и др. Штаб-квартира Beijing Henghesa находится в Пекине, Китай. Ценности компании: честность, сосредоточенность, простота.
+Latinskaya transliteratsiya (Транслитерация): RustFS predstavlyayet soboy priznannoye vo vsyom mire resheniye s otkrytym iskhodnym kodom dlya infrastruktury raspredelyonnogo ob'yektnogo khraneniya. Proyekt byl zapushchen sovmestnymi usiliyami i sostoit iz talantlivykh arkhitektorov khranilishch i entuziastov open-source so vsego mira. Nashi klyuchevyye tsennosti: tselostnost', kontsentratsiya i prostota.
 
 Наше видение заключается в предоставлении всему миру многоязычных, безопасных и экономичных продуктов распределенного объектного хранения.
 

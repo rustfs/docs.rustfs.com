@@ -2,7 +2,9 @@
 
 **RustFS, veri güvenliği ve maliyet azaltma konusunda dünya lideri bir şirket olmaya kararlıdır.**
 
-RustFS, Baidu, Tencent ve TAL Education Group gibi şirketlerden gelen mükemmel depolama mimarlarından oluşan açık kaynaklı bir depolama organizasyonudur (Beijing Henghesa Teknoloji Co., Ltd.). Beijing Henghesa'nın merkezi Çin'in başkenti Beijing'dedir. Şirketin temel değerleri: Dürüstlük, Odaklanma ve Sadeliktir.
+RustFS, dağıtık nesne depolama için dünyaca tanınan, açık kaynaklı bir altyapı çözümüdür. Bu, dünyanın dört bir yanından yetenekli depolama mimarları ve açık kaynak tutkunları tarafından ortaklaşa başlatılan ve oluşturulan bir projedir. Temel değerlerimiz: Dürüstlük, Odaklanma ve Sadeliktir.
+
+
 
 Vizyonumuz, dünyaya çok dilli, güvenli ve maliyet etkin dağıtık nesne depolama ürünleri sunmaktır.
 

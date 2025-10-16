@@ -2,7 +2,7 @@
 
 **RustFS is committed to becoming a world-leading company in data security and cost reduction.**
 
-RustFS is an open-source storage organization (Beijing Henghesa Technology Co., Ltd.) composed of excellent storage architects from companies such as Baidu, Tencent, and TAL Education Group. Beijing Henghesa is headquartered in Beijing, China. The company's core values are: Integrity, Focus, and Simplicity.
+RustFS is a world-renowned open-source infrastructure solution for distributed object storage. It is a project jointly initiated and composed of talented storage architects and open-source enthusiasts from across the globe. Our core values are: Integrity, Focus, and Simplicity.
 
 Our vision is to provide multilingual, secure, and cost-effective distributed object storage products to the world.
 
@@ -22,13 +22,7 @@ Integrity, Focus, Simplicity
 
 ![Vision and Values](./images/vision-values.png)
 
-## Office Address
-
-📍 **Address**
-Building C, North Territory, Dongsheng Science Park, Zhongguancun, No. 66 Xixiaokou Road, Haidian District, Beijing
-
-📞 **Phone**
-400-033-5363
+## Contact Us
 
 📧 **Email**
 <hello@rustfs.com>

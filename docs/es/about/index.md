@@ -2,7 +2,8 @@
 
 **RustFS aspira a convertirse en una empresa líder mundial en seguridad de datos y reducción de costos de datos.**
 
-Una organización de almacenamiento de código abierto (Beijing Henghesa Technology Co., Ltd.) compuesta por excelentes arquitectos de almacenamiento de empresas como Baidu, Tencent, TAL Education Group, etc. La sede de Beijing Henghesa está ubicada en Beijing, China. Los valores de la empresa son: integridad, enfoque, simplicidad.
+RustFS es una solución de infraestructura de código abierto para almacenamiento distribuido de objetos, reconocida a nivel mundial. Se trata de un proyecto impulsado y formado por talentosos arquitectos de almacenamiento y entusiastas del código abierto de todo el globo. Nuestros valores principales son: Integridad, Enfoque y Simplicidad.
+
 
 Nuestra visión es proporcionar al mundo productos de almacenamiento de objetos distribuidos multilingües, seguros y de reducción de costos.
 
@@ -24,11 +25,6 @@ Integridad, enfoque, simplicidad
 
 ## Dirección de oficina
 
-📍 **Dirección**
-Zona C Norte del Parque Tecnológico Zhongguancun Dongsheng, Carretera Xiaokou West 66, Distrito Haidian, Beijing
-
-📞 **Teléfono**
-400-033-5363
 
 📧 **Correo electrónico**
 <hello@rustfs.com>
