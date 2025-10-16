@@ -27,7 +27,6 @@ Intégrité, concentration, simplicité
 📧 **Email**
 <hello@rustfs.com>
 
-![Environnement de bureau](./images/office-location.png)
 
 ## RustFS fournit des solutions de stockage distribué sécurisées et fiables au monde entier
 

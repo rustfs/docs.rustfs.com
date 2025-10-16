@@ -33,7 +33,7 @@ RustFS 不断的在人工智能、大数据、视频、云计算、加密存储�
 📧 **邮箱**
 <hello@rustfs.com>
 
-![办公环境](./images/office-location.png)
+![办公地址](./images/office-location.png)
 
 ## RustFS 为全球提供安全、可靠的分布式存储方案
 

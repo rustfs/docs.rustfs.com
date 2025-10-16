@@ -27,7 +27,6 @@ Integrity, Focus, Simplicity
 📧 **Email**
 <hello@rustfs.com>
 
-![Office Environment](./images/office-location.png)
 
 ## RustFS Provides Secure and Reliable Distributed Storage Solutions Globally
 
@@ -36,6 +35,7 @@ Integrity, Focus, Simplicity
 > According to Fortune Business Insights, the global data storage market is expected to grow from $218.33 billion in 2024 to $774 billion in 2032, with a compound annual growth rate of 17.1% during this period.
 
 ### Invest in RustFS
+
 
 📧 **Contact**
 <hello@rustfs.com>

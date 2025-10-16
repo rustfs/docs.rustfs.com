@@ -26,7 +26,6 @@ RustFS は人工知能、ビッグデータ、ビデオ、クラウドコンピ�
 📧 **メール**
 <hello@rustfs.com>
 
-![オフィス環境](./images/office-location.png)
 
 ## RustFS は世界に安全で信頼性の高い分散ストレージソリューションを提供
 

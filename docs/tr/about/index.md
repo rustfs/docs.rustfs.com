@@ -24,21 +24,12 @@ Dürüstlük, Odaklanma, Sadelik
 
 ![Vizyon ve Değerler](./images/vision-values.png)
 
-## Ofis Adresi
 
-📍 **Adres**
-
-Bina C, Kuzey Bölgesi, Dongsheng Bilim Parkı, Zhongguancun, No. 66 Xixiaokou Road, Haidian Bölgesi, Beijing
-
-📞 **Telefon**
-
-400-033-5363
 
 📧 **E-posta**
 
 <hello@rustfs.com>
 
-![Ofis Ortamı](./images/office-location.png)
 
 ## RustFS Küresel Ölçekte Güvenli ve Güvenilir Dağıtık Depolama Çözümleri Sunar
 
