@@ -209,6 +209,263 @@ e07121ecdd39   rustfs/rustfs:latest                              "/entrypoint.sh
 
 不管是单独启动 `rustfs-server` 还是和可观测性的服务一起启动，对于 RustFS 实例的访问都是通过 `http://localhost:9000`，并使用默认用户名和密码（均为 `rustfsadmin`）。
 
+### 部署示例
+
+本节提供一个基于宝塔面板环境的生产级部署示例，采用 **双端口 + 双域名** 方案，通过 Nginx 反向代理实现 S3 API 和控制台的分离访问，并配置 SSL 证书实现 HTTPS 加密通信。
+
+#### 场景说明
+
+- **部署环境**：宝塔面板 + Docker Compose
+- **架构方案**：单独部署 RustFS（不包含可观测性服务）
+- **访问方式**：
+  - S3 API 端：`https://s3.example.com` (端口 9000)
+  - 控制台端：`https://console.example.com` (端口 9001)
+- **特性**：支持 HTTPS、CORS、健康检查
+
+#### Docker Compose 配置
+
+创建 `docker-compose.yml` 文件：
+
+```yaml
+version: "3.8"
+
+services:
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: rustfs-server
+    security_opt:
+      - "no-new-privileges:true"
+    ports:
+      - "9000:9000"   # S3 API 对外端口
+      - "9001:9001"   # 控制台对外端口
+    environment:
+      # 数据卷（多个路径用逗号分隔）
+      - RUSTFS_VOLUMES=/data/rustfs0
+      # API 和控制台监听地址
+      - RUSTFS_ADDRESS=0.0.0.0:9000
+      - RUSTFS_CONSOLE_ADDRESS=0.0.0.0:9001
+      - RUSTFS_CONSOLE_ENABLE=true
+      # CORS 设置，控制台与 S3 API 都放开来源
+      - RUSTFS_CORS_ALLOWED_ORIGINS=*
+      - RUSTFS_CONSOLE_CORS_ALLOWED_ORIGINS=*
+      # 访问密钥（生产环境请修改为强密码）
+      - RUSTFS_ACCESS_KEY=rustfsadmin
+      - RUSTFS_SECRET_KEY=rustfsadmin
+      # 日志级别
+      - RUSTFS_LOG_LEVEL=info
+
+    volumes:
+      # 存储数据卷（请根据实际情况修改路径）
+      - ./deploy/data/pro:/data
+      # 日志目录
+      - ./deploy/logs:/app/logs
+
+    networks:
+      - rustfs-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -f http://localhost:9000/health && curl -f http://localhost:9001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  rustfs-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+```
+
+启动服务：
+
+```bash
+docker compose up -d
+```
+
+#### Nginx 反向代理配置
+
+##### S3 API 端配置
+
+为 S3 API 创建 Nginx 配置文件（如 `/www/server/panel/vhost/nginx/s3.example.com.conf`）：
+
+```nginx
+# S3 API 负载均衡配置
+upstream rustfs {
+    least_conn;
+    server 127.0.0.1:9000;  # S3 API 服务端口
+}
+
+# HTTP 重定向到 HTTPS
+server {
+    listen 80;
+    listen [::]:80;
+    server_name s3.example.com;  # 替换为你的 S3 API 域名
+
+    return 301 https://$host$request_uri;
+}
+
+# HTTPS 主配置
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name s3.example.com;  # 替换为你的 S3 API 域名
+
+    # SSL 证书配置（请替换为实际证书路径）
+    ssl_certificate     /www/server/panel/vhost/cert/s3.example.com/fullchain.pem;
+    ssl_certificate_key /www/server/panel/vhost/cert/s3.example.com/privkey.pem;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         EECDH+CHACHA20:EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 10m;
+    add_header Strict-Transport-Security "max-age=31536000";
+
+    # 反向代理 RustFS S3 API
+    location / {
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Port  $server_port;
+        proxy_set_header X-Forwarded-Host  $host;
+
+        # 关键配置：禁用 HEAD 请求转换，避免 S3 V4 签名失效
+        proxy_cache_convert_head off;
+        proxy_connect_timeout 300;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+
+        proxy_pass http://rustfs;  # 代理到 S3 API
+    }
+
+    # 日志配置（请根据实际情况修改路径）
+    access_log  /www/wwwlogs/s3.example.com.log;
+    error_log   /www/wwwlogs/s3.example.com.error.log;
+}
+```
+
+##### 控制台端配置
+
+为控制台创建 Nginx 配置文件（如 `/www/server/panel/vhost/nginx/console.example.com.conf`）：
+
+```nginx
+# 控制台负载均衡配置
+upstream rustfs-console {
+    least_conn;
+    server 127.0.0.1:9001;  # 控制台服务端口
+}
+
+# HTTP 重定向到 HTTPS
+server {
+    listen 80;
+    listen [::]:80;
+    server_name console.example.com;  # 替换为你的控制台域名
+
+    return 301 https://$host$request_uri;
+}
+
+# HTTPS 主配置
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name console.example.com;  # 替换为你的控制台域名
+
+    # SSL 证书配置（请替换为实际证书路径）
+    ssl_certificate     /www/server/panel/vhost/cert/console.example.com/fullchain.pem;
+    ssl_certificate_key /www/server/panel/vhost/cert/console.example.com/privkey.pem;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         EECDH+CHACHA20:EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 10m;
+    add_header Strict-Transport-Security "max-age=31536000";
+
+    # 反向代理 RustFS 控制台
+    location / {
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Port  $server_port;
+        proxy_set_header X-Forwarded-Host  $host;
+
+        # 禁用 HEAD 请求转换
+        proxy_cache_convert_head off;
+        proxy_connect_timeout 300;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+
+        proxy_pass http://rustfs-console;  # 代理到控制台
+    }
+
+    # 日志配置（请根据实际情况修改路径）
+    access_log  /www/wwwlogs/console.example.com.log;
+    error_log   /www/wwwlogs/console.example.com.error.log;
+}
+```
+
+重载 Nginx 配置：
+
+```bash
+nginx -t && nginx -s reload
+```
+
+#### 重要说明
+
+> [!WARNING]
+> **关键配置项**
+> 
+> 在 Nginx 配置中**必须添加** `proxy_cache_convert_head off` 指令，原因如下：
+> 
+> - Nginx 默认会将 HEAD 请求转换为 GET 请求以便缓存
+> - 这种转换会导致 S3 V4 签名验证失败
+> - 症状表现为访问存储桶时报错 `Bucket not found` 或 `403 AccessDenied`
+> 
+> 参考 [Nginx 官方文档](http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_cache_convert_head)。
+
+#### 访问验证
+
+配置完成后，通过以下方式验证部署：
+
+1. **访问控制台**：
+   ```
+   https://console.example.com
+   ```
+   使用账号密码登录（默认均为 `rustfsadmin`）
+
+2. **测试 S3 API**：
+   ```bash
+   # 使用 mc 客户端
+   mc alias set myrustfs https://s3.example.com rustfsadmin rustfsadmin
+   mc mb myrustfs/test-bucket
+   mc ls myrustfs
+   ```
+
+3. **检查服务状态**：
+   ```bash
+   # 查看容器状态
+   docker ps
+   
+   # 查看服务日志
+   docker logs rustfs-server
+   
+   # 检查健康状态
+   curl http://localhost:9000/health
+   curl http://localhost:9001/health
+   ```
+
+#### 安全建议
+
+1. **修改默认密钥**：生产环境务必修改 `RUSTFS_ACCESS_KEY` 和 `RUSTFS_SECRET_KEY` 为强密码
+2. **限制 CORS**：将 `RUSTFS_CORS_ALLOWED_ORIGINS` 从 `*` 改为具体域名
+3. **防火墙配置**：确保 9000 和 9001 端口仅允许 Nginx 服务器访问
+4. **SSL 证书**：建议使用 Let's Encrypt 自动续期证书
+5. **定期备份**：配置数据卷的定期备份策略
+
 ## 四、验证与访问
 
 1. **查看容器状态与日志：**
