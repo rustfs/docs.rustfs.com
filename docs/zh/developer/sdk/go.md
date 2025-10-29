@@ -129,4 +129,58 @@ if err != nil {
 fmt.Println("content is :", string(data))
 ```
 
+## 获取预签名上传URL
+
+```go
+presignClient := s3.NewPresignClient(client, func(options *s3.PresignOptions) {
+    options.ClientOptions = []func(oo *s3.Options){
+        func(oo *s3.Options) {
+            oo.UsePathStyle = true
+        },
+    }
+})
+filename := "a/a.txt"
+putObjectInput := s3.PutObjectInput{
+    Bucket: aws.String(config.Cfg.Oss.Bucket),
+    Key:    aws.String(filename),
+}
+presignResult, err := presignClient.PresignPutObject(ctx, &putObjectInput, func(po *s3.PresignOptions) {
+    po.ClientOptions = []func(oo *s3.Options){
+        func(oo *s3.Options) {
+            oo.UsePathStyle = true
+        },
+    }
+    po.Expires = uploadConfig.Expiration // 授权时效
+})
+if err != nil {
+    return nil, errors.New("Couldn't get presigned URL for GetObject" + err.Error())
+}
+fmt.Printf("上传URL: %s\n", presignResult.URL)
+```
+
+## 获取预签名下载URL
+
+```go
+presignClient := s3.NewPresignClient(client, func(options *s3.PresignOptions) {
+    options.ClientOptions = []func(oo *s3.Options){
+        func(oo *s3.Options) {
+            oo.UsePathStyle = true
+        },
+    }
+})
+filename := "a/a.txt"
+getObjectInput := s3.GetObjectInput{
+    Bucket: aws.String(config.Cfg.Oss.Bucket),
+    Key:    aws.String(filename),
+}
+presignResult, err := presignClient.PresignGetObject(ctx, &getObjectInput, func(po *s3.PresignOptions) {
+    // 授权时效
+    po.Expires = expiration
+})
+if err != nil {
+    return nil, errors.New("Couldn't get presigned URL for GetObject,err: " + err.Error())
+}
+fmt.Printf("访问URL: %s\n", presignResult.URL)
+```
+
 其他的使用，大家可以自行探索，如果借助 Vibe Coding，就更简单了！
