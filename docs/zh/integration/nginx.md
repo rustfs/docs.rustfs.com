@@ -156,8 +156,8 @@ upstream rustfs-console {
 
 例如， 给定主机名 www.rustfs.dev :
 
-- Endpoint的地址为 www.rustfs.dev/api/
-- Console的地址为 
+- Endpoint的地址为 `www.rustfs.dev/api/`
+- Console的地址为  `www.rustfs.dev`
 
 
 ~~~
