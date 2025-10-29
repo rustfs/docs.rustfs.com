@@ -26,22 +26,28 @@ Entegrasyonun sorunsuz ilerlemesi için önceden hazırlamanız gerekenler:
 
 ~~~
 
-
 upstream rustfs {
    least_conn;
    server 127.0.0.1:9000;
 }
-server {
-   listen       8000;
-   listen  [::]:8000;
-   server_name  _;
 
-   # Başlıklarda özel karakterlere izin ver
+upstream rustfs-console {
+   least_conn;
+   server 127.0.0.1:9001;
+}
+
+
+server {
+   listen       80;
+   listen  [::]:80;
+   server_name  YOUR_DOMAIN;
+
+   # Allow special characters in headers
    ignore_invalid_headers off;
-   # Herhangi bir boyutta dosyanın yüklenmesine izin ver.
-   # Dosya boyutunu belirli bir değerle sınırlamak için 1000m gibi bir değere ayarlayın
+   # Allow any size file to be uploaded.
+   # Set to a value such as 1000m; to restrict file size to a specific value
    client_max_body_size 0;
-   # Tamponlamayı devre dışı bırak
+   # Disable buffering
    proxy_buffering off;
    proxy_request_buffering off;
 
@@ -51,8 +57,11 @@ server {
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
       proxy_set_header X-Forwarded-Proto $scheme;
 
+      # Disable Nginx from converting HEAD to GET
+      # proxy_cache_convert_head off;
+
       proxy_connect_timeout 300;
-      # Varsayılan HTTP/1'dir, keepalive sadece HTTP/1.1'de etkindir
+      # Default is HTTP/1, keepalive is only enabled in HTTP/1.1
       proxy_http_version 1.1;
       proxy_set_header Connection "";
       chunked_transfer_encoding off;
@@ -63,9 +72,52 @@ server {
 
 
 
-      proxy_pass http://rustfs; # Bu, yük dengeleme için upstream direktif tanımını kullanır
+      proxy_pass http://rustfs; # This uses the upstream directive definition to load balance
    }
 }
+
+
+server {
+   listen       8080;
+   listen  [::]:8080;
+   server_name  YOUR_DOMAIN;
+
+   # Allow special characters in headers
+   ignore_invalid_headers off;
+   # Allow any size file to be uploaded.
+   # Set to a value such as 1000m; to restrict file size to a specific value
+   client_max_body_size 0;
+   # Disable buffering
+   proxy_buffering off;
+   proxy_request_buffering off;
+
+   location / {
+      proxy_set_header Host $http_host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+
+      # Disable Nginx from converting HEAD to GET
+      # proxy_cache_convert_head off;
+
+      proxy_connect_timeout 300;
+      # Default is HTTP/1, keepalive is only enabled in HTTP/1.1
+      proxy_http_version 1.1;
+      proxy_set_header Connection "";
+      chunked_transfer_encoding off;
+
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+
+
+
+
+      proxy_pass http://rustfs-console; # This uses the upstream directive definition to load balance
+   }
+}
+
+
+
 
 ~~~
 
