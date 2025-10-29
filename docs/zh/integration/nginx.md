@@ -136,7 +136,83 @@ upstream rustfs {
    server 10.0.0.3:9000;
    server 10.0.0.4:9000;
 }
+
+
+upstream rustfs-console {
+   least_conn;
+   server 10.0.0.1:9001;
+   server 10.0.0.2:9001;
+   server 10.0.0.3:9001;
+   server 10.0.0.4:9001;
+}
 ~~~
 
 
+## 四、 专用DNS模式
 
+为 RustFS 服务创建或配置一个专用的 DNS 名称。
+
+对于 RustFS 服务器 S3 API，将请求代理到该域名的/api/ 目录。 对于 RustFS 控制台的 Web GUI，将请求代理到 / 根路径。
+
+例如， 给定主机名 www.rustfs.dev :
+
+- Endpoint的地址为 www.rustfs.dev/api/
+- Console的地址为 
+
+
+~~~
+server {
+   listen       443;
+   listen  [::]:443;
+   http2 on;
+   server_name  www.rustfs.dev;
+
+   # Allow special characters in headers
+   ignore_invalid_headers off;
+   # Allow any size file to be uploaded.
+   # Set to a value such as 1000m; to restrict file size to a specific value
+   client_max_body_size 0;
+   # Disable buffering
+   proxy_buffering off;
+   proxy_request_buffering off;
+
+# S3 API
+
+   location /api {
+      proxy_set_header Host $http_host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+
+      proxy_connect_timeout 300;
+      # Default is HTTP/1, keepalive is only enabled in HTTP/1.1
+      proxy_http_version 1.1;
+      proxy_set_header Connection "";
+      chunked_transfer_encoding off;
+
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+
+      proxy_pass http://127.0.0.1:9000;
+   }
+
+# Console
+
+   location / {
+      proxy_set_header Host $http_host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+
+      proxy_connect_timeout 300;
+      # Default is HTTP/1, keepalive is only enabled in HTTP/1.1
+      proxy_http_version 1.1;
+      proxy_set_header Connection "";
+      chunked_transfer_encoding off;
+
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+      proxy_pass http://127.0.0.1:9001; 
+   }
+}
+~~~
