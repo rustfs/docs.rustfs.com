@@ -419,10 +419,10 @@ export const sidebar = [
         text: 'GitLab 对象存储配置',
         link: '/zh/integration/gitlab'
       },
-      // {
-      //   text: 'restic',
-      //   link: '/zh/integration/restic'
-      // },
+      {
+        text: 'traefik 反向代理配置',
+        link: '/zh/integration/traefik'
+      },
       {
         text: 'TLS 配置',
         link: '/zh/integration/tls-configured'
