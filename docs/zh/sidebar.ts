@@ -1,6 +1,7 @@
 export const sidebar = [
   {
     text: 'RustFS 安装指南',
+    link: '/zh/installation/index',
     // collapsed: true,
     home: true,
     items: [
