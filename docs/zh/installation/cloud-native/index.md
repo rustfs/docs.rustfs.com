@@ -24,8 +24,8 @@ RustFS 提供了官方和 [Helm Chart](https://github.com/rustfs/rustfs/tree/mai
 | `limits.cpu` |  限制的 CPU 大小 | `100m`（**一定根据自身需求设置好大小**）|
 | `limits.cpu` |  限制的 Memory 大小 | `100m`（**一定根据自身需求设置好大小**）|
 | `config.rustfs.volume` | RustFS 的 VOLUME 设置 | `/data/rustfs0,/data/rustfs1,/data/rustfs2,/data/rustfs3`（ **4 个 node 下必须这么配置**） |
-| `config.rustfs.address` | RustFS 的 API 端点地址 ｜ `0.0.0.0:9000` |
-| `config.rustfs.console_address` | RustFS 的控制台地址 ｜ `0.0.0.0:9001` |
+| `config.rustfs.address` | RustFS 的 API 端点地址 | `0.0.0.0:9000` |
+| `config.rustfs.console_address` | RustFS 的控制台地址 | `0.0.0.0:9001` |
 | `ingress.className` | ingress class 的类型，`traefik` 或 `nginx` | `nginx` |
 
 ## 安装命令

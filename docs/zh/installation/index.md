@@ -23,9 +23,6 @@ RustFS 即将从商业应用正式向开源，向全球进行发布，帮助全�
 
 您都可以上运行 RustFS。 CPU 架构支持：X86、ARM 、RISC-V 等多种 CPU 架构。
 
-
-
-
 ## 二、RustFS 安装模式
 
 
@@ -36,9 +33,7 @@ RustFS 即将从商业应用正式向开源，向全球进行发布，帮助全�
 - [在 Docker 容器中安装 RustFS](./docker/index.md)
 - [在 Windows 上安装 RustFS](./windows/index.md)
 - [在 macOS 上安装 RustFS](./macos/index.md)
-
-
-
+- [在 Kubernetes 上安装 RustFS](./cloud-native/index.md)
 
 ## 三、RustFS的特征
 
