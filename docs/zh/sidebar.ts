@@ -38,11 +38,10 @@ export const sidebar = [
         text: 'Docker 安装',
         link: '/zh/installation/docker/index'
       },
-      // {
-      //   text: '云原生安装',
-      //   link: '/zh/installation/cloud-native/index'
-      // },
-
+      {
+        text: '云原生安装',
+        link: '/zh/installation/cloud-native/index'
+      },
     ]
   },
   {
