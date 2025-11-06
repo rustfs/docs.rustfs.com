@@ -283,7 +283,6 @@ TimeoutStartSec=30s
 TimeoutStopSec=30s
 
 NoNewPrivileges=true
-ProtectSystem=full
 ProtectHome=true
 PrivateTmp=true
 PrivateDevices=true
