@@ -42,6 +42,10 @@ export default defineConfig({
     ['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' }],
     ['link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' }],
     ['link', { rel: 'manifest', href: '/site.webmanifest' }],
+    // alternate links
+    ['link', { rel: 'alternate', hreflang: 'x-default', href: 'https://docs.rustfs.com' }],
+    ['link', { rel: 'alternate', hreflang: 'en-US', href: 'https://docs.rustfs.com' }],
+    ['link', { rel: 'alternate', hreflang: 'zh-CN', href: 'https://docs.rustfs.com.cn' }],
     ['script', { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-TWW7WMTWL9' }],
 
     [

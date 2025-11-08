@@ -1,88 +1,73 @@
-# 通用规则
+# AI Agent Operating Guidelines
 
-> 本文件用于指导 AI agent 在本仓库中的行为，以下为“翻译规则”。
+This playbook directs AI agents working in the RustFS documentation repository so that every deliverable stays accurate, auditable, and easy to maintain.
 
-## 翻译规则
+## 1. Repository Snapshot
+- Framework: VitePress; source files live in `docs/`, site-wide configuration in `.vitepress`.
+- Goal: produce documentation for a distributed object storage product aimed at a global audience, currently English-first with room for other locales.
+- Navigation: `docs/sidebar.ts` and `docs/config.ts` define the site structure; new pages must be reflected in these files immediately.
 
-请你帮我翻译文档为各个语言，这个项目是一个分布式文件存储系统的文档，你要做的事情你根据中文（docs/zh）下的内容，一对一翻译为英文，请你严格按照下列步骤操作：
+## 2. Core Principles
+1. **Accuracy**: Data, APIs, and commands must be reproducible; cite third-party information with a concise source note.
+2. **Consistency**: Match the existing file layout, naming, frontmatter, and heading hierarchy.
+3. **Minimal change**: Touch only files relevant to the task; avoid drive-by formatting or reordering.
+4. **Readability**: Use concise active-voice English; spell out technical terms once with their abbreviations (e.g., Large Language Model, LLM).
+5. **Security**: Never commit secrets, tokens, or real certificates; scrub sensitive values from sample configs.
 
-### 翻译前检查
+## 3. Recommended Workflow
+### 3.1 Environment Prep
+1. `git checkout main && git pull` to sync with the latest baseline.
+2. Install dependencies via `pnpm install` (or `npm install`) whenever the repo is fresh or packages changed.
+3. Create a topic branch for the task: `git checkout -b docs/<topic>-<short-desc>`.
 
-在开始翻译前，请先检查是否有新的提交需要翻译：
+### 3.2 Editing Steps
+1. Locate or create the Markdown file under `docs/`; when adding a section, create `index.md` in that directory as its entry point.
+2. Reuse existing frontmatter fields (`title`, `aside`, `outline`, etc.) to keep VitePress behavior intact.
+3. Store images in a sibling `images/` folder or `public/`, use descriptive names, and reference them via relative paths such as `./images/<name>.png`.
+4. For multilingual work, mirror the default structure under `docs/<locale>/...` exactly.
+5. Update navigation by editing `docs/sidebar.ts` or the relevant scoped `sidebar.ts`, keeping paths free of extra prefixes.
 
+### 3.3 Review
+1. Manually preview Markdown: keep heading levels sequential and leave blank lines between lists and code blocks.
+2. Compare against requirements or issues to confirm every acceptance criterion is satisfied.
+3. Run the commands listed in Section 5 to ensure builds succeed without warnings.
+
+## 4. Content and Language Rules
+- **Structure**: Start with context, then cover “Overview → Steps → References/Constraints.”
+- **Terminology**: Bold or code-style the first mention of product/module names; wrap commands and filenames in backticks.
+- **Code blocks**: Include language hints (```bash, ```rust, etc.) and provide runnable snippets only.
+- **Tables and media**: Tables need a header row; every image requires meaningful `alt` text.
+- **Update note**: Optionally append “Last Updated: YYYY-MM-DD” at the end for traceability.
+
+## 5. Quality Verification
+1. **Build**: Run `pnpm build` (or `npm run build`) to ensure VitePress generates the site without errors.
+2. **Preview** (optional): `pnpm dev` is recommended when navigation or interactive pieces change.
+3. **Links/assets**: Watch the terminal for warnings; confirm external URLs use the right protocol and remain reachable.
+4. **Self-checklist**:
+   - Frontmatter is complete and valid.
+   - Every relative path points to an existing file.
+   - No new console warnings were introduced (missing default export, TS errors, etc.).
+
+## 6. Delivery Requirements
+1. Use `git status` to verify only task-related files changed.
+2. Write semantic commits such as `docs: <scope>` or `feat: add xxx guide`.
+3. Include in the Pull Request:
+   - A concise change summary.
+   - Build/preview commands and their outcomes.
+   - Links to related issues or requirement docs.
+4. When translation or locale sync is involved, list the language directories covered.
+
+## 7. Command Reference
 ```bash
-node scripts/check-translation.js check
+pnpm install        # install dependencies
+pnpm dev            # local development preview
+pnpm build          # generate static site
+pnpm preview        # preview the build output
 ```
 
-如果有新提交需要翻译，请按照以下步骤进行翻译。翻译完成后，更新翻译记录：
+## 8. Quality and Review Tips
+- Avoid PRs that mix unrelated domains (e.g., config refactors plus large wording sweeps).
+- Prefer Markdown + Mermaid for diagrams; if an image is required, provide the source or reproduction steps.
+- Fix historical doc issues in the same PR only when documented as a “drive-by fix” with rationale.
 
-```bash
-node scripts/check-translation.js update
-```
-
-1. 所有翻译都以中文作为源语言。
-1. 选择目标语言，比如按照 docs/ 下的顺序，先选中目标为 de，并创建此语言专用特性分支(切分支前确保主分支是最新的)。
-1. 使用 npm run sync:de 命令同步到目标语言。
-1. 如果已经存在对应的文件，则检查内容是否需要更新。
-1. 找出对应语言下内容为待翻译的文件（todo.md），并翻译。
-1. 开始翻译中文对应的内容为目标语言，如果是外链，代码，则不翻译，并且删除在中文目录下没有的仅在目标语言目录中存在的文件。
-1. 翻译完成后请仔细检查，确保所有内容都已翻译，尤其是不能存在任何占位符待翻译的文档。
-1. 切记：docs/en/sidebar.ts 里的路径不需要 en 目录前缀。
-1. docs/{locale}/sidebar.ts 请确保仅仅是语言目录不同，其他内容保持跟中文的（docs/zh/sidebar.ts）一致。（docs/en/sidebar.ts 里的路径不需要 en 目录前缀）
-1. 翻译完成一个语言后，确保目标语言下的文件结构跟中文一模一样，如果发现遗漏则重复此翻译流程。
-1. 翻译完成后仔细对比，确保没有遗漏，每一个文件都翻译了，不要多也不要少。
-1. 每完成一个文件的翻译，请执行 npm run todo:de 命令，确保 todo.md 中的文件都翻译了。
-1. 翻译完成后请执行 vitepress 的 build 命令，确保生成静态文件不出错，不能存在死链和任何报错信息。
-1. 如果发现问题，请及时修复并重新执行 build 命令。
-1. 翻译完成后请提交并推送到远程仓库，创建 Pull Request。
-
-## 翻译的要求
-
-### 地道之律
-
-"类似的剧情在计算机围棋领域也重演了一遍，只不过晚了 20 年。"
-而非"相似的情节在计算机围棋领域被重复了，延迟了 20 年。"
-
-### 检验标准
-
-读完后，读者会说"写得真好"
-而不是"翻译得真好"。
-
-### 真实之锚
-
-- 数据一字不改
-- 事实纹丝不动
-- 逻辑完整移植
-- 术语规范标注：大语言模型（LLM）
-
-## 硬规则（最高优先级）
-
-- 输出即为译文；除非用户用开关指定其他模式，不要添加解释、吐槽、道歉、模板语或免责声明。
-
-## 翻译工具说明
-
-### 翻译状态管理
-
-项目使用 `.last-translated-commit` 文件记录上次翻译完成的提交，避免重复翻译。
-
-**检查需要翻译的提交：**
-
-```bash
-node scripts/check-translation.js check
-```
-
-**翻译完成后更新记录：**
-
-```bash
-node scripts/check-translation.js update
-```
-
-### 工作流程
-
-1. 运行 `check` 命令查看是否有新提交需要翻译
-2. 如果有新提交，进行翻译工作
-3. 翻译完成后运行 `update` 命令更新记录
-
-这样可以确保不会重复翻译已经处理过的提交，提高工作效率。
-
-</translate-rules>
+Following these guidelines keeps AI agent contributions maintainable and ready for future reviews or automation hooks.

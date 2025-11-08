@@ -4,7 +4,10 @@ sidebar: false
 ---
 
 <script setup>
-import { sidebar } from './sidebar';
+import { onMounted } from 'vue';
+onMounted(() => {
+  window && window.addEventListener('DOMContentLoaded', () => {
+    window.location.href = '/installation/';
+  });
+});
 </script>
-
-<Home :sidebar="sidebar" title="RustFS Documentation Center" />
