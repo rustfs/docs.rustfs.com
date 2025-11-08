@@ -15,6 +15,7 @@ export default defineAdditionalConfig({
       { text: 'Demo', link: 'https://play.rustfs.com' },
       { text: 'Community', link: 'https://github.com/rustfs/rustfs/discussions' },
       { text: 'About', link: '/about' },
+      { text: '中文', link: 'https://docs.rustfs.com.cn' },
     ],
 
     sidebar: {
