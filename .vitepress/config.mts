@@ -7,8 +7,8 @@ const prod = !!process.env.VITEPRESS_PROD
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: 'RustFS',
-  description: 'RustFS is a high-performance distributed object storage software built using Rust',
+  title: 'RustFS Documentation',
+  description: 'RustFS is an S3-compatible distributed object storage engine written in Rust.',
   lang: 'en-US',
   ignoreDeadLinks: true,
   lastUpdated: true,
