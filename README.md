@@ -33,10 +33,7 @@ RustFS is an S3-compatible distributed object storage engine written in Rust. Th
 
 ### Translations
 
-1. Mirror the English structure under `docs/<locale>/...` (for example `docs/ja/installation/index.md`).
-2. Reuse existing frontmatter fields (`title`, `outline`, etc.) so VitePress renders consistently.
-3. Keep screenshots or diagrams in locale-specific `images/` folders where possible.
-4. Note covered languages in the PR description so reviewers can track parity.
+- Chinese docs: <https://docs.rustfs.com.cn>
 
 ## Local Development
 
