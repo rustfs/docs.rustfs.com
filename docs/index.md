@@ -6,8 +6,8 @@ sidebar: false
 <script setup>
 import { onMounted } from 'vue';
 onMounted(() => {
-  window && window.addEventListener('DOMContentLoaded', () => {
+  if (typeof window !== 'undefined') {
     window.location.href = '/installation/';
-  });
+  }
 });
 </script>
