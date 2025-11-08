@@ -5,9 +5,9 @@ RustFS is an S3-compatible distributed object storage engine written in Rust. Th
 ## Quick Links
 
 - Documentation: <https://docs.rustfs.com>
+- Chinese docs: <https://docs.rustfs.com.cn>
 - Repo issues: <https://github.com/rustfs/docs.rustfs.com/issues>
 - Product issues & roadmap: <https://github.com/rustfs/rustfs/issues>
-- Contributor playbook: `AGENTS.md`
 
 ## Repository Snapshot
 
