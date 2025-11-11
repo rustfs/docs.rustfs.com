@@ -4,6 +4,7 @@ description: "This article will detail the technology and description related to
 ---
 
 # Availability and Scalability Description
+> Note: This document is based on the latest RustFS version. Please perform full data backup before scaling operations. For production environments, it's recommended to contact RustFS technical support engineers for solution review.
 
 ## Scaling Solution Overview
 
@@ -42,8 +43,9 @@ cat /etc/hosts
 # Verify time synchronization status
 timedatectl status | grep synchronized
 
-# Check firewall rules (all nodes need to open ports 7000/7001)
-firewall-cmd --list-ports | grep 7000
+# Check firewall rules (all nodes need to open ports 9000/9001)
+firewall-cmd --list-ports | grep 9000
+firewall-cmd --list-ports | grep 9001
 ```
 
 ---
@@ -62,29 +64,108 @@ mkdir -p /data/rustfs{0..7}
 chown -R rustfs-user:rustfs-user /data/rustfs*
 ```
 
-### 2.2 Install RustFS Service
+### 2.2 Install RustFS Binary on all new nodes
 
 ```bash
-# Download latest binary package (version must match existing cluster)
-wget https://dl.rustfs.com/rustfs/v2.3.0/rustfs -O /usr/local/bin/rustfs
-chmod +x /usr/local/bin/rustfs
+# Check rustfs version on existing node
+/usr/local/bin/rustfs --version
 
+# Download and install binary package (version must match existing cluster), e.g. for version 1.0.0-alpha.67:
+wget https://github.com/rustfs/rustfs/releases/download/1.0.0-alpha.67/rustfs-linux-x86_64-musl-latest.zip
+unzip rustfs-linux-x86_64-musl-latest.zip
+chmod +x rustfs
+mv rustfs /usr/local/bin/
+```
+
+### 2.3 Create RustFS configuration file on all new nodes (/etc/default/rustfs)
+
+```bash
 # Create configuration file (/etc/default/rustfs)
+# Please replace <Your RustFS admin username> and <Secure password of your RustFS admin> with yours values!
 cat <<EOF > /etc/default/rustfs
-RUSTFS_ROOT_USER=admin
-RUSTFS_ROOT_PASSWORD=YourSecurePassword
-RUSTFS_VOLUMES="/data/rustfs{0...7}"
-RUSTFS_ADDRESS=":7000"
-RUSTFS_CONSOLE_ADDRESS=":7001"
+RUSTFS_ACCESS_KEY=<Your RustFS admin username> # e.g. rustfsadmin
+RUSTFS_SECRET_KEY=<Secure password of your RustFS admin> # e.g. rustfsadmin  
+RUSTFS_VOLUMES="http://node-{1...4}:9000/data/rustfs{0...3} http://node-{5...8}:9000/data/rustfs{0...7}" # add new storage pool to the existing
+RUSTFS_ADDRESS=":9000"
+RUSTFS_CONSOLE_ADDRESS=":9001"
 EOF
 ```
 
-### 2.3 Cluster Scaling Operation
+### 2.4 Configure System Service on all new nodes
 
 ```bash
-# Update configuration on all existing nodes (add new storage pool)
-sed -i '/RUSTFS_VOLUMES/s|"$| http://node{5...8}:7000/data/rustfs{0...7}"|' /etc/default/rustfs
+# Create systemd service file
 
+sudo tee /etc/systemd/system/rustfs.service <<EOF
+[Unit]
+Description=RustFS Object Storage Server
+Documentation=https://rustfs.com/docs/
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+NotifyAccess=main
+User=root
+Group=root
+
+WorkingDirectory=/usr/local
+EnvironmentFile=-/etc/default/rustfs
+ExecStart=/usr/local/bin/rustfs \$RUSTFS_VOLUMES
+
+LimitNOFILE=1048576
+LimitNPROC=32768
+TasksMax=infinity
+
+Restart=always
+RestartSec=10s
+
+OOMScoreAdjust=-1000
+SendSIGKILL=no
+
+TimeoutStartSec=30s
+TimeoutStopSec=30s
+
+NoNewPrivileges=true
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectClock=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+
+# service log configuration
+StandardOutput=append:/var/logs/rustfs/rustfs.log
+StandardError=append:/var/logs/rustfs/rustfs-err.log
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+
+### 2.5 Reload service configuration on all new nodes
+
+```bash
+#Reload service configuration
+sudo systemctl daemon-reload
+
+#Start service and set auto-start
+sudo systemctl enable --now rustfs
+```
+
+### 2.6 Cluster Scaling Operation on all existing nodes
+
+```bash
+# Update configuration on all existing nodes (following command will add new storage pool to the existing $RUSTFS_VOLUMES list)
+sed -i '/RUSTFS_VOLUMES/s|"$| http://node{5...8}:9000/data/rustfs{0...7}"|' /etc/default/rustfs
+```
+
+### 2.7 Cluster Scaling Operation on all nodes (existing and added)
+
+```bash
 # Global service restart (execute simultaneously on all nodes)
 systemctl restart rustfs.service
 ```
@@ -95,12 +176,19 @@ systemctl restart rustfs.service
 
 ### 3.1 Cluster Status Check
 
-```bash
-# Check node join status
-curl -s http://node1:7001/cluster/nodes | jq .poolMembers
+#### 3.1.1 Check Server List in RustFS Console
+Open in the RustFS Console Performance menu, e.g. http://node1:9001/rustfs/console/performance and check node join status in the Server List
 
-# Verify storage pool distribution
-rc admin info cluster
+#### 3.1.2 Check storage pool distribution using the Open Source MiniO Client
+
+> Note: Before usign mc, please set alias for your cluster, e.g. myrustfs - https://docs.rustfs.com/developer/mc.html
+```bash
+mc alias set myrustfs http://rustfs.example.net $RUSTFS_ACCESS_KEY $RUSTFS_SECRET_KEY
+```
+
+```bash
+# Verify storage pool distribution usign the Open Source MiniO Client mc - https://github.com/minio/mc)
+mc admin info myrustfs
 ```
 
 ### 3.2 Data Balance Verification
@@ -131,8 +219,6 @@ watch -n 5 "rustfs-admin metrics | grep 'PoolUsagePercent'"
 
 | Symptom | Check Point | Fix Command |
 |---------------------------|---------------------------------|-------------------------------|
-| New nodes cannot join cluster | Check port 7000 connectivity | `telnet node5 7000` |
+| New nodes cannot join cluster | Check port 9000 connectivity | `telnet node5 9000` |
 | Uneven data distribution | Check storage pool capacity configuration | `rustfs-admin rebalance start`|
 | Console shows abnormal node status | Verify time synchronization status | `chronyc sources` |
-
-> Note: This document is based on the latest RustFS version. Please perform full data backup before scaling operations. For production environments, it's recommended to contact RustFS technical support engineers for solution review.
