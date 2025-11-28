@@ -23,6 +23,8 @@ This article is based on RustFS official Linux binary packages, packaging RustFS
 
  * Define listening port, admin account, data path, etc. in host `/etc/rustfs/config.toml` (see Section 4 for details)
 
+4. RustFS container run as non-root user `rustfs` with id `10001`, if you run docker with `-v` to mount host directory into docker container, please make sure the owner of host directory has been changed to `10001`, otherwise you will encounter permission denied error.
+
 ---
 
 ## 2. Quick Pull of RustFS Official Image
