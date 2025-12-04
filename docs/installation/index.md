@@ -5,7 +5,7 @@ description: "Installation guide for RustFS on different operating systems and d
 
 # RustFS Introduction
 
-RustFS is a `high-performance`, `distributed` object storage software developed using Rust, the world's most popular memory-safe language. RustFS combines simplicity and efficiency, and is an efficient, open-source, free object storage solution that can be deployed locally as a private cloud. RustFS is 100% compatible with the S3 protocol and is open-source software released under the Apache2 license. RustFS is written in Rust, the world's most popular memory-safe language. It is a commercially-friendly distributed object storage product participated in and contributed by excellent engineers worldwide. RustFS can replace many object storage products with non-friendly open-source licenses.
+RustFS is a `high-performance`, `distributed` object storage software developed using Rust, the world's most popular memory-safe language. RustFS combines simplicity and efficiency, and is an efficient, open-source, free object storage solution that can be deployed locally as a private cloud. RustFS is 100% compatible with the S3 protocol and is open-source software released under the Apache2 license. It is a commercially-friendly distributed object storage product participated in and contributed by excellent engineers worldwide. RustFS can replace many object storage products with non-friendly open-source licenses.
 
 RustFS is about to transition from commercial applications to open-source, releasing globally to help the world reduce storage costs and improve data security.
 
