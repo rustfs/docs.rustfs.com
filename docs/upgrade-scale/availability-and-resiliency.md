@@ -174,22 +174,8 @@ systemctl restart rustfs.service
 
 ## 3. Post-Scaling Verification
 
-### 3.1 Cluster Status Check
-
-#### 3.1.1 Check Server List in RustFS Console
+### 3.1 Check Server List in RustFS Console
 Open in the RustFS Console Performance menu, e.g. http://node1:9001/rustfs/console/performance and check node join status in the Server List
-
-#### 3.1.2 Check storage pool distribution using the Open Source MiniO Client
-
-> Note: Before usign mc, please set alias for your cluster, e.g. myrustfs - https://docs.rustfs.com/developer/mc.html
-```bash
-mc alias set myrustfs http://rustfs.example.net $RUSTFS_ACCESS_KEY $RUSTFS_SECRET_KEY
-```
-
-```bash
-# Verify storage pool distribution usign the Open Source MiniO Client mc - https://github.com/minio/mc)
-mc admin info myrustfs
-```
 
 ### 3.2 Data Balance Verification
 
