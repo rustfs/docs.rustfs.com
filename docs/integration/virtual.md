@@ -39,3 +39,25 @@ Steps to set Virtual Host Style:
 2. If it's Linux, modify the `/etc/default/rustfs` file; if it's Docker or Kubernetes, modify the yaml or startup configuration parameters;
 3. Add `RUSTFS_SERVER_DOMAINS` to the configuration file, set this parameter to `RUSTFS_SERVER_DOMAINS = "rustfs.com"`;
 4. Save the configuration file, then use `systemctl restart rustfs` to restart the service.
+
+### Port in Domain (Optional)
+
+If your domain is accessed **with an explicit port**, you must also include the port number in `RUSTFS_SERVER_DOMAINS`.
+Otherwise, Virtual Host Style requests will not be matched correctly.
+
+For example, if your service is accessed via `rustfs.com:9001`, configure it as follows:
+
+```ini
+RUSTFS_SERVER_DOMAINS = "rustfs.com:9001"
+```
+
+This ensures that requests like:
+
+```
+http://test.rustfs.com:9001/
+```
+
+can be correctly resolved in Virtual Host Style mode.
+
+> ⚠️ Note: The value of `RUSTFS_SERVER_DOMAINS` must exactly match the **Host header** (including the port, if present) used by the client request
+
