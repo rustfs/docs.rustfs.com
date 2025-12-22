@@ -310,6 +310,6 @@ tail -f /var/logs/rustfs/rustfs*.log
 
 5. Access console
 
-Enter the server's IP address and port, try to access the console, the interface you see is as follows:
+Enter the server's IP address and port (default port for the UI is 9001), try to access the console, the interface you see is as follows:
 
 ![Console](./images/console.jpg)
