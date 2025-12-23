@@ -17,7 +17,7 @@ description: "Comparison of RustFS with mainstream object storage products"
 | License Friendliness | Medium | Poor | Excellent |
 | Performance | Performance depends on hardware and configuration | High performance, low latency, suitable for high-speed read/write and large-scale object access | High performance, low latency, suitable for high-speed read/write and large-scale object access |
 | File Protocol | Supports S3, RBD, CephFS and other protocols | S3 | S3 |
-| Ease of Use | High | Low | Low |
+| Ease of Use | Low | High | High |
 | Scalability | EB level | EB level | EB level |
 | Hardware Requirements | High hardware resource consumption | Medium resource consumption, medium hardware requirements | Low resource consumption, lower hardware requirements |
 | Memory Stability | Stable | High jitter under high concurrency | Stable |
