@@ -6,7 +6,7 @@ description: "RustFS is an object storage solution - an open-source distributed 
 # What is RustFS?
 
 RustFS is a simple, efficient, and distributed object storage solution.
-It is also an efficient, open-source, and free object storage solution. It is 100% compatible with the S3 protocol and is open-source software released under the Apache2 license. RustFS is written in Rust, currently the world's most popular memory-safe programming language.
+It is also an efficient, open-source, and free object storage solution. It is 100% compatible with the S3 protocol and is open-source software released under the Apache2 license. RustFS is written in Rust, leveraging its industry-leading memory safety and zero-cost abstractions for high-performance storage.
 It is a commercially-friendly distributed object storage product participated in and contributed to by outstanding engineers from around the world. RustFS can replace many non-friendly open-source protocol object storage products.
 
 RustFS is about to officially transition from commercial applications to open source, releasing globally to help the world reduce storage costs and improve data security.
