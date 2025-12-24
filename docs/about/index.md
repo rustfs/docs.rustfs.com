@@ -36,7 +36,7 @@ Integrity, Focus, Simplicity
 
 ### Investor Relations
 
-For investment opportunities or strategic partnerships, please contact us.
+For investment opportunities or strategic partnerships, contact us.
 
 📧 **Contact**
 <hello@rustfs.com>

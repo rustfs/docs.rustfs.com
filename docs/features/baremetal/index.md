@@ -1,43 +1,41 @@
 ---
-title: "Bare Metal and Virtualized Deployment Supporting Windows/Linux"
-description: "Open source, S3-compatible, enterprise-hardened, and extremely fast."
+title: "Bare Metal and Virtualized Deployment"
+description: "Open source, S3-compatible, and enterprise-hardened."
 ---
 
-# Bare Metal and Virtualized Deployment Supporting Windows/Linux
+# Bare Metal and Virtualized Deployment
 
-Open source, S3-compatible, enterprise-hardened, and extremely fast.
+Open source, S3-compatible, and enterprise-hardened.
 
-RustFS is a high-performance distributed object storage system. It is software-defined, runs on industry-standard hardware, and is 100% open source with Apache V2.0 as the primary open source license.
+RustFS is a high-performance distributed object storage system. It is software-defined, runs on industry-standard hardware, and is 100% open source (Apache V2.0).
 
-What makes RustFS different is that it was designed from the ground up to be the standard for private cloud/hybrid cloud object storage. Because RustFS is built specifically to serve objects only, the single-layer architecture can achieve all necessary functionality without compromising performance. The result is a cloud-native object server that is simultaneously high-performance, scalable, and lightweight.
+RustFS is designed for private/hybrid cloud object storage. Its single-layer architecture achieves all necessary functionality without compromising performance. RustFS is high-performance, scalable, and lightweight.
 
-While RustFS excels in traditional object storage use cases such as secondary storage, disaster recovery, and archiving, it stands out in overcoming challenges related to machine learning, analytics, and cloud-native application workloads.
+RustFS supports traditional use cases (secondary storage, disaster recovery, archiving) and modern workloads (machine learning, analytics, cloud-native applications).
 
 ## Core Features
 
 ### Erasure Coding
 
-RustFS uses inline erasure coding written in assembly code for each object to protect data while providing the highest possible performance. RustFS uses Reed-Solomon codes to stripe objects into data and parity blocks with user-configurable redundancy levels. RustFS's erasure coding performs repairs at the object level and can independently repair multiple objects.
+RustFS uses inline erasure coding to protect data while providing high performance. RustFS uses Reed-Solomon codes to stripe objects into data and parity blocks with user-configurable redundancy levels.
 
-With maximum parity of N/2, RustFS's implementation can ensure uninterrupted read and write operations using only ((N/2)+1) operational drives in deployment. For example, in a 12-drive setup, RustFS shards objects between 6 data drives and 6 parity drives, and can reliably write new objects or rebuild existing objects with only 7 drives remaining in deployment.
+With maximum parity of N/2, RustFS can ensure uninterrupted read and write operations using only ((N/2)+1) operational drives. For example, in a 12-drive setup (6 data + 6 parity), RustFS can reliably write new objects or rebuild existing objects with only 7 drives remaining.
 
 ![Erasure Coding](./images/sec2-1.png)
 
 ### Bitrot Protection
 
-Silent data corruption or bitrot is a serious problem facing disk drives, causing data to be corrupted without user awareness. The causes are multiple (drive aging, current spikes, disk firmware errors, phantom writes, misdirected reads/writes, driver errors, accidental overwrites), but the result is the same - data corruption.
-
-RustFS's optimized implementation of the HighwayHash algorithm ensures it never reads corrupted data - it can catch and repair corrupted objects instantly. By calculating hashes on READ and verifying them on WRITE from application, network to memory/drive, it ensures end-to-end integrity. The implementation is designed for speed and can achieve hash speeds exceeding 10 GB/s on a single core on Intel CPUs.
+Bitrot (silent data corruption) is a serious problem for disk drives. RustFS uses HighwayHash to detect and repair corrupted data. By calculating hashes on READ and verifying them on WRITE, it ensures end-to-end integrity. The implementation achieves hash speeds exceeding 10 GB/s on a single core.
 
 ![Bitrot Protection](./images/sec2-2.png)
 
 ### Server-Side Encryption
 
-Encrypting data in flight is one thing; protecting data at rest is another. RustFS supports multiple sophisticated server-side encryption schemes to protect data - regardless of where the data resides. RustFS's approach ensures confidentiality, integrity, and authenticity with negligible performance overhead. Server-side and client-side encryption are supported using AES-256-GCM, ChaCha20-Poly1305, and AES-CBC.
+RustFS supports multiple server-side encryption schemes to protect data at rest. RustFS ensures confidentiality, integrity, and authenticity with negligible performance overhead. Supported algorithms include AES-256-GCM, ChaCha20-Poly1305, and AES-CBC.
 
-Encrypted objects are tamper-proof using AEAD server-side encryption. Additionally, RustFS is compatible and tested with all common key management solutions (such as HashiCorp Vault). RustFS uses Key Management System (KMS) to support SSE-S3.
+Encrypted objects are tamper-proof using AEAD server-side encryption. RustFS is compatible with common key management solutions (e.g., HashiCorp Vault) and uses KMS to support SSE-S3.
 
-If a client requests SSE-S3 or auto-encryption is enabled, the RustFS server encrypts each object with a unique object key protected by a master key managed by KMS. Given the extremely low overhead, auto-encryption can be enabled for every application and instance.
+If a client requests SSE-S3 or auto-encryption is enabled, the RustFS server encrypts each object with a unique object key protected by a master key managed by KMS.
 
 ![Server-Side Encryption](./images/sec2-3.png)
 
@@ -45,7 +43,7 @@ If a client requests SSE-S3 or auto-encryption is enabled, the RustFS server enc
 
 #### Identity Management
 
-RustFS supports the most advanced standards in identity management and can integrate with OpenID connect compatible providers as well as major external IDP vendors. This means access is centralized, passwords are temporary and rotated, rather than stored in configuration files and databases. Additionally, access policies are fine-grained and highly configurable, meaning supporting multi-tenant and multi-instance deployments becomes simple.
+RustFS supports advanced identity management standards and integrates with OpenID Connect providers and major external IDP vendors. Access is centralized, and passwords are temporary and rotated. Access policies are fine-grained and highly configurable.
 
 #### Continuous Replication
 

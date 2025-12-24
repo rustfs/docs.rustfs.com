@@ -1,31 +1,27 @@
 ---
-title: "Python SDK"
-description: "This article mainly explains the usage of Python SDK in RustFS."
+title: "Python SDK Guide"
+description: "Guide to using the Python SDK with RustFS."
 ---
 
-Below is the **Complete Documentation for Using S3 Python SDK (Boto3) with RustFS**, including installation, connection, basic operations, advanced features (Presigned URL and multipart upload), etc., suitable for developers using Python to integrate with RustFS.
-
----
-
-# RustFS S3 Python SDK (Boto3) Documentation
+# Python SDK (Boto3) Guide
 
 ## 1. Overview
 
-RustFS is an object storage service compatible with Amazon S3 protocol, supporting integration through Python's [Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) SDK.
+RustFS is S3-compatible and supports the [Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) SDK.
 
-This tutorial will explain how to integrate Python with RustFS and complete the following operations through Boto3:
+This guide covers:
 
 * Bucket creation/deletion
 * Object upload/download/deletion
-* List objects
-* Generate presigned URLs
+* Listing objects
+* Generating presigned URLs
 * Multipart upload for large files
 
 ---
 
 ## 2. Environment Preparation
 
-### 2.1 RustFS Information
+### 2.1 Example Configuration
 
 Assume RustFS is deployed as follows:
 
@@ -37,7 +33,7 @@ SecretKey: rustfssecret
 
 ### 2.2 Install Boto3
 
-Recommended to use `venv` virtual environment:
+We recommend using a virtual environment:
 
 ```bash
 python3 -m venv venv
@@ -49,7 +45,7 @@ pip install boto3
 
 ---
 
-## 3. Connect to RustFS
+## 3. Connecting to RustFS
 
 ```python
 import boto3
@@ -67,7 +63,7 @@ s3 = boto3.client(
 
 > ✅ `endpoint_url`: Points to RustFS
 > ✅ `signature_version='s3v4'`: RustFS supports v4 signatures
-> ✅ `region_name`: RustFS doesn't validate region, any value can be filled
+> ✅ `region_name`: RustFS does not validate regions; you can use any value.
 
 ---
 

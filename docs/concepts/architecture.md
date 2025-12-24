@@ -5,39 +5,36 @@ description: "Introduction to RustFS Architecture"
 
 # RustFS Architecture
 
-RustFS is an object storage system, similar to the well-known AWS S3. As a MinIO alternative, RustFS references MinIO's concise, lightweight, scalable, and elegant architecture.
+RustFS is a high-performance object storage system compatible with the AWS S3 API. It features a concise, lightweight, scalable, and decentralized architecture.
 
-Objects can be documents, videos, PDF files, etc. To store objects, MinIO provides a scalable, flexible, and efficient solution for storing, accessing, and managing data. Its compatibility with AWS S3 API enables seamless integration with AWS S3-based applications.
+Objects can be documents, videos, PDF files, or any other unstructured data. RustFS provides a scalable, flexible, and efficient solution for storing, accessing, and managing this data. Its compatibility with the AWS S3 API enables seamless integration with existing S3-based applications.
 
-The architecture diagram is as follows:
+The following diagram illustrates the architecture:
 
 ![RustFS Architecture Diagram](./images/s2-1.png)
 
-This is RustFS's basic architecture. A distributed grid is a computer architecture that uses multiple nodes to execute a single task. Nodes are connected to each other through a network, enabling them to communicate with each other.
+This diagram represents the basic architecture of RustFS. A distributed grid uses multiple nodes to execute a single task, connected via a network to enable communication.
 
 ## Consistency Design
 
-In both distributed and single-machine modes, all read and write operations strictly follow the read-after-write consistency model.
+In both distributed and single-machine modes, all read and write operations strictly follow the **read-after-write** consistency model.
 
-## Several Important Concepts in RustFS
+## Key Concepts
 
 **Object**: The fundamental unit of storage in RustFS, representing files, byte streams, or any unstructured data.
 
-**Bucket**: A logical container for storing Objects. Data is isolated between Buckets. For clients, it functions similarly to a top-level directory.
+**Bucket**: A logical container for storing objects. Data is isolated between buckets. For clients, it functions similarly to a top-level directory.
 
-**Drive**: The disk that stores data, passed as a parameter when RustFS starts. All object data in RustFS will be stored in Drives.
+**Drive**: The physical disk that stores data, passed as a parameter when RustFS starts. All object data in RustFS is stored on these drives.
 
-**Set**: A collection of a group of Drives. Distributed deployment automatically divides one or more Sets based on cluster scale. Drives in each Set are distributed in different locations. An object is stored on one Set. (Some places also call the combination of Sets **Strips** - stripes).
+**Set**: A group of drives. Distributed deployment automatically divides the cluster into one or more sets based on scale. Drives in each set are distributed across different locations. An object is stored within a single set. (Sometimes referred to as **Stripes**).
 
-Therefore, before designing the architecture and deploying devices, note that:
+Consider the following when designing the architecture and deploying devices:
 
-1. One object is stored on one Set;
-
-2. One cluster is divided into multiple Sets;
-
-3. The number of Drives contained in one Set is fixed, defaulting to automatic calculation by the system based on cluster scale;
-
-4. Drives in one Set should be distributed across different nodes as much as possible;
+- One object is stored on one set.
+- One cluster is divided into multiple sets.
+- The number of drives in a set is fixed, defaulting to automatic calculation by the system based on cluster scale.
+- Drives in a set should be distributed across different nodes as much as possible.
 
 ## Architectural Design
 

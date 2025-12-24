@@ -1,26 +1,24 @@
 ---
-title: "RustFS TLS Configuration Guide"
-description: "Configure TLS for RustFS instances to access RustFS through HTTPS, achieving secure file storage and access."
+title: "TLS Configuration"
+description: "Configure TLS for secure access."
 ---
 
-# RustFS TLS Configuration
+# TLS Configuration
 
-RustFS supports configuring TLS to access and use RustFS instances in a more secure way. You need to specify the TLS certificate path through the environment variable `RUSTFS_TLS_PATH`.
+Configure TLS for secure access. Set the `RUSTFS_TLS_PATH` environment variable.
 
 ## Configuration
 
 ### Prerequisites
 
-- An available RustFS instance (see [Installation Guide](../installation/index.md) for installation details)
-- Available certificate pair (containing certificate file and private key file)
+- A running RustFS instance (see [Installation Guide](../installation/index.md)).
+- Certificate pair (cert and key).
 
-**Note**: The certificate pair names must be `rustfs_cert.pem` and `rustfs_key.pem`, and placed in the specified certificate path.
+**Note**: Certificates must be named `rustfs_cert.pem` and `rustfs_key.pem` and placed in the specified path.
 
-### Configuration Steps
+### Linux
 
-* Linux Installation
-
-1. Edit the RustFS instance configuration file (default file is `/etc/default/rustfs`), add the `RUSTFS_TLS_PATH` environment variable.
+1. Edit the RustFS instance configuration file (default `/etc/default/rustfs`) and add the `RUSTFS_TLS_PATH` environment variable.
 
     ```bash
     # Edit RustFS instance configuration file
@@ -30,19 +28,19 @@ RustFS supports configuring TLS to access and use RustFS instances in a more sec
     RUSTFS_TLS_PATH="/opt/tls"
     ```
 
-**Note**: You can specify any path for `RUSTFS_TLS_PATH`, but it must contain both `rustfs_cert.pem` and `rustfs_key.pem` files.
+**Note**: You can specify any path for `RUSTFS_TLS_PATH`, but it must contain both `rustfs_cert.pem` and `rustfs_key.pem`.
 
-2. Restart the RustFS instance to make the configuration effective.
+2. Restart the RustFS instance.
 
     ```bash
     systemctl restart rustfs
     ```
 
-Access the instance through `https://rustfs.example.com:9001`.
+Access via `https://rustfs.example.com:9001`.
 
-* Docker Installation
+### Docker
 
-1. Mount the certificate path through the `-v` parameter, and specify the `RUSTFS_TLS_PATH` environment variable through the `-e` parameter.
+1. Mount the certificate path via `-v` and specify `RUSTFS_TLS_PATH` via `-e`.
 
     ```bash
         docker pull rustfs/rustfs:latest

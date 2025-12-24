@@ -1,11 +1,11 @@
 ---
 title: "RustFS Bucket Management"
-description: "Buckets are important concepts in RustFS, serving as basic containers for storing data. Bucket management includes creation/deletion, copying, etc."
+description: "Buckets are the fundamental containers for data in RustFS. This section covers bucket creation, deletion, and management."
 ---
 
 # RustFS Bucket Management
 
-Buckets are basic containers in RustFS used to organize and manage data. Each bucket has a unique name and can contain multiple objects. Buckets provide logical grouping of data, making it easy for users to manage and access data.
+Buckets organize and manage data. Each bucket has a unique name and can contain multiple objects, providing logical grouping for easier access and management.
 
 - [Bucket Creation](./creation.md)
 - [Bucket Deletion](./deletion.md)

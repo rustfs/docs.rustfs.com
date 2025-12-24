@@ -13,7 +13,7 @@ RustFS is designed to be cloud-native and can run as lightweight containers mana
 
 RustFS can run anywhere and on any cloud, but typically runs on commodity servers with locally attached drives (JBOD/JBOF). All servers in the cluster are functionally equal (fully symmetric architecture). There are no name nodes or metadata servers.
 
-RustFS atomically writes data and metadata, eliminating the need for a separate metadata database. Additionally, RustFS performs all functionality (erasure coding, bitrot checking, encryption) as inline, strictly consistent operations. The result is that RustFS has extraordinary resilience.
+RustFS atomically writes data and metadata, eliminating the need for a separate metadata database. Additionally, RustFS performs all functionality (erasure coding, bitrot checking, encryption) as inline, strictly consistent operations. This results in extraordinary resilience.
 
 Each RustFS cluster is a collection of distributed RustFS servers, with one process per node. RustFS runs as a single process in user space and uses lightweight coroutines to achieve high concurrency. Drives are grouped into erasure sets (see the erasure calculator here), and objects are placed on these sets using a deterministic hashing algorithm.
 

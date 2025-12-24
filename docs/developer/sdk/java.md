@@ -1,17 +1,17 @@
 ---
-title: "Java SDK"
-description: "This article mainly explains the usage of Java SDK in RustFS."
+title: "Java SDK Guide"
+description: "Guide to using the Java SDK with RustFS."
 ---
 
 # Java SDK
 
-RustFS is an S3-compatible object storage system that supports integration with the system through AWS S3 SDK. This article will use AWS S3 Java SDK as an example to introduce how to set up a development environment from scratch, connect to RustFS, and complete basic object storage operations.
+RustFS is S3-compatible. This guide demonstrates how to use the AWS SDK for Java v2 with RustFS.
 
-## 1. Integrating AWS S3 Java SDK
+## 1. Setup
 
-### 1.1 Create Maven Project
+### 1.1 Maven Project Setup
 
-Use the following directory structure or create a new Maven project in IDE:
+Create a new Maven project:
 
 ```
 rustfs-java-s3-demo/
@@ -42,9 +42,9 @@ Add AWS SDK dependencies in `pom.xml`:
 
 ---
 
-## 2. Connect and Use RustFS
+## 2. Connecting to RustFS
 
-### 2.1 Initialize S3 Client
+### 2.1 Initialize the Client
 
 ```java
 package com.example;
@@ -64,13 +64,13 @@ public class RustfsS3Example {
  // 1. Initialize S3 client
  S3Client s3 = S3Client.builder()
  .endpointOverride(URI.create("http://192.168.1.100:9000")) // RustFS address
- .region(Region.US_EAST_1) // Can be hardcoded, RustFS doesn't validate region
+ .region(Region.US_EAST_1) // RustFS does not validate regions
  .credentialsProvider(
  StaticCredentialsProvider.create(
  AwsBasicCredentials.create("rustfsadmin", "rustfssecret")
  )
  )
- .forcePathStyle(true) // Key configuration! RustFS needs Path-Style enabled
+ .forcePathStyle(true) // Required for RustFS compatibility
  .build();
 
  // 2. Create Bucket

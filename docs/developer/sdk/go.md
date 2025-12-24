@@ -1,22 +1,22 @@
 ---
-title: "RustFS Golang SDK Usage Guide"
+title: "Golang SDK Guide"
 description: "Use the Golang SDK to operate on RustFS instances, including creating and deleting buckets and objects."
 ---
 
 # Golang SDK
 
-Since RustFS is a fully S3-compatible object storage system, you can build a Golang SDK suitable for RustFS by wrapping the S3 Golang SDK. Through the SDK, you can operate on RustFS, including creating and deleting buckets/objects, uploading and downloading files, etc.
+RustFS is fully S3-compatible. You can use the standard AWS SDK for Go to interact with RustFS. Through the SDK, you can operate on RustFS, including creating and deleting buckets/objects, uploading and downloading files, etc.
 
 ## Prerequisites
 
-- A working RustFS instance (refer to [Installation Guide](../../installation/index.md) for installation).
-- Access keys (refer to [Access Key Management](../../administration/iam/access-token.md) for creation).
+- A working RustFS instance (refer to [Installation Guide](../../installation/index.md)).
+- Access keys (refer to [Access Key Management](../../administration/iam/access-token.md)).
 
-## RustFS Golang SDK Construction
+## Initializing the Client
 
-Use `RUSTFS_ACCESS_KEY_ID`, `RUSTFS_SECRET_ACCESS_KEY`, `RUSTFS_ENDPOINT_URL`, `RUSTFS_REGION` to construct an `aws.Config`, then use `s3.NewFromConfig` from the Golang S3 SDK to build a RustFS Client:
+Configure `aws.Config` using environment variables and initialize the client:
 
-```
+```go
 region := os.Getenv("RUSTFS_REGION")
 access_key_id := os.Getenv("RUSTFS_ACCESS_KEY_ID")
 secret_access_key := os.Getenv("RUSTFS_SECRET_ACCESS_KEY")
@@ -44,7 +44,7 @@ client := s3.NewFromConfig(cfg, func(o *s3.Options) {
 })
 ```
 
-Then you can use the constructed RustFS Client to perform bucket and object operations.
+You can now perform bucket and object operations.
 
 ## Create Bucket
 

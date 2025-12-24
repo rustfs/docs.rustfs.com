@@ -1,21 +1,21 @@
 ---
-title: "Managing RustFS Objects with MinIO Client"
-description: "Managing RustFS objects with MinIO Client"
+title: "Manage RustFS Objects with MinIO Client"
+description: "Manage RustFS objects using the MinIO Client."
 ---
 
 # MinIO Client (`mc`)
 
-MinIO Client (`mc`) is an official command-line tool provided by MinIO for managing MinIO object storage services. `mc` can interact with MinIO, Amazon S3, and other S3-compatible object storage services, providing a simple and efficient way to manage data in object storage services. Since MinIO is S3-compatible, `mc` can also be used to manage RustFS objects.
+The MinIO Client (`mc`) is a command-line tool for managing object storage services. It supports MinIO, Amazon S3, and other S3-compatible services. As RustFS is S3-compatible, you can use `mc` to manage RustFS objects.
 
 Prerequisites:
 
-- An available RustFS instance. Refer to the [Installation Guide](../installation/index.md) for installation.
-- `mc` tool is installed.
+- An available RustFS instance. Refer to the [Installation Guide](../installation/index.md).
+- The `mc` tool is installed.
 - Available [access keys](../administration/iam/access-token.md).
 
-## Using `mc` to Operate RustFS
+## Using `mc` with RustFS
 
-First, you need to use the `mc alias` command to configure an alias for RustFS:
+First, configure an alias for RustFS using the `mc alias` command:
 
 ```bash
 mc alias set rustfs http://12.34.56.78:9000 ACCESS_KEY SECRET_KEY
@@ -27,11 +27,11 @@ Output:
 Added `rustfs` successfully.
 ```
 
-Next, you can use `mc` to operate on the alias `rustfs` to create/delete buckets, upload/download files, etc.
+You can now use `mc` with the `rustfs` alias to create/delete buckets, upload/download files, etc.
 
 ### List Buckets
 
-Use `mc ls` to list all buckets under the current RustFS instance:
+List all buckets:
 
 ```bash
 mc ls rustfs
@@ -47,7 +47,7 @@ Output:
 
 ### Create Bucket
 
-Use `mc mb` command to create a bucket:
+Create a bucket:
 
 ```bash
 mc mb rustfs/bucket-creation-by-mc
@@ -61,7 +61,7 @@ Bucket created successfully `rustfs/bucket-creation-by-mc`.
 
 ### Delete Bucket
 
-Use `mc rb` command to delete a bucket:
+Delete a bucket:
 
 ```bash
 mc rb rustfs/bucket-creation-by-mc
@@ -73,9 +73,9 @@ Output:
 Removed `rustfs/bucket-creation-by-mc` successfully.
 ```
 
-### Upload File to Bucket
+### Upload File
 
-Use `mc cp` command to upload a file to a bucket:
+Upload a file to a bucket:
 
 ```bash
 mc cp file_name rustfs/bucket-creation-by-mc
@@ -87,9 +87,9 @@ Output:
 ...path/to/file_name: 4 B / 4 B  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  12 B/s 0s%
 ```
 
-### Delete File in Bucket
+### Delete File
 
-Use `mc rm` command to delete a file in a bucket:
+Delete a file from a bucket:
 
 ```bash
 mc rm rustfs/bucket-creation-by-mc/file_name

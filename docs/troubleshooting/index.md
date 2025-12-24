@@ -1,11 +1,11 @@
 ---
-title: "RustFS Troubleshooting Guide"
-description: "Diagnose issues encountered while using RustFS and provide repair solutions to help RustFS instances quickly recover from failures."
+title: "Troubleshooting"
+description: "Diagnose and resolve RustFS issues."
 ---
 
-# RustFS Troubleshooting Guide
+# Troubleshooting
 
-This chapter includes the following content:
+Contents:
 
 - [Node Failures](./node.md)
 - [Driver Failures](./driver.md)

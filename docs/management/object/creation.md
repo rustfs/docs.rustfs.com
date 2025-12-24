@@ -1,40 +1,40 @@
 ---
-title: "RustFS Object Creation"
-description: "Objects can be created through RustFS UI, MinIO Client, or API."
+title: "Object Creation"
+description: "Create objects using the RustFS UI, MinIO Client, or API."
 ---
 
-# RustFS Objects
+# Object Creation
 
-Objects are the basic units of RustFS storage, containing data, metadata, and unique identifiers (Object Key). Data is stored in the form of objects. This chapter introduces object management using file upload and deletion as examples.
+Objects are the fundamental storage units in RustFS, containing data, metadata, and a unique key. This guide covers object creation (upload).
 
-> For concepts related to Objects, see the [Core Concepts](../../concepts/glossary.md) chapter.
+> For concepts related to Objects, see [Core Concepts](../../concepts/glossary.md).
 
 ## Creating Objects
 
 Prerequisites:
 
-- An available RustFS instance. Refer to the [Installation Guide](../../installation/index.md) for installation.
+- A running RustFS instance (see [Installation Guide](../../installation/index.md)).
 
-[Create a bucket](../bucket/creation.md), then upload files to the bucket to complete object creation. Files can be uploaded through RustFS UI, `mc`, or API methods.
+[Create a bucket](../bucket/creation.md), then upload files to it.
 
-### Uploading Files on RustFS UI
+### Using the RustFS UI
 
-1. Log into the RustFS UI console.
-2. Select the bucket to upload files to.
-3. On the bucket page, in the top right corner, select **New Directory**, **New File**, or **Upload File/Folder** to complete file/folder creation.
-4. To upload files/folders from local, click the **Upload File/Folder** button, select local files/folders, and click **Start Upload** to complete file upload.
+1. Log in to the RustFS Console.
+2. Select the target bucket.
+3. On the bucket page, in the top right corner, select **New Directory**, **New File**, or **Upload File/Folder**.
+4. To upload from your local machine, click **Upload File/Folder**, select the files, and click **Start Upload**.
 
 ![object creation from ui](images/upload_file_from_ui.png)
 
-After upload is complete, click on the object to view detailed object information.
+Click on an object to view its details.
 
 ![object details info](images/object_details_info.png)
 
-### Uploading Files Using `mc`
+### Using `mc`
 
-> For `mc` installation and configuration, see the [`mc` Usage Guide](../../developer/mc.md) chapter.
+> See the [`mc` Usage Guide](../../developer/mc.md) for installation and configuration.
 
-Use the `mc cp` command to upload files:
+Upload a file:
 
 ```bash
 # upload file
@@ -46,11 +46,11 @@ mc ls rustfs/bucket-creation-by-mc
 [2025-08-01 10:01:08 CST]    13B 1.txt
 ```
 
-After upload is complete, you can view it on the RustFS console.
+Verify the upload in the RustFS Console.
 
-### Uploading Files Using API
+### Using the API
 
-Use the following API for file upload:
+Upload a file via API:
 
 ```
 PUT /{bucketName}/{objectName} HTTP/1.1
@@ -67,37 +67,11 @@ curl --location --request PUT 'http://12.34.56.78:9000/bucket-creation-by-api/pa
 --data-binary '@/path/to/password.txt'
 ```
 
-After upload is complete, you can view it on the RustFS console.
+Verify the upload in the RustFS Console.
 
 ## Deleting Objects
 
-Objects can also be deleted on the UI, using `mc`, or API methods. For example, deleting the files created in the above steps will complete object deletion.
-
-## Deleting Files on RustFS UI
-
-1. Log into the RustFS UI console.
-2. Select the bucket containing the file to delete.
-3. On the bucket page, select the file to delete.
-4. Click **Delete Selected Items** in the top right corner, and click **Confirm** in the popup dialog to complete file deletion.
-
-![object deletion from ui](images/delete_file_from_ui.png)
-
-### Deleting Files Using `mc`
-
-Use the `mc rm` command to delete files:
-
-```bash
-# delete file
-mc rm rustfs/bucket-creation-by-mc/1.txt
-Removed `rustfs/bucket-creation-by-mc/1.txt`.
-
-# confirm deletion
-mc ls  rustfs/bucket-creation-by-mc/1.txt
-```
-
-You can confirm the file has been deleted on the RustFS UI.
-
-### Deleting Files Using API
+See [Object Deletion](./deletion.md).
 
 Use the following API for file deletion:
 

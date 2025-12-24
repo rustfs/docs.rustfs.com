@@ -1,80 +1,80 @@
 ---
 title: "Security Checklist"
-description: "RustFS Security Checklist (for enterprise deployers), RustFS is a high-performance distributed object storage software developed in Rust language, released under Apache 2.0 open-source license."
+description: "Security checklist for enterprise deployments."
 ---
 
 # Security Checklist
 
-> To help enterprises deploy RustFS securely, we have compiled the following security best practices based on RustFS official security practice recommendations. It's recommended to check item by item according to the checklist during deployment to ensure system security and reliability.
+> Security best practices for RustFS. Review this checklist during deployment to ensure system security and reliability.
 
-## 1. Identity Authentication and Access Control
+## 1. Authentication & Access Control
 
 - **Use S3-Compatible Key Authentication**
- RustFS adopts signature mechanisms similar to AWS Signature V4 for identity verification. Each user or service must use valid Access Key and Secret Key for access, never skip authentication steps.
+ RustFS uses AWS Signature V4. Ensure all requests are authenticated with valid Access Keys and Secret Keys.
 
 - **Policy-Based Access Control**
- Define access policies for different roles and users according to the principle of least privilege. You can set group policies and user policies, clearly defining allowed S3 operations. By default, operations not explicitly authorized in policies should be denied.
+ Define access policies based on the principle of least privilege. Explicitly define allowed operations; deny all others by default.
 
-## 2. Network Transmission Encryption (TLS/SSL)
+## 2. Encryption (TLS/SSL)
 
-- **Enable TLS/SSL Encryption**
- When deploying, be sure to configure valid SSL certificates and private keys for RustFS. It's recommended to use different domain certificates for external and internal network access, and adopt TLS1.2 or higher security protocols.
+- **Enable TLS/SSL**
+ Configure valid SSL certificates. We recommend using different certificates for external and internal access, and enforcing TLS 1.2+.
 
 - **Certificate Management**
- Ensure certificates are issued by trusted CAs (or use company internal root CA), avoid using expired or self-signed certificates. Private key files should have strict file permissions, only allowing RustFS service processes or dedicated users to read.
+ Use certificates from trusted CAs. Protect private keys with strict file permissions.
 
 - **Multi-Domain and Cipher Suites**
- Configure independent certificates for multiple access domains; use recommended encryption algorithms when generating keys (such as 2048-bit RSA or 256-bit ECC).
+ Configure independent certificates for multiple domains. Use strong encryption algorithms (e.g., 2048-bit RSA or 256-bit ECC).
 
-## 3. Environment Variables and Credential Protection
+## 3. Credential Protection
 
 - **Change Default Credentials**
- If using default accounts (such as `rustfsadmin` / `rustfsadmin`) when initializing RustFS, they must be changed to random complex passwords after deployment.
+ Change default accounts (e.g., `rustfsadmin`) to strong, random passwords immediately after initialization.
 
-- **Secure Credential Storage**
- Don't hardcode plaintext passwords in scripts, images, or logs. Use environment variables or Kubernetes Secrets to manage passwords.
+- **Secure Storage**
+ Do not hardcode credentials. Use environment variables or secrets management systems (e.g., Kubernetes Secrets).
 
-## 4. Logging and Audit Tracking
+## 4. Logging & Auditing
 
 - **Enable Audit Logs**
- RustFS supports exporting audit logs to external systems like HTTP Webhook, Kafka, ELK, Splunk, etc.
+ Export audit logs to external systems (HTTP Webhook, Kafka, ELK, Splunk).
 
-- **Runtime Log Collection**
- Use standard methods to collect and analyze logs on different platforms (such as systemd, Docker, K8s). Recommend using with ELK, Grafana Loki.
+- **Log Collection**
+ Collect logs using standard tools (systemd, Docker, K8s) and analyze with ELK or Grafana Loki.
 
 - **Monitoring and Alerts**
- Set alert notifications for abnormal behaviors like login failures, access at unusual times, large-scale deletions, etc.
+ Set alerts for abnormal behavior (login failures, unusual access patterns, mass deletions).
 
 - **Observability**
- RustFS supports observable environment deployment, allowing precise tuning down to each function's execution time. You can further optimize your configuration for different environments.
+ Monitor function execution times to optimize performance.
 
-## 5. API Access Restrictions
+## 5. API Security
 
 - **Restrict Network Access**
- By default, RustFS S3 API listens on port 9000, management console listens on port 9090. Restrict access source IPs through firewalls or cloud security groups.
+ Restrict access to the S3 API (port 9000) and Console (port 9090) using firewalls or security groups.
 
-- **Network Isolation and Proxy**
- Recommend exposing services through reverse proxies (such as Nginx), avoid directly exposing storage node IPs.
+- **Network Isolation**
+ Use reverse proxies (e.g., Nginx) instead of exposing storage nodes directly.
 
 - **Close Unnecessary Ports**
- Disable unused ports or interfaces, for example, don't expose management interfaces to public networks.
+ Disable unused ports and do not expose management interfaces to the public internet.
 
-## 6. Data Write-Once Read-Many (WORM)
+## 6. WORM Compliance
 
 - **Version Control and Object Locking**
- Enable object versioning and object locking policies to meet regulatory requirements (such as finance, government).
+ Enable versioning and object locking to meet regulatory requirements.
 
-## 7. Updates and Version Management
+## 7. Updates
 
-- **Apply Patches and Upgrades Promptly**
- Pay attention to RustFS official update notifications, regularly upgrade and review change descriptions to avoid security vulnerabilities.
+- **Apply Patches**
+ Regularly check for and apply RustFS updates.
 
-- **Non-Disruptive Upgrade Process**
- RustFS supports hot update processes, enabling zero-downtime service through node-by-node restarts.
+- **Non-Disruptive Upgrades**
+ Use the rolling restart process for zero-downtime upgrades.
 
-- **Operating System and Dependency Management**
- Pay attention to vulnerability updates and fixes for operating systems and basic components (such as OpenSSL).
+- **OS and Dependencies**
+ Keep the operating system and dependencies (e.g., OpenSSL) updated.
 
 ---
 
-The above is the **RustFS Enterprise Deployment Security Checklist**. Check item by item before deployment, and regularly review after deployment to significantly reduce risks and improve stability.
+Review this checklist regularly to maintain a secure RustFS deployment.
