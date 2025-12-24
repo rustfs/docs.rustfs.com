@@ -1,17 +1,15 @@
 ---
-title: "JavaScript SDK"
-description: "This document mainly explains the use of JavaScript SDK in RustFS."
+title: "JavaScript SDK Guide"
+description: "Guide to using the JavaScript SDK with RustFS."
 ---
 
-Here is the **complete development documentation for using AWS S3 JS SDK with RustFS**, including SDK installation, initialization configuration, basic operations (upload, download, delete, list), presigned URLs and multipart uploads, suitable for Node.js environments.
-
-# RustFS AWS S3 JS SDK Documentation (for Node.js)
+# JavaScript SDK Guide (Node.js)
 
 ## I. Overview
 
-RustFS is an S3 protocol-compatible object storage system, accessible through AWS's official JavaScript SDK (v3). This guide will show you how to use JS to connect to RustFS and perform common object storage operations.
+RustFS is S3-compatible and works with the official AWS SDK for JavaScript (v3). This guide will show you how to use JS to connect to RustFS and perform common object storage operations.
 
-## II. Preparation
+## II. Prerequisites
 
 ### 2.1 SDK Installation
 
@@ -21,7 +19,7 @@ Install the required AWS SDK v3 modules with NPM:
 npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
 ```
 
-### 2.2 RustFS Example Configuration
+### 2.2 Example Configuration
 
 Assume the RustFS instance is deployed as follows:
 
@@ -33,7 +31,7 @@ Secret Key: rustfssecret
 
 ---
 
-## III. S3 Client Initialization
+## III. Initializing the Client
 
 ```js
 import { S3Client } from "@aws-sdk/client-s3";
@@ -41,7 +39,7 @@ import { NodeHttpHandler } from "@smithy/node-http-handler";
 
 const s3 = new S3Client({
  endpoint: "http://192.168.1.100:9000", // RustFS endpoint
- region: "us-east-1", // can be filled arbitrarily
+ region: "us-east-1", // Any value is accepted
  credentials: {
  accessKeyId: "rustfsadmin",
  secretAccessKey: "rustfssecret",

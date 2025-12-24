@@ -1,6 +1,6 @@
 ---
 title: "What is RustFS?"
-description: "RustFS is an object storage solution - an open-source distributed object storage released under the Apache2 license."
+description: "RustFS is an open-source, distributed object storage solution released under the Apache 2.0 license."
 ---
 
 # What is RustFS?
@@ -13,14 +13,14 @@ RustFS is transitioning from commercial roots to a fully open-source model, aimi
 
 ## Operating System and CPU Support
 
-You can run RustFS on almost any CPU and operating system, whether it's Linux, Unix, Windows, MacOS, FreeBSD, Docker, or even edge gateways.
-CPU architecture support: X86, ARM, and various other CPU architectures.
+RustFS runs on almost any CPU and operating system, including Linux, Unix, Windows, macOS, FreeBSD, and Docker, as well as edge gateways.
+Supported CPU architectures: x86, ARM, and others.
 
 ## RustFS Features
 
 - **S3 Compatible**: Fully compatible with the S3 protocol, ensuring seamless integration with big data ecosystems, data lakes, backup solutions, and media processing workflows.
 - **Distributed Architecture**: Designed to scale horizontally to meet diverse storage requirements across various scales.
-- **Commercial-Friendly**: Released under the Apache v2.0 license, making it safe and flexible for commercial integration.
+- **Enterprise-Ready**: Released under the Apache v2.0 license, making it safe and flexible for commercial integration.
 - **High Performance**: Built with Rust, offering performance comparable to C/C++ but with modern safety guarantees.
 - **Secure by Design**: Leverages Rust's memory safety guarantees to significantly reduce common security vulnerabilities.
 - **Cross-Platform**: Runs natively on Windows, macOS, and Linux.

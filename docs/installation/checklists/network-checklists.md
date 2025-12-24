@@ -1,51 +1,51 @@
 ---
 title: "Network Checklist"
-description: "RustFS enterprise deployment network checklist"
+description: "Network checklist for enterprise deployments."
 ---
 
 # Network Checklist
 
-## 1. Network Architecture Design
+## 1. Network Architecture
 
-### Basic Network Planning
+### Planning
 
-- **Topology Structure Verification**
- Confirm whether the deployment architecture (star/ring/mesh) meets the high availability requirements of distributed storage
-- **Redundant Path Check**
- Ensure at least two independent physical links exist between nodes
-- **Bandwidth Planning**
- Calculate estimated traffic: object storage read/write bandwidth × node count × replica count + 20% redundancy
+- **Topology**
+ Verify the architecture (star/ring/mesh) meets high availability requirements.
+- **Redundancy**
+ Ensure at least two independent physical links between nodes.
+- **Bandwidth**
+ Calculate estimated traffic: object storage read/write bandwidth × node count × replica count + 20% redundancy.
 
-### IP Planning
+### IP Allocation
 
-- [ ] Separate management network from data network
-- [ ] Allocate continuous IP segments for storage nodes (recommend /24 subnet)
-- [ ] Reserve at least 15% of IP addresses for expansion
+- [ ] Separate management network from data network.
+- [ ] Allocate continuous IP segments for storage nodes (recommend /24 subnet).
+- [ ] Reserve at least 15% of IP addresses for expansion.
 
 ---
 
-## 2. Hardware Device Requirements
+## 2. Hardware Requirements
 
-### Switch Configuration
+### Switches
 
-| Check Item | Standard Requirements |
+| Check Item | Requirements |
 |--------|---------|
 | Backplane Bandwidth | ≥ Full port line rate forwarding capability × 1.2 |
 | Port Type | 10G/25G/100G SFP+/QSFP+ fiber ports |
 | Flow Table Capacity | ≥ Node count × 5 |
-| Spanning Tree Protocol | Enable RSTP/MSTP fast convergence |
+| Spanning Tree | Enable RSTP/MSTP fast convergence |
 
-### Physical Connections
+### Cabling
 
-- [ ] Fiber attenuation test (single mode ≤0.35dB/km)
-- [ ] Port misalignment connection check (Node A eth0 ↔ Node B eth0)
-- [ ] Cable labeling system (including source/destination IP + port number)
+- [ ] Fiber attenuation test (single mode ≤0.35dB/km).
+- [ ] Port misalignment check (Node A eth0 ↔ Node B eth0).
+- [ ] Cable labeling (including source/destination IP + port number).
 
 ---
 
-## 3. Operating System Network Configuration
+## 3. OS Configuration
 
-### Kernel Parameter Tuning
+### Kernel Tuning
 
 ```bash
 # Check the following parameter settings
@@ -55,17 +55,17 @@ net.ipv4.tcp_keepalive_time = 600
 net.ipv4.tcp_slow_start_after_idle = 0
 ```
 
-### Network Card Configuration
+### NIC Configuration
 
-- [ ] Enable jumbo frames (MTU=9000, requires full path support)
-- [ ] Verify network card bonding mode (recommend LACP mode4)
-- [ ] Disable IPv6 (if not needed)
+- [ ] Enable jumbo frames (MTU=9000, requires full path support).
+- [ ] Verify bonding mode (recommend LACP mode4).
+- [ ] Disable IPv6 (if not needed).
 
 ---
 
-## 4. Security Policies
+## 4. Security
 
-### Firewall Rules
+### Firewall
 
 ```bash
 # Necessary open ports
@@ -77,27 +77,27 @@ net.ipv4.tcp_slow_start_after_idle = 0
 
 ### Access Control
 
-- Switch port security MAC restrictions
-- IPSec tunnel encryption between storage nodes
-- Enable TLS 1.3 for management interfaces
+- Switch port security MAC restrictions.
+- IPSec tunnel encryption between storage nodes.
+- Enable TLS 1.3 for management interfaces.
 
 ---
 
-## 5. Performance Verification Testing
+## 5. Performance Testing
 
-### Benchmark Test Items
+### Benchmarks
 
-1. Inter-node latency test: `iperf3 -s 8972 <target IP>`
-2. Cross-rack bandwidth test: `iperf3 -c <target IP> -P 8 -t 30`
-3. Failover test: Randomly disconnect core links to observe recovery time
+1. Inter-node latency: `iperf3 -s 8972 <target IP>`
+2. Cross-rack bandwidth: `iperf3 -c <target IP> -P 8 -t 30`
+3. Failover: Randomly disconnect core links to observe recovery time.
 
-### Acceptance Criteria
+### Criteria
 
 | Metric | Requirements |
 |------|------|
 | Node Latency | ≤1ms (same room) / ≤5ms (cross AZ) |
 | Bandwidth Utilization | Peak ≤70% of design capacity |
-| Failover | Less than 500ms BPDU convergence |
+| Failover | < 500ms BPDU convergence |
 
 ---
 

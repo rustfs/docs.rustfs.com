@@ -1,8 +1,6 @@
 # RustFS for Modern Data Lakes
 
-Modern data lakes and lakehouse architectures are built on modern object storage. This means they are built on RustFS.
-
-**RustFS provides a unified storage solution for modern data lakes/lakehouses that can run anywhere: private cloud, public cloud, colos, bare metal - even at the edge. Yes, fast, scalable, cloud-native and ready to go - fully integrated solution.**
+Modern data lakes and lakehouse architectures rely on object storage. RustFS provides a unified storage solution for modern data lakes/lakehouses that can run anywhere: private cloud, public cloud, colos, bare metal, and edge.
 
 ![Data Lake Architecture](images/data-lake-architecture.png)
 
@@ -10,17 +8,15 @@ Modern data lakes and lakehouse architectures are built on modern object storage
 
 ![Table Formats](images/table-formats.png)
 
-Modern data lakes are multi-engine, and these engines (Spark, Flink, Trino, Arrow, Dask, etc.) all need to be bound together in some cohesive architecture. Modern data lakes must provide central table storage, portable metadata, access control, and persistent structure. This is where formats like Iceberg, Hudi, and Delta Lake come into play. They are designed for modern data lakes, and RustFS supports each of them. We may have opinions on which one will win (you can always ask us...), but we are committed to supporting them until it doesn't make sense (see Docker Swarm and Mesosphere).
+Modern data lakes are multi-engine. They require central table storage, portable metadata, access control, and persistent structure. RustFS supports all major table formats, including Iceberg, Hudi, and Delta Lake.
 
 ## Cloud Native
 
-RustFS was born in the cloud and operates on cloud principles - containerization, orchestration, microservices, APIs, infrastructure as code, and automation. Because of this, the cloud-native ecosystem "just works" with RustFS - from Spark to Presto/Trino, from Snowflake to Dremio, from NiFi to Kafka, from Prometheus to OpenObserve, from Istio to Linkerd, from Hashicorp Vault to Keycloak.
-
-Don't take our word for it - enter your favorite cloud-native technology and let Google provide the evidence.
+RustFS operates on cloud principles: containerization, orchestration, microservices, APIs, infrastructure as code, and automation. The cloud-native ecosystem integrates seamlessly with RustFS, including Spark, Presto/Trino, Snowflake, Dremio, NiFi, Kafka, Prometheus, OpenObserve, Istio, Linkerd, Hashicorp Vault, and Keycloak.
 
 ## Multi-Engine
 
-RustFS supports all S3-compatible query engines, which is to say all of them. Contact us for support.
+RustFS supports all S3-compatible query engines.
 
 ![Multi-Engine Support](images/multi-engine-1.svg)
 
@@ -28,23 +24,21 @@ RustFS supports all S3-compatible query engines, which is to say all of them. Co
 
 ## Performance
 
-Modern data lakes require a level of performance, and even more importantly, performance at scale that the old Hadoop-era commodity stores could only dream of. RustFS has proven in multiple benchmarks that it outperforms Hadoop, and migration paths are well documented. This means query engines (Spark, Presto, Trino, Snowflake, Microsoft SQL Server, Teradata, etc.) perform better. This also includes your AI/ML platforms - from MLflow to Kubeflow.
+Modern data lakes require high performance. RustFS benchmarks demonstrate superior performance compared to legacy Hadoop systems, improving query engine (Spark, Presto, Trino, Snowflake, SQL Server, Teradata) and AI/ML platform (MLflow, Kubeflow) efficiency.
 
-We publish our benchmarks for the world to see and make them reproducible. Learn how we achieved 325 GiB/s (349 GB/s) on GET and 165 GiB/s (177 GB/s) on PUT with just 32 off-the-shelf NVMe SSD nodes in this article.
+Benchmarks show 325 GiB/s (349 GB/s) on GET and 165 GiB/s (177 GB/s) on PUT with 32 NVMe SSD nodes.
 
 ## Lightweight
 
-RustFS's server binary is < 100 MB in its entirety. Despite its power, it's robust enough to run in data centers but still small enough to live comfortably at the edge. There's no such alternative in the Hadoop world. For enterprises, this means your S3 applications can access data anywhere with the same API. By implementing RustFS edge locations and replication capabilities, we can capture and filter data at the edge and deliver it to the parent cluster for aggregation and further analytical implementation.
+The RustFS server binary is < 100 MB. It is robust enough for data centers and lightweight enough for the edge. Enterprises can access data anywhere with the same S3 API. RustFS edge locations and replication capabilities allow data capture and filtering at the edge before aggregation.
 
 ## Decomposition
 
-Modern data lakes extend the decomposition capabilities that broke up Hadoop. Modern data lakes have high-speed query processing engines and high-throughput storage. Modern data lakes are too large to fit in databases, so data resides in object storage. This way, databases can focus on query optimization functionality and outsource storage functionality to high-speed object storage. By keeping subsets of data in memory and leveraging features like predicate pushdown (S3 Select) and external tables - query engines have greater flexibility.
+Modern data lakes separate compute and storage. High-speed query processing engines outsource storage to high-throughput object storage like RustFS. By keeping subsets of data in memory and leveraging features like predicate pushdown (S3 Select) and external tables, query engines gain flexibility.
 
 ## Open Source
 
-Enterprises that adopted Hadoop did so out of preference for open source technology. As the logical successor - enterprises want their data lakes to be open source as well. This is why Iceberg is thriving and why Databricks open-sourced Delta Lake.
-
-The capabilities, freedom from lock-in, and comfort that come from tens of thousands of users have real value. RustFS is also 100% open source, ensuring organizations can stay true to their goals when investing in modern data lakes.
+Open source is a key driver for data lake adoption. RustFS is 100% open source, ensuring freedom from lock-in.
 
 ## Rapid Growth
 

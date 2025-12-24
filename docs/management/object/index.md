@@ -1,11 +1,11 @@
 ---
 title: "RustFS Object Management"
-description: "Introduction to RustFS object management, including object creation/deletion, object versioning, object locking, object sharing, object scanning, etc."
+description: "Guide to RustFS object management, including creation, deletion, versioning, locking, and scanning."
 ---
 
 # RustFS Object Management
 
-Objects are the basic units of RustFS storage, containing data, metadata, and unique identifiers (Object Key). Data is stored in the form of objects. This chapter details the content of RustFS object lifecycle management, including:
+Objects are the fundamental storage units in RustFS, consisting of data, metadata, and a unique key. This section covers:
 
 - [Object Upload](./creation.md)
 - [Object Deletion](./deletion.md)

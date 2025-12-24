@@ -1,11 +1,11 @@
 ---
-title: "Availability and Scalability Description"
-description: "This article will detail the technology and description related to RustFS scaling."
+title: "Availability and Scalability"
+description: "Learn about RustFS upgrades and scaling."
 ---
 
-# RustFS Upgrade and Scaling Overview
+# Upgrades and Scaling
 
-This chapter shares content related to RustFS upgrades and scaling, including:
+Contents:
 
 - [Availability and Resiliency Description](./availability-and-resiliency.md)
 - [Upgrade](./upgrade.md)

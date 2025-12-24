@@ -1,26 +1,22 @@
 ---
 title: "Checklists"
-description: "Pre-installation checklists for RustFS"
+description: "Pre-installation checklists."
 ---
 
 # Checklists
 
-The following documents contain pre-installation checklists for RustFS, including a series of necessary preparations and considerations before preparing the production environment.
+These checklists cover the necessary preparations for a production environment.
 
-These checklists cannot fully meet the precise requirements of your unique deployment architecture, production characteristics, and production metrics. We recommend seeking professional guidance based on your production environment, production characteristics, production metrics, and the RustFS version you are using.
+> **Note**: These are general guidelines. Adjust them based on your specific architecture and requirements.
 
-If you need professional guidance, please contact our storage experts at: 400-033-5363 or via email: hello@rustfs.com.
+For professional support, contact us at hello@rustfs.com.
 
-If you need community support, you can submit an issue on GitHub or join our discussion group. For community questions, we are not responsible for the quality and results of answers, and do not guarantee SLA.
+For community support, submit an issue on GitHub.
 
 ## Checklists
 
-1. [Hardware Checklist](./hardware-checklists.md);
-
-2. [Hardware Selection](./hardware-selection.md)
-
-3. [Security Checklist](./security-checklists);
-
-4. [Software Checklist](./software-checklists);
-
-5. [Network Checklist](./network-checklists).
+- [Hardware Checklist](./hardware-checklists.md)
+- [Hardware Selection](./hardware-selection.md)
+- [Security Checklist](./security-checklists.md)
+- [Software Checklist](./software-checklists.md)
+- [Network Checklist](./network-checklists.md)

@@ -1,30 +1,26 @@
 ---
-title: "RustFS Object Deletion"
-description: "Objects can be deleted on RustFS UI, or through MinIO Client and API."
+title: "Object Deletion"
+description: "Delete objects using the RustFS UI, MinIO Client, or API."
 ---
 
-# RustFS Objects
+# Object Deletion
 
-Objects are the basic storage units in RustFS, containing data, metadata, and unique identifiers (Object Key). Data is stored in the form of objects. This chapter uses file upload and deletion as examples to introduce object management.
+This guide covers object deletion.
 
-> For concepts related to objects, you can refer to the [Core Concepts](../../concepts/glossary.md) chapter.
+> For concepts related to objects, see [Core Concepts](../../concepts/glossary.md).
 
-## Deleting Objects
+## Using the RustFS UI
 
-Objects can also be deleted on the UI, using `mc`, or through API methods. For example, to delete the file created in the previous steps, you can complete object deletion.
-
-## Deleting Files on RustFS UI
-
-1. Log into the RustFS UI console.
-1. Select the bucket containing the file to be deleted.
-1. On the bucket page, select the file to be deleted.
-1. Click **Delete Selected Items** in the upper right corner, then click **Confirm** in the popup dialog to complete file deletion.
+1. Log in to the RustFS Console.
+2. Select the bucket containing the file to be deleted.
+3. On the bucket page, select the file to be deleted.
+4. Click **Delete Selected Items** in the upper right corner, then click **Confirm** in the popup dialog.
 
 ![object deletion from ui](images/delete_file_from_ui.png)
 
-### Deleting Files Using `mc`
+### Using `mc`
 
-Use the `mc rm` command to delete files:
+Delete a file:
 
 ```bash
 # delete file
@@ -35,11 +31,11 @@ Removed `rustfs/bucket-creation-by-mc/1.txt`.
 mc ls  rustfs/bucket-creation-by-mc/1.txt
 ```
 
-You can confirm the file has been deleted on RustFS UI.
+Verify the deletion in the RustFS Console.
 
-### Deleting Files Using API
+### Using the API
 
-Use the following API to delete files:
+Delete a file via API:
 
 ```
 DELETE /{bucketName}/{objectName} HTTP/1.1
@@ -56,4 +52,4 @@ curl --location --request DELETE 'http://12.34.56.78:9000/bucket-creation-by-api
 --data-binary '@/Users/jhma/Desktop/password.txt'
 ```
 
-You can confirm the file has been deleted on RustFS UI.
+Verify the deletion in the RustFS Console.

@@ -5,7 +5,7 @@ description: "RustFS MCP Usage Guide"
 
 # RustFS MCP
 
-**RustFS MCP Server** is a high-performance [Model Context Protocol (MCP)](https://www.anthropic.com/news/model-context-protocol) server that provides AI/LLM tools with seamless access to S3-compatible object storage operations. Built with Rust for maximum performance and security, it enables AI assistants like Claude Desktop to interact with cloud storage through standardized protocols.
+**RustFS MCP Server** is a high-performance [Model Context Protocol (MCP)](https://www.anthropic.com/news/model-context-protocol) server that provides AI/LLM tools with seamless access to S3-compatible object storage operations. Built with Rust for performance and security, it enables AI assistants like Claude Desktop to interact with cloud storage through standardized protocols.
 
 ### What is MCP?
 
@@ -15,16 +15,16 @@ The Model Context Protocol is an open standard that enables AI applications to e
 
 ### Supported S3 Operations
 
-- **List Buckets**: List all accessible S3 buckets
-- **List Objects**: Browse bucket contents with optional prefix filtering
-- **Upload Files**: Upload local files with automatic MIME type detection and cache control
-- **Get Objects**: Retrieve objects from S3 storage, supporting read or download modes
+- **List Buckets**: Lists all accessible S3 buckets.
+- **List Objects**: Browses bucket contents with optional prefix filtering.
+- **Upload Files**: Uploads local files with automatic MIME type detection and cache control.
+- **Get Objects**: Retrieves objects from S3 storage, supporting read or download modes.
 
 ## 🔧 Installation
 
 ### Prerequisites
 
-- Rust 1.88+ (for building from source)
+- Rust 1.75+ (for building from source)
 - Configured AWS credentials (via environment variables, AWS CLI, or IAM roles)
 - Access to S3-compatible storage services
 

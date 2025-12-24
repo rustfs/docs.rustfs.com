@@ -5,21 +5,21 @@ description: "Hybrid/multi-cloud architecture enables consistent performance, se
 
 # Hybrid/Multi-Cloud Object Storage
 
-Hybrid/multi-cloud architecture enables consistent performance, security, and economics. Any discussion of multi-cloud needs to start with a definition. It's not just a single public cloud and on-premises.
+Hybrid/multi-cloud architecture enables consistent performance, security, and economics.
 
-## Successful multi-cloud storage strategies leverage architectures and tools that can run in various environments
+## Multi-Cloud Storage Strategies
 
 ### Public Cloud
 
-This is an increasingly large field, but start with AWS, Azure, GCP, IBM, Alibaba, Tencent, and government clouds. Your hybrid/multi-cloud storage software needs to run wherever the application stack runs. Even companies claiming to run on a single cloud don't - there are always other clouds. RustFS provides storage consistency for each public cloud provider, avoiding the need to rewrite applications when expanding to new clouds.
+Public cloud providers include AWS, Azure, GCP, IBM, Alibaba, Tencent, and government clouds. Hybrid/multi-cloud storage software must run wherever the application stack runs. RustFS provides consistent storage across public cloud providers, avoiding the need to rewrite applications when expanding to new clouds.
 
 ### Private Cloud
 
-Kubernetes is the primary software architecture for modern private clouds. This includes all Kubernetes distributions such as VMware (Tanzu), RedHat (OpenShift), Rancher/SUSE, HP (Ezmeral), and Rafay. Multi-cloud Kubernetes requires software-defined and cloud-native object storage. Private clouds also include more traditional bare metal instances, but enterprise workloads are increasingly containerized and orchestrated.
+Kubernetes is the primary software architecture for modern private clouds (VMware Tanzu, RedHat OpenShift, Rancher, etc.). Multi-cloud Kubernetes requires software-defined, cloud-native object storage.
 
 ### Edge
 
-Edge is about moving computation to where data is generated. After processing, data moves to more centralized locations. Edge storage solutions must be lightweight, powerful, cloud-native, and resilient to operate in such multi-cloud architectures. This is very difficult to achieve, which is why few vendors discuss it - they don't have a good answer, not even Amazon.
+Edge computing moves computation to where data is generated. Edge storage solutions must be lightweight, powerful, cloud-native, and resilient.
 
 ## Multi-Cloud Architecture with RustFS
 
@@ -27,25 +27,21 @@ Edge is about moving computation to where data is generated. After processing, d
 
 ## Properties of Hybrid/Multi-Cloud Storage
 
-Multi-cloud storage follows patterns established by public clouds, where public cloud providers consistently adopt cloud-native object storage. The success of public clouds has effectively made file and block storage obsolete. Every new application is written for AWS S3 API, not POSIX. To scale and perform like cloud-native technologies, older applications must be rewritten for S3 API and refactored into microservices to be container-compatible.
+Multi-cloud storage adopts public cloud patterns. New applications are typically written for the AWS S3 API. To scale and perform like cloud-native technologies, applications should be compatible with the S3 API and refactored into microservices.
 
 ### Kubernetes-Native
 
-Kubernetes-native design requires operator services to configure and manage multi-tenant object storage as a service infrastructure. Each of these tenants runs in their own independent namespace while sharing underlying hardware resources. The operator pattern extends Kubernetes' familiar declarative API model through Custom Resource Definitions (CRDs) to perform common operations like resource orchestration, non-disruptive upgrades, cluster scaling, etc., and maintain high availability.
+Kubernetes-native design requires operator services to configure and manage multi-tenant object storage. Each tenant runs in an independent namespace while sharing underlying hardware resources. The operator pattern extends Kubernetes' declarative API model through Custom Resource Definitions (CRDs) for operations like resource orchestration, upgrades, and scaling.
 
-RustFS is built to fully leverage Kubernetes architecture. Due to fast and lightweight server binaries, RustFS Operator can densely co-locate multiple tenants without exhausting resources. Leverage the advantages of Kubernetes and related ecosystems to gain multi-cloud benefits with portable Kubernetes-native storage.
+RustFS is designed for Kubernetes. The lightweight RustFS binary allows the RustFS Operator to densely co-locate multiple tenants without exhausting resources.
 
 ### Consistent
 
-Hybrid/multi-cloud storage must be consistent in API compatibility, performance, security, and compliance. It needs to execute consistently and independently of underlying hardware. Any variation, even small ones, can break applications, creating enormous operational burden.
-
-Since RustFS is very lightweight, we can roll out non-disruptive updates across public, private, and edge in minutes, maintaining consistent experience. RustFS abstracts fundamental differences between these architectures, including key management, identity management, access policies, and hardware/OS differences.
+Hybrid/multi-cloud storage must be consistent in API compatibility, performance, security, and compliance. RustFS enables non-disruptive updates across public, private, and edge environments, maintaining a consistent experience. RustFS abstracts differences in key management, identity management, access policies, and hardware/OS.
 
 ### Performance
 
-Since object storage serves as both primary and secondary storage, it needs to deliver performance at scale. From mobile/web applications to AI/ML, data-intensive workloads require exceptional performance from underlying object storage. Even data protection workloads need high-performance deduplication and snapshot access. Rapid recovery is essential for business continuity. Traditionally, these workloads required bare metal performance. Now, all these workloads can be containerized - as proven by public cloud providers' success.
-
-RustFS is a high-performance object storage solution, with read/write speeds of 325 GiB/s and 171 GiB/s on NVMe, and 11 GiB/s and 9 GiB/s on HDD. At such speeds, every workload can be achieved in any multi-cloud architecture running on any infrastructure.
+Object storage must deliver performance at scale for workloads ranging from mobile/web applications to AI/ML. RustFS delivers read/write speeds of 325 GiB/s and 171 GiB/s on NVMe, and 11 GiB/s and 9 GiB/s on HDD.
 
 ### Scalable
 

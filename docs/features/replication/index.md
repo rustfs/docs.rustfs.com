@@ -4,48 +4,46 @@
 
 ![Object Storage Replication](images/s6-1.png)
 
-Active replication for object storage is a critical requirement for mission-critical production environments. RustFS provides industry-leading active-active replication. Executed at bucket-level granularity, it's used in the following situations:
+Active replication ensures data availability. RustFS supports active-active replication. It operates at the bucket level.
 
-RustFS supports synchronous and near-synchronous replication, depending on architectural choices and data change rates. In each of the above cases, replication must be as close to strictly consistent as possible (considering bandwidth considerations and change rates).
+RustFS supports synchronous and near-synchronous replication, depending on architectural choices and data change rates. Replication aims for strict consistency within data centers and eventual consistency between data centers.
 
-## RustFS Data Replication Designed for Large-Scale Resilience
+## Resilience Features
 
-Key features include:
-
-- ✅ Encrypted or unencrypted objects and their associated metadata (written atomically with objects)
-- ✅ Object versions
-- ✅ Object tags (if any)
-- ✅ S3 object lock retention information (if any)
+- **Encrypted/Unencrypted Objects**: Replicates objects and metadata.
+- **Object Versions**: Preserves version history.
+- **Object Tags**: Replicates tags.
+- **S3 Object Lock**: Maintains retention information.
 
 ## Core Features
 
-### Identical Bucket Naming Support
+### Identical Bucket Naming
 
-This is required for applications that must transparently failover to remote sites without any interruption.
+Enables transparent failover to remote sites without interruption.
 
-### Native Support for Automatic Object Lock/Retention Replication Across Source and Target
+### Object Lock Replication
 
 Ensures data integrity and compliance requirements are maintained during replication.
 
 ### Near-Synchronous Replication
 
-Can update objects immediately after any mutation occurs in the bucket. RustFS follows strict consistency within data centers and eventual consistency between data centers to protect data.
+Updates objects immediately after mutation.
 
-### Notification Functionality
+### Notifications
 
-Notification functionality for pushing replication failure events. Applications can subscribe to these events and alert operations teams.
+Pushes replication failure events for operations teams.
 
-## Considerations When Implementing RustFS Active-Active Replication
+## Implementation Considerations
 
-At the most basic level, any design needs to consider infrastructure, bandwidth, latency, resilience, and scale. Let's examine them in order:
+Key factors include:
 
 ### Infrastructure
 
-RustFS recommends using the same hardware at both ends of the replication endpoints. While similar hardware can work, introducing heterogeneous hardware profiles brings complexity and slows problem identification.
+RustFS recommends using the same hardware at both ends of the replication endpoints to simplify troubleshooting.
 
 ### Bandwidth
 
-Bandwidth is a critical factor in keeping two sites consistently synchronized. The optimal bandwidth requirement between sites is determined by the rate of incoming data. Specifically, if bandwidth is insufficient to handle peaks, changes will queue to the remote site and eventually synchronize.
+Bandwidth is critical for synchronization. If bandwidth is insufficient to handle peaks, changes will queue to the remote site.
 
 ### Latency
 

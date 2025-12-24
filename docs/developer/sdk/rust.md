@@ -1,20 +1,20 @@
 ---
-title: "RustFS Rust SDK Usage Guide"
+title: "Rust SDK Guide"
 description: "Operating RustFS instances through Rust SDK, including creation and deletion of buckets and objects."
 ---
 
-# RustFS Rust SDK
+# Rust SDK
 
-Since RustFS is a fully S3-compatible object storage system, you can build a Rust SDK suitable for RustFS by wrapping the S3 Rust SDK. Through the SDK, you can operate RustFS, including creation and deletion of buckets/objects, file upload and download, etc.
+RustFS is fully S3-compatible. You can use the official AWS SDK for Rust. Through the SDK, you can operate RustFS, including creation and deletion of buckets/objects, file upload and download, etc.
 
 ## Prerequisites
 
-- An available RustFS instance (refer to [Installation Guide](../../installation/index.md) for installation).
-- Access keys (refer to [Access Key Management](../../administration/iam/access-token.md) for creation).
+- An available RustFS instance (refer to [Installation Guide](../../installation/index.md)).
+- Access keys (refer to [Access Key Management](../../administration/iam/access-token.md)).
 
-## RustFS Rust SDK Construction
+## Initializing the Client
 
-Construct `region`, `access_key_id`, `secret_access_key`, and `endpoint_url` into a Config data structure, and read corresponding information from environment variables:
+Create a configuration struct and load credentials from environment variables:
 
 ```rust
 pub struct Config {
@@ -41,7 +41,7 @@ impl Config {
 }
 ```
 
-Using the constructed Config above, construct RustFS Client with `aws_sdk_s3::Client`:
+Initialize the S3 client:
 
 ```rust
 let config = Config::from_env()?;
@@ -68,7 +68,7 @@ let shard_config = aws_config::defaults(BehaviorVersion::latest())
 let rustfs_client = Client::new(&shard_config);
 ```
 
-Then use the constructed `rustfs_client` for corresponding operations.
+You can now use the client for operations.
 
 ## Create Bucket
 

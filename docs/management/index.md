@@ -1,9 +1,9 @@
 ---
-title: "RustFS Optimal Management"
-description: "Through optimal management of RustFS buckets/objects/permissions, help users use RustFS more securely and efficiently."
+title: "Management Guide"
+description: "Guide to managing RustFS buckets, objects, and permissions."
 ---
 
-This chapter contains the following content:
+This section covers:
 
 - [Bucket Management](./bucket/index.md)
 - [Object Management](./object/index.md)

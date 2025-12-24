@@ -1,16 +1,16 @@
 # AI Revolution Powered by GPUs and High-Performance Object Storage
 
-We are high-performance object storage
+The High-Performance Object Storage for AI
 
 ## AI Storage Delivers Performance at Scale
 
 ![AI Performance](images/ai-performance.png)
 
-RustFS accelerates AI/ML workloads by leveraging its distributed architecture and object storage capabilities. During model training, RustFS's distributed setup allows parallel data access and I/O operations, reducing latency and speeding up training times. For model inference, RustFS's high-throughput data access ensures rapid retrieval and deployment of data stored for AI models, enabling predictions with minimal latency. More importantly, RustFS's performance scales linearly from 100 TB to 100 PB and beyond. This optimizes end-to-end AI workflows, enhancing model development and serving, resulting in more efficient AI workloads and faster response times for applications.
+RustFS accelerates AI/ML workloads by leveraging its distributed architecture and object storage capabilities. During model training, RustFS's distributed setup allows parallel data access and I/O operations, reducing latency and speeding up training times. For model inference, RustFS's high-throughput data access ensures rapid retrieval and deployment of data stored for AI models, enabling predictions with minimal latency. Crucially, RustFS scales linearly from 100 TB to 100 PB and beyond. This optimizes end-to-end AI workflows, enhancing model development and serving, resulting in more efficient AI workloads and faster response times for applications.
 
 ## Core of the AI Ecosystem
 
-RustFS is the standard for S3-compatible object storage for AI workloads. This ubiquity means the entire AI/ML ecosystem integrates with RustFS. RustFS is widely supported across the AI/ML ecosystem.
+RustFS sets the standard for S3-compatible object storage for AI workloads. This ubiquity means the entire AI/ML ecosystem integrates with RustFS. RustFS is widely supported across the AI/ML ecosystem.
 
 ![AI Ecosystem Support](images/multi-engine-1.svg)
 
@@ -38,7 +38,7 @@ RustFS can serve as a high-performance object storage backend for AI models for 
 
 ## Cloud as Operating Model - Starting with S3
 
-RustFS adheres to cloud operating models - containerization, orchestration, automation, APIs, and S3 compatibility. This allows cross-cloud and cross-storage type data storage and access by providing a unified interface for storing and accessing data. Since most AI/ML frameworks and applications are designed to work with S3 APIs, having the best compatibility in the industry is crucial. With over 1.3 billion Docker pulls - no object storage has more developer and application validation of its compatibility - 24/7/365. This compatibility ensures AI workloads can access and leverage data stored in RustFS object storage regardless of the underlying cloud infrastructure, facilitating flexible and agnostic data management and processing approaches across different cloud environments.
+RustFS adheres to cloud operating models - containerization, orchestration, automation, APIs, and S3 compatibility. This allows cross-cloud and cross-storage type data storage and access by providing a unified interface for storing and accessing data. Since most AI/ML frameworks and applications are designed to work with S3 APIs, having the best compatibility in the industry is crucial. With over 280,000 Docker pulls - no object storage has more developer and application validation of its compatibility - 24/7/365. This compatibility ensures AI workloads can access and leverage data stored in RustFS object storage regardless of the underlying cloud infrastructure, facilitating flexible and agnostic data management and processing approaches across different cloud environments.
 
 ## Edge AI Storage
 

@@ -5,22 +5,22 @@ description: "Installation guide for RustFS on different operating systems and d
 
 # RustFS Introduction
 
-RustFS is a `high-performance`, `distributed` object storage system developed in Rust, leveraging the language's memory safety and performance. RustFS combines simplicity with efficiency, offering an open-source, free object storage solution suitable for private cloud deployments. It is fully compatible with the S3 protocol and released under the Apache 2.0 license. Built by a global community of engineers, RustFS serves as a commercially-friendly alternative to restrictive open-source storage products.
+RustFS is a high-performance, distributed object storage system developed in Rust, leveraging the language's memory safety and performance. RustFS combines simplicity with efficiency, offering an open-source, free object storage solution suitable for private cloud deployments. It is fully compatible with the S3 protocol and released under the Apache 2.0 license. Built by a global community of engineers, RustFS serves as a commercially-friendly alternative to restrictive open-source storage products.
 
 RustFS is transitioning from commercial roots to a fully open-source model, aiming to democratize high-performance storage and enhance data security globally.
 
 ## 1. Supported CPUs and Operating Systems
 
-You can run RustFS on almost any CPU and operating system, including:
+RustFS runs on almost any CPU and operating system, including:
 - Linux
 - Unix
 - Windows
-- MacOS
+- macOS
 - FreeBSD
 - Docker
-- Even on edge gateways
+- Edge gateways
 
-You can run RustFS on all of these. CPU architecture support includes: X86, ARM, RISC-V, and many other CPU architectures.
+Supported CPU architectures include x86, ARM, RISC-V, and others.
 
 ## 2. RustFS Installation Modes
 
@@ -36,7 +36,7 @@ This chapter includes installation guides for RustFS on different operating syst
 
 - **S3 Compatible**: Fully compatible with the S3 protocol, ensuring seamless integration with big data ecosystems, data lakes, backup solutions, and media processing workflows.
 - **Distributed Architecture**: Designed to scale horizontally to meet diverse storage requirements.
-- **Commercial-Friendly**: Released under the Apache v2.0 license, making it safe and flexible for commercial integration.
+- **Enterprise-Ready**: Released under the Apache v2.0 license, making it safe and flexible for commercial integration.
 - **High Performance**: Built with Rust, offering performance comparable to C/C++ but with modern safety guarantees.
 - **Secure by Design**: Leverages Rust's memory safety guarantees to significantly reduce common security vulnerabilities.
 - **Cross-Platform**: Runs natively on Windows, macOS, and Linux.

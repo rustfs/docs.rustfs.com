@@ -1,51 +1,51 @@
 ---
-title: "Virtual Mode Configuration"
-description: "RustFS S3 Virtual mode configuration and path style mode configuration"
+title: "Virtual Host Style"
+description: "RustFS S3 Virtual Host Style and Path Style configuration."
 ---
 
-# RustFS S3 Mode Introduction
+# S3 Request Modes
 
-RustFS is 100% compliant with S3 storage protocol requirements. In S3 storage, request paths are divided into two modes:
+RustFS complies with S3 protocols. S3 supports two request modes:
 
 1. Virtual Host Style
-
 2. Path Style
 
-The core difference between these two modes is how the storage bucket (Bucket) name is placed in the request URL.
+The difference lies in the bucket name placement.
 
-## 1. Path Style Mode
+## Path Style
 
-By default, Path style mode is used when starting. The characteristic of Path style mode is that the bucket name comes after the Endpoint access point. Assuming the hostname is rustfs.com and the bucket name is test, then the Path style path would be:
+Path Style is the default. In Path Style, the bucket name follows the endpoint.
+
+Example (Bucket: `test`, Host: `rustfs.com`):
 
 ```
 http://rustfs.com/test
 ```
 
-Note:
-- Default is Path style
-- Users don't need to make any settings, it's Path style mode by default
+**Note**: No configuration is required for Path Style.
 
-## 2. Virtual Host Style
+## Virtual Host Style
 
-When starting, you can change the mode to Virtual Host Style. The characteristic of Virtual Host Style mode is that the bucket name becomes part of the domain name. Assuming the hostname is rustfs.com and the bucket name is test, then the Virtual Host Style path would be:
+In Virtual Host Style, the bucket name is part of the domain.
+
+Example (Bucket: `test`, Host: `rustfs.com`):
 
 ```
 http://test.rustfs.com/
 ```
 
-Steps to set Virtual Host Style:
+### Configuration
 
-1. Set wildcard DNS resolution for your domain to the specified server. Assuming the domain is rustfs.com, you can resolve *.rustfs.com to the specified server;
-2. If it's Linux, modify the `/etc/default/rustfs` file; if it's Docker or Kubernetes, modify the yaml or startup configuration parameters;
-3. Add `RUSTFS_SERVER_DOMAINS` to the configuration file, set this parameter to `RUSTFS_SERVER_DOMAINS = "rustfs.com"`;
-4. Save the configuration file, then use `systemctl restart rustfs` to restart the service.
+1. **DNS**: Configure wildcard DNS resolution (e.g., `*.rustfs.com` -> Server IP).
+2. **Configuration**: Modify the configuration file (Linux: `/etc/default/rustfs`, Docker/K8s: env vars).
+3. **Set Domain**: Set `RUSTFS_SERVER_DOMAINS = "rustfs.com"`.
+4. **Restart**: Restart the service (`systemctl restart rustfs`).
 
 ### Port in Domain (Optional)
 
-If your domain is accessed **with an explicit port**, you must also include the port number in `RUSTFS_SERVER_DOMAINS`.
-Otherwise, Virtual Host Style requests will not be matched correctly.
+If your domain is accessed **with an explicit port**, include the port number in `RUSTFS_SERVER_DOMAINS`.
 
-For example, if your service is accessed via `rustfs.com:9001`, configure it as follows:
+Example (`rustfs.com:9001`):
 
 ```ini
 RUSTFS_SERVER_DOMAINS = "rustfs.com:9001"

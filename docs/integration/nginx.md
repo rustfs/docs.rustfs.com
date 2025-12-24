@@ -1,27 +1,25 @@
 ---
-title: "RustFS Nginx Reverse Proxy Configuration"
-description: "Configuration for implementing Nginx reverse proxy with RustFS"
+title: "Nginx Reverse Proxy"
+description: "Configuration for implementing Nginx reverse proxy with RustFS."
 ---
 
-# RustFS Integration with Nginx
+# Nginx Integration
 
-Through the integration of RustFS with Nginx, the following functions can be achieved:
+Nginx integration enables:
 
-1. Comprehensive log collection;
-2. Load balancing configuration;
-3. Custom URL forwarding and parsing;
-4. Custom URL blocking.
+- Log collection.
+- Load balancing.
+- URL forwarding.
+- URL blocking.
 
-## 1. RustFS Nginx Prerequisites
+## Prerequisites
 
-To ensure smooth integration, you need to prepare in advance:
+- RustFS Server is installed and running.
+- RustFS port is known.
+- Nginx is installed.
+- RustFS IP addresses are known.
 
-1. RustFS Server is properly installed and correctly started;
-2. Determine RustFS port;
-3. Nginx is properly identified;
-4. Confirm RustFS single machine or cluster IP addresses.
-
-## 2. Configuration File
+## Configuration
 
 ```nginx
 upstream rustfs {

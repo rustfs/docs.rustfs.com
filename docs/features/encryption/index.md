@@ -1,8 +1,8 @@
 # Infrastructure for Large-Scale Data
 
-RustFS is designed for scale. Technical scale, operational scale, and economic scale. Foundational scale.
+RustFS is designed for scale—technical, operational, and economic.
 
-In the object storage field, Robust encryption is a fundamental requirement for enterprise storage. RustFS provides more functionality through the highest level of encryption and extensive optimizations, minimizing the performance overhead typically associated with storage encryption operations.
+In the object storage field, robust encryption is a fundamental requirement for enterprise storage. RustFS provides more functionality through the highest level of encryption and extensive optimizations, minimizing the performance overhead typically associated with storage encryption operations.
 
 ![Data Encryption Architecture](images/s5-1.png)
 
