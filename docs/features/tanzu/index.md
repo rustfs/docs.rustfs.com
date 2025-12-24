@@ -1,25 +1,25 @@
 ---
-title: "RustFS for Amazon Elastic Kubernetes Service"
-description: "RustFS provides consistent storage layer for hybrid and multi-cloud deployments on Amazon EKS."
+title: "RustFS for VMware Tanzu Container Platform"
+description: "RustFS provides high-performance object storage for VMware Tanzu with enterprise-grade features and multi-cloud capabilities."
 ---
 
-# RustFS for Amazon Elastic Kubernetes Service
+# RustFS for VMware Tanzu Container Platform
 
-## Three reasons why customers run RustFS on Amazon EKS
+## Three Reasons Customers Run RustFS on VMware Tanzu
 
-- RustFS serves as a consistent storage layer in hybrid cloud or multi-cloud deployment scenarios
-- RustFS is a Kubernetes-native high-performance product that can provide predictable performance in public cloud, private cloud, and edge cloud environments
-- Running RustFS on EKS gives you control over the software stack and the flexibility needed to avoid cloud lock-in
+- RustFS serves as a consistent storage layer in hybrid cloud or multi-cloud deployment scenarios.
+- RustFS is a Kubernetes-native high-performance product that can provide predictable performance in public cloud, private cloud, and edge cloud environments.
+- Running RustFS on Tanzu provides control over the software stack with the flexibility needed to avoid cloud lock-in.
 
-Amazon Elastic Kubernetes Service (Amazon EKS) is a managed service that you can use to run Kubernetes on AWS without installing, operating, and maintaining your own Kubernetes control plane or nodes.
+VMware Tanzu is an enterprise-grade Kubernetes container platform with full-stack automated operations capabilities that can manage hybrid cloud, multi-cloud, and edge deployments. VMware Tanzu includes enterprise-grade Linux operating systems, container runtimes, networking, monitoring, registries, and authentication and authorization solutions.
 
-RustFS provides a portable high-performance object storage system on all major Kubernetes platforms (Alibaba Cloud ACK, Tanzu, Azure, GCP, Alibaba Cloud ACK). On AWS, RustFS integrates natively with Amazon EKS services, making it easier to run your own large-scale multi-tenant object storage as a service. RustFS is a complete replacement for AWS S3 storage as a service.
+RustFS natively integrates with VMware Tanzu, making it easier to operate your own large-scale multi-tenant object storage as a service. RustFS Operator works with the VMware Tanzu toolchain (such as VMware Tanzu Cluster Manager CLI and Quay container registry) to ensure you get maximum return on investment from the VMware Tanzu ecosystem.
 
 ![RustFS Architecture Diagram](images/sec1-1.png)
 
-Unlike AWS S3, RustFS enables applications to scale across multi-cloud and hybrid cloud infrastructure without expensive software rewrites or proprietary integrations. Since RustFS is containerized and Kubernetes-native, it can be deployed on these platforms without specialized skills to operate large-scale storage infrastructure.
+RustFS provides consistent, high-performance, and scalable object storage because it is Kubernetes-native by design and S3-compatible from the start. Developers can easily obtain Amazon S3-compatible persistent storage services for all cloud-native applications running on VMware Tanzu. Unlike AWS S3, RustFS enables applications to scale across any multi-cloud and hybrid cloud infrastructure while still being manageable within the VMware Tanzu ecosystem without public cloud lock-in.
 
-## RustFS Operator natively integrates with VMWare Tanzu functionality
+## RustFS Operator Natively Integrates with VMware Tanzu Features
 
 ### Feature Overview
 
@@ -33,19 +33,19 @@ Unlike AWS S3, RustFS enables applications to scale across multi-cloud and hybri
 
 ## Storage Classes and Tiering
 
-A key requirement for large-scale RustFS deployment on Tencent Cloud TKE is the ability to tier across storage classes (NVMe, HDD, public cloud). This enables enterprises to manage both cost and performance simultaneously.
+A key requirement for deploying RustFS at scale on VMware Tanzu is capability tiers across storage classes (NVMe, HDD, public cloud). This enables enterprises to manage both cost and performance simultaneously.
 
-RustFS supports automatic transition of aging objects from fast NVMe tiers to more cost-effective HDD tiers, or even cost-optimized cold public cloud storage tiers.
+RustFS supports automatic transition of aging objects from fast NVMe tiers to more cost-effective HDD tiers, and even to cost-optimized cold public cloud storage tiers.
 
 When tiering, RustFS provides a unified namespace across tiers. Movement across tiers is transparent to applications and triggered by customer-determined policies.
 
-RustFS provides secure storage in Alibaba Cloud ACK hybrid clouds by encrypting objects at the source, ensuring customers always maintain complete control over their data. When Alibaba Cloud ACK is deployed in public clouds, tiering functionality helps Alibaba Cloud ACK efficiently manage data across persistent block storage and cheaper object storage tiers.
+RustFS provides secure storage in VMware Tanzu hybrid clouds by encrypting objects at the source, ensuring customers always have complete control over data. When VMware Tanzu is deployed in public clouds, tiering capabilities help VMware Tanzu effectively manage data across persistent block storage and cheaper object storage tiers.
 
-**Learn more:**
+**Learn More:**
 
 ## External Load Balancing
 
-All RustFS communication is based on HTTP, RESTful APIs, and will support any standard Kubernetes-compatible ingress controller. This includes both hardware-based and software-defined solutions. The most popular choice is NGINX. Install using OperatorHub or OpenShift Marketplace, then expose RustFS tenants using annotations.
+All RustFS communication is based on HTTP, RESTful APIs, and will support any standard Kubernetes-compatible ingress controller. This includes hardware and software-defined solutions. The most popular choice is NGINX. Install using OperatorHub or Tanzu Marketplace, then expose RustFS tenants using annotations.
 
 ## Encryption Key Management
 

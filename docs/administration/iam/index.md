@@ -1,6 +1,6 @@
 ---
 title: "RustFS IAM Management"
-description: "Detailed explanation of user/user group/policy/AK&SK and other content in RustFS."
+description: "Comprehensive guide to Identity and Access Management (IAM), including Users, Groups, Policies, and Access Keys."
 ---
 
 This chapter includes the following content:

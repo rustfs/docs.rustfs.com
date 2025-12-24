@@ -16,7 +16,7 @@ Built for century-long data storage, constructing secure, intelligent, and susta
 
 **RustFS Solution**:
 
-- Mini-program storage-free architecture: Continuous writing to storage buckets, supporting upgrades according to audit standards/OLC/S3 storage handwriting
+- Lightweight, agentless architecture: Continuous writing to storage buckets, supporting upgrades according to audit standards/S3 protocol compliance
 - Dynamic encoding technology: Automatic conversion of encoded data formats (e.g., COBOL→JSON)
 - Full-stack sandbox: Built-in GDPR/data templates, one-click audit report generation
 
@@ -32,8 +32,8 @@ Built for century-long data storage, constructing secure, intelligent, and susta
 
 **RustFS Solution**:
 
-- Magneto-optical hybrid cloud storage: Mixed optical storage electromagnetic interference + tape low cost, disaster recovery
-- Cold data direct read technology: No need to defrost, recommended <15 seconds
+- Magneto-optical hybrid cloud storage: Magneto-optical storage resistant to electromagnetic interference + tape low cost, disaster recovery
+- Cold data direct read technology: Instant access without restoration delays, recommended <15 seconds
 - Blockchain dump synchronization: Automatic metadata synchronization, ensuring three-site replica consistency
 
 ### Power-Off Network Disaster Recovery

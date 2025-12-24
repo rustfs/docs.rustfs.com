@@ -1,6 +1,6 @@
 # Amazon S3 Compatibility
 
-S3 compatibility is a hard requirement for cloud-native applications. RustFS steadfastly adheres to using the API and has tens of thousands of users, including commercial users and the community. RustFS's S3 implementation is the world's most widely tested and deployed alternative to AWS S3.
+S3 compatibility is a hard requirement for cloud-native applications. RustFS strictly adheres to the S3 API standards and has tens of thousands of users, including commercial users and the community. RustFS's S3 implementation is the world's most widely tested and deployed alternative to AWS S3.
 
 ## RustFS and S3 API - Designed for Multi-Cloud Storage
 
@@ -8,7 +8,7 @@ RustFS has established itself as the standard for AWS S3 compatibility from the 
 
 ## S3 Enables Hybrid and Multi-Cloud Computing
 
-There is only one path to achieving multi-cloud and hybrid cloud compatibility, and that is S3. As a RESTful API standard, S3 has revolutionized interactions between applications, data, and infrastructure. Additionally, the dual forces of containerization and Kubernetes orchestration are also built around RESTful APIs, relegating POSIX APIs to legacy status.
+There is only one path to achieving multi-cloud and hybrid cloud compatibility, and that is S3. As a RESTful API standard, S3 has revolutionized interactions between applications, data, and infrastructure. Additionally, the dual forces of containerization and Kubernetes orchestration are also built around RESTful APIs, positioning RESTful APIs as the preferred standard for modern cloud-native applications.
 
 The result is that Kubernetes-native, S3-compatible object storage and applications can run anywhere - from various public cloud instances (RustFS has nearly 1 million deployments on Google, Azure, and AWS) to private clouds (Red Hat OpenShift, VMware Tanzu), to bare metal. By leveraging advanced S3 API-driven ILM technology, enterprises can perform operationally optimized instances across cloud and on-premises instances.
 
@@ -24,9 +24,7 @@ With RustFS, S3 compatibility is completely location-independent. This means Rus
 
 Cloud-native applications use the S3 API to communicate with object storage. But not all S3 compatibility is the same - many object storage vendors only support a small subset of overall functionality - which can cause application failures. Others claim comprehensive coverage, but their proprietary software or device models limit this claim, as only a small portion of applications, hardware, and software are tested.
 
-RustFS's uniqueness lies in its ability to support its S3 compatibility claims. We have tens of thousands of customers and open-source users, and our S3 API compatibility is the most widely tested and implemented in the world - covering millions of hardware, software, and application combinations. RustFS releases software weekly, and any defects in the S3 API are immediately reported by the community and corrected by RustFS.
-
-There are rumors that even Amazon uses RustFS to test third-party S3 compatibility.
+What sets RustFS apart is its proven track record of S3 compatibility. We have tens of thousands of customers and open-source users, and our S3 API compatibility is the most widely tested and implemented in the world - covering millions of hardware, software, and application combinations. RustFS releases software weekly, and any defects in the S3 API are immediately reported by the community and corrected by RustFS.
 
 The most comprehensive support for the S3 API means applications can leverage data stored in RustFS on any hardware, any location, and any cloud. Developers are free to innovate and iterate, confident that RustFS will never break versions.
 

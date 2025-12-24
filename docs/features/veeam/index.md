@@ -45,8 +45,6 @@ Regardless of size, backups and recoveries need to be fast. RustFS for Veeam Bac
 
 ### 🗃️ Metadata Advantages
 
-Using external tables, enterprises can enjoy the full functionality of SQL Server without the cost of moving data or coordination challenges.
-
 Because RustFS atomically writes metadata together with object data, Veeam backups don't require external metadata databases (Cassandra in most cases). This eliminates performance penalties associated with small objects. RustFS can provide performance within Veeam's recommended object size ranges, helping with fast deletion and deduplication.
 
 ### 🔒 Inline and Strictly Consistent

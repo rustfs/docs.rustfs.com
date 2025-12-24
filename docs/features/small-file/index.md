@@ -8,7 +8,7 @@ Leverage server DRAM to create distributed shared memory pools for workloads req
 
 RustFS small file optimization is ideal for workloads requiring IOPS and throughput performance. In modern architectures, this increasingly means AI/ML workloads. Without caching, I/O can become a bottleneck for GPUs.
 
-Using enterprise caching, buckets containing training, validation, and test datasets can be kept in memory to provide based
+Using enterprise caching, buckets containing training, validation, and test datasets can be kept in memory to provide high-speed access based on cached datasets.
 
 ## Features
 
@@ -32,4 +32,4 @@ Automatically updates new object versions. If a cached object has been updated, 
 
 ### 🧩 Seamless API Integration
 
-RustFS small file optimization is a behind-the-scenes extension of RustFS. Since small file optimization is an extension of RustFS, developers don't need to learn new APIs. Developers use the same APIs as before. If the requested object is in cache, RustFS will automatically fetch it from cache. If an object should be cached and is being requested for the first time, RustFS will fetch it from object storage, return it to the caller, and place it in cache for subsequent requests.
+RustFS small file optimization is a seamlessly integrated extension of RustFS. Since small file optimization is an extension of RustFS, developers don't need to learn new APIs. Developers use the same APIs as before. If the requested object is in cache, RustFS will automatically fetch it from cache. If an object should be cached and is being requested for the first time, RustFS will fetch it from object storage, return it to the caller, and place it in cache for subsequent requests.

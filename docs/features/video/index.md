@@ -32,9 +32,9 @@ Help video storage achieve dramatic cost reduction through object storage and hy
 - Support 2000+ device concurrent writing, read/write latency less than 300ms
 - Intelligent preloading technology: high-frequency access videos automatically cached to edge nodes
 
-### Military-Grade Data Protection
+### Enterprise-Grade Data Protection
 
-- Three-replica storage + remote disaster recovery (compliant with ISO27001/Level 3 Security)
+- Three-replica storage + remote disaster recovery (compliant with ISO 27001)
 - Blockchain evidence storage: key videos generate timestamp hashes, judicial-level trusted evidence
 - Version rollback: video recovery at any time point within 120 days
 

@@ -21,7 +21,7 @@ First, you need to use the `mc alias` command to configure an alias for RustFS:
 mc alias set rustfs http://12.34.56.78:9000 ACCESS_KEY SECRET_KEY
 ```
 
-Response:
+Output:
 
 ```bash
 Added `rustfs` successfully.
@@ -37,7 +37,7 @@ Use `mc ls` to list all buckets under the current RustFS instance:
 mc ls rustfs
 ```
 
-Response:
+Output:
 
 ```bash
 [2025-08-01 10:46:24 CST]     0B bucket-creation-by-api/
@@ -53,7 +53,7 @@ Use `mc mb` command to create a bucket:
 mc mb rustfs/bucket-creation-by-mc
 ```
 
-Response:
+Output:
 
 ```bash
 Bucket created successfully `rustfs/bucket-creation-by-mc`.
@@ -67,7 +67,7 @@ Use `mc rb` command to delete a bucket:
 mc rb rustfs/bucket-creation-by-mc
 ```
 
-Response:
+Output:
 
 ```bash
 Removed `rustfs/bucket-creation-by-mc` successfully.
@@ -81,7 +81,7 @@ Use `mc cp` command to upload a file to a bucket:
 mc cp file_name rustfs/bucket-creation-by-mc
 ```
 
-Response:
+Output:
 
 ```bash
 ...path/to/file_name: 4 B / 4 B  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  12 B/s 0s%
@@ -95,7 +95,7 @@ Use `mc rm` command to delete a file in a bucket:
 mc rm rustfs/bucket-creation-by-mc/file_name
 ```
 
-Response:
+Output:
 
 ```bash
 Removed `rustfs/bucket-creation-by-mc/1.txt`.

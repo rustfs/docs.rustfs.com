@@ -1,6 +1,6 @@
 ---
 title: "Usage Limits"
-description: "RustFS is a simple, efficient, distributed object storage. It is 100% S3 compatible, open source software released under the Apache2 license."
+description: "RustFS is a simple, efficient, distributed object storage. It is fully S3 compatible, open source software released under the Apache2 license."
 ---
 
 # Usage Limits
@@ -28,15 +28,15 @@ description: "RustFS is a simple, efficient, distributed object storage. It is 1
 
 ## 2. Erasure Coding Limits
 
-> EC parameters are configured based on Reed-Solomon matrix EC algorithm. Subject to actual EC parameter configuration.
+> EC parameters are configured based on Reed-Solomon matrix EC algorithm. Actual limits depend on the specific Erasure Coding (EC) configuration.
 
 | Item | Specification |
 | ---------------------------- | ------------------------------ |
-| Maximum number of servers per cluster | Unlimited |
+| Maximum number of servers per cluster | No hard limit |
 | Minimum number of servers | 1 |
 | When server count is 1, minimum number of drives per server | 1 (for single-node single-drive deployment, cannot provide additional reliability or availability) |
 | When server count is 2 or more, minimum number of drives per server | 1 |
-| Maximum number of drives per server | Unlimited |
+| Maximum number of drives per server | No hard limit |
 | Read quorum count | N/2 |
 | Write quorum count | (N/2) + 1 |
 

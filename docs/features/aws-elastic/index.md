@@ -1,25 +1,25 @@
 ---
-title: "RustFS for VMware Tanzu Container Platform"
-description: "RustFS provides high-performance object storage for VMware Tanzu with enterprise-grade features and multi-cloud capabilities."
+title: "RustFS for Amazon Elastic Kubernetes Service (EKS)"
+description: "RustFS provides high-performance object storage for Amazon EKS with enterprise-grade features and multi-cloud capabilities."
 ---
 
-# RustFS for VMware Tanzu Container Platform
+# RustFS for Amazon Elastic Kubernetes Service (EKS)
 
-## Three Reasons Customers Run RustFS on VMware Tanzu
+## Three Reasons Customers Run RustFS on Amazon EKS
 
-- RustFS serves as a consistent storage layer in hybrid cloud or multi-cloud deployment scenarios
+- RustFS serves as a consistent storage layer in hybrid cloud or multi-cloud deployment scenarios.
 - RustFS is a Kubernetes-native high-performance product that can provide predictable performance in public cloud, private cloud, and edge cloud environments.
 - Running RustFS on EKS provides control over the software stack with the flexibility needed to avoid cloud lock-in.
 
-VMware Tanzu is an enterprise-grade Kubernetes container platform with full-stack automated operations capabilities that can manage hybrid cloud, multi-cloud, and edge deployments. VMware Tanzu includes enterprise-grade Linux operating systems, container runtimes, networking, monitoring, registries, and authentication and authorization solutions.
+Amazon Elastic Kubernetes Service (Amazon EKS) is a managed service that makes it easy for you to run Kubernetes on AWS without needing to install, operate, and maintain your own Kubernetes control plane or nodes.
 
-RustFS natively integrates with VMware Tanzu, making it easier to operate your own large-scale multi-tenant object storage as a service. RustFS Operator works with VMware Tanzu toolchain (such as VMware Tanzu Cluster Manager CLI and Quay container registry) to ensure you get maximum return on investment from the VMware Tanzu ecosystem.
+RustFS natively integrates with Amazon EKS, making it easier to operate your own large-scale multi-tenant object storage as a service. RustFS Operator works with the Amazon EKS toolchain to ensure you get maximum return on investment from the AWS ecosystem.
 
 ![RustFS Architecture Diagram](images/sec1-1.png)
 
-RustFS provides consistent, high-performance, and scalable object storage because it is Kubernetes-native by design and S3-compatible from the start. Developers can easily obtain Amazon S3-compatible persistent storage services for all cloud-native applications running on VMware Tanzu. Unlike AWS S3, RustFS enables applications to scale across any multi-cloud and hybrid cloud infrastructure while still being manageable within the VMware Tanzu ecosystem without public cloud lock-in.
+RustFS provides consistent, high-performance, and scalable object storage because it is Kubernetes-native by design and S3-compatible from the start. Developers can easily obtain Amazon S3-compatible persistent storage services for all cloud-native applications running on Amazon EKS. Unlike AWS S3, RustFS enables applications to scale across any multi-cloud and hybrid cloud infrastructure while still being manageable within the Amazon EKS ecosystem without public cloud lock-in.
 
-## RustFS Operator Natively Integrates with VMware Tanzu Features
+## RustFS Operator Natively Integrates with Amazon EKS Features
 
 ### Feature Overview
 
@@ -33,19 +33,19 @@ RustFS provides consistent, high-performance, and scalable object storage becaus
 
 ## Storage Classes and Tiering
 
-A key requirement for deploying RustFS at scale on Tencent Cloud TKE is capability tiers across storage classes (NVMe, HDD, public cloud). This enables enterprises to manage both cost and performance simultaneously.
+A key requirement for deploying RustFS at scale on Amazon EKS is capability tiers across storage classes (NVMe, HDD, public cloud). This enables enterprises to manage both cost and performance simultaneously.
 
-RustFS supports automatic transition of aging objects from fast NVMe tiers to more cost-effective HDD tiers, and even to cost-optimized cold public cloud storage tiers.
+RustFS supports automatic transition of aging objects from fast NVMe tiers to more cost-effective HDD tiers, and even to cost-optimized cold public cloud storage tiers (like AWS S3 Glacier).
 
 When tiering, RustFS provides a unified namespace across tiers. Movement across tiers is transparent to applications and triggered by customer-determined policies.
 
-RustFS provides secure storage in Alibaba Cloud ACK hybrid clouds by encrypting objects at the source, ensuring customers always have complete control over data. When Alibaba Cloud ACK is deployed in public clouds, tiering capabilities help Alibaba Cloud ACK effectively manage data across persistent block storage and cheaper object storage tiers.
+RustFS provides secure storage in Amazon EKS hybrid clouds by encrypting objects at the source, ensuring customers always have complete control over data. When Amazon EKS is deployed in public clouds, tiering capabilities help Amazon EKS effectively manage data across persistent block storage (EBS) and cheaper object storage tiers.
 
 **Learn More:**
 
 ## External Load Balancing
 
-All RustFS communication is based on HTTP, RESTful APIs, and will support any standard Kubernetes-compatible ingress controller. This includes hardware and software-defined solutions. The most popular choice is NGINX. Install using OperatorHub or OpenShift Marketplace, then expose RustFS tenants using annotations.
+All RustFS communication is based on HTTP, RESTful APIs, and will support any standard Kubernetes-compatible ingress controller. This includes hardware and software-defined solutions. The most popular choice is NGINX or AWS Load Balancer Controller. Install using Helm charts, then expose RustFS tenants using annotations.
 
 ## Encryption Key Management
 

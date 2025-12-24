@@ -5,9 +5,9 @@ description: "Installation guide for RustFS on different operating systems and d
 
 # RustFS Introduction
 
-RustFS is a `high-performance`, `distributed` object storage software developed using Rust, the world's most popular memory-safe language. RustFS combines simplicity and efficiency, and is an efficient, open-source, free object storage solution that can be deployed locally as a private cloud. RustFS is 100% compatible with the S3 protocol and is open-source software released under the Apache2 license. It is a commercially-friendly distributed object storage product participated in and contributed by excellent engineers worldwide. RustFS can replace many object storage products with non-friendly open-source licenses.
+RustFS is a `high-performance`, `distributed` object storage system developed in Rust, leveraging the language's memory safety and performance. RustFS combines simplicity with efficiency, offering an open-source, free object storage solution suitable for private cloud deployments. It is fully compatible with the S3 protocol and released under the Apache 2.0 license. Built by a global community of engineers, RustFS serves as a commercially-friendly alternative to restrictive open-source storage products.
 
-RustFS is about to transition from commercial applications to open-source, releasing globally to help the world reduce storage costs and improve data security.
+RustFS is transitioning from commercial roots to a fully open-source model, aiming to democratize high-performance storage and enhance data security globally.
 
 ## 1. Supported CPUs and Operating Systems
 
@@ -34,16 +34,16 @@ This chapter includes installation guides for RustFS on different operating syst
 
 ## 3. RustFS Features
 
-- S3 Compatible: 100% compatible with S3 protocol, excellent compatibility with big data, data lakes, backup software, image processing software, and industrial production software;
-- Distributed: RustFS is a distributed object storage, so it can meet various needs;
-- Commercial Friendly: RustFS is 100% open-source software and released under Apache v2.0 license, making it commercially friendly;
-- Fast: The performance of Rust, the development language, is infinitely close to C language speed. Therefore, RustFS performance is very powerful;
-- Secure: RustFS is written in Rust, a memory-safe language, so it is 100% secure;
-- Cross-platform: RustFS works on Windows, macOS, and Linux;
-- Extensible: RustFS supports custom plugins, so it can meet various needs;
-- Customizable: Due to its open-source nature, you can customize various plugins, so RustFS can meet various needs;
-- Cloud Native: RustFS supports deployment via Docker and other methods, enabling rapid deployment in cloud-native environments.
+- **S3 Compatible**: Fully compatible with the S3 protocol, ensuring seamless integration with big data ecosystems, data lakes, backup solutions, and media processing workflows.
+- **Distributed Architecture**: Designed to scale horizontally to meet diverse storage requirements.
+- **Commercial-Friendly**: Released under the Apache v2.0 license, making it safe and flexible for commercial integration.
+- **High Performance**: Built with Rust, offering performance comparable to C/C++ but with modern safety guarantees.
+- **Secure by Design**: Leverages Rust's memory safety guarantees to significantly reduce common security vulnerabilities.
+- **Cross-Platform**: Runs natively on Windows, macOS, and Linux.
+- **Extensible**: Supports a plugin architecture to adapt to specific business needs.
+- **Customizable**: Open-source nature allows for deep customization and plugin development.
+- **Cloud-Native**: Optimized for containerized environments (Docker, Kubernetes) enabling rapid deployment.
 
 ## 4. RustFS Values
 
-Help all humanity improve data security and reduce storage costs.
+Our mission is to democratize high-performance storage, making data security and cost-efficiency accessible to everyone.

@@ -28,7 +28,7 @@ SSDs provide fast read/write speeds suitable for applications requiring high I/O
 - **Risk Distribution**: Media backup + data mirroring
 - **Green Low Carbon**: Energy saving + low carbon utilization
 
-#### Use SSD for performance, HDD for cost reduction, achieve "using good steel on the blade" for storage spending through intelligent tiering
+#### Use SSD for performance, HDD for cost reduction, optimizing resources where they matter most for storage spending through intelligent tiering
 
 #### SSD+HDD Tiered Storage vs Single Storage Solution Cost Comparison
 
@@ -53,7 +53,7 @@ Blu-ray storage devices consume far less energy during operation than hard disk 
 
 - **Lower Cost**: Blu-ray disc cost per GB is only 15% of original hard disk solutions
 - **Long-term Reliability**: No need for regular data migration
-- **Compliance Security**: Military-grade encryption protection
+- **Compliance Security**: Enterprise-grade encryption protection
 
 #### Cold backup storage reduces low-frequency industrial data archiving costs by 60% through intelligent tiering and elastic scaling, balancing security compliance with efficient resource utilization
 

@@ -34,8 +34,8 @@ Intelligent storage architecture designed specifically for high-frequency tradin
 
 ### Financial Security
 
-- National security SM4 hardware encryption, performance loss <3%
-- Supports three-region five-center disaster recovery, RTO <1 minute
+- Enterprise-grade encryption (e.g., AES-256), performance loss <3%
+- Supports multi-region, multi-zone disaster recovery, RTO <1 minute
 
 ## Scenario-Based Solutions
 

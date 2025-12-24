@@ -33,10 +33,10 @@ Versioning is the simplest way to protect data from accidental operations. Howev
 ### Main Feature Characteristics
 
 - ✅ **Bucket Replication** (Active-Active, Active-Passive)
-- ✅ **Mc undo** - Rollback PUT/DELETE objects with a single command
+- ✅ **`mc undo`** - Rollback PUT/DELETE objects with a single command
 - ✅ **Object Lock**
-- ✅ **Continuous Data Protection-like protection** without the overhead of snapshots or full system replication
-- ✅ **Mc rewind** - View buckets or objects at any point in time after versioning is enabled
+- ✅ **Continuous Data Protection (CDP) capabilities** without the overhead of snapshots or full system replication
+- ✅ **`mc rewind`** - View buckets or objects at any point in time after versioning is enabled
 
 ## Architecture
 

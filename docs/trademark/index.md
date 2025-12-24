@@ -2,7 +2,7 @@
 
 All images on this page are provided for your use only when representing RustFS in your product architecture diagrams or support lists. When using the images, please indicate that the image source is the official RustFS website. Images may be proportionally resized but cannot be modified in any other way.
 
-RustFS® and the rustfs logo® are registered trademarks of Beijing Henghesa Technology Co., Ltd. in China. No one may use these images for any other purpose without written consent from RustFS.
+RustFS® and the rustfs logo® are registered trademarks of RustFS. No one may use these images for any other purpose without written consent from RustFS.
 
 For any other matters not covered here, please contact us via email at <hello@rustfs.com>.
 

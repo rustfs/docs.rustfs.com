@@ -5,7 +5,7 @@ description: "RustFS provides high-performance object storage for Tencent Cloud 
 
 # RustFS for Tencent Cloud TKE Kubernetes Service
 
-## Three Reasons Customers Run RustFS on Amazon EKS
+## Three Reasons Customers Run RustFS on Tencent Cloud TKE
 
 - RustFS serves as a consistent storage layer in hybrid cloud or multi-cloud deployment scenarios
 - RustFS is a Kubernetes-native high-performance product that can provide predictable performance in public cloud, private cloud, and edge cloud environments.

@@ -4,7 +4,7 @@
 
 ![Object Storage Replication](images/s6-1.png)
 
-Active replication for object storage is a critical requirement for mission-critical production environments. RustFS is currently the only vendor providing this service. Executed at bucket-level granularity, it's used in the following situations:
+Active replication for object storage is a critical requirement for mission-critical production environments. RustFS provides industry-leading active-active replication. Executed at bucket-level granularity, it's used in the following situations:
 
 RustFS supports synchronous and near-synchronous replication, depending on architectural choices and data change rates. In each of the above cases, replication must be as close to strictly consistent as possible (considering bandwidth considerations and change rates).
 
@@ -19,7 +19,7 @@ Key features include:
 
 ## Core Features
 
-### Ability for Source and Target Buckets to Have the Same Name
+### Identical Bucket Naming Support
 
 This is required for applications that must transparently failover to remote sites without any interruption.
 

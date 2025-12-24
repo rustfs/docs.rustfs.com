@@ -2,7 +2,7 @@
 
 Modern data lakes and lakehouse architectures are built on modern object storage. This means they are built on RustFS.
 
-**RustFS provides a unified storage solution for modern data lakes/lakehouses that can run anywhere: private cloud, public cloud, colos, bare metal - even at the edge. Yes, fast, scalable, cloud-native and ready to go - batteries included.**
+**RustFS provides a unified storage solution for modern data lakes/lakehouses that can run anywhere: private cloud, public cloud, colos, bare metal - even at the edge. Yes, fast, scalable, cloud-native and ready to go - fully integrated solution.**
 
 ![Data Lake Architecture](images/data-lake-architecture.png)
 
@@ -20,7 +20,7 @@ Don't take our word for it - enter your favorite cloud-native technology and let
 
 ## Multi-Engine
 
-RustFS supports all S3-compatible query engines, which is to say all of them. Don't see the one you use - drop us a line and we'll investigate.
+RustFS supports all S3-compatible query engines, which is to say all of them. Contact us for support.
 
 ![Multi-Engine Support](images/multi-engine-1.svg)
 
@@ -54,7 +54,7 @@ RustFS has multiple customers with daily data ingestion exceeding 250PB.
 
 ## Simplicity
 
-Simplicity is hard. It requires work, discipline, and most importantly, commitment. RustFS's simplicity is legendary and is a philosophical commitment that makes our software easy to deploy, use, upgrade, and scale. Modern data lakes don't have to be complex. There are a few parts, and we're committed to ensuring RustFS is the easiest to adopt and deploy.
+Simplicity is hard. It requires work, discipline, and most importantly, commitment. RustFS prioritizes simplicity in design and operation and is a philosophical commitment that makes our software easy to deploy, use, upgrade, and scale. Modern data lakes don't have to be complex. There are a few parts, and we're committed to ensuring RustFS is the easiest to adopt and deploy.
 
 ## ELT or ETL - It Just Works
 

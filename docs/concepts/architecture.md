@@ -21,9 +21,9 @@ In both distributed and single-machine modes, all read and write operations stri
 
 ## Several Important Concepts in RustFS
 
-**Object**: The basic object stored in RustFS, such as files, byte streams, anything...
+**Object**: The fundamental unit of storage in RustFS, representing files, byte streams, or any unstructured data.
 
-**Bucket**: A logical space used to store Objects. Data between each Bucket is isolated from each other. For clients, it's equivalent to a top-level folder for storing files.
+**Bucket**: A logical container for storing Objects. Data is isolated between Buckets. For clients, it functions similarly to a top-level directory.
 
 **Drive**: The disk that stores data, passed as a parameter when RustFS starts. All object data in RustFS will be stored in Drives.
 
@@ -39,12 +39,10 @@ Therefore, before designing the architecture and deploying devices, note that:
 
 4. Drives in one Set should be distributed across different nodes as much as possible;
 
-## Special Thanks
+## Architectural Design
 
-Traditional distributed storage architectures must have: Master nodes, MetaData nodes, and Data Node nodes. This design pattern makes user deployment very complex. At the same time, without rich distributed storage management experience, once metadata is lost, there is a risk of data loss.
+Traditional distributed storage architectures often rely on distinct Master nodes, Metadata nodes, and Data nodes. This complexity can make deployment challenging and introduces single points of failure—if metadata is lost, data integrity is at risk.
 
-All nodes are peer-level nodes, greatly simplifying the architecture design and eliminating concerns about metadata loss. A single command can start the system.
+RustFS adopts a decentralized, peer-to-peer architecture where all nodes are equal. This design greatly simplifies deployment and eliminates metadata bottlenecks. A single command is sufficient to start the system.
 
-Without losing elegance, simplicity, and reliability, RustFS adopts the same architectural design as MinIO.
-
-Thanks to MinIO's architectural philosophy, which greatly facilitates global users and promotes the S3 protocol.
+RustFS draws inspiration from the elegant and scalable architecture of MinIO, adopting a similar design philosophy that prioritizes simplicity and reliability without compromising on features. We acknowledge MinIO's contribution to promoting the S3 protocol and setting a high standard for object storage architecture.

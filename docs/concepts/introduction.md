@@ -5,11 +5,11 @@ description: "RustFS is an object storage solution - an open-source distributed 
 
 # What is RustFS?
 
-RustFS is a simple, efficient, and distributed object storage solution.
-It is also an efficient, open-source, and free object storage solution. It is 100% compatible with the S3 protocol and is open-source software released under the Apache2 license. RustFS is written in Rust, leveraging its industry-leading memory safety and zero-cost abstractions for high-performance storage.
-It is a commercially-friendly distributed object storage product participated in and contributed to by outstanding engineers from around the world. RustFS can replace many non-friendly open-source protocol object storage products.
+RustFS is a high-performance, distributed object storage solution designed for simplicity and efficiency. Fully compatible with the S3 protocol, it is open-source software released under the Apache 2.0 license. Built with Rust, RustFS leverages industry-leading memory safety and zero-cost abstractions to deliver exceptional performance.
 
-RustFS is about to officially transition from commercial applications to open source, releasing globally to help the world reduce storage costs and improve data security.
+RustFS is a commercially-friendly product built by a global community of engineers. It serves as a modern alternative to legacy object storage solutions, offering a robust platform for data-intensive applications.
+
+RustFS is transitioning from commercial roots to a fully open-source model, aiming to democratize high-performance storage and enhance data security globally.
 
 ## Operating System and CPU Support
 
@@ -18,20 +18,20 @@ CPU architecture support: X86, ARM, and various other CPU architectures.
 
 ## RustFS Features
 
-- **S3 Compatible**: 100% compatible with S3 protocol, excellent compatibility with big data, data lakes, backup software, image processing software, and industrial production software;
-- **Distributed**: RustFS is a distributed object storage, therefore, RustFS can meet various requirements;
-- **Commercial-Friendly**: RustFS is 100% open-source software and is released under the Apache v2.0 license, therefore, RustFS is commercial-friendly;
-- **Fast**: The performance of Rust as a development language is infinitely close to the speed of C language. Therefore, RustFS performance is very powerful;
-- **Secure**: RustFS is written in the memory-safe Rust language, therefore, RustFS is 100% secure;
-- **Cross-Platform**: RustFS works on Windows, macOS, and Linux;
-- **Extensible**: RustFS supports custom plugins, therefore, RustFS can meet various requirements;
-- **Customizable**: Due to its open-source nature, you can customize various plugins, therefore, RustFS can meet various requirements;
-- **Cloud-Native**: RustFS supports deployment via Docker and other methods, enabling rapid deployment in cloud-native environments.
+- **S3 Compatible**: Fully compatible with the S3 protocol, ensuring seamless integration with big data ecosystems, data lakes, backup solutions, and media processing workflows.
+- **Distributed Architecture**: Designed to scale horizontally to meet diverse storage requirements across various scales.
+- **Commercial-Friendly**: Released under the Apache v2.0 license, making it safe and flexible for commercial integration.
+- **High Performance**: Built with Rust, offering performance comparable to C/C++ but with modern safety guarantees.
+- **Secure by Design**: Leverages Rust's memory safety guarantees to significantly reduce common security vulnerabilities.
+- **Cross-Platform**: Runs natively on Windows, macOS, and Linux.
+- **Extensible**: Supports a plugin architecture to adapt to specific business needs.
+- **Customizable**: Open-source nature allows for deep customization and plugin development.
+- **Cloud-Native**: Optimized for containerized environments (Docker, Kubernetes) enabling rapid deployment.
 
 ## RustFS Values
 
-Help all humanity improve data security and reduce storage costs.
+Our mission is to democratize high-performance storage, making data security and cost-efficiency accessible to everyone.
 
 ## RustFS Vision
 
-Every personal AI agent in the world can use RustFS to store data.
+To provide the storage foundation for the AI era, enabling every personal AI agent to securely store and access data.

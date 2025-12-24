@@ -43,9 +43,9 @@ Since RustFS is very lightweight, we can roll out non-disruptive updates across 
 
 ### Performance
 
-Since object storage serves as both primary and secondary storage, it needs to deliver performance at scale. From mobile/web applications to AI/ML, data-intensive workloads require exceptional performance from underlying object storage. Even data protection workloads need high-performance deduplication and snapshot access. No enterprise can afford slow recovery processes. Traditionally, these workloads required bare metal performance. Now, all these workloads can be containerized - as proven by public cloud providers' success.
+Since object storage serves as both primary and secondary storage, it needs to deliver performance at scale. From mobile/web applications to AI/ML, data-intensive workloads require exceptional performance from underlying object storage. Even data protection workloads need high-performance deduplication and snapshot access. Rapid recovery is essential for business continuity. Traditionally, these workloads required bare metal performance. Now, all these workloads can be containerized - as proven by public cloud providers' success.
 
-RustFS is the world's fastest object storage, with read/write speeds of 325 GiB/s and 171 GiB/s on NVMe, and 11 GiB/s and 9 GiB/s on HDD. At such speeds, every workload can be achieved in any multi-cloud architecture running on any infrastructure.
+RustFS is a high-performance object storage solution, with read/write speeds of 325 GiB/s and 171 GiB/s on NVMe, and 11 GiB/s and 9 GiB/s on HDD. At such speeds, every workload can be achieved in any multi-cloud architecture running on any infrastructure.
 
 ### Scalable
 

@@ -10,7 +10,7 @@ RustFS accelerates AI/ML workloads by leveraging its distributed architecture an
 
 ## Core of the AI Ecosystem
 
-RustFS is the standard for S3-compatible object storage for AI workloads. This ubiquity means the entire AI/ML ecosystem integrates with RustFS. Don't take our word for it - enter your favorite framework and let Google provide the evidence.
+RustFS is the standard for S3-compatible object storage for AI workloads. This ubiquity means the entire AI/ML ecosystem integrates with RustFS. RustFS is widely supported across the AI/ML ecosystem.
 
 ![AI Ecosystem Support](images/multi-engine-1.svg)
 
@@ -20,11 +20,11 @@ RustFS is the standard for S3-compatible object storage for AI workloads. This u
 
 Enterprises continuously collect and store AI data that applications and large language models can use to retrain models for improved accuracy. RustFS's scalability allows organizations to scale their storage capacity on demand, ensuring smooth data access and high-performance computing essential for the success of AI/ML applications.
 
-## Resilient (Fault-Tolerant) AI Storage
+## Fault-Tolerant AI Storage
 
 RustFS allows organizations to store large amounts of data, including training datasets, models, and intermediate results in a fault-tolerant manner. This resilience is crucial for ML and AI storage as it ensures data remains accessible even in cases of hardware failures or system crashes. With RustFS's distributed architecture and data replication capabilities, AI/ML workflows can run seamlessly and continue to provide accurate insights and predictions, enhancing the overall reliability of AI-driven applications.
 
-## Reliable (Always On) Storage for AI Workloads
+## High-Availability Storage for AI Workloads
 
 RustFS's active-active replication capabilities support simultaneous access across multiple geographically distributed clusters. This is important for AI/ML as it enhances data availability and performance. AI/ML workloads often involve globally collaborative teams and require low-latency access to data stored for AI model training and inference - ensuring data can be accessed from the nearest cluster location, reducing latency. Additionally, it provides failover capabilities, ensuring uninterrupted access to data even during cluster failures, which is crucial for maintaining reliability and continuity of AI/ML processes.
 

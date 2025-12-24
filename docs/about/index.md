@@ -1,14 +1,14 @@
 # About Us
 
-**RustFS is committed to becoming a world-leading company in data security and cost reduction.**
+**RustFS is dedicated to leading the industry in data security and cost-efficiency.**
 
-RustFS is a world-renowned open-source infrastructure solution for distributed object storage. It is a project jointly initiated and composed of talented storage architects and open-source enthusiasts from across the globe. Our core values are: Integrity, Focus, and Simplicity.
+RustFS is a cutting-edge open-source infrastructure solution for distributed object storage. It is a project driven by a global community of talented storage architects and open-source enthusiasts. Our core values are: Integrity, Focus, and Simplicity.
 
-Our vision is to provide multilingual, secure, and cost-effective distributed object storage products to the world.
+Our vision is to provide secure, multilingual, and cost-effective distributed object storage solutions to the world.
 
-RustFS continuously ensures data security and reduces data storage costs across all aspects including artificial intelligence, big data, video, cloud computing, encrypted storage, industrial production, cloud-native, and data backup.
+RustFS continuously ensures data security and reduces storage costs across diverse sectors, including artificial intelligence, big data, media streaming, cloud computing, encrypted storage, industrial IoT, cloud-native applications, and data backup.
 
-Helping humanity achieve global storage solutions, we are on the way...
+We are committed to building the future of global storage infrastructure.
 
 ## Our Vision and Values
 
@@ -34,8 +34,9 @@ Integrity, Focus, Simplicity
 
 > According to Fortune Business Insights, the global data storage market is expected to grow from $218.33 billion in 2024 to $774 billion in 2032, with a compound annual growth rate of 17.1% during this period.
 
-### Invest in RustFS
+### Investor Relations
 
+For investment opportunities or strategic partnerships, please contact us.
 
 📧 **Contact**
 <hello@rustfs.com>

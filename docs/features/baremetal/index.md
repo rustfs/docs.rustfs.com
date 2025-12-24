@@ -75,7 +75,7 @@ When WORM is enabled, RustFS disables all APIs that might alter object data and 
 
 ## System Architecture
 
-RustFS is designed to be cloud-native and can run as lightweight containers managed by external orchestration services like Kubernetes. The entire server is a static binary of about 40 MB that efficiently uses CPU and memory resources even under high load. As a result, you can co-host a large number of tenants on shared hardware.
+RustFS is designed to be cloud-native and can run as lightweight containers managed by external orchestration services like Kubernetes. The application is compiled into a single static binary (~100 MB) that efficiently uses CPU and memory resources even under high load. As a result, you can co-host a large number of tenants on shared hardware.
 
 RustFS runs on commodity servers with locally attached drives (JBOD/JBOF). All servers in the cluster are functionally equal (completely symmetric architecture). There are no name nodes or metadata servers.
 

@@ -5,7 +5,7 @@ description: "RustFS provides high-performance object storage for Red Hat OpenSh
 
 # RustFS for Red Hat OpenShift Container Platform
 
-## Three Reasons Customers Run RustFS on Amazon EKS
+## Three Reasons Customers Run RustFS on Red Hat OpenShift
 
 - RustFS serves as a consistent storage layer in hybrid cloud or multi-cloud deployment scenarios
 - RustFS is a Kubernetes-native high-performance product that can provide predictable performance in public cloud, private cloud, and edge cloud environments.
@@ -33,7 +33,7 @@ RustFS provides consistent, high-performance, and scalable object storage becaus
 
 ## Storage Classes and Tiering
 
-A key requirement for deploying RustFS at scale on Tencent Cloud TKE is capability tiers across storage classes (NVMe, HDD, public cloud). This enables enterprises to manage both cost and performance simultaneously.
+A key requirement for deploying RustFS at scale on Red Hat OpenShift is capability tiers across storage classes (NVMe, HDD, public cloud). This enables enterprises to manage both cost and performance simultaneously.
 
 RustFS supports automatic transition of aging objects from fast NVMe tiers to more cost-effective HDD tiers, and even to cost-optimized cold public cloud storage tiers.
 

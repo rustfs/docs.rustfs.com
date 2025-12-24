@@ -6,9 +6,9 @@ As data continues to grow, the ability to collaboratively optimize for access, s
 
 Data doesn't have to exist forever: RustFS lifecycle management tools allow you to define how long data remains on disk before deletion. Users define the time length as a specific date or number of days before RustFS begins deleting objects.
 
-Lifecycle management rules are created per bucket and can be constructed using any combination of object and tag filters. Don't specify filters to set expiration rules for the entire bucket, or specify multiple rules to create more complex expiration behavior.
+Lifecycle management rules are created per bucket and can be constructed using any combination of object and tag filters. Omitting filters applies the expiration rule to the entire bucket, or specify multiple rules to create more complex expiration behavior.
 
-RustFS object expiration rules also apply to versioned buckets and come with some versioning-specific flavors. For example, you can specify expiration rules only for non-current versions of objects to maximize the benefits of object versioning without incurring long-term storage costs. Similarly, you can create lifecycle management rules for deleting objects whose only remaining version is a delete marker.
+RustFS object expiration rules also apply to versioned buckets and come with some versioning-specific options. For example, you can specify expiration rules only for non-current versions of objects to maximize the benefits of object versioning without incurring long-term storage costs. Similarly, you can create lifecycle management rules for deleting objects whose only remaining version is a delete marker.
 
 Bucket expiration rules fully comply with RustFS WORM locking and legal holds - objects in a locked state will remain on disk until the lock expires or is explicitly released. Once objects are no longer constrained by locks, RustFS begins applying expiration rules normally.
 
