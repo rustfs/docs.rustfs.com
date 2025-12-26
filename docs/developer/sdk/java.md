@@ -160,17 +160,7 @@ Good, below is the **RustFS AWS S3 Java SDK Advanced Features Example Supplement
 
 > Presigned URLs allow clients to temporarily access private objects without exposing credentials, widely used for browser direct upload or download file scenarios.
 
-#### 5.1.1 Add Dependencies (v2 SDK URL signing is in `s3-presigner` module)
-
-```xml
-<dependency>
- <groupId>software.amazon.awssdk</groupId>
- <artifactId>s3-presigner</artifactId>
- <version>2.25.27</version>
-</dependency>
-```
-
-#### 5.1.2 Generate Download Link (GET)
+#### 5.1.1 Generate Download Link (GET)
 
 ```java
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -203,7 +193,7 @@ System.out.println("Presigned URL: " + presignedRequest.url());
 
 > 🔗 Open the link in browser to access the object.
 
-#### 5.1.3 Upload Presigned URL (PUT)
+#### 5.1.2 Upload Presigned URL (PUT)
 
 Similarly, you can also generate upload URLs:
 
