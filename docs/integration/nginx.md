@@ -32,6 +32,12 @@ upstream rustfs-console {
    server 127.0.0.1:9001;
 }
 
+map $http_upgrade $proxy_set_header_connection {
+   # If the Upgrade request header is present, also send a `Connection: upgrade` request header upstream,
+   # otherwise prevent the default `Connection: close` request header being sent to preserve keepalives.
+   default "upgrade";
+   "" "";
+}
 
 server {
    listen       80;
@@ -59,14 +65,10 @@ server {
       proxy_connect_timeout 300;
       # Default is HTTP/1, keepalive is only enabled in HTTP/1.1
       proxy_http_version 1.1;
-      proxy_set_header Connection "";
       chunked_transfer_encoding off;
 
       proxy_set_header Upgrade $http_upgrade;
-      proxy_set_header Connection "upgrade";
-
-
-
+      proxy_set_header Connection $proxy_set_header_connection;
 
       proxy_pass http://rustfs; # This uses the upstream directive definition to load balance
    }
@@ -99,14 +101,10 @@ server {
       proxy_connect_timeout 300;
       # Default is HTTP/1, keepalive is only enabled in HTTP/1.1
       proxy_http_version 1.1;
-      proxy_set_header Connection "";
       chunked_transfer_encoding off;
 
       proxy_set_header Upgrade $http_upgrade;
-      proxy_set_header Connection "upgrade";
-
-
-
+      proxy_set_header Connection $proxy_set_header_connection;
 
       proxy_pass http://rustfs-console; # This uses the upstream directive definition to load balance
    }
@@ -149,6 +147,13 @@ Console: `www.rustfs.dev`
 
 
 ~~~
+map $http_upgrade $proxy_set_header_connection {
+   # If the Upgrade request header is present, send a `Connection: upgrade` request header upstream,
+   # otherwise prevent the default `Connection: close` request header being sent to preserve keepalives.
+   default "upgrade";
+   "" "";
+}
+
 server {
    listen       443;
    listen  [::]:443;
@@ -175,11 +180,10 @@ server {
       proxy_connect_timeout 300;
       # Default is HTTP/1, keepalive is only enabled in HTTP/1.1
       proxy_http_version 1.1;
-      proxy_set_header Connection "";
       chunked_transfer_encoding off;
 
       proxy_set_header Upgrade $http_upgrade;
-      proxy_set_header Connection "upgrade";
+      proxy_set_header Connection $proxy_set_header_connection;
 
       proxy_pass http://127.0.0.1:9000;
    }
@@ -195,11 +199,11 @@ server {
       proxy_connect_timeout 300;
       # Default is HTTP/1, keepalive is only enabled in HTTP/1.1
       proxy_http_version 1.1;
-      proxy_set_header Connection "";
       chunked_transfer_encoding off;
 
       proxy_set_header Upgrade $http_upgrade;
-      proxy_set_header Connection "upgrade";
+      proxy_set_header Connection $proxy_set_header_connection;
+
       proxy_pass http://127.0.0.1:9001; 
    }
 }
