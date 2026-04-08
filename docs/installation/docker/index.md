@@ -23,7 +23,7 @@ This article is based on RustFS official Linux binary packages, packaging RustFS
 
  * Define listening port, admin account, data path, etc. in host `/etc/rustfs/config.toml` (see Section 4 for details)
 
-4. RustFS container run as non-root user `rustfs` with id `10001`, if you run docker with `-v` to mount host directory into docker container, please make sure the owner of host directory has been changed to `10001`, otherwise you will encounter permission denied error.
+4. RustFS container run as non-root user `rustfs` with id `10001`, if you run docker with `-v` to mount host directory into docker container, please make sure the owner of host directory has been changed to `10001`, otherwise you will encounter permission denied error. You can run `chown -R 10001:10001 /path/to/host_directory` to grant the necessary permissions.
 
 ---
 
@@ -173,6 +173,26 @@ Running the command under root directory,
 
 ```
 docker compose --profile observability up -d
+```
+
+Providing the necessary permissions. An initialization container is necessary to grant the correct access rights to rustfs using the `depends_on` keyword. In the example below the `rustfs_perms` service is added to the `docker-compose.yml` to handle this. 
+
+```
+  services:
+    # grant the necessary permissions to RUSTFS volumes path
+    rustfs_perms:
+      image: alpine
+      user: root
+      volumes:
+        - /path/to/host_directory/volumes:/fix_path
+      command: chown -R 10001:10001 /fix_path
+    
+    rustfs:
+      image: rustfs/rustfs:latest
+      depends_on: 
+        rustfs_perms:
+          condition: service_completed_successfully
+      # ... other configurations
 ```
 
 Started containers is as below,
