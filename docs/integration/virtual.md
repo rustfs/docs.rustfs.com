@@ -16,10 +16,10 @@ The difference lies in the bucket name placement.
 
 Path Style is the default. In Path Style, the bucket name follows the endpoint.
 
-Example (Bucket: `test`, Host: `rustfs.com`):
+Example (Bucket: `test`, Host: `rustfs.yourdomain.com`):
 
 ```
-http://rustfs.com/test
+http://rustfs.yourdomain.com/test
 ```
 
 **Note**: No configuration is required for Path Style.
@@ -28,33 +28,33 @@ http://rustfs.com/test
 
 In Virtual Host Style, the bucket name is part of the domain.
 
-Example (Bucket: `test`, Host: `rustfs.com`):
+Example (Bucket: `test`, Host: `rustfs.yourdomain.com`):
 
 ```
-http://test.rustfs.com/
+http://test.rustfs.yourdomain.com/
 ```
 
 ### Configuration
 
-1. **DNS**: Configure wildcard DNS resolution (e.g., `*.rustfs.com` -> Server IP).
+1. **DNS**: Configure wildcard DNS resolution (e.g., `*.rustfs.yourdomain.com` -> Server IP).
 2. **Configuration**: Modify the configuration file (Linux: `/etc/default/rustfs`, Docker/K8s: env vars).
-3. **Set Domain**: Set `RUSTFS_SERVER_DOMAINS = "rustfs.com"`.
+3. **Set Domain**: Set `RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com"`.
 4. **Restart**: Restart the service (`systemctl restart rustfs`).
 
 ### Port in Domain (Optional)
 
 If your domain is accessed **with an explicit port**, include the port number in `RUSTFS_SERVER_DOMAINS`.
 
-Example (`rustfs.com:9001`):
+Example (`rustfs.yourdomain.com:9001`):
 
 ```ini
-RUSTFS_SERVER_DOMAINS = "rustfs.com:9001"
+RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com:9001"
 ```
 
 This ensures that requests like:
 
 ```
-http://test.rustfs.com:9001/
+http://test.rustfs.yourdomain.com:9001/
 ```
 
 can be correctly resolved in Virtual Host Style mode.
