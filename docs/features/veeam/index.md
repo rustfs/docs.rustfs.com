@@ -5,8 +5,6 @@ description: "Using RustFS to extend your v12 instances and significantly improv
 
 # High-Performance Object Storage for Veeam Backup and Replication
 
-![Veeam Logo](./images/veeam-logo.png)
-
 Use RustFS to extend your v12 instances and significantly improve Veeam storage capacity and performance.
 
 ## RustFS Partners with Veeam to Add High-Performance Private Cloud Object Storage to S3 Endpoint Portfolio
