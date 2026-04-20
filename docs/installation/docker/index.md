@@ -251,7 +251,33 @@ Whether you start only the `rustfs-server` or together with observability servic
 
  If buckets can be successfully created and listed, deployment is effective.
 
-## 5. Other Recommendations
+## 5. Multiple Nodes
+
+Dockers default bridge networking does not support multi-node deployments. Use `--network host` so each container can communicate directly with other nodes.
+
+Run the following on **each node**
+
+```bash
+docker run -d \
+  --name rustfs \
+  --network host \
+  -v /mnt/rustfs/data:/data \
+  -e RUSTFS_ACCESS_KEY=rustfsadmin \
+  -e RUSTFS_SECRET_KEY=rustfsadmin \
+  -e RUSTFS_CONSOLE_ENABLE=true \
+  -e RUSTFS_VOLUMES="http://node{1...4}:9000/data/rustfs{0...3}" \
+  rustfs/rustfs:latest
+```
+
+Add the entries to `/etc/hosts` on **every** node:
+```
+192.168.1.1 node1
+192.168.1.2 node2
+192.168.1.3 node3
+192.168.1.4 node4
+```
+
+## 6. Other Recommendations
 
 1. Production Environment Recommendations:
 - Use multi-node deployment architecture
@@ -268,5 +294,4 @@ Whether you start only the `rustfs-server` or together with observability servic
 
 ## Summary
 
-This article combines RustFS single-node single-disk containerization best practices, demonstrating in detail how to build RustFS images through Docker and deploy SNSD environments.
-This solution is easy to quickly start and experiment with, and can later be extended to multi-node multi-disk production-level clusters on platforms like Kubernetes, Swarm, etc. using the same approach.
+This article explains how to deploy RustFS using Docker with best practices, starting with a single-node single-disk (SNSD) setup and then extending to a multi-node deployment option.
