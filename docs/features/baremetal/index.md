@@ -51,7 +51,7 @@ The challenge with traditional replication methods is that they don't scale effe
 
 RustFS's continuous replication is designed for large-scale, cross-data center deployments. By leveraging Lambda compute notifications and object metadata, it can efficiently and quickly calculate increments. Lambda notifications ensure immediate propagation of changes rather than traditional batch modes.
 
-Continuous replication means that in case of failure, data loss will be kept to a minimum - even in the face of highly dynamic datasets. Finally, like everything RustFS does, continuous replication is multi-vendor, meaning your backup location can be anywhere from NAS to public cloud.
+Continuous replication means that in case of failure, data loss remains minimal - even in the face of highly dynamic datasets. Finally, like other RustFS features, continuous replication is multi-vendor, meaning your backup location can be anywhere from NAS to public cloud.
 
 #### Global Federation
 

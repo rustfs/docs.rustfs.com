@@ -14,7 +14,7 @@ On MacOS, you can use three methods for installation:
 
 ## 1. Preparation
 
-Please understand:
+Note:
 
 > **Graphical startup mode** only supports single-node single-disk mode, more suitable for development, debugging, and testing environments.
 

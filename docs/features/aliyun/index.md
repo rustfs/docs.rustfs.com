@@ -8,7 +8,7 @@ description: "RustFS provides high-performance object storage for Alibaba Cloud 
 ## Three Reasons Customers Run RustFS on Alibaba Cloud
 
 - RustFS serves as a consistent storage layer in hybrid cloud or multi-cloud deployment scenarios
-- RustFS is a Kubernetes-native high-performance product that can provide predictable performance in public cloud, private cloud, and edge cloud environments.
+- RustFS is a Kubernetes-native high-performance product that delivers predictable performance across public cloud, private cloud, and edge environments.
 - Running RustFS on ACK provides control over the software stack with the flexibility needed to avoid cloud lock-in.
 
 Alibaba Cloud ACK is a managed service for running Kubernetes on Alibaba Cloud without needing to install, operate, and maintain your own Kubernetes control plane or nodes.
@@ -37,7 +37,7 @@ A key requirement for deploying RustFS at scale on Alibaba Cloud ACK is capabili
 
 RustFS supports automatic transition of aging objects from fast NVMe tiers to more cost-effective HDD tiers, and even to cost-optimized cold public cloud storage tiers.
 
-When tiering, RustFS provides a unified namespace across tiers. Movement across tiers is transparent to applications and triggered by customer-determined policies.
+When tiering, RustFS provides a unified namespace across tiers. Movement across tiers is transparent to applications and triggered by customer-defined policies.
 
 RustFS provides secure storage in Alibaba Cloud ACK hybrid clouds by encrypting objects at the source, ensuring customers always have complete control over data. When Alibaba Cloud ACK is deployed in public clouds, tiering capabilities help Alibaba Cloud ACK effectively manage data across persistent block storage and cheaper object storage tiers.
 
@@ -45,11 +45,11 @@ RustFS provides secure storage in Alibaba Cloud ACK hybrid clouds by encrypting 
 
 ## External Load Balancing
 
-All RustFS communication is based on HTTP, RESTful APIs, and will support any standard Kubernetes-compatible ingress controller. This includes hardware and software-defined solutions. The most popular choice is NGINX. Install using OperatorHub or OpenShift Marketplace, then expose RustFS tenants using annotations.
+All RustFS communication is based on HTTP, RESTful APIs, and supports any standard Kubernetes-compatible ingress controller. This includes hardware and software-defined solutions. The most popular choice is NGINX. Install using OperatorHub or OpenShift Marketplace, then expose RustFS tenants using annotations.
 
 ## Encryption Key Management
 
-There are no native Alibaba Cloud ACK key management capabilities. Therefore, RustFS recommends using HashiCorp Vault to store keys outside the object storage system. This is a best practice for cloud-native applications.
+Alibaba Cloud ACK does not provide native key management capabilities. RustFS recommends using HashiCorp Vault to store keys outside the object storage system. This is a best practice for cloud-native applications.
 
 For all production environments, we recommend enabling encryption on all buckets by default. RustFS uses AES-256-GCM or ChaCha20-Poly1305 encryption to protect data integrity and confidentiality with negligible performance impact.
 
@@ -59,7 +59,7 @@ RustFS will use this KMS to bootstrap its internal key encryption server (KES se
 
 ## Identity Management
 
-When running RustFS on Alibaba Cloud ACK, customers can manage single sign-on (SSO) through third-party OpenID Connect/LDAP compatible identity providers (such as Keycloak, Okta/Auth0, Google, Facebook, ActiveDirectory, and OpenLDAP). RustFS recommends OpenID Connect compatible Keycloak IDP.
+When running RustFS on Alibaba Cloud ACK, customers can manage single sign-on (SSO) through third-party OpenID Connect/LDAP compatible identity providers (such as Keycloak, Okta/Auth0, Google, Facebook, ActiveDirectory, and OpenLDAP). RustFS recommends OpenID Connect-compatible Keycloak IDP.
 
 External IDPs allow administrators to centrally manage user/application identities. RustFS builds on top of IDPs to provide AWS IAM-style user, group, role, policy, and token service APIs. The ability to have a unified identity and access management (IAM) layer independent of infrastructure provides significant architectural flexibility.
 
@@ -71,12 +71,12 @@ RustFS integrates with OpenShift certificate manager, so you can use the RustFS 
 
 ## Monitoring and Alerting
 
-RustFS recommends using Grafana, platform monitoring components installed in the OpenShift-user-workload-monitoring project, or any other OpenShift container monitoring tools to connect to RustFS. RustFS publishes all imaginable storage-related Prometheus metrics, from bucket capacity to access metrics. These metrics can be collected and visualized in any Prometheus-compatible tool or RustFS console.
+RustFS recommends using Grafana, platform monitoring components installed in the OpenShift-user-workload-monitoring project, or any other OpenShift container monitoring tools to connect to RustFS. RustFS publishes a comprehensive set of storage-related Prometheus metrics, from bucket capacity to access metrics. These metrics can be collected and visualized in any Prometheus-compatible tool or RustFS console.
 
 External monitoring solutions periodically scrape RustFS Prometheus endpoints. RustFS recommends using Grafana or platform monitoring components installed in the openshift-user-workload-monitoring project to connect to RustFS. These same tools can also be used to establish baselines and set notification alert thresholds, which can then be routed to notification platforms like PagerDuty, Freshservice, or even SNMP.
 
 ## Logging and Auditing
 
-Enabling RustFS auditing generates logs for every operation on the object storage cluster. In addition to audit logs, RustFS also logs console errors for operational troubleshooting.
+Enabling RustFS auditing generates logs for every operation on the object storage cluster. In addition to audit logs, RustFS also logs console errors for troubleshooting.
 
-RustFS supports outputting logs to Elastic Stack (or third-party) for analysis and alerting.
+RustFS supports sending logs to Elastic Stack (or third-party) for analysis and alerting.

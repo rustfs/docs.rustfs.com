@@ -5,8 +5,8 @@ description: "RustFS is an object storage solution, open-source distributed obje
 
 # 1. What is RustFS?
 
-RustFS is a simple, efficient, distributed object storage system, suitable for fast replacement of MinIO and object storage scenarios for AI training and inference.
-At the same time, RustFS is an efficient, open-source, free object storage solution. It is 100% S3 protocol compatible and open-source software released under Apache2 license. RustFS is written in Rust, leveraging its industry-leading memory safety and zero-cost abstractions for high-performance storage. RustFS is a commercial-friendly distributed object storage product developed and contributed to by excellent engineers worldwide. RustFS can replace many object storage products with unfriendly open-source licenses.
+RustFS is a simple, efficient, distributed object storage system, well suited for replacing MinIO and object storage scenarios for AI training and inference.
+Additionally, RustFS is an efficient, open-source, free object storage solution. It is 100% S3 protocol compatible and open-source software released under the Apache 2.0 license. RustFS is written in Rust, leveraging its industry-leading memory safety and zero-cost abstractions for high-performance storage. RustFS is a commercial-friendly distributed object storage product developed and contributed to by excellent engineers worldwide. RustFS can replace many object storage products with unfriendly open-source licenses.
 
 RustFS is about to transition from commercial applications to formal open-source release globally, helping the world reduce storage costs and improve data security.
 
@@ -14,13 +14,13 @@ RustFS is about to transition from commercial applications to formal open-source
 
 RustFS has three installation modes: single-node single-disk suitable mode, single-node multi-disk, and multi-node multi-disk modes. Among these, the multi-node multi-disk mode includes enterprise-grade available performance, security, and scalability. It also provides architecture diagrams needed for production workloads. Please read our startup modes and checklists before installation, as follows:
 
-1. Please clarify your three installation startup modes:
+1. Review the three installation startup modes:
 
     - [Single Node Single Disk Mode (SNSD)](./single-node-single-disk.md)
     - [Single Node Multiple Disk Mode (SNMD)](./single-node-multiple-disk.md)
     - [Multiple Node Multiple Disk Mode (MNMD)](./multiple-node-multiple-disk.md)
 
-2. [Pre-installation checks](../checklists/index.md), ensure all indicators meet production guidance characteristics. If production standards are not needed, this guidance can be skipped.
+2. [Pre-installation checks](../checklists/index.md), ensure all items meet production guidance. If production standards are not needed, this guidance can be skipped.
 
 ## 3. Operating System and CPU Support
 

@@ -98,12 +98,12 @@ description: "This article introduces commonly used vocabulary in object storage
 | 89 | Multi-Cloud Storage | Storage solutions across different cloud service providers |
 | 90 | Storage Federation | Abstraction layer for unified management of multiple storage systems |
 | 91 | Object Tag | Adding custom classification tags to objects |
-| 92 | Bucket Tag | 存储桶标签 | Adding management/billing related tags to buckets |
-| 93 | Storage Quota | 存储配额 | Limiting maximum capacity of buckets |
-| 94 | Request Throttling | 请求限速 | Limiting API requests per unit time |
-| 95 | SLA | 服务等级协议 | Service Level Agreement commitments for availability/durability (e.g., 99.9% availability) |
-| 96 | Disaster Recovery | 灾难恢复 | Ensuring business continuity through cross-region backups |
-| 97 | Storage Topology | 存储拓扑 | Distribution structure of data at physical/logical levels |
-| 98 | Proximity Access | 就近访问 | Routing user requests to nearest storage nodes |
-| 99 | Global Namespace | 全球统一命名空间 | Unified view management of cross-region buckets |
-| 100 | Zero-Copy Migration | 零拷贝迁移 | Fast data migration through metadata operations |
+| 92 | Bucket Tag | Adding management/billing related tags to buckets |
+| 93 | Storage Quota | Limiting maximum capacity of buckets |
+| 94 | Request Throttling | Limiting API requests per unit time |
+| 95 | SLA | Service Level Agreement commitments for availability/durability (e.g., 99.9% availability) |
+| 96 | Disaster Recovery | Ensuring business continuity through cross-region backups |
+| 97 | Storage Topology | Distribution structure of data at physical/logical levels |
+| 98 | Proximity Access | Routing user requests to nearest storage nodes |
+| 99 | Global Namespace | Unified view management of cross-region buckets |
+| 100 | Zero-Copy Migration | Fast data migration through metadata operations |

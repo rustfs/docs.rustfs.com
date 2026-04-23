@@ -46,7 +46,7 @@ As firm believers in the spirit of free software and respected community members
 
 The fundamental basis of RustFS's trademark policy is the general law of trademarks.
 
-RustFS is designed to be used and extended, and RustFS recognizes that community members may need some way to identify RustFS products in some way, but you must ensure that consumers are not confused about whether they are official (meaning approved by RustFS).
+RustFS is designed to be used and extended, and RustFS recognizes that community members may need a way to identify RustFS-based products, but you must ensure that consumers are not confused about whether they are official (meaning approved by RustFS).
 
 Your use of RustFS trademarks must always avoid confusion. People should always know who they are dealing with and where the software they download comes from. Websites and software not made or officially authorized by RustFS should not directly or indirectly suggest that they are made or officially authorized by RustFS.
 
@@ -96,4 +96,4 @@ RustFS has tried to make its trademark policy as comprehensive as possible. If y
 
 If RustFS determines at any time in its sole discretion that your use of any of our trademarks violates this policy, we may revoke your license to use it, and you must immediately stop all use of that trademark.
 
-This policy may be updated from time to time. Please refer to this page for all updates.
+This policy may be updated from time to time. Refer to this page for all updates.

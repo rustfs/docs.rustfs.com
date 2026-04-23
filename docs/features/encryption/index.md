@@ -32,7 +32,7 @@ RustFS provides built-in options for key encryption. RustFS's Key Encryption Ser
 
 KES supports encryption operations on RustFS clusters and is a key mechanism for ensuring scalable and high-performance encryption operations. KES acts as an intermediary between RustFS clusters and external KMS, generating encryption keys as needed and performing encryption operations without being limited by KMS constraints. Therefore, there's still a central KMS that protects master keys and serves as the root of trust in the infrastructure. KES simplifies deployment and management by eliminating the need to bootstrap KMS for each set of applications. Instead, applications can request data encryption keys (DEKs) from KES servers or ask KES servers to decrypt encrypted DEKs.
 
-Since KES servers are completely stateless, they can be automatically scaled, such as through Kubernetes Horizontal Pod Autoscaler. At the same time, since KES independently handles the vast majority of application requests, the load on the central KMS doesn't increase significantly.
+Since KES servers are completely stateless, they can be automatically scaled, such as through Kubernetes Horizontal Pod Autoscaler. Additionally, since KES independently handles the vast majority of application requests, the load on the central KMS doesn't increase significantly.
 
 For Kubernetes environments, the RustFS Kubernetes Operator supports deploying and configuring KES for each tenant, enabling SSE-S3 as part of each tenant deployment.
 

@@ -8,16 +8,16 @@ description: "RustFS provides high-performance object storage for Huawei Cloud C
 ## Three Reasons Customers Run RustFS on Huawei Cloud CCE
 
 - RustFS serves as a consistent storage layer in hybrid cloud or multi-cloud deployment scenarios
-- RustFS is a Kubernetes-native high-performance product that can provide predictable performance in public cloud, private cloud, and edge cloud environments.
+- RustFS is a Kubernetes-native high-performance product that delivers predictable performance across public cloud, private cloud, and edge environments.
 - Running RustFS on CCE provides flexible control over the software stack, avoiding cloud lock-in.
 
 Huawei Cloud Container Engine for Kubernetes (CCE) is a fully managed Kubernetes service that provides high-performance, high-availability container clusters for enterprise applications. CCE integrates with Huawei Cloud's infrastructure and services, providing a comprehensive container platform solution.
 
-RustFS natively integrates with CCE, making it easier to operate your own large-scale multi-tenant object storage as a service. RustFS Operator works with CCE toolchain (such as CCE console and Huawei Cloud Container Registry) to ensure you get maximum return on investment from the CCE ecosystem.
+RustFS natively integrates with CCE, making it easier to operate your own large-scale multi-tenant object storage as a service. RustFS Operator works with CCE toolchain (such as CCE console and Huawei Cloud Container Registry) to help you maximize the value of the CCE ecosystem.
 
 ![RustFS Architecture Diagram](images/sec1-1.png)
 
-RustFS provides consistent, high-performance, and scalable object storage because it is Kubernetes-native by design and S3-compatible from the start. Developers can easily obtain Amazon S3-compatible persistent storage services for all cloud-native applications running on CCE. Unlike AWS S3, RustFS enables applications to scale across any multi-cloud and hybrid cloud infrastructure while still being manageable within the CCE ecosystem without public cloud lock-in.
+RustFS provides consistent, high-performance, and scalable object storage because it is Kubernetes-native by design and S3-compatible from the start. Developers can easily provision Amazon S3-compatible persistent storage for all cloud-native applications running on CCE. Unlike AWS S3, RustFS enables applications to scale across any multi-cloud and hybrid cloud infrastructure while still being manageable within the CCE ecosystem without public cloud lock-in.
 
 ## RustFS Operator Natively Integrates with CCE Features
 
@@ -37,7 +37,7 @@ A key requirement for deploying RustFS at scale on Huawei Cloud CCE is capabilit
 
 RustFS supports automatic transition of aging objects from fast NVMe tiers to more cost-effective HDD tiers, and even to cost-optimized cold public cloud storage tiers.
 
-When tiering, RustFS provides a unified namespace across tiers. Movement across tiers is transparent to applications and triggered by customer-determined policies.
+When tiering, RustFS provides a unified namespace across tiers. Movement across tiers is transparent to applications and triggered by customer-defined policies.
 
 RustFS provides secure storage in CCE hybrid clouds by encrypting objects at the source, ensuring customers always have complete control over data. When CCE is deployed in public clouds, tiering capabilities help CCE effectively manage data across persistent block storage and cheaper object storage tiers.
 
@@ -45,11 +45,11 @@ RustFS provides secure storage in CCE hybrid clouds by encrypting objects at the
 
 ## External Load Balancing
 
-All RustFS communication is based on HTTP, RESTful APIs, and will support any standard Kubernetes-compatible ingress controller. This includes hardware and software-defined solutions. The most popular choice is NGINX. Install using CCE marketplace or Helm charts, then expose RustFS tenants using annotations.
+All RustFS communication is based on HTTP, RESTful APIs, and supports any standard Kubernetes-compatible ingress controller. This includes hardware and software-defined solutions. The most popular choice is NGINX. Install using CCE marketplace or Helm charts, then expose RustFS tenants using annotations.
 
 ## Encryption Key Management
 
-There are no native CCE key management capabilities. Therefore, RustFS recommends using HashiCorp Vault to store keys outside the object storage system. This is a best practice for cloud-native applications.
+CCE does not provide native key management capabilities. RustFS recommends using HashiCorp Vault to store keys outside the object storage system. This is a best practice for cloud-native applications.
 
 For all production environments, we recommend enabling encryption on all buckets by default. RustFS uses AES-256-GCM or ChaCha20-Poly1305 encryption to protect data integrity and confidentiality with negligible performance impact.
 
@@ -59,7 +59,7 @@ RustFS will use this KMS to bootstrap its internal key encryption server (KES se
 
 ## Identity Management
 
-When running RustFS on CCE, customers can manage single sign-on (SSO) through third-party OpenID Connect/LDAP compatible identity providers (such as Keycloak, Okta/Auth0, Google, Facebook, ActiveDirectory, and OpenLDAP). RustFS recommends OpenID Connect compatible Keycloak IDP.
+When running RustFS on CCE, customers can manage single sign-on (SSO) through third-party OpenID Connect/LDAP compatible identity providers (such as Keycloak, Okta/Auth0, Google, Facebook, ActiveDirectory, and OpenLDAP). RustFS recommends OpenID Connect-compatible Keycloak IDP.
 
 External IDPs allow administrators to centrally manage user/application identities. RustFS builds on top of IDPs to provide AWS IAM-style user, group, role, policy, and token service APIs. The ability to have a unified identity and access management (IAM) layer independent of infrastructure provides significant architectural flexibility.
 
@@ -71,12 +71,12 @@ RustFS integrates with CCE certificate manager, so you can use the RustFS operat
 
 ## Monitoring and Alerting
 
-RustFS recommends using Grafana, platform monitoring components installed in the CCE-user-workload-monitoring project, or any other CCE container monitoring tools to connect to RustFS. RustFS publishes all imaginable storage-related Prometheus metrics, from bucket capacity to access metrics. These metrics can be collected and visualized in any Prometheus-compatible tool or RustFS console.
+RustFS recommends using Grafana, platform monitoring components installed in the CCE-user-workload-monitoring project, or any other CCE container monitoring tools to connect to RustFS. RustFS publishes a comprehensive set of storage-related Prometheus metrics, from bucket capacity to access metrics. These metrics can be collected and visualized in any Prometheus-compatible tool or RustFS console.
 
 External monitoring solutions periodically scrape RustFS Prometheus endpoints. RustFS recommends using Grafana or platform monitoring components installed in the cce-user-workload-monitoring project to connect to RustFS. These same tools can also be used to establish baselines and set notification alert thresholds, which can then be routed to notification platforms like PagerDuty, Freshservice, or even SNMP.
 
 ## Logging and Auditing
 
-Enabling RustFS auditing generates logs for every operation on the object storage cluster. In addition to audit logs, RustFS also logs console errors for operational troubleshooting.
+Enabling RustFS auditing generates logs for every operation on the object storage cluster. In addition to audit logs, RustFS also logs console errors for troubleshooting.
 
-RustFS supports outputting logs to Elastic Stack (or third-party) for analysis and alerting.
+RustFS supports sending logs to Elastic Stack (or third-party) for analysis and alerting.

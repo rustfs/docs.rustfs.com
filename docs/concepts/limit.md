@@ -48,7 +48,7 @@ description: "RustFS is a simple, efficient, distributed object storage. It is f
 
 Object names in RustFS are primarily limited by the underlying operating system and file system. For example, Windows and some other operating systems restrict the use of certain special characters such as `^`, `*`, `|`, `\`, `/`, `&`, `"`, or `;`.
 
-Please refer to relevant documentation for a complete list of restrictions based on your specific operating system and file system.
+Refer to relevant documentation for a complete list of restrictions based on your specific operating system and file system.
 
 RustFS recommends using Linux operating systems based on XFS file systems in production environments for better performance and compatibility.
 

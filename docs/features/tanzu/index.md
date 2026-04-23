@@ -8,16 +8,16 @@ description: "RustFS provides high-performance object storage for VMware Tanzu w
 ## Three Reasons Customers Run RustFS on VMware Tanzu
 
 - RustFS serves as a consistent storage layer in hybrid cloud or multi-cloud deployment scenarios.
-- RustFS is a Kubernetes-native high-performance product that can provide predictable performance in public cloud, private cloud, and edge cloud environments.
+- RustFS is a Kubernetes-native high-performance product that delivers predictable performance across public cloud, private cloud, and edge environments.
 - Running RustFS on Tanzu provides control over the software stack with the flexibility needed to avoid cloud lock-in.
 
 VMware Tanzu is an enterprise-grade Kubernetes container platform with full-stack automated operations capabilities that can manage hybrid cloud, multi-cloud, and edge deployments. VMware Tanzu includes enterprise-grade Linux operating systems, container runtimes, networking, monitoring, registries, and authentication and authorization solutions.
 
-RustFS natively integrates with VMware Tanzu, making it easier to operate your own large-scale multi-tenant object storage as a service. RustFS Operator works with the VMware Tanzu toolchain (such as VMware Tanzu Cluster Manager CLI and Quay container registry) to ensure you get maximum return on investment from the VMware Tanzu ecosystem.
+RustFS natively integrates with VMware Tanzu, making it easier to operate your own large-scale multi-tenant object storage as a service. RustFS Operator works with the VMware Tanzu toolchain (such as VMware Tanzu Cluster Manager CLI and Quay container registry) to help you maximize the value of the VMware Tanzu ecosystem.
 
 ![RustFS Architecture Diagram](images/sec1-1.png)
 
-RustFS provides consistent, high-performance, and scalable object storage because it is Kubernetes-native by design and S3-compatible from the start. Developers can easily obtain Amazon S3-compatible persistent storage services for all cloud-native applications running on VMware Tanzu. Unlike AWS S3, RustFS enables applications to scale across any multi-cloud and hybrid cloud infrastructure while still being manageable within the VMware Tanzu ecosystem without public cloud lock-in.
+RustFS provides consistent, high-performance, and scalable object storage because it is Kubernetes-native by design and S3-compatible from the start. Developers can easily provision Amazon S3-compatible persistent storage for all cloud-native applications running on VMware Tanzu. Unlike AWS S3, RustFS enables applications to scale across any multi-cloud and hybrid cloud infrastructure while still being manageable within the VMware Tanzu ecosystem without public cloud lock-in.
 
 ## RustFS Operator Natively Integrates with VMware Tanzu Features
 
@@ -37,7 +37,7 @@ A key requirement for deploying RustFS at scale on VMware Tanzu is capability ti
 
 RustFS supports automatic transition of aging objects from fast NVMe tiers to more cost-effective HDD tiers, and even to cost-optimized cold public cloud storage tiers.
 
-When tiering, RustFS provides a unified namespace across tiers. Movement across tiers is transparent to applications and triggered by customer-determined policies.
+When tiering, RustFS provides a unified namespace across tiers. Movement across tiers is transparent to applications and triggered by customer-defined policies.
 
 RustFS provides secure storage in VMware Tanzu hybrid clouds by encrypting objects at the source, ensuring customers always have complete control over data. When VMware Tanzu is deployed in public clouds, tiering capabilities help VMware Tanzu effectively manage data across persistent block storage and cheaper object storage tiers.
 
@@ -45,11 +45,11 @@ RustFS provides secure storage in VMware Tanzu hybrid clouds by encrypting objec
 
 ## External Load Balancing
 
-All RustFS communication is based on HTTP, RESTful APIs, and will support any standard Kubernetes-compatible ingress controller. This includes hardware and software-defined solutions. The most popular choice is NGINX. Install using OperatorHub or Tanzu Marketplace, then expose RustFS tenants using annotations.
+All RustFS communication is based on HTTP, RESTful APIs, and supports any standard Kubernetes-compatible ingress controller. This includes hardware and software-defined solutions. The most popular choice is NGINX. Install using OperatorHub or Tanzu Marketplace, then expose RustFS tenants using annotations.
 
 ## Encryption Key Management
 
-There are no native OpenShift key management capabilities. Therefore, RustFS recommends using HashiCorp Vault to store keys outside the object storage system. This is a best practice for cloud-native applications.
+OpenShift does not provide native key management capabilities. RustFS recommends using HashiCorp Vault to store keys outside the object storage system. This is a best practice for cloud-native applications.
 
 For all production environments, we recommend enabling encryption on all storage buckets by default. RustFS uses AES-256-GCM or ChaCha20-Poly1305 encryption to protect data integrity and confidentiality with negligible performance impact.
 
@@ -77,10 +77,10 @@ External monitoring solutions regularly scrape RustFS Prometheus endpoints. Rust
 
 ## Logging and Auditing
 
-Enabling RustFS auditing generates logs for every operation on the object storage cluster. In addition to audit logs, RustFS also logs console errors for operational troubleshooting.
+Enabling RustFS auditing generates logs for every operation on the object storage cluster. In addition to audit logs, RustFS also logs console errors for troubleshooting.
 
-RustFS supports outputting logs to Elastic Stack (or third-party) for analysis and alerting.
+RustFS supports sending logs to Elastic Stack (or third-party) for analysis and alerting.
 
 ---
 
-*This page is pending translation. Please refer to the [Chinese version](../../../zh/features/tanzu/index.md).*
+*This page is pending translation. Refer to the [Chinese version](../../../zh/features/tanzu/index.md).*

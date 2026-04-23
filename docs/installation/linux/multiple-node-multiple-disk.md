@@ -9,13 +9,13 @@ description: "Install RustFS on multiple servers with multiple disks, data will 
 
 This document covers RustFS multiple node multiple disk mode deployment, which is suitable for enterprise-grade performance, security, and scalability. It also provides architecture diagrams needed for production workloads. Please read before installation. Our startup modes and checklists are as follows:
 
-1. Please clarify your three installation startup modes:
+1. Review the three installation startup modes:
 
    - [Single Node Single Disk Mode (SNSD)](./single-node-single-disk.md)
    - [Single Node Multiple Disk Mode (SNMD)](./single-node-multiple-disk.md)
    - [Multiple Node Multiple Disk Mode (MNMD)](./multiple-node-multiple-disk.md) (current document)
 
-2. [Pre-Installation Checklist](../checklists/index.md) to ensure all indicators meet production guidance characteristics. If production standards are not needed, this guidance can be skipped.
+2. [Pre-Installation Checklist](../checklists/index.md) to ensure all items meet production guidance. If production standards are not needed, this guidance can be skipped.
 
 A minimum of **4 servers** is required, with each server needing at least 1 disk to safely start a distributed object storage cluster.
 
@@ -106,7 +106,7 @@ RustFS requires time synchronization. You can use the following command to check
 timedatectl status
 ```
 
-If the status is "synchronized", it means time synchronization is normal.
+If the status is "synchronized", time synchronization is working properly.
 
 ### 2.6. Capacity and EC Planning
 
@@ -136,13 +136,13 @@ The reasons are as follows:
 - **Simpler Management:** RustFS uniformly manages disks, simplifying storage layer operations and maintenance.
 - **Faster Fault Recovery:** RustFS healing process is faster than traditional RAID rebuild and has less impact on cluster performance.
 
-The official recommendation is to use NVMe SSD as your storage medium on disks to ensure higher performance and throughput.
+The recommended storage medium is NVMe SSD as your storage medium on disks to ensure higher performance and throughput.
 
 ### 2.8. File System Selection
 
-For disk file system formatting, RustFS officially strongly recommends using XFS file system on all disks used for storage. RustFS development and testing are based on XFS, ensuring optimal performance and stability. It is not recommended to use other file systems such as ext4, BTRFS, or ZFS, as they may cause performance degradation or unpredictable issues.
+For disk file system formatting, RustFS strongly recommends using XFS file system on all disks used for storage. RustFS development and testing are based on XFS, ensuring optimal performance and stability. Avoid using other file systems such as ext4, BTRFS, or ZFS, as they may cause performance degradation or unpredictable issues.
 
-RustFS is an object storage system designed for high concurrency and high performance. When clients upload or download large objects, RustFS will shard them and read/write to multiple disks in the erasure set concurrently in parallel.
+RustFS is an object storage system designed for high concurrency and high performance. When clients upload or download large objects, RustFS will shard them and read/write to multiple disks in the erasure set in parallel.
 
 XFS advantages: XFS (eXtents File System) was designed from the beginning for high performance and scalability. It performs extremely well in large file processing and high-concurrency I/O scenarios. Its internal journaling and data structures (such as B+ trees) can efficiently handle large numbers of parallel read/write requests, which perfectly matches RustFS's working mode. In comparison, although file systems like ext4 have made great performance improvements in recent years, when facing extreme concurrent loads, XFS usually provides more stable and superior throughput.
 
@@ -166,17 +166,17 @@ nvme1n1           8:32   0   3.7T  0 disk  <-- if this is our format new disk
 nvme2n1          8:48   0   3.7T   0  disk
 ```
 
-The specific formatting command is as follows:
+Use the following formatting command:
 
 ```bash
 sudo mkfs.xfs  -i size=512 -n ftype=1 -L RUSTFS0 /dev/sdb
 ```
 
-We can add some recommended options during formatting to optimize performance:
+You can add the following options during formatting to optimize performance:
 
 - -L \<label\>: Set a label for the file system, convenient for subsequent identification and mounting.
 - -i size=512: RustFS officially recommends setting inode size to 512 bytes, which has performance advantages for scenarios storing large numbers of small objects (metadata).
-- -n ftype=1: Enable ftype functionality. This allows the file system to record file types in the directory structure, which can improve performance of operations like readdir and unlink, very beneficial for RustFS.
+- -n ftype=1: Enable ftype functionality. This allows the file system to record file types in the directory structure, which can improve performance of operations like readdir and unlink, beneficial for RustFS.
 
 Mounting:
 
@@ -213,7 +213,7 @@ Note:
 
 ## 4. Download Installation Package
 
-Please first install wget or curl to download the rustfs installation package.
+First, install wget or curl to download the rustfs installation package.
 
 ```bash
 # Download address

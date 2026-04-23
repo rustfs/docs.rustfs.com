@@ -7,7 +7,7 @@ description: "Use Windows one-click startup for RustFS."
 
 ## 1. Preparation
 
-Please understand:
+Note:
 
 > Windows startup **mode** only supports single-node single-disk mode, more suitable for development, debugging, and testing environments.
 

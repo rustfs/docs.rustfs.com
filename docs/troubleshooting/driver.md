@@ -121,7 +121,7 @@ rustfs-admin heal --disk /mnt/disk1
 rustfs-admin heal status --follow
 ```
 
-At the same time, you can confirm the system has recognized and started data recovery by viewing service logs:
+Additionally, you can confirm the system has recognized and started data recovery by viewing service logs:
 
 ```bash
 # For systemd-managed installations
