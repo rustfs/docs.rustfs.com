@@ -175,7 +175,7 @@ Running the command under root directory,
 docker compose --profile observability up -d
 ```
 
-Providing the necessary permissions. An initialization container is necessary to grant the correct access rights to rustfs using the `depends_on` keyword. In the example below the `rustfs_perms` service is added to the `docker-compose.yml` to handle this. 
+Providing the necessary permissions. An initialization container is necessary to grant the correct access rights to rustfs using the `depends_on` keyword. In the example below the `rustfs_perms` service is added to the `docker-compose.yml` to handle this. To ensure logs are persisted and accessible, we map the host log directory to the container's `/logs` path
 
 ```
   services:
@@ -192,6 +192,12 @@ Providing the necessary permissions. An initialization container is necessary to
       depends_on: 
         rustfs_perms:
           condition: service_completed_successfully
+      volumes:
+        - /path/to_host_directory/volumes/data:/data
+        - /path/to_host_directory/volumes/logs:/logs
+      environment:
+        - RUSTFS_OBS_LOG_DIRECTORY=/logs
+    
       # ... other configurations
 ```
 
