@@ -32,7 +32,7 @@ RustFS also supports real-time tracing of HTTP/S operations through the RustFS C
 
 ## Architecture
 
-RustFS exposes metrics through Prometheus-compatible HTTP(S) endpoints. The RustFS Kubernetes Operator deploys an independent Prometheus service for each pre-configured RustFS tenant.
+RustFS does not natively expose metrics via Prometheus-compatible HTTP(S) endpoints for direct scraping. To integrate with Prometheus, please deploy an OpenTelemetry Collector to gather metrics from RustFS and forward them to your Prometheus backend. The RustFS Kubernetes Operator deploys an independent Prometheus service for each pre-configured RustFS tenant.
 
 ![Architecture Diagram 1](images/s7-1.png)
 
