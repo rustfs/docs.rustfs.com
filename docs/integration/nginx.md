@@ -54,7 +54,7 @@ server {
       proxy_set_header X-Forwarded-Proto $scheme;
 
       # Disable Nginx from converting HEAD to GET
-      # proxy_cache_convert_head off;
+      proxy_cache_convert_head off;
 
       proxy_connect_timeout 300;
       # Default is HTTP/1, keepalive is only enabled in HTTP/1.1
@@ -94,7 +94,7 @@ server {
       proxy_set_header X-Forwarded-Proto $scheme;
 
       # Disable Nginx from converting HEAD to GET
-      # proxy_cache_convert_head off;
+      proxy_cache_convert_head off;
 
       proxy_connect_timeout 300;
       # Default is HTTP/1, keepalive is only enabled in HTTP/1.1
@@ -114,6 +114,19 @@ server {
 
 
 ```
+
+#### Important Notice
+
+> [!WARNING]
+> **Key configuration items**
+> 
+> The `proxy_cache_convert_head off` directive **must be added** to the Nginx configuration for the following reasons:
+> 
+> - By default, Nginx converts HEAD requests to GET requests for caching.
+> - This conversion will cause S3 V4 signature verification to fail.
+> - The symptom is `Bucket not found` or `403 Access Denied` error when accessing the storage bucket.
+> 
+> Refer to [Nginx Official Documentation](http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_cache_convert_head)。
 
 ## 3. Multi-Machine Load Balancing
 
