@@ -230,6 +230,10 @@ export const sidebar = [
             link: '/developer/sdk/java'
           },
           {
+            text: 'C#',
+            link: '/developer/sdk/csharp'
+          },
+          {
             text: 'Python',
             link: '/developer/sdk/python'
           },
