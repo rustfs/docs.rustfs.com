@@ -30,16 +30,12 @@ if access_key_id == "" || secret_access_key == "" || region == "" || endpoint ==
 // build aws.Config
 cfg := aws.Config{
     Region: region,
-    EndpointResolver: aws.EndpointResolverFunc(func(service, region string) (aws.Endpoint, error) {
-        return aws.Endpoint{
-            URL: endpoint,
-        }, nil
-    }),
     Credentials: aws.NewCredentialsCache(credentials.NewStaticCredentialsProvider(access_key_id, secret_access_key, "")),
 }
 
 // build S3 client
 client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+    o.BaseEndpoint = aws.String(endpoint)
     o.UsePathStyle = true
 })
 ```
