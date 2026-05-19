@@ -256,10 +256,6 @@ export const sidebar = [
         ]
       },
       {
-        text: 'S3 Compatible API',
-        link: '/developer/api'
-      },
-      {
         text: 'Open Source License',
         link: '/developer/license'
       }
