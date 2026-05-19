@@ -129,4 +129,4 @@ if err != nil {
 fmt.Println("content is :", string(data))
 ```
 
-For other usage, you can explore on your own. It's even simpler with Vibe Coding!
+For other usage, you can explore on your own. It's even simpler with the help of an llm!
