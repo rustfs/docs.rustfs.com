@@ -37,11 +37,62 @@ RustFS also supports real-time tracing of HTTP/S operations through the RustFS C
 
 RustFS does not natively expose metrics via Prometheus-compatible HTTP(S) endpoints for direct scraping. To integrate with Prometheus, please deploy an OpenTelemetry Collector to gather metrics from RustFS and forward them to your Prometheus backend. The RustFS Kubernetes Operator deploys an independent Prometheus service for each pre-configured RustFS tenant.
 
-![Architecture Diagram 1](images/s7-1.png)
+```mermaid
+flowchart TD
+  RUSTFS["RustFS Object Storage"]
+  subgraph PROM["Prometheus"]
+    AM[Alertmanager]
+    QA["Query API"]
+    RRW["Remote Read/Write"]
+    WH[Webhooks]
+  end
+  AR["Alert Response"]
+  VA["Visualization / Analytics"]
+  AB["Archival / Backup"]
+  RUSTFS -->|metrics endpoint| PROM
+  PROM --> AR
+  PROM --> VA
+  PROM --> AB
+  classDef server fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b;
+  classDef svc fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#1e293b;
+  classDef accent fill:#fae8ff,stroke:#c026d3,stroke-width:2px,color:#1e293b;
+  class RUSTFS server
+  class AM,QA,RRW,WH svc
+  class AR,VA,AB accent
+```
 
 RustFS Lambda notifications automatically push event notifications to supported target services. Administrators can define bucket-level notification rules.
 
-![Architecture Diagram 2](images/s7-2.png)
+```mermaid
+flowchart LR
+  subgraph Clients["Client Applications"]
+    IOT["Internet of Things"]
+    WEB["Web Applications"]
+    BK["Backup / Archival"]
+    BS["Block Storage"]
+  end
+  TENANT["RustFS Tenant"]
+  subgraph Targets["Notification Targets"]
+    ES[ElasticSearch]
+    PG[PostgreSQL]
+    KAFKA[Kafka]
+    AMQP[AMQP]
+    MQTT[MQTT]
+    RED[Redis]
+    NATS[NATS]
+    MYSQL[MySQL]
+    WH[Webhooks]
+    NSQ[NSQ]
+  end
+  Clients <-->|S3 operations| TENANT
+  TENANT -->|events| Targets
+  classDef server fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b;
+  classDef svc fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#1e293b;
+  classDef accent fill:#fae8ff,stroke:#c026d3,stroke-width:2px,color:#1e293b;
+  class IOT,WEB,BK,BS server
+  class TENANT svc
+  class ES,PG,KAFKA,AMQP,MQTT,RED,NATS,MYSQL,WH,NSQ accent
+```
 
 ## Requirements
 

@@ -25,7 +25,24 @@ RustFS can be programmatically configured for object storage tiering. Objects tr
 
 RustFS abstracts the underlying media to optimize for performance and cost. For example, performance workloads might use NVMe or SSD, while older data is tiered to HDD.
 
-![Cross-Storage Media Tiering](images/s9-2.png)
+```mermaid
+flowchart LR
+  subgraph Cloud[Storage Cluster]
+    HOT[RUSTFS Hot Tier]
+    WARM[RUSTFS Warm Tier]
+    NVME[(NVMe SSDs)]
+    SAS[("SAS/SATA HDDs")]
+    HOT -->|ILM Transition| WARM
+    HOT --- NVME
+    WARM --- SAS
+  end
+  classDef server fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b;
+  classDef store fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#1e293b;
+  classDef accent fill:#fae8ff,stroke:#c026d3,stroke-width:2px,color:#1e293b;
+  class HOT server
+  class WARM accent
+  class NVME,SAS store
+```
 
 ## Hybrid Cloud Tiering
 
@@ -33,7 +50,24 @@ Public cloud storage can serve as a tier for private clouds. Performance-oriente
 
 RustFS runs on both private and public clouds. Using replication, RustFS moves data to public cloud options and protects it. The public cloud serves as a storage tier.
 
-![Cross-Cloud Type Tiering](images/s9-3.png)
+```mermaid
+flowchart LR
+  subgraph Private[Private Cloud Storage]
+    HOT[RUSTFS Hot Tier]
+  end
+  subgraph Public[Public Cloud Storage]
+    subgraph Cold["Warm / Cold Tier"]
+      S3[Amazon S3]
+      GCS[Google Cloud Storage]
+      AZ[Azure Blob Storage]
+    end
+  end
+  HOT -->|ILM Transition| Cold
+  classDef server fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b;
+  classDef svc fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#1e293b;
+  class HOT server
+  class S3,GCS,AZ svc
+```
 
 ## In Public Clouds
 
@@ -41,4 +75,25 @@ RustFS typically serves as the primary application storage tier in public clouds
 
 RustFS combines different storage tiering layers and determines appropriate media to provide better economics without compromising performance. Applications address objects through RustFS, while RustFS transparently applies policies to move objects between tiers.
 
-![Public Cloud Tiering](images/s9-4.png)
+```mermaid
+flowchart LR
+  subgraph Public["Public Cloud Storage"]
+    HOT["RustFS Hot Tier"]
+    subgraph Cold["Warm / Cold Tier"]
+      S3["Amazon S3"]
+      GCS["Google Cloud Storage"]
+      AZ["Azure Blob Storage"]
+    end
+    BS[("Block Storage")]
+    OS[("Object Storage")]
+    HOT -->|ILM Transition| Cold
+    HOT --- BS
+    Cold --- OS
+  end
+  classDef server fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b;
+  classDef svc fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#1e293b;
+  classDef store fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#1e293b;
+  class HOT server
+  class S3,GCS,AZ svc
+  class BS,OS store
+```

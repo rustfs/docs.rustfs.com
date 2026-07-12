@@ -7,7 +7,64 @@ RustFS is engineered for scalability across all dimensions: technical, operation
 
 RustFS is designed to be cloud-native and can run as lightweight containers managed by external orchestration services like Kubernetes. The entire application is compiled into a single static binary (~100 MB) that efficiently uses CPU and memory resources even under high load. As a result, you can co-host large numbers of tenants on shared hardware.
 
-![RustFS Architecture Diagram](./images/s2-1.png)
+```mermaid
+flowchart LR
+    APP[Applications] --> S3API(["S3 API"])
+
+    subgraph DIST["Distributed RustFS"]
+        direction TB
+        subgraph N1["Node 1"]
+            direction LR
+            S3a[S3]
+            subgraph OL1["Object Layer"]
+                direction TB
+                C1[Cache]
+                K1[Compression]
+                E1[Encryption]
+                B1["Erasure Code · Bitrot"]
+            end
+            SL1["Storage Layer"]
+            J1[("JBOD / FS disks")]
+            S3a -->|Object API| OL1
+            OL1 -->|Storage API| SL1
+            SL1 <--> J1
+        end
+        subgraph N2["Node 2"]
+            direction LR
+            S3b[S3]
+            subgraph OL2["Object Layer"]
+                direction TB
+                C2[Cache]
+                K2[Compression]
+                E2[Encryption]
+                B2["Erasure Code · Bitrot"]
+            end
+            SL2["Storage Layer"]
+            J2[("JBOD / FS disks")]
+            S3b -->|Object API| OL2
+            OL2 -->|Storage API| SL2
+            SL2 <--> J2
+        end
+        NN["Node n ..."]
+        N1 <-->|Internal RESTful API| N2
+        N2 <-->|Internal RESTful API| NN
+    end
+
+    S3API --> N1
+    S3API --> N2
+    S3API --> NN
+
+    classDef server fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b;
+    classDef store fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#1e293b;
+    classDef svc fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#1e293b;
+    classDef muted fill:#f3f4f6,stroke:#9ca3af,stroke-width:2px,color:#1e293b;
+    classDef accent fill:#fae8ff,stroke:#c026d3,stroke-width:2px,color:#1e293b;
+    class APP,NN muted
+    class S3API accent
+    class S3a,S3b,SL1,SL2 server
+    class C1,K1,E1,B1,C2,K2,E2,B2 svc
+    class J1,J2 store
+```
 
 RustFS can run anywhere and on any cloud, but typically runs on commodity servers with locally attached drives (JBOD/JBOF). All servers in the cluster are functionally equal (fully symmetric architecture). There are no name nodes or metadata servers.
 

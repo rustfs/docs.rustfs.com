@@ -19,7 +19,18 @@ If a versioned object is overwritten, RustFS creates a new version. Old versions
 
 ## RustFS Supports Object Versioning with Three Different Bucket States
 
-![Bucket States](./images/bucket-states.png)
+```mermaid
+stateDiagram-v2
+    direction LR
+    state "Versioning Not Enabled" as Unversioned
+    state "Versioning Enabled" as Enabled
+    state "Versioning Suspended" as Suspended
+
+    [*] --> Unversioned
+    Unversioned --> Enabled: Enable
+    Enabled --> Suspended: Suspend
+    Suspended --> Enabled: Re-enable
+```
 
 Versioning can be suspended but not disabled once enabled. Versioning is a global setting in the bucket.
 
@@ -39,7 +50,34 @@ Versioning increases bucket size and may create object dependencies. Mitigate th
 
 ## Architecture
 
-![Architecture Diagram](./images/architecture.png)
+```mermaid
+flowchart LR
+    CLOUD(["Internet Cloud"]) --> GLB["Global Load Balancer"]
+    GLB --> S1
+    GLB --> S2
+    GLB --> SN
+    subgraph S1["Site 1 · US-WEST"]
+        A1["Zone 1 · Erasure Sets 1-n"]
+        A2["Zone 2 · Erasure Sets 1-n"]
+        A3["Zone n · Erasure Sets 1-n"]
+    end
+    subgraph S2["Site 2 · US-EAST"]
+        B1["Zone 1 · Erasure Sets 1-n"]
+        B2["Zone 2 · Erasure Sets 1-n"]
+        B3["Zone n · Erasure Sets 1-n"]
+    end
+    subgraph SN["Site n · EU-CENTRAL"]
+        D1["Zone 1 · Erasure Sets 1-n"]
+        D2["Zone 2 · Erasure Sets 1-n"]
+        D3["Zone n · Erasure Sets 1-n"]
+    end
+    classDef svc fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#1e293b;
+    classDef accent fill:#fae8ff,stroke:#c026d3,stroke-width:2px,color:#1e293b;
+    classDef store fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#1e293b;
+    class CLOUD svc
+    class GLB accent
+    class A1,A2,A3,B1,B2,B3,D1,D2,D3 store
+```
 
 ### System Requirements
 

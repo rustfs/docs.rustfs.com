@@ -84,6 +84,6 @@ Simultaneously supports industrial IoT data, service images and other unstructur
 
 ### Technology Value Pyramid
 
-![Technology Value Pyramid](./images/tech-value-pyramid.png)
+![Technology Value Pyramid](./images/tech-value-pyramid.svg)
 
 Based on military-grade reliability and infinitely scalable distributed object storage technology, achieve zero-loss intelligent production throughout the industrial data chain, support AI quality inspection and real-time global supply chain collaboration, driving manufacturing enterprises toward agile Industry 4.0 evolution

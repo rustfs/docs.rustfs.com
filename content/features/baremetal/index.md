@@ -19,13 +19,73 @@ RustFS uses inline erasure coding to protect data while providing high performan
 
 With maximum parity of N/2, RustFS can ensure uninterrupted read and write operations using only ((N/2)+1) operational drives. For example, in a 12-drive setup (6 data + 6 parity), RustFS can reliably write new objects or rebuild existing objects with only 7 drives remaining.
 
-![Erasure Coding](./images/sec2-1.png)
+```mermaid
+flowchart TD
+  EX(["export-xl"])
+  EX --> D1[("Disk1")]
+  EX --> D2[("Disk2")]
+  EX --> D3[("Disk3")]
+  EX --> D4[("Disk4")]
+  D1 --> B1["MyBucket"]
+  D2 --> B2["MyBucket"]
+  D3 --> B3["MyBucket"]
+  D4 --> B4["MyBucket"]
+  B1 --> O1["MyObject"]
+  B2 --> O2["MyObject"]
+  B3 --> O3["MyObject"]
+  B4 --> O4["MyObject"]
+  O1 --> F1["xl.json part.1"]
+  O2 --> F2["xl.json part.1"]
+  O3 --> F3["xl.json part.1"]
+  O4 --> F4["xl.json part.1"]
+  classDef server fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b;
+  classDef store fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#1e293b;
+  classDef svc fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#1e293b;
+  classDef muted fill:#f3f4f6,stroke:#9ca3af,stroke-width:2px,color:#1e293b;
+  classDef accent fill:#fae8ff,stroke:#c026d3,stroke-width:2px,color:#1e293b;
+  class EX accent
+  class D1,D2,D3,D4 store
+  class B1,B2,B3,B4 server
+  class O1,O2,O3,O4 svc
+  class F1,F2,F3,F4 muted
+```
 
 ### Bitrot Protection
 
 Bitrot (silent data corruption) is a serious problem for disk drives. RustFS uses HighwayHash to detect and repair corrupted data. By calculating hashes on READ and verifying them on WRITE, it ensures end-to-end integrity. The implementation achieves hash speeds exceeding 10 GB/s on a single core.
 
-![Bitrot Protection](./images/sec2-2.png)
+```mermaid
+flowchart TD
+  H["Object · erasure-coded across 16 drives"]
+  S["Tolerates 8 disk failures"]
+  H --> S
+  subgraph DATA["Data Block"]
+    direction LR
+    d1["1 checksum"]
+    d2["2 checksum"]
+    d3["3 checksum"]
+    de["..."]
+    d8["8 checksum"]
+    d1 -.- d2 -.- d3 -.- de -.- d8
+  end
+  subgraph PARITY["Parity Block"]
+    direction LR
+    p1["1P checksum"]
+    p2["2P checksum"]
+    p3["3P checksum"]
+    pe["..."]
+    p8["8P checksum"]
+    p1 -.- p2 -.- p3 -.- pe -.- p8
+  end
+  S --> DATA
+  S --> PARITY
+  classDef server fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b;
+  classDef svc fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#1e293b;
+  classDef muted fill:#f3f4f6,stroke:#9ca3af,stroke-width:2px,color:#1e293b;
+  class H svc
+  class d1,d2,d3,d8,de muted
+  class p1,p2,p3,p8,pe server
+```
 
 ### Server-Side Encryption
 
@@ -35,7 +95,41 @@ Encrypted objects are tamper-proof using AEAD server-side encryption. RustFS is 
 
 If a client requests SSE-S3 or auto-encryption is enabled, the RustFS server encrypts each object with a unique object key protected by a master key managed by KMS.
 
-![Server-Side Encryption](./images/sec2-3.png)
+```mermaid
+flowchart LR
+  D1["Data · SSE-S3"]
+  D2["Data · SSE-C"]
+  R(["RustFS"])
+  KMS[("KMS")]
+  B1["My Bucket"]
+  B2["My Bucket"]
+  O1["Object"]
+  O2["Object"]
+  O3["Object"]
+  O4["Object"]
+  O5["Object"]
+  O6["Object"]
+  D1 --> R
+  D2 --> R
+  R --> KMS
+  R --> B1
+  R --> B2
+  B1 --> O1
+  B1 --> O2
+  B1 --> O3
+  B2 --> O4
+  B2 --> O5
+  B2 --> O6
+  classDef server fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b;
+  classDef store fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#1e293b;
+  classDef svc fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#1e293b;
+  classDef accent fill:#fae8ff,stroke:#c026d3,stroke-width:2px,color:#1e293b;
+  class D1,D2 server
+  class R accent
+  class KMS store
+  class B1,B2 svc
+  class O1,O2,O3,O4,O5,O6 svc
+```
 
 ### WORM (Write Once Read Many)
 
@@ -67,7 +161,64 @@ RustFS can go further, making your existing storage infrastructure Amazon S3 com
 
 When WORM is enabled, RustFS disables all APIs that might alter object data and metadata. This means data becomes tamper-proof once written. This has practical applications in many different regulatory requirements.
 
-![WORM Feature](./images/sec2-4.png)
+```mermaid
+flowchart LR
+    APP[Applications] --> S3API(["S3 API"])
+
+    subgraph DIST["Distributed RustFS"]
+        direction TB
+        subgraph N1["Node 1"]
+            direction LR
+            S3a[S3]
+            subgraph OL1["Object Layer"]
+                direction TB
+                C1[Cache]
+                K1[Compression]
+                E1[Encryption]
+                B1["Erasure Code · Bitrot"]
+            end
+            SL1["Storage Layer"]
+            J1[("JBOD / FS disks")]
+            S3a -->|Object API| OL1
+            OL1 -->|Storage API| SL1
+            SL1 <--> J1
+        end
+        subgraph N2["Node 2"]
+            direction LR
+            S3b[S3]
+            subgraph OL2["Object Layer"]
+                direction TB
+                C2[Cache]
+                K2[Compression]
+                E2[Encryption]
+                B2["Erasure Code · Bitrot"]
+            end
+            SL2["Storage Layer"]
+            J2[("JBOD / FS disks")]
+            S3b -->|Object API| OL2
+            OL2 -->|Storage API| SL2
+            SL2 <--> J2
+        end
+        NN["Node n ..."]
+        N1 <-->|Internal RESTful API| N2
+        N2 <-->|Internal RESTful API| NN
+    end
+
+    S3API --> N1
+    S3API --> N2
+    S3API --> NN
+
+    classDef server fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b;
+    classDef store fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#1e293b;
+    classDef svc fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#1e293b;
+    classDef muted fill:#f3f4f6,stroke:#9ca3af,stroke-width:2px,color:#1e293b;
+    classDef accent fill:#fae8ff,stroke:#c026d3,stroke-width:2px,color:#1e293b;
+    class APP,NN muted
+    class S3API accent
+    class S3a,S3b,SL1,SL2 server
+    class C1,K1,E1,B1,C2,K2,E2,B2 svc
+    class J1,J2 store
+```
 
 ## System Architecture
 

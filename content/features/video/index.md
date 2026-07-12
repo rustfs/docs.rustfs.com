@@ -87,7 +87,39 @@ Applicable scenarios: Educational parks, cross-regional enterprises.
 - Intelligent routing: automatically switches TCP/UDP protocols to ensure transmission.
 - Tiered archiving: original videos stored 30 days, low-bitrate copies stored 180 days.
 
-![Video Storage Solution Architecture](./images/solution.png)
+```mermaid
+flowchart LR
+  subgraph Ingest["Camera Ingest"]
+    C1["Cameras → Surveillance Platform"]
+    C2["Cameras → VPN"]
+    C3["Cameras → HTTPS"]
+  end
+  GW["Hybrid Array / S3 Gateway"]
+  NET(["Dedicated Line · VPN · HTTPS"])
+  subgraph OSS["RustFS Object Storage"]
+    PROC["Transcode · Capture · Playback"]
+    STD["Standard Storage"]
+    IA["Infrequent Storage"]
+    ARC["Archive Storage"]
+    PROC --- STD
+    PROC --- IA
+    PROC --- ARC
+  end
+  C1 --> GW
+  GW --> NET
+  C2 --> NET
+  C3 --> NET
+  NET -->|Record / Playback| OSS
+  classDef muted fill:#f3f4f6,stroke:#9ca3af,stroke-width:2px,color:#1e293b;
+  classDef server fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b;
+  classDef svc fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#1e293b;
+  classDef store fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#1e293b;
+  class C1,C2,C3 muted
+  class GW server
+  class NET svc
+  class PROC svc
+  class STD,IA,ARC store
+```
 
 ## Why Choose Us
 
@@ -109,4 +141,9 @@ Platform-provided original video automatic encryption service effectively preven
 
 ## Technical Parameter Comparison Table
 
-![Technical Parameter Comparison Table](./images/params.png)
+| Metric | Traditional Solution | RustFS Solution | Improvement |
+| --- | --- | --- | --- |
+| Storage density | 1.2× raw size | ✓ 0.6× (lossless compression) | 2× ↑ |
+| Concurrent writes | ≤ 500 streams | ✓ 2000+ streams | 4× ↑ |
+| Storage availability | 99% | ✓ 99.999% | 100× reliability |
+| TCO (5 years) | $580K | ✓ $190K | 76% cost savings |

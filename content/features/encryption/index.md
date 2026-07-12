@@ -7,7 +7,39 @@ RustFS is designed for scale—technical, operational, and economic.
 
 In the object storage field, robust encryption is a fundamental requirement for enterprise storage. RustFS provides more functionality through the highest level of encryption and extensive optimizations, minimizing the performance overhead typically associated with storage encryption operations.
 
-![Data Encryption Architecture](images/s5-1.png)
+```mermaid
+flowchart LR
+  subgraph DATA["Data"]
+    SSES3["SSE-S3"]
+    SSEC["SSE-C"]
+  end
+  R(["RustFS"])
+  KMS[("KMS")]
+  subgraph B1["My Bucket"]
+    OBJ1["Object"]
+  end
+  subgraph META1["Object Metadata"]
+    M1A["Random IV"]
+    M1B["Sealed Object Key"]
+    M1C["KMS Key ID"]
+    M1D["Sealed KMS Data Key"]
+  end
+  SSES3 --> R
+  SSEC --> R
+  KMS --- R
+  R --> OBJ1
+  OBJ1 --> META1
+  classDef server fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b;
+  classDef store fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#1e293b;
+  classDef svc fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#1e293b;
+  classDef muted fill:#f3f4f6,stroke:#9ca3af,stroke-width:2px,color:#1e293b;
+  classDef accent fill:#fae8ff,stroke:#c026d3,stroke-width:2px,color:#1e293b;
+  class R server
+  class KMS store
+  class SSES3,SSEC muted
+  class OBJ1 svc
+  class M1A,M1B,M1C,M1D accent
+```
 
 RustFS encrypts data both when stored on disk and when transmitted over the network. RustFS's state-of-the-art encryption scheme supports fine-grained object-level encryption using modern industry-standard encryption algorithms such as AES-256-GCM, ChaCha20-Poly1305, and AES-CBC. RustFS is fully compatible with S3 encryption semantics and also extends S3 by supporting non-AWS key management services such as Hashicorp Vault, Gemalto KeySecure, and Google Secrets Manager.
 
@@ -39,7 +71,34 @@ Since KES servers are completely stateless, they can be automatically scaled, su
 
 For Kubernetes environments, the RustFS Kubernetes Operator supports deploying and configuring KES for each tenant, enabling SSE-S3 as part of each tenant deployment.
 
-![KES Key Encryption Service Architecture](images/s5-2.png)
+```mermaid
+flowchart LR
+  Client["RustFS Server · KES Client"]
+  KES["RustFS KES Server"]
+  ExtKMS["External KMS"]
+  Client <-->|TLS| KES
+  KES <-->|TLS| ExtKMS
+  subgraph FLOW["Key Flow"]
+    App["Application"]
+    NewKey["Create / Fetch DEK"]
+    App --> NewKey
+  end
+  subgraph AUTH["Authentication"]
+    Certs["Key / Cert pairs"]
+    Identity["Identity = Hash of Cert"]
+    Certs --> Identity
+  end
+  App -.->|API| KES
+  Identity -.-> KES
+  classDef server fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b;
+  classDef store fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#1e293b;
+  classDef svc fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#1e293b;
+  classDef muted fill:#f3f4f6,stroke:#9ca3af,stroke-width:2px,color:#1e293b;
+  class KES server
+  class ExtKMS store
+  class Client,App svc
+  class NewKey,Certs,Identity muted
+```
 
 ## Supported External Key Management Systems
 

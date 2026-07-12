@@ -39,7 +39,16 @@ S3 Select relies on performance for complex queries. RustFS leverages SIMD instr
 
 ### Amazon Signature V4
 
-![Amazon Signature V4](images/s1-5.png)
+```mermaid
+flowchart LR
+    A1["1. Create canonical request"]
+    A2["2. Create string to sign"]
+    A3["3. Calculate signature"]
+    A4["4. Add signature to request"]
+    A1 --> A2 --> A3 --> A4
+    classDef svc fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#1e293b;
+    class A1,A2,A3,A4 svc
+```
 
 Applications and clients must authenticate to access RustFS management APIs. RustFS supports AWS Signature Version 4. After authentication, RustFS uses policy-based access control compatible with AWS IAM to authorize operations.
 

@@ -60,7 +60,49 @@ Currently, RustFS only recommends replication across two data centers. Replicati
 
 RustFS supports very large deployments in each data center, including source and target, with the above considerations determining scale.
 
-![Large-Scale Deployment Architecture](images/s6-2.png)
+```mermaid
+flowchart TB
+  WAN(["WAN · 10 Gbps"])
+  subgraph DC1["Data Center 1"]
+    LB1["Spine / Leaf Switches"]
+    KES1["RustFS KES Encryption"]
+    REP1["RustFS Replication"]
+    subgraph C1["Object Storage Cluster"]
+      A1[("Storage")]
+      A2[("Storage")]
+      A3[("Storage")]
+      A4[("Storage")]
+    end
+    LB1 -->|100 Gbps| C1
+    KES1 -->|Secret Keys| REP1
+    REP1 --- C1
+  end
+  subgraph DC2["Data Center 2"]
+    LB2["Spine / Leaf Switches"]
+    KES2["RustFS KES Encryption"]
+    REP2["RustFS Replication"]
+    subgraph C2["Object Storage Cluster"]
+      B1[("Storage")]
+      B2[("Storage")]
+      B3[("Storage")]
+      B4[("Storage")]
+    end
+    LB2 -->|100 Gbps| C2
+    KES2 -->|Secret Keys| REP2
+    REP2 --- C2
+  end
+  WAN --> LB1
+  WAN --> LB2
+  REP1 <-->|Async Replication| REP2
+  classDef muted fill:#f3f4f6,stroke:#9ca3af,stroke-width:2px,color:#1e293b;
+  classDef accent fill:#fae8ff,stroke:#c026d3,stroke-width:2px,color:#1e293b;
+  classDef svc fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#1e293b;
+  classDef store fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#1e293b;
+  class WAN,LB1,LB2 muted
+  class KES1,KES2 accent
+  class REP1,REP2 svc
+  class A1,A2,A3,A4,B1,B2,B3,B4 store
+```
 
 ## Frequently Asked Questions
 
