@@ -29,7 +29,7 @@ description: "Security checklist for enterprise deployments."
 ## 3. Credential Protection
 
 - **Change Default Credentials**
- Change default accounts (e.g., `rustfsadmin`) to strong, random passwords immediately after initialization.
+ Never keep the example placeholders (`<your-access-key>` / `<your-secret-key>`) in production. Set a unique access key and a strong, random secret — e.g. generate one with `openssl rand -base64 24` — immediately after initialization.
 
 - **Secure Storage**
  Do not hardcode credentials. Use environment variables or secrets management systems (e.g., Kubernetes Secrets).

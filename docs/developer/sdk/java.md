@@ -67,7 +67,8 @@ public class RustfsS3Example {
  .region(Region.US_EAST_1) // RustFS does not validate regions
  .credentialsProvider(
  StaticCredentialsProvider.create(
- AwsBasicCredentials.create("rustfsadmin", "change-your-password")
+ // Use a unique access key and a strong secret (e.g. openssl rand -base64 24)
+ AwsBasicCredentials.create("<your-access-key>", "<your-secret-key>")
  )
  )
  .forcePathStyle(true) // Required for RustFS compatibility
@@ -171,7 +172,8 @@ S3Presigner presigner = S3Presigner.builder()
  .region(Region.US_EAST_1)
  .credentialsProvider(
  StaticCredentialsProvider.create(
- AwsBasicCredentials.create("rustfsadmin", "change-your-password")
+ // Use a unique access key and a strong secret (e.g. openssl rand -base64 24)
+ AwsBasicCredentials.create("<your-access-key>", "<your-secret-key>")
  )
  )
  .build();
