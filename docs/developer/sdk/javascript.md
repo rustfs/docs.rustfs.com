@@ -25,8 +25,8 @@ Assume the RustFS instance is deployed as follows:
 
 ```
 Endpoint: http://192.168.1.100:9000
-Access Key: rustfsadmin
-Secret Key: change-your-password
+Access Key: <your-access-key>
+Secret Key: <your-secret-key>
 ```
 
 ---
@@ -41,8 +41,8 @@ const s3 = new S3Client({
  endpoint: "http://192.168.1.100:9000", // RustFS endpoint
  region: "us-east-1", // Any value is accepted
  credentials: {
- accessKeyId: "rustfsadmin",
- secretAccessKey: "change-your-password",
+ accessKeyId: "<your-access-key>",
+ secretAccessKey: "<your-secret-key>",
  },
  forcePathStyle: true, // Must be enabled for RustFS compatibility
  requestHandler: new NodeHttpHandler({
