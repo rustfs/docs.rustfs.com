@@ -28,7 +28,7 @@ Assume RustFS is deployed as follows:
 ```
 Endpoint: http://192.168.1.100:9000
 AccessKey: rustfsadmin
-SecretKey: rustfssecret
+SecretKey: change-your-password
 ```
 
 ### 2.2 Install Boto3
@@ -55,7 +55,7 @@ s3 = boto3.client(
  's3',
  endpoint_url='http://192.168.1.100:9000',
  aws_access_key_id='rustfsadmin',
- aws_secret_access_key='rustfssecret',
+ aws_secret_access_key='change-your-password',
  config=Config(signature_version='s3v4'),
  region_name='us-east-1'
 )

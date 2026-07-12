@@ -231,7 +231,7 @@ mv rustfs /usr/local/bin/
 # Multiple node multiple disk mode
 sudo tee /etc/default/rustfs <<EOF
 RUSTFS_ACCESS_KEY=rustfsadmin
-RUSTFS_SECRET_KEY=rustfsadmin
+RUSTFS_SECRET_KEY=change-your-password
 RUSTFS_VOLUMES="http://node{1...4}:9000/data/rustfs{0...3}"
 RUSTFS_ADDRESS=":9000"
 RUSTFS_CONSOLE_ENABLE=true
