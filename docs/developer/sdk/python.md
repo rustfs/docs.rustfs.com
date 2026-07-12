@@ -54,6 +54,7 @@ from botocore.client import Config
 s3 = boto3.client(
  's3',
  endpoint_url='http://192.168.1.100:9000',
+ # Use a unique access key and a strong secret (e.g. openssl rand -base64 24)
  aws_access_key_id='<your-access-key>',
  aws_secret_access_key='<your-secret-key>',
  config=Config(signature_version='s3v4'),

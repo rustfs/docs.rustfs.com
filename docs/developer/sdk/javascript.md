@@ -41,6 +41,7 @@ const s3 = new S3Client({
  endpoint: "http://192.168.1.100:9000", // RustFS endpoint
  region: "us-east-1", // Any value is accepted
  credentials: {
+ // Use a unique access key and a strong secret (e.g. openssl rand -base64 24)
  accessKeyId: "<your-access-key>",
  secretAccessKey: "<your-secret-key>",
  },

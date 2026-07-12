@@ -65,6 +65,7 @@ Parameter descriptions:
 ### Complete Parameter Configuration Example
 
 ```bash
+# Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
 docker run -d \
   --name rustfs_container \
   -p 9000:9000 \
@@ -87,6 +88,7 @@ docker run -d \
 
 1. **Environment Variable Method** (Recommended):
    ```bash
+   # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
    -e RUSTFS_ADDRESS=:9000 \
    -e RUSTFS_SERVER_DOMAINS=example.com \
    -e RUSTFS_ACCESS_KEY="<your-access-key>" \
@@ -96,6 +98,7 @@ docker run -d \
 
 2. **Command Line Parameter Method**:
    ```
+   # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
    --address :9000 \
    --server-domains example.com \
    --access-key "<your-access-key>" \
@@ -132,6 +135,7 @@ docker run -d \
 
 3. **Custom Authentication Keys**:
    ```bash
+   # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
    docker run -d \
      -p 9000:9000 \
      -p 9001:9001 \
@@ -250,6 +254,7 @@ Whether you start only the `rustfs-server` or together with observability servic
  Use `mc` or other S3 clients:
 
  ```bash
+ # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
  mc alias set rustfs http://localhost:9000 "<your-access-key>" "<your-secret-key>"
  mc mb rustfs/mybucket
  mc ls rustfs
@@ -264,6 +269,7 @@ Dockers default bridge networking does not support multi-node deployments. Use `
 Run the following on **each node**
 
 ```bash
+# Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
 docker run -d \
   --name rustfs \
   --network host \

@@ -203,7 +203,7 @@ mv rustfs /usr/local/bin/
 ```bash
 # Single node single disk mode
 sudo tee /etc/default/rustfs <<EOF
-# Replace the placeholders below; generate a strong secret, e.g. openssl rand -base64 24
+# Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 RUSTFS_VOLUMES="/data/rustfs0"
