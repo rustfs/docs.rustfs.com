@@ -36,7 +36,7 @@ Please confirm that this program has relevant execution permissions in the MacOS
 
 3. Click "Start Service", and RustFS service starts successfully.
 
-<img src="./images/macos-setup.jpg" alt="macos startup" />
+![macos startup](./images/macos-setup.jpg)
 
 ## 4. Modify Configuration
 
@@ -48,7 +48,7 @@ Click the modify button (gear-shaped button) in the upper right corner to modify
 
 3. Specified disk directory;
 
-<img src="./images/setting.jpg" alt="RustFS windows configuration" />
+![RustFS macOS configuration](./images/setting.jpg)
 
 ## 5. Access Console
 

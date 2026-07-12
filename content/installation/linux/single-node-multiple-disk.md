@@ -25,7 +25,15 @@ A data block is split into specified K data blocks and M parity blocks. At most 
 
 Take the following diagram as an example:
 
-<img src="./images/single-node-multiple-disk.jpg" alt="RustFS Single Node Multiple Disk Mode" />
+```mermaid
+flowchart TD
+    S[Server Node] --> D1[(Disk1)] & D2[(Disk2)] & D3[(Disk3)] & D4[(Disk4)]
+
+    classDef server fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b;
+    classDef disk fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#1e293b;
+    class S server
+    class D1,D2,D3,D4 disk
+```
 
 ## 2. Prerequisites
 

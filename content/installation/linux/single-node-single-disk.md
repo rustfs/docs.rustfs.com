@@ -23,7 +23,15 @@ This document contains RustFS single-node single-disk deployment mode.
 
 Specific architecture diagram is as follows:
 
-<img src="./images/single-node-single-disk.jpg" alt="RustFS Single Node Single Disk Mode" />
+```mermaid
+flowchart TD
+    S[Server Node] --> D1[(Disk1)]
+
+    classDef server fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b;
+    classDef disk fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#1e293b;
+    class S server
+    class D1 disk
+```
 
 ## 2. Prerequisites
 

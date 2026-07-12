@@ -25,7 +25,22 @@ Any single server failure or maintenance will not affect data security.
 
 Any data corruption within 4 disks will not affect data security.
 
-<img src="./images/multiple-node-multiple-disk.jpg" alt="RustFS Multiple Node Multiple Disk Mode" />
+```mermaid
+flowchart TD
+    LB([Load Balancing]) --> S1[Server Node1] & S2[Server Node2] & S3[Server Node3] & S4[Server Node4]
+
+    S1 --> N1D1[(Disk1)] & N1D2[(Disk2)] & N1D3[(Disk3)] & N1D4[(Disk4)]
+    S2 --> N2D1[(Disk1)] & N2D2[(Disk2)] & N2D3[(Disk3)] & N2D4[(Disk4)]
+    S3 --> N3D1[(Disk1)] & N3D2[(Disk2)] & N3D3[(Disk3)] & N3D4[(Disk4)]
+    S4 --> N4D1[(Disk1)] & N4D2[(Disk2)] & N4D3[(Disk3)] & N4D4[(Disk4)]
+
+    classDef lb fill:#f3f4f6,stroke:#9ca3af,stroke-width:2px,color:#1e293b;
+    classDef server fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b;
+    classDef disk fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#1e293b;
+    class LB lb
+    class S1,S2,S3,S4 server
+    class N1D1,N1D2,N1D3,N1D4,N2D1,N2D2,N2D3,N2D4,N3D1,N3D2,N3D3,N3D4,N4D1,N4D2,N4D3,N4D4 disk
+```
 
 ## 2. Prerequisites
 
