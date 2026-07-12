@@ -5,7 +5,11 @@ description: "Pre-installation checklists."
 
 These checklists cover the necessary preparations for a production environment.
 
-> **Note**: These are general guidelines. Adjust them based on your specific architecture and requirements.
+:::note
+
+These are general guidelines. Adjust them based on your specific architecture and requirements.
+
+:::
 
 For professional support, contact us at hello@rustfs.com.
 

@@ -117,16 +117,17 @@ server {
 
 #### Important Notice
 
-> [!WARNING]
-> **Key configuration items**
-> 
-> The `proxy_cache_convert_head off` directive **must be added** to the Nginx configuration for the following reasons:
-> 
-> - By default, Nginx converts HEAD requests to GET requests for caching.
-> - This conversion will cause S3 V4 signature verification to fail.
-> - The symptom is `Bucket not found` or `403 Access Denied` error when accessing the storage bucket.
-> 
-> Refer to [Nginx Official Documentation](http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_cache_convert_head)。
+:::warning[Key configuration items]
+
+The `proxy_cache_convert_head off` directive **must be added** to the Nginx configuration for the following reasons:
+
+- By default, Nginx converts HEAD requests to GET requests for caching.
+- This conversion will cause S3 V4 signature verification to fail.
+- The symptom is `Bucket not found` or `403 Access Denied` error when accessing the storage bucket.
+
+Refer to [Nginx Official Documentation](http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_cache_convert_head).
+
+:::
 
 ## 3. Multi-Machine Load Balancing
 

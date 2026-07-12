@@ -27,15 +27,16 @@ Before replacing the physical hard drive, you need to safely unmount the failed 
 umount /dev/sdb
 ```
 
-> **Notes**
->
-> * If there are multiple mount points, execute `umount` separately.
-> * If encountering "device is busy", you can first stop the RustFS service:
->
-> ```bash
-> systemctl stop rustfs
-> ```
->
+:::note[Notes]
+
+* If there are multiple mount points, execute `umount` separately.
+* If encountering "device is busy", you can first stop the RustFS service:
+
+```bash
+systemctl stop rustfs
+```
+
+:::
 
 <a id="replace-failed-disk"></a>
 
@@ -68,20 +69,22 @@ cat /etc/fstab
 LABEL=DISK1 /mnt/disk1 ext4 defaults,noatime 0 2
 ```
 
-> **Tips**
->
-> * If using UUID:
->
-> ```bash
-> blkid /dev/sdb
-> # Get the new partition's UUID, then replace the corresponding field in fstab
-> ```
-> * After modifying fstab, be sure to validate syntax:
->
-> ```bash
-> mount -a # If no errors, configuration is correct
-> ```
->
+:::tip[Tips]
+
+* If using UUID:
+
+```bash
+blkid /dev/sdb
+# Get the new partition's UUID, then replace the corresponding field in fstab
+```
+
+* After modifying fstab, be sure to validate syntax:
+
+```bash
+mount -a # If no errors, configuration is correct
+```
+
+:::
 
 <a id="remount-new-disk"></a>
 
@@ -100,9 +103,11 @@ Confirm all disks are mounted normally:
 df -h | grep /mnt/disk
 ```
 
-> **Note**
->
-> * If some mounts fail, please check if fstab entries are consistent with disk labels/UUIDs.
+:::note
+
+If some mounts fail, please check if fstab entries are consistent with disk labels/UUIDs.
+
+:::
 
 <a id="trigger-and-monitor-data-healing"></a>
 
@@ -131,10 +136,12 @@ journalctl -u rustfs -f
 tail -f /var/log/rustfs/heal.log
 ```
 
-> **Notes**
->
-> * The healing process will complete in the background, usually with minimal impact on online access;
-> * After healing is complete, the tool will report success or list failed objects.
+:::note[Notes]
+
+* The healing process will complete in the background, usually with minimal impact on online access;
+* After healing is complete, the tool will report success or list failed objects.
+
+:::
 
 <a id="follow-up-checks-and-notes"></a>
 

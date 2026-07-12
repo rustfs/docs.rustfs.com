@@ -106,6 +106,10 @@ net.ipv4.tcp_slow_start_after_idle = 0
 3. Baseline test reports (including raw data)
 4. Change record table (including maintenance window information)
 
-> **Tip**: Recommend conducting 72-hour stress testing before formal deployment, simulating 110% peak traffic load scenarios
+:::tip
+
+Recommend conducting 72-hour stress testing before formal deployment, simulating 110% peak traffic load scenarios
+
+:::
 
 This checklist covers key checkpoints for enterprise storage system network deployment, specifically optimized parameter requirements for distributed object storage characteristics. You can contact RustFS for official technical support.

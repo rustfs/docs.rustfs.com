@@ -189,10 +189,12 @@ useradd -M -r -g rustfs-user rustfs-user
 chown rustfs-user:rustfs-user  /data/rustfs*
 ```
 
-Note:
+:::note
 
 - If rustfs-user user and group are created, you need to change User and Group in `/etc/systemd/system/rustfs.service` to `rustfs-user`
 - Adjust `/data/rustfs*` to the specified mount directory.
+
+:::
 
 ## 4. Download Installation Package
 
