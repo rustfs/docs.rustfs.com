@@ -204,7 +204,7 @@ mv rustfs /usr/local/bin/
 # Single node single disk mode
 sudo tee /etc/default/rustfs <<EOF
 RUSTFS_ACCESS_KEY=rustfsadmin
-RUSTFS_SECRET_KEY=rustfsadmin
+RUSTFS_SECRET_KEY=change-your-password
 RUSTFS_VOLUMES="/data/rustfs0"
 RUSTFS_ADDRESS=":9000"
 RUSTFS_CONSOLE_ENABLE=true

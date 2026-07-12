@@ -71,7 +71,7 @@ docker run -d \
   -p 9001:9001 \
   -v /mnt/rustfs/data:/data \
   -e RUSTFS_ACCESS_KEY=rustfsadmin \
-  -e RUSTFS_SECRET_KEY=rustfsadmin \
+  -e RUSTFS_SECRET_KEY=change-your-password \
   -e RUSTFS_CONSOLE_ENABLE=true \
   -e RUSTFS_SERVER_DOMAINS=example.com \
   rustfs/rustfs:latest \
@@ -79,7 +79,7 @@ docker run -d \
   --console-enable \
   --server-domains example.com \
   --access-key rustfsadmin \
-  --secret-key rustfsadmin \
+  --secret-key change-your-password \
   /data
 ```
 
@@ -90,7 +90,7 @@ docker run -d \
    -e RUSTFS_ADDRESS=:9000 \
    -e RUSTFS_SERVER_DOMAINS=example.com \
    -e RUSTFS_ACCESS_KEY=rustfsadmin \
-   -e RUSTFS_SECRET_KEY=rustfsadmin \
+   -e RUSTFS_SECRET_KEY=change-your-password \
    -e RUSTFS_CONSOLE_ENABLE=true \
    ```
 
@@ -99,7 +99,7 @@ docker run -d \
    --address :9000 \
    --server-domains example.com \
    --access-key rustfsadmin \
-   --secret-key rustfsadmin \
+   --secret-key change-your-password \
    --console-enable \
    ```
 
@@ -137,10 +137,10 @@ docker run -d \
      -p 9001:9001 \
      -v /mnt/data:/data \
      -e RUSTFS_ACCESS_KEY=rustfsadmin \
-     -e RUSTFS_SECRET_KEY=rustfsadmin \
+     -e RUSTFS_SECRET_KEY=change-your-password \
      rustfs/rustfs:latest \
      --access-key rustfsadmin \
-     --secret-key rustfsadmin \
+     --secret-key change-your-password \
      /data
    ```
 
@@ -233,7 +233,7 @@ CONTAINER ID   IMAGE                                             COMMAND        
 e07121ecdd39   rustfs/rustfs:latest                              "/entrypoint.sh rust…"   2 seconds ago   Up 1 second (health: starting)   0.0.0.0:9000-9001->9000-9001/tcp, :::9000-9001->9000-9001/tcp   rustfs-server
 ```
 
-Whether you start only the `rustfs-server` or together with observability services, you can access the RustFS instance via `http://localhost:9000` using the default username and password (`rustfsadmin` for both).
+Whether you start only the `rustfs-server` or together with observability services, you can access the RustFS instance via `http://localhost:9000` using the access key and secret key you configured above (in these examples, username `rustfsadmin` and password `change-your-password`). Be sure to replace the password with a strong secret of your own.
 
 ## 4. Verification and Access
 
@@ -250,7 +250,7 @@ Whether you start only the `rustfs-server` or together with observability servic
  Use `mc` or other S3 clients:
 
  ```bash
- mc alias set rustfs http://localhost:9000 rustfsadmin ChangeMe123!
+ mc alias set rustfs http://localhost:9000 rustfsadmin change-your-password
  mc mb rustfs/mybucket
  mc ls rustfs
  ```
@@ -269,7 +269,7 @@ docker run -d \
   --network host \
   -v /mnt/rustfs/data:/data \
   -e RUSTFS_ACCESS_KEY=rustfsadmin \
-  -e RUSTFS_SECRET_KEY=rustfsadmin \
+  -e RUSTFS_SECRET_KEY=change-your-password \
   -e RUSTFS_CONSOLE_ENABLE=true \
   -e RUSTFS_VOLUMES="http://node{1...4}:9000/data/rustfs{0...3}" \
   rustfs/rustfs:latest

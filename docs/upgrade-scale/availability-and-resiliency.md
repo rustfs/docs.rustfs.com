@@ -84,7 +84,7 @@ mv rustfs /usr/local/bin/
 # Please replace <Your RustFS admin username> and <Secure password of your RustFS admin> with yours values!
 cat <<EOF > /etc/default/rustfs
 RUSTFS_ACCESS_KEY=<Your RustFS admin username> # e.g. rustfsadmin
-RUSTFS_SECRET_KEY=<Secure password of your RustFS admin> # e.g. rustfsadmin  
+RUSTFS_SECRET_KEY=<Secure password of your RustFS admin> # e.g. change-your-password
 RUSTFS_VOLUMES="http://node-{1...4}:9000/data/rustfs{0...3} http://node-{5...8}:9000/data/rustfs{0...7}" # add new storage pool to the existing
 RUSTFS_ADDRESS=":9000"
 RUSTFS_CONSOLE_ADDRESS=":9001"
