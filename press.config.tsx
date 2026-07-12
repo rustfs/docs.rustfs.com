@@ -4,6 +4,7 @@ import { flexsearchPlugin } from "fumapress/plugins/flexsearch";
 import { llmsPlugin } from "fumapress/plugins/llms.txt";
 import { sitemapPlugin } from "fumapress/plugins/sitemap";
 import { takumiPlugin } from "fumapress/plugins/takumi";
+import { createNotebookLayoutPage } from "fumapress/layouts/notebook";
 import defaultMdxComponents, { createRelativeLink } from "fumadocs-ui/mdx";
 import { docs } from "./.source/server";
 import { Mermaid } from "./src/components/mermaid";
@@ -153,6 +154,9 @@ gtag('config', 'G-TWW7WMTWL9');`,
 })
   .plugins(flexsearchPlugin(), llmsPlugin(), takumiPlugin(), sitemapPlugin())
   .layouts({
+    // Use the Notebook layout: a full-width top navbar (main links + search +
+    // GitHub + theme) with the page tree in the sidebar — like the FumaPress docs.
+    page: createNotebookLayoutPage(),
     // Shared navbar / links across all Fumadocs layouts.
     defaultProps() {
       // Built as a const (not an inline literal) so the extra `sidebar` field —
