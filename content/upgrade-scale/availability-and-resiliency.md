@@ -74,7 +74,7 @@ flowchart LR
 
 ---
 
-## 1. Pre-Scaling Preparation
+## Pre-Scaling Preparation
 
 ### 1.1 Hardware Planning Requirements
 
@@ -106,7 +106,7 @@ firewall-cmd --list-ports | grep 9001
 
 ---
 
-## 2. Scaling Implementation Steps
+## Scaling Implementation Steps
 
 ### 2.1 New Node Basic Configuration
 
@@ -228,7 +228,7 @@ systemctl restart rustfs.service
 
 ---
 
-## 3. Post-Scaling Verification
+## Post-Scaling Verification
 
 ### 3.1 Check Server List in RustFS Console
 Open in the RustFS Console Performance menu, e.g. http://node1:9001/rustfs/console/performance and check node join status in the Server List
@@ -242,7 +242,7 @@ watch -n 5 "rustfs-admin metrics | grep 'PoolUsagePercent'"
 
 ---
 
-## 4. Important Notes
+## Important Notes
 
 1. **Rolling Restart Prohibited**: Must restart all nodes simultaneously to avoid data inconsistency
 2. **Capacity Planning Recommendation**: Should plan next scaling when storage usage reaches 70%
@@ -257,7 +257,7 @@ watch -n 5 "rustfs-admin metrics | grep 'PoolUsagePercent'"
 
 ---
 
-## 5. Troubleshooting Guide
+## Troubleshooting Guide
 
 | Symptom | Check Point | Fix Command |
 |---------------------------|---------------------------------|-------------------------------|

@@ -10,7 +10,7 @@ On MacOS, you can use three methods for installation:
 
 > This article mainly explains how to use the RustFS **graphical one-click startup package** to quickly launch RustFS.
 
-## 1. Preparation
+### 1. Preparation
 
 :::note
 
@@ -22,15 +22,15 @@ On MacOS, you can use three methods for installation:
 
 2. Download the installation package, modify permissions, and start.
 
-## 2. Download
+### 2. Download
 
 Go to the official website download page and download the latest RustFS installation package.
 
-## 3. Modify Permissions
+### 3. Modify Permissions
 
 Please confirm that this program has relevant execution permissions in the MacOS operating system.
 
-## Double-click the Startup Icon
+### 4. Start the Service
 
 1. Double-click the startup icon;
 
@@ -40,7 +40,7 @@ Please confirm that this program has relevant execution permissions in the MacOS
 
 ![macos startup](./images/macos-setup.jpg)
 
-## 4. Modify Configuration
+### 5. Modify Configuration
 
 Click the modify button (gear-shaped button) in the upper right corner to modify:
 
@@ -52,6 +52,6 @@ Click the modify button (gear-shaped button) in the upper right corner to modify
 
 ![RustFS macOS configuration](./images/setting.jpg)
 
-## 5. Access Console
+### 6. Access Console
 
 After successful startup, visit `http://127.0.0.1:7001` to access the console.

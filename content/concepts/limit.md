@@ -3,7 +3,7 @@ title: "Usage Limits"
 description: "RustFS is a simple, efficient, distributed object storage. It is fully S3 compatible, open source software released under the Apache2 license."
 ---
 
-## 1. S3 API Limits
+## S3 API Limits
 
 > The following standards strictly follow S3 protocol standards for specification.
 
@@ -24,7 +24,7 @@ description: "RustFS is a simple, efficient, distributed object storage. It is f
 
 ---
 
-## 2. Erasure Coding Limits
+## Erasure Coding Limits
 
 > EC parameters are configured based on Reed-Solomon matrix EC algorithm. Actual limits depend on the specific Erasure Coding (EC) configuration.
 
@@ -40,7 +40,7 @@ description: "RustFS is a simple, efficient, distributed object storage. It is f
 
 ---
 
-## 3. Object Naming Limits
+## Object Naming Limits
 
 ### File System and Operating System Limits
 

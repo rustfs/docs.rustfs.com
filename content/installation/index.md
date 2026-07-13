@@ -7,7 +7,7 @@ RustFS is a high-performance, distributed object storage system developed in Rus
 
 RustFS is transitioning from commercial roots to a fully open-source model, aiming to democratize high-performance storage and enhance data security globally.
 
-## 1. Supported CPUs and Operating Systems
+## Supported CPUs and Operating Systems
 
 RustFS runs on almost any CPU and operating system, including:
 - Linux
@@ -20,7 +20,7 @@ RustFS runs on almost any CPU and operating system, including:
 
 Supported CPU architectures include x86, ARM, RISC-V, and others.
 
-## 2. RustFS Installation Modes
+## RustFS Installation Modes
 
 This chapter includes installation guides for RustFS on different operating systems and deployment methods. Specifically includes:
 
@@ -30,7 +30,7 @@ This chapter includes installation guides for RustFS on different operating syst
 - [Installing RustFS on Windows](./windows/index.md)
 - [Installing RustFS on macOS](./macos/index.md)
 
-## 3. RustFS Features
+## RustFS Features
 
 - **S3 Compatible**: Fully compatible with the S3 protocol, ensuring seamless integration with big data ecosystems, data lakes, backup solutions, and media processing workflows.
 - **Distributed Architecture**: Designed to scale horizontally to meet diverse storage requirements.
@@ -42,6 +42,6 @@ This chapter includes installation guides for RustFS on different operating syst
 - **Customizable**: Open-source nature allows for deep customization and plugin development.
 - **Cloud-Native**: Optimized for containerized environments (Docker, Kubernetes) enabling rapid deployment.
 
-## 4. RustFS Values
+## RustFS Values
 
 Our mission is to democratize high-performance storage, making data security and cost-efficiency accessible to everyone.
