@@ -3,9 +3,10 @@
 This playbook directs AI agents working in the RustFS documentation repository so that every deliverable stays accurate, auditable, and easy to maintain.
 
 ## 1. Repository Snapshot
-- Framework: VitePress; source files live in `docs/`, site-wide configuration in `.vitepress`.
+- Framework: **FumaPress** (static-site generator powered by Waku + Fumadocs). Content lives in `content/`; site configuration is in `press.config.tsx`, `source.config.ts`, and `waku.config.ts`.
 - Goal: produce documentation for a distributed object storage product aimed at a global audience, currently English-first with room for other locales.
-- Navigation: `docs/sidebar.ts` and `docs/config.ts` define the site structure; new pages must be reflected in these files immediately.
+- Navigation: `content/meta.json` (root sidebar: section order, labels, links) and per-folder `content/**/meta.json` (nested group titles/order) define the site structure. New pages must be reflected there immediately.
+- Routing: a page's URL mirrors its path under `content/` (e.g. `content/management/bucket/index.md` → `/management/bucket`). `.md` links between pages are resolved automatically; you can write `./sibling.md` or `/absolute/path`.
 
 ## 2. Core Principles
 1. **Accuracy**: Data, APIs, and commands must be reproducible; cite third-party information with a concise source note.
@@ -17,36 +18,36 @@ This playbook directs AI agents working in the RustFS documentation repository s
 ## 3. Recommended Workflow
 ### 3.1 Environment Prep
 1. `git checkout main && git pull` to sync with the latest baseline.
-2. Install dependencies via `pnpm install` (or `npm install`) whenever the repo is fresh or packages changed.
+2. Use Node.js 20+ (Node 22 recommended). Install dependencies via `npm install` whenever the repo is fresh or packages changed.
 3. Create a topic branch for the task: `git checkout -b docs/<topic>-<short-desc>`.
 
 ### 3.2 Editing Steps
-1. Locate or create the Markdown file under `docs/`; when adding a section, create `index.md` in that directory as its entry point.
-2. Reuse existing frontmatter fields (`title`, `aside`, `outline`, etc.) to keep VitePress behavior intact.
-3. Store images in a sibling `images/` folder or `public/`, use descriptive names, and reference them via relative paths such as `./images/<name>.png`.
-4. For multilingual work, mirror the default structure under `docs/<locale>/...` exactly.
-5. Update navigation by editing `docs/sidebar.ts` or the relevant scoped `sidebar.ts`, keeping paths free of extra prefixes.
+1. Locate or create the Markdown file under `content/`; when adding a section, create `index.md` in that directory as its entry point.
+2. Every page needs frontmatter with a `title` (required — it is rendered as the page heading and the sidebar/tab label) and, ideally, a `description`. **Do not** add a duplicate top-level `#` heading matching the title; FumaPress renders the title from frontmatter.
+3. Store images in a sibling `images/` folder and reference them via relative paths such as `./images/<name>.png`. FumaPress bundles and optimizes them at build time. Global assets (favicons, logo, manifest) live in `public/`.
+4. Math renders via KaTeX (`$…$` inline, `$$…$$` display). Diagrams render via Mermaid (` ```mermaid ` code blocks).
+5. Update navigation by editing `content/meta.json` (and the relevant folder `meta.json`). Sidebar labels come from a page's frontmatter `title`, a folder `meta.json` `title`, or a `[Custom Label](/url)` entry in a `pages` array.
 
 ### 3.3 Review
-1. Manually preview Markdown: keep heading levels sequential and leave blank lines between lists and code blocks.
+1. Run the local dev server (`npm run dev`) and confirm the changed pages render, links resolve, and the sidebar looks correct.
 2. Compare against requirements or issues to confirm every acceptance criterion is satisfied.
-3. Run the commands listed in Section 5 to ensure builds succeed without warnings.
+3. Run the commands listed in Section 5 to ensure the build succeeds.
 
 ## 4. Content and Language Rules
 - **Structure**: Start with context, then cover “Overview → Steps → References/Constraints.”
 - **Terminology**: Bold or code-style the first mention of product/module names; wrap commands and filenames in backticks.
-- **Code blocks**: Include language hints (```bash, ```rust, etc.) and provide runnable snippets only.
+- **Code blocks**: Include language hints (` ```bash `, ` ```rust `, etc.) and provide runnable snippets only.
 - **Tables and media**: Tables need a header row; every image requires meaningful `alt` text.
 - **Update note**: Optionally append “Last Updated: YYYY-MM-DD” at the end for traceability.
 
 ## 5. Quality Verification
-1. **Build**: Run `pnpm build` (or `npm run build`) to ensure VitePress generates the site without errors.
-2. **Preview** (optional): `pnpm dev` is recommended when navigation or interactive pieces change.
-3. **Links/assets**: Watch the terminal for warnings; confirm external URLs use the right protocol and remain reachable.
+1. **Build**: Run `npm run build` to ensure FumaPress generates the static site (output in `dist/public/`) without errors.
+2. **Preview** (optional): `npm run dev` is recommended when navigation or interactive pieces change.
+3. **Types** (optional): `npm run types:check`.
 4. **Self-checklist**:
-   - Frontmatter is complete and valid.
-   - Every relative path points to an existing file.
-   - No new console warnings were introduced (missing default export, TS errors, etc.).
+   - Frontmatter is complete and valid (`title` present).
+   - Every relative path points to an existing file, and new pages appear in `meta.json`.
+   - No new build errors were introduced.
 
 ## 6. Delivery Requirements
 1. Use `git status` to verify only task-related files changed.
@@ -59,10 +60,11 @@ This playbook directs AI agents working in the RustFS documentation repository s
 
 ## 7. Command Reference
 ```bash
-pnpm install        # install dependencies
-pnpm dev            # local development preview
-pnpm build          # generate static site
-pnpm preview        # preview the build output
+npm install         # install dependencies (Node 20+)
+npm run dev         # local development preview (http://localhost:3000)
+npm run build       # generate static site into dist/public/
+npm start           # serve the production build
+npm run types:check # fumadocs-mdx + tsc type check
 ```
 
 ## 8. Quality and Review Tips

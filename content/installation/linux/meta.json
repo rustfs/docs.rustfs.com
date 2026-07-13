@@ -1,0 +1,9 @@
+{
+  "title": "Linux Installation",
+  "pages": [
+    "[Linux Quick Installation](/installation/linux/quick-start)",
+    "[Single Node Single Disk Installation](/installation/linux/single-node-single-disk)",
+    "[Single Node Multiple Disk Installation](/installation/linux/single-node-multiple-disk)",
+    "[Multiple Node Multiple Disk Installation](/installation/linux/multiple-node-multiple-disk)"
+  ]
+}

@@ -16,15 +16,10 @@ jobs:
         with:
           node-version: "22"
 
-      - name: 安装 pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: latest
-
       - name: 安装依赖并构建
         run: |
-          pnpm install --no-frozen-lockfile
-          pnpm run build
+          npm ci
+          npm run build
       - name: 安装阿里云 OSS CLI
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         shell: bash
@@ -50,7 +45,7 @@ jobs:
         run: |
           # clean before
           ossutil rm -r oss://$OSS_BUCKET/ --force --recursive
-          ossutil cp -r .vitepress/dist/ oss://$OSS_BUCKET/ --force --recursive
+          ossutil cp -r dist/public/ oss://$OSS_BUCKET/ --force --recursive
           echo "Successfully uploaded to OSS"
       - name: Show OSS error log if exists
         if: failure()
