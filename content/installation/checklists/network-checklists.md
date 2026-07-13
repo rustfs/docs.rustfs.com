@@ -3,7 +3,7 @@ title: "Network Checklist"
 description: "Network checklist for enterprise deployments."
 ---
 
-## Network Architecture
+## 1. Network Architecture
 
 ### Planning
 
@@ -22,7 +22,7 @@ description: "Network checklist for enterprise deployments."
 
 ---
 
-## Hardware Requirements
+## 2. Hardware Requirements
 
 ### Switches
 
@@ -41,7 +41,7 @@ description: "Network checklist for enterprise deployments."
 
 ---
 
-## OS Configuration
+## 3. OS Configuration
 
 ### Kernel Tuning
 
@@ -61,7 +61,7 @@ net.ipv4.tcp_slow_start_after_idle = 0
 
 ---
 
-## Security
+## 4. Security
 
 ### Firewall
 
@@ -81,7 +81,7 @@ net.ipv4.tcp_slow_start_after_idle = 0
 
 ---
 
-## Performance Testing
+## 5. Performance Testing
 
 ### Benchmarks
 
@@ -99,7 +99,7 @@ net.ipv4.tcp_slow_start_after_idle = 0
 
 ---
 
-## Documentation Requirements
+## 6. Documentation Requirements
 
 1. Network topology diagram (including physical connections and logical IPs)
 2. Switch configuration backup files (with timestamps)

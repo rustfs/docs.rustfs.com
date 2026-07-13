@@ -3,7 +3,7 @@ title: "Erasure Coding Principles"
 description: "RustFS, as a new-generation distributed object storage system, demonstrates unique advantages in cloud storage through innovative architectural design and memory safety features. One of its core innovations is the deep application of Reed-Solomon Erasure Coding."
 ---
 
-## Core Algorithm and Application Scope
+## 1. Core Algorithm and Application Scope
 
 Reed-Solomon Code (RS Code) is an erasure code based on finite field algebraic structures. Due to its **efficient data recovery capability** and **flexible redundancy configuration**, it is widely used in multiple fields. Below, we detail its core application scenarios from two dimensions: technical fields and practical applications:
 
@@ -38,7 +38,7 @@ Reed-Solomon Code (RS Code) is an erasure code based on finite field algebraic s
 - **DNA Data Storage**
   Add RS checksums during synthetic biomolecular chain synthesis to resist base synthesis/sequencing errors (e.g., Microsoft experimental project uses RS(4,2)).
 
-## Basic Concepts of Erasure Coding
+## 2. Basic Concepts of Erasure Coding
 
 ### 2.1 Evolution of Storage Redundancy
 ```rust
@@ -59,7 +59,7 @@ Traditional multi-replication schemes have low storage efficiency issues (storag
 | 3 Replicas | 200% | 2 nodes |
 | RS(10,4) | 40% | 4 nodes |
 
-## Mathematical Principles of Reed-Solomon Codes
+## 3. Mathematical Principles of Reed-Solomon Codes
 
 ### 3.1 Finite Field (Galois Field) Construction
 Use GF(2^8) field (256 elements), satisfying:
@@ -93,7 +93,7 @@ $$
 c_i = p(i), \quad i = k+1,...,n
 $$
 
-## Engineering Implementation in RustFS
+## 4. Engineering Implementation in RustFS
 
 ### 4.1 Data Sharding Strategy
 ```rust

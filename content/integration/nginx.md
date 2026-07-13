@@ -129,11 +129,11 @@ Refer to [Nginx Official Documentation](http://nginx.org/en/docs/http/ngx_http_p
 
 :::
 
-## Multi-Machine Load Balancing
+## 3. Multi-Machine Load Balancing
 
 If you need to add multiple RustFS servers in a distributed environment, please adjust DNS resolution or local Hosts addresses in advance, and modify and add servers.
 
-```nginx title="/etc/nginx/conf.d/rustfs.conf (multi-node upstream)"
+```
 upstream rustfs {
    least_conn;
    server 10.0.0.1:9000;
@@ -153,7 +153,7 @@ upstream rustfs-console {
 ```
 
 
-## Dedicated DNS Mode
+## 4. Dedicated DNS Mode
 Create or configure a dedicated DNS name for the RustFS service.
 
 Proxy requests for the RustFS server's S3 API to the /api/ path of this domain. Proxy requests for the RustFS Console Web GUI to the root path (/).
@@ -162,7 +162,7 @@ Endpoint: `www.rustfs.dev/api/`
 Console: `www.rustfs.dev`
 
 
-~~~nginx title="/etc/nginx/conf.d/rustfs.conf (dedicated DNS)"
+~~~
 server {
    listen       443;
    listen  [::]:443;

@@ -3,7 +3,7 @@ title: "Production Environment Hardware Configuration Guide"
 description: "RustFS is a high-performance distributed object storage system developed in Rust, suitable for massive unstructured data storage scenarios. This document provides comprehensive hardware selection and configuration guidance for production environment deployment."
 ---
 
-## Deployment Planning Factor Analysis
+## 1. Deployment Planning Factor Analysis
 
 Before formally deploying RustFS, it's recommended to conduct 2-3 weeks of business research, focusing on evaluating the following dimensions:
 
@@ -24,7 +24,7 @@ Before formally deploying RustFS, it's recommended to conduct 2-3 weeks of busin
 - **Bucket Planning**: Divide storage buckets by business units, single cluster recommended not exceeding 500 active buckets
 - **Disaster Recovery Strategy**: Choose dual-active architecture (recommended) or asynchronous replication based on data importance
 
-## Hardware Configuration Matrix
+## 2. Hardware Configuration Matrix
 
 Baseline configuration solutions based on stress test results:
 
@@ -43,16 +43,16 @@ Baseline configuration solutions based on stress test results:
 2. Network architecture must meet: leaf-spine topology + physically isolated storage network + dual uplink paths
 3. Recommend using 2U server models, single node recommended configuration of 12+ disk bays (based on actual hard disk count)
 
-## Performance Critical Path Optimization
+## 3. Performance Critical Path Optimization
 
-### Network Topology Optimization (Highest Priority)
+### 1. Network Topology Optimization (Highest Priority)
 
 - **Bandwidth Calculation**: Reserve 0.5 Gbps bandwidth per TB of effective data (e.g., 100 TB data needs 50 Gbps dedicated bandwidth)
 - **Latency Requirements**:
 - Inter-node P99 latency ≤ 2ms
 - Cross-rack latency ≤ 5ms
 
-### Storage Subsystem Tuning
+### 2. Storage Subsystem Tuning
 
 - **Controller Configuration**:
 - Enable read-ahead cache (recommended 256 MB+)
@@ -62,14 +62,14 @@ Baseline configuration solutions based on stress test results:
 - Reserve 20% OP space to improve durability
 - Enable atomic write features (requires hardware support)
 
-### Memory Management Strategy
+### 3. Memory Management Strategy
 
 - **Allocation Ratios**:
 - Metadata cache: 60% of total memory
 - Read/write buffers: 30%
 - System reserve: 10%
 
-## Network Design Reference Model
+## 4. Network Design Reference Model
 
 ### Bandwidth and Disk Ratio Relationship
 
@@ -85,7 +85,7 @@ Baseline configuration solutions based on stress test results:
 - Dual 100GbE CX5 network cards
 - Achieves aggregate throughput of 38 GB/s
 
-## Memory Configuration Calculator
+## 5. Memory Configuration Calculator
 
 Dynamic algorithm based on disk capacity and business characteristics:
 
@@ -109,9 +109,9 @@ def calc_memory(data_tb, access_pattern):
 | 100 TB | 112 GB | 152 GB | 132 GB |
 | 500 TB | 432 GB | 632 GB | 532 GB |
 
-## Storage Deployment Standards
+## 6. Storage Deployment Standards
 
-### Media Selection Criteria
+### 1. Media Selection Criteria
 
 | Metric | HDD Suitable Scenarios | SSD Suitable Scenarios | NVMe Mandatory Scenarios |
 |-------------|------------------|---------------------|----------------------|
@@ -119,7 +119,7 @@ def calc_memory(data_tb, access_pattern):
 | Throughput Requirements | < 500 MB/s | 500 MB-3 GB/s | > 3 GB/s |
 | Typical Use Cases | Archive storage | Hot data cache | Real-time analysis |
 
-### File System Configuration
+### 2. File System Configuration
 
 ```bash
 # XFS formatting example
@@ -129,7 +129,7 @@ mkfs.xfs -f -L rustfs_disk1 -d su=256k,sw=10 /dev/sdb
 UUID=xxxx /mnt/disk1 xfs defaults,noatime,nodiratime,logbsize=256k 0 0
 ```
 
-## High Availability Assurance Measures
+## 7. High Availability Assurance Measures
 
 1. **Power Supply**:
 

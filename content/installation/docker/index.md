@@ -62,7 +62,7 @@ Parameter descriptions:
 
 ### Complete Parameter Configuration Example
 
-```bash {7,8,15,16}
+```bash
 # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
 docker run -d \
   --name rustfs_container \
