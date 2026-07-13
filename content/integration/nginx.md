@@ -21,7 +21,7 @@ Nginx integration enables:
 
 ## Configuration
 
-```nginx
+```nginx title="/etc/nginx/conf.d/rustfs.conf"
 upstream rustfs {
    least_conn;
    server 127.0.0.1:9000;
