@@ -8,3 +8,44 @@
   --font-mono: "JetBrains Mono", monospace;
   --default-font-family: "Geist", sans-serif;
 }
+
+.rustfs-tabs {
+  border-color: var(--color-fd-border);
+  border-radius: 0.625rem;
+  background: var(--color-fd-background);
+  box-shadow: 0 1px 2px
+    color-mix(in srgb, var(--color-fd-foreground) 4%, transparent);
+}
+
+.rustfs-tabs > [role="tablist"] {
+  gap: 0;
+  padding-inline: 1rem;
+  border-bottom: 1px solid var(--color-fd-border);
+  background: var(--color-fd-background);
+}
+
+.rustfs-tabs > [role="tablist"] > [role="tab"] {
+  margin-bottom: -1px;
+  padding: 0.9375rem 0.875rem 0.8125rem;
+  border-bottom-width: 2px;
+  color: var(--color-fd-muted-foreground);
+  font-weight: 500;
+}
+
+.rustfs-tabs > [role="tablist"] > [role="tab"][data-active] {
+  border-bottom-color: var(--color-fd-primary);
+  color: var(--color-fd-foreground);
+  font-weight: 600;
+}
+
+.rustfs-tabs > [role="tablist"] > [role="tab"]:focus-visible {
+  border-radius: 0.25rem 0.25rem 0 0;
+  outline: 2px solid var(--color-fd-ring);
+  outline-offset: -2px;
+}
+
+.rustfs-tabs > [role="tabpanel"] {
+  padding: 1.25rem;
+  border-radius: 0;
+  background: var(--color-fd-background);
+}

@@ -8,6 +8,7 @@ import { createNotebookLayoutPage } from "fumapress/layouts/notebook";
 import defaultMdxComponents, { createRelativeLink } from "fumadocs-ui/mdx";
 import { docs } from "./.source/server";
 import { Mermaid } from "./src/components/mermaid";
+import { Tab, Tabs } from "./src/components/tabs";
 
 const isDev = import.meta.env.DEV;
 
@@ -222,6 +223,8 @@ gtag('config', 'G-TWW7WMTWL9');`,
           ...defaultMdxComponents,
           a: createRelativeLink(await this.getLoader(), page),
           Mermaid,
+          Tab,
+          Tabs,
         };
       },
     }),
