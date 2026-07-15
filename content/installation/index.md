@@ -1,47 +1,28 @@
 ---
 title: "RustFS Installation Guide"
-description: "Installation guide for RustFS on different operating systems and deployment methods."
+description: "Choose the right RustFS deployment path: local trial, single-node or multi-node production, containers, and Kubernetes."
 ---
 
-RustFS is a high-performance, distributed object storage system developed in Rust, leveraging the language's memory safety and performance. RustFS combines simplicity with efficiency, offering an open-source, free object storage solution suitable for private cloud deployments. It is fully compatible with the S3 protocol and released under the Apache 2.0 license. Built by a global community of engineers, RustFS serves as a commercially-friendly alternative to restrictive open-source storage products.
+RustFS is a distributed object storage system written in Rust, fully compatible with the S3 protocol and released under the Apache 2.0 license. It runs on Linux, Windows, macOS, FreeBSD, and containers, across x86, ARM, RISC-V, and other CPU architectures. To learn more about the project itself, see [What is RustFS?](../concepts/introduction.md).
 
-RustFS is transitioning from commercial roots to a fully open-source model, aiming to democratize high-performance storage and enhance data security globally.
+## Choose Your Path
 
-## Supported CPUs and Operating Systems
+| Your goal | Recommended path | Guide |
+| - | - | - |
+| Try RustFS on a local machine | One-command install script, or a container | [Linux Quick Start](./linux/quick-start.md) · [Docker](./docker/index.md) |
+| Single-server production | SNSD (one disk) or SNMD (multiple disks) | [Installing RustFS on Linux](./linux/index.md) |
+| Multi-server production cluster | MNMD, after completing the production checklists | [Multiple Node Multiple Disk](./linux/multiple-node-multiple-disk.md) · [Checklists](./checklists/index.md) |
+| Kubernetes / cloud-native | Container orchestration deployment | [Cloud Native](./cloud-native/index.md) |
+| Windows or macOS host | Native installation | [Windows](./windows/index.md) · [macOS](./macos/index.md) |
 
-RustFS runs on almost any CPU and operating system, including:
-- Linux
-- Unix
-- Windows
-- macOS
-- FreeBSD
-- Docker
-- Edge gateways
+## Deployment Mode Comparison
 
-Supported CPU architectures include x86, ARM, RISC-V, and others.
+| Mode | Nodes | Disks | Fault Tolerance | Typical Use |
+| - | - | - | - | - |
+| [SNSD](./linux/single-node-single-disk.md) | 1 | 1 | None — rely on backups | Development, testing, low-density non-critical business |
+| [SNMD](./linux/single-node-multiple-disk.md) | 1 | Multiple | Up to M parity disks within the node | Medium, non-critical business on a single server |
+| [MNMD](./linux/multiple-node-multiple-disk.md) | 4+ | Multiple per node | Disk- and node-level via erasure coding across servers | Production workloads |
 
-## RustFS Installation Modes
+## Production Checklists
 
-This chapter includes installation guides for RustFS on different operating systems and deployment methods. Specifically includes:
-
-- [Quick Installation on Linux](./linux/quick-start.md)
-- [Installing RustFS on Linux](./linux/index.md)
-- [Installing RustFS in Docker Container](./docker/index.md)
-- [Installing RustFS on Windows](./windows/index.md)
-- [Installing RustFS on macOS](./macos/index.md)
-
-## RustFS Features
-
-- **S3 Compatible**: Fully compatible with the S3 protocol, ensuring seamless integration with big data ecosystems, data lakes, backup solutions, and media processing workflows.
-- **Distributed Architecture**: Designed to scale horizontally to meet diverse storage requirements.
-- **Enterprise-Ready**: Released under the Apache v2.0 license, making it safe and flexible for commercial integration.
-- **High Performance**: Built with Rust, offering performance comparable to C/C++ but with modern safety guarantees.
-- **Secure by Design**: Leverages Rust's memory safety guarantees to significantly reduce common security vulnerabilities.
-- **Cross-Platform**: Runs natively on Windows, macOS, and Linux.
-- **Extensible**: Supports a plugin architecture to adapt to specific business needs.
-- **Customizable**: Open-source nature allows for deep customization and plugin development.
-- **Cloud-Native**: Optimized for containerized environments (Docker, Kubernetes) enabling rapid deployment.
-
-## RustFS Values
-
-Our mission is to democratize high-performance storage, making data security and cost-efficiency accessible to everyone.
+Before any production deployment, work through the [Pre-Installation Checklists](./checklists/index.md) — hardware, network, software, and security — to make sure your environment meets production guidance.

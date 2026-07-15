@@ -31,13 +31,13 @@ Backing up Oracle workloads requires performance, resilience, and security. Opti
 
 ## Veeam and RustFS are Natural Partners
 
-Both Veeam and RustFS provide best-in-class software solutions for their respective technologies. From VMs to Office 365, large-scale performance is the metric for end-to-end solutions. RustFS object storage provides the most scalable and high-performance object storage solution in today's market, making it an ideal choice for Veeam customers.
+Both Veeam and RustFS provide best-in-class software solutions for their respective technologies. From VMs to Office 365, large-scale performance is the metric for end-to-end solutions. RustFS object storage provides a highly scalable, high-performance object storage solution, making it a strong choice for Veeam customers.
 
 ## Core Advantages
 
 ### ⚡ Fast Backup is One Thing, Fast Recovery is Another
 
-Regardless of size, backups and recoveries need to be fast. RustFS for Veeam Backup and Replication can read/write at speeds exceeding 160 GiB/s in a single 32-node cluster, enabling backup and recovery from object storage at speeds once thought impossible.
+Regardless of size, backups and recoveries need to be fast. RustFS delivers high read/write throughput that scales with cluster size, enabling backup and recovery directly from object storage at speeds that keep pace with tight recovery objectives. For representative throughput figures, see [RustFS vs other storage products](/concepts/comparison).
 
 ### 🗃️ Metadata Advantages
 

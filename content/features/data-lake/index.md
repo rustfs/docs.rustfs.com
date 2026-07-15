@@ -27,9 +27,7 @@ RustFS supports all S3-compatible query engines.
 
 ## Performance
 
-Modern data lakes require high performance. RustFS benchmarks demonstrate superior performance compared to legacy Hadoop systems, improving query engine (Spark, Presto, Trino, Snowflake, SQL Server, Teradata) and AI/ML platform (MLflow, Kubeflow) efficiency.
-
-Benchmarks show 325 GiB/s (349 GB/s) on GET and 165 GiB/s (177 GB/s) on PUT with 32 NVMe SSD nodes.
+Modern data lakes require high performance. RustFS delivers high throughput on commodity hardware, improving the efficiency of query engines (Spark, Presto, Trino, Snowflake, SQL Server, Teradata) and AI/ML platforms (MLflow, Kubeflow) compared to legacy Hadoop systems. For representative throughput figures, see [RustFS vs other storage products](/concepts/comparison).
 
 ## Lightweight
 
@@ -41,13 +39,11 @@ Modern data lakes separate compute and storage. High-speed query processing engi
 
 ## Open Source
 
-Open source is a key driver for data lake adoption. RustFS is 100% open source, ensuring freedom from lock-in.
+Open source is a key driver for data lake adoption. RustFS is open source under the Apache-2.0 license, ensuring freedom from lock-in.
 
 ## Rapid Growth
 
 Data is constantly being generated, which means it must be constantly ingested - without causing indigestion. RustFS is built for this world and works out of the box with Kafka, Flink, RabbitMQ, and numerous other solutions. The result is that the data lake/lakehouse becomes a single source of truth that can seamlessly scale to exabytes and beyond.
-
-RustFS has multiple customers with daily data ingestion exceeding 250PB.
 
 ## Simplicity
 
@@ -63,7 +59,7 @@ RustFS protects data using inline erasure coding for each object, which is far m
 
 ## Software Defined
 
-The successor to Hadoop HDFS is not a hardware appliance but software running on commodity hardware. This is the essence of RustFS - software. Like Hadoop HDFS, RustFS is designed to take full advantage of commodity servers. By leveraging NVMe drives and 100 GbE networks, RustFS can shrink data centers, thereby improving operational efficiency and manageability. In fact, companies building alternative data lakes reduce their hardware footprint by 60% or more while improving performance and reducing the FTEs required to manage it.
+The successor to Hadoop HDFS is not a hardware appliance but software running on commodity hardware. This is the essence of RustFS - software. Like Hadoop HDFS, RustFS is designed to take full advantage of commodity servers. By leveraging NVMe drives and 100 GbE networks, RustFS can shrink data centers, thereby improving operational efficiency and manageability. Companies building alternative data lakes can substantially reduce their hardware footprint while improving performance and reducing the staff required to manage it.
 
 ## Security
 

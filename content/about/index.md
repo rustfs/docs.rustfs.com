@@ -25,21 +25,14 @@ Integrity, Focus, Simplicity
 
 ![Vision and Values](./images/vision-values.png)
 
-## Contact Us
-
-📧 **Email**
-<hello@rustfs.com>
-
-
 ## RustFS Provides Secure and Reliable Distributed Storage Solutions Globally
 
 ![Global Data Storage Market Growth](./images/market-growth.png)
 
 > According to Fortune Business Insights, the global data storage market is expected to grow from $218.33 billion in 2024 to $774 billion in 2032, with a compound annual growth rate of 17.1% during this period.
 
-### Investor Relations
+## Contact Us
 
-For investment opportunities or strategic partnerships, contact us.
+For general inquiries, investment opportunities, or strategic partnerships:
 
-📧 **Contact**
-<hello@rustfs.com>
+📧 **Email**: <hello@rustfs.com>
