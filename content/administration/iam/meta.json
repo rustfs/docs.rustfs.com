@@ -1,6 +1,10 @@
 {
-  "title": "IAM Management",
+  "title": "IAM",
   "pages": [
-    "[Access Token](/administration/iam/access-token)"
+    "[Overview](/administration/iam)",
+    "[Users, Groups, and Policies](/administration/iam/policies)",
+    "[Service Accounts and STS](/administration/iam/sts)",
+    "[External Identity (OIDC)](/administration/iam/oidc)",
+    "[Access Keys](/administration/iam/access-token)"
   ]
 }
