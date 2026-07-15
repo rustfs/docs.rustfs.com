@@ -174,7 +174,7 @@ gtag('config', 'G-TWW7WMTWL9');`,
         links: [
           { text: "Home", url: "https://rustfs.com", external: true },
           { text: "Docs", url: "/" },
-          { text: "Installation", url: "/installation/linux" },
+          { text: "Installation", url: "/installation" },
           { text: "MCP", url: "/developer/mcp" },
           { text: "SDK", url: "/developer/sdk" },
           { text: "Demo", url: "https://play.rustfs.com", external: true },

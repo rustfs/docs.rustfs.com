@@ -26,6 +26,11 @@ This playbook directs AI agents working in the RustFS documentation repository s
 2. Every page needs frontmatter with a `title` (required — it is rendered as the page heading and the sidebar/tab label) and, ideally, a `description`. **Do not** add a duplicate top-level `#` heading matching the title; FumaPress renders the title from frontmatter.
 3. Store images in a sibling `images/` folder and reference them via relative paths such as `./images/<name>.png`. FumaPress bundles and optimizes them at build time. Global assets (favicons, logo, manifest) live in `public/`.
 4. Math renders via KaTeX (`$…$` inline, `$$…$$` display). Diagrams render via Mermaid (` ```mermaid ` code blocks).
+5. **Rich formatting** — use these built-ins (sparingly, where they genuinely aid scanning):
+   - Admonitions (works in `.md`): `:::note` / `:::tip` / `:::warning[Optional Title]` / `:::danger` … closed by `:::`. Prefer these over bare `>` blockquotes for notes and warnings.
+   - Code blocks: language hint required; add `title="/etc/default/rustfs"` for file contents, `{2,3}` meta ranges or `[!code highlight]` for line highlighting. Put command output in separate ` ```text ` blocks.
+   - Steps: numbered `## 1. Xxx` headings render automatically as steps (remark-steps) — use for install/how-to sequences.
+   - **JSX components require the `.mdx` extension** (in plain `.md` they are silently dropped): `<Cards>/<Card title href>` for landing-page link grids, `<Tabs items={[...]}><Tab value id>` for mutually-exclusive alternatives (each `Tab` needs a page-unique `id`; selecting updates the URL hash). Rename a page to `.mdx` only when it actually uses components — the URL does not change.
 5. Update navigation by editing `content/meta.json` (and the relevant folder `meta.json`). Sidebar labels come from a page's frontmatter `title`, a folder `meta.json` `title`, or a `[Custom Label](/url)` entry in a `pages` array.
 
 ### 3.3 Review
