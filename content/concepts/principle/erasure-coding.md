@@ -108,7 +108,7 @@ fn split_data(data: &[u8], k: usize) -> Vec<Shard> {
 }
 ```
 - Dynamic shard size adjustment (64 KB-4 MB)
-- Hash checksum using Blake3 algorithm
+- Streaming shard checksums using the HighwayHash256 algorithm for bitrot detection
 
 ### 4.2 Parallel Encoding Optimization
 ```rust

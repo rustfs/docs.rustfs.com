@@ -11,7 +11,7 @@ description: "RustFS is a simple, efficient, distributed object storage. It is f
 | --------------------- | ---------------------------------- |
 | Maximum object size | 5 TiB |
 | Minimum object size | 0 B |
-| Maximum object size for single PUT operation | Non-multipart upload: 500 GiB; Multipart upload: 5 TiB |
+| Maximum object size for single PUT operation | Non-multipart upload: 5 GiB; Multipart upload: 5 TiB |
 | Maximum number of parts per upload | 10,000 |
 | Part size range | 5 MiB to 5 GiB; last part can be 0 B to 5 GiB |
 | Maximum number of parts returned per list parts request | 10,000 |
@@ -20,7 +20,7 @@ description: "RustFS is a simple, efficient, distributed object storage. It is f
 | Maximum length of bucket name | 63 characters |
 | Maximum length of object name | 1024 characters |
 | Maximum length of each `/` separated object name segment | 255 characters |
-| Maximum number of versions per single object | 10,000 (configurable) |
+| Maximum number of versions per single object | 10,000 |
 
 ---
 
@@ -35,8 +35,8 @@ description: "RustFS is a simple, efficient, distributed object storage. It is f
 | When server count is 1, minimum number of drives per server | 1 (for single-node single-drive deployment, cannot provide additional reliability or availability) |
 | When server count is 2 or more, minimum number of drives per server | 1 |
 | Maximum number of drives per server | No hard limit |
-| Read quorum count | N/2 |
-| Write quorum count | (N/2) + 1 |
+| Read quorum count | N − M (the number of data shards, where M is the parity shard count) |
+| Write quorum count | N − M; when data and parity counts are equal, N − M + 1 |
 
 ---
 

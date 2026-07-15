@@ -41,18 +41,18 @@ http://test.rustfs.yourdomain.com/
 
 ### Port in Domain (Optional)
 
-If your domain is accessed **with an explicit port**, include the port number in `RUSTFS_SERVER_DOMAINS`.
+Virtual-host routing applies to the S3 API listener (port 9000 by default); RustFS automatically matches `Host` headers that carry the S3 listener's own port. Only when clients reach RustFS through a **different** port (for example via a proxy) do you need to include that port in `RUSTFS_SERVER_DOMAINS`.
 
-Example (`rustfs.yourdomain.com:9001`):
+Example (`rustfs.yourdomain.com:8000`):
 
 ```ini
-RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com:9001"
+RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com:8000"
 ```
 
 This ensures that requests like:
 
 ```
-http://test.rustfs.yourdomain.com:9001/
+http://my-bucket.rustfs.yourdomain.com:8000/
 ```
 
 can be correctly resolved in Virtual Host Style mode.

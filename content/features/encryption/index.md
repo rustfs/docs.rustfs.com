@@ -1,9 +1,7 @@
 ---
-title: "Infrastructure for Large-Scale Data"
-description: "RustFS is designed for scale—technical, operational, and economic."
+title: "Data Encryption"
+description: "Server-side encryption in RustFS with SSE-S3 and SSE-C, designed to minimize performance overhead."
 ---
-
-RustFS is designed for scale—technical, operational, and economic.
 
 In the object storage field, robust encryption is a fundamental requirement for enterprise storage. RustFS provides more functionality through the highest level of encryption and extensive optimizations, minimizing the performance overhead typically associated with storage encryption operations.
 

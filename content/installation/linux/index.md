@@ -6,7 +6,7 @@ description: "RustFS is an object storage solution, open-source distributed obje
 # What is RustFS?
 
 RustFS is a simple, efficient, distributed object storage system, well suited for replacing MinIO and object storage scenarios for AI training and inference.
-Additionally, RustFS is an efficient, open-source, free object storage solution. It is 100% S3 protocol compatible and open-source software released under the Apache 2.0 license. RustFS is written in Rust, leveraging its industry-leading memory safety and zero-cost abstractions for high-performance storage. RustFS is a commercial-friendly distributed object storage product developed and contributed to by excellent engineers worldwide. RustFS can replace many object storage products with unfriendly open-source licenses.
+Additionally, RustFS is an efficient, open-source, free object storage solution. It is S3-compatible open-source software released under the Apache 2.0 license. RustFS is written in Rust, leveraging its industry-leading memory safety and zero-cost abstractions for high-performance storage. RustFS is a commercial-friendly distributed object storage product developed and contributed to by excellent engineers worldwide. RustFS can replace many object storage products with unfriendly open-source licenses.
 
 RustFS is about to transition from commercial applications to formal open-source release globally, helping the world reduce storage costs and improve data security.
 
@@ -29,11 +29,11 @@ CPU architecture support: X86, ARM, and various other CPU architectures.
 
 ## RustFS Features
 
-- **S3 Compatible**: 100% S3 protocol compatible, excellent compatibility with big data, data lakes, backup software, image processing software, and industrial production software;
+- **S3 Compatible**: S3-compatible (see the [compatibility matrix](../../features/s3-compatibility/index.md)), working out of the box with big data, data lakes, backup software, image processing software, and industrial production software;
 - **Distributed**: RustFS is a distributed object storage, therefore, RustFS can meet various needs;
 - **Commercial-Friendly**: RustFS is 100% open-source software and released under Apache v2.0 license, therefore, RustFS is commercial-friendly;
 - **Fast**: The performance of Rust development language is infinitely close to C language speed. Therefore, RustFS performance is very strong;
-- **Secure**: RustFS is written in memory-safe language Rust, therefore, RustFS is 100% secure;
+- **Secure**: RustFS is written in Rust, whose memory safety eliminates entire classes of common storage-security vulnerabilities;
 - **Cross-Platform**: RustFS works on Windows, macOS, and Linux;
 - **Extensible**: RustFS supports custom plugins, therefore, RustFS can meet various needs;
 - **Customizable**: Due to open-source characteristics, you can customize various plugins, therefore, RustFS can meet various needs;

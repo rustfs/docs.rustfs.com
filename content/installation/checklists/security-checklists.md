@@ -49,7 +49,7 @@ description: "Security checklist for enterprise deployments."
 ## API Security
 
 - **Restrict Network Access**
- Restrict access to the S3 API (port 9000) and Console (port 9090) using firewalls or security groups.
+ Restrict access to the S3 API (port 9000) and Console (port 9001) using firewalls or security groups.
 
 - **Network Isolation**
  Use reverse proxies (e.g., Nginx) instead of exposing storage nodes directly.

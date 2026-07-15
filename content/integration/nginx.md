@@ -154,20 +154,28 @@ upstream rustfs-console {
 
 
 ## Dedicated DNS Mode
-Create or configure a dedicated DNS name for the RustFS service.
+Create or configure dedicated DNS names for the RustFS service — one hostname for the S3 API and one for the Console.
 
-Proxy requests for the RustFS server's S3 API to the /api/ path of this domain. Proxy requests for the RustFS Console Web GUI to the root path (/).
-For example, given the hostname www.rustfs.dev:
-Endpoint: `www.rustfs.dev/api/`
-Console: `www.rustfs.dev`
+:::warning[Do not proxy the S3 API under a path prefix]
 
+S3 clients sign the request path (AWS Signature V4). If you expose the API under a prefix such as `/api/`, RustFS receives paths like `/api/<bucket>/...`, interprets `api` as a bucket name, and signature validation fails. Always serve the S3 API from the root of its own hostname.
+
+:::
+
+For example:
+S3 endpoint: `s3.rustfs.dev`
+Console: `console.rustfs.dev`
 
 ~~~nginx title="/etc/nginx/conf.d/rustfs.conf (dedicated DNS)"
+# S3 API
 server {
-   listen       443;
-   listen  [::]:443;
+   listen       443 ssl;
+   listen  [::]:443 ssl;
    http2 on;
-   server_name  www.rustfs.dev;
+   server_name  s3.rustfs.dev;
+
+   ssl_certificate     /etc/nginx/certs/rustfs.dev.pem;
+   ssl_certificate_key /etc/nginx/certs/rustfs.dev.key;
 
    # Allow special characters in headers
    ignore_invalid_headers off;
@@ -178,9 +186,7 @@ server {
    proxy_buffering off;
    proxy_request_buffering off;
 
-# S3 API
-
-   location /api {
+   location / {
       proxy_set_header Host $http_host;
       proxy_set_header X-Real-IP $remote_addr;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -192,13 +198,24 @@ server {
       proxy_set_header Connection "";
       chunked_transfer_encoding off;
 
-      proxy_set_header Upgrade $http_upgrade;
-      proxy_set_header Connection "upgrade";
-
       proxy_pass http://127.0.0.1:9000;
    }
+}
 
 # Console
+server {
+   listen       443 ssl;
+   listen  [::]:443 ssl;
+   http2 on;
+   server_name  console.rustfs.dev;
+
+   ssl_certificate     /etc/nginx/certs/rustfs.dev.pem;
+   ssl_certificate_key /etc/nginx/certs/rustfs.dev.key;
+
+   ignore_invalid_headers off;
+   client_max_body_size 0;
+   proxy_buffering off;
+   proxy_request_buffering off;
 
    location / {
       proxy_set_header Host $http_host;
@@ -214,7 +231,7 @@ server {
 
       proxy_set_header Upgrade $http_upgrade;
       proxy_set_header Connection "upgrade";
-      proxy_pass http://127.0.0.1:9001; 
+      proxy_pass http://127.0.0.1:9001;
    }
 }
 ~~~

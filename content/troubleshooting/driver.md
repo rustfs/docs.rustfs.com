@@ -3,8 +3,6 @@ title: "Hard Drive Failures"
 description: "RustFS ensures read/write access can still be provided when some disks fail through mechanisms similar to erasure coding, and automatically heals data after replacing disks."
 ---
 
-# RustFS Disk Failure Troubleshooting Guide
-
 RustFS ensures read/write access can still be provided when some disks fail through mechanisms similar to erasure coding, and automatically heals data after replacing disks.
 
 ## Table of Contents
@@ -45,28 +43,28 @@ systemctl stop rustfs
 After physically replacing the failed disk, you need to partition and format the new disk, and apply the same label as the original disk.
 
 ```bash
-# Format as ext4 and apply label DISK1 (must correspond to original label)
-mkfs.ext4 /dev/sdb -L DISK1
+# Format as XFS and apply the same label as the original disk (RustFS requires XFS, like the other disks in the deployment)
+mkfs.xfs -L DISK1 /dev/sdb
 ```
 
 > **Requirements**
 >
 > * New disk capacity ≥ original disk capacity;
-> * File system type consistent with other disks;
+> * File system type consistent with other disks (XFS, per the [installation guide](../installation/linux/index.md));
 > * Recommend using labels (LABEL) or UUID for mounting to ensure disk order is not affected by system restarts.
 
 <a id="update-etcfstab-or-rustfs-configuration"></a>
 
 ### Update `/etc/fstab` or RustFS Configuration
 
-Confirm that the mount item labels or UUIDs in `/etc/fstab` point to the new disk. If using RustFS-specific configuration files (such as `config.yaml`), corresponding entries also need to be updated synchronously.
+Confirm that the mount item labels or UUIDs in `/etc/fstab` point to the new disk. The mount point must stay identical to the one listed in `RUSTFS_VOLUMES` (in `/etc/default/rustfs`), so the healed disk rejoins the cluster at the same path.
 
 ```bash
 # View current fstab
 cat /etc/fstab
 
 # Example fstab entry (no modification needed if labels are the same)
-LABEL=DISK1 /mnt/disk1 ext4 defaults,noatime 0 2
+LABEL=DISK1 /data/rustfs0 xfs defaults,noatime 0 2
 ```
 
 :::tip[Tips]
@@ -100,7 +98,7 @@ systemctl start rustfs
 Confirm all disks are mounted normally:
 
 ```bash
-df -h | grep /mnt/disk
+df -h | grep /data/rustfs
 ```
 
 :::note
@@ -113,28 +111,17 @@ If some mounts fail, please check if fstab entries are consistent with disk labe
 
 ### Trigger and Monitor Data Healing
 
-After RustFS detects the new disk, it will automatically or manually trigger the data healing process. The following example uses a hypothetical `rustfs-admin` tool:
-
-```bash
-# View current disk status
-rustfs-admin disk status
-
-# Manually trigger healing for the new disk
-rustfs-admin heal --disk /mnt/disk1
-
-# Real-time view of healing progress
-rustfs-admin heal status --follow
-```
-
-Additionally, you can confirm the system has recognized and started data recovery by viewing service logs:
+Once RustFS detects a freshly formatted disk at a known mount point, its background scanner heals the missing data onto it automatically — no manual command is required. Confirm that recovery has started and track its progress through the service logs:
 
 ```bash
 # For systemd-managed installations
 journalctl -u rustfs -f
 
-# Or view dedicated log files
-tail -f /var/log/rustfs/heal.log
+# Or view the log files under the directory set by RUSTFS_OBS_LOG_DIRECTORY
+tail -f /var/logs/rustfs/rustfs.log
 ```
+
+You can also open the RustFS Console and check the disk status of the affected node.
 
 :::note[Notes]
 

@@ -42,13 +42,12 @@ Create a bucket via API:
 PUT /{bucketName} HTTP/1.1
 ```
 
-Request example:
+S3 requests must be signed with AWS Signature V4, so use an S3 client rather than hand-crafting headers. With the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) configured for your access keys:
 
 ```bash
-curl --location --request PUT 'http://12.34.56.78:9000/bucket-creation-by-api' \
---header 'X-Amz-Content-Sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' \
---header 'X-Amz-Date: 20250801T023519Z' \
---header 'Authorization: AWS4-HMAC-SHA256 Credential=H4xcBZKQfvJjEnk3zp1N/20250801/cn-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=c2fb2ba5199a30ebcfa9976d0f35000ba274da3701327957e84ea0f3920288f2'
+aws s3api create-bucket \
+  --bucket bucket-creation-by-api \
+  --endpoint-url http://localhost:9000
 ```
 
 Verify the bucket creation in the RustFS Console.

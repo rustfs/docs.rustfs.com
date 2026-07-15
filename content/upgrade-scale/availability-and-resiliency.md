@@ -126,9 +126,10 @@ chown -R rustfs-user:rustfs-user /data/rustfs*
 # Check rustfs version on existing node
 /usr/local/bin/rustfs --version
 
-# Download and install binary package (version must match existing cluster), e.g. for version 1.0.0-alpha.67:
-wget https://github.com/rustfs/rustfs/releases/download/1.0.0-alpha.67/rustfs-linux-x86_64-musl-latest.zip
-unzip rustfs-linux-x86_64-musl-latest.zip
+# Download the binary that matches the existing cluster version from
+# https://github.com/rustfs/rustfs/releases (asset name: rustfs-linux-x86_64-musl-v<version>.zip)
+wget https://github.com/rustfs/rustfs/releases/download/<version>/rustfs-linux-x86_64-musl-v<version>.zip
+unzip rustfs-linux-x86_64-musl-v<version>.zip
 chmod +x rustfs
 mv rustfs /usr/local/bin/
 ```
@@ -141,7 +142,7 @@ mv rustfs /usr/local/bin/
 cat <<EOF > /etc/default/rustfs
 RUSTFS_ACCESS_KEY=<Your RustFS admin username> # e.g. admin
 RUSTFS_SECRET_KEY=<Secure password of your RustFS admin> # e.g. output of: openssl rand -base64 24
-RUSTFS_VOLUMES="http://node-{1...4}:9000/data/rustfs{0...3} http://node-{5...8}:9000/data/rustfs{0...7}" # add new storage pool to the existing
+RUSTFS_VOLUMES="http://node{1...4}:9000/data/rustfs{0...3} http://node{5...8}:9000/data/rustfs{0...7}" # add new storage pool to the existing; must match the hostname pattern used by the existing nodes byte for byte
 RUSTFS_ADDRESS=":9000"
 RUSTFS_CONSOLE_ADDRESS=":9001"
 EOF
@@ -179,7 +180,9 @@ RestartSec=10s
 OOMScoreAdjust=-1000
 SendSIGKILL=no
 
-TimeoutStartSec=30s
+# RustFS reports READY only after storage, IAM, and peer checks pass; on a
+# full-cluster restart every node waits for its peers, so allow up to 120s.
+TimeoutStartSec=120s
 TimeoutStopSec=30s
 
 NoNewPrivileges=true
@@ -235,16 +238,13 @@ Open in the RustFS Console Performance menu, e.g. http://node1:9001/rustfs/conso
 
 ### 3.2 Data Balance Verification
 
-```bash
-# View data distribution ratio (should be close to each storage pool capacity ratio)
-watch -n 5 "rustfs-admin metrics | grep 'PoolUsagePercent'"
-```
+New objects are placed across pools according to available capacity. Check per-pool usage in the RustFS Console; it should trend toward each storage pool's capacity ratio. Existing data is not moved automatically — to spread it across the new pool, start a rebalance from the Console and expect it to run in the background for a while.
 
 ---
 
 ## Important Notes
 
-1. **Rolling Restart Prohibited**: Must restart all nodes simultaneously to avoid data inconsistency
+1. **Restart Scope**: Changing `RUSTFS_VOLUMES` (adding a storage pool) requires restarting all nodes so they agree on the new topology — restart them together during this operation. For routine binary upgrades or parameter changes, use a rolling restart (one node at a time) to avoid downtime.
 2. **Capacity Planning Recommendation**: Should plan next scaling when storage usage reaches 70%
 3. **Performance Tuning Recommendations**:
 
@@ -262,5 +262,5 @@ watch -n 5 "rustfs-admin metrics | grep 'PoolUsagePercent'"
 | Symptom | Check Point | Fix Command |
 |---------------------------|---------------------------------|-------------------------------|
 | New nodes cannot join cluster | Check port 9000 connectivity | `telnet node5 9000` |
-| Uneven data distribution | Check storage pool capacity configuration | `rustfs-admin rebalance start`|
+| Uneven data distribution | Check storage pool capacity configuration | Start a rebalance from the RustFS Console |
 | Console shows abnormal node status | Verify time synchronization status | `chronyc sources` |
