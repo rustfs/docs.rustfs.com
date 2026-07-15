@@ -1,11 +1,11 @@
 ---
 title: "Python SDK Guide"
-description: "Guide to using the Python SDK with RustFS."
+description: "Use the official AWS SDK for Python (Boto3) with RustFS."
 ---
 
 ## 1. Overview
 
-RustFS is S3-compatible and supports the [Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) SDK.
+RustFS ships no first-party SDKs — it is S3-compatible, so you use the official AWS SDK for Python, [Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html), configured to point at your RustFS server.
 
 This guide covers:
 
@@ -17,19 +17,19 @@ This guide covers:
 
 ---
 
-## 2. Environment Preparation
+## 2. Prerequisites
 
-### 2.1 Example Configuration
+* Python 3.8 or later
+* A running RustFS instance (see the [Installation Guide](../../installation/index.md)) — the S3 API listens on port `9000`, the Console on port `9001`
+* Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (see [Access Key Management](../../administration/iam/access-token.md))
 
-Assume RustFS is deployed as follows:
+:::tip[Local test]
 
-```
-Endpoint: http://192.168.1.100:9000
-AccessKey: <your-access-key>
-SecretKey: <your-secret-key>
-```
+If you did not set credentials at install time, the server defaults to `rustfsadmin` / `rustfsadmin` — fine for a throwaway local trial, never for anything reachable by others.
 
-### 2.2 Install Boto3
+:::
+
+### 2.1 Install Boto3
 
 We recommend using a virtual environment:
 
@@ -45,24 +45,43 @@ pip install boto3
 
 ## 3. Connecting to RustFS
 
-```python
+The following is a complete, runnable script. Replace `localhost` with your server's IP address if RustFS runs on another machine, and fill in your own access keys:
+
+```python title="main.py"
 import boto3
 from botocore.client import Config
 
 s3 = boto3.client(
- 's3',
- endpoint_url='http://192.168.1.100:9000',
- # Use a unique access key and a strong secret (e.g. openssl rand -base64 24)
- aws_access_key_id='<your-access-key>',
- aws_secret_access_key='<your-secret-key>',
- config=Config(signature_version='s3v4'),
- region_name='us-east-1'
+    's3',
+    endpoint_url='http://localhost:9000',
+    aws_access_key_id='<your-access-key>',
+    aws_secret_access_key='<your-secret-key>',
+    region_name='us-east-1',
+    config=Config(
+        signature_version='s3v4',
+        s3={'addressing_style': 'path'},
+    ),
 )
+
+response = s3.list_buckets()
+for bucket in response['Buckets']:
+    print(bucket['Name'])
 ```
 
-> ✅ `endpoint_url`: Points to RustFS
-> ✅ `signature_version='s3v4'`: RustFS supports v4 signatures
-> ✅ `region_name`: RustFS does not validate regions; you can use any value.
+Run it:
+
+```bash
+python main.py
+```
+
+:::note[Client parameters explained]
+
+- `endpoint_url` — points to your RustFS S3 API (port `9000`, not the Console port `9001`)
+- `signature_version='s3v4'` — RustFS supports v4 signatures
+- `region_name='us-east-1'` — RustFS's default region
+- `addressing_style='path'` — RustFS uses path-style URLs by default; virtual-host style requires `RUSTFS_SERVER_DOMAINS`
+
+:::
 
 ---
 
@@ -74,10 +93,14 @@ s3 = boto3.client(
 bucket_name = 'my-bucket'
 
 try:
- s3.create_bucket(Bucket=bucket_name)
- print(f'Bucket {bucket_name} created.')
+    s3.create_bucket(Bucket=bucket_name)
+    print(f'Bucket {bucket_name} created.')
 except s3.exceptions.BucketAlreadyOwnedByYou:
- print(f'Bucket {bucket_name} already exists.')
+    print(f'Bucket {bucket_name} already exists.')
+```
+
+```text
+Bucket my-bucket created.
 ```
 
 ---
@@ -85,8 +108,12 @@ except s3.exceptions.BucketAlreadyOwnedByYou:
 ### 4.2 Upload File
 
 ```python
-s3.upload_file('hello.txt', bucket_name, 'hello.txt')
+s3.upload_file('/path/to/hello.txt', bucket_name, 'hello.txt')
 print('File uploaded.')
+```
+
+```text
+File uploaded.
 ```
 
 ---
@@ -98,6 +125,10 @@ s3.download_file(bucket_name, 'hello.txt', 'hello-downloaded.txt')
 print('File downloaded.')
 ```
 
+```text
+File downloaded.
+```
+
 ---
 
 ### 4.4 List Objects
@@ -105,7 +136,11 @@ print('File downloaded.')
 ```python
 response = s3.list_objects_v2(Bucket=bucket_name)
 for obj in response.get('Contents', []):
- print(f"- {obj['Key']} ({obj['Size']} bytes)")
+    print(f"- {obj['Key']} ({obj['Size']} bytes)")
+```
+
+```text
+- hello.txt (12 bytes)
 ```
 
 ---
@@ -120,6 +155,11 @@ s3.delete_bucket(Bucket=bucket_name)
 print('Bucket deleted.')
 ```
 
+```text
+Object deleted.
+Bucket deleted.
+```
+
 ---
 
 ## 5. Advanced Features
@@ -130,30 +170,34 @@ print('Bucket deleted.')
 
 ```python
 url = s3.generate_presigned_url(
- ClientMethod='get_object',
- Params={'Bucket': bucket_name, 'Key': 'hello.txt'},
- ExpiresIn=600 # 10 minutes validity
+    ClientMethod='get_object',
+    Params={'Bucket': bucket_name, 'Key': 'hello.txt'},
+    ExpiresIn=600,  # 10 minutes validity
 )
 
 print('Presigned GET URL:', url)
+```
+
+```text
+Presigned GET URL: http://localhost:9000/my-bucket/hello.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&...
 ```
 
 #### 5.1.2 Upload Link (PUT)
 
 ```python
 url = s3.generate_presigned_url(
- ClientMethod='put_object',
- Params={'Bucket': bucket_name, 'Key': 'upload-by-url.txt'},
- ExpiresIn=600
+    ClientMethod='put_object',
+    Params={'Bucket': bucket_name, 'Key': 'upload-by-url.txt'},
+    ExpiresIn=600,
 )
 
 print('Presigned PUT URL:', url)
 ```
 
-You can use `curl` tool to upload:
+You can use the `curl` tool to upload:
 
 ```bash
-curl -X PUT --upload-file hello.txt "http://..."
+curl -X PUT --upload-file /path/to/hello.txt "http://localhost:9000/my-bucket/upload-by-url.txt?X-Amz-Algorithm=..."
 ```
 
 ---
@@ -163,11 +207,9 @@ curl -X PUT --upload-file hello.txt "http://..."
 Suitable for files larger than 10 MB, allows manual control of each part.
 
 ```python
-import os
-
 file_path = 'largefile.bin'
 key = 'largefile.bin'
-part_size = 5 * 1024 * 1024 # 5 MB
+part_size = 5 * 1024 * 1024  # 5 MB
 
 # 1. Start upload
 response = s3.create_multipart_upload(Bucket=bucket_name, Key=key)
@@ -175,38 +217,45 @@ upload_id = response['UploadId']
 parts = []
 
 try:
- with open(file_path, 'rb') as f:
- part_number = 1
- while True:
- data = f.read(part_size)
- if not data:
- break
+    with open(file_path, 'rb') as f:
+        part_number = 1
+        while True:
+            data = f.read(part_size)
+            if not data:
+                break
 
- part = s3.upload_part(
- Bucket=bucket_name,
- Key=key,
- PartNumber=part_number,
- UploadId=upload_id,
- Body=data
- )
+            part = s3.upload_part(
+                Bucket=bucket_name,
+                Key=key,
+                PartNumber=part_number,
+                UploadId=upload_id,
+                Body=data,
+            )
 
- parts.append({'ETag': part['ETag'], 'PartNumber': part_number})
- print(f'Uploaded part {part_number}')
- part_number += 1
+            parts.append({'ETag': part['ETag'], 'PartNumber': part_number})
+            print(f'Uploaded part {part_number}')
+            part_number += 1
 
- # 2. Complete upload
- s3.complete_multipart_upload(
- Bucket=bucket_name,
- Key=key,
- UploadId=upload_id,
- MultipartUpload={'Parts': parts}
- )
- print('Multipart upload complete.')
+    # 2. Complete upload
+    s3.complete_multipart_upload(
+        Bucket=bucket_name,
+        Key=key,
+        UploadId=upload_id,
+        MultipartUpload={'Parts': parts},
+    )
+    print('Multipart upload complete.')
 
 except Exception as e:
- # Abort upload
- s3.abort_multipart_upload(Bucket=bucket_name, Key=key, UploadId=upload_id)
- print('Multipart upload aborted due to error:', e)
+    # Abort upload
+    s3.abort_multipart_upload(Bucket=bucket_name, Key=key, UploadId=upload_id)
+    print('Multipart upload aborted due to error:', e)
+```
+
+```text
+Uploaded part 1
+Uploaded part 2
+Uploaded part 3
+Multipart upload complete.
 ```
 
 ---
@@ -218,7 +267,7 @@ except Exception as e:
 | `SignatureDoesNotMatch` | Not using v4 signature | Set `signature_version='s3v4'` |
 | `EndpointConnectionError` | Wrong RustFS address or service not started | Check endpoint and RustFS service status |
 | `AccessDenied` | Wrong credentials or insufficient permissions | Check AccessKey/SecretKey or bucket policies |
-| `PermanentRedirect` | Path-style not enabled | Boto3 defaults to virtual-host, RustFS only supports path-style, but setting endpoint can bypass |
+| `PermanentRedirect` / wrong bucket URL | Path-style not enabled | Set `s3={'addressing_style': 'path'}` in the `Config` |
 
 ---
 
@@ -226,10 +275,13 @@ except Exception as e:
 
 ```python
 def upload_file(local_path, bucket, object_key):
- s3.upload_file(local_path, bucket, object_key)
- print(f"Uploaded {local_path} to s3://{bucket}/{object_key}")
+    s3.upload_file(local_path, bucket, object_key)
+    print(f"Uploaded {local_path} to s3://{bucket}/{object_key}")
+
 
 def download_file(bucket, object_key, local_path):
- s3.download_file(bucket, object_key, local_path)
- print(f"Downloaded s3://{bucket}/{object_key} to {local_path}")
+    s3.download_file(bucket, object_key, local_path)
+    print(f"Downloaded s3://{bucket}/{object_key} to {local_path}")
 ```
+
+For other operations (object tagging, bucket policies, and more), see the [Boto3 S3 documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html) — every S3-compatible call works against RustFS the same way.
