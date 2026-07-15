@@ -17,7 +17,7 @@ Windows startup **mode** only supports single-node single-disk mode, more suitab
 
 ## 2. Download
 
-Go to the official website download page and download the latest RustFS installation package.
+Download the latest release from [GitHub Releases](https://github.com/rustfs/rustfs/releases) or the [official download page](https://rustfs.com/download/).
 
 ## 3. Modify Permissions
 
