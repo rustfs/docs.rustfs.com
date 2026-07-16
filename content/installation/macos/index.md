@@ -24,7 +24,7 @@ On macOS, you can use three methods for installation:
 
 ## 2. Download
 
-Go to the official website download page and download the latest RustFS installation package.
+Download the latest release from [GitHub Releases](https://github.com/rustfs/rustfs/releases) or the [official download page](https://rustfs.com/download/).
 
 ## 3. Modify Permissions
 
