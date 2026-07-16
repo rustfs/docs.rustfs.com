@@ -37,12 +37,12 @@ SSDs provide fast read/write speeds suitable for applications requiring high I/O
 
 | Comparison Item | Pure SSD Solution | Pure HDD Solution | Tiered Storage Solution |
 |-----------------|-------------------|-------------------|------------------------|
-| **Storage Media Cost** | Extremely High ($6~8/GB) | Extremely Low ($0.03/GB) | Mixed Cost (SSD only stores 20% hot data) |
-| **Performance** | 0.1ms latency | 8~10ms latency | Hot data 0.15ms, cold data on-demand read |
-| **Energy Consumption (1PB/year)** | 250,000 kWh | 300,000 kWh | 120,000 kWh (SSD low power + HDD sleep) |
+| **Storage Media Cost** | High | Low | Mixed (SSD only stores hot data) |
+| **Performance** | Sub-millisecond latency | Millisecond-level latency | Hot data on SSD, cold data read on demand |
+| **Energy Consumption** | High (always-on flash) | High (all spindles active) | Lower (small SSD tier plus HDD sleep) |
 | **Capacity Expansion Cost** | Full expansion required | Performance bottleneck | Tier-by-tier expansion (e.g., HDD tier only) |
-| **5-year TCO (Total Cost)** | $6.7M | $2M | $2.65M (60% savings vs SSD) |
-| **Applicable Scenarios** | Real-time trading, high-frequency read/write | Archive, backup | 90% enterprise mixed workloads (database/file services) |
+| **Total Cost of Ownership** | Highest | Low, but slow | Balanced: near-HDD cost with near-SSD hot-data performance |
+| **Applicable Scenarios** | Real-time trading, high-frequency read/write | Archive, backup | Most enterprise mixed workloads (database/file services) |
 
 ### Cold Backup Storage Cost Reduction
 
@@ -54,19 +54,19 @@ Blu-ray storage devices consume far less energy during operation than hard disk 
 
 #### Core Advantages of Cold Backup Storage
 
-- **Lower Cost**: Blu-ray disc cost per GB is only 15% of original hard disk solutions
+- **Lower Cost**: Optical media cost per GB is a fraction of hard-disk solutions
 - **Long-term Reliability**: No need for regular data migration
 - **Compliance Security**: Enterprise-grade encryption protection
 
-#### Cold backup storage reduces low-frequency industrial data archiving costs by 60% through intelligent tiering and elastic scaling, balancing security compliance with efficient resource utilization
+Cold backup storage substantially reduces low-frequency industrial data archiving costs through intelligent tiering and elastic scaling, balancing security compliance with efficient resource utilization.
 
-#### Cost Comparison (1PB/5 years)
+#### Media Comparison
 
-| Media | Total Cost | Energy Consumption | Lifespan |
+| Media | Relative Cost | Energy Consumption | Typical Lifespan |
 |-------|------------|-------------------|----------|
-| **Blu-ray Storage** | ¥2.2M | 1,200 kWh | 50+ years |
-| **Tape** | ¥3M | 2,800 kWh | 30 years |
-| **HDD Series** | ¥4.93M | 6,500 kWh | 5 years |
+| **Blu-ray Storage** | Low | Lowest | 50+ years |
+| **Tape** | Medium | Low | ~30 years |
+| **HDD Series** | High | Highest | ~5 years |
 
 ### Multi-Cloud Transformation Cost Reduction
 
@@ -74,16 +74,16 @@ Blu-ray storage devices consume far less energy during operation than hard disk 
 
 Cloud storage achieves cost reduction and efficiency improvement through integrated dynamic scheduling of data resources, allocating hot and cold data storage networks on demand, calculating based on each cloud vendor's solution, utilizing standardized interfaces to select optimal paths nearby, completing combined reserved/elastic instance cost optimization.
 
-Simultaneously supports industrial IoT data, service images and other unstructured data and atomic data cloud and edge computing, reducing storage costs by 20%~40% on the basis of domain business continuity, building the most price-competitive infrastructure.
+Simultaneously supports industrial IoT data, service images, and other unstructured data across cloud and edge computing, reducing storage costs while preserving business continuity.
 
 #### Core Advantages of Multi-Cloud Transformation
 
-- **Patented Cross-Cloud Scheduling Algorithm**: Critical business elastic SSD acceleration
-- **30% Cost Savings Commitment**: HDD carries 70% low-frequency data
-- **8 Industry Ready-to-Use Solutions**: AI predicts data lifecycle
+- **Cross-Cloud Scheduling**: Critical business data accelerated on elastic SSD tiers
+- **Cost Reduction Through Tiering**: HDD carries the bulk of low-frequency data
+- **Lifecycle Automation**: Access-pattern-driven policies move data to the right tier
 
 ### Technology Value Pyramid
 
 ![Technology Value Pyramid](./images/tech-value-pyramid.svg)
 
-Based on military-grade reliability and infinitely scalable distributed object storage technology, achieve zero-loss intelligent production throughout the industrial data chain, support AI quality inspection and real-time global supply chain collaboration, driving manufacturing enterprises toward agile Industry 4.0 evolution
+Based on highly reliable, horizontally scalable distributed object storage technology, protect the industrial data chain end to end, support AI quality inspection and real-time global supply chain collaboration, and help manufacturing enterprises move toward agile Industry 4.0 operations.

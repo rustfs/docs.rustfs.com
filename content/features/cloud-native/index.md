@@ -29,9 +29,7 @@ Multi-cloud storage adopts public cloud patterns. New applications are typically
 
 ### Kubernetes-Native
 
-Kubernetes-native design requires operator services to configure and manage multi-tenant object storage. Each tenant runs in an independent namespace while sharing underlying hardware resources. The operator pattern extends Kubernetes' declarative API model through Custom Resource Definitions (CRDs) for operations like resource orchestration, upgrades, and scaling.
-
-RustFS is designed for Kubernetes. The lightweight RustFS binary allows the RustFS Operator to densely co-locate multiple tenants without exhausting resources.
+Kubernetes-native storage must be deployable and manageable through standard Kubernetes primitives — declarative configuration, services, and persistent volumes. RustFS is designed for Kubernetes and ships an official Helm chart for deployment, upgrades, and scaling. The lightweight RustFS binary allows multiple deployments to be densely co-located in separate namespaces without exhausting resources.
 
 ### Consistent
 
@@ -39,7 +37,7 @@ Hybrid/multi-cloud storage must be consistent in API compatibility, performance,
 
 ### Performance
 
-Object storage must deliver performance at scale for workloads ranging from mobile/web applications to AI/ML. RustFS delivers read/write speeds of 325 GiB/s and 171 GiB/s on NVMe, and 11 GiB/s and 9 GiB/s on HDD.
+Object storage must deliver performance at scale for workloads ranging from mobile/web applications to AI/ML. RustFS delivers high throughput on both NVMe and HDD hardware; for representative figures, see [RustFS vs other storage products](/concepts/comparison).
 
 ### Scalable
 
@@ -51,4 +49,4 @@ RustFS's relentless focus on simplicity means large-scale, multi-petabyte data i
 
 The only way to succeed in multi-cloud is with software-defined storage. The reason is straightforward. Hardware appliances don't run on public clouds or Kubernetes. Public cloud storage service offerings aren't designed to run on other public clouds, private clouds, or Kubernetes platforms. Even if they did, bandwidth costs would exceed storage costs because they weren't developed for cross-network replication. Admittedly, software-defined storage can run on public clouds, private clouds, and edge.
 
-RustFS was born in software and is portable across various operating systems and hardware architectures. Evidence can be found in our 2M+ IPs running across AWS, GCP, and Azure.
+RustFS was born in software and is portable across various operating systems and hardware architectures, running on AWS, GCP, Azure, and on-premises infrastructure alike.

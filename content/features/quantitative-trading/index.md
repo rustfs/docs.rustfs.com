@@ -1,96 +1,70 @@
 ---
 title: "Quantitative Trading File Storage Solutions"
-description: "Intelligent storage architecture designed for high-frequency trading and quantitative strategy backtesting, supporting millions of IOPS per second for order flow processing."
+description: "Storage architecture designed for high-frequency trading and quantitative strategy backtesting, with high-throughput order flow processing and low-latency access to tick-level data."
 ---
 
-Intelligent storage architecture designed specifically for high-frequency trading and quantitative strategy backtesting, supporting million-level IOPS order flow processing per second, meeting millisecond access requirements for Tick-level data
+Storage architecture designed for high-frequency trading and quantitative strategy backtesting, supporting high-throughput order flow processing and low-latency access to tick-level market data.
 
 ## Industry Challenges and Pain Points
 
-| Category | Traditional Solution Defects | Quantitative Requirements | Business Impact |
-|------|-------------|----------|----------|
-| **Data Management** | Single protocol storage (S3 only/POSIX only) | Cross-protocol unified access (S3+POSIX+NFS) | Strategy iteration cycle ↑20% |
-| **Performance Metrics** | ≤500k IOPS (small file random read) | 3M+ IOPS <0.5ms latency | High-frequency strategy slippage ↓0.3bps |
-| **Storage Cost** | Cold data > $0.05/GB/month | Intelligent tiering ≤$0.015/GB/month | Annual storage budget growth ↓65% |
+| Category | Traditional Solution Defects | Quantitative Requirements |
+|------|-------------|----------|
+| **Data Management** | Single-protocol storage (S3 only or POSIX only) | Unified access across protocols and tools |
+| **Performance** | Limited IOPS on small-file random reads | High IOPS with sub-millisecond latency for tick data |
+| **Storage Cost** | Cold data kept on expensive hot storage | Intelligent tiering that moves cold data to low-cost media |
 
-## Why Choose Us
+## Why Choose RustFS
 
-### Ultra-Fast Response
+### Fast Response
 
-- Adopts RDMA network acceleration and GPU direct storage, latency ≤500μs, throughput up to 200 Gbps
-- High-frequency trading backtesting speed improved by 300%
+- Distributed, parallel I/O keeps latency low and throughput high for market-data reads
+- Backtesting jobs read historical data in parallel instead of queueing behind a single storage head
 
 ### Massive File Support
 
-- Intelligently aggregates small files into logical large objects, single cluster supports 400 billion files
-- Metadata retrieval efficiency improved by 40%
+- Object storage semantics handle very large numbers of small files without a central metadata bottleneck
+- Metadata is stored with the objects, so listing and retrieval scale with the cluster
 
 ### Elastic Scaling
 
-- Supports hybrid cloud deployment, hot data local SSD acceleration, cold data automatic cloud archiving
-- Capacity can linearly scale to EB level
+- Supports hybrid deployment: hot data on local SSD, cold data tiered to cheaper media or the cloud
+- Capacity scales linearly by adding nodes
 
 ### Financial Security
 
-- Enterprise-grade encryption (e.g., AES-256), performance loss <3%
-- Supports multi-region, multi-zone disaster recovery, RTO <1 minute
+- Enterprise-grade encryption (AES-256-GCM, ChaCha20-Poly1305) with low performance overhead
+- Multi-region replication for disaster recovery
+
+For representative performance figures, see [RustFS vs other storage products](/concepts/comparison).
 
 ## Scenario-Based Solutions
 
 ### High-Frequency Strategy Development
 
-Provides memory-mapped file interface (mmap), supporting C++/Python strategy code direct access to raw trading data
-
-#### Measured Metrics
-
-Single strategy backtesting of 1 billion order data takes only 4 hours (traditional solutions require 24+ hours)
+Strategy code in C++ or Python reads raw trading data directly over the S3 API, and parallel reads shorten large backtests from days to hours compared with single-head storage.
 
 ### AI Factor Mining
 
-Integrates TensorFlow/PyTorch plugins, automatically mapping feature datasets to S3 object storage paths
-
-#### Case Study
-
-Jufund achieved 3000+ factor parallel computing, storage throughput improved 8x
+Feature datasets map naturally to S3 object paths, so TensorFlow/PyTorch pipelines can stream training data straight from RustFS and run many factor computations in parallel.
 
 ### Regulatory Compliance Storage
 
-Built-in WORM (Write Once Read Many) mode, meeting non-tamperable trading record requirements
-
-Automatically generates CFCA-compatible audit logs (processing 100k+ operation records per second)
+Object locking provides WORM (Write Once Read Many) semantics for non-tamperable trading records, and audit logging records operations for regulatory review.
 
 ## Industry Compliance and Security
 
-### Financial-Grade Encryption **(Required)**
+### Encryption
 
-FIPS 140-2 certified national security dual algorithm support
+Server-side encryption with strong ciphers (AES-256-GCM, ChaCha20-Poly1305) protects data at rest.
 
-### Cross-Regional Synchronization **(Required)**
+### Cross-Regional Synchronization
 
-Meets SEC 17a-4 off-site disaster recovery specifications
+Replication across sites supports off-site disaster recovery requirements such as SEC 17a-4-style retention policies.
 
-### Audit Interface **(Required)**
+### Audit Interface
 
-Direct integration with Splunk, Elastic regulatory modules
+Audit logs can be shipped to analysis platforms such as Splunk or Elastic.
 
-## Core Advantage Comparison
+## Deployment
 
-| Dimension | Traditional Solutions | rustFS Solutions | Business Value Manifestation |
-|------|----------|------------|--------------|
-| **Order Flow Processing** | ≤500k IOPS | ✅ 2.3M IOPS | Eliminates order accumulation risk during market peaks |
-| **Data Compression Ratio** | 3:1 | ✅ 11:1 (ZSTD+FPGA acceleration) | PB-level backtesting data storage cost reduced by 67% |
-| **Failover Time** | 15–30 seconds | ✅ 82ms | Avoids SEC regulation penalties for system interruptions |
-
-## Service Guarantee System
-
-### Deployment Services
-
-Provides storage-computing integrated machines (pre-installed RustFS) or pure software delivery
-
-### Performance Optimization
-
-Free provision of "Quantitative Data Lake Design White Paper" and data governance consulting services
-
-### Ecosystem Cooperation
-
-Already completed certification with 20+ quantitative platforms (including JoinQuant, Nuggets Quantitative, etc.)
+RustFS is delivered as software you can run on your own hardware or in the cloud. See the [installation guides](/installation/linux/quick-start) to get started.
