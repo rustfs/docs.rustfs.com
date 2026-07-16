@@ -168,7 +168,7 @@ git clone https://github.com/rustfs/rustfs.git
 
 Running the command under root directory,
 
-```
+```bash
 docker compose --profile observability up -d
 ```
 
@@ -200,7 +200,7 @@ Providing the necessary permissions. An initialization container is necessary to
 
 Started containers is as below,
 
-```
+```text
 CONTAINER ID   IMAGE                                             COMMAND                  CREATED         STATUS                            PORTS                                                                                                                                     NAMES
 c13c23fe3d9d   rustfs/rustfs:latest                              "/entrypoint.sh rust…"   6 seconds ago   Up 5 seconds (health: starting)   0.0.0.0:9000-9001->9000-9001/tcp, :::9000-9001->9000-9001/tcp                                                                             rustfs-server
 e3f4fc4a83a2   grafana/grafana:latest                            "/run.sh"                7 seconds ago   Up 5 seconds                      0.0.0.0:3000->3000/tcp, :::3000->3000/tcp                                                                                                 grafana
@@ -217,7 +217,7 @@ docker compose -f docker-compose.yml up -d rustfs
 
 This way will only install and start `rustfs-server` service, namely rustfs container,
 
-```
+```text
 docker ps
 CONTAINER ID   IMAGE                                             COMMAND                  CREATED         STATUS                           PORTS                                                           NAMES
 e07121ecdd39   rustfs/rustfs:latest                              "/entrypoint.sh rust…"   2 seconds ago   Up 1 second (health: starting)   0.0.0.0:9000-9001->9000-9001/tcp, :::9000-9001->9000-9001/tcp   rustfs-server

@@ -38,7 +38,7 @@ mc ls rustfs/bucket-creation-by-mc
 
 Create a bucket via API:
 
-```
+```http
 PUT /{bucketName} HTTP/1.1
 ```
 
