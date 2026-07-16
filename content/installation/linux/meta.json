@@ -1,9 +1,10 @@
 {
-  "title": "Linux Installation",
+  "title": "Linux",
   "pages": [
-    "[Linux Quick Installation](/installation/linux/quick-start)",
-    "[Single Node Single Disk Installation](/installation/linux/single-node-single-disk)",
-    "[Single Node Multiple Disk Installation](/installation/linux/single-node-multiple-disk)",
-    "[Multiple Node Multiple Disk Installation](/installation/linux/multiple-node-multiple-disk)"
+    "[Quick Start](/installation/linux/quick-start)",
+    "[Prerequisites & Service Setup](/installation/linux/prerequisites-and-service)",
+    "[Single Node Single Disk (SNSD)](/installation/linux/single-node-single-disk)",
+    "[Single Node Multiple Disk (SNMD)](/installation/linux/single-node-multiple-disk)",
+    "[Multiple Node Multiple Disk (MNMD)](/installation/linux/multiple-node-multiple-disk)"
   ]
 }
