@@ -1,0 +1,9 @@
+{
+  "title": "Examples",
+  "pages": [
+    "[mc (MinIO Client)](/developer/examples/mc)",
+    "[AWS CLI](/developer/examples/aws-cli)",
+    "[boto3 (Python)](/developer/examples/boto3)",
+    "[rclone](/developer/examples/rclone)"
+  ]
+}
