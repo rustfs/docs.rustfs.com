@@ -1,0 +1,1 @@
+var e=`/`;e.endsWith(`/`)||(e+=`/`);function t(e){return e.startsWith(`http://`)||e.startsWith(`https://`)?e:(e.startsWith(`/`)||(e=`/`+e),e.length>1&&e.endsWith(`/`)&&(e=e.slice(0,-1)),e)}export{t as n,e as t};

@@ -1,0 +1,96 @@
+# Docs
+
+
+- **RustFS Installation Guide**
+- Linux Installation
+  - [What is RustFS and Installation Instructions](/installation/linux): RustFS is an object storage solution, open-source distributed object storage released under Apache2 license.
+  - [Linux Quick Installation](/installation/linux/quick-start)
+  - [Single Node Single Disk Installation](/installation/linux/single-node-single-disk)
+  - [Single Node Multiple Disk Installation](/installation/linux/single-node-multiple-disk)
+  - [Multiple Node Multiple Disk Installation](/installation/linux/multiple-node-multiple-disk)
+- [Windows Installation](/installation/windows)
+- [macOS Installation](/installation/macos)
+- [Docker Installation](/installation/docker)
+
+- **Installation Checklist**
+- [Hardware Requirements](/installation/checklists/hardware-checklists)
+- [Hardware Selection](/installation/checklists/hardware-selection)
+- [Network Check](/installation/checklists/network-checklists)
+- [Software Check](/installation/checklists/software-checklists)
+- [Security Check](/installation/checklists/security-checklists)
+
+- **RustFS Performance and Framework**
+- [RustFS Performance Comparison](/concepts/comparison)
+- [RustFS Design Architecture](/concepts/architecture)
+- [Terminology Explanation](/concepts/glossary)
+- [Usage Limitations](/concepts/limit)
+- Core Concepts
+  - [RustFS Core Concepts Explained](/concepts/principle): Detailed explanation of RustFS core concepts, including erasure coding, stripes, Data Scanner, data self-healing, etc. Allows users to have a deeper understanding of RustFS.
+  - [Erasure Coding](/concepts/principle/erasure-coding)
+
+- **Manage RustFS**
+- Bucket Management
+  - [RustFS Bucket Management](/management/bucket): Buckets are the fundamental containers for data in RustFS. This section covers bucket creation, deletion, and management.
+  - [Bucket Creation](/management/bucket/creation)
+  - [Bucket Deletion](/management/bucket/deletion)
+- Object Management
+  - [RustFS Object Management](/management/object): Guide to RustFS object management, including creation, deletion, versioning, locking, and scanning.
+  - [Object Upload](/management/object/creation)
+  - [Object Deletion](/management/object/deletion)
+- [Object Scanner](/management/object/scanner)
+
+- **Upgrade, Expansion and Uninstallation**
+- [Overview](/upgrade-scale)
+- [Availability and Expansion Explanation](/upgrade-scale/availability-and-resiliency)
+
+- **Troubleshooting**
+- [Overview](/troubleshooting)
+- [Disk Failure](/troubleshooting/driver)
+- [Object Inspection and Automatic Recovery](/troubleshooting/healing)
+- [Node Failure](/troubleshooting/node)
+
+- **System Administration**
+- IAM Management
+  - [RustFS IAM Management](/administration/iam): Comprehensive guide to Identity and Access Management (IAM), including Users, Groups, Policies, and Access Keys.
+  - [Access Token](/administration/iam/access-token)
+
+- **Integration**
+- [Nginx Reverse Proxy Configuration](/integration/nginx)
+- [Virtual Host Mode Configuration](/integration/virtual)
+- [TLS Configuration](/integration/tls-configured)
+
+- **Developer**
+- [MCP](/developer/mcp)
+- [MinIO Client](/developer/mc)
+- SDK
+  - [RustFS SDK Overview](/developer/sdk): Overview of supported S3 SDKs for RustFS.
+  - [Java](/developer/sdk/java)
+  - [Python](/developer/sdk/python)
+  - [Rust](/developer/sdk/rust)
+  - [JavaScript](/developer/sdk/javascript)
+  - [TypeScript](/developer/sdk/typescript)
+  - [Golang](/developer/sdk/go)
+  - [Other SDKs](/developer/sdk/other)
+- [Open Source License](/developer/license)
+
+- **Product Features**
+- [Distributed](/features/distributed)
+- [Log Management](/features/logging)
+- [Version Control](/features/versioning)
+- [S3 Compatibility](/features/s3-compatibility)
+- [Object Level and Read-Only](/features/worm)
+- [Cross-Region Replication](/features/replication)
+- [Encryption](/features/encryption)
+- [Lifecycle Management](/features/lifecycle)
+
+- **Solutions**
+- [Modern Data Lake](/features/data-lake)
+- [AI and Machine Learning](/features/ai)
+- [Cloud Native](/features/cloud-native)
+- [Big Data Computing Storage Separation](/features/hdfs)
+- [SQL Support](/features/sql-server)
+- [Quantitative Trading](/features/quantitative-trading)
+- [Manufacturing Cost Reduction](/features/industry)
+- [Cold Archive Storage](/features/cold-archiving)
+- [Video Storage Solution](/features/video)
+- [Domestic Innovation and SM Solution](/features/domestic)

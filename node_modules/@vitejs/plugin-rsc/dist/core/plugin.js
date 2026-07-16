@@ -1,0 +1,26 @@
+//#region src/core/plugin.ts
+function vitePluginRscCore() {
+	return [{
+		name: "rsc:patch-react-server-dom-webpack",
+		transform: {
+			filter: { code: "__webpack_require__" },
+			handler(originalCode, _id, _options) {
+				let code = originalCode;
+				if (code.includes("__webpack_require__.u")) code = code.replaceAll("__webpack_require__.u", "({}).u");
+				if (code.includes("__webpack_require__")) code = code.replaceAll("__webpack_require__", "__vite_rsc_require__");
+				if (code !== originalCode) return {
+					code,
+					map: null
+				};
+			}
+		}
+	}, {
+		name: "rsc:workaround-linked-dep",
+		apply: () => !import.meta.url.includes("/node_modules/"),
+		configEnvironment() {
+			return { build: { commonjsOptions: { include: [/\/node_modules\//, /\/vendor\/react-server-dom\//] } } };
+		}
+	}];
+}
+//#endregion
+export { vitePluginRscCore as default };

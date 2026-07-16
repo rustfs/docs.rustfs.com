@@ -1,0 +1,2 @@
+import { i as useFumadocsLoader, n as SerializedPageTree, r as deserializePageTree, t as Serialized } from "../../index-CdZGMKDG.js";
+export { Serialized, SerializedPageTree, deserializePageTree, useFumadocsLoader };

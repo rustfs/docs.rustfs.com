@@ -1,0 +1,28 @@
+//#region src/content/github.ts
+/**
+* Get the last edit time of a file using GitHub API
+*
+* By default, this will cache the result forever.
+* Set `options.next.revalidate` to customize this.
+*/
+async function getGithubLastEdit({ repo, token, owner, path, sha, baseUrl = "https://api.github.com", options = {}, params: customParams = {} }) {
+	const headers = new Headers(options.headers);
+	const params = new URLSearchParams();
+	params.set("path", path);
+	params.set("page", "1");
+	params.set("per_page", "1");
+	if (sha) params.set("sha", sha);
+	for (const [key, value] of Object.entries(customParams)) params.set(key, value);
+	if (token) headers.append("authorization", token);
+	const res = await fetch(`${baseUrl}/repos/${owner}/${repo}/commits?${params.toString()}`, {
+		cache: "force-cache",
+		...options,
+		headers
+	});
+	if (!res.ok) throw new Error(`Failed to fetch last edit time from Git ${await res.text()}`);
+	const data = await res.json();
+	if (data.length === 0) return null;
+	return new Date(data[0].commit.committer.date);
+}
+//#endregion
+export { getGithubLastEdit };

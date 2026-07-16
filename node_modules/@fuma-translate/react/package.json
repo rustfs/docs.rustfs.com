@@ -1,0 +1,47 @@
+{
+  "name": "@fuma-translate/react",
+  "version": "1.0.2",
+  "description": "React runtime for fuma-translate",
+  "license": "MIT",
+  "author": "Fuma Nama",
+  "repository": {
+    "type": "git",
+    "url": "github:fuma-nama/fuma-translate"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "tsdown": "^0.22.2",
+    "typescript": "6.0.3",
+    "vitest": "^4.1.8",
+    "@repo/typescript-config": "0.0.0"
+  },
+  "peerDependencies": {
+    "@types/react": "*",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "peerDependenciesMeta": {
+    "@types/react": {
+      "optional": true
+    }
+  },
+  "scripts": {
+    "types:check": "tsc --noEmit",
+    "build": "tsdown",
+    "dev": "tsdown --watch"
+  }
+}

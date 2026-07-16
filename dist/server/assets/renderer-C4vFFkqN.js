@@ -1,0 +1,77 @@
+import { r as x, t as S } from "./fonts-B4N9qU8h-w8m3v4uG.js";
+//#region node_modules/@takumi-rs/helpers/dist/renderer.mjs
+function n(e) {
+	return e instanceof Uint8Array || e instanceof ArrayBuffer || typeof Buffer < `u` && Buffer.isBuffer(e);
+}
+function r(e) {
+	return n(e) ? e : typeof e.data == `function` ? e.data() : e.data;
+}
+function i(e) {
+	return n(e) ? e : `key` in e && e.key ? e.key : typeof e.data == `function` ? `${e.name ?? ``}:${e.weight ?? ``}:${e.style ?? ``}` : e.data;
+}
+async function a(e) {
+	let { sources: t = [], cache: n } = Array.isArray(e) ? { sources: e } : e, r = /* @__PURE__ */ new Map();
+	for (let e of t) r.set(e.src, e);
+	return Promise.all([...r.values()].map(async ({ src: e, data: t, cache: r }) => ({
+		src: e,
+		data: typeof t == `function` ? await t() : t,
+		cache: r ?? n
+	})));
+}
+var o = class {
+	registerInner;
+	byKey = /* @__PURE__ */ new Map();
+	byData = /* @__PURE__ */ new WeakMap();
+	constructor(e) {
+		this.registerInner = e;
+	}
+	getFont(e) {
+		return typeof e == `string` ? this.byKey.get(e) : this.byData.get(e);
+	}
+	setFont(e, t) {
+		typeof e == `string` ? this.byKey.set(e, t) : this.byData.set(e, t);
+	}
+	deleteFont(e) {
+		typeof e == `string` ? this.byKey.delete(e) : this.byData.delete(e);
+	}
+	async register(e) {
+		let a = typeof e == `string` ? S(e) : e, o = i(a), s = this.getFont(o);
+		if (s) return s;
+		let c = r(a), l = Promise.resolve(c).then((e) => this.registerInner(n(a) ? e : {
+			...a,
+			data: e
+		})).catch((e) => {
+			throw this.deleteFont(o), e;
+		});
+		return this.setFont(o, l), l;
+	}
+	async prepareFonts(e) {
+		if (!e) return;
+		let t = await Promise.all(e.map((e) => this.register(e)));
+		return [...new Set(t.flat().map((e) => e.name))];
+	}
+	async resolveResources(e, t, n) {
+		let r = await this.prepareFonts(e);
+		return {
+			images: t ? await a(t) : void 0,
+			fontFamilies: n ?? r
+		};
+	}
+};
+async function s(t, n, r) {
+	let { fonts: i, fontFamilies: a, signal: o, images: s, ...c } = n;
+	o?.throwIfAborted();
+	let l = await i, u = await t.resolveResources(l && x({
+		fonts: l,
+		source: r
+	}), s, a);
+	return o?.throwIfAborted(), {
+		options: {
+			...c,
+			...u
+		},
+		signal: o
+	};
+}
+//#endregion
+export { s as n, o as t };

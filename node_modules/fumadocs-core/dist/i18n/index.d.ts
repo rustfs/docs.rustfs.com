@@ -1,0 +1,2 @@
+import { a as TranslationPreset, c as defineTranslations, i as TranslationExtension, n as I18nConfig, o as TranslationsAPI, r as SingularTranslationsAPI, s as defineI18n, t as I18nAPI } from "../index-DydiXvgS.js";
+export { I18nAPI, I18nConfig, SingularTranslationsAPI, TranslationExtension, TranslationPreset, TranslationsAPI, defineI18n, defineTranslations };

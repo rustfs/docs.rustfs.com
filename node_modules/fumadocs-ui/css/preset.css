@@ -1,0 +1,11 @@
+@import './lib/base.css';
+@import './lib/shiki.css';
+
+@plugin '../dist/tailwind/typography.js';
+
+@import './generated/flux.css';
+@import './generated/docs.css';
+@import './generated/home.css';
+@import './generated/notebook.css';
+
+@import './generated/shared.css';

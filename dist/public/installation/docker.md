@@ -1,0 +1,323 @@
+# Installing RustFS with Docker (/installation/docker)
+
+
+
+RustFS is a high-performance, 100% S3-compatible open-source distributed object storage system. In single-node single-disk (SNSD) deployment mode, the backend uses zero erasure coding without additional data redundancy, suitable for local testing and small-scale scenarios.
+This article is based on RustFS official Linux binary packages, packaging RustFS and its runtime environment into containers through custom Dockerfile, and configuring data volumes and environment variables for one-click service startup.
+
+***
+
+<div className="fd-steps">
+  <div className="fd-step">
+    ## Prerequisites [#1-prerequisites]
+
+    1. **Host Requirements**
+
+    * Docker installed (≥ 20.10) and able to pull images and run containers normally
+    * Local path `/mnt/rustfs/data` (or custom path) for mounting object data
+
+    2. **Network and Firewall**
+
+    * Ensure host port 9000 is open to external access (or consistent with custom port)
+
+    3. **Configuration File Preparation**
+
+    * Define listening port, admin account, data path, etc. in host `/etc/rustfs/config.toml` (see Section 4 for details)
+
+    4. RustFS container run as non-root user `rustfs` with id `10001`, if you run docker with `-v` to mount host directory into docker container, please make sure the owner of host directory has been changed to `10001`, otherwise you will encounter permission denied error. You can run `chown -R 10001:10001 /path/to/host_directory` to grant the necessary permissions.
+
+    ***
+  </div>
+
+  <div className="fd-step">
+    ## Quick Pull of RustFS Official Image [#2-quick-pull-of-rustfs-official-image]
+
+    Use official Ubuntu base image to quickly pull RustFS official image:
+
+    ```bash
+    docker pull rustfs/rustfs
+    ```
+
+    ***
+  </div>
+
+  <div className="fd-step">
+    ## Run RustFS Container [#3-run-rustfs-container]
+
+    RustFS SNSD Docker running method, combining the above image and configuration, execute:
+
+    ```bash
+     docker run -d \
+      --name rustfs_local \
+      -p 9000:9000 \
+      -p 9001:9001 \
+      -v /mnt/rustfs/data:/data \
+      rustfs/rustfs:latest \
+      /data
+    ```
+
+    Parameter descriptions:
+
+    * `-p 9000:9000`: Map host port 9000 to container
+    * `-v /mnt/rustfs/data:/data`: Mount data volume
+    * `--name rustfs_local`: Custom container name
+    * `-d`: Run in background
+
+    ***
+
+    ### Complete Parameter Configuration Example [#complete-parameter-configuration-example]
+
+    ```bash {7,8,15,16}
+    # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
+    docker run -d \
+      --name rustfs_container \
+      -p 9000:9000 \
+      -p 9001:9001 \
+      -v /mnt/rustfs/data:/data \
+      -e RUSTFS_ACCESS_KEY="<your-access-key>" \
+      -e RUSTFS_SECRET_KEY="<your-secret-key>" \
+      -e RUSTFS_CONSOLE_ENABLE=true \
+      -e RUSTFS_SERVER_DOMAINS=example.com \
+      rustfs/rustfs:latest \
+      --address :9000 \
+      --console-enable \
+      --server-domains example.com \
+      --access-key "<your-access-key>" \
+      --secret-key "<your-secret-key>" \
+      /data
+    ```
+
+    ### Parameter Description and Corresponding Methods [#parameter-description-and-corresponding-methods]
+
+    1. **Environment Variable Method** (Recommended):
+       ```bash
+       # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
+       -e RUSTFS_ADDRESS=:9000 \
+       -e RUSTFS_SERVER_DOMAINS=example.com \
+       -e RUSTFS_ACCESS_KEY="<your-access-key>" \
+       -e RUSTFS_SECRET_KEY="<your-secret-key>" \
+       -e RUSTFS_CONSOLE_ENABLE=true \
+       ```
+
+    2. **Command Line Parameter Method**:
+       ```
+       # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
+       --address :9000 \
+       --server-domains example.com \
+       --access-key "<your-access-key>" \
+       --secret-key "<your-secret-key>" \
+       --console-enable \
+       ```
+
+    3. **Required Parameters**:
+       * `<VOLUMES>`: Specify at the end of command, such as `/data`
+
+    ### Common Configuration Combinations [#common-configuration-combinations]
+
+    1. **Basic Configuration**:
+       ```bash
+       docker run -d \
+         -p 9000:9000 \
+         -p 9001:9001 \
+         -v /mnt/data:/data \
+         rustfs/rustfs:latest \
+         /data
+       ```
+
+    2. **Enable Console**:
+       ```bash
+       docker run -d \
+         -p 9000:9000 \
+         -p 9001:9001 \
+         -v /mnt/data:/data \
+         -e RUSTFS_CONSOLE_ENABLE=true \
+         rustfs/rustfs:latest \
+         --console-enable \
+         /data
+       ```
+
+    3. **Custom Authentication Keys**:
+       ```bash
+       # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
+       docker run -d \
+         -p 9000:9000 \
+         -p 9001:9001 \
+         -v /mnt/data:/data \
+         -e RUSTFS_ACCESS_KEY="<your-access-key>" \
+         -e RUSTFS_SECRET_KEY="<your-secret-key>" \
+         rustfs/rustfs:latest \
+         --access-key "<your-access-key>" \
+         --secret-key "<your-secret-key>" \
+         /data
+       ```
+
+    ### Important Notes [#important-notes]
+
+    1. Port mapping must correspond:
+       * Service port defaults to 9000 (`-p 9000:9000`)
+
+    2. Data volumes must be persistent:
+       * `-v /host/path:/container/path`
+
+    3. Environment variables and command line parameters can be mixed, but command line parameters have higher priority
+
+    4. If [using TLS](../../integration/tls-configured.md), additional certificate path mounting is needed:
+
+       ```bash
+       -v /path/to/certs:/certs \
+       -e RUSTFS_TLS_PATH=/certs \
+       ```
+
+    ### Docker Compose Installation [#docker-compose-installation]
+
+    RustFS officially provides a Docker Compose installation method. The [`docker-compose.yml`](https://github.com/rustfs/rustfs/blob/main/docker-compose.yml) file includes multiple services, such as `grafana`, `prometheus`, `otel-collector`, and `jaeger`, mainly for observability. If you want to deploy these services together, clone the [RustFS code repository](https://github.com/rustfs/rustfs) locally,
+
+    ```
+    git clone git@github.com:rustfs/rustfs.git
+    ```
+
+    Running the command under root directory,
+
+    ```
+    docker compose --profile observability up -d
+    ```
+
+    Providing the necessary permissions. An initialization container is necessary to grant the correct access rights to rustfs using the `depends_on` keyword. In the example below the `rustfs_perms` service is added to the `docker-compose.yml` to handle this. To ensure logs are persisted and accessible, we map the host log directory to the container's `/logs` path
+
+    ```yaml title="docker-compose.yml"
+      services:
+        # grant the necessary permissions to RUSTFS volumes path
+        rustfs_perms:
+          image: alpine
+          user: root
+          volumes:
+            - /path/to/host_directory/volumes:/fix_path
+          command: chown -R 10001:10001 /fix_path
+        
+        rustfs:
+          image: rustfs/rustfs:latest
+          depends_on: 
+            rustfs_perms:
+              condition: service_completed_successfully
+          volumes:
+            - /path/to_host_directory/volumes/data:/data
+            - /path/to_host_directory/volumes/logs:/logs
+          environment:
+            - RUSTFS_OBS_LOG_DIRECTORY=/logs
+        
+          # ... other configurations
+    ```
+
+    Started containers is as below,
+
+    ```
+    CONTAINER ID   IMAGE                                             COMMAND                  CREATED         STATUS                            PORTS                                                                                                                                     NAMES
+    c13c23fe3d9d   rustfs/rustfs:latest                              "/entrypoint.sh rust…"   6 seconds ago   Up 5 seconds (health: starting)   0.0.0.0:9000-9001->9000-9001/tcp, :::9000-9001->9000-9001/tcp                                                                             rustfs-server
+    e3f4fc4a83a2   grafana/grafana:latest                            "/run.sh"                7 seconds ago   Up 5 seconds                      0.0.0.0:3000->3000/tcp, :::3000->3000/tcp                                                                                                 grafana
+    71ef1b8212cf   prom/prometheus:latest                            "/bin/prometheus --c…"   7 seconds ago   Up 5 seconds                      0.0.0.0:9090->9090/tcp, :::9090->9090/tcp                                                                                                 prometheus
+    e7db806b2d6f   jaegertracing/all-in-one:latest                   "/go/bin/all-in-one-…"   7 seconds ago   Up 5 seconds                      4317-4318/tcp, 9411/tcp, 0.0.0.0:14250->14250/tcp, :::14250->14250/tcp, 14268/tcp, 0.0.0.0:16686->16686/tcp, :::16686->16686/tcp          jaeger
+    1897830a2f1e   otel/opentelemetry-collector-contrib:latest       "/otelcol-contrib --…"   7 seconds ago   Up 5 seconds                      0.0.0.0:4317-4318->4317-4318/tcp, :::4317-4318->4317-4318/tcp, 0.0.0.0:8888-8889->8888-8889/tcp, :::8888-8889->8888-8889/tcp, 55679/tcp   otel-collector
+    ```
+
+    If you only want to install rustfs, do not want to deploy grafana,prometheus,etc, please comment below lines in `docker-compose.yml` file,
+
+    ```
+    #depends_on:
+    #  - otel-collector
+    ```
+
+    Then, run the command,
+
+    ```
+    docker compose -f docker-compose.yml up -d rustfs
+    ```
+
+    This way will only install and start `rustfs-server` service, namely rustfs container,
+
+    ```
+    docker ps
+    CONTAINER ID   IMAGE                                             COMMAND                  CREATED         STATUS                           PORTS                                                           NAMES
+    e07121ecdd39   rustfs/rustfs:latest                              "/entrypoint.sh rust…"   2 seconds ago   Up 1 second (health: starting)   0.0.0.0:9000-9001->9000-9001/tcp, :::9000-9001->9000-9001/tcp   rustfs-server
+    ```
+
+    Whether you start only the `rustfs-server` or together with observability services, you can access the RustFS instance via `http://localhost:9000` using the access key and secret key you configured above (the `<your-access-key>` / `<your-secret-key>` placeholders). Generate a strong secret with, for example, `openssl rand -base64 24`, and never ship the placeholder values to production.
+  </div>
+
+  <div className="fd-step">
+    ## Verification and Access [#4-verification-and-access]
+
+    1. **View Container Status and Logs:**
+
+    ```bash
+    docker logs rustfs_local
+    ```
+
+    Logs should show successful service startup and listening on port 9000.
+
+    2. **Test S3 API:**
+
+    Use `mc` or other S3 clients:
+
+    ```bash
+    # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
+    mc alias set rustfs http://localhost:9000 "<your-access-key>" "<your-secret-key>"
+    mc mb rustfs/mybucket
+    mc ls rustfs
+    ```
+
+    If buckets can be successfully created and listed, deployment is effective.
+  </div>
+
+  <div className="fd-step">
+    ## Multiple Nodes [#5-multiple-nodes]
+
+    Dockers default bridge networking does not support multi-node deployments. Use `--network host` so each container can communicate directly with other nodes.
+
+    Run the following on **each node**
+
+    ```bash
+    # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
+    docker run -d \
+      --name rustfs \
+      --network host \
+      -v /mnt/rustfs/data:/data \
+      -e RUSTFS_ACCESS_KEY="<your-access-key>" \
+      -e RUSTFS_SECRET_KEY="<your-secret-key>" \
+      -e RUSTFS_CONSOLE_ENABLE=true \
+      -e RUSTFS_VOLUMES="http://node{1...4}:9000/data/rustfs{0...3}" \
+      rustfs/rustfs:latest
+    ```
+
+    Add the entries to `/etc/hosts` on **every** node:
+
+    ```ini title="/etc/hosts"
+    192.168.1.1 node1
+    192.168.1.2 node2
+    192.168.1.3 node3
+    192.168.1.4 node4
+    ```
+  </div>
+
+  <div className="fd-step">
+    ## Other Recommendations [#6-other-recommendations]
+
+    1. Production Environment Recommendations:
+
+    * Use multi-node deployment architecture
+    * [Enable TLS encrypted communication](../../integration/tls-configured.md)
+    * Configure log rotation strategy
+    * Set up regular backup strategy
+
+    2. Storage Recommendations:
+
+    * Use local SSD/NVMe storage
+    * Avoid using network file systems (NFS)
+    * Ensure storage directory exclusive access
+
+    ***
+  </div>
+</div>
+
+## Summary [#summary]
+
+This article explains how to deploy RustFS using Docker with best practices, starting with a single-node single-disk (SNSD) setup and then extending to a multi-node deployment option.

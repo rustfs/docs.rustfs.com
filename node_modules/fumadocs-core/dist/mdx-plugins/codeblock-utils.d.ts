@@ -1,0 +1,2 @@
+import { i as parseCodeBlockAttributes, n as CodeBlockTabsOptions, r as generateCodeBlockTabs, t as CodeBlockAttributes } from "../codeblock-utils-CyP8qsYv.js";
+export { CodeBlockAttributes, CodeBlockTabsOptions, generateCodeBlockTabs, parseCodeBlockAttributes };

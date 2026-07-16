@@ -1,0 +1,108 @@
+{
+  "name": "cnfast",
+  "version": "0.0.8",
+  "description": "Fast drop-in replacement for `cn`",
+  "keywords": [
+    "className",
+    "classes",
+    "classnames",
+    "clsx",
+    "cn",
+    "tailwind",
+    "utility"
+  ],
+  "homepage": "https://github.com/aidenybai/cnfast#readme",
+  "bugs": {
+    "url": "https://github.com/aidenybai/cnfast/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Aiden Bai",
+    "email": "aiden@million.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aidenybai/cnfast.git",
+    "directory": "packages/cnfast"
+  },
+  "bin": {
+    "cnfast": "./bin/cli.js"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "browser": "dist/index.iife.js",
+  "types": "dist/index.d.mts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "@types/prompts": "^2.4.9",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "clsx": "^2.1.1",
+    "commander": "^14.0.3",
+    "esbuild": "^0.28.1",
+    "magic-string": "^0.30.17",
+    "ora": "^9.4.0",
+    "picocolors": "^1.1.1",
+    "playwright-core": "^1.61.0",
+    "prompts": "^2.4.2",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "tailwind-merge": "^3.6.0",
+    "tinybench": "^6.0.2",
+    "tinyglobby": "^0.2.10",
+    "vega": "^6.2.0",
+    "vega-lite": "^6.4.3",
+    "vitest": "^3.0.0"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "dev": "vp pack --watch",
+    "test": "vp test",
+    "typecheck": "tsc --noEmit",
+    "bench": "bun bench/cn.bench.ts",
+    "bench:all": "bun bench/index.ts",
+    "bench:chart": "bun scripts/generate-bench-chart.ts",
+    "bench:chart:render": "bun scripts/render-chart.ts",
+    "bench:lru": "bun bench/lru.bench.ts",
+    "bench:cases": "bun scripts/extract-bench-cases.ts",
+    "bench:report": "bun bench/report.ts",
+    "bench:setup": "bun scripts/extract-cases.ts && bun scripts/capture-pages.ts",
+    "bench:parity": "bun scripts/verify-parity.ts",
+    "bench:corpus": "bun bench/corpus.bench.ts",
+    "bench:replay": "bun bench/page-replay.bench.ts",
+    "bench:hard": "bun bench/hard-task.bench.ts",
+    "bench:tpl": "bun bench/template.bench.ts",
+    "bench:ssr": "bun bench/ssr.bench.ts",
+    "bench:pages": "bun scripts/page-vitals-harness.ts",
+    "bench:extract": "bun scripts/extract-cases.ts",
+    "bench:capture": "bun scripts/capture-pages.ts",
+    "bench:analyze": "bun scripts/analyze-pages.ts",
+    "size": "bun scripts/bundle-size.ts",
+    "iter": "bash scripts/optimize-iter.sh",
+    "deopt": "bash scripts/deopt.sh"
+  }
+}

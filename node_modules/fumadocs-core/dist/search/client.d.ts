@@ -1,0 +1,2 @@
+import { _ as FetchOptions, d as OramaCloudOptions, h as StaticOptions, n as SearchClient, p as AlgoliaOptions, r as useDocsSearch, t as ClientPreset } from "../client-CFte63Ws.js";
+export { type AlgoliaOptions, ClientPreset, type FetchOptions, type OramaCloudOptions, SearchClient, type StaticOptions, useDocsSearch };

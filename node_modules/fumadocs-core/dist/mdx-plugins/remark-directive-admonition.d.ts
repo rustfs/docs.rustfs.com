@@ -1,0 +1,2 @@
+import { n as remarkDirectiveAdmonition, t as RemarkDirectiveAdmonitionOptions } from "../remark-directive-admonition-BLiJ5l43.js";
+export { RemarkDirectiveAdmonitionOptions, remarkDirectiveAdmonition };
