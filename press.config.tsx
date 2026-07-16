@@ -9,6 +9,20 @@ import defaultMdxComponents, { createRelativeLink } from "fumadocs-ui/mdx";
 import { docs } from "./.source/server";
 import { Mermaid } from "./src/components/mermaid";
 import { Tab, Tabs } from "./src/components/tabs";
+// Lucide icons registered for use in MDX (e.g. <Card icon={<Rocket />} />).
+import {
+  Rocket,
+  Container,
+  BookOpen,
+  Network,
+  Gauge,
+  Server,
+  ClipboardCheck,
+  Activity,
+  Code,
+  Terminal,
+  Library,
+} from "lucide-react";
 
 const isDev = import.meta.env.DEV;
 
@@ -211,6 +225,18 @@ gtag('config', 'G-TWW7WMTWL9');`,
           Mermaid,
           Tab,
           Tabs,
+          // Lucide icons for <Card icon={<Rocket />} /> on landing pages.
+          Rocket,
+          Container,
+          BookOpen,
+          Network,
+          Gauge,
+          Server,
+          ClipboardCheck,
+          Activity,
+          Code,
+          Terminal,
+          Library,
         };
       },
     }),
