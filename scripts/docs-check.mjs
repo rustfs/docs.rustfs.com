@@ -127,12 +127,17 @@ for (const file of mdFiles) {
     }
   });
 
-  // relative .md links: [text](path.md) — skip http(s), absolute, and anchors
+  // relative .md links: [text](path.md) — skip http(s), absolute, and anchors.
+  // A `.md` link also resolves if the sibling `.mdx` exists (FumaPress maps
+  // links by URL, not by on-disk extension), and vice versa.
   for (const m of text.matchAll(/\]\(([^)\s]+?\.mdx?)(?:#[^)]*)?\)/g)) {
     const target = m[1];
     if (/^(https?:)?\/\//.test(target) || target.startsWith('/')) continue;
     const resolved = path.resolve(dir, decodeURIComponent(target));
-    if (!fs.existsSync(resolved)) brokenLinks.push(`${rel(file)}  ->  ${target}`);
+    const alt = resolved.replace(/\.mdx$/, '.md').replace(/\.md$/, '.mdx');
+    if (!fs.existsSync(resolved) && !fs.existsSync(alt)) {
+      brokenLinks.push(`${rel(file)}  ->  ${target}`);
+    }
   }
 
   // referenced images

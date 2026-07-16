@@ -16,7 +16,7 @@ Prerequisites:
 First, configure an alias for RustFS using the `mc alias` command:
 
 ```bash
-mc alias set rustfs http://12.34.56.78:9000 ACCESS_KEY SECRET_KEY
+mc alias set rustfs http://192.168.1.100:9000 <your-access-key> <your-secret-key>
 ```
 
 Output:

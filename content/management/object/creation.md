@@ -50,7 +50,7 @@ Verify the upload in the RustFS Console.
 
 Upload a file via API:
 
-```
+```http
 PUT /{bucketName}/{objectName} HTTP/1.1
 ```
 
@@ -72,7 +72,7 @@ See [Object Deletion](./deletion.md).
 
 Use the following API for file deletion:
 
-```
+```http
 DELETE /{bucketName}/{objectName} HTTP/1.1
 ```
 

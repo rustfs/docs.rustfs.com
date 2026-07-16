@@ -36,7 +36,7 @@ mc: <ERROR> Unable to list folder. Bucket `bucket-creation-by-mc` does not exist
 
 Delete a bucket via API:
 
-```
+```http
 DELETE /{bucketName} HTTP/1.1
 ```
 

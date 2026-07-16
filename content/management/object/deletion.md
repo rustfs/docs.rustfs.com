@@ -35,7 +35,7 @@ Verify the deletion in the RustFS Console.
 
 Delete a file via API:
 
-```
+```http
 DELETE /{bucketName}/{objectName} HTTP/1.1
 ```
 

@@ -16,7 +16,7 @@ Path Style is the default. In Path Style, the bucket name follows the endpoint.
 
 Example (Bucket: `test`, Host: `rustfs.yourdomain.com`):
 
-```
+```text
 http://rustfs.yourdomain.com/test
 ```
 
@@ -28,7 +28,7 @@ In Virtual Host Style, the bucket name is part of the domain.
 
 Example (Bucket: `test`, Host: `rustfs.yourdomain.com`):
 
-```
+```text
 http://test.rustfs.yourdomain.com/
 ```
 
@@ -51,7 +51,7 @@ RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com:8000"
 
 This ensures that requests like:
 
-```
+```text
 http://my-bucket.rustfs.yourdomain.com:8000/
 ```
 

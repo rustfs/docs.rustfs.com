@@ -166,7 +166,7 @@ Currently, mainstream AI IDEs such as Cursor, Windsurf, Trae, etc. all support M
       "env": {
         "AWS_ACCESS_KEY_ID": "rustfs_access_key",
         "AWS_SECRET_ACCESS_KEY": "rustfs_secret_key",
-        "AWS_REGION": "cn-east-1",
+        "AWS_REGION": "us-east-1",
         "AWS_ENDPOINT_URL": "rustfs_instance_url"
       }
     }
@@ -182,7 +182,7 @@ If added successfully, you can list the [available tools](#️-available-tools) 
 
 In Trae, you can use the corresponding tools by entering the corresponding prompts. For example, in Trae's chat dialog, enter:
 
-```
+```text
 Please help me list the buckets in the current rustfs instance, thank you!
 ```
 
@@ -257,7 +257,7 @@ Deletes the specified RustFS bucket.
 
 The MCP server is built with a modular architecture:
 
-```
+```text
 rustfs-mcp/
 ├── src/
 │   ├── main.rs          # Entry point, CLI parsing and server initialization
