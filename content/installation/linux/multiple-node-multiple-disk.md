@@ -74,10 +74,11 @@ systemctl stop firewalld
 systemctl disable firewalld
 ```
 
-Or allow RustFS port 9000:
+Or allow the RustFS ports — 9000 (S3 API) and 9001 (Console):
 
 ```bash
 firewall-cmd --zone=public --add-port=9000/tcp --permanent
+firewall-cmd --zone=public --add-port=9001/tcp --permanent
 firewall-cmd --reload
 ```
 
@@ -297,7 +298,8 @@ RestartSec=10s
 OOMScoreAdjust=-1000
 SendSIGKILL=no
 
-TimeoutStartSec=30s
+# RustFS reports READY only after storage and peer checks pass; allow up to 120s.
+TimeoutStartSec=120s
 TimeoutStopSec=30s
 
 NoNewPrivileges=true

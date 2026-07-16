@@ -1,6 +1,6 @@
 ---
 title: "Logging and Auditing"
-description: "Metrics and logging are crucial for system health. RustFS provides robust monitoring and observability through detailed storage performance monitoring,…"
+description: "RustFS observability: OpenTelemetry metrics, audit logging, and event notifications to external targets."
 ---
 
 Metrics and logging are crucial for system health. RustFS provides robust monitoring and observability through detailed storage performance monitoring, metrics, and logging.
@@ -17,29 +17,24 @@ Records detailed log information for every operation, supporting audit trails.
 
 ## Metrics Monitoring
 
-RustFS exports a wide range of fine-grained hardware and software metrics through Prometheus-compatible metrics endpoints. RustFS includes a storage monitoring dashboard that uses Grafana to visualize collected metrics.
+RustFS collects a wide range of fine-grained hardware and software metrics and exports them over OTLP (the OpenTelemetry Protocol, configured via `RUSTFS_OBS_ENDPOINT`). Deploy an OpenTelemetry Collector to forward these metrics to Prometheus, Grafana, or any OTLP-compatible backend. The upstream [`docker-compose.yml`](https://github.com/rustfs/rustfs/blob/main/docker-compose.yml) ships a ready-made observability profile with OpenTelemetry Collector, Prometheus, Grafana, and Jaeger.
 
-The RustFS Kubernetes Operator can automatically deploy, configure, and manage Prometheus deployments and metrics collection for each tenant. Organizations can also point their own Prometheus systems to each tenant for centralized monitoring.
-
-RustFS also provides a health check endpoint for probing node and cluster liveness.
+RustFS also provides health check endpoints (`/health` and `/health/ready`) for probing node and cluster liveness.
 
 ## Audit Logs
 
-Audit logging generates logs for every cluster operation. Each operation generates an audit log containing a unique ID and detailed information about the client, object, bucket, and metadata. RustFS writes log data to configured HTTP/HTTPS webhook endpoints.
+Audit logging generates logs for every cluster operation. Each operation generates an audit log containing a unique ID and detailed information about the client, object, bucket, and metadata. RustFS writes audit data to configured targets such as HTTP/HTTPS webhook endpoints and Kafka (`RUSTFS_AUDIT_*` environment variables).
 
-RustFS supports configuring audit logs through the RustFS Console UI and the `mc` command-line tool. For Kubernetes environments, the RustFS Operator automatically configures the console with LogSearch integration.
-
-RustFS Lambda notifications provide additional logging support. RustFS can automatically send bucket and object events to third-party applications (RabbitMQ, Kafka, Elasticsearch) for event-driven processing.
-
-RustFS also supports real-time tracing of HTTP/S operations through the RustFS Console and `mc admin trace`.
+RustFS event notifications provide additional logging support: bucket and object events can be pushed automatically to third-party systems (for example RabbitMQ via AMQP, Kafka, or a webhook) for event-driven processing.
 
 ## Architecture
 
-RustFS does not natively expose metrics via Prometheus-compatible HTTP(S) endpoints for direct scraping. To integrate with Prometheus, please deploy an OpenTelemetry Collector to gather metrics from RustFS and forward them to your Prometheus backend. The RustFS Kubernetes Operator deploys an independent Prometheus service for each pre-configured RustFS tenant.
+RustFS does not natively expose metrics via Prometheus-compatible HTTP(S) endpoints for direct scraping. To integrate with Prometheus, deploy an OpenTelemetry Collector to gather metrics from RustFS and forward them to your Prometheus backend.
 
 ```mermaid
 flowchart TD
   RUSTFS["RustFS Object Storage"]
+  OTEL["OpenTelemetry Collector"]
   subgraph PROM["Prometheus"]
     AM[Alertmanager]
     QA["Query API"]
@@ -49,7 +44,8 @@ flowchart TD
   AR["Alert Response"]
   VA["Visualization / Analytics"]
   AB["Archival / Backup"]
-  RUSTFS -->|metrics endpoint| PROM
+  RUSTFS -->|OTLP| OTEL
+  OTEL --> PROM
   PROM --> AR
   PROM --> VA
   PROM --> AB
@@ -57,11 +53,11 @@ flowchart TD
   classDef svc fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#1e293b;
   classDef accent fill:#fae8ff,stroke:#c026d3,stroke-width:2px,color:#1e293b;
   class RUSTFS server
-  class AM,QA,RRW,WH svc
+  class OTEL,AM,QA,RRW,WH svc
   class AR,VA,AB accent
 ```
 
-RustFS Lambda notifications automatically push event notifications to supported target services. Administrators can define bucket-level notification rules.
+RustFS event notifications automatically push bucket and object events to supported target services. Administrators can define bucket-level notification rules.
 
 ```mermaid
 flowchart LR
@@ -71,18 +67,17 @@ flowchart LR
     BK["Backup / Archival"]
     BS["Block Storage"]
   end
-  TENANT["RustFS Tenant"]
+  TENANT["RustFS Cluster"]
   subgraph Targets["Notification Targets"]
-    ES[ElasticSearch]
-    PG[PostgreSQL]
+    WH[Webhooks]
     KAFKA[Kafka]
     AMQP[AMQP]
     MQTT[MQTT]
     RED[Redis]
     NATS[NATS]
+    PULSAR[Pulsar]
     MYSQL[MySQL]
-    WH[Webhooks]
-    NSQ[NSQ]
+    PG[PostgreSQL]
   end
   Clients <-->|S3 operations| TENANT
   TENANT -->|events| Targets
@@ -91,19 +86,19 @@ flowchart LR
   classDef accent fill:#fae8ff,stroke:#c026d3,stroke-width:2px,color:#1e293b;
   class IOT,WEB,BK,BS server
   class TENANT svc
-  class ES,PG,KAFKA,AMQP,MQTT,RED,NATS,MYSQL,WH,NSQ accent
+  class WH,KAFKA,AMQP,MQTT,RED,NATS,PULSAR,MYSQL,PG accent
 ```
 
 ## Requirements
 
 ### For Metrics
 
-Use Prometheus or the Kubernetes Operator to automatically deploy/configure for each tenant.
+Deploy an OpenTelemetry Collector and point `RUSTFS_OBS_ENDPOINT` at it; visualize with Prometheus and Grafana (see the upstream observability compose profile).
 
-### For Log Search
+### For Audit Logs
 
-BYO PostgreSQL *or* use Kubernetes Operator to automatically deploy/configure for each tenant.
+Configure one or more audit targets (webhook, Kafka) via `RUSTFS_AUDIT_*` environment variables.
 
-### For Logs
+### For Event Notifications
 
-Support for third-party notification targets.
+Configure bucket notification rules toward the supported targets: webhook, Kafka, AMQP, MQTT, Redis, NATS, Pulsar, MySQL, or PostgreSQL.

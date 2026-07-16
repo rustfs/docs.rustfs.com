@@ -11,7 +11,7 @@ Windows startup **mode** only supports single-node single-disk mode, more suitab
 
 :::
 
-1. For detailed introduction about Windows startup modes, please refer to [Startup Modes](../linux/index.md#mode);
+1. For detailed introduction about startup modes, please refer to [Installation Modes](../linux/quick-start.md#mode);
 
 2. Download the installation package, modify permissions, and start.
 
@@ -48,3 +48,9 @@ Click the modify button (gear-shaped button) in the upper right corner to modify
 ## 5. Access Console
 
 After successful startup, visit `http://127.0.0.1:7001` to access the console.
+
+:::note
+
+Port `7001` applies to the Windows desktop launcher. If you run the standalone `rustfs` server binary instead, the console listens on port `9001` by default.
+
+:::

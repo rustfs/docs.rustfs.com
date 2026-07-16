@@ -1,13 +1,13 @@
 ---
 title: "Object Inspection and Auto-Recovery"
-description: "This article introduces RustFS's object self-healing function design and implementation in single-server multi-disk architecture, including the significance, principles, processes, configuration, and common troubleshooting of self-healing."
+description: "How RustFS object self-healing works: design principles, trigger paths, scrub and repair process, and usage notes."
 ---
 
 ## RustFS Architecture and Self-Healing Design
 
-### Single Server Multi-Disk Architecture
+### Erasure-Coded Storage Pools
 
-RustFS adopts a single-server multi-disk design, organizing multiple disks into a logical storage pool to provide object storage services. Each object is split into multiple data shards and redundant shards when written, and distributed across different disks to improve reliability and performance.
+RustFS organizes disks — on a single node or across nodes — into erasure-set storage pools. Each object is split into data shards and parity shards when written, and distributed across different disks (and nodes) to improve reliability and performance.
 
 ### Self-Healing Design Principles
 
@@ -33,37 +33,21 @@ When data scanning discovers inconsistencies, RustFS automatically calls the Rep
 
 ### Online Self-Healing During Reads
 
-Each time a client executes a `GET` or `HEAD` request, RustFS first checks all data shards of the corresponding object:
-1. If all data shards are intact, data is returned directly.
-2. If shards are lost or corrupted, the system calculates missing shards based on redundant shards, repairs them, then returns the complete object to the client.
-This mechanism is consistent with MinIO's read-time self-healing process, enabling transparent data repair without affecting client requests.
+When a client executes a `GET` or `HEAD` request, RustFS reads the data shards required to serve the object (a read quorum, not every shard):
+1. If enough shards are intact, data is returned directly.
+2. If shards are lost or corrupted, the system reconstructs the missing shards from parity shards, repairs them, then returns the complete object to the client.
+This enables transparent data repair without affecting client requests.
 
 ### Background Scanning Self-Healing
 
 RustFS has a built-in object scanner that traverses 1/1024 of objects in the storage pool using hash methods for integrity checks:
 - Object scanner runs lightweight verification periodically (configurable frequency);
 - If corruption is discovered, self-healing reconstruction process is immediately triggered.
-By default, deep bit rot checking is not performed to reduce resource overhead, but deep verification can be enabled as needed.
+Deep bit-rot verification runs on its own cycle (30 days by default) and can be tuned or disabled to trade thoroughness against resource overhead.
 
 ### Manual Trigger Self-Healing
 
-Administrators can execute full self-healing through command-line tools:
-
-```bash
-rc admin heal start --all
-```
-This operation scans the entire storage pool and performs complete verification and repair on all objects, consuming significant resources, so it should be used cautiously during low-peak periods.
-
-## Usage Examples
-
-```bash
-# View current self-healing status
-rc admin heal status
-# Start self-healing for specified bucket
-rc admin heal start --bucket photos
-# Stop ongoing self-healing tasks
-rc admin heal stop
-```
+Administrators can trigger a full heal through the RustFS Console or the admin API. A full heal scans the entire storage pool and performs complete verification and repair on all objects, consuming significant resources, so it should be used cautiously during low-peak periods.
 
 ## Summary
 

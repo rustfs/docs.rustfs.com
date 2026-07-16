@@ -39,15 +39,13 @@ Delete a file via API:
 DELETE /{bucketName}/{objectName} HTTP/1.1
 ```
 
-Request example:
+S3 requests must be signed with AWS Signature V4, so use an S3 client rather than hand-crafting headers. With the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) configured for your access keys:
 
 ```bash
-curl --location --request DELETE 'http://12.34.56.78:9000/bucket-creation-by-api/password.txt' \
---header 'Content-Type: text/plain' \
---header 'X-Amz-Content-Sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' \
---header 'X-Amz-Date: 20250801T030822Z' \
---header 'Authorization: AWS4-HMAC-SHA256 Credential=H4xcBZKQfvJjEnk3zp1N/20250801/cn-east-1/s3/aws4_request, SignedHeaders=content-length;content-type;host;x-amz-content-sha256;x-amz-date, Signature=1ee63bb0b699598602b2fdbd013e355a57bcb9991307a8ad41f6512e8afebf3a' \
---data-binary '@/Users/jhma/Desktop/password.txt'
+aws s3api delete-object \
+  --bucket bucket-creation-by-api \
+  --key hello.txt \
+  --endpoint-url http://localhost:9000
 ```
 
 Verify the deletion in the RustFS Console.

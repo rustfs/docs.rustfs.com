@@ -65,12 +65,11 @@ net.ipv4.tcp_slow_start_after_idle = 0
 
 ### Firewall
 
-```bash
+```text
 # Necessary open ports
-- TCP 443 (HTTPS API)
-- TCP 9000 (S3 compatible interface)
-- TCP 7946 (Serf node communication)
-- UDP 4789 (VxLAN tunnel)
+- TCP 9000 (S3 API; also used for internal node-to-node communication)
+- TCP 9001 (RustFS Console)
+- TCP 443 (only if you terminate HTTPS on a reverse proxy / load balancer)
 ```
 
 ### Access Control
@@ -85,7 +84,7 @@ net.ipv4.tcp_slow_start_after_idle = 0
 
 ### Benchmarks
 
-1. Inter-node latency: `iperf3 -s 8972 <target IP>`
+1. Inter-node latency: `ping -c 20 <target IP>` (run `iperf3 -s` on the target first for throughput tests)
 2. Cross-rack bandwidth: `iperf3 -c <target IP> -P 8 -t 30`
 3. Failover: Randomly disconnect core links to observe recovery time.
 

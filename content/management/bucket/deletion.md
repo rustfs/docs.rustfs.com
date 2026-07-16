@@ -40,13 +40,12 @@ Delete a bucket via API:
 DELETE /{bucketName} HTTP/1.1
 ```
 
-Request example:
+S3 requests must be signed with AWS Signature V4, so use an S3 client rather than hand-crafting headers. With the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) configured for your access keys:
 
 ```bash
-curl --location --request DELETE 'http://12.34.56.78:9000/bucket-creation-by-api' \
---header 'X-Amz-Content-Sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' \
---header 'X-Amz-Date: 20250801T024406Z' \
---header 'Authorization: AWS4-HMAC-SHA256 Credential=H4xcBZKQfvJjEnk3zp1N/20250801/cn-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=d0f6addf09fffd7eef75191e9d3209bb7188e6b004e9707238fc60ad7033edae'
+aws s3api delete-bucket \
+  --bucket bucket-creation-by-api \
+  --endpoint-url http://localhost:9000
 ```
 
 Verify the bucket deletion in the RustFS Console.

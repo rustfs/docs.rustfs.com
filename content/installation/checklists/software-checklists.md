@@ -8,12 +8,12 @@ Ensure the following requirements are met before deployment.
 ## OS Requirements
 
 - **Operating System**: Use LTS versions (Ubuntu 20.04+, RHEL 8/9).
-- **Kernel**: Linux 5.x+ is recommended for `io_uring` support.
+- **Kernel**: Linux 5.x+ is recommended.
 - **CPU & Memory**: x86_64 or ARM. Minimum 2 GB RAM for testing, 64 GB+ for production.
 - **Disable Interfering Services**: Disable file indexing and auditing services (e.g., `mlocate`, `auditd`, antivirus) to prevent I/O interference.
 
 > **Why Linux 5.x+?**
-> RustFS leverages **io_uring** for high-performance asynchronous I/O, which is mature in Linux 5.10+.
+> Modern LTS kernels bring mature async I/O and filesystem improvements. RustFS also offers an optional `io_uring` read path (`RUSTFS_IO_URING_READ_ENABLE`, disabled by default), which requires Linux 5.10+ to be effective.
 
 ## Binary Deployment
 

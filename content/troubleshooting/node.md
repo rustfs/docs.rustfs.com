@@ -39,7 +39,7 @@ In distributed RustFS clusters, erasure coding mechanisms are adopted to ensure 
 
 * **Configuration Verification**
 
- * Check whether the cluster node list (endpoints) in `config.yaml` includes the new node's hostname and port.
+ * Check that `RUSTFS_VOLUMES` in `/etc/default/rustfs` is byte-for-byte identical to the other nodes, and that it covers the replacement node's hostname and port.
  * Ensure all nodes have the same access keys and permission configurations to avoid new nodes being unable to join due to authentication failures.
 
 ## 4) Rejoin Cluster and Trigger Data Healing
@@ -47,26 +47,17 @@ In distributed RustFS clusters, erasure coding mechanisms are adopted to ensure 
 * **Start Service**
 
  ```bash
- systemctl start rustfs-server
+ systemctl start rustfs
  ```
 
-  Or use your custom startup script to start RustFS services, and view startup logs through `journalctl -u rustfs-server -f` to confirm the new node has detected other online nodes and started the data healing process.
+  Or use your custom startup script to start RustFS services, and view startup logs through `journalctl -u rustfs -f` to confirm the new node has detected other online nodes and started the data healing process.
 
-* **Manually Monitor Healing Status**
-  Use RustFS management tools (assuming the command is `rustfs-admin`) to view cluster health and healing progress:
+* **Monitor Healing Status**
+  Healing runs in the background once the node rejoins; no manual command is required. Watch its progress through the service logs on the replacement node, and check node and disk status in the RustFS Console:
 
  ```bash
- # View cluster node status
- rc cluster status
-
- # Trigger data healing for new node
- rc heal --node rustfs-node-2.example.net
-
- # Real-time tracking of healing progress
- rc heal status --follow
+ journalctl -u rustfs -f
  ```
-
-  Among them, the `heal` command is similar to RustFS's `rc admin heal`, ensuring all lost or inconsistent data shards are restored in the background.
 
 * **Community Experience Reference**
   Community testing shows that when nodes go offline and rejoin, RustFS will only perform healing operations on new nodes, not fully rebalance the cluster, thus avoiding unnecessary network and I/O peaks.

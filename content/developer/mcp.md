@@ -20,6 +20,12 @@ The Model Context Protocol is an open standard that enables AI applications to e
 
 ## 🔧 Installation
 
+:::warning[Build instructions may be outdated]
+
+The `rustfs-mcp` crate is no longer part of the current `rustfs/rustfs` main branch, so the build commands below may fail against a fresh clone. Check the [RustFS GitHub organization](https://github.com/rustfs) for the MCP server's current location before building from source.
+
+:::
+
 ### Prerequisites
 
 - Rust 1.75+ (for building from source)
@@ -126,7 +132,7 @@ rustfs-mcp --log-level debug --region us-west-2
 
 ```bash
 # Clone RustFS repository code
-git clone git@github.com:rustfs/rustfs.git
+git clone https://github.com/rustfs/rustfs.git
 
 # Build Docker image
 docker build -f crates/mcp/Dockerfile -t rustfs/rustfs-mcp .
