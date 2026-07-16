@@ -89,6 +89,7 @@ RUSTFS_VOLUMES="/data"
 - Plain Markdown pages use `.md`.
 - Pages that need JSX components (`<Cards>`, `<Tabs>`, `<Steps>`, etc.) must use the `.mdx` extension. Do not put JSX in `.md` files.
 - Mermaid diagrams are supported in fenced ```mermaid blocks.
+- **Card icons:** when a landing grid (`<Cards>`) uses icons, use a single consistent set of monochrome line icons from `lucide-react` (registered in `press.config.tsx`), one semantically matched icon per card, applied to **every** card in the grid — never a partial set. Do not use emoji-as-icons and do not mix brand logos (e.g. the Docker whale) with abstract icons. Pass them via `<Card icon={<Rocket />} …>`.
 
 ## Product Terminology
 
