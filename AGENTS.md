@@ -2,6 +2,8 @@
 
 This playbook directs AI agents working in the RustFS documentation repository so that every deliverable stays accurate, auditable, and easy to maintain.
 
+> **Every agent:** the operating playbook for writing and reviewing these docs is the skill at [`.agents/skills/rustfs-docs/SKILL.md`](.agents/skills/rustfs-docs/SKILL.md) — factual-accuracy discipline, canonical constants, FumaPress syntax, screenshots, and the `npm run docs:check` / `npm run build` pre-flight. Read it before changing anything under `content/`. It uses the cross-client `.agents/skills/` convention; Claude Code auto-loads it via the `.claude/skills/rustfs-docs` symlink, and other agents should open the file directly. See also `STYLE.md` for the detailed style guide.
+
 ## 1. Repository Snapshot
 - Framework: **FumaPress** (static-site generator powered by Waku + Fumadocs). Content lives in `content/`; site configuration is in `press.config.tsx`, `source.config.ts`, and `waku.config.ts`.
 - Goal: produce documentation for a distributed object storage product aimed at a global audience, currently English-first with room for other locales.
