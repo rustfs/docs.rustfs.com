@@ -34,7 +34,7 @@ After signing in you land on the console home page, which shows:
 
 ## 4. Create Your First Bucket
 
-1. On the home page, in the top left corner, select **Create Bucket**.
+1. On the Buckets page, in the top right corner, select **Create Bucket**.
 2. Enter a bucket name (for example `my-first-bucket`) and click **Create**.
 
 ![bucket creation](../management/bucket/images/bucket-creation-by-ui.png)

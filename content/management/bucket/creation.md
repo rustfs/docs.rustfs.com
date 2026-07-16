@@ -14,7 +14,7 @@ Prerequisites:
 ## Using the RustFS UI
 
 1. Log in to the RustFS Console.
-2. On the homepage, in the top left corner, select **Create Bucket**.
+2. On the Buckets page, in the top right corner, select **Create Bucket**.
 3. Enter the bucket name and click **Create** to complete bucket creation.
 
 ![bucket creation](images/bucket-creation-by-ui.png)
