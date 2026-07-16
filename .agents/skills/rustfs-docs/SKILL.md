@@ -85,6 +85,11 @@ Banned in examples (the CI rejects them): `12.34.56.78`, `cn-east-1`,
   href>` for link grids; `<Tabs items={[...]}><Tab value id>` for mutually
   exclusive alternatives (each `Tab` needs a page-unique `id`). Rename a page to
   `.mdx` only when it actually uses components — the URL does not change.
+- **Card icons** — when a `<Cards>` grid uses icons, use one consistent set of
+  monochrome line icons from `lucide-react` (registered in `press.config.tsx`),
+  one semantically matched icon per card, applied to **every** card in the grid.
+  No emoji-as-icons, no mixing brand logos with abstract icons.
+  `<Card icon={<Rocket />} title="…" href="…">`.
 - Diagrams: ```mermaid fenced blocks. Math: KaTeX `$…$` / `$$…$$`.
 
 ## 5. Voice
