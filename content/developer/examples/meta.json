@@ -3,7 +3,11 @@
   "pages": [
     "[mc (MinIO Client)](/developer/examples/mc)",
     "[AWS CLI](/developer/examples/aws-cli)",
+    "[s3cmd](/developer/examples/s3cmd)",
+    "[rclone](/developer/examples/rclone)",
     "[boto3 (Python)](/developer/examples/boto3)",
-    "[rclone](/developer/examples/rclone)"
+    "[AWS SDK for JavaScript](/developer/examples/aws-sdk-js)",
+    "[AWS SDK for Go](/developer/examples/aws-sdk-go)",
+    "[Terraform](/developer/examples/terraform)"
   ]
 }
