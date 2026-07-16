@@ -1,59 +1,79 @@
 ---
-title: "Amazon S3 Compatibility"
-description: "S3 compatibility is essential for cloud-native applications. RustFS strictly adheres to S3 API standards. RustFS offers a widely tested S3 alternative."
+title: "S3 Compatibility"
+description: "The RustFS S3 compatibility matrix: which S3 APIs are implemented, which are planned, and which are intentionally out of scope, backed by the executable Ceph s3tests suites."
 ---
 
-S3 compatibility is essential for cloud-native applications. RustFS strictly adheres to S3 API standards. RustFS offers a widely tested S3 alternative.
+RustFS provides broad S3 API compatibility for supported features. It does not claim complete coverage of every standard or vendor-specific S3 behavior. This page reproduces the upstream [S3 compatibility matrix](https://github.com/rustfs/rustfs/blob/main/docs/architecture/s3-compatibility-matrix.md), which ties the compatibility claim to the executable Ceph s3tests lists under `scripts/s3-tests/` in the RustFS repository.
 
-## RustFS and S3 API - Designed for Multi-Cloud Storage
+Legend: ✅ implemented and gated by tests · ❌ planned but not yet implemented · ⊘ intentionally excluded (out of scope).
 
-RustFS prioritizes S3 compatibility. As an early adopter of the S3 API (V2 and V4), RustFS ensures compatibility across public cloud, private cloud, data center, multi-cloud, hybrid cloud, and edge environments.
+## Test list sources
 
-## S3 Enables Hybrid and Multi-Cloud Computing
+| List | Purpose | Count | Source |
+| --- | --- | ---: | --- |
+| Implemented tests | Standard S3 tests expected to pass; used by the default local s3tests run. | 452 | `scripts/s3-tests/implemented_tests.txt` |
+| Lifecycle behavior tests | Expiration behavior cases gated by the dedicated lifecycle lane (debug-accelerated day + scanner enabled). | 5 | `scripts/s3-tests/lifecycle_behavior_tests.txt` |
+| Unimplemented tests | Standard S3 features planned but not yet implemented. | 17 | `scripts/s3-tests/unimplemented_tests.txt` |
+| Excluded tests | Vendor-specific or intentionally unsupported behavior excluded from compatibility gating. | 273 | `scripts/s3-tests/excluded_tests.txt` |
 
-S3 is the standard for multi-cloud compatibility. As a RESTful API standard, S3 facilitates interactions between applications, data, and infrastructure.
+Counts ignore blank lines and comments.
 
-Kubernetes-native, S3-compatible object storage and applications can run anywhere - from public cloud instances (Google, Azure, AWS) to private clouds (Red Hat OpenShift, VMware Tanzu) and bare metal.
+## Supported coverage
 
-## S3 Compatibility for Bare Metal Workloads
+The implemented test list currently covers the common object-storage surface:
 
-Private cloud is a fundamental building block of hybrid cloud architecture. S3 compatibility is crucial for all applications, from analytics to archiving.
+### Bucket APIs
 
-With RustFS, S3 compatibility is location-independent. RustFS bare metal instances have the same S3 compatibility and performance as public cloud or edge instances.
+| Area | Status |
+| --- | --- |
+| Bucket create / delete / list / head | ✅ |
+| Bucket and object tagging | ✅ |
+| Bucket policy put / get / delete | ✅ |
+| Public access block put / get / delete | ✅ |
 
-## Advantages of RustFS Scalable Object Storage
+### Object APIs
 
-Cloud-native applications use the S3 API to communicate with object storage. Many vendors only support a subset of functionality.
+| Area | Status |
+| --- | --- |
+| Object put / get / delete / copy / head | ✅ |
+| ListObjects / ListObjectsV2 with prefix, delimiter, marker, max-keys | ✅ |
+| Presigned GET and PUT URLs | ✅ |
+| Range and conditional reads | ✅ |
+| User metadata | ✅ |
+| SSE-C and selected SSE-KMS edge cases | ✅ |
+| Selected versioning, object-lock, checksum, CORS, raw request, and conditional write behavior | ✅ |
 
-RustFS has a proven track record of S3 compatibility. We test millions of hardware, software, and application combinations. RustFS releases software weekly, and community-reported defects are promptly addressed.
+### Multipart APIs
 
-Comprehensive S3 API support means applications can leverage data stored in RustFS on any hardware, location, or cloud.
+| Area | Status |
+| --- | --- |
+| Multipart upload create / upload / complete / abort | ✅ |
+| Selected multipart copy, checksum, and object-attribute behavior | ✅ |
 
-## Core Features
+## Planned standard coverage
 
-### S3 Select
+These are standard S3 areas that remain planned work and are not yet complete:
 
-![S3 Select](images/s1-4.png)
+| Area | Status | Evidence |
+| --- | --- | --- |
+| Bucket access logging | ❌ | `unimplemented_tests.txt` |
+| POST Object form upload checksum handling | ❌ | `unimplemented_tests.txt` |
+| Bucket ownership controls | ❌ | `unimplemented_tests.txt` |
+| IAM-account or multi-storage-class dependent cases | ❌ | `unimplemented_tests.txt` |
+| Tenanted bucket policy edge cases | ❌ (needs investigation) | `unimplemented_tests.txt` |
+| Multipart upload listing and part lookup compatibility edge cases | ⊘ (not part of default gate) | `excluded_tests.txt` |
 
-S3 Select relies on performance for complex queries. RustFS leverages SIMD instruction sets to optimize performance, running complex S3 Select queries on CSV, Parquet, JSON, and more.
+## Intentional exclusions
 
-### Amazon Signature V4
+The excluded list contains tests that do not block the RustFS compatibility gate. They fall into two classes:
 
-```mermaid
-flowchart LR
-    A1["1. Create canonical request"]
-    A2["2. Create string to sign"]
-    A3["3. Calculate signature"]
-    A4["4. Add signature to request"]
-    A1 --> A2 --> A3 --> A4
-    classDef svc fill:#eef2ff,stroke:#6366f1,stroke-width:2px,color:#1e293b;
-    class A1,A2,A3,A4 svc
-```
+- vendor-specific or non-portable behavior not required for RustFS S3 compatibility;
+- intentionally unsupported product behavior, such as ACL authorization.
 
-Applications and clients must authenticate to access RustFS management APIs. RustFS supports AWS Signature Version 4. After authentication, RustFS uses policy-based access control compatible with AWS IAM to authorize operations.
+## Lifecycle behavior lane
 
-## AWS S3 API and RustFS
+The lifecycle behavior lane runs real Days-based expiration cases. It requires `RUSTFS_ILM_DEBUG_DAY_SECS` (the Ceph `lc_debug_interval` equivalent) and an enabled background scanner, and runs separately from the default single-server gate because a global debug day would also shrink the `x-amz-expiration` header asserted by other lifecycle header tests.
 
-RustFS is a high-performance object storage. Combined with S3 compatibility, it supports a wide set of use cases, including code repositories (GitHub, GitLab), analytics (MongoDB, ClickHouse, MariaDB, CockroachDB, Teradata), and archiving/backup.
-
-RustFS is ideal for AI/ML and data science workloads. KubeFlow and TensorFlow require high-performance S3-compatible object storage. RustFS provides multi-cloud object storage and efficient replication.
+:::note
+For the authoritative, always-current test lists and the update rule that moves entries from unimplemented to implemented, see the upstream matrix: [docs/architecture/s3-compatibility-matrix.md](https://github.com/rustfs/rustfs/blob/main/docs/architecture/s3-compatibility-matrix.md).
+:::
