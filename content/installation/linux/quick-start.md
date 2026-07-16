@@ -1,41 +1,89 @@
 ---
-title: "Quick Start Guide for Linux"
-description: "Quick deployment and installation in Linux environment using RustFS one-click installation package"
+title: "Quick Start"
+description: "Install RustFS with the one-click script, log in to the Console, and store your first object — in about ten minutes."
 ---
 
-<a id="mode"></a>
+This guide takes you from an empty Linux server to a working RustFS instance: install, log in to the Console, create a bucket, and upload your first object. Production planning (multi-node layout, hardware sizing) is deliberately left for [the next step](#next-steps).
 
-## 1. Pre-Installation Reading
+**Prerequisites**
 
-This page contains complete documentation and instructions for all three installation modes of RustFS. Among them, the multi-machine multi-disk mode includes enterprise-grade performance, security, and scalability. It also provides architecture diagrams needed for production workloads. Please read before installation, our startup modes and checklists are as follows:
+- A Linux server (x86_64 or aarch64) with `systemd`, and root or sudo access
+- `unzip` installed, and outbound network access to download the package
+- Ports `9000` (S3 API) and `9001` (Console) reachable from your machine
 
-1. Choose one of the following installation modes:
+## 1. Install and start RustFS
 
-    - [Single Node Single Disk Mode (SNSD)](./single-node-single-disk.md)
-    - [Single Node Multiple Disk Mode (SNMD)](./single-node-multiple-disk.md)
-    - [Multiple Node Multiple Disk Mode (MNMD)](./multiple-node-multiple-disk.md)
-
-2. [Pre-Installation Check](../checklists/index.md), ensure your system meets the production requirements. For non-production environments, you can skip this step.
-
-## 2. Quick Installation
-
-The quick installation script sets up the **Single Node Single Disk (SNSD)** mode. The script is as follows:
+Run the official installation script:
 
 ```bash
 curl -O https://rustfs.com/install_rustfs.sh && bash install_rustfs.sh
 ```
 
-**Notes:**
-- Default installation port is `9000`.
-- Default installation path is `/data/rustfs0`. If you have independent disks, please mount them in advance.
-- Ensure `unzip` is installed to ensure RustFS zip installation package can be extracted normally.
+The script installs the binary to `/usr/local/bin/rustfs`, registers a `rustfs` systemd service, and starts it. By default it stores data in `/data/rustfs0` and listens on port `9000` (S3 API) and `9001` (Console); the data path and ports can be adjusted during installation. On success it prints a summary like:
 
-The quick installation script is available on GitHub at: https://github.com/rustfs/rustfs.com/blob/main/public/install_rustfs.sh
+```text
+RustFS has been installed and started successfully!
+Service port: 9000,  Console port: 9001,  Data directory: /data/rustfs0
 
-## 3. Other Important Notes
+[SECURITY WARNING] Please change the default value for RUSTFS_ACCESS_KEY/RUSTFS_SECRET_KEY immediately ...
+  Config file: /etc/default/rustfs
+```
 
-1. Verify firewall settings.
-2. Ensure NTP synchronization.
-3. Determine current disk capacity and planning.
-4. Confirm the operating system kernel version supports IO-Uring.
-5. Check SELinux settings.
+## 2. Set your credentials
+
+The generated config file ships placeholder credentials. Set your own access key and secret key, then restart the service:
+
+```ini title="/etc/default/rustfs" {1,2}
+RUSTFS_ACCESS_KEY=<your-access-key>
+RUSTFS_SECRET_KEY=<your-secret-key>   ; e.g. output of: openssl rand -base64 24
+```
+
+```bash
+sudo systemctl restart rustfs
+sudo systemctl status rustfs --no-pager   # should report: active (running)
+```
+
+:::warning[Do not keep default credentials]
+
+If `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` are not set, the server falls back to the built-in default `rustfsadmin` / `rustfsadmin` — acceptable for a throwaway local test, never for anything reachable by others.
+
+:::
+
+## 3. Log in to the Console
+
+Open `http://<server-ip>:9001` in your browser and sign in with the access key and secret key from step 2.
+
+![RustFS Console login](./images/console.jpg)
+
+## 4. Create a bucket and upload a file
+
+1. In the Console home page, select **Create Bucket**, name it (for example `my-bucket`), and confirm.
+2. Open the bucket and use the upload action to add any local file.
+3. Click the uploaded object to view its details — you have a working object store.
+
+Prefer the command line? The same two operations with the [MinIO Client (`mc`)](../../developer/mc.md):
+
+```bash
+mc alias set rustfs http://<server-ip>:9000 <your-access-key> <your-secret-key>
+mc mb rustfs/my-bucket
+mc cp ./hello.txt rustfs/my-bucket
+mc ls rustfs/my-bucket
+```
+
+```text
+Bucket created successfully `rustfs/my-bucket`.
+[2026-07-15 10:00:00 UTC]  12B hello.txt
+```
+
+<a id="mode"></a>
+
+## Next steps
+
+The quick install runs RustFS in **Single Node Single Disk (SNSD)** mode — zero redundancy, right for evaluation and development. Where to go from here:
+
+- **Plan a production deployment** — choose a topology, then follow its guide:
+  - [Single Node Single Disk (SNSD)](./single-node-single-disk.md) — dev and small workloads
+  - [Single Node Multiple Disk (SNMD)](./single-node-multiple-disk.md) — disk-level fault tolerance on one machine
+  - [Multiple Node Multiple Disk (MNMD)](./multiple-node-multiple-disk.md) — production-grade availability and scale, with the [pre-installation checklists](../checklists/index.md)
+- **Prefer containers?** — [Install with Docker](../docker/index.md)
+- **Connect your application** — [SDKs and examples](../../developer/sdk/index.md)

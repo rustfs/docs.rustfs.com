@@ -3,7 +3,7 @@ title: "Installing RustFS with Docker"
 description: "RustFS Docker deployment."
 ---
 
-RustFS is a high-performance, 100% S3-compatible open-source distributed object storage system. In single-node single-disk (SNSD) deployment mode, the backend uses zero erasure coding without additional data redundancy, suitable for local testing and small-scale scenarios.
+RustFS is a high-performance, S3-compatible open-source distributed object storage system. In single-node single-disk (SNSD) deployment mode, the backend uses zero erasure coding without additional data redundancy, suitable for local testing and small-scale scenarios.
 This article is based on RustFS official Linux binary packages, packaging RustFS and its runtime environment into containers through custom Dockerfile, and configuring data volumes and environment variables for one-click service startup.
 
 ---
@@ -16,18 +16,17 @@ This article is based on RustFS official Linux binary packages, packaging RustFS
  * Local path `/mnt/rustfs/data` (or custom path) for mounting object data
 2. **Network and Firewall**
 
- * Ensure host port 9000 is open to external access (or consistent with custom port)
-3. **Configuration File Preparation**
+ * Ensure host ports 9000 (S3 API) and 9001 (Console) are open to external access (or consistent with custom ports)
 
- * Define listening port, admin account, data path, etc. in host `/etc/rustfs/config.toml` (see Section 4 for details)
+3. **Directory Permissions**
 
-4. RustFS container run as non-root user `rustfs` with id `10001`, if you run docker with `-v` to mount host directory into docker container, please make sure the owner of host directory has been changed to `10001`, otherwise you will encounter permission denied error. You can run `chown -R 10001:10001 /path/to/host_directory` to grant the necessary permissions.
+ * The RustFS container runs as non-root user `rustfs` with id `10001`. If you run docker with `-v` to mount a host directory into the container, make sure the owner of the host directory is `10001`, otherwise you will encounter permission denied errors. Run `chown -R 10001:10001 /path/to/host_directory` to grant the necessary permissions.
 
 ---
 
-## 2. Quick Pull of RustFS Official Image
+## 2. Pull the RustFS Official Image
 
-Use official Ubuntu base image to quickly pull RustFS official image:
+Pull the official image (Alpine-based) from Docker Hub:
 
 ```bash
 docker pull rustfs/rustfs
@@ -60,52 +59,48 @@ Parameter descriptions:
 
 ---
 
-### Complete Parameter Configuration Example
+### Complete Configuration Example
 
-```bash {7,8,15,16}
+Configuration can be passed as environment variables (recommended) or as command-line flags — pick one style; when both are present, command-line flags win. The volume path (`/data`) always comes last.
+
+<Tabs items={["Environment variables", "Command-line flags"]}>
+  <Tab value="Environment variables" id="docker-env-config">
+
+```bash {7,8}
 # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
 docker run -d \
-  --name rustfs_container \
+  --name rustfs \
   -p 9000:9000 \
   -p 9001:9001 \
   -v /mnt/rustfs/data:/data \
   -e RUSTFS_ACCESS_KEY="<your-access-key>" \
   -e RUSTFS_SECRET_KEY="<your-secret-key>" \
+  -e RUSTFS_ADDRESS=:9000 \
   -e RUSTFS_CONSOLE_ENABLE=true \
-  -e RUSTFS_SERVER_DOMAINS=example.com \
   rustfs/rustfs:latest \
-  --address :9000 \
-  --console-enable \
-  --server-domains example.com \
-  --access-key "<your-access-key>" \
-  --secret-key "<your-secret-key>" \
   /data
 ```
 
-### Parameter Description and Corresponding Methods
+  </Tab>
+  <Tab value="Command-line flags" id="docker-cli-config">
 
-1. **Environment Variable Method** (Recommended):
-   ```bash
-   # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
-   -e RUSTFS_ADDRESS=:9000 \
-   -e RUSTFS_SERVER_DOMAINS=example.com \
-   -e RUSTFS_ACCESS_KEY="<your-access-key>" \
-   -e RUSTFS_SECRET_KEY="<your-secret-key>" \
-   -e RUSTFS_CONSOLE_ENABLE=true \
-   ```
+```bash {8,9}
+# Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
+docker run -d \
+  --name rustfs \
+  -p 9000:9000 \
+  -p 9001:9001 \
+  -v /mnt/rustfs/data:/data \
+  rustfs/rustfs:latest \
+  --access-key "<your-access-key>" \
+  --secret-key "<your-secret-key>" \
+  --address :9000 \
+  --console-enable \
+  /data
+```
 
-2. **Command Line Parameter Method**:
-   ```
-   # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
-   --address :9000 \
-   --server-domains example.com \
-   --access-key "<your-access-key>" \
-   --secret-key "<your-secret-key>" \
-   --console-enable \
-   ```
-
-3. **Required Parameters**:
-    - `<VOLUMES>`: Specify at the end of command, such as `/data`
+  </Tab>
+</Tabs>
 
 ### Common Configuration Combinations
 
@@ -167,8 +162,8 @@ docker run -d \
 
 RustFS officially provides a Docker Compose installation method. The [`docker-compose.yml`](https://github.com/rustfs/rustfs/blob/main/docker-compose.yml) file includes multiple services, such as `grafana`, `prometheus`, `otel-collector`, and `jaeger`, mainly for observability. If you want to deploy these services together, clone the [RustFS code repository](https://github.com/rustfs/rustfs) locally,
 
-```
-git clone git@github.com:rustfs/rustfs.git
+```bash
+git clone https://github.com/rustfs/rustfs.git
 ```
 
 Running the command under root directory,
@@ -214,16 +209,9 @@ e7db806b2d6f   jaegertracing/all-in-one:latest                   "/go/bin/all-in
 1897830a2f1e   otel/opentelemetry-collector-contrib:latest       "/otelcol-contrib --…"   7 seconds ago   Up 5 seconds                      0.0.0.0:4317-4318->4317-4318/tcp, :::4317-4318->4317-4318/tcp, 0.0.0.0:8888-8889->8888-8889/tcp, :::8888-8889->8888-8889/tcp, 55679/tcp   otel-collector
 ```
 
-If you only want to install rustfs, do not want to deploy grafana,prometheus,etc, please comment below lines in `docker-compose.yml` file,
+If you only want to install RustFS without Grafana, Prometheus, and the other observability services, start just the `rustfs` service (the compose file marks the collector dependency as optional):
 
-```
-#depends_on:
-#  - otel-collector
-```
-
-Then, run the command,
-
-```
+```bash
 docker compose -f docker-compose.yml up -d rustfs
 ```
 
@@ -235,7 +223,7 @@ CONTAINER ID   IMAGE                                             COMMAND        
 e07121ecdd39   rustfs/rustfs:latest                              "/entrypoint.sh rust…"   2 seconds ago   Up 1 second (health: starting)   0.0.0.0:9000-9001->9000-9001/tcp, :::9000-9001->9000-9001/tcp   rustfs-server
 ```
 
-Whether you start only the `rustfs-server` or together with observability services, you can access the RustFS instance via `http://localhost:9000` using the access key and secret key you configured above (the `<your-access-key>` / `<your-secret-key>` placeholders). Generate a strong secret with, for example, `openssl rand -base64 24`, and never ship the placeholder values to production.
+Whether you start only the `rustfs-server` or together with observability services, the S3 API is served at `http://localhost:9000`, and the RustFS Console is at `http://localhost:9001` — open it in a browser and log in with the access key and secret key you configured above (the `<your-access-key>` / `<your-secret-key>` placeholders). Generate a strong secret with, for example, `openssl rand -base64 24`, and never ship the placeholder values to production.
 
 ## 4. Verification and Access
 
