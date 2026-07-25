@@ -4,6 +4,7 @@
     "s3",
     "webdav",
     "ftps",
+    "sftp",
     "[MCP Server](/developer/mcp)"
   ]
 }
