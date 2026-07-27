@@ -1,5 +1,6 @@
 {
   "title": "Troubleshooting",
+  "defaultOpen": false,
   "pages": [
     "driver",
     "node"

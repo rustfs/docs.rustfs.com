@@ -1,5 +1,6 @@
 {
   "title": "Security & Compliance",
+  "defaultOpen": true,
   "pages": [
     "iam",
     "encryption",

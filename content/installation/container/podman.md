@@ -1,5 +1,5 @@
 ---
-title: "Podman Installation"
+title: "Podman"
 description: "Run a single-node RustFS instance with Podman and persistent container storage."
 ---
 

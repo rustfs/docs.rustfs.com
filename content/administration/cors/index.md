@@ -18,7 +18,9 @@ When this variable is unset or empty, the S3 endpoint does not add generic CORS 
 You can set the value to `*` to allow requests from any origin. Wildcard mode does not allow browser credentials.
 
 :::warning[Use explicit origins in production]
+
 Use a comma-separated allowlist for applications that send credentials. Reserve `*` for public resources that do not require credentialed browser requests.
+
 :::
 
 ## Console origins

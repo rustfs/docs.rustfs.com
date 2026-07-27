@@ -2,6 +2,7 @@
   "title": "Requirement",
   "pages": [
     "[Topology Selection](/installation#deployment-mode-comparison)",
+    "ec-configuration",
     "disk-preparation",
     "checklists"
   ]

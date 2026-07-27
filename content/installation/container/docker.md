@@ -1,5 +1,5 @@
 ---
-title: "Docker Installation"
+title: "Docker"
 description: "Run a single-node RustFS instance with Docker and persistent container storage."
 ---
 

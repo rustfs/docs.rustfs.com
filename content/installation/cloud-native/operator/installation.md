@@ -79,7 +79,9 @@ kubectl -n rustfs-system port-forward \
 Open `http://127.0.0.1:19090` and paste the token into the login form. The Helm installation notes print the exact ServiceAccount and Service names when release names or namespaces differ.
 
 :::note[Local HTTP access]
+
 If your browser does not retain the login over HTTP, set `CONSOLE_COOKIE_SECURE=false` under `console.env` for local testing only. Keep secure cookies enabled for HTTPS.
+
 :::
 
 ## 4. Configure Console TLS

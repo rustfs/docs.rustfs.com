@@ -177,5 +177,5 @@ Configure the client for whole-file, single-connection uploads. Symbolic links a
 ## Next steps
 
 - [Manage credentials](/operations/credentials)
-- [Configure ports](/reference/ports)
+- [Check service status](/operations/status-check)
 - [Configure lifecycle management](/administration/data/lifecycle-management)

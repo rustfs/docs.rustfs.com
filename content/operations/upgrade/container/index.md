@@ -16,7 +16,9 @@ curl -fsS http://localhost:9000/health/ready
 ```
 
 :::warning[Preserve persistent storage]
+
 Do not remove the named volume or host directory mounted at `/data`. Commands such as `docker compose down -v`, `docker volume rm`, and `podman volume rm` delete persistent storage and are not part of an upgrade.
+
 :::
 
 ## Upgrade a Docker container

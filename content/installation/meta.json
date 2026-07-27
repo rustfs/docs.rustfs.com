@@ -1,5 +1,6 @@
 {
   "title": "Installation",
+  "defaultOpen": true,
   "pages": [
     "requirement",
     "linux",

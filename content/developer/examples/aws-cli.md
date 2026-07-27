@@ -31,7 +31,9 @@ Default output format [None]: json
 Pass your RustFS address with `--endpoint-url` on every command. Replace `http://localhost:9000` with your server address. When `--endpoint-url` is set, the AWS CLI uses path-style addressing, which is what RustFS requires.
 
 :::note
+
 If you did not set credentials at install, the local-test default is `rustfsadmin` / `rustfsadmin` — never use it beyond a throwaway local trial.
+
 :::
 
 ## Verify

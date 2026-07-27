@@ -63,7 +63,9 @@ Every server flag has an environment variable equivalent; the flag wins when bot
 | `--buffer-profile-disable` | `RUSTFS_BUFFER_PROFILE_DISABLE` | `false` | Use legacy fixed-size buffers. |
 
 :::note
+
 If neither `--access-key`/`--secret-key` nor their file variants are provided, the server falls back to the built-in default credentials (`rustfsadmin`/`rustfsadmin`) and logs a warning. Set real credentials for any non-throwaway deployment.
+
 :::
 
 ## Volume syntax

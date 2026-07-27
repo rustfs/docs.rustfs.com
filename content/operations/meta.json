@@ -1,5 +1,6 @@
 {
   "title": "Operations & Observability",
+  "defaultOpen": true,
   "pages": [
     "rc",
     "upgrade",

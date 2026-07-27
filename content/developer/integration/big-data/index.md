@@ -8,5 +8,6 @@ Use **RustFS** as the object storage layer for big data systems that support an 
 ## Systems
 
 - [Iceberg](./iceberg.md)
+- [Milvus](./milvus.md)
 
-Keep table metadata and data files in a dedicated bucket, and use credentials scoped to the required bucket operations.
+Keep application data in a dedicated bucket and prefix, and use credentials scoped to the required bucket operations.

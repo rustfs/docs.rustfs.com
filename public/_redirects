@@ -13,3 +13,7 @@
 /security-compliance/iam/oidc /security-compliance/oidc 301
 /security-compliance/sts-token-service /security-compliance/iam/sts 301
 /operations/cluster-health-check /operations/status-check 301
+/reference/ports /operations/status-check 301
+/reference/metrics /operations/observability 301
+/concepts/principle/erasure-coding /installation/requirement/ec-configuration 301
+/integration/nginx /developer/integration/reverse-proxy/nginx 301

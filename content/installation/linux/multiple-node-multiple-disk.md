@@ -117,6 +117,6 @@ tail -f /var/logs/rustfs/rustfs*.log
 
 ## Next Steps
 
-- Put a load balancer in front of the cluster — see the [Nginx integration guide](../../integration/nginx.md).
+- Put a load balancer in front of the cluster — see the [Nginx integration guide](/developer/integration/reverse-proxy/nginx).
 - Enable TLS for production traffic — see [TLS configuration](../../integration/tls-configured.md).
 - Review [Pool Expansion](../../operations/scaling/storage-pool-expansion.md) before scaling.

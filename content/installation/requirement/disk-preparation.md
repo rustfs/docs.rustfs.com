@@ -45,6 +45,18 @@ Add an entry to `/etc/fstab` so the disk is mounted by its stable file-system la
 LABEL=RUSTFS0 /data/rustfs0 xfs defaults,noatime,nodiratime 0 0
 ```
 
+For more reliable device selection, we recommend mounting by file-system UUID. A UUID uniquely identifies the file system and avoids mounting the wrong disk if labels are duplicated or Linux device names change. Retrieve the UUID after formatting:
+
+```bash
+sudo blkid -s UUID -o value /dev/sdb
+```
+
+Replace `<filesystem-uuid>` with the returned value, and use this entry instead of the `LABEL` entry above:
+
+```ini title="/etc/fstab"
+UUID=<filesystem-uuid> /data/rustfs0 xfs defaults,noatime,nodiratime 0 0
+```
+
 Mount all entries and confirm the result:
 
 ```bash
@@ -52,7 +64,7 @@ sudo mount -a
 findmnt /data/rustfs0
 ```
 
-For multiple disks, create one mount point and one `/etc/fstab` entry per label.
+For multiple disks, create one mount point and one `/etc/fstab` entry per file-system UUID.
 
 ## 4. Verify the prepared disks
 

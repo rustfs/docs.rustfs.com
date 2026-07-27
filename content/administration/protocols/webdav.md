@@ -205,4 +205,4 @@ Enter the RustFS access key and secret key when the client prompts for credentia
 
 - [Manage credentials](/operations/credentials)
 - [Configure TLS](/integration/tls-configured)
-- [Configure ports](/reference/ports)
+- [Check service status](/operations/status-check)

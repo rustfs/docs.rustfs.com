@@ -243,4 +243,4 @@ If login succeeds but directory listings or transfers time out, check the passiv
 
 - [Manage credentials](/operations/credentials)
 - [Configure TLS](/integration/tls-configured)
-- [Configure ports](/reference/ports)
+- [Check service status](/operations/status-check)

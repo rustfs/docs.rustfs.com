@@ -9,7 +9,7 @@ We recommend using separate hostnames for the S3 API on port `9000` and the Cons
 
 ## Supported guides
 
-- [Nginx](/integration/nginx)
+- [Nginx](./nginx.md)
 - [Traefik](./traefik.md)
 - [Caddy](./caddy.md)
 - [HAProxy](./haproxy.md)
