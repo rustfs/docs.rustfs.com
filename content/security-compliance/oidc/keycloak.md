@@ -80,15 +80,7 @@ If you use realm or client roles instead of groups, add a role mapper that emits
 
 ### RustFS configuration
 
-You can configure the Keycloak provider from the RustFS Console or through environment variables.
-
-#### Configure with the Console
-
-:::note[Console configuration placeholder]
-
-The Console workflow and screenshots for configuring an OIDC provider will be added here after the current interface is finalized. Until then, use the environment-variable configuration below.
-
-:::
+Configure the Keycloak provider through environment variables.
 
 #### Configure with environment variables
 

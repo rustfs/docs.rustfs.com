@@ -26,7 +26,7 @@ Open the following address, replacing `<server-ip>` with the RustFS server addre
 http://<server-ip>:9001
 ```
 
-![RustFS Console login page with key, STS, and OIDC sign-in options](./images/rustfs-conosle-login.png)
+![RustFS Console login page with key, STS, and OIDC sign-in options](./images/rustfs-console-login.png)
 
 For a local deployment, use `http://localhost:9001`. Windows and macOS desktop launchers use port `7001` instead.
 

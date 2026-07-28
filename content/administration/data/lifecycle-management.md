@@ -142,4 +142,4 @@ rc bucket lifecycle tier --help
 
 ## Next steps
 
-Review [Tiered Storage](/administration/data/tiered-storage) to monitor or maintain remote tiers, and use [object management](/administration/data/object) to create test objects for a lifecycle rule.
+Review [Tiered Storage](/administration/data/tiered-storage) to monitor or maintain remote tiers, and use [object creation](/administration/data/object/creation) to create test objects for a lifecycle rule.

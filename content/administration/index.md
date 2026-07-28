@@ -9,7 +9,7 @@ Use this section to manage RustFS through the Console, administer buckets and ob
 
 - [Console](./console/index.md) covers browser-based administration and sign-in methods.
 - [Data Management](./data/object/object-lock.md) covers buckets, objects, lifecycle behavior, and data protection features.
-- [Protocol Support](./protocols/s3.md) covers S3, WebDAV, and FTPS access.
+- [Protocol Support](./protocols/s3.md) covers S3, WebDAV, FTPS, and SFTP access.
 - [CORS Configuration](./cors/index.md) covers cross-origin access to RustFS services.
 - [Virtual-Host Access](/integration/virtual) covers domain-based S3 addressing.
 

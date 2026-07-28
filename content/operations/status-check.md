@@ -58,14 +58,14 @@ The `details` object reports `storage` / `iam` / `lock` (and `kms` when configur
 
 ## Cluster status
 
-### Console
+### Check cluster status in the Console
 
 1. Sign in to the RustFS Console.
 2. Open **Status**.
 3. Confirm that the cluster is online and review the server, network, and drive status.
 4. Investigate any offline server, unavailable drive, or failed network connection before maintenance or capacity changes.
 
-### rc
+### Check cluster status with rc
 
 Run the cluster information command with your configured alias:
 
@@ -83,14 +83,14 @@ rc admin info cluster rustfs --json
 
 ## Storage capacity
 
-### Console
+### Check storage capacity in the Console
 
 1. Sign in to the RustFS Console and open **Status**.
 2. Review the cluster's used and total storage capacity.
 3. Review the capacity and available space for each disk.
 4. Compare usage over time and plan expansion before available capacity becomes insufficient for normal writes and maintenance.
 
-### rc
+### Check storage capacity with rc
 
 Use the same cluster information command:
 

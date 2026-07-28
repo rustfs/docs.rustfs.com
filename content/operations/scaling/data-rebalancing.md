@@ -18,7 +18,7 @@ Before starting, verify that all nodes and disks are healthy, no decommission is
 
 ## Operation
 
-### Console
+### Start rebalancing in the Console
 
 1. Sign in to the RustFS Console with an account that has rebalance administration permission.
 2. Open **Rebalance**.
@@ -27,13 +27,7 @@ Before starting, verify that all nodes and disks are healthy, no decommission is
 5. Keep the page open or return to it periodically to review per-pool progress.
 6. Use **Stop Rebalance** only when you need to halt the operation. Data already moved remains in its new pool.
 
-:::note[Image placeholder]
-
-Add screenshots of the Rebalance page before starting, while the operation is running, and after it reports `Completed`.
-
-:::
-
-### rc
+### Start rebalancing with rc
 
 Configure the cluster alias if it does not already exist:
 
@@ -65,7 +59,7 @@ rc admin rebalance stop rustfs
 
 ## Verification
 
-### Console
+### Verify rebalancing in the Console
 
 Wait until the Rebalance page reports `Completed`. Confirm that:
 
@@ -74,13 +68,7 @@ Wait until the Rebalance page reports `Completed`. Confirm that:
 - All nodes and disks remain online.
 - Normal object reads and writes succeed.
 
-:::note[Image placeholder]
-
-Add a screenshot of the completed rebalance with the final per-pool usage values.
-
-:::
-
-### rc
+### Verify rebalancing with rc
 
 Run:
 

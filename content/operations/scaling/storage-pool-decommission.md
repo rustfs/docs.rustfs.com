@@ -26,7 +26,7 @@ Canceling a decommission does not roll back completed moves. Objects already rel
 
 ## Operation
 
-### Console
+### Start decommissioning in the Console
 
 1. Sign in to the RustFS Console with an account that has decommission administration permission.
 2. Open **Pool Decommission**.
@@ -35,15 +35,9 @@ Canceling a decommission does not roll back completed moves. Objects already rel
 5. Review the confirmation dialog carefully, then select **Confirm**.
 6. Use **Sync** to refresh the pool state and movement counters until the operation completes.
 
-:::note[Image placeholder]
-
-Add screenshots of the pool selection, confirmation dialog, running progress, and completed decommission state.
-
-:::
-
 After completion, remove the drained pool expression from `RUSTFS_VOLUMES` on every remaining node and restart RustFS with the same ordered topology. For Helm, decommission the pool before removing its entry from `pools.list`; never remove or reorder a live pool entry.
 
-### rc
+### Start decommissioning with rc
 
 Configure the cluster alias if needed, then list the pools:
 
@@ -87,7 +81,7 @@ After the target reports `complete`, remove its expression from `RUSTFS_VOLUMES`
 
 ## Verification
 
-### Console
+### Verify decommissioning in the Console
 
 Confirm that the target pool reports `Completed`, with zero failed objects and zero failed bytes. After removing the pool from the startup topology and restarting RustFS, verify that:
 
@@ -96,13 +90,7 @@ Confirm that the target pool reports `Completed`, with zero failed objects and z
 - Remaining pools show the relocated data and have adequate free capacity.
 - Existing objects can still be listed, read, and downloaded.
 
-:::note[Image placeholder]
-
-Add screenshots of the completed decommission and the final topology after the retired pool is removed.
-
-:::
-
-### rc
+### Verify decommissioning with rc
 
 Before removing the pool from the topology, run:
 

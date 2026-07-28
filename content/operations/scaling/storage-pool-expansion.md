@@ -33,7 +33,7 @@ Every node must start with the complete ordered pool list. Omitting the existing
 
 ## Operation
 
-### Console
+### Expand with Console assistance
 
 The Console displays storage pools but does not add a pool to the server startup topology. Use this Console-assisted workflow:
 
@@ -43,15 +43,9 @@ The Console displays storage pools but does not add a pool to the server startup
 4. Restart RustFS across all nodes so every process starts with the same expanded topology.
 5. Wait for all nodes to become ready, then refresh the pool list in the Console.
 
-:::note[Image placeholder]
-
-Add a screenshot of the Console pool list showing the existing and newly added pools.
-
-:::
-
 For a Helm deployment, append the new entry to `pools.list` and apply `helm upgrade`. Do not remove or reorder existing entries.
 
-### rc
+### Inspect the expansion with rc
 
 Configure an alias with credentials that can read cluster and pool status:
 
@@ -79,7 +73,7 @@ Use a zero-based pool ID to inspect the new pool in detail:
 rc admin pool status rustfs 1 --by-id
 ```
 
-:::note
+:::note[Rebalance aliases]
 
 `rc admin expand start`, `status`, and `stop` are aliases for the post-expansion rebalance workflow. They redistribute existing data; they do not append a pool to `RUSTFS_VOLUMES`.
 
@@ -87,7 +81,7 @@ rc admin pool status rustfs 1 --by-id
 
 ## Verification
 
-### Console
+### Verify the expansion in the Console
 
 Confirm that:
 
@@ -96,13 +90,7 @@ Confirm that:
 - The new pool reports the expected total and available capacity.
 - The cluster reports no degraded nodes before you resume normal traffic.
 
-:::note[Image placeholder]
-
-Add a screenshot of the expanded topology and healthy pool status in the Console.
-
-:::
-
-### rc
+### Verify the expansion with rc
 
 Run:
 
