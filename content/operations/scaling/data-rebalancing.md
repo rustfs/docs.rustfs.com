@@ -27,6 +27,8 @@ Before starting, verify that all nodes and disks are healthy, no decommission is
 5. Keep the page open or return to it periodically to review per-pool progress.
 6. Use **Stop Rebalance** only when you need to halt the operation. Data already moved remains in its new pool.
 
+![RustFS Console showing a rebalance in progress with moved bytes and objects](./images/rebalance-running-console.png)
+
 ### Start rebalancing with rc
 
 Configure the cluster alias if it does not already exist:
@@ -62,6 +64,8 @@ rc admin rebalance stop rustfs
 ### Verify rebalancing in the Console
 
 Wait until the Rebalance page reports `Completed`. Confirm that:
+
+![RustFS Console showing a completed rebalance and balanced pool usage](./images/rebalance-completed-console.png)
 
 - No pool reports a failed or stopped state.
 - Used-capacity ratios are closer across the active pools.

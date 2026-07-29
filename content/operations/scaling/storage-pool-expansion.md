@@ -43,6 +43,8 @@ The Console displays storage pools but does not add a pool to the server startup
 4. Restart RustFS across all nodes so every process starts with the same expanded topology.
 5. Wait for all nodes to become ready, then refresh the pool list in the Console.
 
+![RustFS Console showing the original and newly added storage pools](./images/pool-expansion-console.png)
+
 For a Helm deployment, append the new entry to `pools.list` and apply `helm upgrade`. Do not remove or reorder existing entries.
 
 ### Inspect the expansion with rc
