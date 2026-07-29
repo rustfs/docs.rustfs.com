@@ -1,0 +1,35 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/installation/docker/",
+      "destination": "/installation/container/docker",
+      "statusCode": 301
+    },
+    {
+      "source": "/concepts/comparison.html",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
+      "source": "/features/logging",
+      "destination": "/operations/observability",
+      "statusCode": 301
+    },
+    {
+      "source": "/features/integration/",
+      "destination": "/developer/integration",
+      "statusCode": 301
+    },
+    {
+      "source": "/administration/iam/access-token.html",
+      "destination": "/security-compliance/iam/access-token",
+      "statusCode": 301
+    },
+    {
+      "source": "/features/replication/",
+      "destination": "/administration/data/bucket/replication",
+      "statusCode": 301
+    }
+  ]
+}
