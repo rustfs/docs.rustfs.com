@@ -49,3 +49,242 @@
   border-radius: 0;
   background: var(--color-fd-background);
 }
+
+.rustfs-install-home {
+  --rustfs-install-accent: #d61f45;
+  margin-top: 1.5rem;
+}
+
+article:has(.rustfs-install-home) > h1 {
+  max-width: 48rem;
+  font-size: 3.75rem;
+  line-height: 1.08;
+}
+
+article:has(.rustfs-install-home) > h1 + p {
+  max-width: 48rem;
+  font-size: 1.25rem;
+  line-height: 1.65;
+}
+
+article:has(.rustfs-install-home) > h1 + p + div {
+  display: none;
+}
+
+.rustfs-install-intro {
+  max-width: 52rem;
+  margin-bottom: 2.75rem;
+}
+
+.rustfs-install-lede {
+  margin: 0;
+  color: var(--color-fd-muted-foreground);
+  font-size: 1.125rem;
+  line-height: 1.75;
+}
+
+.rustfs-install-overview {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  color: var(--rustfs-install-accent);
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.rustfs-install-overview > svg {
+  width: 1rem;
+  height: 1rem;
+  transition: transform 160ms ease;
+}
+
+.rustfs-install-overview:hover > svg {
+  transform: translateX(0.2rem);
+}
+
+.rustfs-install-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.rustfs-install-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr) 1.25rem;
+  gap: 1rem;
+  align-items: start;
+  min-height: 10.5rem;
+  padding: 1.5rem;
+  overflow: hidden;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--rustfs-install-accent) 4%, transparent), transparent 42%),
+    var(--color-fd-card);
+  color: var(--color-fd-foreground);
+  text-decoration: none;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--color-fd-foreground) 5%, transparent);
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.rustfs-install-card:hover {
+  border-color: color-mix(in srgb, var(--rustfs-install-accent) 58%, var(--color-fd-border));
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-fd-foreground) 9%, transparent);
+  transform: translateY(-2px);
+}
+
+.rustfs-install-card:focus-visible,
+.rustfs-install-overview:focus-visible {
+  outline: 2px solid var(--color-fd-ring);
+  outline-offset: 3px;
+}
+
+.rustfs-install-icon {
+  --rustfs-brand-color: var(--rustfs-install-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border: 1px solid color-mix(in srgb, var(--rustfs-brand-color) 28%, var(--color-fd-border));
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--rustfs-brand-color) 9%, var(--color-fd-background));
+  color: var(--rustfs-brand-color);
+}
+
+.rustfs-install-icon > svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.rustfs-install-icon--linux {
+  --rustfs-brand-color: #171717;
+}
+
+.rustfs-install-icon--docker {
+  --rustfs-brand-color: #2496ed;
+}
+
+.rustfs-install-icon--podman {
+  --rustfs-brand-color: #892ca0;
+}
+
+.rustfs-install-icon--helm {
+  --rustfs-brand-color: #0f1689;
+}
+
+.rustfs-install-icon--kubernetes {
+  --rustfs-brand-color: #326ce5;
+}
+
+.rustfs-install-icon--apple {
+  --rustfs-brand-color: #171717;
+}
+
+.rustfs-install-icon--windows {
+  --rustfs-brand-color: #0078d4;
+}
+
+.rustfs-install-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.rustfs-install-copy > strong {
+  font-size: 1.0625rem;
+  line-height: 1.35;
+}
+
+.rustfs-install-copy > span {
+  color: var(--color-fd-muted-foreground);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.rustfs-install-arrow {
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-top: 0.1875rem;
+  color: var(--color-fd-muted-foreground);
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.rustfs-install-card:hover .rustfs-install-arrow {
+  color: var(--rustfs-install-accent);
+  transform: translateX(0.2rem);
+}
+
+@media (max-width: 48rem) {
+  article:has(.rustfs-install-home) > h1 {
+    font-size: 2.5rem;
+  }
+
+  article:has(.rustfs-install-home) > h1 + p {
+    font-size: 1.0625rem;
+  }
+
+  .rustfs-install-intro {
+    margin-bottom: 2rem;
+  }
+
+  .rustfs-install-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rustfs-install-card {
+    min-height: 9.5rem;
+  }
+}
+
+@media (max-width: 30rem) {
+  .rustfs-install-lede {
+    font-size: 1rem;
+  }
+
+  .rustfs-install-card {
+    grid-template-columns: 2.75rem minmax(0, 1fr);
+    padding: 1.25rem;
+  }
+
+  .rustfs-install-icon {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .rustfs-install-arrow {
+    display: none;
+  }
+}
+
+.dark .rustfs-install-home {
+  --rustfs-install-accent: #ff5574;
+}
+
+.dark .rustfs-install-icon--linux,
+.dark .rustfs-install-icon--apple {
+  --rustfs-brand-color: #f5f5f5;
+}
+
+.dark .rustfs-install-icon--docker {
+  --rustfs-brand-color: #59b9ff;
+}
+
+.dark .rustfs-install-icon--podman {
+  --rustfs-brand-color: #c77dda;
+}
+
+.dark .rustfs-install-icon--helm {
+  --rustfs-brand-color: #929bff;
+}
+
+.dark .rustfs-install-icon--kubernetes {
+  --rustfs-brand-color: #78a4ff;
+}
+
+.dark .rustfs-install-icon--windows {
+  --rustfs-brand-color: #4bb4ff;
+}

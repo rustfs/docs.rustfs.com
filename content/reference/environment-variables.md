@@ -5,8 +5,10 @@ description: "Reference for the environment variables that configure the RustFS 
 
 This page lists the environment variables recognized by the `rustfs` server binary. It covers the operations-relevant subset verified against the RustFS source code; some internal tuning knobs are intentionally omitted. Every variable can also be supplied through the matching command-line flag where one exists (see the [CLI reference](./cli)).
 
-:::note
+:::note[Boolean values]
+
 Boolean variables accept `true`/`false`. Values shown as "unset" have no default and the corresponding feature stays disabled or falls back to built-in behavior.
+
 :::
 
 ## Core server
@@ -31,6 +33,15 @@ Boolean variables accept `true`/`false`. Values shown as "unset" have no default
 | --- | --- | --- |
 | `RUSTFS_CONSOLE_ENABLE` | `true` | Enable the embedded web console (served on a separate listener). |
 | `RUSTFS_CONSOLE_ADDRESS` | `:9001` | Bind address and port for the console listener. |
+
+## CORS
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `RUSTFS_CORS_ALLOWED_ORIGINS` | empty | Comma-separated origins allowed to access the S3 API from a browser. Set `*` for wildcard origins without credentials. |
+| `RUSTFS_CONSOLE_CORS_ALLOWED_ORIGINS` | `*` | Comma-separated origins allowed to access the Console from a browser, or `*` for all origins. |
+
+See [CORS Configuration](/administration/cors) for configuration and verification steps.
 
 ## TLS & KMS
 
@@ -133,7 +144,9 @@ Metrics collection intervals follow the pattern `RUSTFS_METRICS_<SCOPE>_INTERVAL
 | `RUSTFS_RPC_SECRET` | derived | Secret used to authenticate internode RPC. When unset it is derived from the active access/secret key pair; with an all-default credential pair, multi-node clusters must set it explicitly. |
 
 :::warning
+
 The built-in default credentials `rustfsadmin`/`rustfsadmin` are for first-boot convenience only. Always set non-default credentials for production deployments.
+
 :::
 
 ## Event & Audit targets

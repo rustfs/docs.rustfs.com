@@ -15,7 +15,7 @@ Or see the [official install guide](https://rclone.org/install/).
 
 ## Configure
 
-Add a remote to `~/.config/rclone/rclone.conf`. Replace `http://localhost:9000` with your server address, and use your own [access keys](../../administration/iam/access-token.md). `force_path_style = true` is required because RustFS uses path-style addressing:
+Add a remote to `~/.config/rclone/rclone.conf`. Replace `http://localhost:9000` with your server address, and use your own [access keys](../../security-compliance/iam/access-token.md). `force_path_style = true` is required because RustFS uses path-style addressing:
 
 ```ini title="~/.config/rclone/rclone.conf"
 [rustfs]
@@ -56,4 +56,4 @@ rclone ls rustfs:my-bucket
 
 ## Next steps
 
-Build applications against RustFS with an [S3 SDK](../sdk/index.md), or manage objects with [mc](../mc.md).
+Build applications against RustFS with an [S3 SDK](../sdk/index.md), or manage objects with [`rc`](/operations/rc).

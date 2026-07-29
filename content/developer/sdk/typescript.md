@@ -9,7 +9,7 @@ RustFS ships no first-party TypeScript SDK — it is fully S3-compatible, so you
 
 - Node.js 18 or later (the examples use ES modules — set `"type": "module"` in your `package.json`)
 - An available RustFS instance (refer to [Installation Guide](../../installation/index.md) for installation) — the S3 API listens on port `9000`, the Console on port `9001`
-- Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (refer to [Access Key Management](../../administration/iam/access-token.md) for creation)
+- Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (refer to [Access Key Management](../../security-compliance/iam/access-token.md) for creation)
 
 :::tip[Local test]
 

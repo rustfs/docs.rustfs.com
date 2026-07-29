@@ -174,7 +174,7 @@ Currently, mainstream AI IDEs such as Cursor, Windsurf, Trae, etc. all support M
 }
 ```
 
-> `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are RustFS access keys. You can refer to the [Access Key Management chapter](../administration/iam/access-token.md) for creation.
+> `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are RustFS access keys. You can refer to the [Access Key Management chapter](../security-compliance/iam/access-token.md) for creation.
 
 If added successfully, you can list the [available tools](#️-available-tools) on the MCP configuration page.
 

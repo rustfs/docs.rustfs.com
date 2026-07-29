@@ -1,0 +1,10 @@
+{
+  "title": "Protocol Support",
+  "pages": [
+    "s3",
+    "webdav",
+    "ftps",
+    "sftp",
+    "[MCP Server](/developer/mcp)"
+  ]
+}

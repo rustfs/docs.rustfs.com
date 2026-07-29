@@ -1,0 +1,13 @@
+{
+  "title": "Operations & Observability",
+  "defaultOpen": true,
+  "pages": [
+    "rc",
+    "upgrade",
+    "scaling",
+    "high-availability",
+    "observability",
+    "status-check",
+    "event-notifications"
+  ]
+}

@@ -18,7 +18,7 @@ pip install s3cmd
 
 ## Configure
 
-Create `~/.s3cfg`. Replace `localhost:9000` with your server address and use your own [access keys](../../administration/iam/access-token.md). RustFS uses path-style addressing, so set the bucket host to the same endpoint:
+Create `~/.s3cfg`. Replace `localhost:9000` with your server address and use your own [access keys](../../security-compliance/iam/access-token.md). RustFS uses path-style addressing, so set the bucket host to the same endpoint:
 
 ```ini title="~/.s3cfg"
 [default]
@@ -53,4 +53,4 @@ upload: '/path/to/hello.txt' -> 's3://my-bucket/hello.txt'  [1 of 1]
 
 ## Next steps
 
-See the [SDK overview](../sdk/index.md) to connect an application, or manage objects with [mc](../mc.md).
+See the [SDK overview](../sdk/index.md) to connect an application, or manage objects with [`rc`](/operations/rc).

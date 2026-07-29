@@ -29,7 +29,7 @@ flowchart TD
     class N1D1,N1D2,N1D3,N1D4,N2D1,N2D2,N2D3,N2D4,N3D1,N3D2,N3D3,N3D4,N4D1,N4D2,N4D3,N4D4 disk
 ```
 
-Before installation, review the [Pre-Installation Checklists](../checklists/index.md) and ensure all items meet production guidance.
+Before installation, review the [Pre-Installation Checklists](../requirement/checklists/index.md) and ensure all items meet production guidance.
 
 ## Hostnames
 
@@ -117,6 +117,6 @@ tail -f /var/logs/rustfs/rustfs*.log
 
 ## Next Steps
 
-- Put a load balancer in front of the cluster — see the [Nginx integration guide](../../integration/nginx.md).
+- Put a load balancer in front of the cluster — see the [Nginx integration guide](/developer/integration/reverse-proxy/nginx).
 - Enable TLS for production traffic — see [TLS configuration](../../integration/tls-configured.md).
-- Review [Availability and Resiliency](../../upgrade-scale/availability-and-resiliency.md) before scaling.
+- Review [Pool Expansion](../../operations/scaling/storage-pool-expansion.md) before scaling.

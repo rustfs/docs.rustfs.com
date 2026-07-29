@@ -1,0 +1,11 @@
+{
+  "title": "Object",
+  "pages": [
+    "creation",
+    "deletion",
+    "object-lock",
+    "versioning",
+    "multipart-upload",
+    "scanner"
+  ]
+}

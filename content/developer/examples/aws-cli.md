@@ -15,7 +15,7 @@ brew install awscli
 
 ## Configure
 
-Set your [access keys](../../administration/iam/access-token.md) and region:
+Set your [access keys](../../security-compliance/iam/access-token.md) and region:
 
 ```bash
 aws configure
@@ -31,7 +31,9 @@ Default output format [None]: json
 Pass your RustFS address with `--endpoint-url` on every command. Replace `http://localhost:9000` with your server address. When `--endpoint-url` is set, the AWS CLI uses path-style addressing, which is what RustFS requires.
 
 :::note
+
 If you did not set credentials at install, the local-test default is `rustfsadmin` / `rustfsadmin` — never use it beyond a throwaway local trial.
+
 :::
 
 ## Verify
@@ -68,4 +70,4 @@ aws s3 ls s3://my-bucket --endpoint-url http://localhost:9000
 
 ## Next steps
 
-Build applications against RustFS with an [S3 SDK](../sdk/index.md), or manage objects with [mc](../mc.md).
+Build applications against RustFS with an [S3 SDK](../sdk/index.md), or manage objects with [`rc`](/operations/rc).

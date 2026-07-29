@@ -1,0 +1,11 @@
+{
+  "title": "Administration",
+  "defaultOpen": true,
+  "pages": [
+    "[Console](/administration/console)",
+    "data",
+    "protocols",
+    "cors",
+    "[Virtual-Host Access](/integration/virtual)"
+  ]
+}

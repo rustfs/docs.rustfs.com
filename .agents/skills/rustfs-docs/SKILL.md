@@ -12,8 +12,8 @@ description: >-
 # Writing RustFS documentation
 
 This is a **FumaPress** site (Waku + Fumadocs). Pages live in `content/`; each
-page's URL mirrors its path (`content/management/bucket/creation.md` →
-`/management/bucket/creation`). Navigation is defined by `content/meta.json`
+page's URL mirrors its path (`content/administration/data/bucket/creation.md` →
+`/administration/data/bucket/creation`). Navigation is defined by `content/meta.json`
 (root sidebar) and per-folder `meta.json` files.
 
 Read `STYLE.md` (repo root) for the full style guide and `AGENTS.md` for repo
@@ -93,8 +93,8 @@ Second person ("you"). Official recommendations as "We recommend". No
 superlatives or promises (fastest, perfect, 100% …). Technical pages carry
 instructions, not sales copy — solutions/marketing content belongs on the main
 site (rustfs.com), not in these docs. The docs sidebar has seven sections:
-Getting Started · Core Concepts · Installation · Administration · Operations ·
-Developer · Reference. New pages go into one of these.
+Installation · Administration · Security & Compliance · Operations ·
+Troubleshooting · Developer · Reference. New pages go into one of these.
 
 ## 6. Navigation
 

@@ -1,0 +1,9 @@
+{
+  "title": "Developer",
+  "defaultOpen": false,
+  "pages": [
+    "sdk",
+    "integration",
+    "license"
+  ]
+}

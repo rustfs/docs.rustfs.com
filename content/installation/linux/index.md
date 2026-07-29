@@ -5,6 +5,12 @@ description: "Choose a Linux deployment mode — SNSD, SNMD, or MNMD — and ins
 
 This section covers installing RustFS on Linux servers. For a one-command trial installation, use the [Quick Start](./quick-start.md). For a manual installation, pick one of the three deployment modes below — all three share the same [prerequisites and service setup](./prerequisites-and-service.md), and differ only in topology and volume configuration.
 
+:::warning[Change the default credentials immediately]
+
+After installation, set unique `RUSTFS_ACCESS_KEY` and `RUSTFS_SECRET_KEY` values in `/etc/default/rustfs`. Do not use the well-known `rustfsadmin` value for either credential. Restart the service with `sudo systemctl restart rustfs` after changing the file.
+
+:::
+
 ## Single Node Single Disk (SNSD)
 
 One server, one data disk. The simplest mode, with no redundancy — a disk failure means data loss, so rely on backups. Suitable for development, testing, and low-density non-critical business.
@@ -25,4 +31,4 @@ Four or more servers, each with one or more disks. Erasure coding spans servers,
 
 ## Before Production
 
-Work through the [Pre-Installation Checklists](../checklists/index.md) — hardware, network, software, and security — before deploying to production. If you don't need production standards, you can skip them.
+Work through the [Pre-Installation Checklists](../requirement/checklists/index.md) — hardware, network, software, and security — before deploying to production. If you don't need production standards, you can skip them.

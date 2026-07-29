@@ -1,0 +1,10 @@
+{
+  "title": "Bucket",
+  "pages": [
+    "creation",
+    "deletion",
+    "quota",
+    "replication",
+    "policy"
+  ]
+}

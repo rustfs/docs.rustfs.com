@@ -9,7 +9,7 @@ RustFS ships no first-party Go SDK — it is fully S3-compatible, so you use the
 
 - Go 1.21 or later
 - A working RustFS instance (refer to [Installation Guide](../../installation/index.md)) — the S3 API listens on port `9000`, the Console on port `9001`
-- Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (refer to [Access Key Management](../../administration/iam/access-token.md))
+- Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (refer to [Access Key Management](../../security-compliance/iam/access-token.md))
 
 :::tip[Local test]
 

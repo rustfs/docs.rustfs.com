@@ -7,7 +7,7 @@ The [Terraform AWS provider](https://registry.terraform.io/providers/hashicorp/a
 
 ## Configure
 
-Replace `http://localhost:9000` with your server address and use your own [access keys](../../administration/iam/access-token.md). The skip flags stop the provider from calling AWS-only metadata and STS endpoints:
+Replace `http://localhost:9000` with your server address and use your own [access keys](../../security-compliance/iam/access-token.md). The skip flags stop the provider from calling AWS-only metadata and STS endpoints:
 
 ```hcl title="main.tf"
 provider "aws" {

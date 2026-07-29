@@ -1,0 +1,170 @@
+---
+title: "rc"
+description: "Install the RustFS command-line client and use it to connect to and inspect a RustFS cluster."
+---
+
+`rc` is the RustFS command-line client for S3 object operations and RustFS administration. This guide installs `rc`, configures a cluster alias, and introduces the main inspection commands. The download examples use `v0.1.30`; check the [RustFS CLI releases](https://github.com/rustfs/cli/releases) for a newer version before installing.
+
+## Installation
+
+### Linux
+
+The default Linux archives are statically linked with musl for broad compatibility. Choose the tab that matches `uname -m`.
+
+<Tabs items={["AMD64", "ARM64"]} updateAnchor={false}>
+	<Tab value="AMD64" id="rc-linux-amd64">
+
+For an `x86_64` host:
+
+```bash
+curl -fLO https://github.com/rustfs/cli/releases/download/v0.1.30/rustfs-cli-linux-amd64-v0.1.30.tar.gz
+tar -xzf rustfs-cli-linux-amd64-v0.1.30.tar.gz
+sudo install -m 0755 rc /usr/local/bin/rc
+```
+
+	</Tab>
+	<Tab value="ARM64" id="rc-linux-arm64">
+
+For an `aarch64` host:
+
+```bash
+curl -fLO https://github.com/rustfs/cli/releases/download/v0.1.30/rustfs-cli-linux-arm64-v0.1.30.tar.gz
+tar -xzf rustfs-cli-linux-arm64-v0.1.30.tar.gz
+sudo install -m 0755 rc /usr/local/bin/rc
+```
+
+	</Tab>
+</Tabs>
+
+If your environment specifically requires a glibc-linked binary, select the `linux-amd64-gnu` or `linux-arm64-gnu` archive from the release page.
+
+### macOS
+
+Choose the tab that matches the value returned by `uname -m`.
+
+<Tabs items={["Intel", "Apple silicon"]} updateAnchor={false}>
+	<Tab value="Intel" id="rc-macos-amd64">
+
+For an Intel (`x86_64`) Mac:
+
+```bash
+curl -fLO https://github.com/rustfs/cli/releases/download/v0.1.30/rustfs-cli-macos-amd64-v0.1.30.tar.gz
+tar -xzf rustfs-cli-macos-amd64-v0.1.30.tar.gz
+sudo install -m 0755 rc /usr/local/bin/rc
+```
+
+	</Tab>
+	<Tab value="Apple silicon" id="rc-macos-arm64">
+
+For an Apple silicon (`arm64`) Mac:
+
+```bash
+curl -fLO https://github.com/rustfs/cli/releases/download/v0.1.30/rustfs-cli-macos-arm64-v0.1.30.tar.gz
+tar -xzf rustfs-cli-macos-arm64-v0.1.30.tar.gz
+sudo install -m 0755 rc /usr/local/bin/rc
+```
+
+	</Tab>
+</Tabs>
+
+You can alternatively install the package through Homebrew:
+
+```bash
+brew install rustfs/tap/rc
+```
+
+### Windows
+
+The current Windows release provides an AMD64 binary. Install it through the official Scoop bucket:
+
+```powershell
+scoop bucket add rustfs https://github.com/rustfs/scoop-bucket
+scoop install rustfs/rc
+```
+
+### Verify the installation
+
+Open a new terminal and verify that `rc` is available:
+
+```bash
+rc --version
+rc --help
+```
+
+## Usage
+
+### Configure an alias
+
+An alias stores the RustFS endpoint and credentials so you do not need to repeat them for every command. Replace the credentials before running:
+
+```bash
+rc alias set local http://localhost:9000 <your-access-key> <your-secret-key>
+rc alias list
+```
+
+`alias set` replaces an existing alias with the same name. `alias list` does not print secret keys.
+
+### Check service health
+
+Check whether the service is live and whether its required dependencies are ready:
+
+```bash
+rc ping local
+rc ready local
+```
+
+### Inspect the cluster
+
+Use the administrative cluster information command to inspect cluster status, servers, disks, and storage capacity:
+
+```bash
+rc admin info cluster local
+```
+
+List server pools when the deployment uses multiple pools:
+
+```bash
+rc admin pool list local
+```
+
+Administrative commands require credentials with the corresponding RustFS Admin API permissions.
+
+### Inspect buckets and objects
+
+Prefer the noun-first command groups for new scripts:
+
+```bash
+rc bucket list local/
+rc object list local/my-bucket
+rc object stat local/my-bucket/hello.txt
+```
+
+### Manage lifecycle rules and storage tiers
+
+`rc` groups lifecycle rules, remote storage tiers, and restore requests under `bucket lifecycle`:
+
+```bash
+rc bucket lifecycle rule list local/my-bucket
+rc bucket lifecycle tier list local
+rc bucket lifecycle restore local/my-bucket/hello.txt --days 7
+```
+
+Use the `rule` commands to add, edit, remove, export, or import bucket lifecycle rules. Use the `tier` commands to add, inspect, update credentials for, or remove a remote tier. The older `rc ilm` form remains available as a compatibility alias, but we recommend `rc bucket lifecycle` for new scripts.
+
+See [Lifecycle Management](/administration/data/lifecycle-management) for rule and restore workflows, and [Tiered Storage](/administration/data/tiered-storage) for remote-tier configuration and maintenance.
+
+### Discover more commands
+
+Use `--help` at any command level to see the commands and options supported by your installed version:
+
+```bash
+rc --help
+rc alias --help
+rc admin --help
+rc admin info --help
+rc bucket --help
+rc bucket lifecycle --help
+rc object --help
+```
+
+For the complete source and command reference, see the [RustFS CLI repository](https://github.com/rustfs/cli).

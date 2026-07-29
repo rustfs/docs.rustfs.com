@@ -26,7 +26,7 @@ flowchart TD
 - 1 server with multiple data disks (this example uses 4 disks mounted at `/data/rustfs0` through `/data/rustfs3`).
 - Erasure coding spreads data and parity shards across the disks; fault tolerance is limited to disk failures within the single node.
 - Format each disk with XFS and mount it separately (e.g., labels `RUSTFS0` – `RUSTFS3`), as described in the prerequisites page.
-- For production deployments, also review the [Pre-Installation Checklists](../checklists/index.md).
+- For production deployments, also review the [Pre-Installation Checklists](../requirement/checklists/index.md).
 
 ## Prerequisites and Service Setup
 

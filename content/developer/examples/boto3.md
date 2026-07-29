@@ -13,7 +13,7 @@ pip install boto3
 
 ## Configure
 
-Point the client at your RustFS endpoint. Replace `http://localhost:9000` with your server address, and use your own [access keys](../../administration/iam/access-token.md). RustFS requires path-style addressing, set via botocore `Config`:
+Point the client at your RustFS endpoint. Replace `http://localhost:9000` with your server address, and use your own [access keys](../../security-compliance/iam/access-token.md). RustFS requires path-style addressing, set via botocore `Config`:
 
 ```python
 import boto3
@@ -50,4 +50,4 @@ hello.txt 12
 
 ## Next steps
 
-See the [S3 SDK overview](../sdk/index.md) for more languages, or manage objects with [mc](../mc.md).
+See the [S3 SDK overview](../sdk/index.md) for more languages, or manage objects with [`rc`](/operations/rc).

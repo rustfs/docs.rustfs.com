@@ -15,7 +15,7 @@ go get github.com/aws/aws-sdk-go-v2/service/s3
 
 ## Configure
 
-Replace `http://localhost:9000` with your server address and use your own [access keys](../../administration/iam/access-token.md). RustFS requires path-style addressing (`UsePathStyle: true`):
+Replace `http://localhost:9000` with your server address and use your own [access keys](../../security-compliance/iam/access-token.md). RustFS requires path-style addressing (`UsePathStyle: true`):
 
 ```go {9,11}
 import (
@@ -52,4 +52,4 @@ my-bucket
 
 ## Next steps
 
-See the full [Go SDK guide](../sdk/go.md), or manage objects with [mc](../mc.md).
+See the full [Go SDK guide](../sdk/go.md), or manage objects with [`rc`](/operations/rc).

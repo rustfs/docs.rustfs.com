@@ -1,7 +1,7 @@
 {
   "title": "Examples",
   "pages": [
-    "[mc (MinIO Client)](/developer/examples/mc)",
+    "[rc](/operations/rc)",
     "[AWS CLI](/developer/examples/aws-cli)",
     "[s3cmd](/developer/examples/s3cmd)",
     "[rclone](/developer/examples/rclone)",

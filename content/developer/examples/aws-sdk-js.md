@@ -13,7 +13,7 @@ npm install @aws-sdk/client-s3
 
 ## Configure
 
-Replace `http://localhost:9000` with your server address and use your own [access keys](../../administration/iam/access-token.md). RustFS requires path-style addressing (`forcePathStyle: true`):
+Replace `http://localhost:9000` with your server address and use your own [access keys](../../security-compliance/iam/access-token.md). RustFS requires path-style addressing (`forcePathStyle: true`):
 
 ```javascript title="index.mjs" {8}
 import { S3Client, CreateBucketCommand, PutObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
@@ -43,4 +43,4 @@ hello.txt 12
 
 ## Next steps
 
-See the full [JavaScript SDK guide](../sdk/javascript.md), or manage objects with [mc](../mc.md).
+See the full [JavaScript SDK guide](../sdk/javascript.md), or manage objects with [`rc`](/operations/rc).

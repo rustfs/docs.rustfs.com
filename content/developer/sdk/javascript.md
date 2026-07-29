@@ -11,7 +11,7 @@ RustFS ships no first-party JavaScript SDK — it is S3-compatible, so you use t
 
 * Node.js 18 or later
 * A running RustFS instance (see the [Installation Guide](../../installation/index.md)) — the S3 API listens on port `9000`, the Console on port `9001`
-* Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (see [Access Key Management](../../administration/iam/access-token.md))
+* Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (see [Access Key Management](../../security-compliance/iam/access-token.md))
 
 :::tip[Local test]
 

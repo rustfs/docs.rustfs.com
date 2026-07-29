@@ -1,12 +1,12 @@
 ---
-title: RustFS Developer Guide
-description: Guide to using STS, MCP, MinIO Client, SDKs, and APIs with RustFS.
+title: Developer
+description: "Integrate applications with RustFS by using STS, MCP, SDKs, and the S3-compatible API."
 ---
 
-This guide provides instructions for integrating and interacting with RustFS using STS, MCP (Model Context Protocol), MinIO Client (`mc`), SDKs, and APIs. It is designed to enable developers to build efficient and scalable applications on top of RustFS. This document covers the following topics:
+Use this section to integrate applications with RustFS through temporary credentials, the Model Context Protocol (MCP), SDKs, and the S3-compatible API.
 
-- STS
-- [MCP Usage Guide](./mcp.md)
-- [MinIO Client Usage Guide](./mc.md)
-- [SDK Usage Guide](./sdk/index.md)
-- API Usage Guide
+- [Security Token Service (STS)](/security-compliance/iam/sts) explains how to request temporary credentials.
+- [MCP](/developer/mcp) connects AI tools and agents to RustFS.
+- [SDKs](/developer/sdk) provide language-specific integration examples.
+- [Integration guides](/developer/integration) cover proxies and data platforms.
+- [S3 API](/administration/protocols/s3) documents client configuration and compatibility considerations.

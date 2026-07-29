@@ -11,6 +11,7 @@ RustFS ships an official Helm chart that deploys either a single-node instance (
 - Helm 3
 - RustFS image version `>= 1.0.0-alpha.69` (the chart requirement)
 - A StorageClass with a working provisioner — the chart defaults to [`local-path`](https://github.com/rancher/local-path-provisioner); set `storageclass.name` to use your own
+- [`rc`](/operations/rc) installed on the administration host before using the server-pool commands in this guide
 
 The chart lives in the RustFS source repository under `helm/rustfs`:
 
@@ -146,7 +147,7 @@ Log in to the Console with the access key and secret key you set at install time
 
 ## 7. Scaling out with server pools
 
-In distributed mode the chart can run multiple **server pools** — independent StatefulSets whose drives together form one cluster. This is the chart-level equivalent of adding a Server Pool as described in [Availability and Scalability](../../upgrade-scale/availability-and-resiliency.md).
+In distributed mode the chart can run multiple **server pools** — independent StatefulSets whose drives together form one cluster. This is the chart-level equivalent of adding a Server Pool as described in [Pool Expansion](../../operations/scaling/storage-pool-expansion.md).
 
 To expand an existing deployment, enable pools and describe the current layout as pool 0 plus your new capacity:
 
@@ -177,7 +178,7 @@ What to expect during the rollout, per the chart's documentation:
 
 :::note
 
-`rc` is the RustFS admin command-line client referenced by the chart documentation (`rc admin pool ls` / `expand` / `rebalance` / `decommission`). Confirm its availability and packaging with your RustFS distribution before relying on it in runbooks.
+`rc` is the RustFS command-line client. Use `rc admin pool list`, `expand`, `rebalance`, and `decommission` for the server-pool workflows described by the chart.
 
 :::
 
@@ -195,6 +196,6 @@ Helm does not delete PVCs created by StatefulSet volume claim templates. If you 
 
 ## Next steps
 
-- [Availability and Scalability](../../upgrade-scale/availability-and-resiliency.md) — how Server Pool expansion works at the cluster level
-- [Upgrade](../../upgrade-scale/upgrade.md) — zero-downtime rolling upgrades
+- [Pool Expansion](../../operations/scaling/storage-pool-expansion.md) — how Server Pool expansion works at the cluster level
+- [Kubernetes Upgrade](../../operations/upgrade/kubernetes/index.md) — upgrade Helm- and Operator-managed deployments
 - [TLS configuration](../../integration/tls-configured.md) — end-to-end TLS options

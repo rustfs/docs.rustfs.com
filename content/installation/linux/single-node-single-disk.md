@@ -25,7 +25,7 @@ flowchart TD
 
 - 1 server, 1 data disk (e.g., an XFS-formatted disk mounted at `/data/rustfs0`).
 - No erasure coding across disks — fault tolerance depends entirely on backups.
-- For production deployments, also review the [Pre-Installation Checklists](../checklists/index.md).
+- For production deployments, also review the [Pre-Installation Checklists](../requirement/checklists/index.md).
 
 ## Prerequisites and Service Setup
 

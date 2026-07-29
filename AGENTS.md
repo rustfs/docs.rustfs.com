@@ -8,7 +8,7 @@ This playbook directs AI agents working in the RustFS documentation repository s
 - Framework: **FumaPress** (static-site generator powered by Waku + Fumadocs). Content lives in `content/`; site configuration is in `press.config.tsx`, `source.config.ts`, and `waku.config.ts`.
 - Goal: produce documentation for a distributed object storage product aimed at a global audience, currently English-first with room for other locales.
 - Navigation: `content/meta.json` (root sidebar: section order, labels, links) and per-folder `content/**/meta.json` (nested group titles/order) define the site structure. New pages must be reflected there immediately.
-- Routing: a page's URL mirrors its path under `content/` (e.g. `content/management/bucket/index.md` → `/management/bucket`). `.md` links between pages are resolved automatically; you can write `./sibling.md` or `/absolute/path`.
+- Routing: a page's URL mirrors its path under `content/` (e.g. `content/administration/data/bucket/creation.md` → `/administration/data/bucket/creation`). `.md` links between pages are resolved automatically; you can write `./sibling.md` or `/absolute/path`.
 
 ## 2. Core Principles
 1. **Accuracy**: Data, APIs, and commands must be reproducible; cite third-party information with a concise source note.

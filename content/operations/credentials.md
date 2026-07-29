@@ -15,7 +15,9 @@ RUSTFS_SECRET_KEY=<your-secret-key>
 If neither is provided, the server falls back to the built-in default `rustfsadmin` / `rustfsadmin`.
 
 :::warning
+
 The default `rustfsadmin` credentials are public and well-known. The container entrypoint prints a warning but still starts. Always set non-default credentials before exposing ports 9000/9001 beyond localhost. Additionally, a multi-node cluster running with an all-default pair **must** set `RUSTFS_RPC_SECRET` (see below) — the server refuses to derive internode RPC auth from the default secret key.
+
 :::
 
 ## File-Based Injection (Docker/Kubernetes Secrets)
@@ -56,7 +58,9 @@ secrets:
 All nodes of a cluster must run with the **same** root credential pair — internode RPC authentication is derived from it unless `RUSTFS_RPC_SECRET` is set explicitly.
 
 :::note
+
 The step-by-step procedure below is standard operational practice composed from verified building blocks (env/file configuration plus the verified rolling-restart readiness signals); RustFS does not currently document an online root-credential rotation API.
+
 :::
 
 1. If you have not already, set an explicit `RUSTFS_RPC_SECRET` (same value on all nodes) **before** the rotation. This decouples internode auth from the credential pair, so the cluster tolerates nodes temporarily running with mixed old/new root credentials during the rolling restart.
@@ -98,7 +102,9 @@ For drop-in migration, RustFS accepts credential variables under legacy and MinI
 The `MINIO_` prefix mapping covers a broader allowlist of variables (address, console address, audit webhook settings, and more), applied at startup as "external-prefix compatibility mappings".
 
 :::note
+
 Aliases are deprecated. When one is used, the server logs a one-time warning of the form `Environment variable MINIO_ROOT_USER is deprecated, use RUSTFS_ROOT_USER instead`. Use the `RUSTFS_`-prefixed canonical names in new deployments; the canonical name always wins when both are set.
+
 :::
 
 ## Beyond the Root Credential

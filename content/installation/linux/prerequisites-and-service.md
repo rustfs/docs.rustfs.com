@@ -50,7 +50,7 @@ timedatectl status
 
 If the status is "synchronized", time synchronization is working properly.
 
-## Capacity and EC Planning
+## Capacity Planning
 
 When planning object storage capacity, we recommend considering:
 
@@ -59,13 +59,7 @@ When planning object storage capacity, we recommend considering:
 - Planning cycle: How long should this hardware planning last? (recommended: 3 years)
 - Your company's hardware iteration and update cycles.
 
-EC (Erasure Coding) planning is as follows:
-
-| Scenario | Recommended Parity Level | Description |
-| - | - | - |
-| Standard Production Environment | EC:4 | Can tolerate up to 4 disk (or node) failures, achieving a good balance between reliability and storage efficiency. |
-| High Availability Requirements | EC:4 - 8 or higher | Suitable for scenarios with extremely high data availability requirements, but sacrifices more storage space. |
-| Development Test Environment | EC:2 | Provides basic redundancy protection, suitable for non-critical business. |
+Review [EC Configuration](../requirement/ec-configuration.md) to calculate usable capacity, understand the automatic parity defaults, and validate any explicit parity or erasure-set width before deployment.
 
 ## Disk Planning
 
