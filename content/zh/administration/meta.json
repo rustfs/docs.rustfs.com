@@ -1,0 +1,11 @@
+{
+  "title": "管理",
+  "defaultOpen": true,
+  "pages": [
+    "[控制台](/zh/administration/console)",
+    "data",
+    "protocols",
+    "cors",
+    "[虚拟主机访问](/zh/integration/virtual)"
+  ]
+}

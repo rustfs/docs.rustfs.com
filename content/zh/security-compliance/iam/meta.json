@@ -1,0 +1,8 @@
+{
+  "title": "IAM",
+  "pages": [
+    "[用户、用户组和策略](/zh/security-compliance/iam/policies)",
+    "[服务账户和 STS](/zh/security-compliance/iam/sts)",
+    "[访问密钥](/zh/security-compliance/iam/access-token)"
+  ]
+}

@@ -1,0 +1,170 @@
+---
+title: "rc"
+description: "安装 RustFS 命令行客户端，并使用它连接和检查 RustFS 集群。"
+---
+
+`rc` 是用于 S3 对象操作和 RustFS 管理的 RustFS 命令行客户端。本指南介绍如何安装 `rc`、配置集群别名以及使用主要检查命令。下载示例使用 `v0.1.30`；安装前请查看 [RustFS CLI 发行版](https://github.com/rustfs/cli/releases)是否有更新版本。
+
+## 安装
+
+### Linux
+
+默认 Linux 归档使用 musl 静态链接，以提供广泛的兼容性。请选择与 `uname -m` 匹配的选项卡。
+
+<Tabs items={["AMD64", "ARM64"]} updateAnchor={false}>
+	<Tab value="AMD64" id="rc-linux-amd64">
+
+对于 `x86_64` 主机：
+
+```bash
+curl -fLO https://github.com/rustfs/cli/releases/download/v0.1.30/rustfs-cli-linux-amd64-v0.1.30.tar.gz
+tar -xzf rustfs-cli-linux-amd64-v0.1.30.tar.gz
+sudo install -m 0755 rc /usr/local/bin/rc
+```
+
+	</Tab>
+	<Tab value="ARM64" id="rc-linux-arm64">
+
+对于 `aarch64` 主机：
+
+```bash
+curl -fLO https://github.com/rustfs/cli/releases/download/v0.1.30/rustfs-cli-linux-arm64-v0.1.30.tar.gz
+tar -xzf rustfs-cli-linux-arm64-v0.1.30.tar.gz
+sudo install -m 0755 rc /usr/local/bin/rc
+```
+
+	</Tab>
+</Tabs>
+
+如果您的环境明确要求使用链接 glibc 的二进制文件，请从发行版页面选择 `linux-amd64-gnu` 或 `linux-arm64-gnu` 归档。
+
+### macOS
+
+请选择与 `uname -m` 返回值匹配的选项卡。
+
+<Tabs items={["Intel", "Apple silicon"]} updateAnchor={false}>
+	<Tab value="Intel" id="rc-macos-amd64">
+
+对于 Intel（`x86_64`）Mac：
+
+```bash
+curl -fLO https://github.com/rustfs/cli/releases/download/v0.1.30/rustfs-cli-macos-amd64-v0.1.30.tar.gz
+tar -xzf rustfs-cli-macos-amd64-v0.1.30.tar.gz
+sudo install -m 0755 rc /usr/local/bin/rc
+```
+
+	</Tab>
+	<Tab value="Apple silicon" id="rc-macos-arm64">
+
+对于 Apple 芯片（`arm64`）Mac：
+
+```bash
+curl -fLO https://github.com/rustfs/cli/releases/download/v0.1.30/rustfs-cli-macos-arm64-v0.1.30.tar.gz
+tar -xzf rustfs-cli-macos-arm64-v0.1.30.tar.gz
+sudo install -m 0755 rc /usr/local/bin/rc
+```
+
+	</Tab>
+</Tabs>
+
+您也可以通过 Homebrew 安装软件包：
+
+```bash
+brew install rustfs/tap/rc
+```
+
+### Windows
+
+当前 Windows 发行版提供 AMD64 二进制文件。请通过官方 Scoop bucket 安装：
+
+```powershell
+scoop bucket add rustfs https://github.com/rustfs/scoop-bucket
+scoop install rustfs/rc
+```
+
+### 验证安装
+
+打开新终端并确认 `rc` 可用：
+
+```bash
+rc --version
+rc --help
+```
+
+## 用法
+
+### 配置别名
+
+别名用于存储 RustFS 端点和凭证，因此无需在每条命令中重复输入。运行前请替换凭证：
+
+```bash
+rc alias set local http://localhost:9000 <your-access-key> <your-secret-key>
+rc alias list
+```
+
+`alias set` 会替换同名的现有别名。`alias list` 不会输出秘密密钥。
+
+### 检查服务健康状态
+
+检查服务是否存活，以及所需依赖项是否就绪：
+
+```bash
+rc ping local
+rc ready local
+```
+
+### 检查集群
+
+使用管理集群信息命令检查集群状态、服务器、磁盘和存储容量：
+
+```bash
+rc admin info cluster local
+```
+
+部署使用多个存储池时，列出服务器池：
+
+```bash
+rc admin pool list local
+```
+
+管理命令要求凭证具有相应的 RustFS Admin API 权限。
+
+### 检查存储桶和对象
+
+新脚本优先使用名词在前的命令组：
+
+```bash
+rc bucket list local/
+rc object list local/my-bucket
+rc object stat local/my-bucket/hello.txt
+```
+
+### 管理生命周期规则和存储层
+
+`rc` 将生命周期规则、远程存储层和恢复请求归入 `bucket lifecycle`：
+
+```bash
+rc bucket lifecycle rule list local/my-bucket
+rc bucket lifecycle tier list local
+rc bucket lifecycle restore local/my-bucket/hello.txt --days 7
+```
+
+使用 `rule` 命令添加、编辑、删除、导出或导入存储桶生命周期规则。使用 `tier` 命令添加、检查、更新凭证或删除远程存储层。旧版 `rc ilm` 形式仍可作为兼容性别名使用，但我们建议新脚本使用 `rc bucket lifecycle`。
+
+有关规则和恢复工作流程，请参阅[生命周期管理](/administration/data/lifecycle-management)；有关远程存储层配置和维护，请参阅[分层存储](/administration/data/tiered-storage)。
+
+### 发现更多命令
+
+在任何命令层级使用 `--help`，查看已安装版本支持的命令和选项：
+
+```bash
+rc --help
+rc alias --help
+rc admin --help
+rc admin info --help
+rc bucket --help
+rc bucket lifecycle --help
+rc object --help
+```
+
+有关完整源代码和命令参考，请参阅 [RustFS CLI 仓库](https://github.com/rustfs/cli)。

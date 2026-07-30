@@ -1,0 +1,12 @@
+{
+  "title": "安装",
+  "defaultOpen": true,
+  "pages": [
+    "requirement",
+    "linux",
+    "container",
+    "cloud-native",
+    "[Windows](/zh/installation/windows)",
+    "[macOS](/zh/installation/macos)"
+  ]
+}

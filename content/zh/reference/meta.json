@@ -1,0 +1,8 @@
+{
+  "title": "参考",
+  "defaultOpen": false,
+  "pages": [
+    "environment-variables",
+    "cli"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "title": "Operator",
+  "pages": [
+    "installation",
+    "tenant",
+    "pool-expansion",
+    "kms"
+  ]
+}

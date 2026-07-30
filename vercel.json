@@ -1,34 +1,20 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "bulkRedirectsPath": "dist/vercel-redirects.json",
   "redirects": [
     {
-      "source": "/installation/docker/",
-      "destination": "/installation/container/docker",
+      "source": "/management/:path*",
+      "destination": "/en/administration/:path*",
       "statusCode": 301
     },
     {
-      "source": "/concepts/comparison.html",
-      "destination": "/",
+      "source": "/administration/iam/:path*",
+      "destination": "/en/security-compliance/iam/:path*",
       "statusCode": 301
     },
     {
-      "source": "/features/logging",
-      "destination": "/operations/observability",
-      "statusCode": 301
-    },
-    {
-      "source": "/features/integration/",
-      "destination": "/developer/integration",
-      "statusCode": 301
-    },
-    {
-      "source": "/administration/iam/access-token.html",
-      "destination": "/security-compliance/iam/access-token",
-      "statusCode": 301
-    },
-    {
-      "source": "/features/replication/",
-      "destination": "/administration/data/bucket/replication",
+      "source": "/administration/security/encryption/:path*",
+      "destination": "/en/security-compliance/encryption/:path*",
       "statusCode": 301
     }
   ]

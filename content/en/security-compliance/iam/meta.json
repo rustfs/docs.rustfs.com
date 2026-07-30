@@ -1,0 +1,8 @@
+{
+  "title": "IAM",
+  "pages": [
+    "[Users, Groups, and Policies](/en/security-compliance/iam/policies)",
+    "[Service Accounts and STS](/en/security-compliance/iam/sts)",
+    "[Access Keys](/en/security-compliance/iam/access-token)"
+  ]
+}

@@ -5,6 +5,8 @@ import { llmsPlugin } from "fumapress/plugins/llms.txt";
 import { sitemapPlugin } from "fumapress/plugins/sitemap";
 import { takumiPlugin } from "fumapress/plugins/takumi";
 import { createNotebookLayoutPage } from "fumapress/layouts/notebook";
+import { zhCN } from "@fumapress/language/zh-cn";
+import { defineI18n } from "fumadocs-core/i18n";
 import defaultMdxComponents, { createRelativeLink } from "fumadocs-ui/mdx";
 import { docs } from "./.source/server";
 import { BrandLogo } from "./src/components/brand-logo";
@@ -17,6 +19,22 @@ const isDev = import.meta.env.DEV;
 const siteDescription =
   "RustFS is an S3-compatible distributed object storage engine written in Rust.";
 
+const i18n = defineI18n({
+  languages: ["en", "zh"],
+  defaultLanguage: "en",
+  parser: "dir",
+  hideLocale: "never",
+  fallbackLanguage: "en",
+});
+
+const translations = i18n
+  .translations()
+  .preset("zh", zhCN())
+  .add({
+    en: { displayName: "English" },
+    zh: { displayName: "简体中文" },
+  });
+
 // Social icons (inline SVG so the bundle stays self-contained).
 const TwitterIcon = (
   <svg role="img" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
@@ -24,16 +42,43 @@ const TwitterIcon = (
   </svg>
 );
 
-// Sidebar footer: license + copyright (parity with the previous VitePress footer).
-const SidebarFooter = (
-  <div className="flex flex-col gap-0.5 px-2 py-3 text-xs text-fd-muted-foreground">
-    <p>Released under the Apache License 2.0.</p>
-    <p>Copyright © 2025 RustFS</p>
-  </div>
-);
+const layoutLabels = {
+  en: {
+    home: "Home",
+    docs: "Docs",
+    installation: "Installation",
+    demo: "Demo",
+    community: "Community",
+    blog: "Blog",
+    license: "Released under the Apache License 2.0.",
+    copyright: "Copyright © 2025 RustFS",
+  },
+  zh: {
+    home: "首页",
+    docs: "文档",
+    installation: "安装",
+    demo: "演示",
+    community: "社区",
+    blog: "博客",
+    license: "根据 Apache License 2.0 发布。",
+    copyright: "版权所有 © 2025 RustFS",
+  },
+} as const;
+
+function createSidebarFooter(locale: keyof typeof layoutLabels) {
+  const labels = layoutLabels[locale];
+
+  return (
+    <div className="flex flex-col gap-0.5 px-2 py-3 text-xs text-fd-muted-foreground">
+      <p>{labels.license}</p>
+      <p>{labels.copyright}</p>
+    </div>
+  );
+}
 
 export default defineConfig({
   content: docs.toFumadocsSource(),
+  translations,
   site: {
     name: "RustFS Documentation",
     baseUrl: isDev ? "http://localhost:3000" : "https://docs.rustfs.com",
@@ -90,23 +135,6 @@ export default defineConfig({
           <meta name="twitter:site" content="@rustfs" />
           <meta name="twitter:creator" content="@rustfs" />
 
-          {/* Locale alternates */}
-          <link
-            rel="alternate"
-            hrefLang="x-default"
-            href="https://docs.rustfs.com"
-          />
-          <link
-            rel="alternate"
-            hrefLang="en-US"
-            href="https://docs.rustfs.com"
-          />
-          <link
-            rel="alternate"
-            hrefLang="zh-CN"
-            href="https://docs.rustfs.com.cn"
-          />
-
           {/* Analytics — only loaded in production builds. */}
           {!isDev && (
             <>
@@ -140,11 +168,21 @@ gtag('config', 'G-TWW7WMTWL9');`,
     },
     // Per-page <meta name="description"> (VitePress emitted this from frontmatter).
     page(page) {
+      const pathname = page.slugs.join("/");
+      const localizedUrl = (language: "en" | "zh") =>
+        `https://docs.rustfs.com/${language}${pathname ? `/${pathname}` : ""}`;
+
       return (
-        <meta
-          name="description"
-          content={page.data.description ?? siteDescription}
-        />
+        <>
+          <meta
+            name="description"
+            content={page.data.description ?? siteDescription}
+          />
+          <link rel="canonical" href={localizedUrl(page.locale === "zh" ? "zh" : "en")} />
+          <link rel="alternate" hrefLang="x-default" href={localizedUrl("en")} />
+          <link rel="alternate" hrefLang="en" href={localizedUrl("en")} />
+          <link rel="alternate" hrefLang="zh" href={localizedUrl("zh")} />
+        </>
       );
     },
   },
@@ -155,7 +193,11 @@ gtag('config', 'G-TWW7WMTWL9');`,
     // GitHub + theme) with the page tree in the sidebar — like the FumaPress docs.
     page: createNotebookLayoutPage(),
     // Shared navbar / links across all Fumadocs layouts.
-    defaultProps() {
+    defaultProps({ lang }) {
+      const locale = lang === "zh" ? "zh" : i18n.defaultLanguage;
+      const docsUrl = `/${locale}`;
+      const labels = layoutLabels[locale];
+
       // Built as a const (not an inline literal) so the extra `sidebar` field —
       // which lives on DocsLayoutProps, not BaseLayoutProps — is accepted and
       // deep-merged into the docs layout at runtime.
@@ -174,18 +216,18 @@ gtag('config', 'G-TWW7WMTWL9');`,
         },
         githubUrl: "https://github.com/rustfs/rustfs",
         links: [
-          { text: "Home", url: "https://rustfs.com", external: true },
-          { text: "Docs", url: "/" },
-          { text: "Installation", url: "/installation" },
-          { text: "MCP", url: "/developer/mcp" },
-          { text: "SDK", url: "/developer/sdk" },
-          { text: "Demo", url: "https://play.rustfs.com", external: true },
+          { text: labels.home, url: "https://rustfs.com", external: true },
+          { text: labels.docs, url: docsUrl },
+          { text: labels.installation, url: `${docsUrl}/installation` },
+          { text: "MCP", url: `${docsUrl}/developer/mcp` },
+          { text: "SDK", url: `${docsUrl}/developer/sdk` },
+          { text: labels.demo, url: "https://play.rustfs.com", external: true },
           {
-            text: "Community",
+            text: labels.community,
             url: "https://github.com/rustfs/rustfs/discussions",
             external: true,
           },
-          { text: "Blog", url: "https://rustfs.dev", external: true },
+          { text: labels.blog, url: "https://rustfs.dev", external: true },
           {
             type: "icon" as const,
             label: "Twitter",
@@ -196,7 +238,7 @@ gtag('config', 'G-TWW7WMTWL9');`,
           },
         ],
         sidebar: {
-          footer: SidebarFooter,
+          footer: createSidebarFooter(locale),
         },
       };
       return props;
@@ -207,9 +249,23 @@ gtag('config', 'G-TWW7WMTWL9');`,
       // Preserve Fumadocs' default components + relative-link resolver, and
       // register the Mermaid renderer used by ```mermaid code blocks.
       async getMdxComponents(page) {
+        const sourcePath = page.path.replace(/^(en|zh)\//, "");
+        const RelativeLink = createRelativeLink(await this.getLoader(), {
+          ...page,
+          path: sourcePath,
+        });
+        const localePrefix = page.locale ? `/${page.locale}` : "";
+
         return {
           ...defaultMdxComponents,
-          a: createRelativeLink(await this.getLoader(), page),
+          a: ({ href, ...props }) => {
+            const localizedHref =
+              localePrefix && href?.startsWith("/") && !href.startsWith(`${localePrefix}/`)
+                ? `${localePrefix}${href}`
+                : href;
+
+            return <RelativeLink href={localizedHref} {...props} />;
+          },
           Mermaid,
           Tab,
           Tabs,

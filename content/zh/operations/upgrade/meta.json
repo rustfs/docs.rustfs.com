@@ -1,0 +1,8 @@
+{
+  "title": "升级",
+  "pages": [
+    "[二进制文件](/zh/operations/upgrade/binary)",
+    "[容器](/zh/operations/upgrade/container)",
+    "[Kubernetes](/zh/operations/upgrade/kubernetes)"
+  ]
+}

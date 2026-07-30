@@ -1,0 +1,168 @@
+---
+title: 安装
+description: 使用官方 Helm chart 在 Kubernetes 上安装单机或分布式 RustFS。
+---
+
+本指南介绍如何从源代码或 Helm 仓库获取官方 RustFS chart、完成安装，并验证对 S3 API 和控制台的访问。
+
+## 环境要求
+
+| 组件 | 要求 |
+|-----------|-------------|
+| Helm | 版本 3 |
+| Kubernetes | 可通过 `kubectl` 访问的集群 |
+| StorageClass | 为 RustFS 数据动态预配 PVC |
+| RustFS | `1.0.0-alpha.69` 或更高版本 |
+
+Ingress 控制器为可选组件。如果启用 Ingress，请将 `ingress.className` 设置为集群中的控制器，例如 `nginx` 或 `traefik`。
+
+检查当前集群和可用的 StorageClass：
+
+```bash
+kubectl config current-context
+kubectl get storageclass
+helm version --short
+```
+
+## 1. 获取 chart
+
+选择 Helm 访问 chart 的方式。两个选项都会设置 `RUSTFS_CHART`，供后续安装命令使用。
+
+<Tabs items={["Clone the repository", "Helm repository"]} updateAnchor={false}>
+  <Tab value="Clone the repository" id="helm-chart-clone">
+
+克隆 RustFS 源代码仓库，使用 `helm/rustfs` 中的 chart：
+
+```bash
+git clone https://github.com/rustfs/rustfs.git
+cd rustfs
+export RUSTFS_CHART=./helm/rustfs
+```
+
+  </Tab>
+  <Tab value="Helm repository" id="helm-chart-repository">
+
+添加 [Artifact Hub](https://artifacthub.io/packages/helm/rustfs/rustfs) 上列出的 RustFS 仓库，然后更新本地仓库索引：
+
+```bash
+helm repo add rustfs https://charts.rustfs.com
+helm repo update
+export RUSTFS_CHART=rustfs/rustfs
+```
+
+  </Tab>
+</Tabs>
+
+## 2. 安装单机模式
+
+为单 Pod 开发部署创建 values 文件：
+
+```yaml title="standalone-values.yaml"
+mode:
+  standalone:
+    enabled: true
+  distributed:
+    enabled: false
+
+secret:
+  rustfs:
+    access_key: "<your-access-key>"
+    secret_key: "<your-secret-key>"
+
+storageclass:
+  name: standard
+  dataStorageSize: 10Gi
+  logStorageSize: 1Gi
+
+ingress:
+  enabled: false
+```
+
+将 `standard` 替换为集群中的 StorageClass，然后安装：
+
+```bash
+helm upgrade --install rustfs "$RUSTFS_CHART" \
+  --namespace rustfs \
+  --create-namespace \
+  -f standalone-values.yaml
+```
+
+## 3. 安装分布式模式
+
+对于分布式集群，请显式设置 Pod 和驱动器数量。数据驱动器总数等于 `replicaCount * drivesPerNode`。
+
+```yaml title="distributed-values.yaml"
+mode:
+  standalone:
+    enabled: false
+  distributed:
+    enabled: true
+
+replicaCount: 4
+drivesPerNode: 2
+
+secret:
+  rustfs:
+    access_key: "<your-access-key>"
+    secret_key: "<your-secret-key>"
+
+storageclass:
+  name: standard
+  dataStorageSize: 100Gi
+  logStorageSize: 1Gi
+
+ingress:
+  enabled: false
+```
+
+该示例创建四个 Pod 和八个数据 PVC。确保集群可以调度所有 Pod 并预配所有 PVC，然后安装：
+
+```bash
+helm upgrade --install rustfs "$RUSTFS_CHART" \
+  --namespace rustfs \
+  --create-namespace \
+  -f distributed-values.yaml
+```
+
+:::warning[安装前选择拓扑]
+
+Kubernetes 不允许更新 StatefulSet `volumeClaimTemplates`。以后更改 `drivesPerNode` 需要重新创建 StatefulSet 或重新安装。
+
+:::
+
+## 4. 验证并访问 RustFS
+
+```bash
+kubectl -n rustfs get pods,pvc,services
+kubectl -n rustfs rollout status statefulset/rustfs
+```
+
+单机模式创建 Deployment，而不是 StatefulSet。使用以下命令检查：
+
+```bash
+kubectl -n rustfs rollout status deployment/rustfs
+```
+
+将 S3 API 和控制台转发到工作站：
+
+```bash
+kubectl -n rustfs port-forward svc/rustfs 9000:9000 9001:9001
+```
+
+将 `http://localhost:9000` 用作 S3 端点，并打开 `http://localhost:9001` 访问控制台。
+
+## 关键值
+
+| 值 | 用途 | Chart 默认值 |
+|-------|---------|---------------|
+| `mode.standalone.enabled` | 启用单 Pod 单机模式 | `false` |
+| `mode.distributed.enabled` | 启用分布式模式 | `true` |
+| `replicaCount` | 分布式 Pod 数量 | `4` |
+| `drivesPerNode` | 每个 Pod 的数据 PVC 数量 | 根据 `replicaCount` 推断 |
+| `storageclass.name` | PVC 使用的 StorageClass | `local-path` |
+| `storageclass.dataStorageSize` | 每个数据 PVC 的大小 | `256Mi` |
+| `storageclass.logStorageSize` | 每个日志 PVC 的大小 | `256Mi` |
+| `service.endpoint.port` | S3 API 端口 | `9000` |
+| `service.console.port` | 控制台端口 | `9001` |
+
+建议显式设置存储大小；chart 默认值仅用于基本评估。

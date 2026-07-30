@@ -1,0 +1,9 @@
+{
+  "title": "环境要求",
+  "pages": [
+    "[拓扑选择](/zh/installation#deployment-mode-comparison)",
+    "ec-configuration",
+    "disk-preparation",
+    "checklists"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "title": "Linux",
+  "pages": [
+    "[快速开始](/zh/installation/linux/quick-start)",
+    "[前提条件与服务配置](/zh/installation/linux/prerequisites-and-service)",
+    "[单节点单磁盘 (SNSD)](/zh/installation/linux/single-node-single-disk)",
+    "[单节点多磁盘 (SNMD)](/zh/installation/linux/single-node-multiple-disk)",
+    "[多节点多磁盘 (MNMD)](/zh/installation/linux/multiple-node-multiple-disk)"
+  ]
+}

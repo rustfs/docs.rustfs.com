@@ -1,0 +1,7 @@
+{
+	"title": "云原生",
+	"pages": [
+		"helm-chart",
+		"operator"
+	]
+}

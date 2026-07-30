@@ -1,0 +1,10 @@
+{
+  "title": "协议支持",
+  "pages": [
+    "s3",
+    "webdav",
+    "ftps",
+    "sftp",
+    "[MCP 服务器](/zh/developer/mcp)"
+  ]
+}
