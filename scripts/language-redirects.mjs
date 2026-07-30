@@ -6,20 +6,6 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ENGLISH_CONTENT = path.join(ROOT, 'content', 'en');
 const SOURCE_REDIRECTS = path.join(ROOT, 'public', '_redirects');
 
-/**
- * @param {string} directory
- * @param {string[]} files
- * @returns {string[]}
- */
-function walk(directory, files = []) {
-  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
-    const absolutePath = path.join(directory, entry.name);
-    if (entry.isDirectory()) walk(absolutePath, files);
-    else files.push(absolutePath);
-  }
-  return files;
-}
-
 /** @param {string} target */
 function prefixEnglishTarget(target) {
   if (!target.startsWith('/') || target === '/en' || target.startsWith('/en/')) return target;
@@ -43,13 +29,15 @@ export function collectLanguageRedirects() {
     rules.set(source, `${prefixEnglishTarget(target)} ${status}`);
   }
 
-  for (const file of walk(ENGLISH_CONTENT)) {
-    if (!/\.mdx?$/.test(file)) continue;
-    let route = path.relative(ENGLISH_CONTENT, file).split(path.sep).join('/');
-    route = route.replace(/\.mdx?$/, '').replace(/(^|\/)index$/, '');
-    if (!route) continue;
-    const source = `/${route}`;
-    if (!rules.has(source)) rules.set(source, `/en${source} 301`);
+  // Collapse all current unprefixed documentation routes into one rule per
+  // top-level section. This keeps Cloudflare's _redirects file below its
+  // 100-rule dynamic redirect limit while preserving the legacy rules above.
+  for (const entry of fs.readdirSync(ENGLISH_CONTENT, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+
+    const section = `/${entry.name}`;
+    if (!rules.has(section)) rules.set(section, `/en${section} 301`);
+    rules.set(`${section}/*`, `/en${section}/:splat 301`);
   }
 
   return rules;
