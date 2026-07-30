@@ -14,7 +14,13 @@ RUSTFS_SECRET_KEY=<your-secret-key>
 
 如果两者均未提供，服务器会回退到内置默认值 `rustfsadmin` / `rustfsadmin`。
 
-:::warning
+:::warning[选择安全的根凭证]
+
+[AWS Signature Version 4（SigV4）](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv-signing-elements.html)会将访问密钥嵌入以斜杠分隔的凭证作用域：
+
+`<access-key>/<date>/<region>/<service>/aws4_request`
+
+请勿在 `RUSTFS_ACCESS_KEY` 中使用 `/`，否则会导致访问密钥和凭证作用域被错误解析。建议访问密钥仅使用大写 ASCII 字母和数字（`A-Z`、`0-9`），这与 RustFS 自动生成的访问密钥格式一致。请勿直接使用未经转换的 Base64 输出作为访问密钥；请为 `RUSTFS_SECRET_KEY` 使用单独的强随机值。
 
 默认的 `rustfsadmin` 凭证是公开且广为人知的。容器入口点会输出警告，但仍会启动。在将端口 9000/9001 暴露到 localhost 以外之前，请务必设置非默认凭证。此外，使用全默认凭证对运行的多节点集群**必须**设置 `RUSTFS_RPC_SECRET`（见下文），否则服务器会拒绝从默认密钥派生节点间 RPC 身份认证信息。
 
