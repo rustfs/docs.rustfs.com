@@ -39,6 +39,8 @@ RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>   ; e.g. output of: openssl rand -base64 24
 ```
 
+Use an uppercase alphanumeric access key. Do not use unmodified Base64 output for `RUSTFS_ACCESS_KEY`, because Base64 can contain `/`, which conflicts with the AWS Signature Version 4 credential scope. See [Credential Management](/en/operations/credentials) for details.
+
 ```bash
 sudo systemctl restart rustfs
 sudo systemctl status rustfs --no-pager   # should report: active (running)

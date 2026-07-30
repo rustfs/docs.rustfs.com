@@ -39,6 +39,8 @@ RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>   ; e.g. output of: openssl rand -base64 24
 ```
 
+访问密钥请仅使用大写字母和数字。请勿直接将未经转换的 Base64 输出用于 `RUSTFS_ACCESS_KEY`，因为 Base64 可能包含 `/`，与 AWS Signature Version 4 的凭证作用域分隔符冲突。详情请参阅[凭证管理](/zh/operations/credentials)。
+
 ```bash
 sudo systemctl restart rustfs
 sudo systemctl status rustfs --no-pager   # should report: active (running)
