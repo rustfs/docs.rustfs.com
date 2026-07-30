@@ -1,5 +1,6 @@
 {
   "title": "安全与合规",
+  "icon": "ShieldCheck",
   "defaultOpen": true,
   "pages": [
     "iam",

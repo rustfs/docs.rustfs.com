@@ -1,5 +1,6 @@
 {
   "title": "参考",
+  "icon": "BookOpen",
   "defaultOpen": false,
   "pages": [
     "environment-variables",

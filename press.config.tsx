@@ -1,4 +1,5 @@
 import { defineConfig } from "fumapress";
+import { lucideIconsPlugin } from "fumadocs-core/source/plugins/lucide-icons";
 import { fumadocsMdx } from "fumapress/adapters/mdx";
 import { flexsearchPlugin } from "fumapress/plugins/flexsearch";
 import { llmsPlugin } from "fumapress/plugins/llms.txt";
@@ -79,6 +80,9 @@ function createSidebarFooter(locale: keyof typeof layoutLabels) {
 export default defineConfig({
   content: docs.toFumadocsSource(),
   translations,
+  loaderOptions: {
+    plugins: [lucideIconsPlugin()],
+  },
   site: {
     name: "RustFS Documentation",
     baseUrl: isDev ? "http://localhost:3000" : "https://docs.rustfs.com",

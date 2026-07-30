@@ -1,5 +1,6 @@
 {
   "title": "Operations & Observability",
+  "icon": "Activity",
   "defaultOpen": true,
   "pages": [
     "rc",

@@ -1,5 +1,6 @@
 {
   "title": "运维与可观测性",
+  "icon": "Activity",
   "defaultOpen": true,
   "pages": [
     "rc",

@@ -1,5 +1,6 @@
 {
   "title": "Security & Compliance",
+  "icon": "ShieldCheck",
   "defaultOpen": true,
   "pages": [
     "iam",
