@@ -1,19 +1,21 @@
 import { defineConfig } from "fumapress";
 import { lucideIconsPlugin } from "fumadocs-core/source/plugins/lucide-icons";
 import { fumadocsMdx } from "fumapress/adapters/mdx";
-import { flexsearchPlugin } from "fumapress/plugins/flexsearch";
 import { llmsPlugin } from "fumapress/plugins/llms.txt";
 import { sitemapPlugin } from "fumapress/plugins/sitemap";
 import { takumiPlugin } from "fumapress/plugins/takumi";
 import { createNotebookLayoutPage } from "fumapress/layouts/notebook";
+import { createRootLayout } from "fumapress/layouts/root";
 import { zhCN } from "@fumapress/language/zh-cn";
 import { defineI18n } from "fumadocs-core/i18n";
 import defaultMdxComponents, { createRelativeLink } from "fumadocs-ui/mdx";
 import { docs } from "./.source/server";
+import AlgoliaSearchDialog from "./src/components/algolia-search-dialog";
 import { BrandLogo } from "./src/components/brand-logo";
 import { Mermaid } from "./src/components/mermaid";
 import { Tab, Tabs } from "./src/components/tabs";
 import { ArrowRight } from "lucide-react";
+import { algoliaIndexPlugin } from "./src/plugins/algolia-index";
 
 const isDev = import.meta.env.DEV;
 
@@ -191,8 +193,13 @@ gtag('config', 'G-TWW7WMTWL9');`,
     },
   },
 })
-  .plugins(flexsearchPlugin(), llmsPlugin(), takumiPlugin(), sitemapPlugin())
+  .plugins(algoliaIndexPlugin(), llmsPlugin(), takumiPlugin(), sitemapPlugin())
   .layouts({
+    root: createRootLayout({
+      providerProps: {
+        search: { SearchDialog: AlgoliaSearchDialog },
+      },
+    }),
     // Use the Notebook layout: a full-width top navbar (main links + search +
     // GitHub + theme) with the page tree in the sidebar — like the FumaPress docs.
     page: createNotebookLayoutPage(),
