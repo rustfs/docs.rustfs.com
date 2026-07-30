@@ -231,7 +231,7 @@ gtag('config', 'G-TWW7WMTWL9');`,
             url: "https://github.com/rustfs/rustfs/discussions",
             external: true,
           },
-          { text: labels.blog, url: "https://rustfs.dev", external: true },
+          { text: labels.blog, url: "https://rustfs.com/blog", external: true },
           {
             type: "icon" as const,
             label: "Twitter",
