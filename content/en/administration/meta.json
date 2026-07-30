@@ -1,5 +1,6 @@
 {
   "title": "Administration",
+  "icon": "Settings",
   "defaultOpen": true,
   "pages": [
     "[Console](/en/administration/console)",

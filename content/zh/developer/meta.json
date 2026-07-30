@@ -1,5 +1,6 @@
 {
   "title": "开发者",
+  "icon": "CodeXml",
   "defaultOpen": false,
   "pages": [
     "sdk",

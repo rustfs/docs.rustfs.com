@@ -1,5 +1,6 @@
 {
   "title": "安装",
+  "icon": "Download",
   "defaultOpen": true,
   "pages": [
     "requirement",

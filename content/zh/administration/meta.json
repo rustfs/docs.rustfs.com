@@ -1,5 +1,6 @@
 {
   "title": "管理",
+  "icon": "Settings",
   "defaultOpen": true,
   "pages": [
     "[控制台](/zh/administration/console)",
