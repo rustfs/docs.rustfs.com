@@ -1,8 +1,0 @@
-{
-  "title": "Upgrade",
-  "pages": [
-    "[Binary](/operations/upgrade/binary)",
-    "[Container](/operations/upgrade/container)",
-    "[Kubernetes](/operations/upgrade/kubernetes)"
-  ]
-}

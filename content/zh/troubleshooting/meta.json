@@ -1,0 +1,8 @@
+{
+  "title": "故障排除",
+  "defaultOpen": false,
+  "pages": [
+    "driver",
+    "node"
+  ]
+}

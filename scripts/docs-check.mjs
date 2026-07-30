@@ -18,6 +18,7 @@ import path from 'node:path';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const CONTENT = path.join(ROOT, 'content');
+const LANGUAGES = new Set(['en', 'zh']);
 
 const BANNED_STRINGS = [
   '12.34.56.78',
@@ -53,10 +54,13 @@ const rel = (f) => path.relative(ROOT, f);
 const referencedPages = new Set(); // absolute paths of referenced .md files
 const referencedFolders = new Set(); // absolute paths of referenced folders
 
-// content/index.md is the site root; folders that own a meta.json count as referenced.
-referencedFolders.add(CONTENT);
+// Each language directory is a navigation root; folders that own a meta.json
+// count as referenced within that language.
+for (const language of LANGUAGES) referencedFolders.add(path.join(CONTENT, language));
 
 for (const metaFile of metaFiles) {
+  const [language] = path.relative(CONTENT, metaFile).split(path.sep);
+  const languageRoot = LANGUAGES.has(language) ? path.join(CONTENT, language) : CONTENT;
   let meta;
   try {
     meta = JSON.parse(fs.readFileSync(metaFile, 'utf8'));
@@ -69,8 +73,10 @@ for (const metaFile of metaFiles) {
     if (/^---.*---$/.test(entry)) continue; // separator
     const link = entry.match(/\]\((\/[^)]+)\)/); // [Title](/url)
     if (link) {
-      const url = link[1].replace(/[#?].*$/, '');
-      const base = path.join(CONTENT, url);
+      const url = link[1]
+        .replace(/[#?].*$/, '')
+        .replace(new RegExp(`^/${language}(?=/|$)`), '');
+      const base = path.join(languageRoot, url);
       referencedPages.add(`${base}.md`);
       referencedPages.add(`${base}.mdx`);
       referencedPages.add(path.join(base, 'index.md'));

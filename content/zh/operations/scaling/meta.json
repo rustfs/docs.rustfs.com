@@ -1,0 +1,8 @@
+{
+  "title": "扩缩容",
+  "pages": [
+    "storage-pool-expansion",
+    "data-rebalancing",
+    "storage-pool-decommission"
+  ]
+}

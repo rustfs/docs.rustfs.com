@@ -1,0 +1,9 @@
+{
+  "title": "开发者",
+  "defaultOpen": false,
+  "pages": [
+    "sdk",
+    "integration",
+    "license"
+  ]
+}

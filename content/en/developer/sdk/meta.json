@@ -1,0 +1,12 @@
+{
+  "title": "SDK",
+  "pages": [
+    "[Java](/en/developer/sdk/java)",
+    "[Python](/en/developer/sdk/python)",
+    "[Rust](/en/developer/sdk/rust)",
+    "[JavaScript](/en/developer/sdk/javascript)",
+    "[TypeScript](/en/developer/sdk/typescript)",
+    "[Golang](/en/developer/sdk/go)",
+    "[Other SDKs](/en/developer/sdk/other)"
+  ]
+}

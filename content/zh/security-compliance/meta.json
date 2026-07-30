@@ -1,0 +1,12 @@
+{
+  "title": "安全与合规",
+  "defaultOpen": true,
+  "pages": [
+    "iam",
+    "encryption",
+    "oidc",
+    "[TLS 配置](/zh/integration/tls-configured)",
+    "audit-logs",
+    "[凭证管理](/zh/operations/credentials)"
+  ]
+}

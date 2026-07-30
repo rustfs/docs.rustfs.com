@@ -1,0 +1,11 @@
+{
+  "title": "对象",
+  "pages": [
+    "creation",
+    "deletion",
+    "object-lock",
+    "versioning",
+    "multipart-upload",
+    "scanner"
+  ]
+}

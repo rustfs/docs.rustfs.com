@@ -7,7 +7,7 @@
   "sideEffects": false,
   "scripts": {
     "dev": "waku dev",
-    "build": "waku build",
+    "build": "waku build && node scripts/add-language-redirects.mjs",
     "start": "waku start",
     "types:check": "fumadocs-mdx && tsc --noEmit",
     "docs:check": "node scripts/docs-check.mjs"

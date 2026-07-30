@@ -1,0 +1,10 @@
+{
+  "title": "检查清单",
+  "pages": [
+    "[硬件检查清单](/zh/installation/requirement/checklists/hardware-checklists)",
+    "[硬件选型](/zh/installation/requirement/checklists/hardware-selection)",
+    "[网络检查清单](/zh/installation/requirement/checklists/network-checklists)",
+    "[软件检查清单](/zh/installation/requirement/checklists/software-checklists)",
+    "[安全检查清单](/zh/installation/requirement/checklists/security-checklists)"
+  ]
+}

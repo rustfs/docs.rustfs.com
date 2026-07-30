@@ -1,0 +1,13 @@
+{
+  "title": "运维与可观测性",
+  "defaultOpen": true,
+  "pages": [
+    "rc",
+    "upgrade",
+    "scaling",
+    "high-availability",
+    "observability",
+    "status-check",
+    "event-notifications"
+  ]
+}

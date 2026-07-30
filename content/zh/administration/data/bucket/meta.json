@@ -1,0 +1,10 @@
+{
+  "title": "存储桶",
+  "pages": [
+    "creation",
+    "deletion",
+    "quota",
+    "replication",
+    "policy"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "title": "示例",
+  "pages": [
+    "[rc](/zh/operations/rc)",
+    "[AWS CLI](/zh/developer/examples/aws-cli)",
+    "[s3cmd](/zh/developer/examples/s3cmd)",
+    "[rclone](/zh/developer/examples/rclone)",
+    "[boto3 (Python)](/zh/developer/examples/boto3)",
+    "[AWS SDK（JavaScript）](/zh/developer/examples/aws-sdk-js)",
+    "[AWS SDK（Go）](/zh/developer/examples/aws-sdk-go)",
+    "[Terraform](/zh/developer/examples/terraform)"
+  ]
+}
