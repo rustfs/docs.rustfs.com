@@ -3,7 +3,7 @@ title: "SFTP"
 description: "构建、配置并使用 RustFS SFTP 网关，通过 SFTP 客户端访问存储桶和对象。"
 ---
 
-RustFS 包含一个 SSH 文件传输协议（SSH File Transfer Protocol，SFTP）网关，通过加密的 SSH 连接向 SFTP 客户端公开存储桶和对象。你可以列出和创建存储桶，以及上传、下载、重命名或删除对象；RustFS 会执行已验证身份与访问管理（IAM）用户的权限。
+RustFS 包含一个 SSH 文件传输协议（SSH File Transfer Protocol，SFTP）网关，通过加密的 SSH 连接向 SFTP 客户端公开存储桶和对象。你可以列出和创建存储桶，以及上传、下载、重命名或删除对象；RustFS 会根据通过身份验证的身份与访问管理（IAM）用户权限执行每项操作。
 
 SFTP 是可选的编译时功能，不包含在默认 RustFS 构建中。启用监听器前，请使用 `sftp` 或 `full` 功能构建 RustFS。监听器在运行时默认禁用。
 

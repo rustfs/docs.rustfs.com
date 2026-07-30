@@ -9,6 +9,7 @@
  *   3. Code fences    — fenced code blocks without a language
  *   4. Banned strings — placeholder IPs, fake regions, leaked paths, marketing claims
  *   5. Large images   — referenced images larger than 300 KB
+ *   6. Locale parity  — translated page trees and technical code blocks match English
  *
  * No external dependencies. Exits non-zero if any check fails.
  */
@@ -19,6 +20,7 @@ import path from 'node:path';
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const CONTENT = path.join(ROOT, 'content');
 const LANGUAGES = new Set(['en', 'zh']);
+const DEFAULT_LANGUAGE = 'en';
 
 const BANNED_STRINGS = [
   '12.34.56.78',
@@ -34,6 +36,11 @@ const IMAGE_SIZE_LIMIT = 300 * 1024; // 300 KB
 
 // ---------- helpers ----------
 
+/**
+ * @param {string} dir
+ * @param {string[]} out
+ * @returns {string[]}
+ */
 function walk(dir, out = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
@@ -47,11 +54,14 @@ const allFiles = walk(CONTENT);
 const mdFiles = allFiles.filter((f) => /\.(md|mdx)$/.test(f));
 const metaFiles = allFiles.filter((f) => path.basename(f) === 'meta.json');
 
-const rel = (f) => path.relative(ROOT, f);
+/** @param {string} file */
+const rel = (file) => path.relative(ROOT, file);
 
 // ---------- check 1: orphan pages ----------
 
+/** @type {Set<string>} */
 const referencedPages = new Set(); // absolute paths of referenced .md files
+/** @type {Set<string>} */
 const referencedFolders = new Set(); // absolute paths of referenced folders
 
 // Each language directory is a navigation root; folders that own a meta.json
@@ -59,7 +69,7 @@ const referencedFolders = new Set(); // absolute paths of referenced folders
 for (const language of LANGUAGES) referencedFolders.add(path.join(CONTENT, language));
 
 for (const metaFile of metaFiles) {
-  const [language] = path.relative(CONTENT, metaFile).split(path.sep);
+  const language = path.relative(CONTENT, metaFile).split(path.sep)[0] ?? '';
   const languageRoot = LANGUAGES.has(language) ? path.join(CONTENT, language) : CONTENT;
   let meta;
   try {
@@ -73,7 +83,9 @@ for (const metaFile of metaFiles) {
     if (/^---.*---$/.test(entry)) continue; // separator
     const link = entry.match(/\]\((\/[^)]+)\)/); // [Title](/url)
     if (link) {
-      const url = link[1]
+      const linkedUrl = link[1];
+      if (!linkedUrl) continue;
+      const url = linkedUrl
         .replace(/[#?].*$/, '')
         .replace(new RegExp(`^/${language}(?=/|$)`), '');
       const base = path.join(languageRoot, url);
@@ -91,6 +103,7 @@ for (const metaFile of metaFiles) {
   }
 }
 
+/** @type {string[]} */
 const orphans = [];
 for (const file of mdFiles) {
   if (referencedPages.has(file)) continue;
@@ -102,10 +115,15 @@ for (const file of mdFiles) {
 
 // ---------- per-file scans (checks 2–5) ----------
 
+/** @type {string[]} */
 const brokenLinks = [];
+/** @type {string[]} */
 const bareFences = [];
+/** @type {string[]} */
 const bannedHits = [];
+/** @type {string[]} */
 const largeImages = [];
+/** @type {Set<string>} */
 const seenLargeImages = new Set();
 
 for (const file of mdFiles) {
@@ -122,7 +140,7 @@ for (const file of mdFiles) {
       inFence = false;
     } else {
       inFence = true;
-      if (fence[2].trim() === '') bareFences.push(`${rel(file)}:${i + 1}`);
+      if ((fence[2] ?? '').trim() === '') bareFences.push(`${rel(file)}:${i + 1}`);
     }
   });
 
@@ -138,6 +156,7 @@ for (const file of mdFiles) {
   // links by URL, not by on-disk extension), and vice versa.
   for (const m of text.matchAll(/\]\(([^)\s]+?\.mdx?)(?:#[^)]*)?\)/g)) {
     const target = m[1];
+    if (!target) continue;
     if (/^(https?:)?\/\//.test(target) || target.startsWith('/')) continue;
     const resolved = path.resolve(dir, decodeURIComponent(target));
     const alt = resolved.replace(/\.mdx$/, '.md').replace(/\.md$/, '.mdx');
@@ -153,6 +172,7 @@ for (const file of mdFiles) {
   ];
   for (const m of imageRefs) {
     const target = m[1];
+    if (!target) continue;
     if (/^(https?:)?\/\//.test(target) || target.startsWith('data:')) continue;
     const resolved = target.startsWith('/')
       ? path.join(ROOT, 'public', target)
@@ -166,10 +186,76 @@ for (const file of mdFiles) {
   }
 }
 
+// ---------- check 6: locale parity ----------
+
+/** @type {string[]} */
+const localeParity = [];
+/** @type {string[]} */
+const technicalFenceDrift = [];
+const localizableFiles = /\.(md|mdx|json)$/;
+
+/**
+ * Return code/config blocks whose contents must not change during translation.
+ * Mermaid is excluded because diagram labels are reader-facing prose.
+ *
+ * @param {string} text
+ * @returns {string[]}
+ */
+function extractTechnicalFences(text) {
+  const blocks = [];
+  const pattern = /^(```+|~~~+)([^\n]*)\n([\s\S]*?)^\1\s*$/gm;
+  for (const match of text.matchAll(pattern)) {
+    const info = (match[2] ?? '').trim();
+    const language = info.split(/\s+/, 1)[0];
+    if (language === 'mermaid') continue;
+    blocks.push(`${info}\n${(match[3] ?? '').trimEnd()}`);
+  }
+  return blocks;
+}
+
+const defaultRoot = path.join(CONTENT, DEFAULT_LANGUAGE);
+const defaultFiles = walk(defaultRoot)
+  .filter((file) => localizableFiles.test(file))
+  .map((file) => path.relative(defaultRoot, file));
+
+for (const language of LANGUAGES) {
+  if (language === DEFAULT_LANGUAGE) continue;
+  const languageRoot = path.join(CONTENT, language);
+  const translatedFiles = new Set(
+    walk(languageRoot)
+      .filter((file) => localizableFiles.test(file))
+      .map((file) => path.relative(languageRoot, file)),
+  );
+
+  for (const relativeFile of defaultFiles) {
+    if (!translatedFiles.delete(relativeFile)) {
+      localeParity.push(`${language} missing ${relativeFile}`);
+      continue;
+    }
+    if (!/\.mdx?$/.test(relativeFile)) continue;
+
+    const sourceBlocks = extractTechnicalFences(
+      fs.readFileSync(path.join(defaultRoot, relativeFile), 'utf8'),
+    );
+    const translatedBlocks = extractTechnicalFences(
+      fs.readFileSync(path.join(languageRoot, relativeFile), 'utf8'),
+    );
+    if (JSON.stringify(sourceBlocks) !== JSON.stringify(translatedBlocks)) {
+      technicalFenceDrift.push(`${language}/${relativeFile}`);
+    }
+  }
+
+  for (const extraFile of translatedFiles) localeParity.push(`${language} has extra ${extraFile}`);
+}
+
 // ---------- report ----------
 
 let failed = false;
 
+/**
+ * @param {string} title
+ * @param {string[]} items
+ */
 function report(title, items) {
   if (items.length === 0) {
     console.log(`PASS  ${title}`);
@@ -186,6 +272,8 @@ report('Broken relative .md links', brokenLinks);
 report('Code fences without a language', bareFences);
 report('Banned strings', bannedHits);
 report(`Referenced images larger than ${IMAGE_SIZE_LIMIT / 1024} KB`, largeImages);
+report('Locale page tree parity', localeParity);
+report('Translated technical code blocks match English', technicalFenceDrift);
 
 console.log('');
 if (failed) {

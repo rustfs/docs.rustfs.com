@@ -5,6 +5,7 @@ import { llmsPlugin } from "fumapress/plugins/llms.txt";
 import { sitemapPlugin } from "fumapress/plugins/sitemap";
 import { takumiPlugin } from "fumapress/plugins/takumi";
 import { createNotebookLayoutPage } from "fumapress/layouts/notebook";
+import { zhCN } from "@fumapress/language/zh-cn";
 import { defineI18n } from "fumadocs-core/i18n";
 import defaultMdxComponents, { createRelativeLink } from "fumadocs-ui/mdx";
 import { docs } from "./.source/server";
@@ -26,10 +27,13 @@ const i18n = defineI18n({
   fallbackLanguage: "en",
 });
 
-const translations = i18n.translations().add({
-  en: { displayName: "English" },
-  zh: { displayName: "简体中文" },
-});
+const translations = i18n
+  .translations()
+  .preset("zh", zhCN())
+  .add({
+    en: { displayName: "English" },
+    zh: { displayName: "简体中文" },
+  });
 
 // Social icons (inline SVG so the bundle stays self-contained).
 const TwitterIcon = (
@@ -38,13 +42,39 @@ const TwitterIcon = (
   </svg>
 );
 
-// Sidebar footer: license + copyright (parity with the previous VitePress footer).
-const SidebarFooter = (
-  <div className="flex flex-col gap-0.5 px-2 py-3 text-xs text-fd-muted-foreground">
-    <p>Released under the Apache License 2.0.</p>
-    <p>Copyright © 2025 RustFS</p>
-  </div>
-);
+const layoutLabels = {
+  en: {
+    home: "Home",
+    docs: "Docs",
+    installation: "Installation",
+    demo: "Demo",
+    community: "Community",
+    blog: "Blog",
+    license: "Released under the Apache License 2.0.",
+    copyright: "Copyright © 2025 RustFS",
+  },
+  zh: {
+    home: "首页",
+    docs: "文档",
+    installation: "安装",
+    demo: "演示",
+    community: "社区",
+    blog: "博客",
+    license: "根据 Apache License 2.0 发布。",
+    copyright: "版权所有 © 2025 RustFS",
+  },
+} as const;
+
+function createSidebarFooter(locale: keyof typeof layoutLabels) {
+  const labels = layoutLabels[locale];
+
+  return (
+    <div className="flex flex-col gap-0.5 px-2 py-3 text-xs text-fd-muted-foreground">
+      <p>{labels.license}</p>
+      <p>{labels.copyright}</p>
+    </div>
+  );
+}
 
 export default defineConfig({
   content: docs.toFumadocsSource(),
@@ -164,7 +194,9 @@ gtag('config', 'G-TWW7WMTWL9');`,
     page: createNotebookLayoutPage(),
     // Shared navbar / links across all Fumadocs layouts.
     defaultProps({ lang }) {
-      const docsUrl = `/${lang ?? i18n.defaultLanguage}`;
+      const locale = lang === "zh" ? "zh" : i18n.defaultLanguage;
+      const docsUrl = `/${locale}`;
+      const labels = layoutLabels[locale];
 
       // Built as a const (not an inline literal) so the extra `sidebar` field —
       // which lives on DocsLayoutProps, not BaseLayoutProps — is accepted and
@@ -184,18 +216,18 @@ gtag('config', 'G-TWW7WMTWL9');`,
         },
         githubUrl: "https://github.com/rustfs/rustfs",
         links: [
-          { text: "Home", url: "https://rustfs.com", external: true },
-          { text: "Docs", url: docsUrl },
-          { text: "Installation", url: `${docsUrl}/installation` },
+          { text: labels.home, url: "https://rustfs.com", external: true },
+          { text: labels.docs, url: docsUrl },
+          { text: labels.installation, url: `${docsUrl}/installation` },
           { text: "MCP", url: `${docsUrl}/developer/mcp` },
           { text: "SDK", url: `${docsUrl}/developer/sdk` },
-          { text: "Demo", url: "https://play.rustfs.com", external: true },
+          { text: labels.demo, url: "https://play.rustfs.com", external: true },
           {
-            text: "Community",
+            text: labels.community,
             url: "https://github.com/rustfs/rustfs/discussions",
             external: true,
           },
-          { text: "Blog", url: "https://rustfs.dev", external: true },
+          { text: labels.blog, url: "https://rustfs.dev", external: true },
           {
             type: "icon" as const,
             label: "Twitter",
@@ -206,7 +238,7 @@ gtag('config', 'G-TWW7WMTWL9');`,
           },
         ],
         sidebar: {
-          footer: SidebarFooter,
+          footer: createSidebarFooter(locale),
         },
       };
       return props;

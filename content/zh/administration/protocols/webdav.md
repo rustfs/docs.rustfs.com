@@ -3,7 +3,7 @@ title: "WebDAV"
 description: "配置 RustFS WebDAV 网关，并使用 WebDAV 客户端访问存储桶和对象。"
 ---
 
-RustFS 包含一个网络分布式创作与版本控制（Web Distributed Authoring and Versioning，WebDAV）网关，通过 HTTP 或 HTTPS 向 WebDAV 客户端公开存储桶和对象。你可以浏览存储桶、创建集合，以及上传、下载、重命名或删除对象；RustFS 会执行已验证身份与访问管理（IAM）用户的权限。
+RustFS 包含一个网络分布式创作与版本控制（Web Distributed Authoring and Versioning，WebDAV）网关，通过 HTTP 或 HTTPS 向 WebDAV 客户端公开存储桶和对象。你可以浏览存储桶、创建集合，以及上传、下载、重命名或删除对象；RustFS 会根据通过身份验证的身份与访问管理（IAM）用户权限执行每项操作。
 
 标准 RustFS 二进制文件中已编译 WebDAV 支持，但网关在运行时默认禁用。连接客户端前必须启用并配置网关。
 

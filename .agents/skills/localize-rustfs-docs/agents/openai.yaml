@@ -1,0 +1,4 @@
+interface:
+  display_name: "Localize RustFS Docs"
+  short_description: "Build and verify localized RustFS documentation"
+  default_prompt: "Use $localize-rustfs-docs to add or review a documentation locale end to end."

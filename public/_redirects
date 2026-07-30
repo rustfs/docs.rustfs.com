@@ -19,6 +19,7 @@
 /integration/nginx /developer/integration/reverse-proxy/nginx 301
 /concepts/architecture / 301
 /concepts/comparison / 301
+/concepts/comparison.html / 301
 /concepts/glossary /reference 301
 /concepts/introduction / 301
 /concepts/limit /reference 301
@@ -31,6 +32,11 @@
 /installation/checklists/security-checklists /installation/requirement/checklists/security-checklists 301
 /installation/checklists/software-checklists /installation/requirement/checklists/software-checklists 301
 /installation/docker /installation/container/docker 301
+/installation/docker/ /installation/container/docker 301
+/features/logging /operations/observability 301
+/features/integration/ /developer/integration 301
+/administration/iam/access-token.html /security-compliance/iam/access-token 301
+/features/replication/ /administration/data/bucket/replication 301
 /operations/cold-start /operations/status-check 301
 /operations/decommission /operations/scaling/storage-pool-decommission 301
 /operations/monitoring /operations/observability 301
