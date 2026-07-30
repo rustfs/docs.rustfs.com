@@ -32,6 +32,7 @@ Use a dedicated client for RustFS and grant each identity only the policies it r
 ## Provider guides
 
 - [Configure Keycloak](/security-compliance/oidc/keycloak) as an OIDC provider for the RustFS Console.
+- [Configure GitLab](/security-compliance/oidc/gitlab) as an OIDC provider for the RustFS Console.
 
 ## Next steps
 

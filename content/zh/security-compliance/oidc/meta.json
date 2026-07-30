@@ -1,4 +1,4 @@
 {
   "title": "OIDC",
-  "pages": ["keycloak"]
+  "pages": ["keycloak", "gitlab"]
 }

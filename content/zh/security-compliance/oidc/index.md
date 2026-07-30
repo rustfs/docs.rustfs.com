@@ -32,6 +32,7 @@ RustFS 使用带有授权码交换证明（Proof Key for Code Exchange，PKCE）
 ## 提供商指南
 
 - [配置 Keycloak](/security-compliance/oidc/keycloak)，将其用作 RustFS 控制台的 OIDC 提供商。
+- [配置 GitLab](/security-compliance/oidc/gitlab)，将其用作 RustFS 控制台的 OIDC 提供商。
 
 ## 后续步骤
 
