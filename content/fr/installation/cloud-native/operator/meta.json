@@ -1,0 +1,9 @@
+{
+  "title": "Opérateur RustFS",
+  "pages": [
+    "installation",
+    "tenant",
+    "pool-expansion",
+    "kms"
+  ]
+}

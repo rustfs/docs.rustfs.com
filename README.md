@@ -11,9 +11,9 @@ RustFS is an S3-compatible distributed object storage engine written in Rust. Th
 
 ## Repository Snapshot
 
-- `content/` – Markdown (`.md`) sources; each section has an `index.md` entry point. URLs mirror the folder path (e.g. `content/installation/linux/quick-start.md` → `/installation/linux/quick-start`).
-- `content/meta.json` – root sidebar definition (section order, labels, and links).
-- `content/**/meta.json` – per-folder sidebar titles and ordering for nested groups.
+- `content/<locale>/` – localized Markdown (`.md`) and MDX (`.mdx`) sources. URLs mirror the locale and folder path (for example, `content/en/installation/linux/quick-start.md` → `/en/installation/linux/quick-start`).
+- `content/<locale>/meta.json` – locale-specific root sidebar definition (section order, labels, and links).
+- `content/<locale>/**/meta.json` – locale-specific sidebar titles and ordering for nested groups.
 - `press.config.tsx` – site config: name, navbar links, social links, logo, analytics, SEO, plugins, and MDX components.
 - `source.config.ts` – content collection + global MDX options (KaTeX math, Mermaid diagrams).
 - `waku.config.ts` – Waku/Vite plugins (FumaPress, Fumadocs MDX, Tailwind).
@@ -39,7 +39,9 @@ RustFS is an S3-compatible distributed object storage engine written in Rust. Th
 
 ### Translations
 
-- Chinese docs: <https://docs.rustfs.com.cn>
+The site exposes `en`, `zh`, `de`, `fr`, and `ja` locale routes. Simplified Chinese is fully localized. German, French, and Japanese currently localize the site UI, homepage, and navigation while using the current English page body as an explicit fallback. Translate fallback pages from `content/en`, keep each locale's relative file tree aligned, and preserve non-Mermaid technical code blocks exactly.
+
+Run `npm run docs:check`, `npm run types:check`, and `npm run build` before submitting localization changes.
 
 ## Local Development
 

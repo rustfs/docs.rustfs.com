@@ -1,0 +1,8 @@
+{
+  "title": "IAM",
+  "pages": [
+    "[Utilisateurs, groupes et politiques](/fr/security-compliance/iam/policies)",
+    "[Comptes de service et STS](/fr/security-compliance/iam/sts)",
+    "[Clés d’accès](/fr/security-compliance/iam/access-token)"
+  ]
+}

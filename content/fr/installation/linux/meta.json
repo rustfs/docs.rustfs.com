@@ -1,0 +1,10 @@
+{
+  "title": "Linux",
+  "pages": [
+    "[Démarrage rapide](/fr/installation/linux/quick-start)",
+    "[Prérequis et configuration du service](/fr/installation/linux/prerequisites-and-service)",
+    "[Nœud unique et disque unique (SNSD)](/fr/installation/linux/single-node-single-disk)",
+    "[Nœud unique et plusieurs disques (SNMD)](/fr/installation/linux/single-node-multiple-disk)",
+    "[Plusieurs nœuds et plusieurs disques (MNMD)](/fr/installation/linux/multiple-node-multiple-disk)"
+  ]
+}

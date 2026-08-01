@@ -1,0 +1,10 @@
+{
+  "title": "Prise en charge des protocoles",
+  "pages": [
+    "s3",
+    "webdav",
+    "ftps",
+    "sftp",
+    "[Serveur MCP](/fr/developer/mcp)"
+  ]
+}

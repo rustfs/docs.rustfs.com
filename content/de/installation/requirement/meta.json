@@ -1,0 +1,9 @@
+{
+  "title": "Anforderungen",
+  "pages": [
+    "[Topologieauswahl](/de/installation#deployment-mode-comparison)",
+    "ec-configuration",
+    "disk-preparation",
+    "checklists"
+  ]
+}

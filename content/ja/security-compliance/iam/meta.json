@@ -1,0 +1,8 @@
+{
+  "title": "IAM",
+  "pages": [
+    "[ユーザー、グループ、ポリシー](/ja/security-compliance/iam/policies)",
+    "[サービスアカウントと STS](/ja/security-compliance/iam/sts)",
+    "[アクセスキー](/ja/security-compliance/iam/access-token)"
+  ]
+}

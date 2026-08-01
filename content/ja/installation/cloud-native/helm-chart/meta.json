@@ -1,0 +1,8 @@
+{
+  "title": "Helm チャート",
+  "pages": [
+    "installation",
+    "mtls",
+    "cert-manager"
+  ]
+}

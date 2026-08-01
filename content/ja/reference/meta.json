@@ -1,0 +1,9 @@
+{
+  "title": "リファレンス",
+  "icon": "BookOpen",
+  "defaultOpen": false,
+  "pages": [
+    "environment-variables",
+    "cli"
+  ]
+}

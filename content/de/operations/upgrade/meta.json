@@ -1,0 +1,8 @@
+{
+  "title": "Upgrade",
+  "pages": [
+    "[Binärdatei](/de/operations/upgrade/binary)",
+    "[Container](/de/operations/upgrade/container)",
+    "[Kubernetes](/de/operations/upgrade/kubernetes)"
+  ]
+}

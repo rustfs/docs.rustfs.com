@@ -1,0 +1,10 @@
+{
+  "title": "チェックリスト",
+  "pages": [
+    "[ハードウェアチェックリスト](/ja/installation/requirement/checklists/hardware-checklists)",
+    "[ハードウェアの選定](/ja/installation/requirement/checklists/hardware-selection)",
+    "[ネットワークチェックリスト](/ja/installation/requirement/checklists/network-checklists)",
+    "[ソフトウェアチェックリスト](/ja/installation/requirement/checklists/software-checklists)",
+    "[セキュリティチェックリスト](/ja/installation/requirement/checklists/security-checklists)"
+  ]
+}

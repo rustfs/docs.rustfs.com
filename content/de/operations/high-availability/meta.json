@@ -1,0 +1,7 @@
+{
+  "title": "Hochverfügbarkeit",
+  "pages": [
+    "site-replication",
+    "node-healing"
+  ]
+}

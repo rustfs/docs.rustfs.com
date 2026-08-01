@@ -1,0 +1,14 @@
+{
+  "title": "Exploitation et observabilité",
+  "icon": "Activity",
+  "defaultOpen": true,
+  "pages": [
+    "rc",
+    "upgrade",
+    "scaling",
+    "high-availability",
+    "observability",
+    "status-check",
+    "event-notifications"
+  ]
+}

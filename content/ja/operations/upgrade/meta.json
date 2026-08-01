@@ -1,0 +1,8 @@
+{
+  "title": "アップグレード",
+  "pages": [
+    "[バイナリ](/ja/operations/upgrade/binary)",
+    "[コンテナ](/ja/operations/upgrade/container)",
+    "[Kubernetes](/ja/operations/upgrade/kubernetes)"
+  ]
+}

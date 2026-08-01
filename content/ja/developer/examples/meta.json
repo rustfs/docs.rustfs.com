@@ -1,0 +1,13 @@
+{
+  "title": "使用例",
+  "pages": [
+    "[rc](/ja/operations/rc)",
+    "[AWS CLI](/ja/developer/examples/aws-cli)",
+    "[s3cmd](/ja/developer/examples/s3cmd)",
+    "[rclone](/ja/developer/examples/rclone)",
+    "[boto3（Python）](/ja/developer/examples/boto3)",
+    "[AWS SDK for JavaScript](/ja/developer/examples/aws-sdk-js)",
+    "[AWS SDK for Go](/ja/developer/examples/aws-sdk-go)",
+    "[Terraform](/ja/developer/examples/terraform)"
+  ]
+}

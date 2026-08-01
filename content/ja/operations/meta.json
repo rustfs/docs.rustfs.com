@@ -1,0 +1,14 @@
+{
+  "title": "運用と可観測性",
+  "icon": "Activity",
+  "defaultOpen": true,
+  "pages": [
+    "rc",
+    "upgrade",
+    "scaling",
+    "high-availability",
+    "observability",
+    "status-check",
+    "event-notifications"
+  ]
+}

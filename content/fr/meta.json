@@ -1,0 +1,12 @@
+{
+  "root": true,
+  "pages": [
+    "installation",
+    "administration",
+    "security-compliance",
+    "operations",
+    "troubleshooting",
+    "developer",
+    "reference"
+  ]
+}

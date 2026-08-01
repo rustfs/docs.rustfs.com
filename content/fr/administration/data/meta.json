@@ -1,0 +1,9 @@
+{
+  "title": "Gestion des données",
+  "pages": [
+    "object",
+    "bucket",
+    "tiered-storage",
+    "lifecycle-management"
+  ]
+}

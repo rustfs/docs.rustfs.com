@@ -1,0 +1,13 @@
+{
+  "title": "セキュリティとコンプライアンス",
+  "icon": "ShieldCheck",
+  "defaultOpen": true,
+  "pages": [
+    "iam",
+    "encryption",
+    "oidc",
+    "[TLS の設定](/ja/integration/tls-configured)",
+    "audit-logs",
+    "[認証情報の管理](/ja/operations/credentials)"
+  ]
+}

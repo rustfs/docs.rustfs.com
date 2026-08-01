@@ -1,0 +1,10 @@
+{
+  "title": "Développement",
+  "icon": "CodeXml",
+  "defaultOpen": false,
+  "pages": [
+    "sdk",
+    "integration",
+    "license"
+  ]
+}

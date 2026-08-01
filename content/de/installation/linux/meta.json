@@ -1,0 +1,10 @@
+{
+  "title": "Linux",
+  "pages": [
+    "[Schnellstart](/de/installation/linux/quick-start)",
+    "[Voraussetzungen und Diensteinrichtung](/de/installation/linux/prerequisites-and-service)",
+    "[Einzelner Knoten mit einem Datenträger (SNSD)](/de/installation/linux/single-node-single-disk)",
+    "[Einzelner Knoten mit mehreren Datenträgern (SNMD)](/de/installation/linux/single-node-multiple-disk)",
+    "[Mehrere Knoten mit mehreren Datenträgern (MNMD)](/de/installation/linux/multiple-node-multiple-disk)"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+	"title": "クラウドネイティブ",
+	"pages": [
+		"helm-chart",
+		"operator"
+	]
+}

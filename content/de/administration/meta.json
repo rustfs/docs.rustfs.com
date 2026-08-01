@@ -1,0 +1,12 @@
+{
+  "title": "Administration",
+  "icon": "Settings",
+  "defaultOpen": true,
+  "pages": [
+    "[Console](/de/administration/console)",
+    "data",
+    "protocols",
+    "cors",
+    "[Virtual-Host-Zugriff](/de/integration/virtual)"
+  ]
+}

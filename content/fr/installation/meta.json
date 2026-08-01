@@ -1,0 +1,13 @@
+{
+  "title": "Installation",
+  "icon": "Download",
+  "defaultOpen": true,
+  "pages": [
+    "requirement",
+    "linux",
+    "container",
+    "cloud-native",
+    "[Windows](/fr/installation/windows)",
+    "[macOS](/fr/installation/macos)"
+  ]
+}
