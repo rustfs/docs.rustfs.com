@@ -16,7 +16,6 @@ function prefixEnglishTarget(target) {
 export function collectLanguageRedirects() {
   /** @type {Map<string, string>} */
   const rules = new Map();
-  rules.set('/', '/en 302');
 
   const existingRules = fs.readFileSync(SOURCE_REDIRECTS, 'utf8').split('\n');
   for (const line of existingRules) {
