@@ -1,74 +1,182 @@
 ---
 name: localize-rustfs-docs
-description: Localize, add, review, or repair RustFS documentation languages and FumaPress internationalization. Use for locale directories, translated Markdown or MDX, localized navigation and UI, terminology decisions, language routing, hreflang metadata, search indexes, redirects, and translation-quality reviews in docs.rustfs.com.
+description: Localize, review, audit, or repair RustFS documentation and FumaPress internationalization. Use for translated Markdown or MDX, frontmatter, meta.json navigation, locale directories, localized links and UI, terminology decisions, language routing, hreflang metadata, search indexes, redirects, untranslated-content detection, and localization pull requests in docs.rustfs.com, especially for German, French, Japanese, or Chinese.
 ---
 
-# Localize RustFS documentation
+# Localize and review RustFS documentation
 
-Build each locale as a complete RustFS documentation experience. Preserve product meaning and operational accuracy; do not perform literal sentence-by-sentence substitution.
+Produce target-language documentation that is technically equivalent to the current English source, idiomatic for infrastructure developers, structurally valid for FumaPress, and safe to publish. Preserve meaning, operational behavior, warnings, constraints, and claim strength instead of translating sentence by sentence.
 
-## Required context
+## Load the required context
 
-1. Read `../rustfs-docs/SKILL.md` and the repository `STYLE.md` before editing content.
-2. Read [the current FumaPress internationalization guide](https://press.fumadocs.dev/docs/internationalization.md) before changing `press.config.tsx` or locale layout.
-3. Read [references/terminology.md](references/terminology.md) before translating or reviewing terminology.
+1. Read `../rustfs-docs/SKILL.md`, the repository `AGENTS.md`, and `STYLE.md`.
+2. Read [references/terminology.md](references/terminology.md), then read the target-locale reference when one exists:
+   - [references/de.md](references/de.md) for German
+   - [references/fr.md](references/fr.md) for French
+   - [references/ja.md](references/ja.md) for Japanese
+3. Read the [current FumaPress internationalization guide](https://press.fumadocs.dev/docs/internationalization.md) before changing `press.config.tsx`, routing, search, or locale layout.
 4. Verify commands, flags, configuration keys, defaults, ports, APIs, and feature claims against `rustfs/rustfs`; never infer them from a translation.
 
-## Translation standard
+Use the current English page as the content baseline. For a pull request, compare against the English page at the base commit unless the pull request also proposes a newer English version.
 
-- Translate meaning in the context of the RustFS product, its Console, and S3-compatible behavior. Rewrite sentence structure when necessary for natural target-language documentation.
-- Keep `RustFS`, protocol names, API names, CLI commands, code, environment variables, configuration keys, file paths, URLs, JSON/YAML keys, and identifiers unchanged.
-- Use the glossary consistently. When a technical term has no established translation, keep the English term and add a short target-language explanation on first use.
-- Preserve visible Console labels exactly when instructing the reader to click them; add a translation in parentheses only when it improves comprehension.
-- Preserve the source page's technical scope. Do not add capabilities, defaults, warnings, or recommendations during translation unless they are verified and added to every maintained locale.
-- Keep code fences byte-for-byte equivalent across locales unless a localized string is itself part of the demonstrated behavior. Translate prose outside code fences instead.
-- Preserve links and cited sources. Localize internal documentation links to the current locale while keeping external destinations unchanged.
-- Review the completed page as native technical writing. Reject awkward calques, ambiguous pronouns, untranslated prose fragments, terminology drift, and sentences that are grammatically correct but unnatural.
+## Select the operation mode
 
-## Configure FumaPress i18n
+- **Audit**: report prioritized findings without modifying files.
+- **Repair**: correct existing translations and validate the affected locales.
+- **Translate**: create missing locale counterparts from the current English source.
+- **Integrate**: update navigation, routing, search, language metadata, or repository-owned UI strings.
 
-1. Define all locales with `defineI18n` and choose the parser explicitly. This repository uses locale directories, so keep `parser: "dir"`.
-2. Pass the resulting translations API to `defineConfig`.
-3. Use an official `@fumapress/language` preset when available. A preset localizes Fumadocs UI and FumaPress strings; setting only `displayName` is insufficient.
-4. Localize repository-owned navigation, footer text, labels, and calls to action separately because language packs cannot translate hard-coded strings.
-5. Keep `content/<locale>/` trees structurally aligned. Every maintained page must have a target-locale counterpart or an explicitly documented fallback decision.
-6. Emit the correct `<html lang>`, canonical URL, and `hreflang` alternates for every page.
-7. Verify that search output is partitioned by locale and that the language switcher retains the corresponding page path.
+Infer the mode from the request. Default to audit when the user asks only to check or review content. Do not hardcode a pull request, branch, locale, or file list in this skill.
 
-## Content and navigation workflow
+## Establish scope and coverage
 
-1. Start from the current default-language page, not from an older translation.
-2. Identify RustFS-specific terms and runtime claims before translating.
-3. Translate headings and prose for reader intent, then reconcile terminology against the glossary and nearby translated pages.
-4. Copy or share required images without changing the English, light-theme screenshot policy from `rustfs-docs`.
-5. Update the target locale's `meta.json`. Use bare entries for pages inside the same folder; use locale-prefixed URLs for cross-folder navigation entries.
-6. Check that frontmatter, heading levels, admonitions, links, images, code-fence languages, and MDX component structure match the source page.
-7. Review the rendered page, including sidebar, breadcrumbs, table of contents, previous/next links, search, and custom navbar/footer text.
+Map each target file to its English counterpart:
 
-## Routing and deployment
+```text
+content/<locale>/<relative-path>
+content/en/<relative-path>
+```
 
-- Keep locale prefixes explicit (`/en/...`, `/zh/...`) while `hideLocale: "never"` is configured.
-- Redirect `/` to the default locale and preserve every historical unprefixed URL by redirecting it to the equivalent default-locale URL.
-- Treat hosting configuration as part of i18n. `_redirects` is used by Cloudflare-style static hosting; Vercel requires `vercel.json`, `vercel.ts`, or a configured bulk redirects file.
-- Never delete a legacy redirect merely because the destination gained a locale prefix. Prefix its destination and retain the original source.
-- Smoke-test redirects against the deployed preview. A successful build or deployment status does not prove that redirects work.
+Include `.md`, `.mdx`, `meta.json`, locale-aware configuration, repository-owned UI strings, internal links, redirects, search, and language metadata. Ignore copied binary images during linguistic review, but verify paths and avoid unnecessary binary duplication.
 
-## Validation
+For large changes, run exhaustive structural checks before semantic review. Review content in traceable batches and record exactly which files and locales were covered. Never claim full review after sampling only part of a change.
 
-Run all repository checks:
+Run the bundled audit before and after broad locale work:
 
 ```bash
+node .agents/skills/localize-rustfs-docs/scripts/audit-locales.mjs --locales de,fr,ja
+```
+
+Use `--strict` when warnings must fail the command and `--json` for machine-readable output.
+
+## Preserve technical truth
+
+Keep the translation semantically equivalent to the source. Preserve:
+
+- commands, flags, API operations, and configuration behavior;
+- environment variables, identifiers, filenames, paths, ports, versions, regions, units, and numeric limits;
+- prerequisites, conditions, exceptions, warnings, negation, and modal strength;
+- feature status, compatibility scope, security guidance, and operational consequences.
+
+Distinguish `must`, `should`, `may`, and `can`; `supported`, `compatible`, `experimental`, and `unavailable`; local files and S3 Objects; Bucket replication and site replication; and replication, erasure coding, healing, rebalancing, and decommissioning.
+
+Never strengthen “S3-compatible” into “fully compatible” or “100% compatible”. Never turn “alternative to MinIO” into “drop-in replacement for MinIO” unless the English source and verified behavior support that claim.
+
+Report an English-source defect instead of silently correcting the fact in only one locale.
+
+## Protect non-translatable content
+
+Preserve these exactly unless a repository rule explicitly requires a locale-specific change:
+
+- fenced code contents, languages, and metadata;
+- inline-code tokens;
+- CLI commands, API actions, HTTP methods, headers, status codes, and protocol tokens;
+- environment variables, configuration keys, JSON/YAML keys, metrics, and identifiers;
+- class, function, type, field, package, and Kubernetes resource names;
+- filenames, paths, domains, image tags, external URLs, and explicit anchors;
+- MDX component names, imports, JavaScript expressions, and structural attributes.
+
+Do not reformat protected content for style. Preserve visible Console labels exactly when instructing the reader to select them; add a target-language explanation on first use only when it helps the reader.
+
+## Preserve document structure
+
+### Frontmatter
+
+Preserve delimiters, key names, key order where practical, and non-user-facing values. Translate user-facing values such as `title` and `description`. Keep `description` a complete sentence and do not introduce new claims.
+
+### Markdown
+
+Preserve heading hierarchy, list nesting, numbering, table dimensions, admonition types, footnote identifiers, code fences, explicit anchors, emphasis, and inline-code boundaries. Translate prose, headings, link labels, image alt text, table prose, and admonition titles. Do not add a body H1 when frontmatter renders the title.
+
+### Links
+
+Translate visible labels, preserve external destinations, and point internal documentation links to the corresponding target locale. Preserve relative links where practical. Verify fragments after translating headings because generated slugs can change. Preserve explicit anchors unless every reference is deliberately updated.
+
+### MDX and HTML
+
+Preserve component and tag names, nesting, imports, expressions, and structural attributes. Translate visible children and user-facing properties such as `title`, `description`, `alt`, and `aria-label`. Keep `id`, `value`, `name`, `className`, and `aria-hidden` unchanged, except for required locale changes in internal `href` values.
+
+### `meta.json`
+
+Preserve valid JSON, keys, array order, page identifiers, and navigation structure. Translate visible section titles and Markdown link labels. Change only the locale segment of internal locale-prefixed URLs, and ensure every entry resolves within that locale.
+
+### Images
+
+Keep screenshots in English when required by `STYLE.md`. Translate captions and alt text. Do not edit image files merely to localize visible Console labels.
+
+## Apply terminology consistently
+
+Choose terms in this order:
+
+1. RustFS product names, source code, Console labels, APIs, and protocol identifiers.
+2. The approved RustFS glossary for the target locale.
+3. Consistent usage in nearby target-language RustFS pages.
+4. Official localized terminology from Amazon S3, AWS IAM, Kubernetes, and the applicable ecosystem.
+5. Established target-language infrastructure usage.
+6. English with a concise target-language explanation when no stable translation exists.
+
+Do not preserve every S3-related noun in English indiscriminately. Preserve exact English for product names, API identifiers, SDK fields, commands, and visible UI labels. Use approved localized terms in explanatory prose.
+
+Protected identifiers include `CreateBucket`, `ListObjectsV2`, `MultipartUpload`, `AccessKeyId`, `SecretAccessKey`, `forcePathStyle`, `RUSTFS_ACCESS_KEY`, and `RUSTFS_SECRET_KEY`.
+
+Record a new canonical decision in the target-locale reference instead of allowing several translations for the same concept.
+
+## Review in priority order
+
+1. **Completeness**: detect untranslated pages, fragments, frontmatter, labels, omissions, and duplicated content.
+2. **Technical accuracy**: compare commands, identifiers, values, conditions, warnings, behavior, negation, modality, compatibility scope, and feature status.
+3. **Structural integrity**: compare frontmatter, headings, lists, tables, admonitions, links, images, code fences, MDX, and navigation.
+4. **Terminology**: enforce the target glossary and product capitalization across related pages.
+5. **Native-language quality**: reject awkward calques, ambiguous pronouns, unnatural word order, grammar errors, machine-translated phrasing, and casual slang.
+6. **Site integration**: validate navigation, language switching, search partitioning, canonical URLs, `hreflang`, redirects, and rendered output.
+
+## Classify audit findings
+
+- **P0 — Blocker**: build failure, broken route, unsafe command change, security-critical mistranslation, wrong locale, or substantially untranslated page.
+- **P1 — Major**: changed meaning, omitted requirement, incorrect negation or condition, unsupported compatibility claim, wrong operational terminology, or broken internal link.
+- **P2 — Normal**: terminology drift, unnatural technical writing, inconsistent UI-label handling, accessibility text issue, or localized navigation defect.
+- **P3 — Minor**: punctuation or stylistic polish with no effect on meaning.
+
+Report actionable findings as:
+
+```text
+[P1] path/to/file:line — Short title
+Problem: ...
+Source meaning: ...
+Recommended correction: ...
+```
+
+Group repeated mechanical problems by cause and include representative files plus the total affected count. Report locales reviewed, files reviewed, files skipped, automated checks, semantic-review coverage, and remaining uncertainty.
+
+## Repair and translate narrowly
+
+1. Make the smallest changes that correct the translation.
+2. Keep locale trees structurally aligned and update affected navigation and links.
+3. Update the locale terminology reference when establishing a new canonical term.
+4. Do not mix unrelated English-source improvements into a localization repair.
+5. Review the final diff to ensure protected content did not change.
+
+When the user supplies one document and explicitly requests “Markdown source only”, return only the corrected Markdown without a surrounding code fence or explanation. Do not apply that output rule to a pull-request audit unless explicitly requested.
+
+## Validate the result
+
+Run from the repository root:
+
+```bash
+node .agents/skills/localize-rustfs-docs/scripts/audit-locales.mjs --locales de,fr,ja
 npm run docs:check
 npm run types:check
 npm run build
 ```
 
-Then verify:
+Replace the locale list with the comma-separated locales changed by the task.
 
-- `content/en` and every maintained locale contain the same relative file set.
-- Commands and non-localized code blocks remain identical across translated counterparts.
-- Every generated internal `href` resolves to a generated page or public asset.
-- Target-language pages do not expose unexpected English framework UI strings.
-- `/`, representative legacy URLs, and representative locale URLs return the intended status and destination on the deployment preview.
+Also verify that locale file sets align, code blocks and identifiers remain protected, `meta.json` files parse, frontmatter contains localized `title` and `description`, target pages contain no unexpected source-language prose, links and fragments resolve, language switching preserves the corresponding page, language metadata is correct, and search results do not mix locales unexpectedly.
 
-Do not commit `node_modules/`, `dist/`, preview output, or temporary translation files.
+Preview representative pages whenever routing, MDX, navigation, or visible UI text changes. Do not commit `node_modules`, `dist`, generated search indexes, preview output, or temporary translation artifacts.
+
+## Report completion
+
+For an audit, return prioritized findings, coverage and limitations, validation performed, and merge readiness. For a repair, translation, or integration, return files changed, important terminology or structural decisions, validation commands and results, and remaining unverified issues.
+
+Use the requester’s language for the report. Keep documentation content in its target locale and repository-owned technical identifiers in English.
