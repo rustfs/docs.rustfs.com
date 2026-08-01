@@ -19,7 +19,7 @@ import path from 'node:path';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const CONTENT = path.join(ROOT, 'content');
-const LANGUAGES = new Set(['en', 'zh']);
+const LANGUAGES = new Set(['en', 'zh', 'de', 'fr', 'ja']);
 const DEFAULT_LANGUAGE = 'en';
 
 const BANNED_STRINGS = [

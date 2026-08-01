@@ -1,0 +1,10 @@
+{
+  "title": "バケット",
+  "pages": [
+    "creation",
+    "deletion",
+    "quota",
+    "replication",
+    "policy"
+  ]
+}

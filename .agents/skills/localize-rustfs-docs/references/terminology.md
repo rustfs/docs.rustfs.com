@@ -9,6 +9,14 @@ Use this hierarchy when choosing a translation:
 
 Never choose a dictionary translation that changes the RustFS concept. Search the repository and upstream source before adding a new translation, and update this glossary when a new term becomes canonical.
 
+Read the locale-specific reference before translating or reviewing that locale:
+
+- [de.md](de.md) for German
+- [fr.md](fr.md) for French
+- [ja.md](ja.md) for Japanese
+
+Treat these references as project decisions, not substitutes for current upstream documentation. When an ecosystem changes its official localized term, verify the new usage, update the applicable reference, and use one term consistently across the locale.
+
 ## Simplified Chinese baseline
 
 | Source term | Preferred Chinese | Guidance |

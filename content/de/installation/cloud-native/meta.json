@@ -1,0 +1,7 @@
+{
+	"title": "Cloud-native",
+	"pages": [
+		"helm-chart",
+		"operator"
+	]
+}

@@ -1,0 +1,9 @@
+{
+  "title": "Proxy inverse",
+  "pages": [
+    "nginx",
+    "traefik",
+    "caddy",
+    "haproxy"
+  ]
+}

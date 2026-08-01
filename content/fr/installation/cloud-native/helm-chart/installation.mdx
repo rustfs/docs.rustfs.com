@@ -1,0 +1,168 @@
+---
+title: Install
+description: Install standalone or distributed RustFS on Kubernetes with the official Helm chart.
+---
+
+This guide gets the official RustFS chart from source or the Helm repository, installs it, and verifies access to the S3 API and Console.
+
+## Requirements
+
+| Component | Requirement |
+|-----------|-------------|
+| Helm | Version 3 |
+| Kubernetes | A cluster reachable with `kubectl` |
+| StorageClass | Dynamic PVC provisioning for RustFS data |
+| RustFS | `1.0.0-alpha.69` or later |
+
+An Ingress controller is optional. If you enable Ingress, set `ingress.className` to the controller in your cluster, such as `nginx` or `traefik`.
+
+Check the active cluster and available StorageClasses:
+
+```bash
+kubectl config current-context
+kubectl get storageclass
+helm version --short
+```
+
+## 1. Get the chart
+
+Choose how Helm should access the chart. Both options set `RUSTFS_CHART`, which the installation commands below use.
+
+<Tabs items={["Clone the repository", "Helm repository"]} updateAnchor={false}>
+  <Tab value="Clone the repository" id="helm-chart-clone">
+
+Clone the RustFS source repository to use the chart at `helm/rustfs`:
+
+```bash
+git clone https://github.com/rustfs/rustfs.git
+cd rustfs
+export RUSTFS_CHART=./helm/rustfs
+```
+
+  </Tab>
+  <Tab value="Helm repository" id="helm-chart-repository">
+
+Add the RustFS repository listed on [Artifact Hub](https://artifacthub.io/packages/helm/rustfs/rustfs), then update the local repository index:
+
+```bash
+helm repo add rustfs https://charts.rustfs.com
+helm repo update
+export RUSTFS_CHART=rustfs/rustfs
+```
+
+  </Tab>
+</Tabs>
+
+## 2. Install standalone mode
+
+Create a values file for a one-Pod development deployment:
+
+```yaml title="standalone-values.yaml"
+mode:
+  standalone:
+    enabled: true
+  distributed:
+    enabled: false
+
+secret:
+  rustfs:
+    access_key: "<your-access-key>"
+    secret_key: "<your-secret-key>"
+
+storageclass:
+  name: standard
+  dataStorageSize: 10Gi
+  logStorageSize: 1Gi
+
+ingress:
+  enabled: false
+```
+
+Replace `standard` with a StorageClass in your cluster, then install:
+
+```bash
+helm upgrade --install rustfs "$RUSTFS_CHART" \
+  --namespace rustfs \
+  --create-namespace \
+  -f standalone-values.yaml
+```
+
+## 3. Install distributed mode
+
+For a distributed cluster, set the Pod and drive counts explicitly. Total data drives equal `replicaCount * drivesPerNode`.
+
+```yaml title="distributed-values.yaml"
+mode:
+  standalone:
+    enabled: false
+  distributed:
+    enabled: true
+
+replicaCount: 4
+drivesPerNode: 2
+
+secret:
+  rustfs:
+    access_key: "<your-access-key>"
+    secret_key: "<your-secret-key>"
+
+storageclass:
+  name: standard
+  dataStorageSize: 100Gi
+  logStorageSize: 1Gi
+
+ingress:
+  enabled: false
+```
+
+The example creates four Pods and eight data PVCs. Ensure the cluster can schedule all Pods and provision all PVCs, then install:
+
+```bash
+helm upgrade --install rustfs "$RUSTFS_CHART" \
+  --namespace rustfs \
+  --create-namespace \
+  -f distributed-values.yaml
+```
+
+:::warning[Choose the topology before installation]
+
+Kubernetes does not allow updates to StatefulSet `volumeClaimTemplates`. Changing `drivesPerNode` later requires StatefulSet recreation or a new installation.
+
+:::
+
+## 4. Verify and access RustFS
+
+```bash
+kubectl -n rustfs get pods,pvc,services
+kubectl -n rustfs rollout status statefulset/rustfs
+```
+
+Standalone mode creates a Deployment instead of a StatefulSet. Check it with:
+
+```bash
+kubectl -n rustfs rollout status deployment/rustfs
+```
+
+Forward the S3 API and Console to your workstation:
+
+```bash
+kubectl -n rustfs port-forward svc/rustfs 9000:9000 9001:9001
+```
+
+Use `http://localhost:9000` as the S3 endpoint and open `http://localhost:9001` for the Console.
+
+## Key values
+
+| Value | Purpose | Chart default |
+|-------|---------|---------------|
+| `mode.standalone.enabled` | Enable one-Pod standalone mode | `false` |
+| `mode.distributed.enabled` | Enable distributed mode | `true` |
+| `replicaCount` | Distributed Pod count | `4` |
+| `drivesPerNode` | Data PVCs per Pod | Inferred from `replicaCount` |
+| `storageclass.name` | StorageClass for PVCs | `local-path` |
+| `storageclass.dataStorageSize` | Size of each data PVC | `256Mi` |
+| `storageclass.logStorageSize` | Size of each log PVC | `256Mi` |
+| `service.endpoint.port` | S3 API port | `9000` |
+| `service.console.port` | Console port | `9001` |
+
+We recommend setting storage sizes explicitly; the chart defaults are intended only for basic evaluation.

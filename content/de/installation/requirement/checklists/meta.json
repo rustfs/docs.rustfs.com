@@ -1,0 +1,10 @@
+{
+  "title": "Checklisten",
+  "pages": [
+    "[Hardware-Checkliste](/de/installation/requirement/checklists/hardware-checklists)",
+    "[Hardwareauswahl](/de/installation/requirement/checklists/hardware-selection)",
+    "[Netzwerk-Checkliste](/de/installation/requirement/checklists/network-checklists)",
+    "[Software-Checkliste](/de/installation/requirement/checklists/software-checklists)",
+    "[Sicherheits-Checkliste](/de/installation/requirement/checklists/security-checklists)"
+  ]
+}

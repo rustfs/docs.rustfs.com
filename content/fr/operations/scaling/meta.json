@@ -1,0 +1,8 @@
+{
+  "title": "Mise à l’échelle",
+  "pages": [
+    "storage-pool-expansion",
+    "data-rebalancing",
+    "storage-pool-decommission"
+  ]
+}

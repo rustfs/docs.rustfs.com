@@ -22,8 +22,15 @@ const isDev = import.meta.env.DEV;
 const siteDescription =
   "RustFS is an S3-compatible distributed object storage engine written in Rust.";
 
+type Language = "en" | "zh" | "de" | "fr" | "ja";
+const languages: Language[] = ["en", "zh", "de", "fr", "ja"];
+
+function isLanguage(value: string | undefined): value is Language {
+  return languages.includes(value as Language);
+}
+
 const i18n = defineI18n({
-  languages: ["en", "zh"],
+  languages,
   defaultLanguage: "en",
   parser: "dir",
   hideLocale: "never",
@@ -36,6 +43,21 @@ const translations = i18n
   .add({
     en: { displayName: "English" },
     zh: { displayName: "简体中文" },
+    de: {
+      displayName: "Deutsch",
+      "Blog(blog)": "Blog",
+      "All Tags(blog tags page)": "Alle Tags",
+    },
+    fr: {
+      displayName: "Français",
+      "Blog(blog)": "Blog",
+      "All Tags(blog tags page)": "Tous les tags",
+    },
+    ja: {
+      displayName: "日本語",
+      "Blog(blog)": "ブログ",
+      "All Tags(blog tags page)": "すべてのタグ",
+    },
   });
 
 // Social icons (inline SVG so the bundle stays self-contained).
@@ -65,6 +87,36 @@ const layoutLabels = {
     blog: "博客",
     license: "根据 Apache License 2.0 发布。",
     copyright: "版权所有 © 2025 RustFS",
+  },
+  de: {
+    home: "Startseite",
+    docs: "Dokumentation",
+    installation: "Installation",
+    demo: "Demo",
+    community: "Community",
+    blog: "Blog",
+    license: "Veröffentlicht unter der Apache License 2.0.",
+    copyright: "Copyright © 2025 RustFS",
+  },
+  fr: {
+    home: "Accueil",
+    docs: "Documentation",
+    installation: "Installation",
+    demo: "Démo",
+    community: "Communauté",
+    blog: "Blog",
+    license: "Publié sous la licence Apache 2.0.",
+    copyright: "Copyright © 2025 RustFS",
+  },
+  ja: {
+    home: "ホーム",
+    docs: "ドキュメント",
+    installation: "インストール",
+    demo: "デモ",
+    community: "コミュニティ",
+    blog: "ブログ",
+    license: "Apache License 2.0 の下で公開されています。",
+    copyright: "Copyright © 2025 RustFS",
   },
 } as const;
 
@@ -175,7 +227,8 @@ gtag('config', 'G-TWW7WMTWL9');`,
     // Per-page <meta name="description"> (VitePress emitted this from frontmatter).
     page(page) {
       const pathname = page.slugs.join("/");
-      const localizedUrl = (language: "en" | "zh") =>
+      const locale: Language = isLanguage(page.locale) ? page.locale : "en";
+      const localizedUrl = (language: Language) =>
         `https://docs.rustfs.com/${language}${pathname ? `/${pathname}` : ""}`;
 
       return (
@@ -184,10 +237,16 @@ gtag('config', 'G-TWW7WMTWL9');`,
             name="description"
             content={page.data.description ?? siteDescription}
           />
-          <link rel="canonical" href={localizedUrl(page.locale === "zh" ? "zh" : "en")} />
+          <link rel="canonical" href={localizedUrl(locale)} />
           <link rel="alternate" hrefLang="x-default" href={localizedUrl("en")} />
-          <link rel="alternate" hrefLang="en" href={localizedUrl("en")} />
-          <link rel="alternate" hrefLang="zh" href={localizedUrl("zh")} />
+          {languages.map((language) => (
+            <link
+              key={language}
+              rel="alternate"
+              hrefLang={language}
+              href={localizedUrl(language)}
+            />
+          ))}
         </>
       );
     },
@@ -205,7 +264,7 @@ gtag('config', 'G-TWW7WMTWL9');`,
     page: createNotebookLayoutPage(),
     // Shared navbar / links across all Fumadocs layouts.
     defaultProps({ lang }) {
-      const locale = lang === "zh" ? "zh" : i18n.defaultLanguage;
+      const locale: Language = isLanguage(lang) ? lang : "en";
       const docsUrl = `/${locale}`;
       const labels = layoutLabels[locale];
 
@@ -260,7 +319,7 @@ gtag('config', 'G-TWW7WMTWL9');`,
       // Preserve Fumadocs' default components + relative-link resolver, and
       // register the Mermaid renderer used by ```mermaid code blocks.
       async getMdxComponents(page) {
-        const sourcePath = page.path.replace(/^(en|zh)\//, "");
+        const sourcePath = page.path.replace(/^(en|zh|de|fr|ja)\//, "");
         const RelativeLink = createRelativeLink(await this.getLoader(), {
           ...page,
           path: sourcePath,

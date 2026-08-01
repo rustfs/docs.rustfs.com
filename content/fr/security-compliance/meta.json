@@ -1,0 +1,13 @@
+{
+  "title": "Sécurité et conformité",
+  "icon": "ShieldCheck",
+  "defaultOpen": true,
+  "pages": [
+    "iam",
+    "encryption",
+    "oidc",
+    "[Configuration TLS](/fr/integration/tls-configured)",
+    "audit-logs",
+    "[Gestion des informations d’identification](/fr/operations/credentials)"
+  ]
+}

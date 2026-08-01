@@ -1,0 +1,8 @@
+{
+  "title": "Mise à niveau",
+  "pages": [
+    "[Binaire](/fr/operations/upgrade/binary)",
+    "[Conteneur](/fr/operations/upgrade/container)",
+    "[Kubernetes](/fr/operations/upgrade/kubernetes)"
+  ]
+}

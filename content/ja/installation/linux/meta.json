@@ -1,0 +1,10 @@
+{
+  "title": "Linux",
+  "pages": [
+    "[クイックスタート](/ja/installation/linux/quick-start)",
+    "[前提条件とサービスのセットアップ](/ja/installation/linux/prerequisites-and-service)",
+    "[シングルノード・シングルディスク（SNSD）](/ja/installation/linux/single-node-single-disk)",
+    "[シングルノード・マルチディスク（SNMD）](/ja/installation/linux/single-node-multiple-disk)",
+    "[マルチノード・マルチディスク（MNMD）](/ja/installation/linux/multiple-node-multiple-disk)"
+  ]
+}

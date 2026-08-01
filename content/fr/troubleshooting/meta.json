@@ -1,0 +1,9 @@
+{
+  "title": "Dépannage",
+  "icon": "Wrench",
+  "defaultOpen": false,
+  "pages": [
+    "driver",
+    "node"
+  ]
+}

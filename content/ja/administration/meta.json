@@ -1,0 +1,12 @@
+{
+  "title": "管理",
+  "icon": "Settings",
+  "defaultOpen": true,
+  "pages": [
+    "[コンソール](/ja/administration/console)",
+    "data",
+    "protocols",
+    "cors",
+    "[仮想ホスト形式のアクセス](/ja/integration/virtual)"
+  ]
+}

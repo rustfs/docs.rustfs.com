@@ -1,0 +1,10 @@
+{
+  "title": "Listes de contrôle",
+  "pages": [
+    "[Liste de contrôle du matériel](/fr/installation/requirement/checklists/hardware-checklists)",
+    "[Choix du matériel](/fr/installation/requirement/checklists/hardware-selection)",
+    "[Liste de contrôle du réseau](/fr/installation/requirement/checklists/network-checklists)",
+    "[Liste de contrôle des logiciels](/fr/installation/requirement/checklists/software-checklists)",
+    "[Liste de contrôle de la sécurité](/fr/installation/requirement/checklists/security-checklists)"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "title": "対応プロトコル",
+  "pages": [
+    "s3",
+    "webdav",
+    "ftps",
+    "sftp",
+    "[MCP サーバー](/ja/developer/mcp)"
+  ]
+}

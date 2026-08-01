@@ -1,0 +1,9 @@
+{
+  "title": "要件",
+  "pages": [
+    "[トポロジーの選択](/ja/installation#deployment-mode-comparison)",
+    "ec-configuration",
+    "disk-preparation",
+    "checklists"
+  ]
+}

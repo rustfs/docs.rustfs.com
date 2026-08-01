@@ -1,0 +1,9 @@
+{
+  "title": "Fehlerbehebung",
+  "icon": "Wrench",
+  "defaultOpen": false,
+  "pages": [
+    "driver",
+    "node"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "title": "Skalierung",
+  "pages": [
+    "storage-pool-expansion",
+    "data-rebalancing",
+    "storage-pool-decommission"
+  ]
+}
