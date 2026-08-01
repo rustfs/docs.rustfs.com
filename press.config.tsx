@@ -181,6 +181,7 @@ export default defineConfig({
             href="/favicon-16x16.png"
           />
           <link rel="manifest" href="/site.webmanifest" />
+          <script src="/language-redirect.js" />
 
           {/* SEO / crawler hints */}
           <meta name="author" content="RustFS" />
