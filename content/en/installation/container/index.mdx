@@ -78,6 +78,7 @@ docker run -d \
   -e RUSTFS_SECRET_KEY="<your-secret-key>" \
   -e RUSTFS_ADDRESS=:9000 \
   -e RUSTFS_CONSOLE_ENABLE=true \
+  -e RUSTFS_CONSOLE_ADDRESS=":9001" \
   rustfs/rustfs:latest \
   /data
 ```
@@ -122,6 +123,7 @@ docker run -d \
      -p 9001:9001 \
      -v /mnt/data:/data \
      -e RUSTFS_CONSOLE_ENABLE=true \
+    -e RUSTFS_CONSOLE_ADDRESS=":9001" \
      rustfs/rustfs:latest \
      --console-enable \
      /data
@@ -270,6 +272,7 @@ docker run -d \
   -e RUSTFS_ACCESS_KEY="<your-access-key>" \
   -e RUSTFS_SECRET_KEY="<your-secret-key>" \
   -e RUSTFS_CONSOLE_ENABLE=true \
+  -e RUSTFS_CONSOLE_ADDRESS=":9001" \
   -e RUSTFS_VOLUMES="http://node{1...4}:9000/data/rustfs{0...3}" \
   rustfs/rustfs:latest
 ```

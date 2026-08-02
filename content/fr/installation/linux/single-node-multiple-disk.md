@@ -43,8 +43,9 @@ RUSTFS_SECRET_KEY=<your-secret-key>
 RUSTFS_VOLUMES="/data/rustfs{0...3}"
 RUSTFS_ADDRESS=":9000"
 RUSTFS_CONSOLE_ENABLE=true
-RUST_LOG=error
-RUSTFS_OBS_LOG_DIRECTORY="/var/logs/rustfs/"
+RUSTFS_CONSOLE_ADDRESS=":9001"
+RUSTFS_OBS_LOGGER_LEVEL=error
+RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
 ```
 
 2. Create the storage and log directories:

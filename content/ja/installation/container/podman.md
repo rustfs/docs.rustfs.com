@@ -32,6 +32,7 @@ podman run -d \
   -e RUSTFS_ACCESS_KEY="<your-access-key>" \
   -e RUSTFS_SECRET_KEY="<your-secret-key>" \
   -e RUSTFS_CONSOLE_ENABLE=true \
+  -e RUSTFS_CONSOLE_ADDRESS=":9001" \
   docker.io/rustfs/rustfs:latest \
   /data
 ```
