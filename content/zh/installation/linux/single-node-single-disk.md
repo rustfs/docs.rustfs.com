@@ -50,8 +50,8 @@ RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
 2. 创建存储和日志目录：
 
 ```bash
-sudo mkdir -p /data/rustfs0 /var/logs/rustfs /opt/tls
-sudo chmod -R 750 /data/rustfs* /var/logs/rustfs
+sudo mkdir -p /data/rustfs0 /var/log/rustfs /opt/tls
+sudo chmod -R 750 /data/rustfs* /var/log/rustfs
 ```
 
 ## 启动服务并验证
@@ -77,7 +77,7 @@ netstat -ntpl
 4. 查看日志文件：
 
 ```bash
-tail -f /var/logs/rustfs/rustfs*.log
+tail -f /var/log/rustfs/rustfs*.log
 ```
 
 5. 访问控制台：在浏览器中输入服务器 IP 地址和控制台端口（默认 9001）。你将看到：

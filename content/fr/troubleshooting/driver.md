@@ -118,7 +118,7 @@ Once RustFS detects a freshly formatted disk at a known mount point, its backgro
 journalctl -u rustfs -f
 
 # Or view the log files under the directory set by RUSTFS_OBS_LOG_DIRECTORY
-tail -f /var/logs/rustfs/rustfs.log
+tail -f /var/log/rustfs/rustfs.log
 ```
 
 You can also open the RustFS Console and check the disk status of the affected node.

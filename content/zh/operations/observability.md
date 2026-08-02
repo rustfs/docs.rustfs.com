@@ -209,13 +209,16 @@ scrape_configs:
 日志去向由 `RUSTFS_OBS_LOG_DIRECTORY` 控制：
 
 - **未设置**：日志写入 stdout。在容器中使用日志驱动；在 systemd 主机上，stdout/stderr 由 **journald** 捕获，因此无需额外配置即可使用 `journalctl -u rustfs -f`。
-- **本地目录**（例如 `/logs`）：RustFS 在其中写入轮换日志文件。使用 `RUSTFS_OBS_LOG_FILENAME`、`RUSTFS_OBS_LOG_ROTATION_SIZE_MB`、`RUSTFS_OBS_LOG_ROTATION_TIME` 和 `RUSTFS_OBS_LOG_KEEP_FILES` 调整轮换。
+- **本地目录**（例如 `/var/log/rustfs/`）：RustFS 在其中写入轮换日志文件。使用 `RUSTFS_OBS_LOG_FILENAME`、`RUSTFS_OBS_LOG_ROTATION_SIZE_MB`、`RUSTFS_OBS_LOG_ROTATION_TIME` 和 `RUSTFS_OBS_LOG_KEEP_FILES` 调整轮换。
 - **URL**（包含 `://`）：日志发送到远程端点。
 
 设置 `RUSTFS_OBS_ENDPOINT` 并启用日志导出后，日志还会通过 OTLP 导出；参考栈将其路由到 Loki，以便从 Grafana 查询。
 
 ```bash title="Example: file logs plus OTLP export"
-RUSTFS_OBS_LOG_DIRECTORY=/var/log/rustfs
-RUSTFS_OBS_LOGGER_LEVEL=info
+RUSTFS_ADDRESS=":9000"
+RUSTFS_CONSOLE_ADDRESS=":9001"
+RUSTFS_CONSOLE_ENABLE=true
+RUSTFS_OBS_LOGGER_LEVEL=error
+RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
 RUSTFS_OBS_ENDPOINT=http://otel-collector:4318
 ```

@@ -82,8 +82,8 @@ The access key, secret key, and `RUSTFS_VOLUMES` value must be identical on all 
 2. Create the storage and log directories on every node:
 
 ```bash
-sudo mkdir -p /data/rustfs{0..3} /var/logs/rustfs /opt/tls
-sudo chmod -R 750 /data/rustfs* /var/logs/rustfs
+sudo mkdir -p /data/rustfs{0..3} /var/log/rustfs /opt/tls
+sudo chmod -R 750 /data/rustfs* /var/log/rustfs
 ```
 
 ## Start Service and Verification
@@ -109,7 +109,7 @@ netstat -ntpl
 4. View log files:
 
 ```bash
-tail -f /var/logs/rustfs/rustfs*.log
+tail -f /var/log/rustfs/rustfs*.log
 ```
 
 5. Access the console: enter any node's IP address (or the load balancer address) and the console port (default 9001) in a browser. You should see:

@@ -118,7 +118,7 @@ RustFS 在已知挂载点检测到新格式化的磁盘后，后台扫描器会�
 journalctl -u rustfs -f
 
 # Or view the log files under the directory set by RUSTFS_OBS_LOG_DIRECTORY
-tail -f /var/logs/rustfs/rustfs.log
+tail -f /var/log/rustfs/rustfs.log
 ```
 
 你也可以打开 RustFS 控制台，检查受影响节点的磁盘状态。

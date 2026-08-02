@@ -50,8 +50,8 @@ RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
 2. Create the storage and log directories:
 
 ```bash
-sudo mkdir -p /data/rustfs0 /var/logs/rustfs /opt/tls
-sudo chmod -R 750 /data/rustfs* /var/logs/rustfs
+sudo mkdir -p /data/rustfs0 /var/log/rustfs /opt/tls
+sudo chmod -R 750 /data/rustfs* /var/log/rustfs
 ```
 
 ## Start Service and Verification
@@ -77,7 +77,7 @@ netstat -ntpl
 4. View log files:
 
 ```bash
-tail -f /var/logs/rustfs/rustfs*.log
+tail -f /var/log/rustfs/rustfs*.log
 ```
 
 5. Access the console: enter the server's IP address and the console port (default 9001) in a browser. You should see:
