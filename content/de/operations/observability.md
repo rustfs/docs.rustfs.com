@@ -209,13 +209,16 @@ Per-disk usage and disk online/offline state are currently surfaced through the 
 Where logs go is controlled by `RUSTFS_OBS_LOG_DIRECTORY`:
 
 - **Unset** — logs go to stdout. In containers, use your log driver; on systemd hosts, stdout/stderr is captured by **journald**, so `journalctl -u rustfs -f` works without extra configuration.
-- **A local directory** (e.g. `/logs`) — RustFS writes rotating log files there. Rotation is tuned with `RUSTFS_OBS_LOG_FILENAME`, `RUSTFS_OBS_LOG_ROTATION_SIZE_MB`, `RUSTFS_OBS_LOG_ROTATION_TIME`, and `RUSTFS_OBS_LOG_KEEP_FILES`.
+- **A local directory** (e.g. `/var/log/rustfs/`) — RustFS writes rotating log files there. Rotation is tuned with `RUSTFS_OBS_LOG_FILENAME`, `RUSTFS_OBS_LOG_ROTATION_SIZE_MB`, `RUSTFS_OBS_LOG_ROTATION_TIME`, and `RUSTFS_OBS_LOG_KEEP_FILES`.
 - **A URL** (contains `://`) — logs are shipped to a remote endpoint.
 
 When `RUSTFS_OBS_ENDPOINT` is set and log export is enabled, logs are additionally exported via OTLP; the reference stack routes them into Loki for querying from Grafana.
 
 ```bash title="Example: file logs plus OTLP export"
-RUSTFS_OBS_LOG_DIRECTORY=/var/log/rustfs
-RUSTFS_OBS_LOGGER_LEVEL=info
+RUSTFS_ADDRESS=":9000"
+RUSTFS_CONSOLE_ADDRESS=":9001"
+RUSTFS_CONSOLE_ENABLE=true
+RUSTFS_OBS_LOGGER_LEVEL=error
+RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
 RUSTFS_OBS_ENDPOINT=http://otel-collector:4318
 ```

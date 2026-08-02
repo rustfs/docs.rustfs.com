@@ -50,7 +50,11 @@ docker run -d \
 	-v rustfs-data:/data \
 	-e RUSTFS_ACCESS_KEY="<your-access-key>" \
 	-e RUSTFS_SECRET_KEY="<your-secret-key>" \
+	-e RUSTFS_ADDRESS=":9000" \
+	-e RUSTFS_CONSOLE_ADDRESS=":9001" \
 	-e RUSTFS_CONSOLE_ENABLE=true \
+	-e RUSTFS_OBS_LOGGER_LEVEL=error \
+	-e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
 	rustfs/rustfs:<target-version> \
 	/data
 ```
@@ -84,7 +88,11 @@ podman run -d \
 	-v rustfs-data:/data \
 	-e RUSTFS_ACCESS_KEY="<your-access-key>" \
 	-e RUSTFS_SECRET_KEY="<your-secret-key>" \
+	-e RUSTFS_ADDRESS=":9000" \
+	-e RUSTFS_CONSOLE_ADDRESS=":9001" \
 	-e RUSTFS_CONSOLE_ENABLE=true \
+	-e RUSTFS_OBS_LOGGER_LEVEL=error \
+	-e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
 	docker.io/rustfs/rustfs:<target-version> \
 	/data
 ```

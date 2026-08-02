@@ -10,8 +10,11 @@ The **RustFS Console** is the web administration interface for RustFS. Use this 
 The Console is enabled by default and listens on port `9001`, separately from the S3 API on port `9000`. You can set the behavior explicitly with the following environment variables:
 
 ```ini title="/etc/default/rustfs"
-RUSTFS_CONSOLE_ENABLE=true
+RUSTFS_ADDRESS=":9000"
 RUSTFS_CONSOLE_ADDRESS=":9001"
+RUSTFS_CONSOLE_ENABLE=true
+RUSTFS_OBS_LOGGER_LEVEL=error
+RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
 ```
 
 Restart RustFS after changing these values. Set `RUSTFS_CONSOLE_ENABLE=false` when the Console must not run.

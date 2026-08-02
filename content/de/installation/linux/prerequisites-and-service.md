@@ -206,8 +206,8 @@ RestrictSUIDSGID=true
 RestrictRealtime=true
 
 # service log configuration
-StandardOutput=append:/var/logs/rustfs/rustfs.log
-StandardError=append:/var/logs/rustfs/rustfs-err.log
+StandardOutput=append:/var/log/rustfs/rustfs.log
+StandardError=append:/var/log/rustfs/rustfs-err.log
 
 [Install]
 WantedBy=multi-user.target

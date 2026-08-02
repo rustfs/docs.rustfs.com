@@ -76,8 +76,11 @@ docker run -d \
   -v /mnt/rustfs/data:/data \
   -e RUSTFS_ACCESS_KEY="<your-access-key>" \
   -e RUSTFS_SECRET_KEY="<your-secret-key>" \
-  -e RUSTFS_ADDRESS=:9000 \
+  -e RUSTFS_ADDRESS=":9000" \
+  -e RUSTFS_CONSOLE_ADDRESS=":9001" \
   -e RUSTFS_CONSOLE_ENABLE=true \
+  -e RUSTFS_OBS_LOGGER_LEVEL=error \
+  -e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
   rustfs/rustfs:latest \
   /data
 ```
@@ -121,7 +124,11 @@ docker run -d \
      -p 9000:9000 \
      -p 9001:9001 \
      -v /mnt/data:/data \
-     -e RUSTFS_CONSOLE_ENABLE=true \
+    -e RUSTFS_ADDRESS=":9000" \
+    -e RUSTFS_CONSOLE_ADDRESS=":9001" \
+    -e RUSTFS_CONSOLE_ENABLE=true \
+    -e RUSTFS_OBS_LOGGER_LEVEL=error \
+    -e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
      rustfs/rustfs:latest \
      --console-enable \
      /data
@@ -173,7 +180,7 @@ Running the command under root directory,
 docker compose --profile observability up -d
 ```
 
-Providing the necessary permissions. An initialization container is necessary to grant the correct access rights to rustfs using the `depends_on` keyword. In the example below the `rustfs_perms` service is added to the `docker-compose.yml` to handle this. To ensure logs are persisted and accessible, we map the host log directory to the container's `/logs` path
+Providing the necessary permissions. An initialization container is necessary to grant the correct access rights to rustfs using the `depends_on` keyword. In the example below the `rustfs_perms` service is added to the `docker-compose.yml` to handle this. To ensure logs are persisted and accessible, we map the host log directory to the container's `/var/log/rustfs/` path
 
 ```yaml title="docker-compose.yml"
   services:
@@ -192,9 +199,13 @@ Providing the necessary permissions. An initialization container is necessary to
           condition: service_completed_successfully
       volumes:
         - /path/to_host_directory/volumes/data:/data
-        - /path/to_host_directory/volumes/logs:/logs
+        - /path/to_host_directory/volumes/logs:/var/log/rustfs/
       environment:
-        - RUSTFS_OBS_LOG_DIRECTORY=/logs
+        - RUSTFS_ADDRESS=":9000"
+        - RUSTFS_CONSOLE_ADDRESS=":9001"
+        - RUSTFS_CONSOLE_ENABLE=true
+        - RUSTFS_OBS_LOGGER_LEVEL=error
+        - RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
     
       # ... other configurations
 ```
@@ -269,7 +280,11 @@ docker run -d \
   -v /mnt/rustfs/data:/data \
   -e RUSTFS_ACCESS_KEY="<your-access-key>" \
   -e RUSTFS_SECRET_KEY="<your-secret-key>" \
+  -e RUSTFS_ADDRESS=":9000" \
+  -e RUSTFS_CONSOLE_ADDRESS=":9001" \
   -e RUSTFS_CONSOLE_ENABLE=true \
+  -e RUSTFS_OBS_LOGGER_LEVEL=error \
+  -e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
   -e RUSTFS_VOLUMES="http://node{1...4}:9000/data/rustfs{0...3}" \
   rustfs/rustfs:latest
 ```

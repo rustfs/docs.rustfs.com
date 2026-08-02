@@ -76,8 +76,11 @@ docker run -d \
   -v /mnt/rustfs/data:/data \
   -e RUSTFS_ACCESS_KEY="<your-access-key>" \
   -e RUSTFS_SECRET_KEY="<your-secret-key>" \
-  -e RUSTFS_ADDRESS=:9000 \
+  -e RUSTFS_ADDRESS=":9000" \
+  -e RUSTFS_CONSOLE_ADDRESS=":9001" \
   -e RUSTFS_CONSOLE_ENABLE=true \
+  -e RUSTFS_OBS_LOGGER_LEVEL=error \
+  -e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
   rustfs/rustfs:latest \
   /data
 ```
@@ -121,7 +124,11 @@ docker run -d \
      -p 9000:9000 \
      -p 9001:9001 \
      -v /mnt/data:/data \
-     -e RUSTFS_CONSOLE_ENABLE=true \
+    -e RUSTFS_ADDRESS=":9000" \
+    -e RUSTFS_CONSOLE_ADDRESS=":9001" \
+    -e RUSTFS_CONSOLE_ENABLE=true \
+    -e RUSTFS_OBS_LOGGER_LEVEL=error \
+    -e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
      rustfs/rustfs:latest \
      --console-enable \
      /data
@@ -173,7 +180,7 @@ git clone https://github.com/rustfs/rustfs.git
 docker compose --profile observability up -d
 ```
 
-提供必要的权限。需要使用初始化容器，通过 `depends_on` 关键字为 rustfs 授予正确的访问权限。以下示例将 `rustfs_perms` 服务添加到 `docker-compose.yml` 来处理权限。为了确保日志持久化且可访问，将主机日志目录映射到容器的 `/logs` 路径：
+提供必要的权限。需要使用初始化容器，通过 `depends_on` 关键字为 rustfs 授予正确的访问权限。以下示例将 `rustfs_perms` 服务添加到 `docker-compose.yml` 来处理权限。为了确保日志持久化且可访问，将主机日志目录映射到容器的 `/var/log/rustfs/` 路径：
 
 ```yaml title="docker-compose.yml"
   services:
@@ -192,9 +199,13 @@ docker compose --profile observability up -d
           condition: service_completed_successfully
       volumes:
         - /path/to_host_directory/volumes/data:/data
-        - /path/to_host_directory/volumes/logs:/logs
+        - /path/to_host_directory/volumes/logs:/var/log/rustfs/
       environment:
-        - RUSTFS_OBS_LOG_DIRECTORY=/logs
+        - RUSTFS_ADDRESS=":9000"
+        - RUSTFS_CONSOLE_ADDRESS=":9001"
+        - RUSTFS_CONSOLE_ENABLE=true
+        - RUSTFS_OBS_LOGGER_LEVEL=error
+        - RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
     
       # ... other configurations
 ```
@@ -269,7 +280,11 @@ docker run -d \
   -v /mnt/rustfs/data:/data \
   -e RUSTFS_ACCESS_KEY="<your-access-key>" \
   -e RUSTFS_SECRET_KEY="<your-secret-key>" \
+  -e RUSTFS_ADDRESS=":9000" \
+  -e RUSTFS_CONSOLE_ADDRESS=":9001" \
   -e RUSTFS_CONSOLE_ENABLE=true \
+  -e RUSTFS_OBS_LOGGER_LEVEL=error \
+  -e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
   -e RUSTFS_VOLUMES="http://node{1...4}:9000/data/rustfs{0...3}" \
   rustfs/rustfs:latest
 ```

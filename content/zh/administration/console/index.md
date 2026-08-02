@@ -10,8 +10,11 @@ description: "启用 RustFS 控制台，将其连接到服务器并安全登录�
 控制台默认启用并监听端口 `9001`，与端口 `9000` 上的 S3 API 分开。你可以使用以下环境变量显式设置其行为：
 
 ```ini title="/etc/default/rustfs"
-RUSTFS_CONSOLE_ENABLE=true
+RUSTFS_ADDRESS=":9000"
 RUSTFS_CONSOLE_ADDRESS=":9001"
+RUSTFS_CONSOLE_ENABLE=true
+RUSTFS_OBS_LOGGER_LEVEL=error
+RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
 ```
 
 更改这些值后请重启 RustFS。如果不应运行控制台，请设置 `RUSTFS_CONSOLE_ENABLE=false`。
