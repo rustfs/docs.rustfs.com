@@ -40,15 +40,156 @@ RustFS requires at least 2 GB of memory for a test environment; production envir
 
 ## Time Synchronization
 
-Multi-node consistency requires a time server to keep clocks consistent, otherwise services may fail to start. Use tools such as `ntp`, `timedatectl`, or `timesyncd`.
+Alle Knoten in einer verteilten RustFS-Deployment müssen synchronisierte Uhren aufweisen. RustFS ist auf Zeitstempel für Anfragesignaturen, Objektversionierung, verteiltes Locking und Replikation angewiesen. Eine erhebliche Uhrenabweichung zwischen Knoten kann Folgendes verursachen:
 
-Check the synchronization status with:
+- **Fehler bei Anfragesignaturen** — Die S3-Signaturprüfung erfordert genaue Zeitstempel.
+- **Replikations- und Konsistenzprobleme** — Uhrenversatz kann zu veralteten oder widersprüchlichen Objektversionen führen.
+- **Lock-Konflikte** — Verteilte Locks verwenden Zeitstempel für die Leasedauer.
+- **Fehler beim Starten des Dienstes** — RustFS verweigert den Start, wenn der Uhrenversatz zwischen den Knoten den sicheren Schwellenwert überschreitet.
+
+:::warning
+
+Die Uhrenabweichung zwischen zwei Knoten darf **15 Minuten** nicht überschreiten. Für Produktionsumgebungen empfehlen wir, die Abweichung unter **1 Sekunde** zu halten.
+
+:::
+
+### Empfohlene NTP-Tools
+
+Verwenden Sie auf **jedem Knoten** einen der folgenden Zeitsynchronisationsdienste. Wählen Sie ein Tool und konfigurieren Sie es einheitlich in der gesamten Deployment.
+
+#### chrony (Empfohlen)
+
+`chrony` ist die bevorzugte NTP-Implementierung für moderne Linux-Distributionen. Es synchronisiert schneller und geht besser mit intermittierender Netzwerkkonnektivität um als das ältere `ntpd`.
+
+chrony installieren:
+
+```bash
+# RHEL / CentOS / Rocky Linux
+sudo dnf install chrony -y
+
+# Ubuntu / Debian
+sudo apt install chrony -y
+```
+
+Bearbeiten Sie die Konfigurationsdatei `/etc/chrony.conf` (RHEL) oder `/etc/chrony/chrony.conf` (Debian/Ubuntu), um Ihre bevorzugten NTP-Server anzugeben:
+
+```ini
+server time1.google.com iburst
+server time2.google.com iburst
+server time3.google.com iburst
+server time4.google.com iburst
+```
+
+> Ersetzen Sie die Serveradressen durch die internen NTP-Server Ihrer Organisation, falls verfügbar. Die Verwendung von `iburst` beschleunigt die Erstsynchronisation.
+
+Dienst aktivieren und starten:
+
+```bash
+sudo systemctl enable chronyd
+sudo systemctl start chronyd
+```
+
+#### systemd-timesyncd
+
+`systemd-timesyncd` ist ein leichtgewichtiger SNTP-Client, der in systemd-basierten Distributionen integriert ist. Er eignet sich für Umgebungen, in denen kein vollständiger NTP-Daemon erforderlich ist.
+
+Bearbeiten Sie `/etc/systemd/timesyncd.conf`, um NTP-Server zu konfigurieren:
+
+```ini
+[Time]
+NTP=time1.google.com time2.google.com time3.google.com time4.google.com
+FallbackNTP=0.pool.ntp.org 1.pool.ntp.org
+```
+
+Dienst aktivieren und starten:
+
+```bash
+sudo timedatectl set-ntp true
+sudo systemctl enable systemd-timesyncd
+sudo systemctl start systemd-timesyncd
+```
+
+#### ntpd (Veraltet)
+
+Der klassische `ntpd` aus der NTP-Referenzimplementierung ist noch weit verbreitet. Verwenden Sie `chrony`, es sei denn, Ihre Umgebung erfordert ausdrücklich `ntpd`.
+
+```bash
+# RHEL / CentOS / Rocky Linux
+sudo dnf install ntp -y
+
+# Ubuntu / Debian
+sudo apt install ntp -y
+```
+
+Bearbeiten Sie `/etc/ntp.conf`, um NTP-Server festzulegen, dann aktivieren und starten:
+
+```bash
+sudo systemctl enable ntpd
+sudo systemctl start ntpd
+```
+
+### Zeitsynchronisation überprüfen
+
+Nach der Konfiguration des NTP-Dienstes überprüfen Sie den Synchronisationsstatus auf jedem Knoten.
+
+Systemuhr-Status prüfen:
 
 ```bash
 timedatectl status
 ```
 
-If the status is "synchronized", time synchronization is working properly.
+Die Ausgabe sollte `System clock synchronized: yes` und `NTP service: active` anzeigen.
+
+Für `chrony` verwenden Sie den folgenden Befehl für detaillierte Synchronisationsinformationen:
+
+```bash
+chronyc tracking
+```
+
+Wichtige Felder zur Überprüfung:
+
+- **Leap status** — Sollte `Normal` sein (nicht `Not synchronised`).
+- **System time** — Der Offset vom Referenzserver. Sollte nahe `0.000000000 seconds` liegen.
+- **Root delay** — Roundtrip-Zeit zum Referenzserver.
+
+Aktuelle NTP-Quellen und deren Status auflisten:
+
+```bash
+chronyc sources -v
+```
+
+Zu beachtende Spalten:
+
+- **`*`** — Die aktuell gewählte Synchronisationsquelle.
+- **`+`** — Andere akzeptable Quellen.
+- **`-`** — Vom Auswahlalgorithmus abgelehnte Quellen.
+- **`?`** — Quellen mit fraglicher Konnektivität.
+
+Für `ntpd`:
+
+```bash
+ntpq -p
+```
+
+### Übergreifende Uhrenkonsistenz prüfen
+
+Nachdem alle Knoten synchronisiert sind, überprüfen Sie, dass die Uhren im gesamten Cluster konsistent sind. Vergleichen Sie Zeitstempel auf jedem Knoten:
+
+```bash
+# Run on each node and compare the output
+date -u '+%Y-%m-%d %H:%M:%S'
+```
+
+Für einen präziseren Vergleich installieren Sie `sshpass` und führen Folgendes aus:
+
+```bash
+for host in node1 node2 node3 node4; do
+  echo -n "$host: "
+  ssh "$host" date -u '+%Y-%m-%d %H:%M:%S.%N'
+done
+```
+
+In einer korrekt konfigurierten Umgebung sollte der Unterschied zwischen zwei Knoten vernachlässigbar sein (unter 1 Millisekunde).
 
 ## Capacity Planning
 
