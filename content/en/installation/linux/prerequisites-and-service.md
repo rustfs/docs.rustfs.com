@@ -47,8 +47,10 @@ All nodes in a RustFS distributed deployment **must** maintain synchronized cloc
 - **Lock contention problems** — Distributed locks use timestamps for lease expiration.
 - **Service startup failures** — RustFS refuses to start if clock skew between nodes exceeds safe thresholds.
 
-:::warning[Clock Drift Tolerance]
+:::warning
+
 Clock drift between any two nodes should not exceed **15 minutes**. For production environments, we recommend keeping drift under **1 second**.
+
 :::
 
 ### Recommended NTP Tools

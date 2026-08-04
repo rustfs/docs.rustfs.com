@@ -47,8 +47,10 @@ Alle Knoten in einer verteilten RustFS-Deployment müssen synchronisierte Uhren 
 - **Lock-Konflikte** — Verteilte Locks verwenden Zeitstempel für die Leasedauer.
 - **Fehler beim Starten des Dienstes** — RustFS verweigert den Start, wenn der Uhrenversatz zwischen den Knoten den sicheren Schwellenwert überschreitet.
 
-:::warning[Uhrenabweichung Toleranz]
+:::warning
+
 Die Uhrenabweichung zwischen zwei Knoten darf **15 Minuten** nicht überschreiten. Für Produktionsumgebungen empfehlen wir, die Abweichung unter **1 Sekunde** zu halten.
+
 :::
 
 ### Empfohlene NTP-Tools
