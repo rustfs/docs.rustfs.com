@@ -40,15 +40,154 @@ RustFS requires at least 2 GB of memory for a test environment; production envir
 
 ## Time Synchronization
 
-Multi-node consistency requires a time server to keep clocks consistent, otherwise services may fail to start. Use tools such as `ntp`, `timedatectl`, or `timesyncd`.
+RustFS の分散デプロイメントでは、すべてのノードのクロックを同期させる必要があります。RustFS はリクエスト署名、オブジェクトバージョニング、分散ロック、レプリケーションにタイムスタンプに依存しています。ノード間のクロックドリフトにより、以下のような問題が発生する可能性があります：
 
-Check the synchronization status with:
+- **リクエスト署名の失敗** — S3 署名の検証は正確なタイムスタンプに依存します。
+- **レプリケーションと整合性の問題** — クロックスキーによりオブジェクトバージョンが古くなったり競合したりする可能性があります。
+- **ロック競合の問題** — 分散ロックはリース期限にタイムスタンプを使用します。
+- **サービス起動の失敗** — ノード間のクロックスキーが安全な閾値を超えると、RustFS は起動を拒否します。
+
+:::warning
+任意の 2 ノード間のクロックドリフトは **15 分**を超えてはなりません。本番環境では、ドリフトを **1 秒**以内に抑えることを推奨します。
+:::
+
+### 推奨 NTP ツール
+
+**すべてのノード**で以下のいずれかの時間同期サービスを使用してください。1 つのツールを選択し、デプロイメント全体で統一して設定します。
+
+#### chrony（推奨）
+
+`chrony` は最新の Linux ディストリビューションで推奨される NTP 実装です。レガシーの `ntpd` と比較して同期が速く、断続的なネットワーク接続にもより適切に対応します。
+
+chrony のインストール：
+
+```bash
+# RHEL / CentOS / Rocky Linux
+sudo dnf install chrony -y
+
+# Ubuntu / Debian
+sudo apt install chrony -y
+```
+
+設定ファイル `/etc/chrony.conf`（RHEL）または `/etc/chrony/chrony.conf`（Debian/Ubuntu）を編集し、使用する NTP サーバーを指定します：
+
+```conf
+server time1.google.com iburst
+server time2.google.com iburst
+server time3.google.com iburst
+server time4.google.com iburst
+```
+
+> サーバーアドレスは組織内の NTP サーバーがある場合はそれに置き換えてください。`iburst` を使用すると初期同期が高速化されます。
+
+サービスを有効化して起動：
+
+```bash
+sudo systemctl enable chronyd
+sudo systemctl start chronyd
+```
+
+#### systemd-timesyncd
+
+`systemd-timesyncd` は systemd ベースのディストリビューションに組み込まれた軽量 SNTP クライアントです。フル NTP デーモンが不要な環境に適しています。
+
+`/etc/systemd/timesyncd.conf` を編集して NTP サーバーを設定：
+
+```ini
+[Time]
+NTP=time1.google.com time2.google.com time3.google.com time4.google.com
+FallbackNTP=0.pool.ntp.org 1.pool.ntp.org
+```
+
+サービスを有効化して起動：
+
+```bash
+sudo timedatectl set-ntp true
+sudo systemctl enable systemd-timesyncd
+sudo systemctl start systemd-timesyncd
+```
+
+#### ntpd（レガシー）
+
+NTP リファレンス実装のクラシックな `ntpd` は現在も広く利用可能です。環境で特に `ntpd` が必要な場合を除き、`chrony` を使用してください。
+
+```bash
+# RHEL / CentOS / Rocky Linux
+sudo dnf install ntp -y
+
+# Ubuntu / Debian
+sudo apt install ntp -y
+```
+
+`/etc/ntp.conf` を編集して NTP サーバーを設定し、有効化して起動：
+
+```bash
+sudo systemctl enable ntpd
+sudo systemctl start ntpd
+```
+
+### 時間同期の検証
+
+NTP サービスを設定した後、各ノードで同期状態を確認してください。
+
+システムクロックの状態を確認：
 
 ```bash
 timedatectl status
 ```
 
-If the status is "synchronized", time synchronization is working properly.
+出力には `System clock synchronized: yes` および `NTP service: active` と表示される必要があります。
+
+`chrony` の場合、以下のコマンドで詳細な同期状態を確認できます：
+
+```bash
+chronyc tracking
+```
+
+確認すべき重要な項目：
+
+- **Leap status** — `Normal` であるべきです（`Not synchronised` ではないこと）。
+- **System time** — 参照サーバーからのオフセット。`0.000000000 seconds` に近い必要があります。
+- **Root delay** — 参照サーバーまでの往復時間。
+
+現在の NTP ソースとその状態を一覧表示：
+
+```bash
+chronyc sources -v
+```
+
+注目すべき列：
+
+- **`*`** — 現在選択されている同期ソース。
+- **`+`** — その他の許容可能なソース。
+- **`-`** — 選択アルゴリズムによって拒否されたソース。
+- **`?`** — 接続状態に問題がある可能性のあるソース。
+
+`ntpd` の場合：
+
+```bash
+ntpq -p
+```
+
+### クロスノードクロック整合性の検証
+
+すべてのノードが同期した後、クラスタ全体でクロックが一致していることを確認してください。各ノードでタイムスタンプを比較：
+
+```bash
+# 各ノードで実行し、出力を比較
+date -u '+%Y-%m-%d %H:%M:%S'
+```
+
+より精密な比較が必要な場合は、`sshpass` をインストールして以下を実行：
+
+```bash
+for host in node1 node2 node3 node4; do
+  echo -n "$host: "
+  ssh "$host" date -u '+%Y-%m-%d %H:%M:%S.%N'
+done
+```
+
+適切に設定された環境では、任意の 2 ノード間の差異は無視できる程度（1 ミリ秒未満）である必要があります。
 
 ## Capacity Planning
 

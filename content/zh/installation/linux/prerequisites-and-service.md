@@ -40,15 +40,154 @@ firewall-cmd --reload
 
 ## 时间同步
 
-多节点一致性需要时间服务器保持时钟一致，否则服务可能无法启动。可使用 `ntp`、`timedatectl` 或 `timesyncd` 等工具。
+RustFS 分布式部署中的所有节点**必须**保持时钟同步。RustFS 依赖时间戳进行请求签名、对象版本控制、分布式锁和复制。节点间的时钟漂移可能导致：
 
-使用以下命令检查同步状态：
+- **请求签名失败** — S3 签名验证依赖准确的时间戳。
+- **复制和一致性问题** — 时钟偏移可能导致对象版本过时或冲突。
+- **锁竞争问题** — 分布式锁使用时间戳进行租约过期。
+- **服务启动失败** — 如果节点间时钟偏移超过安全阈值，RustFS 将拒绝启动。
+
+:::warning
+任意两个节点之间的时钟漂移不应超过 **15 分钟**。对于生产环境，建议将漂移控制在 **1 秒**以内。
+:::
+
+### 推荐的 NTP 工具
+
+在**每个**节点上使用以下任一时间同步服务。请选择一种工具并在整个部署中统一配置。
+
+#### chrony（推荐）
+
+`chrony` 是现代 Linux 发行版首选的 NTP 实现。与传统的 `ntpd` 相比，它同步速度更快，能更好地处理间歇性网络连接。
+
+安装 chrony：
+
+```bash
+# RHEL / CentOS / Rocky Linux
+sudo dnf install chrony -y
+
+# Ubuntu / Debian
+sudo apt install chrony -y
+```
+
+编辑配置文件 `/etc/chrony.conf`（RHEL）或 `/etc/chrony/chrony.conf`（Debian/Ubuntu），指向您首选的 NTP 服务器：
+
+```conf
+server time1.google.com iburst
+server time2.google.com iburst
+server time3.google.com iburst
+server time4.google.com iburst
+```
+
+> 请将服务器地址替换为贵组织的内部 NTP 服务器（如有）。使用 `iburst` 可加速初始同步。
+
+启用并启动服务：
+
+```bash
+sudo systemctl enable chronyd
+sudo systemctl start chronyd
+```
+
+#### systemd-timesyncd
+
+`systemd-timesyncd` 是 systemd 发行版内置的轻量级 SNTP 客户端，适用于不需要完整 NTP 守护进程的环境。
+
+编辑 `/etc/systemd/timesyncd.conf` 配置 NTP 服务器：
+
+```ini
+[Time]
+NTP=time1.google.com time2.google.com time3.google.com time4.google.com
+FallbackNTP=0.pool.ntp.org 1.pool.ntp.org
+```
+
+启用并启动服务：
+
+```bash
+sudo timedatectl set-ntp true
+sudo systemctl enable systemd-timesyncd
+sudo systemctl start systemd-timesyncd
+```
+
+#### ntpd（传统方式）
+
+经典的 `ntpd` 来自 NTP 参考实现，仍然广泛可用。除非您的环境特别需要 `ntpd`，否则建议使用 `chrony`。
+
+```bash
+# RHEL / CentOS / Rocky Linux
+sudo dnf install ntp -y
+
+# Ubuntu / Debian
+sudo apt install ntp -y
+```
+
+编辑 `/etc/ntp.conf` 设置 NTP 服务器，然后启用并启动：
+
+```bash
+sudo systemctl enable ntpd
+sudo systemctl start ntpd
+```
+
+### 验证时间同步
+
+配置 NTP 服务后，请在每个节点上验证同步状态。
+
+检查系统时钟状态：
 
 ```bash
 timedatectl status
 ```
 
-如果状态为 "synchronized"，则时间同步工作正常。
+输出应显示 `System clock synchronized: yes` 和 `NTP service: active`。
+
+对于 `chrony`，使用以下命令查看详细的同步状态：
+
+```bash
+chronyc tracking
+```
+
+关键字段说明：
+
+- **Leap status** — 应为 `Normal`（而非 `Not synchronised`）。
+- **System time** — 与参考服务器的偏移量，应接近 `0.000000000 seconds`。
+- **Root delay** — 到参考服务器的往返时间。
+
+列出当前 NTP 源及其状态：
+
+```bash
+chronyc sources -v
+```
+
+需关注的列：
+
+- **`*`** — 当前选定的同步源。
+- **`+`** — 其他可接受的源。
+- **`-`** — 被选择算法拒绝的源。
+- **`?`** — 连接状态存疑的源。
+
+对于 `ntpd`，使用：
+
+```bash
+ntpq -p
+```
+
+### 验证跨节点时钟一致性
+
+所有节点同步后，请验证集群中时钟是否一致。在每个节点上比较时间戳：
+
+```bash
+# 在每个节点上运行并比较输出
+date -u '+%Y-%m-%d %H:%M:%S'
+```
+
+如需更精确的比较，可安装 `sshpass` 并运行：
+
+```bash
+for host in node1 node2 node3 node4; do
+  echo -n "$host: "
+  ssh "$host" date -u '+%Y-%m-%d %H:%M:%S.%N'
+done
+```
+
+在配置良好的环境中，任意两个节点之间的差异应可忽略不计（低于 1 毫秒）。
 
 ## 容量规划
 
