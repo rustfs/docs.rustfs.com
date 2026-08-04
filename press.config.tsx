@@ -292,7 +292,7 @@ gtag('config', 'G-TWW7WMTWL9');`,
           { text: labels.installation, url: `${docsUrl}/installation` },
           { text: "MCP", url: `${docsUrl}/developer/mcp` },
           { text: "SDK", url: `${docsUrl}/developer/sdk` },
-          { text: labels.demo, url: "https://play.rustfs.com", external: true },
+          { text: labels.demo, url: "https://rustfs.com/demo/", external: true },
           {
             text: labels.community,
             url: "https://github.com/rustfs/rustfs/discussions",
