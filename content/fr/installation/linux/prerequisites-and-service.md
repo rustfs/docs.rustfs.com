@@ -47,7 +47,7 @@ Tous les nœuds d'un déploiement distribué RustFS **doivent** maintenir des ho
 - **Problèmes de contention de verrouillage** — Les verrous distribués utilisent des horodatages pour l'expiration des baux.
 - **Échecs de démarrage du service** — RustFS refuse de démarrer si le décalage d'horloge entre les nœuds dépasse les seuils de sécurité.
 
-:::warning
+:::warning[Tolérance de dérive d'horloge]
 La dérive d'horloge entre deux nœuds ne doit pas dépasser **15 minutes**. Pour les environnements de production, nous recommandons de maintenir la dérive en dessous d'**1 seconde**.
 :::
 
@@ -174,7 +174,7 @@ ntpq -p
 Après la synchronisation de tous les nœuds, vérifiez que les horloges sont cohérentes dans tout le cluster. Comparez les horodatages sur chaque nœud :
 
 ```bash
-# Exécuter sur chaque nœud et comparer la sortie
+# Run on each node and compare the output
 date -u '+%Y-%m-%d %H:%M:%S'
 ```
 
