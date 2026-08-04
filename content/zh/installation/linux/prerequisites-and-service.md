@@ -73,7 +73,7 @@ sudo apt install chrony -y
 
 编辑配置文件 `/etc/chrony.conf`（RHEL）或 `/etc/chrony/chrony.conf`（Debian/Ubuntu），指向您首选的 NTP 服务器：
 
-```conf
+```ini
 server time1.google.com iburst
 server time2.google.com iburst
 server time3.google.com iburst

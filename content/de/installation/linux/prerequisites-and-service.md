@@ -73,7 +73,7 @@ sudo apt install chrony -y
 
 Bearbeiten Sie die Konfigurationsdatei `/etc/chrony.conf` (RHEL) oder `/etc/chrony/chrony.conf` (Debian/Ubuntu), um Ihre bevorzugten NTP-Server anzugeben:
 
-```conf
+```ini
 server time1.google.com iburst
 server time2.google.com iburst
 server time3.google.com iburst

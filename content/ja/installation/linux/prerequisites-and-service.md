@@ -73,7 +73,7 @@ sudo apt install chrony -y
 
 設定ファイル `/etc/chrony.conf`（RHEL）または `/etc/chrony/chrony.conf`（Debian/Ubuntu）を編集し、使用する NTP サーバーを指定します：
 
-```conf
+```ini
 server time1.google.com iburst
 server time2.google.com iburst
 server time3.google.com iburst
