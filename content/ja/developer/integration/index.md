@@ -1,13 +1,14 @@
 ---
 title: "Integration"
-description: "Integrate RustFS with reverse proxies and big data systems."
+description: "RustFS をリバースプロキシ、バックアップツール、ビッグデータシステムと連携させます。"
 ---
 
-Use this section to connect **RustFS** to infrastructure and application platforms through its S3-compatible API.
+このセクションでは、**RustFS** を S3 互換 API 経由でインフラストラクチャとアプリケーションプラットフォームに接続します。
 
 ## Integration categories
 
-- [Reverse Proxy](./reverse-proxy/index.md) covers Nginx, Traefik, Caddy, and HAProxy.
-- [Big Data](./big-data/index.md) covers Iceberg.
+- [Reverse Proxy](./reverse-proxy/index.md) は Nginx、Traefik、Caddy、HAProxy を扱います。
+- [Backup](./backup/index.md) は Restic を扱います。
+- [Big Data](./big-data/index.md) は Iceberg を扱います。
 
-Each guide identifies the RustFS endpoint and addressing requirements to use when configuring the integrating system.
+各ガイドでは、連携先システムを設定する際に使用する RustFS のエンドポイントとアドレス指定の要件を示します。

@@ -1,13 +1,14 @@
 ---
 title: "Integration"
-description: "Integrate RustFS with reverse proxies and big data systems."
+description: "Intégrez RustFS avec des reverse proxies, des outils de sauvegarde et des systèmes de big data."
 ---
 
-Use this section to connect **RustFS** to infrastructure and application platforms through its S3-compatible API.
+Utilisez cette section pour connecter **RustFS** à des plateformes d'infrastructure et d'applications via son API compatible S3.
 
 ## Integration categories
 
-- [Reverse Proxy](./reverse-proxy/index.md) covers Nginx, Traefik, Caddy, and HAProxy.
-- [Big Data](./big-data/index.md) covers Iceberg.
+- [Reverse Proxy](./reverse-proxy/index.md) couvre Nginx, Traefik, Caddy et HAProxy.
+- [Backup](./backup/index.md) couvre Restic.
+- [Big Data](./big-data/index.md) couvre Iceberg.
 
-Each guide identifies the RustFS endpoint and addressing requirements to use when configuring the integrating system.
+Chaque guide indique le point de terminaison RustFS et les exigences d'adressage à utiliser lors de la configuration du système intégré.

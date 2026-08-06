@@ -2,6 +2,7 @@
   "title": "Intégration",
   "pages": [
     "reverse-proxy",
+    "backup",
     "big-data"
   ]
 }
