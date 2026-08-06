@@ -53,3 +53,6 @@
 /installation/docker /en/installation/container/docker 301
 /administration/iam /en/security-compliance/iam 301
 /features/replication /en/operations/high-availability/site-replication 301
+/features/integration /en/developer/integration 301
+/features/ai /en 301
+/features/data-lake /en 301
