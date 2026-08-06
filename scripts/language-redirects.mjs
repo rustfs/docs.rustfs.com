@@ -3,13 +3,27 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const ENGLISH_CONTENT = path.join(ROOT, 'content', 'en');
 const SOURCE_REDIRECTS = path.join(ROOT, 'public', '_redirects');
+const LOCALES = ['en', 'zh', 'de', 'fr', 'ja'];
 
-/** @param {string} target */
-function prefixEnglishTarget(target) {
-  if (!target.startsWith('/') || target === '/en' || target.startsWith('/en/')) return target;
-  return target === '/' ? '/en' : `/en${target}`;
+/** @param {string} pathname */
+function isLocalizedPath(pathname) {
+  return LOCALES.some((locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`));
+}
+
+/** @param {string} source @param {string} locale */
+function localizeSource(source, locale) {
+  if (!source.startsWith('/')) return source;
+  if (isLocalizedPath(source)) return source;
+  return `/${locale}${source}`;
+}
+
+/** @param {string} target @param {string} locale */
+function localizeTarget(target, locale) {
+  if (!target.startsWith('/')) return target;
+  if (isLocalizedPath(target)) return target;
+  if (target === '/') return `/${locale}`;
+  return `/${locale}${target}`;
 }
 
 /** @returns {Map<string, string>} */
@@ -25,18 +39,16 @@ export function collectLanguageRedirects() {
     const target = match[2];
     const status = match[3];
     if (!source || !target || !status) continue;
-    rules.set(source, `${prefixEnglishTarget(target)} ${status}`);
-  }
 
-  // Collapse all current unprefixed documentation routes into one rule per
-  // top-level section. This keeps Cloudflare's _redirects file below its
-  // 100-rule dynamic redirect limit while preserving the legacy rules above.
-  for (const entry of fs.readdirSync(ENGLISH_CONTENT, { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue;
+    // Keep the original unprefixed rule exactly as declared in public/_redirects.
+    rules.set(source, `${target} ${status}`);
 
-    const section = `/${entry.name}`;
-    if (!rules.has(section)) rules.set(section, `/en${section} 301`);
-    rules.set(`${section}/*`, `/en${section}/:splat 301`);
+    // Also emit language-prefixed variants, e.g. /zh/foo -> /zh/bar.
+    for (const locale of LOCALES) {
+      const localizedSource = localizeSource(source, locale);
+      const localizedTarget = localizeTarget(target, locale);
+      rules.set(localizedSource, `${localizedTarget} ${status}`);
+    }
   }
 
   return rules;

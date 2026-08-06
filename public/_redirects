@@ -45,5 +45,5 @@
 /upgrade-scale/availability-and-resiliency /operations/scaling 301
 /upgrade-scale/upgrade /operations/upgrade 301
 /installation/docker /installation/container/docker 301
-/administration/iam  /security-compliance/iam 301
+/administration/iam /security-compliance/iam 301
 /features/replication /operations/high-availability/site-replication 301
