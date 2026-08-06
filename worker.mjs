@@ -1,5 +1,5 @@
 let redirectRulesPromise;
-const LOCALES = ["en", "zh", "de", "fr", "ja"];
+const DEFAULT_LOCALE = "en";
 
 async function loadRedirectRules(env) {
   // Use the built _redirects file from the assets bundle so build-time generated rules are honored.
@@ -64,14 +64,14 @@ function splitLocale(pathname) {
   if (parts.length === 0) return { locale: null, remainder: pathname };
 
   const locale = parts[0];
-  if (!LOCALES.includes(locale)) return { locale: null, remainder: pathname };
+  if (locale !== DEFAULT_LOCALE) return { locale: null, remainder: pathname };
 
   const remainder = `/${parts.slice(1).join("/")}`;
   return { locale, remainder: remainder === "/" ? "/" : remainder };
 }
 
 function isLocalizedPath(pathname) {
-  return LOCALES.some((locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`));
+  return pathname === `/${DEFAULT_LOCALE}` || pathname.startsWith(`/${DEFAULT_LOCALE}/`);
 }
 
 function applyLocaleToTarget(target, locale) {
@@ -89,7 +89,7 @@ export default {
       const rules = await getRedirectRules(env);
       let matched = matchRedirect(url.pathname, rules);
 
-      // Locale-aware fallback: /zh/foo can reuse base rule /foo -> /bar as /zh/bar.
+      // English-only fallback: /en/foo can reuse base rule /foo -> /en/bar.
       if (!matched) {
         const { locale, remainder } = splitLocale(url.pathname);
         if (locale) {
