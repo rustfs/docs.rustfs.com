@@ -4,6 +4,7 @@
   "defaultOpen": false,
   "pages": [
     "environment-variables",
-    "cli"
+    "cli",
+    "s3-compatibility"
   ]
 }

@@ -5,6 +5,7 @@
     "webdav",
     "ftps",
     "sftp",
+    "swift",
     "[MCP-Server](/de/developer/mcp)"
   ]
 }
