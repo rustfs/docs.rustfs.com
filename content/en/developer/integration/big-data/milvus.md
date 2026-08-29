@@ -100,7 +100,7 @@ services:
       RUSTFS_CONSOLE_ADDRESS: ":9001"
       RUSTFS_CONSOLE_ENABLE: "true"
       RUSTFS_OBS_LOGGER_LEVEL: error
-      RUSTFS_OBS_LOG_DIRECTORY: /var/log/rustfs/
+      RUSTFS_OBS_LOG_DIRECTORY: /logs
     volumes:
       - rustfs-data:/data
     ports:

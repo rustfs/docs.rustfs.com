@@ -170,7 +170,7 @@ services:
       RUSTFS_ADDRESS: ":9000"
       RUSTFS_CONSOLE_ADDRESS: ":9001"
       RUSTFS_OBS_LOGGER_LEVEL: error
-      RUSTFS_OBS_LOG_DIRECTORY: /var/log/rustfs/
+      RUSTFS_OBS_LOG_DIRECTORY: /logs
     expose:
       - "9000"
       - "9001"

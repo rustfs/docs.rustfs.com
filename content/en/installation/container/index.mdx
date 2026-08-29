@@ -13,7 +13,7 @@ This article is based on RustFS official Linux binary packages, packaging RustFS
 1. **Host Requirements**
 
  * Docker installed (≥ 20.10) and able to pull images and run containers normally
- * Local path `/mnt/rustfs/data` (or custom path) for mounting object data
+ * Local paths `/mnt/rustfs/data` and `/mnt/rustfs/logs` (or custom paths) for mounting object data and logs
  * [`rc`](/operations/rc) installed on the administration host for the verification workflow
 2. **Network and Firewall**
 
@@ -21,7 +21,13 @@ This article is based on RustFS official Linux binary packages, packaging RustFS
 
 3. **Directory Permissions**
 
- * The RustFS container runs as non-root user `rustfs` with id `10001`. If you run docker with `-v` to mount a host directory into the container, make sure the owner of the host directory is `10001`, otherwise you will encounter permission denied errors. Run `chown -R 10001:10001 /path/to/host_directory` to grant the necessary permissions.
+ * The RustFS container runs as non-root user `rustfs` (`10001:10001`). The image owns `/data` and `/logs`, and the image default for `RUSTFS_OBS_LOG_DIRECTORY` is `/logs`. Do not set that variable to `/var/log/rustfs/` — the container user cannot create that path.
+ * If you bind-mount host directories with `-v`, every mounted path (data, logs, and TLS certificates) must be owned by `10001:10001`:
+
+```bash
+sudo mkdir -p /mnt/rustfs/data /mnt/rustfs/logs
+sudo chown -R 10001:10001 /mnt/rustfs/data /mnt/rustfs/logs
+```
 
 ---
 
@@ -47,6 +53,7 @@ RustFS SNSD Docker running method, combining the above image and configuration, 
   -p 9000:9000 \
   -p 9001:9001 \
   -v /mnt/rustfs/data:/data \
+  -v /mnt/rustfs/logs:/logs \
   rustfs/rustfs:latest \
   /data
 ```
@@ -54,7 +61,8 @@ RustFS SNSD Docker running method, combining the above image and configuration, 
 Parameter descriptions:
 
 * `-p 9000:9000`: Map host port 9000 to container
-* `-v /mnt/rustfs/data:/data`: Mount data volume
+* `-v /mnt/rustfs/data:/data`: Mount the data directory
+* `-v /mnt/rustfs/logs:/logs`: Mount the log directory (image default; writable by UID `10001`)
 * `--name rustfs_local`: Custom container name
 * `-d`: Run in background
 
@@ -67,27 +75,6 @@ Configuration can be passed as environment variables (recommended) or as command
 <Tabs items={["Environment variables", "Command-line flags"]}>
   <Tab value="Environment variables" id="docker-env-config">
 
-```bash {7,8}
-# Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
-docker run -d \
-  --name rustfs \
-  -p 9000:9000 \
-  -p 9001:9001 \
-  -v /mnt/rustfs/data:/data \
-  -e RUSTFS_ACCESS_KEY="<your-access-key>" \
-  -e RUSTFS_SECRET_KEY="<your-secret-key>" \
-  -e RUSTFS_ADDRESS=":9000" \
-  -e RUSTFS_CONSOLE_ADDRESS=":9001" \
-  -e RUSTFS_CONSOLE_ENABLE=true \
-  -e RUSTFS_OBS_LOGGER_LEVEL=error \
-  -e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
-  rustfs/rustfs:latest \
-  /data
-```
-
-  </Tab>
-  <Tab value="Command-line flags" id="docker-cli-config">
-
 ```bash {8,9}
 # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
 docker run -d \
@@ -95,6 +82,29 @@ docker run -d \
   -p 9000:9000 \
   -p 9001:9001 \
   -v /mnt/rustfs/data:/data \
+  -v /mnt/rustfs/logs:/logs \
+  -e RUSTFS_ACCESS_KEY="<your-access-key>" \
+  -e RUSTFS_SECRET_KEY="<your-secret-key>" \
+  -e RUSTFS_ADDRESS=":9000" \
+  -e RUSTFS_CONSOLE_ADDRESS=":9001" \
+  -e RUSTFS_CONSOLE_ENABLE=true \
+  -e RUSTFS_OBS_LOGGER_LEVEL=error \
+  -e RUSTFS_OBS_LOG_DIRECTORY="/logs" \
+  rustfs/rustfs:latest \
+  /data
+```
+
+  </Tab>
+  <Tab value="Command-line flags" id="docker-cli-config">
+
+```bash {9,10}
+# Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
+docker run -d \
+  --name rustfs \
+  -p 9000:9000 \
+  -p 9001:9001 \
+  -v /mnt/rustfs/data:/data \
+  -v /mnt/rustfs/logs:/logs \
   rustfs/rustfs:latest \
   --access-key "<your-access-key>" \
   --secret-key "<your-secret-key>" \
@@ -114,6 +124,7 @@ docker run -d \
      -p 9000:9000 \
      -p 9001:9001 \
      -v /mnt/data:/data \
+     -v /mnt/logs:/logs \
      rustfs/rustfs:latest \
      /data
    ```
@@ -124,11 +135,12 @@ docker run -d \
      -p 9000:9000 \
      -p 9001:9001 \
      -v /mnt/data:/data \
+     -v /mnt/logs:/logs \
     -e RUSTFS_ADDRESS=":9000" \
     -e RUSTFS_CONSOLE_ADDRESS=":9001" \
     -e RUSTFS_CONSOLE_ENABLE=true \
     -e RUSTFS_OBS_LOGGER_LEVEL=error \
-    -e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
+    -e RUSTFS_OBS_LOG_DIRECTORY="/logs" \
      rustfs/rustfs:latest \
      --console-enable \
      /data
@@ -141,6 +153,7 @@ docker run -d \
      -p 9000:9000 \
      -p 9001:9001 \
      -v /mnt/data:/data \
+     -v /mnt/logs:/logs \
      -e RUSTFS_ACCESS_KEY="<your-access-key>" \
      -e RUSTFS_SECRET_KEY="<your-secret-key>" \
      rustfs/rustfs:latest \
@@ -159,7 +172,11 @@ docker run -d \
 
 3. Environment variables and command line parameters can be mixed, but command line parameters have higher priority
 
-4. If [using TLS](../../integration/tls-configured.md), additional certificate path mounting is needed:
+4. If [using TLS](../../integration/tls-configured.md), additional certificate path mounting is needed. The certificate directory must also be readable by UID `10001`:
+
+   ```bash
+   sudo chown -R 10001:10001 /path/to/certs
+   ```
 
    ```bash
    -v /path/to/certs:/certs \
@@ -180,7 +197,7 @@ Running the command under root directory,
 docker compose --profile observability up -d
 ```
 
-Providing the necessary permissions. An initialization container is necessary to grant the correct access rights to rustfs using the `depends_on` keyword. In the example below the `rustfs_perms` service is added to the `docker-compose.yml` to handle this. To ensure logs are persisted and accessible, we map the host log directory to the container's `/var/log/rustfs/` path
+Providing the necessary permissions. An initialization container is necessary to grant the correct access rights to rustfs using the `depends_on` keyword. In the example below the `rustfs_perms` service is added to the `docker-compose.yml` to handle this. To persist logs, map the host log directory to the container's `/logs` path (the image default). Do not mount or set `RUSTFS_OBS_LOG_DIRECTORY` to `/var/log/rustfs/`.
 
 ```yaml title="docker-compose.yml"
   services:
@@ -199,13 +216,13 @@ Providing the necessary permissions. An initialization container is necessary to
           condition: service_completed_successfully
       volumes:
         - /path/to_host_directory/volumes/data:/data
-        - /path/to_host_directory/volumes/logs:/var/log/rustfs/
+        - /path/to_host_directory/volumes/logs:/logs
       environment:
         - RUSTFS_ADDRESS=":9000"
         - RUSTFS_CONSOLE_ADDRESS=":9001"
         - RUSTFS_CONSOLE_ENABLE=true
         - RUSTFS_OBS_LOGGER_LEVEL=error
-        - RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
+        - RUSTFS_OBS_LOG_DIRECTORY="/logs"
     
       # ... other configurations
 ```
@@ -278,13 +295,14 @@ docker run -d \
   --name rustfs \
   --network host \
   -v /mnt/rustfs/data:/data \
+  -v /mnt/rustfs/logs:/logs \
   -e RUSTFS_ACCESS_KEY="<your-access-key>" \
   -e RUSTFS_SECRET_KEY="<your-secret-key>" \
   -e RUSTFS_ADDRESS=":9000" \
   -e RUSTFS_CONSOLE_ADDRESS=":9001" \
   -e RUSTFS_CONSOLE_ENABLE=true \
   -e RUSTFS_OBS_LOGGER_LEVEL=error \
-  -e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
+  -e RUSTFS_OBS_LOG_DIRECTORY="/logs" \
   -e RUSTFS_VOLUMES="http://node{1...4}:9000/data/rustfs{0...3}" \
   rustfs/rustfs:latest
 ```

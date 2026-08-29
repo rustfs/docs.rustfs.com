@@ -37,6 +37,8 @@
 /en/installation/checklists/network-checklists /en/installation/requirement/checklists/network-checklists 301
 /en/installation/checklists/security-checklists /en/installation/requirement/checklists/security-checklists 301
 /en/installation/checklists/software-checklists /en/installation/requirement/checklists/software-checklists 301
+/installation /en/installation 301
+/installation/ /en/installation 301
 /installation/docker /en/installation/container/docker 301
 /installation/docker/ /en/installation/container/docker 301
 /features/logging /en/operations/observability 301

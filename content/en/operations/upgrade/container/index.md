@@ -17,13 +17,17 @@ curl -fsS http://localhost:9000/health/ready
 
 :::warning[Preserve persistent storage]
 
-Do not remove the named volume or host directory mounted at `/data`. Commands such as `docker compose down -v`, `docker volume rm`, and `podman volume rm` delete persistent storage and are not part of an upgrade.
+Do not remove the named volume or host directory mounted at `/data` (or `/logs`, if you persist container logs). Commands such as `docker compose down -v`, `docker volume rm`, and `podman volume rm` delete persistent storage and are not part of an upgrade.
 
 :::
 
 ## Upgrade a Docker container
 
-The following workflow matches the container name and named volume used in the [Docker installation guide](/installation/container/docker). If your deployment uses different ports, environment variables, mounts, or startup arguments, keep those settings unchanged in the replacement command.
+The following workflow matches the container name and named volumes used in the [Docker installation guide](/installation/container/docker). If your deployment uses different ports, environment variables, mounts, or startup arguments, keep those settings unchanged in the replacement command. If the original container did not mount `/logs`, create the log volume before recreating it:
+
+```bash
+docker volume create rustfs-logs
+```
 
 Record the current image, then pull the target version:
 
@@ -32,7 +36,7 @@ docker inspect --format '{{.Config.Image}}' rustfs
 docker pull rustfs/rustfs:<target-version>
 ```
 
-Stop and remove only the container. The `rustfs-data` volume remains intact:
+Stop and remove only the container. The `rustfs-data` and `rustfs-logs` volumes remain intact:
 
 ```bash
 docker stop rustfs
@@ -48,13 +52,14 @@ docker run -d \
 	-p 9000:9000 \
 	-p 9001:9001 \
 	-v rustfs-data:/data \
+	-v rustfs-logs:/logs \
 	-e RUSTFS_ACCESS_KEY="<your-access-key>" \
 	-e RUSTFS_SECRET_KEY="<your-secret-key>" \
 	-e RUSTFS_ADDRESS=":9000" \
 	-e RUSTFS_CONSOLE_ADDRESS=":9001" \
 	-e RUSTFS_CONSOLE_ENABLE=true \
 	-e RUSTFS_OBS_LOGGER_LEVEL=error \
-	-e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
+	-e RUSTFS_OBS_LOG_DIRECTORY="/logs" \
 	rustfs/rustfs:<target-version> \
 	/data
 ```
@@ -69,7 +74,11 @@ curl -fsS http://localhost:9000/health/ready
 
 ## Upgrade a Podman container
 
-The Podman workflow is the same replacement operation, using the image name from the [Podman installation guide](/installation/container/podman).
+The Podman workflow is the same replacement operation, using the image name from the [Podman installation guide](/installation/container/podman). If the original container did not mount `/logs`, create the log volume first:
+
+```bash
+podman volume create rustfs-logs
+```
 
 ```bash
 podman inspect --format '{{.Config.Image}}' rustfs
@@ -86,13 +95,14 @@ podman run -d \
 	-p 9000:9000 \
 	-p 9001:9001 \
 	-v rustfs-data:/data \
+	-v rustfs-logs:/logs \
 	-e RUSTFS_ACCESS_KEY="<your-access-key>" \
 	-e RUSTFS_SECRET_KEY="<your-secret-key>" \
 	-e RUSTFS_ADDRESS=":9000" \
 	-e RUSTFS_CONSOLE_ADDRESS=":9001" \
 	-e RUSTFS_CONSOLE_ENABLE=true \
 	-e RUSTFS_OBS_LOGGER_LEVEL=error \
-	-e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
+	-e RUSTFS_OBS_LOG_DIRECTORY="/logs" \
 	docker.io/rustfs/rustfs:<target-version> \
 	/data
 ```

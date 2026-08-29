@@ -85,7 +85,7 @@ The observability pipeline exports traces, metrics, and logs over OTLP/HTTP.
 | `RUSTFS_OBS_ENVIRONMENT` | unset | Deployment environment label (`production`, `development`, `test`, `staging`). |
 | `RUSTFS_OBS_LOGGER_LEVEL` | unset | Log level filter (e.g. `info`, `debug`). |
 | `RUSTFS_OBS_LOG_STDOUT_ENABLED` | unset | Also mirror logs to stdout when file/OTLP logging is active. |
-| `RUSTFS_OBS_LOG_DIRECTORY` | unset | Local log directory. Unset means logs go to stdout; a URL value sends logs to a remote endpoint. |
+| `RUSTFS_OBS_LOG_DIRECTORY` | unset | Local log directory. Unset means logs go to stdout; a URL value sends logs to a remote endpoint. The official container image sets this to `/logs` (writable by UID `10001`). Do not use `/var/log/rustfs/` in container examples. |
 | `RUSTFS_OBS_LOG_FILENAME` | `rustfs.log` | Log filename inside the log directory. |
 | `RUSTFS_OBS_LOG_ROTATION_TIME` | `hourly` | Time-based log rotation: `daily`, `hourly`, `minutely`. |
 | `RUSTFS_OBS_LOG_KEEP_FILES` | `30` | Number of rotated log files to keep. |
