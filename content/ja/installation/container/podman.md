@@ -17,6 +17,11 @@ Create a named volume so object data remains available when you replace the cont
 
 ```bash
 podman volume create rustfs-data
+podman volume create rustfs-logs
+
+# Bind-mount alternative on SELinux hosts (`:U` sets ownership; `:Z` sets the SELinux label):
+# mkdir -p data logs
+# podman run ... -v "$(pwd)/data":/data:Z,U -v "$(pwd)/logs":/logs:Z,U ...
 ```
 
 ## 3. Start RustFS
@@ -29,13 +34,14 @@ podman run -d \
   -p 9000:9000 \
   -p 9001:9001 \
   -v rustfs-data:/data \
+  -v rustfs-logs:/logs \
   -e RUSTFS_ACCESS_KEY="<your-access-key>" \
   -e RUSTFS_SECRET_KEY="<your-secret-key>" \
   -e RUSTFS_ADDRESS=":9000" \
   -e RUSTFS_CONSOLE_ADDRESS=":9001" \
   -e RUSTFS_CONSOLE_ENABLE=true \
   -e RUSTFS_OBS_LOGGER_LEVEL=error \
-  -e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
+  -e RUSTFS_OBS_LOG_DIRECTORY="/logs" \
   docker.io/rustfs/rustfs:latest \
   /data
 ```
@@ -54,7 +60,6 @@ Check the container and the S3 API health endpoint:
 podman ps --filter name=rustfs
 curl --fail http://localhost:9000/health
 ```
-
 The S3 API is available at `http://localhost:9000`, and the Console is available at `http://localhost:9001`.
 
 ## Next steps

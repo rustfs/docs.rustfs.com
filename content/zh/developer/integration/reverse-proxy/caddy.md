@@ -26,7 +26,6 @@ description: "在 Caddy 后方部署 RustFS，并为独立的 S3 API 和控制�
 mkdir rustfs-caddy
 cd rustfs-caddy
 ```
-
 ## 2. 设置部署变量
 
 创建环境文件并替换每个值：
@@ -38,7 +37,6 @@ ACME_EMAIL=admin@example.com
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
-
 请使用能够接收证书通知的电子邮件地址。不要将 `.env` 提交到源代码管理系统。
 
 ## 3. 配置 Caddy
@@ -72,7 +70,6 @@ RUSTFS_SECRET_KEY=<your-secret-key>
 		}
 }
 ```
-
 Caddy 默认会保留传入的 `Host` 标头、HTTP 方法和请求 URI。它还会通过 `X-Forwarded-*` 标头转发客户端信息，并且无需额外的标头规则即可处理控制台 WebSocket 升级。
 
 ## 4. 创建 Compose 文件
@@ -112,7 +109,7 @@ services:
       RUSTFS_ADDRESS: ":9000"
       RUSTFS_CONSOLE_ADDRESS: ":9001"
       RUSTFS_OBS_LOGGER_LEVEL: error
-      RUSTFS_OBS_LOG_DIRECTORY: /var/log/rustfs/
+      RUSTFS_OBS_LOG_DIRECTORY: /logs
     expose:
       - "9000"
       - "9001"
@@ -135,7 +132,6 @@ volumes:
 networks:
   rustfs:
 ```
-
 持久化的 `caddy-data` 卷用于存储证书、私钥和 ACME 账户状态。请备份此卷，并且不要共享其中的内容。只有 Caddy 会发布主机端口；RustFS 仅可在 Compose 网络内部访问。
 
 ## 5. 验证并启动部署
@@ -146,13 +142,11 @@ networks:
 docker compose config
 docker compose up -d rustfs
 ```
-
 使用与部署相同的镜像验证 Caddyfile：
 
 ```bash
 docker compose run --rm --no-deps caddy caddy validate --config /etc/caddy/Caddyfile
 ```
-
 启动 Caddy 并检查两个服务：
 
 ```bash
@@ -160,7 +154,6 @@ docker compose up -d caddy
 docker compose ps
 docker compose logs --follow caddy
 ```
-
 Caddy 会在后台获取证书，并将 HTTP 请求重定向到 HTTPS。如果签发失败，请确认两条 DNS 记录均解析到此主机、端口 `80` 和 `443` 可以访问，并且 `caddy-data` 卷可写。
 
 ## 6. 验证两个端点
@@ -171,7 +164,6 @@ Caddy 会在后台获取证书，并将 HTTP 请求重定向到 HTTPS。如果�
 curl --fail https://s3.example.com/health/ready
 curl --fail https://console.example.com/rustfs/console/health
 ```
-
 将 S3 客户端端点配置为 `https://s3.example.com`，并启用路径样式寻址。打开 `https://console.example.com` 登录控制台。
 
 ## 多节点上游
@@ -199,7 +191,6 @@ curl --fail https://console.example.com/rustfs/console/health
 		}
 }
 ```
-
 将 `<your-cookie-secret>` 替换为由所有 Caddy 实例共享的随机密钥。控制台会话亲和性可确保正在进行的 OpenID Connect 登录始终由创建其 `state` 的 RustFS 节点处理。请保持 RustFS 节点之间的端口 `9000` 直接开放，因为内部节点 RPC 使用同一监听器。
 
 ## 后续步骤

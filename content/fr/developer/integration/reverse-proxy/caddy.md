@@ -26,7 +26,6 @@ Create a directory for the deployment:
 mkdir rustfs-caddy
 cd rustfs-caddy
 ```
-
 ## 2. Set deployment variables
 
 Create an environment file and replace each value:
@@ -38,7 +37,6 @@ ACME_EMAIL=admin@example.com
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
-
 Use an email address that receives certificate notices. Do not commit `.env` to source control.
 
 ## 3. Configure Caddy
@@ -72,7 +70,6 @@ Create a Caddyfile with one site block for each RustFS endpoint:
 		}
 }
 ```
-
 Caddy preserves the incoming `Host` header, HTTP method, and request URI by default. It also forwards client information through `X-Forwarded-*` headers and handles Console WebSocket upgrades without additional header rules.
 
 ## 4. Create the Compose file
@@ -112,7 +109,7 @@ services:
       RUSTFS_ADDRESS: ":9000"
       RUSTFS_CONSOLE_ADDRESS: ":9001"
       RUSTFS_OBS_LOGGER_LEVEL: error
-      RUSTFS_OBS_LOG_DIRECTORY: /var/log/rustfs/
+      RUSTFS_OBS_LOG_DIRECTORY: /logs
     expose:
       - "9000"
       - "9001"
@@ -135,7 +132,6 @@ volumes:
 networks:
   rustfs:
 ```
-
 The persistent `caddy-data` volume stores certificates, private keys, and ACME account state. Back up this volume and do not share its contents. Only Caddy publishes host ports; RustFS remains reachable inside the Compose network.
 
 ## 5. Validate and start the deployment
@@ -146,13 +142,11 @@ Render the Compose configuration and start RustFS:
 docker compose config
 docker compose up -d rustfs
 ```
-
 Validate the Caddyfile with the same image used by the deployment:
 
 ```bash
 docker compose run --rm --no-deps caddy caddy validate --config /etc/caddy/Caddyfile
 ```
-
 Start Caddy and check both services:
 
 ```bash
@@ -160,7 +154,6 @@ docker compose up -d caddy
 docker compose ps
 docker compose logs --follow caddy
 ```
-
 Caddy obtains certificates in the background and redirects HTTP requests to HTTPS. If issuance fails, confirm that both DNS records resolve to this host, ports `80` and `443` are reachable, and the `caddy-data` volume is writable.
 
 ## 6. Verify both endpoints
@@ -171,7 +164,6 @@ Verify the API and Console through their public HTTPS hostnames:
 curl --fail https://s3.example.com/health/ready
 curl --fail https://console.example.com/rustfs/console/health
 ```
-
 Configure S3 clients with `https://s3.example.com` as the endpoint and enable path-style addressing. Open `https://console.example.com` to sign in to the Console.
 
 ## Multi-node upstreams
@@ -199,7 +191,6 @@ For a distributed RustFS deployment, list every node in the corresponding site b
 		}
 }
 ```
-
 Replace `<your-cookie-secret>` with a random secret shared by all Caddy instances. Console affinity keeps an in-progress OpenID Connect login on the RustFS node that created its `state`. Keep port `9000` open directly between RustFS nodes because internal node RPC uses the same listener.
 
 ## Next steps

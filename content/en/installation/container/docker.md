@@ -20,22 +20,13 @@ Create named volumes so object data and logs remain available when you replace t
 ```bash
 docker volume create rustfs-data
 docker volume create rustfs-logs
+
+# Bind-mount alternative (host directories must be owned by 10001:10001):
+# mkdir -p data logs
+# sudo chown -R 10001:10001 data logs
 ```
 
-Named volumes mounted at `/data` and `/logs` inherit the image's `10001:10001` ownership.
-
-:::warning[Bind mounts need UID 10001]
-
-If you bind-mount host directories instead of named volumes, create them first and change their owner. Every bind-mounted path (data, logs, and TLS certificates when `RUSTFS_TLS_PATH` is set) must be writable by `10001:10001`:
-
-```bash
-mkdir -p data logs
-sudo chown -R 10001:10001 data logs
-```
-
-Then mount those directories at `/data` and `/logs`.
-
-:::
+Named volumes mounted at `/data` and `/logs` inherit the image's `10001:10001` ownership. If you bind-mount host directories instead, create them first and change their owner (`mkdir -p data logs` then `sudo chown -R 10001:10001 data logs`). Every bind-mounted path (data, logs, and TLS certificates when `RUSTFS_TLS_PATH` is set) must be writable by `10001:10001`.
 
 ## 3. Start RustFS
 

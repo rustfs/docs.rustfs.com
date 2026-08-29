@@ -26,14 +26,12 @@ description: "在 HAProxy 后方部署 RustFS，为 S3 API 和控制台配置独
 mkdir -p rustfs-haproxy/config rustfs-haproxy/certs
 cd rustfs-haproxy
 ```
-
 HAProxy 要求证书链和私钥位于同一个 PEM 文件中。请按以下顺序合并：
 
 ```bash
 cat fullchain.pem privkey.pem > certs/rustfs.pem
 chmod 600 certs/rustfs.pem
 ```
-
 证书必须涵盖两个公网主机名。
 
 ## 2. 设置 RustFS 凭证
@@ -44,7 +42,6 @@ chmod 600 certs/rustfs.pem
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
-
 不要将此文件或证书私钥提交到源代码管理系统。
 
 ## 3. 配置 HAProxy
@@ -95,7 +92,6 @@ backend rustfs_console
     http-check expect status 200
     server rustfs rustfs:9001 check inter 10s fall 3 rise 2 cookie rustfs
 ```
-
 除非显式重写，否则 HAProxy 会保留传入的主机和请求路径。较长的客户端、服务器和隧道超时时间可以满足流式 S3 操作和控制台 WebSocket 连接的需要。
 
 控制台后端会设置亲和性 Cookie。只有一台 RustFS 服务器时，它不会影响路由，但保留在基础配置中可以使添加节点后的行为保持一致。
@@ -131,7 +127,7 @@ services:
       RUSTFS_ADDRESS: ":9000"
       RUSTFS_CONSOLE_ADDRESS: ":9001"
       RUSTFS_OBS_LOGGER_LEVEL: error
-      RUSTFS_OBS_LOG_DIRECTORY: /var/log/rustfs/
+      RUSTFS_OBS_LOG_DIRECTORY: /logs
     expose:
       - "9000"
       - "9001"
@@ -152,7 +148,6 @@ volumes:
 networks:
   rustfs:
 ```
-
 只有 HAProxy 会发布主机端口。RustFS 端口 `9000` 和 `9001` 仅可在 Compose 网络内部访问。
 
 ## 5. 验证并启动部署
@@ -163,27 +158,23 @@ networks:
 docker compose config
 docker compose up -d rustfs
 ```
-
 使用与部署相同的镜像验证 HAProxy 配置：
 
 ```bash
 docker compose run --rm --no-deps haproxy haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg
 ```
-
 启动 HAProxy 并检查两个服务：
 
 ```bash
 docker compose up -d haproxy
 docker compose ps
 ```
-
 如果服务未进入健康状态，请检查其日志：
 
 ```bash
 docker compose logs haproxy
 docker compose logs rustfs
 ```
-
 ## 6. 验证两个端点
 
 通过各自的公网 HTTPS 主机名验证 API 和控制台：
@@ -192,7 +183,6 @@ docker compose logs rustfs
 curl --fail https://s3.example.com/health/ready
 curl --fail https://console.example.com/rustfs/console/health
 ```
-
 将 S3 客户端端点配置为 `https://s3.example.com`，并启用路径样式寻址。打开 `https://console.example.com` 登录控制台。
 
 替换续订后的 `certs/rustfs.pem` 时，请验证配置并重新创建 HAProxy 容器以加载证书：
@@ -201,7 +191,6 @@ curl --fail https://console.example.com/rustfs/console/health
 docker compose run --rm --no-deps haproxy haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg
 docker compose up -d --force-recreate haproxy
 ```
-
 ## 多节点后端
 
 对于分布式 RustFS 部署，请将每个 RustFS 节点添加到两个后端：
@@ -226,7 +215,6 @@ backend rustfs_console
 		server node3 node3.example.net:9001 check inter 10s fall 3 rise 2 cookie node3
 		server node4 node4.example.net:9001 check inter 10s fall 3 rise 2 cookie node4
 ```
-
 控制台 Cookie 可确保正在进行的 OpenID Connect 登录始终由创建其 `state` 的 RustFS 节点处理。请保持 RustFS 节点之间的端口 `9000` 直接开放，因为内部节点 RPC 使用同一监听器。
 
 ## 后续步骤

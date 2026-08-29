@@ -20,31 +20,13 @@ Create named volumes so object data and logs remain available when you replace t
 ```bash
 podman volume create rustfs-data
 podman volume create rustfs-logs
+
+# Bind-mount alternative on SELinux hosts (`:U` sets ownership; `:Z` sets the SELinux label):
+# mkdir -p data logs
+# podman run ... -v "$(pwd)/data":/data:Z,U -v "$(pwd)/logs":/logs:Z,U ...
 ```
 
-Named volumes mounted at `/data` and `/logs` inherit the image's `10001:10001` ownership.
-
-:::warning[Bind mounts need UID 10001]
-
-If you bind-mount host directories instead of named volumes, create them first. Podman can adjust ownership with the `:U` mount option; `:Z` is required on SELinux hosts:
-
-```bash
-mkdir -p data logs
-podman run -d \
-  --name rustfs \
-  -p 9000:9000 \
-  -p 9001:9001 \
-  -v "$(pwd)/data":/data:Z,U \
-  -v "$(pwd)/logs":/logs:Z,U \
-  -e RUSTFS_ACCESS_KEY="<your-access-key>" \
-  -e RUSTFS_SECRET_KEY="<your-secret-key>" \
-  docker.io/rustfs/rustfs:latest \
-  /data
-```
-
-If you do not use `:U`, run `sudo chown -R 10001:10001 data logs` before starting the container. Every bind-mounted path (data, logs, and TLS certificates when `RUSTFS_TLS_PATH` is set) must be writable by `10001:10001`.
-
-:::
+Named volumes mounted at `/data` and `/logs` inherit the image's `10001:10001` ownership. If you bind-mount host directories and do not use `:U`, run `sudo chown -R 10001:10001 data logs` first. Every bind-mounted path (data, logs, and TLS certificates when `RUSTFS_TLS_PATH` is set) must be writable by `10001:10001`.
 
 ## 3. Start RustFS
 

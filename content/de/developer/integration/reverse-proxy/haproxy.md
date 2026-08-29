@@ -26,14 +26,12 @@ Create directories for the HAProxy configuration and TLS certificate:
 mkdir -p rustfs-haproxy/config rustfs-haproxy/certs
 cd rustfs-haproxy
 ```
-
 HAProxy expects the certificate chain and private key in one PEM file. Combine them in this order:
 
 ```bash
 cat fullchain.pem privkey.pem > certs/rustfs.pem
 chmod 600 certs/rustfs.pem
 ```
-
 The certificate must cover both public hostnames.
 
 ## 2. Set RustFS credentials
@@ -44,7 +42,6 @@ Create an environment file and replace both credential placeholders:
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
-
 Do not commit this file or the certificate private key to source control.
 
 ## 3. Configure HAProxy
@@ -95,7 +92,6 @@ backend rustfs_console
     http-check expect status 200
     server rustfs rustfs:9001 check inter 10s fall 3 rise 2 cookie rustfs
 ```
-
 HAProxy preserves the incoming host and request path unless you explicitly rewrite them. The long client, server, and tunnel timeouts accommodate streaming S3 operations and Console WebSocket connections.
 
 The Console backend sets an affinity cookie. With one RustFS server it has no routing effect, but keeping it in the base configuration makes the behavior consistent when you add nodes.
@@ -131,7 +127,7 @@ services:
       RUSTFS_ADDRESS: ":9000"
       RUSTFS_CONSOLE_ADDRESS: ":9001"
       RUSTFS_OBS_LOGGER_LEVEL: error
-      RUSTFS_OBS_LOG_DIRECTORY: /var/log/rustfs/
+      RUSTFS_OBS_LOG_DIRECTORY: /logs
     expose:
       - "9000"
       - "9001"
@@ -152,7 +148,6 @@ volumes:
 networks:
   rustfs:
 ```
-
 Only HAProxy publishes host ports. RustFS ports `9000` and `9001` remain reachable inside the Compose network.
 
 ## 5. Validate and start the deployment
@@ -163,27 +158,23 @@ Render the Compose configuration and start RustFS:
 docker compose config
 docker compose up -d rustfs
 ```
-
 Validate the HAProxy configuration with the same image used by the deployment:
 
 ```bash
 docker compose run --rm --no-deps haproxy haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg
 ```
-
 Start HAProxy and check both services:
 
 ```bash
 docker compose up -d haproxy
 docker compose ps
 ```
-
 If a service does not become healthy, inspect its logs:
 
 ```bash
 docker compose logs haproxy
 docker compose logs rustfs
 ```
-
 ## 6. Verify both endpoints
 
 Verify the API and Console through their public HTTPS hostnames:
@@ -192,7 +183,6 @@ Verify the API and Console through their public HTTPS hostnames:
 curl --fail https://s3.example.com/health/ready
 curl --fail https://console.example.com/rustfs/console/health
 ```
-
 Configure S3 clients with `https://s3.example.com` as the endpoint and enable path-style addressing. Open `https://console.example.com` to sign in to the Console.
 
 When you replace a renewed `certs/rustfs.pem`, validate the configuration and recreate the HAProxy container to load it:
@@ -201,7 +191,6 @@ When you replace a renewed `certs/rustfs.pem`, validate the configuration and re
 docker compose run --rm --no-deps haproxy haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg
 docker compose up -d --force-recreate haproxy
 ```
-
 ## Multi-node backends
 
 For a distributed RustFS deployment, add every RustFS node to both backends:
@@ -226,7 +215,6 @@ backend rustfs_console
 		server node3 node3.example.net:9001 check inter 10s fall 3 rise 2 cookie node3
 		server node4 node4.example.net:9001 check inter 10s fall 3 rise 2 cookie node4
 ```
-
 The Console cookie keeps an in-progress OpenID Connect login on the RustFS node that created its `state`. Keep port `9000` open directly between RustFS nodes because internal node RPC uses the same listener.
 
 ## Next steps

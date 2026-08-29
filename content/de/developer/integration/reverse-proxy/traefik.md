@@ -28,7 +28,6 @@ cd rustfs-traefik
 touch acme.json
 chmod 600 acme.json
 ```
-
 ## 2. Set deployment variables
 
 Create an environment file and replace each value:
@@ -40,7 +39,6 @@ ACME_EMAIL=admin@example.com
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
-
 Use an email address that receives certificate expiration notices. Do not commit `.env` or `acme.json` to source control.
 
 ## 3. Create the Compose file
@@ -86,7 +84,7 @@ services:
       RUSTFS_ADDRESS: ":9000"
       RUSTFS_CONSOLE_ADDRESS: ":9001"
       RUSTFS_OBS_LOGGER_LEVEL: error
-      RUSTFS_OBS_LOG_DIRECTORY: /var/log/rustfs/
+      RUSTFS_OBS_LOG_DIRECTORY: /logs
     expose:
       - "9000"
       - "9001"
@@ -125,7 +123,6 @@ networks:
   rustfs:
     name: rustfs
 ```
-
 The two routers use different host rules and backend ports. RustFS does not publish ports `9000` or `9001` on the Docker host, and the Traefik Dashboard is not exposed.
 
 :::note[Docker socket access]
@@ -141,20 +138,17 @@ Render the Compose configuration and check that all variables resolve:
 ```bash
 docker compose config
 ```
-
 Start both services:
 
 ```bash
 docker compose up -d
 docker compose ps
 ```
-
 Follow the Traefik logs while it completes the ACME challenge and creates both certificates:
 
 ```bash
 docker compose logs --follow traefik
 ```
-
 If certificate issuance fails, confirm that both DNS records resolve to this host and that ports `80` and `443` are reachable from the internet. Let's Encrypt rate limits apply, so correct DNS and firewall problems before repeatedly recreating the deployment.
 
 ## 5. Verify both endpoints
@@ -165,7 +159,6 @@ Verify the S3 API readiness endpoint and Console health endpoint through Traefik
 curl --fail https://s3.example.com/health/ready
 curl --fail https://console.example.com/rustfs/console/health
 ```
-
 Configure S3 clients with `https://s3.example.com` as the endpoint and enable path-style addressing. Open `https://console.example.com` to sign in to the Console.
 
 ## Multi-node services
@@ -181,7 +174,6 @@ services:
     volumes:
       - ./dynamic.yaml:/etc/traefik/dynamic.yaml:ro
 ```
-
 Create the dynamic configuration with every RustFS node:
 
 ```yaml title="dynamic.yaml"
@@ -233,7 +225,6 @@ http:
           - url: http://node3.example.net:9001
           - url: http://node4.example.net:9001
 ```
-
 Configure sticky sessions for the Console service when you use OpenID Connect. An in-progress login stores its `state` on one RustFS node and the callback must return to that node. Keep port `9000` open directly between RustFS nodes because internal node RPC uses the same listener.
 
 ## Next steps

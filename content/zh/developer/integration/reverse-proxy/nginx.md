@@ -26,7 +26,6 @@ description: "在 Nginx 后方部署 RustFS，为 S3 API 和控制台配置独�
 mkdir -p rustfs-nginx/sites rustfs-nginx/certs
 cd rustfs-nginx
 ```
-
 将证书链和私钥复制到 `certs/`：
 
 ```text
@@ -36,13 +35,11 @@ rustfs-nginx/
 │   └── privkey.pem
 └── sites/
 ```
-
 限制对私钥的访问：
 
 ```bash
 chmod 600 certs/privkey.pem
 ```
-
 ## 2. 设置 RustFS 凭证
 
 创建环境文件并替换两个凭证占位符：
@@ -51,7 +48,6 @@ chmod 600 certs/privkey.pem
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
-
 不要将此文件提交到源代码管理系统。
 
 ## 3. 配置 Nginx
@@ -136,7 +132,6 @@ server {
     }
 }
 ```
-
 S3 服务器会保留原始主机和请求路径，禁用请求缓冲以支持流式上传，并且不会转换已签名的 `HEAD` 请求。控制台服务器还会转发 WebSocket 升级标头。
 
 ## 4. 创建 Compose 文件
@@ -170,7 +165,7 @@ services:
       RUSTFS_ADDRESS: ":9000"
       RUSTFS_CONSOLE_ADDRESS: ":9001"
       RUSTFS_OBS_LOGGER_LEVEL: error
-      RUSTFS_OBS_LOG_DIRECTORY: /var/log/rustfs/
+      RUSTFS_OBS_LOG_DIRECTORY: /logs
     expose:
       - "9000"
       - "9001"
@@ -191,7 +186,6 @@ volumes:
 networks:
   rustfs:
 ```
-
 只有 Nginx 会发布主机端口。RustFS 端口 `9000` 和 `9001` 仅可在 Compose 网络内部访问。
 
 ## 5. 验证并启动部署
@@ -203,21 +197,18 @@ docker compose config
 docker compose up -d rustfs
 docker compose run --rm --no-deps nginx nginx -t
 ```
-
 启动 Nginx 并检查两个服务：
 
 ```bash
 docker compose up -d nginx
 docker compose ps
 ```
-
 如果服务未进入健康状态，请检查其日志：
 
 ```bash
 docker compose logs nginx
 docker compose logs rustfs
 ```
-
 ## 6. 验证两个端点
 
 通过各自的公网 HTTPS 主机名验证 API 和控制台：
@@ -226,7 +217,6 @@ docker compose logs rustfs
 curl --fail https://s3.example.com/health/ready
 curl --fail https://console.example.com/rustfs/console/health
 ```
-
 将 S3 客户端端点配置为 `https://s3.example.com`，并启用路径样式寻址。打开 `https://console.example.com` 登录控制台。
 
 替换 `certs/` 中续订后的证书或密钥时，请验证配置并重新加载 Nginx，且不会中断活动连接：
@@ -235,7 +225,6 @@ curl --fail https://console.example.com/rustfs/console/health
 docker compose exec nginx nginx -t
 docker compose exec nginx nginx -s reload
 ```
-
 ## 多节点上游
 
 对于分布式 RustFS 部署，请将每个上游中的单台服务器替换为所有 RustFS 节点：
@@ -259,7 +248,6 @@ upstream rustfs_console {
   keepalive 16;
 }
 ```
-
 控制台上游使用客户端亲和性，因为正在进行的 OpenID Connect 登录会将其 `state` 存储在一个 RustFS 节点上。请保持 RustFS 节点之间的端口 `9000` 开放，因为内部节点 RPC 使用同一监听器。
 
 ## 后续步骤

@@ -33,14 +33,12 @@ Spark 使用 REST 服务执行 catalog 操作。Spark 和 REST catalog 都会接
 mkdir rustfs-iceberg
 cd rustfs-iceberg
 ```
-
 创建环境文件并替换两个凭证占位符：
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
-
 请为仓库存储桶使用专用凭证。不要将 `.env` 提交到源代码管理系统。
 
 创建 Spark catalog 配置：
@@ -57,7 +55,6 @@ spark.sql.catalog.demo.s3.path-style-access true
 spark.sql.defaultCatalog demo
 spark.sql.catalogImplementation in-memory
 ```
-
 此容器网络端点必须使用路径样式访问。主机名 `rustfs` 只能在 Compose 网络内部解析；在主机上运行的客户端应改用 `http://localhost:9000`。
 
 创建 Compose 文件：
@@ -74,7 +71,7 @@ services:
       RUSTFS_CONSOLE_ADDRESS: ":9001"
       RUSTFS_CONSOLE_ENABLE: "true"
       RUSTFS_OBS_LOGGER_LEVEL: error
-      RUSTFS_OBS_LOG_DIRECTORY: /var/log/rustfs/
+      RUSTFS_OBS_LOG_DIRECTORY: /logs
     volumes:
       - rustfs-data:/data
     ports:
@@ -145,7 +142,6 @@ networks:
 volumes:
   rustfs-data:
 ```
-
 [`rc` 镜像](https://github.com/rustfs/cli)提供官方 RustFS 命令行客户端。初始化程序会在创建 `my-bucket` 前检查其是否存在，因此重复启动不会删除现有仓库数据。RustFS 卷会在容器重新创建后继续保留仓库对象。
 
 :::warning[镜像版本]
@@ -161,20 +157,17 @@ Apache Iceberg 快速入门镜像在上游示例中发布时没有稳定版本�
 ```bash
 docker compose config
 ```
-
 启动服务并等待存储桶初始化程序完成：
 
 ```bash
 docker compose up -d
 docker compose ps -a
 ```
-
 `create-bucket` 服务应显示退出代码 `0`。如果该服务未完成，请检查其日志：
 
 ```bash
 docker compose logs create-bucket
 ```
-
 在 `http://localhost:9001` 打开 RustFS 控制台。REST catalog 位于 `http://localhost:8181`，Spark notebook 服务器位于 `http://localhost:8888`。
 
 ## 3. 创建并查询 Iceberg 表
@@ -184,7 +177,6 @@ docker compose logs create-bucket
 ```bash
 docker compose exec spark-iceberg spark-sql
 ```
-
 创建命名空间和分区表：
 
 ```sql
@@ -200,7 +192,6 @@ CREATE TABLE demo.nyc.taxis
 )
 PARTITIONED BY (vendor_id);
 ```
-
 插入并查询示例数据行：
 
 ```sql
@@ -213,7 +204,6 @@ VALUES
 
 SELECT * FROM demo.nyc.taxis ORDER BY trip_id;
 ```
-
 查询应返回四行：
 
 ```text
@@ -222,7 +212,6 @@ SELECT * FROM demo.nyc.taxis ORDER BY trip_id;
 2  1000373  0.9  9.01   N
 1  1000374  8.4  42.13  Y
 ```
-
 ## 4. 验证 RustFS 中的对象
 
 使用存储桶初始化程序镜像列出仓库内容：
@@ -231,7 +220,6 @@ SELECT * FROM demo.nyc.taxis ORDER BY trip_id;
 docker compose run --rm --entrypoint /bin/sh create-bucket -c \
   '/usr/bin/rc alias set rustfs http://rustfs:9000 "$RUSTFS_ACCESS_KEY" "$RUSTFS_SECRET_KEY" >/dev/null && /usr/bin/rc find rustfs/my-bucket/warehouse'
 ```
-
 输出应包含 `warehouse/nyc/taxis` 前缀下的 Iceberg 元数据和数据对象。你也可以在 RustFS 控制台中检查 `my-bucket` 存储桶。
 
 ## 5. 停止或重置服务栈
@@ -241,13 +229,11 @@ docker compose run --rm --entrypoint /bin/sh create-bucket -c \
 ```bash
 docker compose down
 ```
-
 要删除本地仓库并从空的 RustFS 卷重新开始，请显式添加 `--volumes`：
 
 ```bash
 docker compose down --volumes
 ```
-
 ## 故障排除
 
 ### Spark 无法连接 RustFS
@@ -263,7 +249,6 @@ docker compose down --volumes
 ```bash
 docker compose logs create-bucket rest
 ```
-
 REST catalog 属性 `CATALOG_IO__IMPL` 和 `CATALOG_S3_PATH__STYLE__ACCESS` 使用双下划线；fixture 会将它们转换为带点号和连字符的 Iceberg 属性名。
 
 ## 后续步骤

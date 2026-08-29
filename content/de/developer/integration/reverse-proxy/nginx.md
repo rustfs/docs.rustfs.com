@@ -26,7 +26,6 @@ Create directories for the Nginx configuration and TLS certificate:
 mkdir -p rustfs-nginx/sites rustfs-nginx/certs
 cd rustfs-nginx
 ```
-
 Copy your certificate chain and private key into `certs/`:
 
 ```text
@@ -36,13 +35,11 @@ rustfs-nginx/
 │   └── privkey.pem
 └── sites/
 ```
-
 Restrict access to the private key:
 
 ```bash
 chmod 600 certs/privkey.pem
 ```
-
 ## 2. Set RustFS credentials
 
 Create an environment file and replace both credential placeholders:
@@ -51,7 +48,6 @@ Create an environment file and replace both credential placeholders:
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
-
 Do not commit this file to source control.
 
 ## 3. Configure Nginx
@@ -136,7 +132,6 @@ server {
     }
 }
 ```
-
 The S3 server preserves the original host and request path, disables request buffering for streaming uploads, and does not convert signed `HEAD` requests. The Console server also forwards WebSocket upgrade headers.
 
 ## 4. Create the Compose file
@@ -170,7 +165,7 @@ services:
       RUSTFS_ADDRESS: ":9000"
       RUSTFS_CONSOLE_ADDRESS: ":9001"
       RUSTFS_OBS_LOGGER_LEVEL: error
-      RUSTFS_OBS_LOG_DIRECTORY: /var/log/rustfs/
+      RUSTFS_OBS_LOG_DIRECTORY: /logs
     expose:
       - "9000"
       - "9001"
@@ -191,7 +186,6 @@ volumes:
 networks:
   rustfs:
 ```
-
 Only Nginx publishes host ports. RustFS ports `9000` and `9001` remain reachable inside the Compose network.
 
 ## 5. Validate and start the deployment
@@ -203,21 +197,18 @@ docker compose config
 docker compose up -d rustfs
 docker compose run --rm --no-deps nginx nginx -t
 ```
-
 Start Nginx and check both services:
 
 ```bash
 docker compose up -d nginx
 docker compose ps
 ```
-
 If a service does not become healthy, inspect its logs:
 
 ```bash
 docker compose logs nginx
 docker compose logs rustfs
 ```
-
 ## 6. Verify both endpoints
 
 Verify the API and Console through their public HTTPS hostnames:
@@ -226,7 +217,6 @@ Verify the API and Console through their public HTTPS hostnames:
 curl --fail https://s3.example.com/health/ready
 curl --fail https://console.example.com/rustfs/console/health
 ```
-
 Configure S3 clients with `https://s3.example.com` as the endpoint and enable path-style addressing. Open `https://console.example.com` to sign in to the Console.
 
 When you replace a renewed certificate or key in `certs/`, validate and reload Nginx without interrupting active connections:
@@ -235,7 +225,6 @@ When you replace a renewed certificate or key in `certs/`, validate and reload N
 docker compose exec nginx nginx -t
 docker compose exec nginx nginx -s reload
 ```
-
 ## Multi-node upstreams
 
 For a distributed RustFS deployment, replace the single server in each upstream with all RustFS nodes:
@@ -259,7 +248,6 @@ upstream rustfs_console {
   keepalive 16;
 }
 ```
-
 The Console upstream uses client affinity because an in-progress OpenID Connect login stores its `state` on one RustFS node. Keep port `9000` open between RustFS nodes because internal node RPC uses the same listener.
 
 ## Next steps

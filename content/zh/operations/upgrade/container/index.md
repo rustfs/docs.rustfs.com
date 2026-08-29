@@ -28,17 +28,16 @@ curl -fsS http://localhost:9000/health/ready
 记录当前镜像，然后拉取目标版本：
 
 ```bash
+docker volume create rustfs-logs
 docker inspect --format '{{.Config.Image}}' rustfs
 docker pull rustfs/rustfs:<target-version>
 ```
-
 仅停止并删除容器。`rustfs-data` 卷会保持不变：
 
 ```bash
 docker stop rustfs
 docker rm rustfs
 ```
-
 使用原始配置和目标镜像重新创建容器：
 
 ```bash
@@ -48,17 +47,17 @@ docker run -d \
 	-p 9000:9000 \
 	-p 9001:9001 \
 	-v rustfs-data:/data \
+	-v rustfs-logs:/logs \
 	-e RUSTFS_ACCESS_KEY="<your-access-key>" \
 	-e RUSTFS_SECRET_KEY="<your-secret-key>" \
 	-e RUSTFS_ADDRESS=":9000" \
 	-e RUSTFS_CONSOLE_ADDRESS=":9001" \
 	-e RUSTFS_CONSOLE_ENABLE=true \
 	-e RUSTFS_OBS_LOGGER_LEVEL=error \
-	-e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
+	-e RUSTFS_OBS_LOG_DIRECTORY="/logs" \
 	rustfs/rustfs:<target-version> \
 	/data
 ```
-
 等待替换容器进入健康状态：
 
 ```bash
@@ -72,12 +71,12 @@ curl -fsS http://localhost:9000/health/ready
 Podman 工作流程执行相同的替换操作，并使用 [Podman 安装指南](/installation/container/podman)中的镜像名称。
 
 ```bash
+podman volume create rustfs-logs
 podman inspect --format '{{.Config.Image}}' rustfs
 podman pull docker.io/rustfs/rustfs:<target-version>
 podman stop rustfs
 podman rm rustfs
 ```
-
 使用原始配置和持久化卷重新创建容器：
 
 ```bash
@@ -86,17 +85,17 @@ podman run -d \
 	-p 9000:9000 \
 	-p 9001:9001 \
 	-v rustfs-data:/data \
+	-v rustfs-logs:/logs \
 	-e RUSTFS_ACCESS_KEY="<your-access-key>" \
 	-e RUSTFS_SECRET_KEY="<your-secret-key>" \
 	-e RUSTFS_ADDRESS=":9000" \
 	-e RUSTFS_CONSOLE_ADDRESS=":9001" \
 	-e RUSTFS_CONSOLE_ENABLE=true \
 	-e RUSTFS_OBS_LOGGER_LEVEL=error \
-	-e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
+	-e RUSTFS_OBS_LOG_DIRECTORY="/logs" \
 	docker.io/rustfs/rustfs:<target-version> \
 	/data
 ```
-
 继续之前验证替换结果：
 
 ```bash
@@ -113,7 +112,6 @@ curl -fsS http://localhost:9000/health/ready
 docker compose config > docker-compose.resolved.yaml
 docker compose images rustfs
 ```
-
 将 `rustfs` 服务更改为明确的目标镜像标签，同时保持其卷、环境变量、端口和命令不变：
 
 ```yaml title="docker-compose.yml"
@@ -121,7 +119,6 @@ services:
 	rustfs:
 		image: rustfs/rustfs:<target-version>
 ```
-
 验证文件，拉取目标镜像，并仅重新创建 RustFS 服务。`--no-deps` 会让可选的可观测性服务继续运行：
 
 ```bash
@@ -129,7 +126,6 @@ docker compose config --quiet
 docker compose pull rustfs
 docker compose up -d --no-deps rustfs
 ```
-
 检查服务和 RustFS 就绪端点：
 
 ```bash
@@ -137,7 +133,6 @@ docker compose ps rustfs
 docker compose logs --tail=100 rustfs
 curl -fsS http://localhost:9000/health/ready
 ```
-
 如果 RustFS 与 `observability` profile 一起启动，RustFS 服务仍使用相同的命令升级。请根据各组件的发行说明分别升级可观测性镜像。
 
 ## 升级多节点部署
@@ -157,7 +152,6 @@ docker compose pull rustfs
 docker compose up -d --no-deps rustfs
 curl -fsS http://localhost:9000/health/ready
 ```
-
 在多节点部署中，请一次回滚一个节点，并等待其就绪后再继续。
 
 ## 后续步骤

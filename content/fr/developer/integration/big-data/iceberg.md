@@ -33,14 +33,12 @@ Create a working directory:
 mkdir rustfs-iceberg
 cd rustfs-iceberg
 ```
-
 Create an environment file and replace both credential placeholders:
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
-
 Use dedicated credentials for the warehouse bucket. Do not commit `.env` to source control.
 
 Create the Spark catalog configuration:
@@ -57,7 +55,6 @@ spark.sql.catalog.demo.s3.path-style-access true
 spark.sql.defaultCatalog demo
 spark.sql.catalogImplementation in-memory
 ```
-
 Path-style access is required for this container-network endpoint. The hostname `rustfs` is resolvable only inside the Compose network; clients running on the host use `http://localhost:9000` instead.
 
 Create the Compose file:
@@ -74,7 +71,7 @@ services:
       RUSTFS_CONSOLE_ADDRESS: ":9001"
       RUSTFS_CONSOLE_ENABLE: "true"
       RUSTFS_OBS_LOGGER_LEVEL: error
-      RUSTFS_OBS_LOG_DIRECTORY: /var/log/rustfs/
+      RUSTFS_OBS_LOG_DIRECTORY: /logs
     volumes:
       - rustfs-data:/data
     ports:
@@ -145,7 +142,6 @@ networks:
 volumes:
   rustfs-data:
 ```
-
 The [`rc` image](https://github.com/rustfs/cli) provides the official RustFS command-line client. The initializer checks for `my-bucket` before creating it, so repeated starts do not delete existing warehouse data. The RustFS volume preserves warehouse objects across container recreation.
 
 :::warning[Image versions]
@@ -161,20 +157,17 @@ Resolve the Compose file before starting containers:
 ```bash
 docker compose config
 ```
-
 Start the services and wait for the bucket initializer to finish:
 
 ```bash
 docker compose up -d
 docker compose ps -a
 ```
-
 The `create-bucket` service should show an exit code of `0`. Check its logs if it does not complete:
 
 ```bash
 docker compose logs create-bucket
 ```
-
 Open the RustFS Console at `http://localhost:9001`. The REST catalog is available at `http://localhost:8181`, and the Spark notebook server is available at `http://localhost:8888`.
 
 ## 3. Create and query an Iceberg table
@@ -184,7 +177,6 @@ Start Spark SQL:
 ```bash
 docker compose exec spark-iceberg spark-sql
 ```
-
 Create a namespace and a partitioned table:
 
 ```sql
@@ -200,7 +192,6 @@ CREATE TABLE demo.nyc.taxis
 )
 PARTITIONED BY (vendor_id);
 ```
-
 Insert and query sample rows:
 
 ```sql
@@ -213,7 +204,6 @@ VALUES
 
 SELECT * FROM demo.nyc.taxis ORDER BY trip_id;
 ```
-
 The query should return four rows:
 
 ```text
@@ -222,7 +212,6 @@ The query should return four rows:
 2  1000373  0.9  9.01   N
 1  1000374  8.4  42.13  Y
 ```
-
 ## 4. Verify objects in RustFS
 
 List the warehouse from the bucket-initializer image:
@@ -231,7 +220,6 @@ List the warehouse from the bucket-initializer image:
 docker compose run --rm --entrypoint /bin/sh create-bucket -c \
   '/usr/bin/rc alias set rustfs http://rustfs:9000 "$RUSTFS_ACCESS_KEY" "$RUSTFS_SECRET_KEY" >/dev/null && /usr/bin/rc find rustfs/my-bucket/warehouse'
 ```
-
 The output should include Iceberg metadata and data objects below the `warehouse/nyc/taxis` prefix. You can also inspect the `my-bucket` bucket in the RustFS Console.
 
 ## 5. Stop or reset the stack
@@ -241,13 +229,11 @@ Stop the containers while keeping the RustFS data volume:
 ```bash
 docker compose down
 ```
-
 To delete the local warehouse and start from an empty RustFS volume, explicitly include `--volumes`:
 
 ```bash
 docker compose down --volumes
 ```
-
 ## Troubleshooting
 
 ### Spark cannot reach RustFS
@@ -263,7 +249,6 @@ Check that the credentials in `.env` match the RustFS credentials and that the `
 ```bash
 docker compose logs create-bucket rest
 ```
-
 The REST catalog property uses doubled underscores in `CATALOG_IO__IMPL` and `CATALOG_S3_PATH__STYLE__ACCESS`; the fixture converts them to the dotted and hyphenated Iceberg property names.
 
 ## Next steps

@@ -34,14 +34,12 @@ Create a working directory:
 mkdir rustfs-milvus
 cd rustfs-milvus
 ```
-
 Create an environment file and replace both credential placeholders:
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
-
 Use dedicated credentials for the Milvus bucket. Do not commit `.env` to source control.
 
 Create the Milvus storage override:
@@ -61,7 +59,6 @@ minio:
   region: us-east-1
   useVirtualHost: false
 ```
-
 `useVirtualHost: false` selects path-style S3 requests. The hostname `rustfs` resolves inside the Compose network; clients on the host use `http://localhost:9000`.
 
 Create the Compose file:
@@ -100,7 +97,7 @@ services:
       RUSTFS_CONSOLE_ADDRESS: ":9001"
       RUSTFS_CONSOLE_ENABLE: "true"
       RUSTFS_OBS_LOGGER_LEVEL: error
-      RUSTFS_OBS_LOG_DIRECTORY: /var/log/rustfs/
+      RUSTFS_OBS_LOG_DIRECTORY: /logs
     volumes:
       - rustfs-data:/data
     ports:
@@ -185,7 +182,6 @@ volumes:
   rustfs-data:
   milvus-data:
 ```
-
 The `create-bucket` service uses the official [`rc`](https://github.com/rustfs/cli) image and exits after ensuring that `my-bucket` exists. Named volumes preserve etcd metadata, RustFS objects, and Milvus local data when containers are recreated.
 
 :::warning[Protect local service ports]
@@ -201,20 +197,17 @@ Resolve the Compose file before starting containers:
 ```bash
 docker compose config
 ```
-
 Start the services:
 
 ```bash
 docker compose up -d
 docker compose ps -a
 ```
-
 The `create-bucket` service should exit with code `0`, and `etcd`, `rustfs`, and `standalone` should become healthy. Inspect logs if a service does not reach its expected state:
 
 ```bash
 docker compose logs create-bucket rustfs standalone
 ```
-
 Open these local interfaces:
 
 - RustFS Console: `http://localhost:9001`
@@ -232,7 +225,6 @@ python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install "pymilvus==2.6.0"
 ```
-
 Create a test script:
 
 ```python title="verify_milvus.py"
@@ -269,13 +261,11 @@ results = client.search(
 print(results)
 client.close()
 ```
-
 Run the script:
 
 ```bash
 python verify_milvus.py
 ```
-
 The result should rank the row with ID `1` first. Open Attu and confirm that the `rustfs_demo` collection contains three entities.
 
 ## 4. Verify Milvus objects in RustFS
@@ -286,7 +276,6 @@ Use the bucket-initializer image to list objects below the configured `milvus` r
 docker compose run --rm --entrypoint /bin/sh create-bucket -c \
   '/usr/bin/rc alias set rustfs http://rustfs:9000 "$RUSTFS_ACCESS_KEY" "$RUSTFS_SECRET_KEY" --region us-east-1 --bucket-lookup path >/dev/null && /usr/bin/rc find rustfs/my-bucket/milvus'
 ```
-
 The output should contain objects created by Milvus below the `milvus/` prefix. You can also open `my-bucket` in the RustFS Console.
 
 Milvus may buffer or compact data before every expected object appears. The successful insert, flush, query, and RustFS object listing together validate the integration path.
@@ -298,13 +287,11 @@ Stop the containers while retaining all named volumes:
 ```bash
 docker compose down
 ```
-
 To delete the local test data, including the Milvus bucket contents and etcd metadata, explicitly remove the volumes:
 
 ```bash
 docker compose down --volumes
 ```
-
 :::warning[Reset removes the test data]
 
 The `--volumes` option permanently deletes the named volumes used by this Compose project. Do not run it against data you need to retain.
@@ -322,7 +309,6 @@ Confirm that `useVirtualHost` remains `false` and that the credential values pas
 ```bash
 docker compose logs standalone rustfs
 ```
-
 ### The bucket initializer fails
 
 Check RustFS readiness and the initializer logs:
@@ -331,7 +317,6 @@ Check RustFS readiness and the initializer logs:
 curl -fsS http://localhost:9000/health/ready
 docker compose logs create-bucket
 ```
-
 Verify that `.env` contains non-empty credentials and that `docker compose config` resolves both variables.
 
 ### Milvus starts without existing data
@@ -346,7 +331,6 @@ The Attu container must use `standalone:19530`. A browser or host-side client us
 curl -fsS http://localhost:9091/healthz
 docker compose logs attu standalone
 ```
-
 ## Next steps
 
 - Review [S3 compatibility notes](/administration/protocols/s3) before enabling additional Milvus storage features.

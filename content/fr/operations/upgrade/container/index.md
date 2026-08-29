@@ -28,17 +28,16 @@ The following workflow matches the container name and named volume used in the [
 Record the current image, then pull the target version:
 
 ```bash
+docker volume create rustfs-logs
 docker inspect --format '{{.Config.Image}}' rustfs
 docker pull rustfs/rustfs:<target-version>
 ```
-
 Stop and remove only the container. The `rustfs-data` volume remains intact:
 
 ```bash
 docker stop rustfs
 docker rm rustfs
 ```
-
 Recreate the container with the original configuration and the target image:
 
 ```bash
@@ -48,17 +47,17 @@ docker run -d \
 	-p 9000:9000 \
 	-p 9001:9001 \
 	-v rustfs-data:/data \
+	-v rustfs-logs:/logs \
 	-e RUSTFS_ACCESS_KEY="<your-access-key>" \
 	-e RUSTFS_SECRET_KEY="<your-secret-key>" \
 	-e RUSTFS_ADDRESS=":9000" \
 	-e RUSTFS_CONSOLE_ADDRESS=":9001" \
 	-e RUSTFS_CONSOLE_ENABLE=true \
 	-e RUSTFS_OBS_LOGGER_LEVEL=error \
-	-e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
+	-e RUSTFS_OBS_LOG_DIRECTORY="/logs" \
 	rustfs/rustfs:<target-version> \
 	/data
 ```
-
 Wait for the replacement container to become healthy:
 
 ```bash
@@ -72,12 +71,12 @@ curl -fsS http://localhost:9000/health/ready
 The Podman workflow is the same replacement operation, using the image name from the [Podman installation guide](/installation/container/podman).
 
 ```bash
+podman volume create rustfs-logs
 podman inspect --format '{{.Config.Image}}' rustfs
 podman pull docker.io/rustfs/rustfs:<target-version>
 podman stop rustfs
 podman rm rustfs
 ```
-
 Recreate the container with the original configuration and persistent volume:
 
 ```bash
@@ -86,17 +85,17 @@ podman run -d \
 	-p 9000:9000 \
 	-p 9001:9001 \
 	-v rustfs-data:/data \
+	-v rustfs-logs:/logs \
 	-e RUSTFS_ACCESS_KEY="<your-access-key>" \
 	-e RUSTFS_SECRET_KEY="<your-secret-key>" \
 	-e RUSTFS_ADDRESS=":9000" \
 	-e RUSTFS_CONSOLE_ADDRESS=":9001" \
 	-e RUSTFS_CONSOLE_ENABLE=true \
 	-e RUSTFS_OBS_LOGGER_LEVEL=error \
-	-e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
+	-e RUSTFS_OBS_LOG_DIRECTORY="/logs" \
 	docker.io/rustfs/rustfs:<target-version> \
 	/data
 ```
-
 Verify the replacement before continuing:
 
 ```bash
@@ -113,7 +112,6 @@ Run Compose commands from the directory containing the deployment's `docker-comp
 docker compose config > docker-compose.resolved.yaml
 docker compose images rustfs
 ```
-
 Change the `rustfs` service to an explicit target image tag while leaving its volumes, environment, ports, and command unchanged:
 
 ```yaml title="docker-compose.yml"
@@ -121,7 +119,6 @@ services:
 	rustfs:
 		image: rustfs/rustfs:<target-version>
 ```
-
 Validate the file, pull the target image, and recreate only the RustFS service. `--no-deps` leaves optional observability services running:
 
 ```bash
@@ -129,7 +126,6 @@ docker compose config --quiet
 docker compose pull rustfs
 docker compose up -d --no-deps rustfs
 ```
-
 Check the service and the RustFS readiness endpoint:
 
 ```bash
@@ -137,7 +133,6 @@ docker compose ps rustfs
 docker compose logs --tail=100 rustfs
 curl -fsS http://localhost:9000/health/ready
 ```
-
 If you started RustFS together with the `observability` profile, the RustFS service still upgrades with the same commands. Upgrade observability images separately according to each component's release notes.
 
 ## Upgrade a multi-node deployment
@@ -157,7 +152,6 @@ docker compose pull rustfs
 docker compose up -d --no-deps rustfs
 curl -fsS http://localhost:9000/health/ready
 ```
-
 In a multi-node deployment, roll back one node at a time and wait for readiness before continuing.
 
 ## Next steps

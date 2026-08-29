@@ -12,14 +12,12 @@ RustFS (RUSTFS_OBS_ENDPOINT) --OTLP--> OpenTelemetry Collector --> Prometheus --
                                                               \--> Loki (logs)
                                                               \--> Tempo / Jaeger (traces)
 ```
-
 使用以下配置将 RustFS 指向 Collector：
 
 ```bash
 # OTLP over HTTP (the Collector's default HTTP receiver port is 4318; gRPC is 4317)
 RUSTFS_OBS_ENDPOINT=http://otel-collector:4318
 ```
-
 相关环境变量（均在服务器配置中定义）：
 
 | 变量 | 用途 |
@@ -53,7 +51,6 @@ service:
       receivers: [otlp]
       exporters: [prometheus]
 ```
-
 随后 Prometheus 抓取 Collector，而不是 RustFS：
 
 ```yaml
@@ -66,7 +63,6 @@ scrape_configs:
     static_configs:
       - targets: ["otel-collector:8888"]   # Collector self-metrics
 ```
-
 :::note
 
 如果 Prometheus 中没有 `rustfs_*` 序列，请依次检查：是否在每个节点上设置了 `RUSTFS_OBS_ENDPOINT`、节点能否访问 Collector，以及 Prometheus 是否正在抓取 Collector 的 `8889` 导出端口。
@@ -219,6 +215,7 @@ RUSTFS_ADDRESS=":9000"
 RUSTFS_CONSOLE_ADDRESS=":9001"
 RUSTFS_CONSOLE_ENABLE=true
 RUSTFS_OBS_LOGGER_LEVEL=error
+# Linux packages use /var/log/rustfs/; the container image uses /logs.
 RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
 RUSTFS_OBS_ENDPOINT=http://otel-collector:4318
 ```

@@ -22,12 +22,7 @@ This article is based on RustFS official Linux binary packages, packaging RustFS
 3. **Directory Permissions**
 
  * The RustFS container runs as non-root user `rustfs` (`10001:10001`). The image owns `/data` and `/logs`, and the image default for `RUSTFS_OBS_LOG_DIRECTORY` is `/logs`. Do not set that variable to `/var/log/rustfs/` — the container user cannot create that path.
- * If you bind-mount host directories with `-v`, every mounted path (data, logs, and TLS certificates) must be owned by `10001:10001`:
-
-```bash
-sudo mkdir -p /mnt/rustfs/data /mnt/rustfs/logs
-sudo chown -R 10001:10001 /mnt/rustfs/data /mnt/rustfs/logs
-```
+ * If you bind-mount host directories with `-v`, every mounted path (data, logs, and TLS certificates) must be owned by `10001:10001`. Run `sudo mkdir -p /mnt/rustfs/data /mnt/rustfs/logs` and `sudo chown -R 10001:10001 /mnt/rustfs/data /mnt/rustfs/logs` before starting the container.
 
 ---
 
@@ -172,11 +167,7 @@ docker run -d \
 
 3. Environment variables and command line parameters can be mixed, but command line parameters have higher priority
 
-4. If [using TLS](../../integration/tls-configured.md), additional certificate path mounting is needed. The certificate directory must also be readable by UID `10001`:
-
-   ```bash
-   sudo chown -R 10001:10001 /path/to/certs
-   ```
+4. If [using TLS](../../integration/tls-configured.md), additional certificate path mounting is needed. The certificate directory must also be readable by UID `10001` (`sudo chown -R 10001:10001 /path/to/certs`):
 
    ```bash
    -v /path/to/certs:/certs \

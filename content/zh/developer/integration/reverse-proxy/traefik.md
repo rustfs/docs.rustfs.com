@@ -28,7 +28,6 @@ cd rustfs-traefik
 touch acme.json
 chmod 600 acme.json
 ```
-
 ## 2. 设置部署变量
 
 创建环境文件并替换每个值：
@@ -40,7 +39,6 @@ ACME_EMAIL=admin@example.com
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
-
 请使用能够接收证书到期通知的电子邮件地址。不要将 `.env` 或 `acme.json` 提交到源代码管理系统。
 
 ## 3. 创建 Compose 文件
@@ -86,7 +84,7 @@ services:
       RUSTFS_ADDRESS: ":9000"
       RUSTFS_CONSOLE_ADDRESS: ":9001"
       RUSTFS_OBS_LOGGER_LEVEL: error
-      RUSTFS_OBS_LOG_DIRECTORY: /var/log/rustfs/
+      RUSTFS_OBS_LOG_DIRECTORY: /logs
     expose:
       - "9000"
       - "9001"
@@ -125,7 +123,6 @@ networks:
   rustfs:
     name: rustfs
 ```
-
 两个路由器使用不同的主机规则和后端端口。RustFS 不会在 Docker 主机上发布端口 `9000` 或 `9001`，Traefik Dashboard 也不会对外公开。
 
 :::note[Docker 套接字访问]
@@ -141,20 +138,17 @@ Traefik 通过只读 Docker 套接字挂载读取容器标签。任何能够修�
 ```bash
 docker compose config
 ```
-
 启动两个服务：
 
 ```bash
 docker compose up -d
 docker compose ps
 ```
-
 在 Traefik 完成 ACME 质询并创建两张证书期间跟踪其日志：
 
 ```bash
 docker compose logs --follow traefik
 ```
-
 如果证书签发失败，请确认两条 DNS 记录均解析到此主机，并且端口 `80` 和 `443` 可从互联网访问。Let's Encrypt 存在速率限制，因此请先修正 DNS 和防火墙问题，再反复重新创建部署。
 
 ## 5. 验证两个端点
@@ -165,7 +159,6 @@ docker compose logs --follow traefik
 curl --fail https://s3.example.com/health/ready
 curl --fail https://console.example.com/rustfs/console/health
 ```
-
 将 S3 客户端端点配置为 `https://s3.example.com`，并启用路径样式寻址。打开 `https://console.example.com` 登录控制台。
 
 ## 多节点服务
@@ -181,7 +174,6 @@ services:
     volumes:
       - ./dynamic.yaml:/etc/traefik/dynamic.yaml:ro
 ```
-
 创建包含每个 RustFS 节点的动态配置：
 
 ```yaml title="dynamic.yaml"
@@ -233,7 +225,6 @@ http:
           - url: http://node3.example.net:9001
           - url: http://node4.example.net:9001
 ```
-
 使用 OpenID Connect 时，请为控制台服务配置粘性会话。正在进行的登录会将其 `state` 存储在一个 RustFS 节点上，回调必须返回该节点。请保持 RustFS 节点之间的端口 `9000` 直接开放，因为内部节点 RPC 使用同一监听器。
 
 ## 后续步骤

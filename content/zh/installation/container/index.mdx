@@ -32,7 +32,6 @@ RustFS 是高性能、兼容 S3 的开源分布式对象存储系统。在单节
 ```bash
 docker pull rustfs/rustfs
 ```
-
 ---
 
 
@@ -47,10 +46,10 @@ docker pull rustfs/rustfs
   -p 9000:9000 \
   -p 9001:9001 \
   -v /mnt/rustfs/data:/data \
+  -v /mnt/rustfs/logs:/logs \
   rustfs/rustfs:latest \
   /data
 ```
-
 参数说明：
 
 * `-p 9000:9000`：将主机端口 9000 映射到容器
@@ -67,27 +66,6 @@ docker pull rustfs/rustfs
 <Tabs items={["Environment variables", "Command-line flags"]}>
   <Tab value="Environment variables" id="docker-env-config">
 
-```bash {7,8}
-# Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
-docker run -d \
-  --name rustfs \
-  -p 9000:9000 \
-  -p 9001:9001 \
-  -v /mnt/rustfs/data:/data \
-  -e RUSTFS_ACCESS_KEY="<your-access-key>" \
-  -e RUSTFS_SECRET_KEY="<your-secret-key>" \
-  -e RUSTFS_ADDRESS=":9000" \
-  -e RUSTFS_CONSOLE_ADDRESS=":9001" \
-  -e RUSTFS_CONSOLE_ENABLE=true \
-  -e RUSTFS_OBS_LOGGER_LEVEL=error \
-  -e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
-  rustfs/rustfs:latest \
-  /data
-```
-
-  </Tab>
-  <Tab value="Command-line flags" id="docker-cli-config">
-
 ```bash {8,9}
 # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
 docker run -d \
@@ -95,6 +73,28 @@ docker run -d \
   -p 9000:9000 \
   -p 9001:9001 \
   -v /mnt/rustfs/data:/data \
+  -v /mnt/rustfs/logs:/logs \
+  -e RUSTFS_ACCESS_KEY="<your-access-key>" \
+  -e RUSTFS_SECRET_KEY="<your-secret-key>" \
+  -e RUSTFS_ADDRESS=":9000" \
+  -e RUSTFS_CONSOLE_ADDRESS=":9001" \
+  -e RUSTFS_CONSOLE_ENABLE=true \
+  -e RUSTFS_OBS_LOGGER_LEVEL=error \
+  -e RUSTFS_OBS_LOG_DIRECTORY="/logs" \
+  rustfs/rustfs:latest \
+  /data
+```
+  </Tab>
+  <Tab value="Command-line flags" id="docker-cli-config">
+
+```bash {9,10}
+# Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
+docker run -d \
+  --name rustfs \
+  -p 9000:9000 \
+  -p 9001:9001 \
+  -v /mnt/rustfs/data:/data \
+  -v /mnt/rustfs/logs:/logs \
   rustfs/rustfs:latest \
   --access-key "<your-access-key>" \
   --secret-key "<your-secret-key>" \
@@ -102,7 +102,6 @@ docker run -d \
   --console-enable \
   /data
 ```
-
   </Tab>
 </Tabs>
 
@@ -114,6 +113,7 @@ docker run -d \
      -p 9000:9000 \
      -p 9001:9001 \
      -v /mnt/data:/data \
+     -v /mnt/logs:/logs \
      rustfs/rustfs:latest \
      /data
    ```
@@ -124,11 +124,12 @@ docker run -d \
      -p 9000:9000 \
      -p 9001:9001 \
      -v /mnt/data:/data \
+     -v /mnt/logs:/logs \
     -e RUSTFS_ADDRESS=":9000" \
     -e RUSTFS_CONSOLE_ADDRESS=":9001" \
     -e RUSTFS_CONSOLE_ENABLE=true \
     -e RUSTFS_OBS_LOGGER_LEVEL=error \
-    -e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
+    -e RUSTFS_OBS_LOG_DIRECTORY="/logs" \
      rustfs/rustfs:latest \
      --console-enable \
      /data
@@ -141,6 +142,7 @@ docker run -d \
      -p 9000:9000 \
      -p 9001:9001 \
      -v /mnt/data:/data \
+     -v /mnt/logs:/logs \
      -e RUSTFS_ACCESS_KEY="<your-access-key>" \
      -e RUSTFS_SECRET_KEY="<your-secret-key>" \
      rustfs/rustfs:latest \
@@ -173,13 +175,11 @@ RustFS 官方提供 Docker Compose 安装方式。[`docker-compose.yml`](https:/
 ```bash
 git clone https://github.com/rustfs/rustfs.git
 ```
-
 在根目录下运行命令：
 
 ```bash
 docker compose --profile observability up -d
 ```
-
 提供必要的权限。需要使用初始化容器，通过 `depends_on` 关键字为 rustfs 授予正确的访问权限。以下示例将 `rustfs_perms` 服务添加到 `docker-compose.yml` 来处理权限。为了确保日志持久化且可访问，将主机日志目录映射到容器的 `/var/log/rustfs/` 路径：
 
 ```yaml title="docker-compose.yml"
@@ -199,17 +199,16 @@ docker compose --profile observability up -d
           condition: service_completed_successfully
       volumes:
         - /path/to_host_directory/volumes/data:/data
-        - /path/to_host_directory/volumes/logs:/var/log/rustfs/
+        - /path/to_host_directory/volumes/logs:/logs
       environment:
         - RUSTFS_ADDRESS=":9000"
         - RUSTFS_CONSOLE_ADDRESS=":9001"
         - RUSTFS_CONSOLE_ENABLE=true
         - RUSTFS_OBS_LOGGER_LEVEL=error
-        - RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
+        - RUSTFS_OBS_LOG_DIRECTORY="/logs"
     
       # ... other configurations
 ```
-
 启动后的容器如下：
 
 ```text
@@ -220,13 +219,11 @@ e3f4fc4a83a2   grafana/grafana:latest                            "/run.sh"      
 e7db806b2d6f   jaegertracing/all-in-one:latest                   "/go/bin/all-in-one-…"   7 seconds ago   Up 5 seconds                      4317-4318/tcp, 9411/tcp, 0.0.0.0:14250->14250/tcp, :::14250->14250/tcp, 14268/tcp, 0.0.0.0:16686->16686/tcp, :::16686->16686/tcp          jaeger
 1897830a2f1e   otel/opentelemetry-collector-contrib:latest       "/otelcol-contrib --…"   7 seconds ago   Up 5 seconds                      0.0.0.0:4317-4318->4317-4318/tcp, :::4317-4318->4317-4318/tcp, 0.0.0.0:8888-8889->8888-8889/tcp, :::8888-8889->8888-8889/tcp, 55679/tcp   otel-collector
 ```
-
 如果只想安装 RustFS，而不安装 Grafana、Prometheus 和其他可观测性服务，请仅启动 `rustfs` 服务（compose 文件将 collector 依赖项标记为可选）：
 
 ```bash
 docker compose -f docker-compose.yml up -d rustfs
 ```
-
 这样只会安装并启动 `rustfs-server` 服务，即 rustfs 容器：
 
 ```text
@@ -234,7 +231,6 @@ docker ps
 CONTAINER ID   IMAGE                                             COMMAND                  CREATED         STATUS                           PORTS                                                           NAMES
 e07121ecdd39   rustfs/rustfs:latest                              "/entrypoint.sh rust…"   2 seconds ago   Up 1 second (health: starting)   0.0.0.0:9000-9001->9000-9001/tcp, :::9000-9001->9000-9001/tcp   rustfs-server
 ```
-
 无论只启动 `rustfs-server` 还是同时启动可观测性服务，S3 API 都位于 `http://localhost:9000`，RustFS 控制台位于 `http://localhost:9001`。请在浏览器中打开控制台，使用上面配置的访问密钥和秘密密钥（`<your-access-key>` / `<your-secret-key>` 占位符）登录。例如使用 `openssl rand -base64 24` 生成强密钥，绝不要将占位符值用于生产环境。
 
 :::warning[立即设置容器凭证]
@@ -278,17 +274,17 @@ docker run -d \
   --name rustfs \
   --network host \
   -v /mnt/rustfs/data:/data \
+  -v /mnt/rustfs/logs:/logs \
   -e RUSTFS_ACCESS_KEY="<your-access-key>" \
   -e RUSTFS_SECRET_KEY="<your-secret-key>" \
   -e RUSTFS_ADDRESS=":9000" \
   -e RUSTFS_CONSOLE_ADDRESS=":9001" \
   -e RUSTFS_CONSOLE_ENABLE=true \
   -e RUSTFS_OBS_LOGGER_LEVEL=error \
-  -e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
+  -e RUSTFS_OBS_LOG_DIRECTORY="/logs" \
   -e RUSTFS_VOLUMES="http://node{1...4}:9000/data/rustfs{0...3}" \
   rustfs/rustfs:latest
 ```
-
 在**每个**节点的 `/etc/hosts` 中添加条目：
 ```ini title="/etc/hosts"
 192.168.1.1 node1
@@ -296,7 +292,6 @@ docker run -d \
 192.168.1.3 node3
 192.168.1.4 node4
 ```
-
 ## 6. 其他建议
 
 1. 生产环境建议：

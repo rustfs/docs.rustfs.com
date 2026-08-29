@@ -17,6 +17,11 @@ podman pull docker.io/rustfs/rustfs:latest
 
 ```bash
 podman volume create rustfs-data
+podman volume create rustfs-logs
+
+# Bind-mount alternative on SELinux hosts (`:U` sets ownership; `:Z` sets the SELinux label):
+# mkdir -p data logs
+# podman run ... -v "$(pwd)/data":/data:Z,U -v "$(pwd)/logs":/logs:Z,U ...
 ```
 
 ## 3. 启动 RustFS
@@ -29,13 +34,14 @@ podman run -d \
   -p 9000:9000 \
   -p 9001:9001 \
   -v rustfs-data:/data \
+  -v rustfs-logs:/logs \
   -e RUSTFS_ACCESS_KEY="<your-access-key>" \
   -e RUSTFS_SECRET_KEY="<your-secret-key>" \
   -e RUSTFS_ADDRESS=":9000" \
   -e RUSTFS_CONSOLE_ADDRESS=":9001" \
   -e RUSTFS_CONSOLE_ENABLE=true \
   -e RUSTFS_OBS_LOGGER_LEVEL=error \
-  -e RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/" \
+  -e RUSTFS_OBS_LOG_DIRECTORY="/logs" \
   docker.io/rustfs/rustfs:latest \
   /data
 ```
@@ -54,7 +60,6 @@ podman run -d \
 podman ps --filter name=rustfs
 curl --fail http://localhost:9000/health
 ```
-
 S3 API 位于 `http://localhost:9000`，控制台位于 `http://localhost:9001`。
 
 ## 后续步骤

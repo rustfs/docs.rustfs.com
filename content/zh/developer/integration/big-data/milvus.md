@@ -34,14 +34,12 @@ Milvus 将服务元数据存储在 etcd 中，并将向量数据、索引和相�
 mkdir rustfs-milvus
 cd rustfs-milvus
 ```
-
 创建环境文件并替换两个凭证占位符：
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
-
 请为 Milvus 存储桶使用专用凭证。不要将 `.env` 提交到源代码管理系统。
 
 创建 Milvus 存储覆盖配置：
@@ -61,7 +59,6 @@ minio:
   region: us-east-1
   useVirtualHost: false
 ```
-
 `useVirtualHost: false` 会选择路径样式 S3 请求。主机名 `rustfs` 可在 Compose 网络内部解析；主机上的客户端使用 `http://localhost:9000`。
 
 创建 Compose 文件：
@@ -100,7 +97,7 @@ services:
       RUSTFS_CONSOLE_ADDRESS: ":9001"
       RUSTFS_CONSOLE_ENABLE: "true"
       RUSTFS_OBS_LOGGER_LEVEL: error
-      RUSTFS_OBS_LOG_DIRECTORY: /var/log/rustfs/
+      RUSTFS_OBS_LOG_DIRECTORY: /logs
     volumes:
       - rustfs-data:/data
     ports:
@@ -185,7 +182,6 @@ volumes:
   rustfs-data:
   milvus-data:
 ```
-
 `create-bucket` 服务使用官方 [`rc`](https://github.com/rustfs/cli) 镜像，并在确保 `my-bucket` 存在后退出。命名卷会在容器重新创建时保留 etcd 元数据、RustFS 对象和 Milvus 本地数据。
 
 :::warning[保护本地服务端口]
@@ -201,20 +197,17 @@ volumes:
 ```bash
 docker compose config
 ```
-
 启动服务：
 
 ```bash
 docker compose up -d
 docker compose ps -a
 ```
-
 `create-bucket` 服务应以代码 `0` 退出，`etcd`、`rustfs` 和 `standalone` 应进入健康状态。如果服务未达到预期状态，请检查日志：
 
 ```bash
 docker compose logs create-bucket rustfs standalone
 ```
-
 打开以下本地界面：
 
 - RustFS 控制台：`http://localhost:9001`
@@ -232,7 +225,6 @@ python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install "pymilvus==2.6.0"
 ```
-
 创建测试脚本：
 
 ```python title="verify_milvus.py"
@@ -269,13 +261,11 @@ results = client.search(
 print(results)
 client.close()
 ```
-
 运行脚本：
 
 ```bash
 python verify_milvus.py
 ```
-
 结果应将 ID 为 `1` 的数据行排在第一位。打开 Attu 并确认 `rustfs_demo` collection 包含三个实体。
 
 ## 4. 验证 RustFS 中的 Milvus 对象
@@ -286,7 +276,6 @@ python verify_milvus.py
 docker compose run --rm --entrypoint /bin/sh create-bucket -c \
   '/usr/bin/rc alias set rustfs http://rustfs:9000 "$RUSTFS_ACCESS_KEY" "$RUSTFS_SECRET_KEY" --region us-east-1 --bucket-lookup path >/dev/null && /usr/bin/rc find rustfs/my-bucket/milvus'
 ```
-
 输出应包含 Milvus 在 `milvus/` 前缀下创建的对象。你也可以在 RustFS 控制台中打开 `my-bucket`。
 
 Milvus 可能会在每个预期对象出现前缓冲或压缩数据。插入、刷新和查询成功，再加上 RustFS 对象列表，共同验证了集成路径。
@@ -298,13 +287,11 @@ Milvus 可能会在每个预期对象出现前缓冲或压缩数据。插入、�
 ```bash
 docker compose down
 ```
-
 要删除本地测试数据（包括 Milvus 存储桶内容和 etcd 元数据），请显式移除卷：
 
 ```bash
 docker compose down --volumes
 ```
-
 :::warning[重置会删除测试数据]
 
 `--volumes` 选项会永久删除此 Compose 项目使用的命名卷。请勿针对需要保留的数据运行此命令。
@@ -322,7 +309,6 @@ docker compose down --volumes
 ```bash
 docker compose logs standalone rustfs
 ```
-
 ### 存储桶初始化程序失败
 
 检查 RustFS 就绪状态和初始化程序日志：
@@ -331,7 +317,6 @@ docker compose logs standalone rustfs
 curl -fsS http://localhost:9000/health/ready
 docker compose logs create-bucket
 ```
-
 确认 `.env` 包含非空凭证，并且 `docker compose config` 能够解析这两个变量。
 
 ### Milvus 启动后没有现有数据
@@ -346,7 +331,6 @@ Attu 容器必须使用 `standalone:19530`。浏览器或主机端客户端应�
 curl -fsS http://localhost:9091/healthz
 docker compose logs attu standalone
 ```
-
 ## 后续步骤
 
 - 在启用其他 Milvus 存储功能前，请查看 [S3 兼容性说明](/administration/protocols/s3)。

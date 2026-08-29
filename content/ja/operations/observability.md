@@ -12,14 +12,12 @@ RustFS (RUSTFS_OBS_ENDPOINT) --OTLP--> OpenTelemetry Collector --> Prometheus --
                                                               \--> Loki (logs)
                                                               \--> Tempo / Jaeger (traces)
 ```
-
 Point RustFS at the Collector with:
 
 ```bash
 # OTLP over HTTP (the Collector's default HTTP receiver port is 4318; gRPC is 4317)
 RUSTFS_OBS_ENDPOINT=http://otel-collector:4318
 ```
-
 Related environment variables (all defined in the server configuration):
 
 | Variable | Purpose |
@@ -53,7 +51,6 @@ service:
       receivers: [otlp]
       exporters: [prometheus]
 ```
-
 Prometheus then scrapes the Collector, not RustFS:
 
 ```yaml
@@ -66,7 +63,6 @@ scrape_configs:
     static_configs:
       - targets: ["otel-collector:8888"]   # Collector self-metrics
 ```
-
 :::note
 
 If Prometheus shows no `rustfs_*` series, check the chain in order: is `RUSTFS_OBS_ENDPOINT` set on every node, is the Collector reachable from the nodes, and is Prometheus scraping the Collector's `8889` exporter port.
@@ -219,6 +215,7 @@ RUSTFS_ADDRESS=":9000"
 RUSTFS_CONSOLE_ADDRESS=":9001"
 RUSTFS_CONSOLE_ENABLE=true
 RUSTFS_OBS_LOGGER_LEVEL=error
+# Linux packages use /var/log/rustfs/; the container image uses /logs.
 RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
 RUSTFS_OBS_ENDPOINT=http://otel-collector:4318
 ```

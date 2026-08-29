@@ -23,15 +23,12 @@ Do not remove the named volume or host directory mounted at `/data` (or `/logs`,
 
 ## Upgrade a Docker container
 
-The following workflow matches the container name and named volumes used in the [Docker installation guide](/installation/container/docker). If your deployment uses different ports, environment variables, mounts, or startup arguments, keep those settings unchanged in the replacement command. If the original container did not mount `/logs`, create the log volume before recreating it:
-
-```bash
-docker volume create rustfs-logs
-```
+The following workflow matches the container name and named volumes used in the [Docker installation guide](/installation/container/docker). If your deployment uses different ports, environment variables, mounts, or startup arguments, keep those settings unchanged in the replacement command. If the original container did not mount `/logs`, include `docker volume create rustfs-logs` before recreating the container.
 
 Record the current image, then pull the target version:
 
 ```bash
+docker volume create rustfs-logs
 docker inspect --format '{{.Config.Image}}' rustfs
 docker pull rustfs/rustfs:<target-version>
 ```
@@ -74,13 +71,10 @@ curl -fsS http://localhost:9000/health/ready
 
 ## Upgrade a Podman container
 
-The Podman workflow is the same replacement operation, using the image name from the [Podman installation guide](/installation/container/podman). If the original container did not mount `/logs`, create the log volume first:
+The Podman workflow is the same replacement operation, using the image name from the [Podman installation guide](/installation/container/podman). If the original container did not mount `/logs`, include `podman volume create rustfs-logs` before recreating the container.
 
 ```bash
 podman volume create rustfs-logs
-```
-
-```bash
 podman inspect --format '{{.Config.Image}}' rustfs
 podman pull docker.io/rustfs/rustfs:<target-version>
 podman stop rustfs
