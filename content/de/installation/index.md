@@ -18,7 +18,7 @@ After installation, set unique values for `RUSTFS_ACCESS_KEY` and `RUSTFS_SECRET
 
 | Your goal | Recommended path | Guide |
 | - | - | - |
-| Try RustFS on a local machine | One-command install script, or a container | [Linux Quick Start](./linux/quick-start.md) · [Container](./container/index.mdx) |
+| Try RustFS on a local machine | One-command install script, or a container | [Linux Quick Start](./linux/quick-start.md) · [Container](./container/index.md) |
 | Single-server production | SNSD (one disk) or SNMD (multiple disks) | [Installing RustFS on Linux](./linux/index.md) |
 | Multi-server production cluster | MNMD, after completing the production checklists | [Multiple Node Multiple Disk](./linux/multiple-node-multiple-disk.md) · [Checklists](./requirement/checklists/index.md) |
 | Kubernetes / cloud-native | Container orchestration deployment | [Cloud Native](./cloud-native/index.md) |
