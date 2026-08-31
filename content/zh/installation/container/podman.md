@@ -19,6 +19,16 @@ podman pull docker.io/rustfs/rustfs:latest
 podman volume create rustfs-data
 ```
 
+:::note[绑定挂载主机目录]
+
+上面的命名卷无需额外设置。如果改用主机目录挂载，请注意容器以非 root 用户 `rustfs`（ID `10001`）运行。请确保主机目录的所有者为 `10001`，否则会遇到权限拒绝错误：
+
+```bash
+chown -R 10001:10001 /path/to/host_directory
+```
+
+:::
+
 ## 3. 启动 RustFS
 
 运行容器前，请替换凭证占位符：

@@ -88,5 +88,5 @@ The quick install runs RustFS in **Single Node Single Disk (SNSD)** mode — zer
   - [Single Node Single Disk (SNSD)](./single-node-single-disk.md) — dev and small workloads
   - [Single Node Multiple Disk (SNMD)](./single-node-multiple-disk.md) — disk-level fault tolerance on one machine
   - [Multiple Node Multiple Disk (MNMD)](./multiple-node-multiple-disk.md) — production-grade availability and scale, with the [pre-installation checklists](../requirement/checklists/index.md)
-- **Prefer containers?** — [Install with a container](../container/index.mdx)
+- **Prefer containers?** — [Install with a container](../container/index.md)
 - **Connect your application** — [SDKs and examples](../../developer/sdk/index.md)

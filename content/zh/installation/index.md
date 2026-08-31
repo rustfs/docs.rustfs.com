@@ -18,7 +18,7 @@ RustFS 是使用 Rust 编写并采用 Apache 2.0 许可证发布的分布式对�
 
 | 目标 | 推荐方式 | 指南 |
 | - | - | - |
-| 在本地计算机上试用 RustFS | 一键安装脚本或容器 | [Linux 快速入门](./linux/quick-start.md) · [容器](./container/index.mdx) |
+| 在本地计算机上试用 RustFS | 一键安装脚本或容器 | [Linux 快速入门](./linux/quick-start.md) · [容器](./container/index.md) |
 | 单服务器生产环境 | SNSD（单磁盘）或 SNMD（多磁盘） | [在 Linux 上安装 RustFS](./linux/index.md) |
 | 多服务器生产集群 | 完成生产检查清单后使用 MNMD | [多节点多磁盘](./linux/multiple-node-multiple-disk.md) · [检查清单](./requirement/checklists/index.md) |
 | Kubernetes/云原生 | 容器编排部署 | [云原生](./cloud-native/index.md) |

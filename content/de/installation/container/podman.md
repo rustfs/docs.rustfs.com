@@ -19,6 +19,16 @@ Create a named volume so object data remains available when you replace the cont
 podman volume create rustfs-data
 ```
 
+:::note[Bind-mounting a host directory]
+
+The named volume above needs no extra setup. If you bind-mount a host directory instead, keep in mind that the container runs as non-root user `rustfs` with id `10001`. Make the host directory owned by `10001`, otherwise you will encounter permission denied errors:
+
+```bash
+chown -R 10001:10001 /path/to/host_directory
+```
+
+:::
+
 ## 3. Start RustFS
 
 Replace the credential placeholders before running the container:

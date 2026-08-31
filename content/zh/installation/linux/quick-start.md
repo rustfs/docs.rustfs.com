@@ -88,5 +88,5 @@ rc object list rustfs/my-bucket
   - [单节点单磁盘（SNSD）](./single-node-single-disk.md)：开发和小型工作负载
   - [单节点多磁盘（SNMD）](./single-node-multiple-disk.md)：单台计算机上的磁盘级容错
   - [多节点多磁盘（MNMD）](./multiple-node-multiple-disk.md)：生产级可用性和扩展能力，并完成[安装前检查清单](../requirement/checklists/index.md)
-- **偏好使用容器？** 请[使用容器安装](../container/index.mdx)
+- **偏好使用容器？** 请[使用容器安装](../container/index.md)
 - **连接应用程序**：参阅 [SDK 和示例](../../developer/sdk/index.md)
