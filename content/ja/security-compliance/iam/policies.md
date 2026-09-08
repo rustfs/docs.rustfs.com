@@ -179,6 +179,6 @@ RustFS defines five built-in policies that can be attached without creating them
 
 :::warning
 
-The built-in `readonly` policy is intentionally minimal — it does not include `s3:ListBucket` or `s3:ListAllMyBuckets`. Users with only `readonly` can fetch objects by key but cannot browse buckets. Create a custom policy if listing is needed.
+組み込みの `readonly` ポリシーには、`s3:ListBucket` と `s3:ListAllMyBuckets` は含まれません。このポリシーの `s3:GetBucketLocation` 権限により RustFS でバケット名を確認でき、`s3:GetObject` 権限により既知のオブジェクトキーを指定してオブジェクトを取得できます。バケット内のオブジェクトを一覧表示するには、そのバケットに対する `s3:ListBucket` 権限を付与するカスタムポリシーを追加します。
 
 :::
