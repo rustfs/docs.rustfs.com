@@ -3,7 +3,7 @@ title: "SSE-KMS"
 description: "使用本地或 HashiCorp Vault KMS 后端为 RustFS 配置 SSE-KMS。"
 ---
 
-RustFS 密钥管理服务（KMS）为 [SSE-S3](./sse-s.md) 和 SSE-KMS 生成并封装每对象数据加密密钥。本指南介绍如何在服务器启动时使用本地密钥存储、Vault KV v2 加 Transit 或 Vault Transit 配置 SSE-KMS。
+RustFS 密钥管理服务（KMS）为 [SSE-S3](./sse-s.md) 和 SSE-KMS 生成并封装每对象数据加密密钥。本指南介绍如何在服务器启动时使用本地密钥存储、Vault KV v2 或 Vault Transit 配置 SSE-KMS。
 
 ## 要求
 
@@ -25,7 +25,7 @@ RustFS 不会在配置的后端之外存储可恢复的 KMS 主密钥副本。�
 | 后端 | `RUSTFS_KMS_BACKEND` | 密钥存储和封装 | 适用场景 |
 | --- | --- | --- | --- |
 | Local | `local` | RustFS 主机上的密钥文件 | 开发、测试或经过审慎备份的单主机部署 |
-| Vault KV2 | `vault` 或 `vault-kv2` | 元数据存储在 Vault KV v2 中；通过 Vault Transit 进行封装 | 集中式生产密钥管理 |
+| Vault KV2 | `vault` 或 `vault-kv2` | 主密钥材料存储在 Vault KV v2 中；由 RustFS 封装数据密钥 | 集中式密钥存储 |
 | Vault Transit | `vault-transit` | 通过 Vault Transit 执行加密操作 | 不使用 KV2 后端模式的集中式生产密钥管理 |
 
 SSE-S3 和 SSE-KMS 都要求 KMS 服务正在运行。当 KMS 不可用时，仅配置存储桶默认设置并不能使加密写入成功。
@@ -58,17 +58,20 @@ sudo systemctl status rustfs --no-pager
 
 ## 配置 Vault KV2
 
-为密钥元数据启用 KV v2 引擎，并为密钥封装启用 Transit 引擎。然后配置每个 RustFS 节点：
+为主密钥材料和元数据启用 KV v2 引擎。RustFS 读取主密钥材料并在本地封装数据密钥；此后端不调用 Vault Transit。配置每个 RustFS 节点：
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_KMS_ENABLE=true
 RUSTFS_KMS_BACKEND=vault-kv2
 RUSTFS_KMS_VAULT_ADDRESS=https://vault.example.com:8200
 RUSTFS_KMS_VAULT_TOKEN=<your-vault-token>
-RUSTFS_KMS_VAULT_MOUNT_PATH=transit
+RUSTFS_KMS_VAULT_KV_MOUNT=secret
+RUSTFS_KMS_VAULT_KEY_PREFIX=rustfs/kms/keys
 ```
 
-服务器启动接口使用 `secret` 作为 KV 挂载点，使用 `rustfs/kms/keys` 作为密钥前缀。使用能够读写该 KV 路径并执行所需 Transit 操作的 Vault 令牌。
+KV 挂载点默认为 `secret`，密钥前缀默认为 `rustfs/kms/keys`；可通过上述变量选择其他路径。使用有权访问所配置 KV 数据路径和元数据路径的 Vault 令牌。`RUSTFS_KMS_VAULT_MOUNT_PATH` 对 KV2 后端已弃用且不生效。
+
+主密钥材料在 KV2 中以 Base64 编码保存。任何对密钥路径具有 KV 读取权限的身份都能恢复明文主密钥，因此应将该权限限制在受信任的 RustFS 身份范围内。
 
 RustFS 会验证 Vault URL；除非设置 `RUSTFS_KMS_ALLOW_INSECURE_DEV_DEFAULTS=true`，否则会拒绝不安全的开发默认值。在生产环境中使用 HTTPS 以及 RustFS 主机信任的证书。
 

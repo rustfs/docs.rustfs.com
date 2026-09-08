@@ -56,12 +56,14 @@ description: "介绍用于配置 RustFS 服务器、控制台、TLS、KMS、可�
 | `RUSTFS_MTLS_CLIENT_CERT` | 未设置 | 节点间 mTLS 连接提供的客户端证书。 |
 | `RUSTFS_MTLS_CLIENT_KEY` | 未设置 | 节点间 mTLS 连接使用的客户端私钥。 |
 | `RUSTFS_KMS_ENABLE` | `false` | 启用由 KMS 支持的服务端加密。 |
-| `RUSTFS_KMS_BACKEND` | `local` | KMS 后端：`local`、`vault` / `vault-kv2`（Vault KV2 + Transit）或 `vault-transit`。 |
+| `RUSTFS_KMS_BACKEND` | `local` | KMS 后端：`local`、`vault` / `vault-kv2`（Vault KV2 存储，在本地封装数据密钥）或 `vault-transit`。 |
 | `RUSTFS_KMS_KEY_DIR` | 未设置 | `local` 后端的密钥目录。 |
 | `RUSTFS_KMS_LOCAL_MASTER_KEY` | 未设置 | 保护本地 KMS 密钥文件的主密钥。 |
 | `RUSTFS_KMS_VAULT_ADDRESS` | 未设置 | Vault 后端的 Vault 服务器地址。 |
 | `RUSTFS_KMS_VAULT_TOKEN` | 未设置 | Vault 后端的 Vault 令牌。 |
-| `RUSTFS_KMS_VAULT_MOUNT_PATH` | 未设置 | Vault 后端的 Vault 挂载路径。 |
+| `RUSTFS_KMS_VAULT_MOUNT_PATH` | `transit` | `vault-transit` 的 Transit 挂载点；对 `vault` / `vault-kv2` 已弃用且不生效。 |
+| `RUSTFS_KMS_VAULT_KV_MOUNT` | `secret` | `vault` / `vault-kv2` 后端的 KV v2 挂载点。 |
+| `RUSTFS_KMS_VAULT_KEY_PREFIX` | `rustfs/kms/keys` | `vault` / `vault-kv2` 后端在 KV v2 挂载点中的密钥记录前缀。 |
 | `RUSTFS_KMS_DEFAULT_KEY_ID` | 未设置 | 用于加密的默认 KMS 密钥 ID。 |
 | `RUSTFS_KMS_ALLOW_INSECURE_DEV_DEFAULTS` | `false` | 允许仅用于开发的不安全 KMS 默认值。切勿在生产环境中启用。 |
 
@@ -103,14 +105,14 @@ description: "介绍用于配置 RustFS 服务器、控制台、TLS、KMS、可�
 | `RUSTFS_SCANNER_MAX_WAIT_SECS` | 预设值 | 覆盖扫描器最长休眠秒数。 |
 | `RUSTFS_SCANNER_CYCLE` | 预设值 | 覆盖扫描周期的秒数（例如 `3600`）。 |
 | `RUSTFS_SCANNER_START_DELAY_SECS` | 未设置 | 第一个扫描周期开始前的启动延迟秒数。 |
-| `RUSTFS_SCANNER_CYCLE_MAX_DURATION_SECS` | `0` | 限制单个周期的运行秒数；`0` 表示禁用该预算。 |
+| `RUSTFS_SCANNER_CYCLE_MAX_DURATION_SECS` | `1800` | 限制单个周期的运行秒数；`0` 表示禁用该预算。 |
 | `RUSTFS_SCANNER_CYCLE_MAX_OBJECTS` | `0` | 限制每个周期处理的对象数；`0` 表示禁用该预算。 |
 | `RUSTFS_SCANNER_CYCLE_MAX_DIRECTORIES` | `0` | 限制每个周期进入的目录数；`0` 表示禁用该预算。 |
 | `RUSTFS_SCANNER_BITROT_CYCLE_SECS` | `2592000` | 定期深度（位衰减）扫描周期的秒数（30 天）。`0`/`true`/`on` 使每个周期都执行深度扫描；`false`/`off` 禁用深度扫描。 |
 | `RUSTFS_SCANNER_IDLE_MODE` | `true` | 为 `true` 时扫描器会自行限速；为 `false` 时全速运行。 |
-| `RUSTFS_SCANNER_CACHE_SAVE_TIMEOUT_SECS` | `30` | 扫描器缓存保存超时秒数（最小值为 `1`）。 |
-| `RUSTFS_SCANNER_MAX_CONCURRENT_SET_SCANS` | `0` | 限制并发纠删集扫描任务数；`0` 保留基于拓扑的并发数。 |
-| `RUSTFS_SCANNER_MAX_CONCURRENT_DISK_SCANS` | `0` | 限制每个纠删集并发执行的磁盘存储桶遍历数；`0` 保留基于磁盘数量的并发数。 |
+| `RUSTFS_SCANNER_CACHE_SAVE_TIMEOUT_SECS` | `14` | 扫描器缓存保存超时秒数（最小值为 `1`）。 |
+| `RUSTFS_SCANNER_MAX_CONCURRENT_SET_SCANS` | `4` | 限制并发纠删集扫描任务数；`0` 保留基于拓扑的并发数。 |
+| `RUSTFS_SCANNER_MAX_CONCURRENT_DISK_SCANS` | `4` | 限制每个纠删集并发执行的磁盘存储桶遍历数；`0` 保留基于磁盘数量的并发数。 |
 | `RUSTFS_SCANNER_YIELD_EVERY_N_OBJECTS` | `128` | 扫描器对象循环向异步运行时让出的频率；`0` 禁用额外让出。 |
 | `RUSTFS_SCANNER_ALERT_EXCESS_VERSIONS` | `100` | 触发扫描器告警的对象版本数。 |
 | `RUSTFS_SCANNER_ALERT_EXCESS_VERSION_SIZE` | `1099511627776` | 触发扫描器告警的累计版本字节数（1 TiB）。 |

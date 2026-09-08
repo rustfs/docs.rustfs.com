@@ -57,7 +57,7 @@ RustFS implements an AWS-compatible STS endpoint at the server root (`POST /` wi
 
 ### AssumeRole
 
-The request must be signed (AWS Signature V4) by a long-term IAM credential — temporary credentials and service accounts cannot call `AssumeRole`. The calling identity also needs the `sts:AssumeRole` action allowed by its policies (all built-in policies include it).
+The request must be signed (AWS Signature V4) by a long-term IAM credential — temporary credentials and service accounts cannot call `AssumeRole`. With built-in IAM authorization, RustFS evaluates `sts:AssumeRole` for regular IAM users in deny-only mode: a matching explicit `Deny` rejects the request, but a separate `Allow` is not required. The user must have at least one applicable user or group policy binding, and all bound policy names must resolve.
 
 Form parameters:
 

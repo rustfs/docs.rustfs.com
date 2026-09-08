@@ -1,9 +1,9 @@
 ---
 title: "CLI 参考"
-description: "介绍 rustfs 命令行界面，包括 server、info 和 tls 子命令、主要参数及对应环境变量，以及卷路径语法。"
+description: "介绍 rustfs 子命令、服务器参数及对应环境变量，以及卷路径语法。"
 ---
 
-`rustfs` 二进制文件提供三个子命令。不带子命令运行 `rustfs` 时会启动服务器。
+`rustfs` 二进制文件提供六个子命令。不带子命令运行 `rustfs` 时会启动服务器。
 
 ## 子命令
 
@@ -12,6 +12,9 @@ description: "介绍 rustfs 命令行界面，包括 server、info 和 tls 子�
 | `rustfs server [OPTIONS] <VOLUMES>...` | 启动对象存储服务器（未指定子命令时的默认行为）。 |
 | `rustfs info [--all] [--json] [system\|runtime\|build\|config\|deps]` | 显示系统、运行时、构建、配置或依赖项信息。 |
 | `rustfs tls inspect --path <DIR>` | 检查 TLS 证书目录布局和解析状态。 |
+| `rustfs diagnose [OPTIONS] <PATHS>...` | 分析日志文件并报告可能的故障原因。 |
+| `rustfs inspect <COMMAND>` | 在服务器未运行时检查持久化的存储桶元数据。 |
+| `rustfs connect <COMMAND>` | 配置出站 RustFS Connect 集成。 |
 
 ```bash title="Examples"
 rustfs server /data/rustfs
@@ -56,7 +59,7 @@ RustFS 会预处理参数以保持向后兼容，因此旧版调用方式仍可�
 | `--kms-local-master-key` | `RUSTFS_KMS_LOCAL_MASTER_KEY` | 未设置 | 用于加密本地 KMS 密钥文件的主密钥。 |
 | `--kms-vault-address` | `RUSTFS_KMS_VAULT_ADDRESS` | 未设置 | Vault 后端的 Vault 地址。 |
 | `--kms-vault-token` | `RUSTFS_KMS_VAULT_TOKEN` | 未设置 | Vault 后端的 Vault 令牌。 |
-| `--kms-vault-mount-path` | `RUSTFS_KMS_VAULT_MOUNT_PATH` | 未设置 | Vault 挂载路径。 |
+| `--kms-vault-mount-path` | `RUSTFS_KMS_VAULT_MOUNT_PATH` | 未设置 | `vault-transit` 的 Transit 挂载点（默认为 `transit`）；对 `vault` / `vault-kv2` 已弃用且不生效。 |
 | `--kms-default-key-id` | `RUSTFS_KMS_DEFAULT_KEY_ID` | 未设置 | 用于加密的默认 KMS 密钥 ID。 |
 | `--kms-allow-insecure-dev-defaults` | `RUSTFS_KMS_ALLOW_INSECURE_DEV_DEFAULTS` | `false` | 允许仅用于开发的不安全 KMS 默认值。 |
 | `--buffer-profile` | `RUSTFS_BUFFER_PROFILE` | `GeneralPurpose` | 自适应缓冲区大小的工作负载配置。 |
