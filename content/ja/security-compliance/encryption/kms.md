@@ -3,7 +3,7 @@ title: "SSE-KMS"
 description: "Configure SSE-KMS with a local or HashiCorp Vault KMS backend for RustFS."
 ---
 
-RustFS Key Management Service (KMS) generates and wraps per-object data encryption keys for [SSE-S3](./sse-s.md) and SSE-KMS. This guide configures SSE-KMS at server startup with a local key store, Vault KV v2 plus Transit, or Vault Transit.
+RustFS Key Management Service (KMS) generates and wraps per-object data encryption keys for [SSE-S3](./sse-s.md) and SSE-KMS. This guide configures SSE-KMS at server startup with a local key store, Vault KV v2, or Vault Transit.
 
 ## Requirements
 
@@ -25,7 +25,7 @@ RustFS does not store a recoverable copy of your KMS master key outside the conf
 | Backend | `RUSTFS_KMS_BACKEND` | Key storage and wrapping | Intended use |
 | --- | --- | --- | --- |
 | Local | `local` | Key files on the RustFS host | Development, testing, or a carefully backed-up single-host deployment |
-| Vault KV2 | `vault` or `vault-kv2` | Metadata in Vault KV v2; wrapping through Vault Transit | Centralized production key management |
+| Vault KV2 | `vault` or `vault-kv2` | Master key material in Vault KV v2; data-key wrapping in RustFS | Centralized key storage |
 | Vault Transit | `vault-transit` | Cryptographic operations through Vault Transit | Centralized production key management without the KV2 backend mode |
 
 SSE-S3 and SSE-KMS both require the KMS service to be running. Configuring a bucket default alone does not make encrypted writes succeed when KMS is unavailable.
@@ -58,17 +58,20 @@ sudo systemctl status rustfs --no-pager
 
 ## Configure Vault KV2
 
-Enable a KV v2 engine for key metadata and a Transit engine for key wrapping. Then configure every RustFS node:
+Enable a KV v2 engine for master key material and metadata. RustFS reads the master key material and wraps data keys locally; this backend does not call Vault Transit. Configure every RustFS node:
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_KMS_ENABLE=true
 RUSTFS_KMS_BACKEND=vault-kv2
 RUSTFS_KMS_VAULT_ADDRESS=https://vault.example.com:8200
 RUSTFS_KMS_VAULT_TOKEN=<your-vault-token>
-RUSTFS_KMS_VAULT_MOUNT_PATH=transit
+RUSTFS_KMS_VAULT_KV_MOUNT=secret
+RUSTFS_KMS_VAULT_KEY_PREFIX=rustfs/kms/keys
 ```
 
-The server startup interface uses `secret` as the KV mount and `rustfs/kms/keys` as the key prefix. Use a Vault token that can read and write that KV path and perform the required Transit operations.
+The KV mount defaults to `secret` and the key prefix to `rustfs/kms/keys`; the variables above let you select different paths. Use a Vault token authorized for the configured KV data and metadata paths. `RUSTFS_KMS_VAULT_MOUNT_PATH` is deprecated and unused for the KV2 backend.
+
+Master key material is Base64-encoded in KV2. Any identity with KV read access to the key path can recover the plaintext master key, so restrict that access to trusted RustFS identities.
 
 RustFS validates the Vault URL and rejects insecure development defaults unless `RUSTFS_KMS_ALLOW_INSECURE_DEV_DEFAULTS=true` is set. Use HTTPS and a certificate trusted by the RustFS hosts in production.
 

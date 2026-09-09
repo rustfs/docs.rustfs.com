@@ -1,9 +1,9 @@
 ---
 title: "CLI Reference"
-description: "Reference for the rustfs command-line interface, including the server, info, and tls subcommands, key flags with environment variable equivalents, and volume path syntax."
+description: "Reference for the rustfs subcommands, server flags, environment variable equivalents, and volume path syntax."
 ---
 
-The `rustfs` binary ships three subcommands. Running `rustfs` with no subcommand starts the server.
+The `rustfs` binary ships six subcommands. Running `rustfs` with no subcommand starts the server.
 
 ## Subcommands
 
@@ -12,6 +12,9 @@ The `rustfs` binary ships three subcommands. Running `rustfs` with no subcommand
 | `rustfs server [OPTIONS] <VOLUMES>...` | Start the object storage server (default when no subcommand is given). |
 | `rustfs info [--all] [--json] [system\|runtime\|build\|config\|deps]` | Display system, runtime, build, configuration, or dependency information. |
 | `rustfs tls inspect --path <DIR>` | Inspect a TLS certificate directory layout and parsing status. |
+| `rustfs diagnose [OPTIONS] <PATHS>...` | Analyze log files and report probable failure causes. |
+| `rustfs inspect <COMMAND>` | Inspect persisted bucket metadata without a running server. |
+| `rustfs connect <COMMAND>` | Configure outbound RustFS Connect integration. |
 
 ```bash title="Examples"
 rustfs server /data/rustfs
@@ -56,7 +59,7 @@ Every server flag has an environment variable equivalent; the flag wins when bot
 | `--kms-local-master-key` | `RUSTFS_KMS_LOCAL_MASTER_KEY` | unset | Master key for local KMS key-file encryption. |
 | `--kms-vault-address` | `RUSTFS_KMS_VAULT_ADDRESS` | unset | Vault address for the Vault backends. |
 | `--kms-vault-token` | `RUSTFS_KMS_VAULT_TOKEN` | unset | Vault token for the Vault backends. |
-| `--kms-vault-mount-path` | `RUSTFS_KMS_VAULT_MOUNT_PATH` | unset | Vault mount path. |
+| `--kms-vault-mount-path` | `RUSTFS_KMS_VAULT_MOUNT_PATH` | unset | Transit mount for `vault-transit` (defaults to `transit`); deprecated and unused for `vault` / `vault-kv2`. |
 | `--kms-default-key-id` | `RUSTFS_KMS_DEFAULT_KEY_ID` | unset | Default KMS key ID for encryption. |
 | `--kms-allow-insecure-dev-defaults` | `RUSTFS_KMS_ALLOW_INSECURE_DEV_DEFAULTS` | `false` | Allow development-only insecure KMS defaults. |
 | `--buffer-profile` | `RUSTFS_BUFFER_PROFILE` | `GeneralPurpose` | Workload profile for adaptive buffer sizing. |

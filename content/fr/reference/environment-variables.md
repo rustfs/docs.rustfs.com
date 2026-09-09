@@ -56,12 +56,14 @@ See [CORS Configuration](/administration/cors) for configuration and verificatio
 | `RUSTFS_MTLS_CLIENT_CERT` | unset | Client certificate presented for internode mTLS connections. |
 | `RUSTFS_MTLS_CLIENT_KEY` | unset | Client private key for internode mTLS connections. |
 | `RUSTFS_KMS_ENABLE` | `false` | Enable KMS-backed server-side encryption. |
-| `RUSTFS_KMS_BACKEND` | `local` | KMS backend: `local`, `vault` / `vault-kv2` (Vault KV2 + Transit), or `vault-transit`. |
+| `RUSTFS_KMS_BACKEND` | `local` | KMS backend: `local`, `vault` / `vault-kv2` (Vault KV2 storage with local data-key wrapping), or `vault-transit`. |
 | `RUSTFS_KMS_KEY_DIR` | unset | Key directory for the `local` backend. |
 | `RUSTFS_KMS_LOCAL_MASTER_KEY` | unset | Master key protecting local KMS key files. |
 | `RUSTFS_KMS_VAULT_ADDRESS` | unset | Vault server address for the Vault backends. |
 | `RUSTFS_KMS_VAULT_TOKEN` | unset | Vault token for the Vault backends. |
-| `RUSTFS_KMS_VAULT_MOUNT_PATH` | unset | Vault mount path for the Vault backends. |
+| `RUSTFS_KMS_VAULT_MOUNT_PATH` | `transit` | Transit mount for `vault-transit`; deprecated and unused for `vault` / `vault-kv2`. |
+| `RUSTFS_KMS_VAULT_KV_MOUNT` | `secret` | KV v2 mount for the `vault` / `vault-kv2` backend. |
+| `RUSTFS_KMS_VAULT_KEY_PREFIX` | `rustfs/kms/keys` | Key record prefix within the KV v2 mount for `vault` / `vault-kv2`. |
 | `RUSTFS_KMS_DEFAULT_KEY_ID` | unset | Default KMS key ID used for encryption. |
 | `RUSTFS_KMS_ALLOW_INSECURE_DEV_DEFAULTS` | `false` | Allow development-only insecure KMS defaults. Never enable in production. |
 
@@ -103,14 +105,14 @@ Metrics collection intervals follow the pattern `RUSTFS_METRICS_<SCOPE>_INTERVAL
 | `RUSTFS_SCANNER_MAX_WAIT_SECS` | preset | Overrides the maximum scanner sleep in seconds. |
 | `RUSTFS_SCANNER_CYCLE` | preset | Overrides the scan cycle interval in seconds (e.g. `3600`). |
 | `RUSTFS_SCANNER_START_DELAY_SECS` | unset | Startup delay in seconds before the first scan cycle. |
-| `RUSTFS_SCANNER_CYCLE_MAX_DURATION_SECS` | `0` | Caps one cycle's runtime in seconds; `0` disables the budget. |
+| `RUSTFS_SCANNER_CYCLE_MAX_DURATION_SECS` | `1800` | Caps one cycle's runtime in seconds; `0` disables the budget. |
 | `RUSTFS_SCANNER_CYCLE_MAX_OBJECTS` | `0` | Caps objects processed per cycle; `0` disables the budget. |
 | `RUSTFS_SCANNER_CYCLE_MAX_DIRECTORIES` | `0` | Caps directories entered per cycle; `0` disables the budget. |
 | `RUSTFS_SCANNER_BITROT_CYCLE_SECS` | `2592000` | Periodic deep (bitrot) scan cycle in seconds (30 days). `0`/`true`/`on` makes every cycle deep; `false`/`off` disables deep scans. |
 | `RUSTFS_SCANNER_IDLE_MODE` | `true` | When `true` the scanner throttles itself; `false` runs at full speed. |
-| `RUSTFS_SCANNER_CACHE_SAVE_TIMEOUT_SECS` | `30` | Scanner cache save timeout in seconds (minimum `1`). |
-| `RUSTFS_SCANNER_MAX_CONCURRENT_SET_SCANS` | `0` | Caps concurrent erasure-set scan tasks; `0` keeps topology-based concurrency. |
-| `RUSTFS_SCANNER_MAX_CONCURRENT_DISK_SCANS` | `0` | Caps concurrent disk bucket walks per set; `0` keeps disk-count-based concurrency. |
+| `RUSTFS_SCANNER_CACHE_SAVE_TIMEOUT_SECS` | `14` | Scanner cache save timeout in seconds (minimum `1`). |
+| `RUSTFS_SCANNER_MAX_CONCURRENT_SET_SCANS` | `4` | Caps concurrent erasure-set scan tasks; `0` keeps topology-based concurrency. |
+| `RUSTFS_SCANNER_MAX_CONCURRENT_DISK_SCANS` | `4` | Caps concurrent disk bucket walks per set; `0` keeps disk-count-based concurrency. |
 | `RUSTFS_SCANNER_YIELD_EVERY_N_OBJECTS` | `128` | How often scanner object loops yield to the async runtime; `0` disables the extra yield. |
 | `RUSTFS_SCANNER_ALERT_EXCESS_VERSIONS` | `100` | Object version count that triggers scanner alerts. |
 | `RUSTFS_SCANNER_ALERT_EXCESS_VERSION_SIZE` | `1099511627776` | Cumulative version bytes (1 TiB) that trigger scanner alerts. |

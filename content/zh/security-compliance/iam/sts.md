@@ -57,7 +57,7 @@ RustFS 在服务器根路径实现了与 AWS 兼容的 STS 端点（使用表单
 
 ### AssumeRole
 
-请求必须由长期 IAM 凭证签名（AWS Signature V4），临时凭证和服务账户不能调用 `AssumeRole`。调用身份还需要其策略允许 `sts:AssumeRole` 操作（所有内置策略均包含此操作）。
+请求必须由长期 IAM 凭证签名（AWS Signature V4），临时凭证和服务账户不能调用 `AssumeRole`。使用内置 IAM 授权时，RustFS 对普通 IAM 用户的 `sts:AssumeRole` 请求采用仅检查拒绝（deny-only）的模式：匹配的显式 `Deny` 会拒绝请求，但不要求单独的 `Allow`。用户必须至少具有一个适用的用户或组策略绑定，且所有绑定的策略名称都必须能解析到对应策略。
 
 表单参数：
 

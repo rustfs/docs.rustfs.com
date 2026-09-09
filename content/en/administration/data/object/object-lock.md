@@ -7,7 +7,7 @@ RustFS Object Lock applies write-once, read-many protection to individual object
 
 ## Overview
 
-Object Lock requires bucket versioning and must be enabled when the bucket is created. Each overwrite creates a new version; retention and Legal Hold protect a specific version rather than the object key as a whole.
+Object Lock requires bucket versioning. You can enable it when creating a bucket or use the S3 `PutObjectLockConfiguration` API on an existing bucket whose versioning is enabled. Each overwrite creates a new version; retention and Legal Hold protect a specific version rather than the object key as a whole.
 
 | Protection | Behavior |
 | --- | --- |
