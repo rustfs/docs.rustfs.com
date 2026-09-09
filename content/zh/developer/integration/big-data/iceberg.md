@@ -5,6 +5,8 @@ description: "使用 Docker Compose 运行 Apache Iceberg、Spark、REST catalog
 
 本指南将运行 **Apache Iceberg**、Spark、Iceberg REST catalog，并将 **RustFS** 用作兼容 S3 的仓库。你将创建一个 Iceberg 表、写入并查询数据行，然后验证表文件是否存储在 RustFS 中。
 
+如需使用 RustFS 内置 REST 目录，请参阅 [S3 Tables 配置](/administration/data/s3-tables)和 [PyIceberg 指南](/developer/integration/big-data/pyiceberg)。下文的部署方式会运行独立的目录服务。
+
 你需要安装带 Compose 插件的 Docker，并具备足够的本地资源来运行四个容器。此部署仅用于本地集成测试，不适用于生产环境。
 
 :::note[上游状态]

@@ -3,6 +3,7 @@
   "pages": [
     "object",
     "bucket",
+    "s3-tables",
     "tiered-storage",
     "lifecycle-management"
   ]

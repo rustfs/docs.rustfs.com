@@ -9,6 +9,7 @@ description: "管理 RustFS 数据、访问协议和基于浏览器的管理功�
 
 - [控制台](./console/index.md)介绍基于浏览器的管理和登录方式。
 - [数据管理](./data/object/object-lock.md)介绍存储桶、对象、生命周期行为和数据保护功能。
+- [S3 Tables](/administration/data/s3-tables)介绍表存储桶和内置 Iceberg REST 目录。
 - [协议支持](./protocols/s3.md)介绍 S3、WebDAV、FTPS 和 SFTP 访问。
 - [CORS 配置](./cors/index.md)介绍 RustFS 服务的跨源访问。
 - [虚拟主机访问](/integration/virtual)介绍基于域名的 S3 寻址。
