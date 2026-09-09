@@ -5,6 +5,8 @@ description: "Run Apache Iceberg with Spark, a REST catalog, and RustFS object s
 
 This guide runs **Apache Iceberg** with Spark, an Iceberg REST catalog, and **RustFS** as the S3-compatible warehouse. You will create an Iceberg table, write rows, query them, and verify that the table files are stored in RustFS.
 
+Für den in RustFS integrierten REST-Katalog folgen Sie der [Einrichtung von S3 Tables](/administration/data/s3-tables) und der [PyIceberg-Anleitung](/developer/integration/big-data/pyiceberg). Die folgende Bereitstellung verwendet einen separaten Katalogdienst.
+
 You need Docker with the Compose plugin and enough local resources to run four containers. This deployment is intended for local integration testing, not production.
 
 :::note[Upstream status]

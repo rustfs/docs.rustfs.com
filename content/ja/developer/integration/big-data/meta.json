@@ -2,6 +2,7 @@
   "title": "ビッグデータ",
   "pages": [
     "iceberg",
+    "pyiceberg",
     "milvus"
   ]
 }
