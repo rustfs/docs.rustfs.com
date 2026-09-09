@@ -179,6 +179,6 @@ RustFS 定义了五个内置策略，无需预先创建即可附加：
 
 :::warning
 
-内置 `readonly` 策略有意保持最小权限，不包括 `s3:ListBucket` 或 `s3:ListAllMyBuckets`。仅有 `readonly` 权限的用户可以按键获取对象，但不能浏览存储桶。如需列出内容，请创建自定义策略。
+内置 `readonly` 策略不包含 `s3:ListBucket` 或 `s3:ListAllMyBuckets`。其中的 `s3:GetBucketLocation` 权限允许你在 RustFS 中看到存储桶名称，`s3:GetObject` 权限允许你通过已知的对象键读取对象。如需列出存储桶内的对象，请添加自定义策略，授予针对该存储桶的 `s3:ListBucket` 权限。
 
 :::
