@@ -1,10 +1,11 @@
 {
-  "title": "Intégration",
+  "title": "Integration",
   "pages": [
     "reverse-proxy",
     "backup",
     "big-data",
     "observability",
-    "others"
+    "others",
+    "registry"
   ]
 }
