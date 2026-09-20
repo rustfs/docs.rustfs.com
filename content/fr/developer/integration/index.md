@@ -1,6 +1,6 @@
 ---
 title: "Integration"
-description: "Intégrez RustFS avec des reverse proxies, des outils de sauvegarde, des systèmes de big data et des plateformes d'observabilité."
+description: "Intégrez RustFS avec des reverse proxies, des outils de sauvegarde, des systèmes d'analyse de données et des plateformes d'observabilité."
 ---
 
 Utilisez cette section pour connecter **RustFS** à des plateformes d'infrastructure et d'applications via son API compatible S3.
@@ -9,7 +9,7 @@ Utilisez cette section pour connecter **RustFS** à des plateformes d'infrastruc
 
 - [Reverse Proxy](./reverse-proxy/index.md) couvre Nginx, Traefik, Caddy et HAProxy.
 - [Backup](./backup/index.md) couvre Restic.
-- [Big Data](./big-data/index.md) couvre Iceberg.
+- [Analyse de données](./big-data/index.md) couvre Iceberg.
 - [Observabilité](./observability/index.md) couvre OpenObserve.
 - [Autres](./others/index.md) couvre le SDK communautaire capo pour Python.
 

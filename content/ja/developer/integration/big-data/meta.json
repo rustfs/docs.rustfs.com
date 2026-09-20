@@ -1,5 +1,5 @@
 {
-  "title": "ビッグデータ",
+  "title": "データ分析",
   "pages": [
     "iceberg",
     "pyiceberg",
