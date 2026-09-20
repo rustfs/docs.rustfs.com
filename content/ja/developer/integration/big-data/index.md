@@ -8,6 +8,8 @@ Use **RustFS** as the object storage layer for big data systems that support an 
 ## Systems
 
 - [Iceberg](./iceberg.md)
+- [PyIceberg](./pyiceberg.md)
 - [Milvus](./milvus.md)
+- [DuckDB](./duckdb.md)
 
 Keep application data in a dedicated bucket and prefix, and use credentials scoped to the required bucket operations.
