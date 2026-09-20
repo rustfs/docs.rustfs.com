@@ -4,6 +4,7 @@
   "defaultOpen": false,
   "pages": [
     "sdk",
+    "examples",
     "integration",
     "license"
   ]
