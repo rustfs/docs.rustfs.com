@@ -8,5 +8,7 @@ Use **RustFS** as the object storage layer for observability platforms that supp
 ## Platforms
 
 - [OpenObserve](./openobserve.md)
+- [Loki](./loki.md)
+- [Tempo](./tempo.md)
 
 Keep telemetry data in a dedicated bucket, and use credentials scoped to the required bucket operations.

@@ -8,5 +8,7 @@ description: "通过 S3 兼容对象存储接口，将可观测性平台连接�
 ## 平台
 
 - [OpenObserve](./openobserve.md)
+- [Loki](./loki.md)
+- [Tempo](./tempo.md)
 
 请使用专用的存储桶保存遥测数据，并为凭证仅授予所需桶操作的权限。
