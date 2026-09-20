@@ -1,6 +1,8 @@
 {
   "title": "Observability",
   "pages": [
-    "openobserve"
+    "openobserve",
+    "loki",
+    "tempo"
   ]
 }

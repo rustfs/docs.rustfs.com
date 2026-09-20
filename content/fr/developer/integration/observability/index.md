@@ -8,5 +8,7 @@ Utilisez **RustFS** comme couche de stockage objet pour les plateformes d'observ
 ## Plateformes
 
 - [OpenObserve](./openobserve.md)
+- [Loki](./loki.md)
+- [Tempo](./tempo.md)
 
 Conservez les données de télémétrie dans un bucket dédié et limitez les identifiants aux opérations de bucket requises.

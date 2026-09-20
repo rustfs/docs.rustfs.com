@@ -1,6 +1,8 @@
 {
   "title": "可观测性",
   "pages": [
-    "openobserve"
+    "openobserve",
+    "loki",
+    "tempo"
   ]
 }
