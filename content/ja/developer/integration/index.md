@@ -1,6 +1,6 @@
 ---
 title: "Integration"
-description: "RustFS をリバースプロキシ、バックアップツール、データ分析システム、オブザーバビリティプラットフォームと連携させます。"
+description: "RustFS をリバースプロキシ、バックアップツール、データ分析システム、オブザーバビリティプラットフォーム、コンテナレジストリと連携させます。"
 ---
 
 このセクションでは、**RustFS** を S3 互換 API 経由でインフラストラクチャとアプリケーションプラットフォームに接続します。
@@ -12,5 +12,7 @@ description: "RustFS をリバースプロキシ、バックアップツール�
 - [データ分析](./big-data/index.md) は Iceberg を扱います。
 - [オブザーバビリティ](./observability/index.md) は OpenObserve を扱います。
 - [その他](./others/index.md) はコミュニティ主導の Python 用 capo SDK を扱います。
+- [コンテナレジストリ](./registry/index.md) は Harbor を扱います。
+- [コンテナレジストリ](./registry/index.md) は Harbor を扱います。
 
 各ガイドでは、連携先システムを設定する際に使用する RustFS のエンドポイントとアドレス指定の要件を示します。
