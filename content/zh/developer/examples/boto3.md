@@ -50,4 +50,4 @@ hello.txt 12
 
 ## 后续步骤
 
-有关更多编程语言，请参阅 [S3 SDK 概述](../sdk/index.md)；也可以使用 [`rc`](/operations/rc) 管理对象。
+有关更多编程语言，请参阅 [S3 SDK 概述](../sdk/index.md)；也可以使用 [`rc`](/operations/rc) 管理对象。如果更倾向于使用社区驱动、原生支持异步且带完整类型标注的 SDK，请参阅 [capo (Python)](./capo.md)。
