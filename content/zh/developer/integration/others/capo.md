@@ -15,7 +15,7 @@ pip install capo-s3
 
 ## 配置
 
-将客户端指向您的 RustFS 端点。请将 `http://localhost:9000` 替换为您的服务器地址，并使用您自己的[访问密钥](../../security-compliance/iam/access-token.md)。RustFS 要求使用路径样式寻址，capo 可通过 `force_path_style` 原生开启：
+将客户端指向您的 RustFS 端点。请将 `http://localhost:9000` 替换为您的服务器地址，并使用您自己的[访问密钥](../../../security-compliance/iam/access-token.md)。RustFS 要求使用路径样式寻址，capo 可通过 `force_path_style` 原生开启：
 
 ```python
 from capo_s3 import Credentials, S3Client
@@ -105,4 +105,4 @@ asyncio.run(main())
 
 ## 后续步骤
 
-分页列举遵循相同的约定——使用 `iter_list_objects_v2` 迭代结果。如需官方 AWS SDK 替代方案，请参阅 [boto3 (Python)](./boto3.md)；更多编程语言请参阅 [S3 SDK 概述](../sdk/index.md)。
+分页列举遵循相同的约定——使用 `iter_list_objects_v2` 迭代结果。如需官方 AWS SDK 替代方案，请参阅 [boto3 (Python)](../../examples/boto3.md)；更多编程语言请参阅 [S3 SDK 概述](../../sdk/index.md)。

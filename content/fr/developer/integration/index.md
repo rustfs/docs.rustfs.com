@@ -11,5 +11,6 @@ Utilisez cette section pour connecter **RustFS** à des plateformes d'infrastruc
 - [Backup](./backup/index.md) couvre Restic.
 - [Big Data](./big-data/index.md) couvre Iceberg.
 - [Observabilité](./observability/index.md) couvre OpenObserve.
+- [Autres](./others/index.md) couvre le SDK communautaire capo pour Python.
 
 Chaque guide indique le point de terminaison RustFS et les exigences d'adressage à utiliser lors de la configuration du système intégré.

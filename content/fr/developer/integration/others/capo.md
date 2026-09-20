@@ -15,7 +15,7 @@ pip install capo-s3
 
 ## Configuration
 
-Pointez le client vers votre point de terminaison RustFS. Remplacez `http://localhost:9000` par l'adresse de votre serveur et utilisez vos propres [clés d'accès](../../security-compliance/iam/access-token.md). RustFS exige l'adressage de type chemin, que capo active nativement via `force_path_style` :
+Pointez le client vers votre point de terminaison RustFS. Remplacez `http://localhost:9000` par l'adresse de votre serveur et utilisez vos propres [clés d'accès](../../../security-compliance/iam/access-token.md). RustFS exige l'adressage de type chemin, que capo active nativement via `force_path_style` :
 
 ```python
 from capo_s3 import Credentials, S3Client
@@ -105,4 +105,4 @@ asyncio.run(main())
 
 ## Prochaines étapes
 
-Le listage paginé suit la même convention — `iter_list_objects_v2` itère sur les résultats. Pour l'alternative officielle du SDK AWS, voir [boto3 (Python)](./boto3.md) ; la [présentation des SDK S3](../sdk/index.md) répertorie les autres langages.
+Le listage paginé suit la même convention — `iter_list_objects_v2` itère sur les résultats. Pour l'alternative officielle du SDK AWS, voir [boto3 (Python)](../../examples/boto3.md) ; la [présentation des SDK S3](../../sdk/index.md) répertorie les autres langages.

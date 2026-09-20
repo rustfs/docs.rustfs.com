@@ -15,7 +15,7 @@ pip install capo-s3
 
 ## Configure
 
-Point the client at your RustFS endpoint. Replace `http://localhost:9000` with your server address, and use your own [access keys](../../security-compliance/iam/access-token.md). RustFS requires path-style addressing, which capo enables natively through `force_path_style`:
+Point the client at your RustFS endpoint. Replace `http://localhost:9000` with your server address, and use your own [access keys](../../../security-compliance/iam/access-token.md). RustFS requires path-style addressing, which capo enables natively through `force_path_style`:
 
 ```python
 from capo_s3 import Credentials, S3Client
@@ -105,4 +105,4 @@ asyncio.run(main())
 
 ## Next steps
 
-Paginated listing follows the same convention — `iter_list_objects_v2` iterates over results. For the official AWS SDK alternative, see [boto3 (Python)](./boto3.md), or see the [S3 SDK overview](../sdk/index.md) for more languages.
+Paginated listing follows the same convention — `iter_list_objects_v2` iterates over results. For the official AWS SDK alternative, see [boto3 (Python)](../../examples/boto3.md), or see the [S3 SDK overview](../../sdk/index.md) for more languages.

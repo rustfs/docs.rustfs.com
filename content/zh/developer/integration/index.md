@@ -11,5 +11,6 @@ description: "将 RustFS 与反向代理、备份工具、大数据系统和可�
 - [备份](./backup/index.md)涵盖 Restic。
 - [大数据](./big-data/index.md)涵盖 Iceberg。
 - [可观测性](./observability/index.md)涵盖 OpenObserve。
+- [其他](./others/index.md)涵盖社区驱动的 Python capo SDK。
 
 每篇指南都会说明配置集成系统时需要使用的 RustFS 端点和寻址要求。
