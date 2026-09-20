@@ -105,6 +105,20 @@ RUSTFS_IDENTITY_OPENID_USERNAME_CLAIM="preferred_username"
 
 Restart RustFS after applying the configuration.
 
+:::note[Keycloak in einem privaten Netzwerk]
+
+Wenn Keycloak zu einer privaten oder Loopback-IP-Adresse aufgelöst wird, fügen Sie dessen Origin zu `RUSTFS_OUTBOUND_ALLOW_ORIGINS` in der RustFS-Dienstumgebung hinzu. Beispiel für einen Docker-Dienst namens `kc` auf Port `8080`:
+
+```ini
+RUSTFS_OUTBOUND_ALLOW_ORIGINS="http://kc:8080"
+```
+
+Verwenden Sie `scheme://host:port` ohne einen Pfad wie `/realms/rustfs`. Trennen Sie mehrere Origins durch Kommas. Nehmen Sie auch andere private Origins auf, die `jwks_uri` oder `token_endpoint` im Discovery-Dokument verwenden. Starten Sie RustFS nach der Änderung neu. Öffentliche Endpunkte, die zu öffentlichen IP-Adressen aufgelöst werden, benötigen diese Freigabeliste nicht.
+
+Ohne die erforderliche Freigabe schlägt die Discovery beim Start fehl. Der Provider ist dann für die Console-Anmeldung und STS nicht verfügbar, auch wenn seine Konfiguration `enabled: true` anzeigt.
+
+:::
+
 `RUSTFS_BROWSER_REDIRECT_URL` must contain the public scheme and authority without a path. It controls the Console success redirect and logout fallback URL. The provider callback URL must exactly match the URL registered in Keycloak.
 
 :::warning[Map claims in production]

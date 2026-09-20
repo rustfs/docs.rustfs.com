@@ -105,6 +105,20 @@ RUSTFS_IDENTITY_OPENID_USERNAME_CLAIM="preferred_username"
 
 Restart RustFS after applying the configuration.
 
+:::note[Keycloak on a private network]
+
+If Keycloak resolves to a private or loopback IP address, add its origin to `RUSTFS_OUTBOUND_ALLOW_ORIGINS` in the RustFS service environment. For example, for a Docker service named `kc` on port `8080`:
+
+```ini
+RUSTFS_OUTBOUND_ALLOW_ORIGINS="http://kc:8080"
+```
+
+Use `scheme://host:port` without a path such as `/realms/rustfs`. Separate multiple origins with commas, including any other private origins used by the discovery document's `jwks_uri` or `token_endpoint`. Restart RustFS after changing this setting. Public endpoints that resolve to public IP addresses do not need this allowlist.
+
+Without the required allowlist, startup discovery fails and the provider is unavailable for Console login and STS, even if its configuration shows `enabled: true`.
+
+:::
+
 `RUSTFS_BROWSER_REDIRECT_URL` must contain the public scheme and authority without a path. It controls the Console success redirect and logout fallback URL. The provider callback URL must exactly match the URL registered in Keycloak.
 
 :::warning[Map claims in production]

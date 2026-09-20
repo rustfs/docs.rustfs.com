@@ -105,6 +105,20 @@ RUSTFS_IDENTITY_OPENID_USERNAME_CLAIM="preferred_username"
 
 应用配置后重启 RustFS。
 
+:::note[内网中的 Keycloak]
+
+如果 Keycloak 解析到私网或回环 IP 地址，请在 RustFS 服务的环境变量 `RUSTFS_OUTBOUND_ALLOW_ORIGINS` 中添加它的源地址。例如，Docker 服务名为 `kc`、端口为 `8080` 时：
+
+```ini
+RUSTFS_OUTBOUND_ALLOW_ORIGINS="http://kc:8080"
+```
+
+使用 `scheme://host:port` 格式，不要包含 `/realms/rustfs` 等路径。多个源地址用逗号分隔；如果发现文档中的 `jwks_uri` 或 `token_endpoint` 使用其他内网源地址，也需要添加。修改后重启 RustFS。解析到公网 IP 的公共端点无需配置此白名单。
+
+如果缺少必要的白名单配置，启动时的服务发现会失败，即使配置显示 `enabled: true`，该提供商也无法用于控制台登录和 STS。
+
+:::
+
 `RUSTFS_BROWSER_REDIRECT_URL` 必须包含不带路径的公共 scheme 和 authority。它控制控制台成功重定向和注销回退 URL。提供商回调 URL 必须与 Keycloak 中注册的 URL 完全匹配。
 
 :::warning[在生产环境中映射声明]
