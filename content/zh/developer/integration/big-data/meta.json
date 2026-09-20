@@ -3,6 +3,7 @@
   "pages": [
     "iceberg",
     "pyiceberg",
-    "milvus"
+    "milvus",
+    "duckdb"
   ]
 }

@@ -8,6 +8,8 @@ description: "通过 S3 兼容的对象存储接口将大数据系统连接到 R
 ## 系统
 
 - [Iceberg](./iceberg.md)
+- [PyIceberg](./pyiceberg.md)
 - [Milvus](./milvus.md)
+- [DuckDB](./duckdb.md)
 
 将应用程序数据保存在专用存储桶和前缀中，并使用作用域限定为所需存储桶操作的凭证。
