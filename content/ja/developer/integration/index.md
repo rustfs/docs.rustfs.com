@@ -1,6 +1,6 @@
 ---
 title: "Integration"
-description: "RustFS をリバースプロキシ、バックアップツール、ビッグデータシステム、オブザーバビリティプラットフォームと連携させます。"
+description: "RustFS をリバースプロキシ、バックアップツール、データ分析システム、オブザーバビリティプラットフォームと連携させます。"
 ---
 
 このセクションでは、**RustFS** を S3 互換 API 経由でインフラストラクチャとアプリケーションプラットフォームに接続します。
@@ -9,7 +9,7 @@ description: "RustFS をリバースプロキシ、バックアップツール�
 
 - [Reverse Proxy](./reverse-proxy/index.md) は Nginx、Traefik、Caddy、HAProxy を扱います。
 - [Backup](./backup/index.md) は Restic を扱います。
-- [Big Data](./big-data/index.md) は Iceberg を扱います。
+- [データ分析](./big-data/index.md) は Iceberg を扱います。
 - [オブザーバビリティ](./observability/index.md) は OpenObserve を扱います。
 - [その他](./others/index.md) はコミュニティ主導の Python 用 capo SDK を扱います。
 

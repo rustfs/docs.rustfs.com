@@ -1,9 +1,9 @@
 ---
-title: "Big Data"
-description: "Connect big data systems to RustFS through S3-compatible object storage interfaces."
+title: "Analyse de données"
+description: "Connect data analytics systems to RustFS through S3-compatible object storage interfaces."
 ---
 
-Use **RustFS** as the object storage layer for big data systems that support an S3-compatible endpoint.
+Use **RustFS** as the object storage layer for data analytics systems that support an S3-compatible endpoint.
 
 ## Systems
 
