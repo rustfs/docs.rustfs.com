@@ -285,3 +285,5 @@ def download_file(bucket, object_key, local_path):
 ```
 
 For other operations (object tagging, bucket policies, and more), see the [Boto3 S3 documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html) — every S3-compatible call works against RustFS the same way.
+
+If you prefer native async support and full type hints, the community-driven [capo](https://github.com/kap-sh/capo) SDK also works with RustFS — see the [capo (Python) example](../examples/capo.md).
