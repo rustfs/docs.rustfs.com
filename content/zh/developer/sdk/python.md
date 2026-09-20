@@ -286,4 +286,4 @@ def download_file(bucket, object_key, local_path):
 
 有关其他操作（对象标签、存储桶策略等），请参阅 [Boto3 S3 文档](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html)。所有 S3 兼容调用都能以相同方式用于 RustFS。
 
-如果需要原生异步支持和完整类型标注，社区驱动的 [capo](https://github.com/kap-sh/capo) SDK 同样可用于 RustFS——请参阅 [capo (Python) 示例](../examples/capo.md)。
+如果需要原生异步支持和完整类型标注，社区驱动的 [capo](https://github.com/kap-sh/capo) SDK 同样可用于 RustFS——请参阅 [capo (Python) 集成指南](../integration/others/capo.md)。

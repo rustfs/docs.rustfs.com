@@ -50,4 +50,4 @@ hello.txt 12
 
 ## Next steps
 
-See the [S3 SDK overview](../sdk/index.md) for more languages, or manage objects with [`rc`](/operations/rc). If you prefer a community-driven SDK with native async support and full typing, see [capo (Python)](./capo.md).
+See the [S3 SDK overview](../sdk/index.md) for more languages, or manage objects with [`rc`](/operations/rc). If you prefer a community-driven SDK with native async support and full typing, see [capo (Python)](../integration/others/capo.md).

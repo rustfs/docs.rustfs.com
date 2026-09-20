@@ -6,7 +6,6 @@
     "[s3cmd](/fr/developer/examples/s3cmd)",
     "[rclone](/fr/developer/examples/rclone)",
     "[boto3 (Python)](/fr/developer/examples/boto3)",
-    "[capo (Python)](/fr/developer/examples/capo)",
     "[AWS SDK for JavaScript](/fr/developer/examples/aws-sdk-js)",
     "[AWS SDK for Go](/fr/developer/examples/aws-sdk-go)",
     "[Terraform](/fr/developer/examples/terraform)"

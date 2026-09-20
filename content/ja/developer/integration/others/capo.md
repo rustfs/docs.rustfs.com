@@ -15,7 +15,7 @@ pip install capo-s3
 
 ## 設定
 
-クライアントを RustFS エンドポイントに向けます。`http://localhost:9000` を実際のサーバーアドレスに置き換え、独自の[アクセスキー](../../security-compliance/iam/access-token.md)を使用してください。RustFS はパス形式のアドレス指定を必要とします。capo では `force_path_style` でネイティブに有効化できます：
+クライアントを RustFS エンドポイントに向けます。`http://localhost:9000` を実際のサーバーアドレスに置き換え、独自の[アクセスキー](../../../security-compliance/iam/access-token.md)を使用してください。RustFS はパス形式のアドレス指定を必要とします。capo では `force_path_style` でネイティブに有効化できます：
 
 ```python
 from capo_s3 import Credentials, S3Client
@@ -105,4 +105,4 @@ asyncio.run(main())
 
 ## 次のステップ
 
-ページネーション付きの一覧表示も同じ規則に従います。`iter_list_objects_v2` が結果を反復処理します。公式の AWS SDK による代替としては [boto3 (Python)](./boto3.md) を、他の言語については [S3 SDK の概要](../sdk/index.md) を参照してください。
+ページネーション付きの一覧表示も同じ規則に従います。`iter_list_objects_v2` が結果を反復処理します。公式の AWS SDK による代替としては [boto3 (Python)](../../examples/boto3.md) を、他の言語については [S3 SDK の概要](../../sdk/index.md) を参照してください。

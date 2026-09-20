@@ -11,5 +11,6 @@ Use this section to connect **RustFS** to infrastructure and application platfor
 - [Backup](./backup/index.md) covers Restic.
 - [Big Data](./big-data/index.md) covers Iceberg.
 - [Observability](./observability/index.md) covers OpenObserve.
+- [Others](./others/index.md) covers the community-driven capo SDK for Python.
 
 Each guide identifies the RustFS endpoint and addressing requirements to use when configuring the integrating system.

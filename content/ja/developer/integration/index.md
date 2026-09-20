@@ -11,5 +11,6 @@ description: "RustFS をリバースプロキシ、バックアップツール�
 - [Backup](./backup/index.md) は Restic を扱います。
 - [Big Data](./big-data/index.md) は Iceberg を扱います。
 - [オブザーバビリティ](./observability/index.md) は OpenObserve を扱います。
+- [その他](./others/index.md) はコミュニティ主導の Python 用 capo SDK を扱います。
 
 各ガイドでは、連携先システムを設定する際に使用する RustFS のエンドポイントとアドレス指定の要件を示します。
