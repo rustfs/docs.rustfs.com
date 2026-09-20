@@ -105,6 +105,20 @@ RUSTFS_IDENTITY_OPENID_USERNAME_CLAIM="preferred_username"
 
 Restart RustFS after applying the configuration.
 
+:::note[プライベートネットワーク上の Keycloak]
+
+Keycloak の名前解決結果がプライベート IP アドレスまたはループバック IP アドレスの場合は、RustFS サービスの環境変数 `RUSTFS_OUTBOUND_ALLOW_ORIGINS` にそのオリジンを追加します。たとえば、ポート `8080` を使用する Docker サービス `kc` では、次のように設定します。
+
+```ini
+RUSTFS_OUTBOUND_ALLOW_ORIGINS="http://kc:8080"
+```
+
+`scheme://host:port` 形式を使用し、`/realms/rustfs` などのパスは含めません。複数のオリジンはカンマで区切ります。ディスカバリードキュメントの `jwks_uri` または `token_endpoint` が別のプライベートオリジンを使用する場合は、それらも追加します。設定を変更したら RustFS を再起動します。パブリック IP アドレスに解決される公開エンドポイントには、この許可リストは不要です。
+
+必要な許可設定がないと、起動時のディスカバリーが失敗します。設定に `enabled: true` と表示されていても、そのプロバイダーは Console ログインと STS に使用できません。
+
+:::
+
 `RUSTFS_BROWSER_REDIRECT_URL` must contain the public scheme and authority without a path. It controls the Console success redirect and logout fallback URL. The provider callback URL must exactly match the URL registered in Keycloak.
 
 :::warning[Map claims in production]
