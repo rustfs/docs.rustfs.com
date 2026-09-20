@@ -3,6 +3,7 @@
   "pages": [
     "reverse-proxy",
     "backup",
-    "big-data"
+    "big-data",
+    "observability"
   ]
 }
