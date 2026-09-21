@@ -12,5 +12,8 @@ Use **RustFS** as the object storage layer for data analytics systems that suppo
 - [Milvus](./milvus.md)
 - [DuckDB](./duckdb.md)
 - [InfluxDB](./influxdb.md)
+- [Spark](./spark.md)
+- [Flink](./flink.md)
+- [Trino](./trino.md)
 
 Keep application data in a dedicated bucket and prefix, and use credentials scoped to the required bucket operations.
