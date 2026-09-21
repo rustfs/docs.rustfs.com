@@ -10,5 +10,6 @@ Nutzen Sie **RustFS** als Objektspeicher-Layer für Observability-Plattformen, d
 - [OpenObserve](./openobserve.md)
 - [Loki](./loki.md)
 - [Tempo](./tempo.md)
+- [Thanos](./thanos.md)
 
 Speichern Sie Telemetriedaten in einem dedizierten Bucket und beschränken Sie die Anmeldeinformationen auf die erforderlichen Bucket-Operationen.

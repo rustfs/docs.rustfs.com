@@ -1,6 +1,7 @@
 {
   "title": "备份",
   "pages": [
-    "restic"
+    "restic",
+    "longhorn"
   ]
 }

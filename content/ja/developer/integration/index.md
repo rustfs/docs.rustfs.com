@@ -8,11 +8,11 @@ description: "RustFS をリバースプロキシ、バックアップツール�
 ## Integration categories
 
 - [Reverse Proxy](./reverse-proxy/index.md) は Nginx、Traefik、Caddy、HAProxy を扱います。
-- [Backup](./backup/index.md) は Restic を扱います。
+- [Backup](./backup/index.md) は Restic と Longhorn を扱います。
 - [データ分析](./big-data/index.md) は Iceberg を扱います。
 - [オブザーバビリティ](./observability/index.md) は OpenObserve を扱います。
 - [その他](./others/index.md) はコミュニティ主導の Python 用 capo SDK を扱います。
 - [コンテナレジストリ](./registry/index.md) は Harbor を扱います。
-- [DevOps](./devops/index.md) は Elasticsearch と Terraform を扱います。
+- [DevOps](./devops/index.md) は Elasticsearch、Gitea、Terraform を扱います。
 
 各ガイドでは、連携先システムを設定する際に使用する RustFS のエンドポイントとアドレス指定の要件を示します。

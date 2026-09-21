@@ -8,5 +8,6 @@ Use **RustFS** as the object storage backend for backup tools that store reposit
 ## Systems
 
 - [Restic](./restic.md)
+- [Longhorn](./longhorn.md)
 
 Keep backup jobs in a dedicated bucket and prefix, and use credentials scoped to the required bucket operations.

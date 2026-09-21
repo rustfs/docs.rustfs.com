@@ -8,11 +8,11 @@ Utilisez cette section pour connecter **RustFS** à des plateformes d'infrastruc
 ## Integration categories
 
 - [Reverse Proxy](./reverse-proxy/index.md) couvre Nginx, Traefik, Caddy et HAProxy.
-- [Backup](./backup/index.md) couvre Restic.
+- [Backup](./backup/index.md) couvre Restic et Longhorn.
 - [Analyse de données](./big-data/index.md) couvre Iceberg.
 - [Observabilité](./observability/index.md) couvre OpenObserve.
 - [Autres](./others/index.md) couvre le SDK communautaire capo pour Python.
 - [Registre](./registry/index.md) couvre Harbor.
-- [DevOps](./devops/index.md) couvre Elasticsearch et Terraform.
+- [DevOps](./devops/index.md) couvre Elasticsearch, Gitea et Terraform.
 
 Chaque guide indique le point de terminaison RustFS et les exigences d'adressage à utiliser lors de la configuration du système intégré.

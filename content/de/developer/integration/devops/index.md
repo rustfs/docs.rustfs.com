@@ -8,6 +8,7 @@ Nutzen Sie **RustFS** als Objektspeicher-Layer für DevOps-Plattformen und Infra
 ## Plattformen und Tools
 
 - [Elasticsearch](./elasticsearch.md)
+- [Gitea](./gitea.md)
 - [Terraform](./terraform.md)
 
 Speichern Sie Artefakte, State und Telemetriedaten in dedizierten Buckets und beschränken Sie die Anmeldeinformationen auf die erforderlichen Bucket-Operationen.
