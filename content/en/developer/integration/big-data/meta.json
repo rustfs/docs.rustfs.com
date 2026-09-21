@@ -4,6 +4,7 @@
     "iceberg",
     "pyiceberg",
     "milvus",
-    "duckdb"
+    "duckdb",
+    "influxdb"
   ]
 }

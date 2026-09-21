@@ -3,7 +3,6 @@
   "pages": [
     "openobserve",
     "loki",
-    "tempo",
-    "influxdb"
+    "tempo"
   ]
 }

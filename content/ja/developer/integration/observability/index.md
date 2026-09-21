@@ -10,6 +10,5 @@ S3 互換エンドポイントをサポートするオブザーバビリティ�
 - [OpenObserve](./openobserve.md)
 - [Loki](./loki.md)
 - [Tempo](./tempo.md)
-- [InfluxDB](./influxdb.md)
 
 テレメトリデータは専用バケットに保存し、必要なバケット操作のみに権限が絞られた認証情報を使用してください。
