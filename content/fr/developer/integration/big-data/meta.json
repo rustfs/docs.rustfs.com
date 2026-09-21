@@ -1,10 +1,13 @@
 {
-  "title": "Analyse de données",
+  "title": "Data Analytics",
   "pages": [
     "iceberg",
     "pyiceberg",
     "milvus",
     "duckdb",
-    "influxdb"
+    "influxdb",
+    "spark",
+    "flink",
+    "trino"
   ]
 }

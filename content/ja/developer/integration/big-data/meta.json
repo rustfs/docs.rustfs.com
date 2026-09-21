@@ -5,6 +5,9 @@
     "pyiceberg",
     "milvus",
     "duckdb",
-    "influxdb"
+    "influxdb",
+    "spark",
+    "flink",
+    "trino"
   ]
 }

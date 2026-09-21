@@ -12,5 +12,8 @@ description: "通过 S3 兼容的对象存储接口将数据分析系统连接�
 - [Milvus](./milvus.md)
 - [DuckDB](./duckdb.md)
 - [InfluxDB](./influxdb.md)
+- [Spark](./spark.md)
+- [Flink](./flink.md)
+- [Trino](./trino.md)
 
 将应用程序数据保存在专用存储桶和前缀中，并使用作用域限定为所需存储桶操作的凭证。
