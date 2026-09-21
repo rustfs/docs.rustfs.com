@@ -7,11 +7,14 @@ Use **RustFS** as the object storage layer for data analytics systems that suppo
 
 ## Systems
 
+- [ClickHouse](./clickhouse.md)
 - [Iceberg](./iceberg.md)
 - [PyIceberg](./pyiceberg.md)
 - [Milvus](./milvus.md)
 - [MLflow](./mlflow.md)
+- [OpenDAL](./opendal.md)
 - [DuckDB](./duckdb.md)
+- [Doris](./doris.md)
 - [InfluxDB](./influxdb.md)
 - [Spark](./spark.md)
 - [Flink](./flink.md)

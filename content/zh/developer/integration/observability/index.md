@@ -7,7 +7,9 @@ description: "通过 S3 兼容对象存储接口，将可观测性平台连接�
 
 ## 平台
 
+- [Fluentd](./fluentd.md)
 - [OpenObserve](./openobserve.md)
+- [OpenTelemetry](./opentelemetry.md)
 - [Loki](./loki.md)
 - [Tempo](./tempo.md)
 - [Thanos](./thanos.md)

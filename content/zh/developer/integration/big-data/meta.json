@@ -1,14 +1,18 @@
 {
   "title": "数据分析",
   "pages": [
+    "clickhouse",
     "iceberg",
     "pyiceberg",
     "milvus",
     "mlflow",
+    "opendal",
     "duckdb",
+    "doris",
     "influxdb",
     "spark",
     "flink",
-    "trino"
+    "trino",
+    "zeppelin"
   ]
 }

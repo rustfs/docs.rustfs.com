@@ -1,8 +1,10 @@
 {
   "title": "Observability",
   "pages": [
-    "openobserve",
+    "fluentd",
     "loki",
+    "openobserve",
+    "opentelemetry",
     "tempo",
     "thanos"
   ]

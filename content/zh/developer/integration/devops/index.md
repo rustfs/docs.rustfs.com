@@ -9,6 +9,7 @@ description: "通过 S3 兼容的对象存储接口，将 DevOps 平台与基础
 
 - [Elasticsearch](./elasticsearch.md)
 - [Gitea](./gitea.md)
+- [Jenkins](./jenkins.md)
 - [Terraform](./terraform.md)
 
 请使用专用的存储桶保存制品、状态与遥测数据，并为凭证仅授予所需桶操作的权限。

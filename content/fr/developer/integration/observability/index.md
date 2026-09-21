@@ -7,7 +7,9 @@ Utilisez **RustFS** comme couche de stockage objet pour les plateformes d'observ
 
 ## Plateformes
 
+- [Fluentd](./fluentd.md)
 - [OpenObserve](./openobserve.md)
+- [OpenTelemetry](./opentelemetry.md)
 - [Loki](./loki.md)
 - [Tempo](./tempo.md)
 - [Thanos](./thanos.md)

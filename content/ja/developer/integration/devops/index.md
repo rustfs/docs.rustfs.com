@@ -9,6 +9,7 @@ S3 互換エンドポイントをサポートする DevOps プラットフォー
 
 - [Elasticsearch](./elasticsearch.md)
 - [Gitea](./gitea.md)
+- [Jenkins](./jenkins.md)
 - [Terraform](./terraform.md)
 
 アーティファクト、ステート、テレメトリデータは専用バケットに保存し、必要なバケット操作のみに権限が絞られた認証情報を使用してください。

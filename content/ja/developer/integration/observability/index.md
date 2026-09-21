@@ -7,7 +7,9 @@ S3 互換エンドポイントをサポートするオブザーバビリティ�
 
 ## プラットフォーム
 
+- [Fluentd](./fluentd.md)
 - [OpenObserve](./openobserve.md)
+- [OpenTelemetry](./opentelemetry.md)
 - [Loki](./loki.md)
 - [Tempo](./tempo.md)
 - [Thanos](./thanos.md)

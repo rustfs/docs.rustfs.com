@@ -3,6 +3,7 @@
   "pages": [
     "elasticsearch",
     "gitea",
+    "jenkins",
     "terraform"
   ]
 }
