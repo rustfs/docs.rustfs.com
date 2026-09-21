@@ -1,6 +1,7 @@
 {
   "title": "Backup",
   "pages": [
-    "restic"
+    "restic",
+    "longhorn"
   ]
 }
