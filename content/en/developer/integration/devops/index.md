@@ -9,6 +9,7 @@ Use **RustFS** as the object storage layer for DevOps platforms and infrastructu
 
 - [Elasticsearch](./elasticsearch.md)
 - [Gitea](./gitea.md)
+- [Jenkins](./jenkins.md)
 - [Terraform](./terraform.md)
 
 Keep artifacts, state, and telemetry in dedicated buckets, and use credentials scoped to the required bucket operations.

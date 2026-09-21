@@ -9,6 +9,7 @@ Utilisez **RustFS** comme couche de stockage objet pour les plateformes DevOps e
 
 - [Elasticsearch](./elasticsearch.md)
 - [Gitea](./gitea.md)
+- [Jenkins](./jenkins.md)
 - [Terraform](./terraform.md)
 
 Conservez les artefacts, l'état et les données de télémétrie dans des buckets dédiés et limitez les identifiants aux opérations de bucket requises.

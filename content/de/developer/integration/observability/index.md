@@ -7,7 +7,9 @@ Nutzen Sie **RustFS** als Objektspeicher-Layer für Observability-Plattformen, d
 
 ## Plattformen
 
+- [Fluentd](./fluentd.md)
 - [OpenObserve](./openobserve.md)
+- [OpenTelemetry](./opentelemetry.md)
 - [Loki](./loki.md)
 - [Tempo](./tempo.md)
 - [Thanos](./thanos.md)
