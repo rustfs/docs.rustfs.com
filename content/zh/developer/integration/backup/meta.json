@@ -1,7 +1,9 @@
 {
   "title": "备份",
   "pages": [
+    "kopia",
+    "longhorn",
     "restic",
-    "longhorn"
+    "velero"
   ]
 }

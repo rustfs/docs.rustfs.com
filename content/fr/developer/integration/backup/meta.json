@@ -1,7 +1,9 @@
 {
   "title": "Sauvegarde",
   "pages": [
+    "kopia",
+    "longhorn",
     "restic",
-    "longhorn"
+    "velero"
   ]
 }

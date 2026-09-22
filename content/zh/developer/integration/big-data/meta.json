@@ -2,16 +2,18 @@
   "title": "数据分析",
   "pages": [
     "clickhouse",
+    "duckdb",
+    "doris",
+    "flink",
+    "hudi",
     "iceberg",
-    "pyiceberg",
+    "influxdb",
+    "lakefs",
     "milvus",
     "mlflow",
     "opendal",
-    "duckdb",
-    "doris",
-    "influxdb",
+    "pyiceberg",
     "spark",
-    "flink",
     "trino",
     "zeppelin"
   ]

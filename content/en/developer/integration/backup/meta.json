@@ -1,7 +1,9 @@
 {
   "title": "Backup",
   "pages": [
+    "kopia",
+    "longhorn",
     "restic",
-    "longhorn"
+    "velero"
   ]
 }

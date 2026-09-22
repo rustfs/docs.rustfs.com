@@ -8,8 +8,9 @@ Utilisez cette section pour connecter **RustFS** à des plateformes d'infrastruc
 ## Integration categories
 
 - [Reverse Proxy](./reverse-proxy/index.md) couvre Nginx, Traefik, Caddy et HAProxy.
-- [Backup](./backup/index.md) couvre Restic et Longhorn.
-- [Analyse de données](./big-data/index.md) couvre les systèmes d'analyse incluant ClickHouse, Doris, Iceberg, Milvus, OpenDAL et Zeppelin.
+- [Backup](./backup/index.md) couvre Kopia, Longhorn, Restic et Velero.
+- [IA](./ai/index.md) couvre les plateformes d'IA incluant Ray.
+- [Analyse de données](./big-data/index.md) couvre les systèmes d'analyse incluant ClickHouse, Doris, Hudi, Iceberg, lakeFS, Milvus, OpenDAL et Zeppelin.
 - [Observabilité](./observability/index.md) couvre les systèmes de télémétrie incluant Fluentd, OpenObserve, OpenTelemetry, Thanos et Tempo.
 - [Autres](./others/index.md) couvre le SDK communautaire capo pour Python.
 - [Registre](./registry/index.md) couvre Harbor.
