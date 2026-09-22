@@ -8,6 +8,8 @@ description: "通过兼容 S3 的对象存储接口将备份工具连接到 Rust
 ## 系统
 
 - [Restic](./restic.md)
+- [Velero](./velero.md)
+- [Kopia](./kopia.md)
 - [Longhorn](./longhorn.md)
 
 请将备份作业放在专用的存储桶和前缀中，并使用仅限所需存储桶操作的凭据。

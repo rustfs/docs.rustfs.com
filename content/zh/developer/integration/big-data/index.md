@@ -8,6 +8,7 @@ description: "通过 S3 兼容的对象存储接口将数据分析系统连接�
 ## 系统
 
 - [ClickHouse](./clickhouse.md)
+- [Hudi](./hudi.md)
 - [Iceberg](./iceberg.md)
 - [PyIceberg](./pyiceberg.md)
 - [Milvus](./milvus.md)
@@ -15,6 +16,7 @@ description: "通过 S3 兼容的对象存储接口将数据分析系统连接�
 - [OpenDAL](./opendal.md)
 - [DuckDB](./duckdb.md)
 - [Doris](./doris.md)
+- [lakeFS](./lakefs.md)
 - [InfluxDB](./influxdb.md)
 - [Spark](./spark.md)
 - [Flink](./flink.md)

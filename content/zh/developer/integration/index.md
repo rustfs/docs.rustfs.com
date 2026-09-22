@@ -8,8 +8,9 @@ description: "将 RustFS 与反向代理、备份工具、数据分析系统、�
 ## 集成类别
 
 - [反向代理](./reverse-proxy/index.md)涵盖 Nginx、Traefik、Caddy 和 HAProxy。
-- [备份](./backup/index.md)涵盖 Restic 和 Longhorn。
-- [数据分析](./big-data/index.md)涵盖 ClickHouse、Doris、Iceberg、Milvus、OpenDAL 和 Zeppelin 等数据分析系统。
+- [备份](./backup/index.md)涵盖 Kopia、Longhorn、Restic 和 Velero。
+- [AI](./ai/index.md)涵盖 Ray 等 AI 平台。
+- [数据分析](./big-data/index.md)涵盖 ClickHouse、Doris、Hudi、Iceberg、lakeFS、Milvus、OpenDAL 和 Zeppelin 等数据分析系统。
 - [可观测性](./observability/index.md)涵盖 Fluentd、OpenObserve、OpenTelemetry、Thanos 和 Tempo 等遥测系统。
 - [其他](./others/index.md)涵盖社区驱动的 Python capo SDK。
 - [镜像仓库](./registry/index.md)涵盖 Harbor。

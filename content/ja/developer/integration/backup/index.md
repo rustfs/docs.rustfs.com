@@ -8,6 +8,8 @@ description: "S3 互換のオブジェクトストレージ経由でバックア
 ## システム
 
 - [Restic](./restic.md)
+- [Velero](./velero.md)
+- [Kopia](./kopia.md)
 - [Longhorn](./longhorn.md)
 
 バックアップジョブは専用のバケットとプレフィックスにまとめ、必要なバケット操作だけに絞った認証情報を使用します。
