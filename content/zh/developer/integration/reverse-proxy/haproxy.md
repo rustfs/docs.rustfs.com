@@ -131,7 +131,7 @@ services:
       RUSTFS_ADDRESS: ":9000"
       RUSTFS_CONSOLE_ADDRESS: ":9001"
       RUSTFS_OBS_LOGGER_LEVEL: error
-      RUSTFS_OBS_LOG_DIRECTORY: /var/log/rustfs/
+      RUSTFS_OBS_LOG_DIRECTORY: /logs
     expose:
       - "9000"
       - "9001"
@@ -193,7 +193,7 @@ curl --fail https://s3.example.com/health/ready
 curl --fail https://console.example.com/rustfs/console/health
 ```
 
-将 S3 客户端端点配置为 `https://s3.example.com`，并启用路径样式寻址。打开 `https://console.example.com` 登录控制台。
+将 S3 客户端端点配置为 `https://s3.example.com`，并启用路径样式寻址。打开 `https://console.example.com/rustfs/console/` 登录控制台。
 
 替换续订后的 `certs/rustfs.pem` 时，请验证配置并重新创建 HAProxy 容器以加载证书：
 
