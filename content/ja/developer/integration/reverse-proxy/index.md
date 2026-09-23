@@ -13,6 +13,7 @@ We recommend using separate hostnames for the S3 API on port `9000` and the Cons
 - [Traefik](./traefik.md)
 - [Caddy](./caddy.md)
 - [HAProxy](./haproxy.md)
+- [Apache HTTP Server](./httpd.md)
 
 ## Related configuration
 

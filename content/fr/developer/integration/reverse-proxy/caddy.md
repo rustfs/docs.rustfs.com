@@ -112,7 +112,7 @@ services:
       RUSTFS_ADDRESS: ":9000"
       RUSTFS_CONSOLE_ADDRESS: ":9001"
       RUSTFS_OBS_LOGGER_LEVEL: error
-      RUSTFS_OBS_LOG_DIRECTORY: /var/log/rustfs/
+      RUSTFS_OBS_LOG_DIRECTORY: /logs
     expose:
       - "9000"
       - "9001"
@@ -172,7 +172,7 @@ curl --fail https://s3.example.com/health/ready
 curl --fail https://console.example.com/rustfs/console/health
 ```
 
-Configure S3 clients with `https://s3.example.com` as the endpoint and enable path-style addressing. Open `https://console.example.com` to sign in to the Console.
+Configure S3 clients with `https://s3.example.com` as the endpoint and enable path-style addressing. Open `https://console.example.com/rustfs/console/` to sign in to the Console.
 
 ## Multi-node upstreams
 
