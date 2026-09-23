@@ -82,7 +82,7 @@ _条款与条件结束_
 
 要将 Apache 许可证应用于您的作品，请附上以下标准声明，并将方括号 `[]` 中的字段替换为您自己的身份信息。（不要包含方括号！）该文本应包含在适合相应文件格式的注释语法中。我们还建议在与版权声明相同的“打印页面”中包含文件名或类名以及用途说明，以便在第三方归档中更容易识别。
 
- Copyright [yyyy] [name of copyright owner]
+ Copyright 2024-2026 RustFS, Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
