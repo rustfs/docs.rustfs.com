@@ -4,6 +4,7 @@
     "nginx",
     "traefik",
     "caddy",
-    "haproxy"
+    "haproxy",
+    "httpd"
   ]
 }

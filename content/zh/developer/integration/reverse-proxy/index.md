@@ -13,6 +13,7 @@ description: "为 RustFS S3 API 和控制台选择并配置反向代理。"
 - [Traefik](./traefik.md)
 - [Caddy](./caddy.md)
 - [HAProxy](./haproxy.md)
+- [Apache HTTP Server](./httpd.md)
 
 ## 相关配置
 
