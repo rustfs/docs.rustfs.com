@@ -15,6 +15,7 @@
     "pyiceberg",
     "spark",
     "trino",
+    "vitess",
     "zeppelin"
   ]
 }
