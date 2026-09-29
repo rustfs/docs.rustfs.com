@@ -10,7 +10,8 @@
     "build": "waku build && node scripts/add-language-redirects.mjs && node scripts/sync-algolia.mjs",
     "start": "waku start",
     "types:check": "fumadocs-mdx && tsc --noEmit",
-    "docs:check": "node scripts/docs-check.mjs"
+    "docs:check": "node scripts/docs-check.mjs",
+    "test:worker": "node --test scripts/worker-redirects.test.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
