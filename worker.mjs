@@ -70,6 +70,16 @@ function splitLocale(pathname) {
   return { locale, remainder: remainder === "/" ? "/" : remainder };
 }
 
+// Redirect sources never carry a trailing slash (see scripts/language-redirects.mjs),
+// but inbound URLs may. Canonicalize before matching so /installation/ reuses the
+// /installation rule instead of falling through to a missing asset.
+function normalizePathname(pathname) {
+  if (pathname.length > 1 && pathname.endsWith("/")) {
+    return pathname.slice(0, -1);
+  }
+  return pathname;
+}
+
 function isLocalizedPath(pathname) {
   return pathname === `/${DEFAULT_LOCALE}` || pathname.startsWith(`/${DEFAULT_LOCALE}/`);
 }
@@ -87,11 +97,12 @@ export default {
     if (method === "GET" || method === "HEAD") {
       const url = new URL(request.url);
       const rules = await getRedirectRules(env);
-      let matched = matchRedirect(url.pathname, rules);
+      const pathname = normalizePathname(url.pathname);
+      let matched = matchRedirect(pathname, rules);
 
       // English-only fallback: /en/foo can reuse base rule /foo -> /en/bar.
       if (!matched) {
-        const { locale, remainder } = splitLocale(url.pathname);
+        const { locale, remainder } = splitLocale(pathname);
         if (locale) {
           const baseMatch = matchRedirect(remainder, rules);
           if (baseMatch) {
@@ -108,7 +119,7 @@ export default {
         targetUrl.search = url.search;
 
         // Avoid redirect loops caused by equivalent source/target paths.
-        if (`${targetUrl.pathname}${targetUrl.search}` !== `${url.pathname}${url.search}`) {
+        if (`${targetUrl.pathname}${targetUrl.search}` !== `${pathname}${url.search}`) {
           return Response.redirect(targetUrl.toString(), matched.status);
         }
       }
