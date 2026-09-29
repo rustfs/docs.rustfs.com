@@ -8,10 +8,12 @@ S3 互換エンドポイントをサポートするオブザーバビリティ�
 ## プラットフォーム
 
 - [Fluentd](./fluentd.md)
+- [GreptimeDB](./greptimedb.md)
 - [OpenObserve](./openobserve.md)
 - [OpenTelemetry](./opentelemetry.md)
 - [Loki](./loki.md)
 - [Tempo](./tempo.md)
 - [Thanos](./thanos.md)
+- [VictoriaMetrics](./victoriametrics.md)
 
 テレメトリデータは専用バケットに保存し、必要なバケット操作のみに権限が絞られた認証情報を使用してください。

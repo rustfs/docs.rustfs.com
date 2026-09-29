@@ -8,10 +8,12 @@ Use **RustFS** as the object storage layer for observability platforms that supp
 ## Platforms
 
 - [Fluentd](./fluentd.md)
+- [GreptimeDB](./greptimedb.md)
 - [OpenObserve](./openobserve.md)
 - [OpenTelemetry](./opentelemetry.md)
 - [Loki](./loki.md)
 - [Tempo](./tempo.md)
 - [Thanos](./thanos.md)
+- [VictoriaMetrics](./victoriametrics.md)
 
 Keep telemetry data in a dedicated bucket, and use credentials scoped to the required bucket operations.

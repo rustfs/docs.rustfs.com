@@ -7,14 +7,14 @@ Utilisez cette section pour connecter **RustFS** à des plateformes d'infrastruc
 
 ## Integration categories
 
-- [Reverse Proxy](./reverse-proxy/index.md) couvre Nginx, Traefik, Caddy et HAProxy.
+- [Reverse Proxy](./reverse-proxy/index.md) couvre Nginx, Traefik, Caddy, HAProxy et Envoy.
 - [Backup](./backup/index.md) couvre Kopia, Longhorn, Restic et Velero.
 - [IA](./ai/index.md) couvre les plateformes d'IA incluant Ray.
-- [Analyse de données](./big-data/index.md) couvre les systèmes d'analyse incluant ClickHouse, Doris, Hudi, Iceberg, lakeFS, Milvus, OpenDAL, Vitess et Zeppelin.
+- [Analyse de données](./big-data/index.md) couvre les systèmes d'analyse incluant Airflow, ClickHouse, Delta Lake, Doris, Hudi, Iceberg, Kafka, lakeFS, Milvus, OpenDAL, Vitess et Zeppelin.
 - [Cloud Native](./cloud-native/index.md) couvre Cortex et Flux.
-- [Observabilité](./observability/index.md) couvre les systèmes de télémétrie incluant Fluentd, OpenObserve, OpenTelemetry, Thanos et Tempo.
-- [Autres](./others/index.md) couvre le SDK communautaire capo pour Python.
+- [Observabilité](./observability/index.md) couvre les systèmes de télémétrie incluant Fluentd, GreptimeDB, Loki, OpenObserve, OpenTelemetry, Tempo, Thanos et VictoriaMetrics.
+- [Autres](./others/index.md) couvre le SDK capo, rclone, JuiceFS et Nextcloud.
 - [Registre](./registry/index.md) couvre Harbor.
-- [DevOps](./devops/index.md) couvre Elasticsearch, Gitea, Jenkins et Terraform.
+- [DevOps](./devops/index.md) couvre Elasticsearch, Gitea, Jenkins, OpenSearch et Terraform.
 
 Chaque guide indique le point de terminaison RustFS et les exigences d'adressage à utiliser lors de la configuration du système intégré.

@@ -8,10 +8,12 @@ Nutzen Sie **RustFS** als Objektspeicher-Layer für Observability-Plattformen, d
 ## Plattformen
 
 - [Fluentd](./fluentd.md)
+- [GreptimeDB](./greptimedb.md)
 - [OpenObserve](./openobserve.md)
 - [OpenTelemetry](./opentelemetry.md)
 - [Loki](./loki.md)
 - [Tempo](./tempo.md)
 - [Thanos](./thanos.md)
+- [VictoriaMetrics](./victoriametrics.md)
 
 Speichern Sie Telemetriedaten in einem dedizierten Bucket und beschränken Sie die Anmeldeinformationen auf die erforderlichen Bucket-Operationen.

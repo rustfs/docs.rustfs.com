@@ -8,6 +8,7 @@ Utilisez **RustFS** comme couche de stockage objet pour les plateformes DevOps e
 ## Plateformes et outils
 
 - [Elasticsearch](./elasticsearch.md)
+- [OpenSearch](./opensearch.md)
 - [Gitea](./gitea.md)
 - [Jenkins](./jenkins.md)
 - [Terraform](./terraform.md)

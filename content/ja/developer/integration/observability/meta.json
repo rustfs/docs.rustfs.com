@@ -2,10 +2,12 @@
   "title": "オブザーバビリティ",
   "pages": [
     "fluentd",
+    "greptimedb",
     "loki",
     "openobserve",
     "opentelemetry",
     "tempo",
-    "thanos"
+    "thanos",
+    "victoriametrics"
   ]
 }

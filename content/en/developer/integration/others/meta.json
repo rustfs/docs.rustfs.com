@@ -1,6 +1,9 @@
 {
   "title": "Others",
   "pages": [
-    "capo"
+    "capo",
+    "juicefs",
+    "nextcloud",
+    "rclone"
   ]
 }

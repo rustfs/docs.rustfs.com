@@ -8,6 +8,7 @@ Nutzen Sie **RustFS** als Objektspeicher-Layer für DevOps-Plattformen und Infra
 ## Plattformen und Tools
 
 - [Elasticsearch](./elasticsearch.md)
+- [OpenSearch](./opensearch.md)
 - [Gitea](./gitea.md)
 - [Jenkins](./jenkins.md)
 - [Terraform](./terraform.md)

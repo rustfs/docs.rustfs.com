@@ -8,6 +8,7 @@ description: "通过 S3 兼容的对象存储接口，将 DevOps 平台与基础
 ## 平台与工具
 
 - [Elasticsearch](./elasticsearch.md)
+- [OpenSearch](./opensearch.md)
 - [Gitea](./gitea.md)
 - [Jenkins](./jenkins.md)
 - [Terraform](./terraform.md)
