@@ -65,11 +65,11 @@ The chart supports two modes, selected via the `mode` values:
 
 | Mode | Values | Workload | Layout |
 | --- | --- | --- | --- |
-| Distributed (**default**) | `mode.distributed.enabled=true` | StatefulSet | `replicaCount: 4` pods, 4 data PVCs each (16 drives total) — or `replicaCount: 16` for 16 pods with 1 data PVC each |
+| Distributed (**default**) | `mode.distributed.enabled=true` | StatefulSet | `replicaCount` pods (`>= 2`, default `4`) × `drivesPerNode` data PVCs per pod (`>= 1`, inferred as `4` when `replicaCount: 4` or `1` otherwise; 16 drives by default) |
 | Standalone | `mode.standalone.enabled=true`, `mode.distributed.enabled=false` | Deployment | 1 pod, 1 data PVC (single node single disk) |
 
 - **Standalone** matches single-node single-disk: no erasure-coding redundancy across nodes. Use it for development, testing, or small setups where the underlying storage provides its own durability. It can reuse existing PVCs via `mode.standalone.existingClaim.dataClaim` / `mode.standalone.existingClaim.logsClaim`.
-- **Distributed** behaves like [multiple node multiple disk](../linux/multiple-node-multiple-disk.md): objects are erasure-coded across pods and PVCs. `replicaCount` must be `4` (each pod gets 4 PVCs) or `16` (each pod gets 1 PVC); pick based on how many nodes your cluster can spread pods across.
+- **Distributed** behaves like [multiple node multiple disk](../linux/multiple-node-multiple-disk.md): objects are erasure-coded across pods and PVCs. `replicaCount` sets the number of pods (`>= 2`) and `drivesPerNode` sets the number of data PVCs per pod (`>= 1`), giving `replicaCount * drivesPerNode` total drives. When `drivesPerNode` is left unset (`null`), the chart infers `4` data PVCs per pod when `replicaCount` is `4` (16 drives total) and `1` data PVC per pod for any other `replicaCount` (such as `replicaCount: 16` for 16 pods with 1 PVC each). Set both `replicaCount` and `drivesPerNode` explicitly (for example, `replicaCount: 4` and `drivesPerNode: 2` for 8 drives) to choose another layout.
 
 ```bash
 # Standalone mode
@@ -93,7 +93,7 @@ storageclass:
 
 :::warning[The default PVC size is 256Mi — change it]
 
-The chart's default size for the data and logs volumes is **256Mi**, which is only enough to verify the chart works. For any real workload set `storageclass.dataStorageSize` (for example `1Ti`) and `storageclass.logStorageSize` (for example `1Gi`) at install time. In distributed mode the data size applies to **each** data PVC (16 PVCs by default).
+The chart's default size for the data and logs volumes is **256Mi**, which is only enough to verify the chart works. For any real workload set `storageclass.dataStorageSize` (for example `1Ti`) and `storageclass.logStorageSize` (for example `1Gi`) at install time. In distributed mode the data size applies to **each** data PVC (`replicaCount * drivesPerNode`, 16 PVCs by default).
 
 :::
 
@@ -157,12 +157,12 @@ pools:
   list:
     - {}                  # pool 0: inherits top-level values and keeps the
                           # existing StatefulSet/pod/PVC names and data
-    - replicaCount: 4     # pool 1: new capacity (4 or 16)
+    - replicaCount: 4     # pool 1: new capacity (replicaCount >= 2)
       storageclass:
         dataStorageSize: 10Gi
 ```
 
-Then apply with `helm upgrade`. Each entry may set `replicaCount` (4 or 16) and/or a `storageclass` block; omitted fields inherit the top-level values. Additional pools render as `<fullname>-pool<N>` StatefulSets; all pools share the headless service, the main service, the configuration, and the credentials.
+Then apply with `helm upgrade`. Each entry may set `replicaCount` (`>= 2`) and/or a `storageclass` block; omitted fields inherit the top-level values. When top-level `drivesPerNode` is set explicitly, that drive count applies to every pool; when `drivesPerNode` is left unset (`null`), the chart infers the drive count per pool from that pool's `replicaCount` (`4` drives per pod when `replicaCount` is `4`, or `1` drive per pod otherwise). Additional pools render as `<fullname>-pool<N>` StatefulSets; all pools share the headless service, the main service, the configuration, and the credentials.
 
 :::warning[Pools are append-only]
 
