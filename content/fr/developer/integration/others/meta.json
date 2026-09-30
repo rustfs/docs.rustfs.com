@@ -1,6 +1,10 @@
 {
   "title": "Autres",
   "pages": [
-    "capo"
+    "capo",
+    "juicefs",
+    "nextcloud",
+    "rclone",
+    "tusd"
   ]
 }

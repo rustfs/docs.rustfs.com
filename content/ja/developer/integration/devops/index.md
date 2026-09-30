@@ -8,6 +8,7 @@ S3 互換エンドポイントをサポートする DevOps プラットフォー
 ## プラットフォームとツール
 
 - [Elasticsearch](./elasticsearch.md)
+- [OpenSearch](./opensearch.md)
 - [Gitea](./gitea.md)
 - [Jenkins](./jenkins.md)
 - [Terraform](./terraform.md)

@@ -8,5 +8,6 @@ Utilisez **RustFS** comme couche de stockage objet pour les plateformes d'IA et 
 ## Plateformes
 
 - [Ray](./ray.md)
+- [vLLM](./vllm.md)
 
 Conservez les jeux de données et les checkpoints dans des buckets dédiés et limitez les identifiants aux opérations de bucket requises.

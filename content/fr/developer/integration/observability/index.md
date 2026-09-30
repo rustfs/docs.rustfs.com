@@ -8,10 +8,12 @@ Utilisez **RustFS** comme couche de stockage objet pour les plateformes d'observ
 ## Plateformes
 
 - [Fluentd](./fluentd.md)
+- [GreptimeDB](./greptimedb.md)
 - [OpenObserve](./openobserve.md)
 - [OpenTelemetry](./opentelemetry.md)
 - [Loki](./loki.md)
 - [Tempo](./tempo.md)
 - [Thanos](./thanos.md)
+- [VictoriaMetrics](./victoriametrics.md)
 
 Conservez les données de télémétrie dans un bucket dédié et limitez les identifiants aux opérations de bucket requises.
