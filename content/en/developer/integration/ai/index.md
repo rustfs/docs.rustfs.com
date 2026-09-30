@@ -8,5 +8,6 @@ Use **RustFS** as the object storage layer for AI and machine learning platforms
 ## Platforms
 
 - [Ray](./ray.md)
+- [vLLM](./vllm.md)
 
 Keep training datasets and checkpoints in dedicated buckets, and use credentials scoped to the required bucket operations.

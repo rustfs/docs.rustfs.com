@@ -9,11 +9,11 @@ description: "RustFS をリバースプロキシ、バックアップツール�
 
 - [Reverse Proxy](./reverse-proxy/index.md) は Nginx、Traefik、Caddy、HAProxy、Envoy を扱います。
 - [Backup](./backup/index.md) は Kopia、Longhorn、Restic、Velero を扱います。
-- [AI](./ai/index.md) は Ray などの AI プラットフォームを扱います。
+- [AI](./ai/index.md) は Ray、vLLM などの AI プラットフォームを扱います。
 - [データ分析](./big-data/index.md) は Airflow、ClickHouse、Delta Lake、Doris、Hudi、Iceberg、Kafka、lakeFS、Milvus、OpenDAL、Vitess、Zeppelin などの分析システムを扱います。
 - [クラウドネイティブ](./cloud-native/index.md) は Cortex、Flux を扱います。
 - [オブザーバビリティ](./observability/index.md) は Fluentd、GreptimeDB、Loki、OpenObserve、OpenTelemetry、Tempo、Thanos、VictoriaMetrics などのテレメトリシステムを扱います。
-- [その他](./others/index.md) は capo SDK、rclone、JuiceFS、Nextcloud などのツールを扱います。
+- [その他](./others/index.md) は capo SDK、rclone、JuiceFS、Nextcloud、tusd などのツールを扱います。
 - [コンテナレジストリ](./registry/index.md) は Harbor を扱います。
 - [DevOps](./devops/index.md) は Elasticsearch、Gitea、Jenkins、OpenSearch、Terraform を扱います。
 

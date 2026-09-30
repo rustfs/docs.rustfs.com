@@ -4,6 +4,7 @@
     "capo",
     "juicefs",
     "nextcloud",
-    "rclone"
+    "rclone",
+    "tusd"
   ]
 }

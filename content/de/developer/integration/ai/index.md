@@ -8,5 +8,6 @@ Nutzen Sie **RustFS** als Objektspeicher-Layer für KI- und Machine-Learning-Pla
 ## Plattformen
 
 - [Ray](./ray.md)
+- [vLLM](./vllm.md)
 
 Speichern Sie Trainingsdaten und Checkpoints in dedizierten Buckets und beschränken Sie die Anmeldeinformationen auf die erforderlichen Bucket-Operationen.
