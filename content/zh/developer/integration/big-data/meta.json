@@ -18,6 +18,7 @@
     "pyiceberg",
     "spark",
     "trino",
+    "zerofs",
     "vitess",
     "zeppelin"
   ]
