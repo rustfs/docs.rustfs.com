@@ -24,6 +24,7 @@ Use **RustFS** as the object storage layer for data analytics systems that suppo
 - [Spark](./spark.md)
 - [Flink](./flink.md)
 - [Trino](./trino.md)
+- [ZeroFS](./zerofs.md)
 - [Vitess](./vitess.md)
 
 Keep application data in a dedicated bucket and prefix, and use credentials scoped to the required bucket operations.
