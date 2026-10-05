@@ -26,6 +26,7 @@ Boolean variables accept `true`/`false`. Values shown as "unset" have no default
 | `RUSTFS_HEALTH_READINESS_CACHE_TTL_MS` | `1000` | Cache TTL for readiness probe results, in milliseconds. |
 | `RUSTFS_HEALTH_CLUSTER_TIMEOUT_MS` | `2000` | Timeout for cluster health probes (`/minio/health/cluster`), in milliseconds. |
 | `RUSTFS_STARTUP_READINESS_MAX_WAIT_SECS` | `120` | Maximum time the readiness probe reports "starting" before startup is considered failed. |
+| `RUSTFS_CHECK_UPDATE` | `true` | Check for a newer RustFS release at startup by sending one HTTPS request to `version.rustfs.com`; the user agent carries the current version. The result is logged only, and RustFS never updates itself. Set to `false` to skip the outbound request, for example in air-gapped deployments; unrecognized values fall back to `true`. |
 
 ## Console
 
