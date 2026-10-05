@@ -26,6 +26,7 @@ description: "介绍用于配置 RustFS 服务器、控制台、TLS、KMS、可�
 | `RUSTFS_HEALTH_READINESS_CACHE_TTL_MS` | `1000` | 就绪探针结果的缓存 TTL，单位为毫秒。 |
 | `RUSTFS_HEALTH_CLUSTER_TIMEOUT_MS` | `2000` | 集群健康探针（`/minio/health/cluster`）的超时时间，单位为毫秒。 |
 | `RUSTFS_STARTUP_READINESS_MAX_WAIT_SECS` | `120` | 就绪探针报告“starting”的最长时间，超过后视为启动失败。 |
+| `RUSTFS_CHECK_UPDATE` | `true` | 启动时向 `version.rustfs.com` 发送一次 HTTPS 请求，检查是否有新版本的 RustFS（请求的 User-Agent 会携带当前版本号）。结果仅记录日志，RustFS 不会自动升级。设置为 `false` 可跳过该出站请求，例如在隔离网络部署中；无法识别的取值会回退为 `true`。 |
 
 ## 控制台
 
