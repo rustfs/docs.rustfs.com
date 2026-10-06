@@ -7,6 +7,7 @@ S3 互換エンドポイントをサポートする AI・機械学習プラッ�
 
 ## プラットフォーム
 
+- [MLflow](./mlflow.md)
 - [Ray](./ray.md)
 - [vLLM](./vllm.md)
 

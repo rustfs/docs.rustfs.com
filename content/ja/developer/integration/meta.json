@@ -3,7 +3,9 @@
   "pages": [
     "reverse-proxy",
     "backup",
+    "database",
     "big-data",
+    "storage",
     "ai",
     "cloud-native",
     "observability",

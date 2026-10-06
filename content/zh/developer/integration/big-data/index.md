@@ -7,24 +7,14 @@ description: "通过 S3 兼容的对象存储接口将数据分析系统连接�
 
 ## 系统
 
-- [ClickHouse](./clickhouse.md)
 - [Airflow](./airflow.md)
+- [Delta Lake](./delta-lake.md)
+- [Flink](./flink.md)
 - [Hudi](./hudi.md)
 - [Iceberg](./iceberg.md)
-- [PyIceberg](./pyiceberg.md)
-- [Milvus](./milvus.md)
-- [MLflow](./mlflow.md)
-- [OpenDAL](./opendal.md)
-- [DuckDB](./duckdb.md)
-- [Doris](./doris.md)
-- [Delta Lake](./delta-lake.md)
-- [lakeFS](./lakefs.md)
-- [InfluxDB](./influxdb.md)
 - [Kafka](./kafka.md)
+- [PyIceberg](./pyiceberg.md)
 - [Spark](./spark.md)
-- [Flink](./flink.md)
-- [Trino](./trino.md)
-- [ZeroFS](./zerofs.md)
-- [Vitess](./vitess.md)
+- [Zeppelin](./zeppelin.md)
 
-将应用程序数据保存在专用存储桶和前缀中，并使用作用域限定为所需存储桶操作的凭证。
+请将大数据作业的数据保存在专用的桶和前缀下，并为凭证仅授予所需桶操作的权限。

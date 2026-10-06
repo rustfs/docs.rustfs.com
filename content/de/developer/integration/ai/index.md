@@ -7,6 +7,7 @@ Nutzen Sie **RustFS** als Objektspeicher-Layer für KI- und Machine-Learning-Pla
 
 ## Plattformen
 
+- [MLflow](./mlflow.md)
 - [Ray](./ray.md)
 - [vLLM](./vllm.md)
 

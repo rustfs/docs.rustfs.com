@@ -1,25 +1,14 @@
 {
-  "title": "数据分析",
+  "title": "大数据",
   "pages": [
-    "clickhouse",
     "airflow",
-    "duckdb",
-    "doris",
     "delta-lake",
     "flink",
     "hudi",
     "iceberg",
-    "influxdb",
     "kafka",
-    "lakefs",
-    "milvus",
-    "mlflow",
-    "opendal",
     "pyiceberg",
     "spark",
-    "trino",
-    "zerofs",
-    "vitess",
     "zeppelin"
   ]
 }

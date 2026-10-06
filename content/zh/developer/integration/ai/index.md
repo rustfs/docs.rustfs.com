@@ -7,6 +7,7 @@ description: "通过 S3 兼容的对象存储接口，将 AI 平台连接到 Rus
 
 ## 平台
 
+- [MLflow](./mlflow.md)
 - [Ray](./ray.md)
 - [vLLM](./vllm.md)
 
