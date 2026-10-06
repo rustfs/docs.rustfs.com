@@ -7,6 +7,7 @@ Use **RustFS** as the object storage layer for AI and machine learning platforms
 
 ## Platforms
 
+- [MLflow](./mlflow.md)
 - [Ray](./ray.md)
 - [vLLM](./vllm.md)
 

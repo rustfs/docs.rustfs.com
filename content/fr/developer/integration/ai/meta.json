@@ -1,6 +1,7 @@
 {
   "title": "IA",
   "pages": [
+    "mlflow",
     "ray",
     "vllm"
   ]

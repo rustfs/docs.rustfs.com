@@ -7,6 +7,7 @@ Utilisez **RustFS** comme couche de stockage objet pour les plateformes d'IA et 
 
 ## Plateformes
 
+- [MLflow](./mlflow.md)
 - [Ray](./ray.md)
 - [vLLM](./vllm.md)
 

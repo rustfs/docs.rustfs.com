@@ -1,25 +1,14 @@
 {
-  "title": "Data Analytics",
+  "title": "Big Data",
   "pages": [
-    "clickhouse",
     "airflow",
-    "duckdb",
-    "doris",
     "delta-lake",
     "flink",
     "hudi",
     "iceberg",
-    "influxdb",
     "kafka",
-    "lakefs",
-    "milvus",
-    "mlflow",
-    "opendal",
     "pyiceberg",
     "spark",
-    "trino",
-    "zerofs",
-    "vitess",
     "zeppelin"
   ]
 }
