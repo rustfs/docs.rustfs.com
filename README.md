@@ -16,7 +16,7 @@ RustFS is an S3-compatible distributed object storage engine written in Rust. Th
 - `content/<locale>/**/meta.json` – locale-specific sidebar titles and ordering for nested groups.
 - `press.config.tsx` – site config: name, navbar links, social links, logo, analytics, SEO, plugins, and MDX components.
 - `source.config.ts` – content collection + global MDX options (KaTeX math, Mermaid diagrams).
-- `waku.config.ts` – Waku/Vite plugins (FumaPress, Fumadocs MDX, Tailwind).
+- `vite.config.ts` – Vite plugins (FumaPress, Fumadocs MDX, Tailwind).
 - `src/app.css` – Tailwind + Fumadocs UI theme imports.
 - `src/components/` – custom React components (e.g. the Mermaid renderer).
 - `public/` – static assets (favicons, logo, manifest) served from the site root.
@@ -47,7 +47,7 @@ Run `npm run docs:check`, `npm run types:check`, and `npm run build` before subm
 
 ### Prerequisites
 
-- Node.js 20+ (Node 22 recommended)
+- Node.js 24+
 - `npm`
 - Git
 
@@ -59,7 +59,7 @@ cd docs.rustfs.com
 npm install
 
 # Work locally
-npm run dev        # Waku dev server (defaults to http://localhost:3000)
+npm run dev        # FumaPress dev server (defaults to http://localhost:3000)
 
 # Required before opening a PR
 npm run build      # static export to dist/public/
