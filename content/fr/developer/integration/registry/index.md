@@ -8,5 +8,6 @@ Utilisez **RustFS** comme couche de stockage objet pour les registries de conten
 ## Registries
 
 - [Harbor](./harbor.md)
+- [Docker Registry](./docker-registry.md)
 
 Conservez les artefacts d'images dans un bucket dédié et limitez les identifiants aux opérations de bucket requises.

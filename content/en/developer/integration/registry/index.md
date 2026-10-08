@@ -8,5 +8,6 @@ Use **RustFS** as the object storage layer for container registries that support
 ## Registries
 
 - [Harbor](./harbor.md)
+- [Docker Registry](./docker-registry.md)
 
 Keep image artifacts in a dedicated bucket, and use credentials scoped to the required bucket operations.

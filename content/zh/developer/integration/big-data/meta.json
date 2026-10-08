@@ -2,13 +2,18 @@
   "title": "大数据",
   "pages": [
     "airflow",
+    "dolphinscheduler",
     "delta-lake",
     "flink",
+    "hive",
     "hudi",
+    "paimon",
     "iceberg",
     "kafka",
+    "automq",
     "pyiceberg",
     "spark",
+    "seatunnel",
     "zeppelin"
   ]
 }

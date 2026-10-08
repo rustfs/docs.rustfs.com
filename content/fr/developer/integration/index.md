@@ -10,13 +10,13 @@ Utilisez cette section pour connecter **RustFS** à des plateformes d'infrastruc
 - [Reverse Proxy](./reverse-proxy/index.md) couvre Nginx, Traefik, Caddy, HAProxy et Envoy.
 - [Backup](./backup/index.md) couvre Kopia, Longhorn, Restic et Velero.
 - [IA](./ai/index.md) couvre les plateformes d'IA incluant Ray et vLLM.
-- [Database](./database/index.md) covers ClickHouse, Doris, DuckDB, InfluxDB, LanceDB, Milvus, Trino, and Vitess.
-- [Big Data](./big-data/index.md) covers Airflow, Delta Lake, Flink, Hudi, Iceberg, Kafka, PyIceberg, Spark, and Zeppelin.
-- [Storage](./storage/index.md) covers lakeFS, OpenDAL, and ZeroFS.
+- [Database](./database/index.md) covers ClickHouse, Databend, Doris, DuckDB, InfluxDB, LanceDB, Milvus, Trino, and Vitess.
+- [Big Data](./big-data/index.md) covers Airflow, AutoMQ, Delta Lake, DolphinScheduler, Flink, Hive, Hudi, Iceberg, Kafka, Paimon, PyIceberg, SeaTunnel, Spark, and Zeppelin.
+- [Storage](./storage/index.md) covers Alluxio, lakeFS, OpenDAL, SFTPGo, s3fs, and ZeroFS.
 - [Cloud Native](./cloud-native/index.md) couvre Cortex et Flux.
 - [Observabilité](./observability/index.md) couvre les systèmes de télémétrie incluant Fluentd, GreptimeDB, Loki, OpenObserve, OpenTelemetry, Tempo, Thanos et VictoriaMetrics.
 - [Autres](./others/index.md) couvre le SDK capo, rclone, JuiceFS, Nextcloud et tusd.
-- [Registre](./registry/index.md) couvre Harbor.
+- [Registre](./registry/index.md) couvre Docker Registry et Harbor.
 - [DevOps](./devops/index.md) couvre Elasticsearch, Gitea, Jenkins, OpenSearch et Terraform.
 
 Chaque guide indique le point de terminaison RustFS et les exigences d'adressage à utiliser lors de la configuration du système intégré.

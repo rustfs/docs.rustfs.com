@@ -15,6 +15,11 @@ description: "通过 S3 兼容的对象存储接口将数据分析系统连接�
 - [Kafka](./kafka.md)
 - [PyIceberg](./pyiceberg.md)
 - [Spark](./spark.md)
+- [SeaTunnel](./seatunnel.md)
+- [AutoMQ](./automq.md)
+- [Paimon](./paimon.md)
+- [DolphinScheduler](./dolphinscheduler.md)
+- [Hive](./hive.md)
 - [Zeppelin](./zeppelin.md)
 
 请将大数据作业的数据保存在专用的桶和前缀下，并为凭证仅授予所需桶操作的权限。

@@ -15,6 +15,11 @@ Use **RustFS** as the object storage layer for data analytics systems that suppo
 - [Kafka](./kafka.md)
 - [PyIceberg](./pyiceberg.md)
 - [Spark](./spark.md)
+- [SeaTunnel](./seatunnel.md)
+- [AutoMQ](./automq.md)
+- [Paimon](./paimon.md)
+- [DolphinScheduler](./dolphinscheduler.md)
+- [Hive](./hive.md)
 - [Zeppelin](./zeppelin.md)
 
 Keep big data workload data in a dedicated bucket and prefix, and use credentials scoped to the required bucket operations.

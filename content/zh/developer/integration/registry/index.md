@@ -8,5 +8,6 @@ description: "通过 S3 兼容的对象存储接口将容器镜像仓库连接�
 ## 镜像仓库
 
 - [Harbor](./harbor.md)
+- [Docker Registry](./docker-registry.md)
 
 请将镜像制品保存在专用存储桶中，并为凭证仅授予所需桶操作的权限。

@@ -2,13 +2,18 @@
   "title": "Big Data",
   "pages": [
     "airflow",
+    "dolphinscheduler",
     "delta-lake",
     "flink",
+    "hive",
     "hudi",
+    "paimon",
     "iceberg",
     "kafka",
+    "automq",
     "pyiceberg",
     "spark",
+    "seatunnel",
     "zeppelin"
   ]
 }
