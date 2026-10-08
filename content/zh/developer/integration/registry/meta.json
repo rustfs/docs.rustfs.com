@@ -1,6 +1,7 @@
 {
   "title": "镜像仓库",
   "pages": [
-    "harbor"
+    "harbor",
+    "docker-registry"
   ]
 }

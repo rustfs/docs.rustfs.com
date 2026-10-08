@@ -8,5 +8,6 @@ Nutzen Sie **RustFS** als Objektspeicher-Layer für Container-Registries mit ein
 ## Registries
 
 - [Harbor](./harbor.md)
+- [Docker Registry](./docker-registry.md)
 
 Speichern Sie Image-Artefakte in einem dedizierten Bucket und beschränken Sie die Anmeldeinformationen auf die erforderlichen Bucket-Operationen.

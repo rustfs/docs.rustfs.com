@@ -5,6 +5,7 @@
     "doris",
     "duckdb",
     "influxdb",
+    "databend",
     "lancedb",
     "milvus",
     "trino",

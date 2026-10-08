@@ -3,6 +3,9 @@
   "pages": [
     "lakefs",
     "opendal",
-    "zerofs"
+    "zerofs",
+    "alluxio",
+    "sftpgo",
+    "s3fs"
   ]
 }

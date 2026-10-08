@@ -1,6 +1,7 @@
 {
   "title": "Registry",
   "pages": [
-    "harbor"
+    "harbor",
+    "docker-registry"
   ]
 }

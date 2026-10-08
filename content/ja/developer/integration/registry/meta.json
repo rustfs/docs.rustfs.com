@@ -1,6 +1,7 @@
 {
   "title": "コンテナレジストリ",
   "pages": [
-    "harbor"
+    "harbor",
+    "docker-registry"
   ]
 }
