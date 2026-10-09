@@ -5,7 +5,7 @@ This playbook directs AI agents working in the RustFS documentation repository s
 > **Every agent:** the operating playbook for writing and reviewing these docs is the skill at [`.agents/skills/rustfs-docs/SKILL.md`](.agents/skills/rustfs-docs/SKILL.md) — factual-accuracy discipline, canonical constants, FumaPress syntax, screenshots, and the `npm run docs:check` / `npm run build` pre-flight. Read it before changing anything under `content/`. For translations, locale structure, language UI, or internationalized routing, also read [`.agents/skills/localize-rustfs-docs/SKILL.md`](.agents/skills/localize-rustfs-docs/SKILL.md). It requires product-context translation instead of literal substitution and defines the RustFS terminology workflow. Skills use the cross-client `.agents/skills/` convention; Claude Code auto-loads them through matching `.claude/skills/` symlinks, and other agents should open the files directly. See also `STYLE.md` for the detailed style guide.
 
 ## 1. Repository Snapshot
-- Framework: **FumaPress** (static-site generator powered by Waku + Fumadocs). Content lives in `content/`; site configuration is in `press.config.tsx`, `source.config.ts`, and `waku.config.ts`.
+- Framework: **FumaPress** (static-site generator powered by Waku + Fumadocs). Content lives in `content/`; site configuration is in `press.config.tsx`, `source.config.ts`, and `vite.config.ts`.
 - Goal: produce documentation for a distributed object storage product aimed at a global audience, currently English-first with room for other locales.
 - Navigation: `content/meta.json` (root sidebar: section order, labels, links) and per-folder `content/**/meta.json` (nested group titles/order) define the site structure. New pages must be reflected there immediately.
 - Routing: a page's URL mirrors its path under `content/` (e.g. `content/administration/data/bucket/creation.md` → `/administration/data/bucket/creation`). `.md` links between pages are resolved automatically; you can write `./sibling.md` or `/absolute/path`.
@@ -20,7 +20,7 @@ This playbook directs AI agents working in the RustFS documentation repository s
 ## 3. Recommended Workflow
 ### 3.1 Environment Prep
 1. `git checkout main && git pull` to sync with the latest baseline.
-2. Use Node.js 20+ (Node 22 recommended). Install dependencies via `npm install` whenever the repo is fresh or packages changed.
+2. Use Node.js 24+. Install dependencies via `npm install` whenever the repo is fresh or packages changed.
 3. Create a topic branch for the task: `git checkout -b docs/<topic>-<short-desc>`.
 
 ### 3.2 Editing Steps
@@ -67,7 +67,7 @@ This playbook directs AI agents working in the RustFS documentation repository s
 
 ## 7. Command Reference
 ```bash
-npm install         # install dependencies (Node 20+)
+npm install         # install dependencies (Node 24+)
 npm run dev         # local development preview (http://localhost:3000)
 npm run build       # generate static site into dist/public/
 npm start           # serve the production build

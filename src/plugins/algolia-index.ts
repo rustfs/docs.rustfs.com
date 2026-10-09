@@ -1,7 +1,7 @@
 import type { DocumentRecord } from "fumadocs-core/search/algolia";
-import type { ServerPlugin } from "fumapress";
+import type { PressPlugin } from "fumapress";
 
-export function algoliaIndexPlugin(): ServerPlugin<any> {
+export function algoliaIndexPlugin(): PressPlugin<any> {
   return {
     name: "rustfs:algolia-index",
     createPages({ createApiIsomorphic }) {

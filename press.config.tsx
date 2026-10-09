@@ -3,6 +3,8 @@ import { lucideIconsPlugin } from "fumadocs-core/source/plugins/lucide-icons";
 import { fumadocsMdx } from "fumapress/adapters/mdx";
 import { llmsPlugin } from "fumapress/plugins/llms.txt";
 import { sitemapPlugin } from "fumapress/plugins/sitemap";
+import { robotsPlugin } from "fumapress/plugins/robots";
+import { rssPlugin } from "fumapress/plugins/rss";
 import { takumiPlugin } from "fumapress/plugins/takumi";
 import { createNotebookLayoutPage } from "fumapress/layouts/notebook";
 import { createRootLayout } from "fumapress/layouts/root";
@@ -133,6 +135,8 @@ function createSidebarFooter(locale: keyof typeof layoutLabels) {
 
 export default defineConfig({
   content: docs.toFumadocsSource(),
+  // Keep Algolia and plain image URLs; the preset adds Flexsearch and CDN transforms.
+  preset: false,
   translations,
   loaderOptions: {
     plugins: [lucideIconsPlugin()],
@@ -227,33 +231,25 @@ gtag('config', 'G-TWW7WMTWL9');`,
     },
     // Per-page <meta name="description"> (VitePress emitted this from frontmatter).
     page(page) {
-      const pathname = page.slugs.join("/");
-      const locale: Language = isLanguage(page.locale) ? page.locale : "en";
-      const localizedUrl = (language: Language) =>
-        `https://docs.rustfs.com/${language}${pathname ? `/${pathname}` : ""}`;
-
       return (
         <>
           <meta
             name="description"
             content={page.data.description ?? siteDescription}
           />
-          <link rel="canonical" href={localizedUrl(locale)} />
-          <link rel="alternate" hrefLang="x-default" href={localizedUrl("en")} />
-          {languages.map((language) => (
-            <link
-              key={language}
-              rel="alternate"
-              hrefLang={language}
-              href={localizedUrl(language)}
-            />
-          ))}
         </>
       );
     },
   },
 })
-  .plugins(algoliaIndexPlugin(), llmsPlugin(), takumiPlugin(), sitemapPlugin())
+  .plugins(
+    algoliaIndexPlugin(),
+    llmsPlugin(),
+    takumiPlugin(),
+    sitemapPlugin(),
+    robotsPlugin(),
+    rssPlugin(),
+  )
   .layouts({
     root: createRootLayout({
       providerProps: {
