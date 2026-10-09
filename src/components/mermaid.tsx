@@ -17,17 +17,17 @@ export function Mermaid({ chart, locale }: { chart: string; locale?: string }) {
 function MermaidChart({ chart }: { chart: string }) {
   const rawId = useId();
   const container = useRef<HTMLDivElement>(null);
+  const revision = useRef(0);
   const [svg, setSvg] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
     let active = true;
-    let revision = 0;
 
     async function render() {
-      const current = ++revision;
+      const current = ++revision.current;
       const { default: mermaid } = await import("mermaid");
-      if (!active || current !== revision || !container.current) return;
+      if (!active || current !== revision.current || !container.current) return;
       const palette = getComputedStyle(container.current);
       const color = (name: string) => palette.getPropertyValue(`--diagram-${name}`).trim();
 
@@ -49,10 +49,12 @@ function MermaidChart({ chart }: { chart: string }) {
         flowchart: { curve: "stepAfter", nodeSpacing: 40, rankSpacing: 56, padding: 20 },
       });
 
-      const id = `mermaid-${rawId.replace(/[^a-zA-Z0-9-]/g, "")}`;
+      // Mermaid removes an existing SVG with this ID before rendering. Each
+      // revision needs its own ID, including repeated updates to the same theme.
+      const id = `mermaid-${rawId.replace(/[^a-zA-Z0-9-]/g, "")}-${current}`;
       try {
         const { svg } = await mermaid.render(id, chart);
-        if (active && current === revision) {
+        if (active && current === revision.current) {
           const drawing = new DOMParser().parseFromString(svg, "image/svg+xml").documentElement;
           const width = Number(drawing.getAttribute("viewBox")?.split(" ")[2]);
           if (width > 0) drawing.setAttribute("style", `${drawing.getAttribute("style") ?? ""};min-width:${Math.ceil(width * 12 / 14)}px`);
@@ -63,7 +65,7 @@ function MermaidChart({ chart }: { chart: string }) {
           setError("");
         }
       } catch (error) {
-        if (active && current === revision) {
+        if (active && current === revision.current) {
           setError(String(error));
         }
       }
