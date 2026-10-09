@@ -285,6 +285,111 @@ article:has(.rustfs-install-home) > h1 + p + div {
   --rustfs-brand-color: #78a4ff;
 }
 
+/* Shared diagram palette: neutral structure, RustFS blue for the focal area. */
+.rustfs-diagram {
+  --diagram-ink: #172033;
+  --diagram-muted: #64748b;
+  --diagram-line: #64748b;
+  --diagram-border: #94a3b8;
+  --diagram-surface: #f8fafc;
+  --diagram-zone: #ffffff;
+  --diagram-accent: #0062ff;
+  --diagram-accent-surface: #eff6ff;
+  margin: 1.5rem 0;
+  max-width: 100%;
+  overflow-x: auto;
+  font-family: var(--default-font-family);
+}
+
+.dark .rustfs-diagram {
+  --diagram-ink: #e5e7eb;
+  --diagram-muted: #94a3b8;
+  --diagram-line: #94a3b8;
+  --diagram-border: #64748b;
+  --diagram-surface: #20252d;
+  --diagram-zone: #171b22;
+  --diagram-accent: #78a4ff;
+  --diagram-accent-surface: #152640;
+}
+
+.rustfs-diagram--deployment svg {
+  display: block;
+  width: 100%;
+  max-width: var(--diagram-width);
+  min-width: var(--diagram-min-width);
+  margin: 0 auto;
+  font-size: 14px;
+}
+
+.rustfs-diagram-zone {
+  fill: var(--diagram-zone);
+  stroke: var(--diagram-border);
+  stroke-width: 1;
+}
+
+.rustfs-diagram-zone--compute {
+  fill: var(--diagram-accent-surface);
+  stroke: var(--diagram-accent);
+}
+
+.rustfs-diagram-zones text,
+.rustfs-diagram-legend text {
+  fill: var(--diagram-muted);
+}
+
+.rustfs-diagram-node rect {
+  fill: var(--diagram-surface);
+  stroke: var(--diagram-border);
+  stroke-width: 1.5;
+}
+
+.rustfs-diagram-node text {
+  fill: var(--diagram-ink);
+  font-weight: 500;
+}
+
+.rustfs-diagram-node--accent rect {
+  fill: var(--diagram-accent-surface);
+  stroke: var(--diagram-accent);
+}
+
+.rustfs-diagram-edges path,
+.rustfs-diagram-legend path {
+  fill: none;
+  stroke: var(--diagram-line);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.rustfs-diagram-arrow {
+  fill: var(--diagram-line);
+}
+
+.rustfs-diagram--mermaid svg {
+  display: block;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.rustfs-diagram--mermaid .node rect,
+.rustfs-diagram--mermaid .node polygon {
+  rx: 6px;
+  ry: 6px;
+}
+
+.rustfs-diagram--mermaid .rustfs-diagram-focal rect,
+.rustfs-diagram--mermaid .rustfs-diagram-focal polygon {
+  fill: var(--diagram-accent-surface) !important;
+  stroke: var(--diagram-accent) !important;
+}
+
+@media print {
+  .rustfs-diagram--deployment svg {
+    min-width: 0;
+  }
+}
+
 .dark .rustfs-install-icon--windows {
   --rustfs-brand-color: #4bb4ff;
 }

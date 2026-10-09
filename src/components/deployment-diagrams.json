@@ -1,0 +1,151 @@
+{
+  "flowchart TD\n    LB([Load Balancing]) --> S1[Server Node1] & S2[Server Node2] & S3[Server Node3] & S4[Server Node4]\n\n    S1 --> N1D1[(Disk1)] & N1D2[(Disk2)] & N1D3[(Disk3)] & N1D4[(Disk4)]\n    S2 --> N2D1[(Disk1)] & N2D2[(Disk2)] & N2D3[(Disk3)] & N2D4[(Disk4)]\n    S3 --> N3D1[(Disk1)] & N3D2[(Disk2)] & N3D3[(Disk3)] & N3D4[(Disk4)]\n    S4 --> N4D1[(Disk1)] & N4D2[(Disk2)] & N4D3[(Disk3)] & N4D4[(Disk4)]\n\n    classDef lb fill:#f3f4f6,stroke:#9ca3af,stroke-width:2px,color:#1e293b;\n    classDef server fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b;\n    classDef disk fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#1e293b;\n    class LB lb\n    class S1,S2,S3,S4 server\n    class N1D1,N1D2,N1D3,N1D4,N2D1,N2D2,N2D3,N2D4,N3D1,N3D2,N3D3,N3D4,N4D1,N4D2,N4D3,N4D4 disk": {
+    "kind": "cluster",
+    "labels": {
+      "LB": "Load Balancing",
+      "S1": "Server Node1",
+      "S2": "Server Node2",
+      "S3": "Server Node3",
+      "S4": "Server Node4",
+      "N1D1": "Disk1",
+      "N1D2": "Disk2",
+      "N1D3": "Disk3",
+      "N1D4": "Disk4",
+      "N2D1": "Disk1",
+      "N2D2": "Disk2",
+      "N2D3": "Disk3",
+      "N2D4": "Disk4",
+      "N3D1": "Disk1",
+      "N3D2": "Disk2",
+      "N3D3": "Disk3",
+      "N3D4": "Disk4",
+      "N4D1": "Disk1",
+      "N4D2": "Disk2",
+      "N4D3": "Disk3",
+      "N4D4": "Disk4"
+    },
+    "edges": [
+      {
+        "source": "LB",
+        "target": "S1"
+      },
+      {
+        "source": "LB",
+        "target": "S2"
+      },
+      {
+        "source": "LB",
+        "target": "S3"
+      },
+      {
+        "source": "LB",
+        "target": "S4"
+      },
+      {
+        "source": "S1",
+        "target": "N1D1"
+      },
+      {
+        "source": "S1",
+        "target": "N1D2"
+      },
+      {
+        "source": "S1",
+        "target": "N1D3"
+      },
+      {
+        "source": "S1",
+        "target": "N1D4"
+      },
+      {
+        "source": "S2",
+        "target": "N2D1"
+      },
+      {
+        "source": "S2",
+        "target": "N2D2"
+      },
+      {
+        "source": "S2",
+        "target": "N2D3"
+      },
+      {
+        "source": "S2",
+        "target": "N2D4"
+      },
+      {
+        "source": "S3",
+        "target": "N3D1"
+      },
+      {
+        "source": "S3",
+        "target": "N3D2"
+      },
+      {
+        "source": "S3",
+        "target": "N3D3"
+      },
+      {
+        "source": "S3",
+        "target": "N3D4"
+      },
+      {
+        "source": "S4",
+        "target": "N4D1"
+      },
+      {
+        "source": "S4",
+        "target": "N4D2"
+      },
+      {
+        "source": "S4",
+        "target": "N4D3"
+      },
+      {
+        "source": "S4",
+        "target": "N4D4"
+      }
+    ]
+  },
+  "flowchart TD\n    S[Server Node] --> D1[(Disk1)] & D2[(Disk2)] & D3[(Disk3)] & D4[(Disk4)]\n\n    classDef server fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b;\n    classDef disk fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#1e293b;\n    class S server\n    class D1,D2,D3,D4 disk": {
+    "kind": "multi-disk",
+    "labels": {
+      "S": "Server Node",
+      "D1": "Disk1",
+      "D2": "Disk2",
+      "D3": "Disk3",
+      "D4": "Disk4"
+    },
+    "edges": [
+      {
+        "source": "S",
+        "target": "D1"
+      },
+      {
+        "source": "S",
+        "target": "D2"
+      },
+      {
+        "source": "S",
+        "target": "D3"
+      },
+      {
+        "source": "S",
+        "target": "D4"
+      }
+    ]
+  },
+  "flowchart TD\n    S[Server Node] --> D1[(Disk1)]\n\n    classDef server fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b;\n    classDef disk fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#1e293b;\n    class S server\n    class D1 disk": {
+    "kind": "single",
+    "labels": {
+      "S": "Server Node",
+      "D1": "Disk1"
+    },
+    "edges": [
+      {
+        "source": "S",
+        "target": "D1"
+      }
+    ]
+  }
+}
