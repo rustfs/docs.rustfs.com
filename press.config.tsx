@@ -5,7 +5,6 @@ import { llmsPlugin } from "fumapress/plugins/llms.txt";
 import { sitemapPlugin } from "fumapress/plugins/sitemap";
 import { robotsPlugin } from "fumapress/plugins/robots";
 import { rssPlugin } from "fumapress/plugins/rss";
-import { imagePlugin } from "fumapress/plugins/image/cloudflare";
 import { takumiPlugin } from "fumapress/plugins/takumi";
 import { createNotebookLayoutPage } from "fumapress/layouts/notebook";
 import { createRootLayout } from "fumapress/layouts/root";
@@ -136,7 +135,7 @@ function createSidebarFooter(locale: keyof typeof layoutLabels) {
 
 export default defineConfig({
   content: docs.toFumadocsSource(),
-  // Algolia supplies search; the default preset also builds a Flexsearch index.
+  // Keep Algolia and plain image URLs; the preset adds Flexsearch and CDN transforms.
   preset: false,
   translations,
   loaderOptions: {
@@ -250,7 +249,6 @@ gtag('config', 'G-TWW7WMTWL9');`,
     sitemapPlugin(),
     robotsPlugin(),
     rssPlugin(),
-    imagePlugin(),
   )
   .layouts({
     root: createRootLayout({
