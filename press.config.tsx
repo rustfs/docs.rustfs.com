@@ -337,7 +337,7 @@ gtag('config', 'G-TWW7WMTWL9');`,
 
             return <RelativeLink href={localizedHref} {...props} />;
           },
-          Mermaid,
+          Mermaid: (props) => <Mermaid {...props} locale={page.locale} />,
           Tab,
           Tabs,
           BrandLogo,

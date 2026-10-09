@@ -89,6 +89,8 @@ RUSTFS_VOLUMES="/data"
 - Plain Markdown pages use `.md`.
 - Pages that need JSX components (`<Cards>`, `<Tabs>`, `<Steps>`, etc.) must use the `.mdx` extension. Do not put JSX in `.md` files.
 - Mermaid diagrams are supported in fenced ```mermaid blocks.
+- Diagrams use the shared palette in `src/app.css`: Geist labels, neutral boxes, RustFS blue for the focal area, and orthogonal connectors. Keep labels at least 12px; wide drawings scroll within the page on mobile.
+- The three Linux deployment diagrams have SVG layouts in `src/components/deployment-diagram.tsx`, following [diagram-design](https://github.com/cathrynlavery/diagram-design). Their original Mermaid sources, node labels, and edges are recorded in `deployment-diagrams.json`. Keep those records in sync when changing a deployment graph; an unrecognized source uses the standard Mermaid renderer.
 - **Card icons:** use one consistent icon family within each landing grid and apply an icon to every card. Use Lucide for abstract concepts. A platform-selection grid may use brand logos from `react-icons` when every primary card icon is a brand logo. Do not mix brand logos with abstract primary icons or use emoji as icons.
 
 ## Product Terminology
