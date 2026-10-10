@@ -9,5 +9,6 @@ description: "通过 S3 兼容的对象存储接口，将云原生平台连接�
 
 - [Cortex](./cortex.md)
 - [Flux](./flux.md)
+- [celld](./celld.md)
 
 请将平台状态保存在专用的存储桶中，并为凭证仅授予所需桶操作的权限。

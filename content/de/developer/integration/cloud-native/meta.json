@@ -2,6 +2,7 @@
   "title": "Cloud Native",
   "pages": [
     "cortex",
-    "flux"
+    "flux",
+    "celld"
   ]
 }

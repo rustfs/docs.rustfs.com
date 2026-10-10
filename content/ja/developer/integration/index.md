@@ -13,7 +13,7 @@ description: "RustFS をリバースプロキシ、バックアップツール�
 - [Database](./database/index.md) covers ClickHouse, Databend, Doris, DuckDB, InfluxDB, LanceDB, Milvus, Trino, and Vitess.
 - [Big Data](./big-data/index.md) covers Airflow, AutoMQ, Delta Lake, DolphinScheduler, Flink, Hive, Hudi, Iceberg, Kafka, Paimon, PyIceberg, SeaTunnel, Spark, and Zeppelin.
 - [Storage](./storage/index.md) covers Alluxio, lakeFS, OpenDAL, SFTPGo, s3fs, and ZeroFS.
-- [クラウドネイティブ](./cloud-native/index.md) は Cortex、Flux を扱います。
+- [クラウドネイティブ](./cloud-native/index.md) は Cortex、Flux、celld を扱います。
 - [オブザーバビリティ](./observability/index.md) は Fluentd、GreptimeDB、Loki、OpenObserve、OpenTelemetry、Tempo、Thanos、VictoriaMetrics などのテレメトリシステムを扱います。
 - [その他](./others/index.md) は capo SDK、rclone、JuiceFS、Nextcloud、tusd などのツールを扱います。
 - [コンテナレジストリ](./registry/index.md) は Docker Registry、Harbor を扱います。

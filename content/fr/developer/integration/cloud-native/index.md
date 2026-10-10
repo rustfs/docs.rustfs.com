@@ -9,5 +9,6 @@ Use **RustFS** as the object storage layer for cloud native platforms that suppo
 
 - [Cortex](./cortex.md)
 - [Flux](./flux.md)
+- [celld](./celld.md)
 
 Keep platform state in a dedicated bucket, and use credentials scoped to the required bucket operations.
