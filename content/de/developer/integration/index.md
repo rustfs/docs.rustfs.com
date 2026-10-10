@@ -13,7 +13,7 @@ Use this section to connect **RustFS** to infrastructure and application platfor
 - [Database](./database/index.md) covers ClickHouse, Databend, Doris, DuckDB, InfluxDB, LanceDB, Milvus, Trino, and Vitess.
 - [Big Data](./big-data/index.md) covers Airflow, AutoMQ, Delta Lake, DolphinScheduler, Flink, Hive, Hudi, Iceberg, Kafka, Paimon, PyIceberg, SeaTunnel, Spark, and Zeppelin.
 - [Storage](./storage/index.md) covers Alluxio, lakeFS, OpenDAL, SFTPGo, s3fs, and ZeroFS.
-- [Cloud Native](./cloud-native/index.md) covers Cortex and Flux.
+- [Cloud Native](./cloud-native/index.md) covers Cortex, Flux, and celld.
 - [Observability](./observability/index.md) covers telemetry systems including Fluentd, GreptimeDB, Loki, OpenObserve, OpenTelemetry, Tempo, Thanos, and VictoriaMetrics.
 - [Others](./others/index.md) covers the capo SDK, rclone, JuiceFS, Nextcloud, and tusd.
 - [Registry](./registry/index.md) covers Docker Registry and Harbor.

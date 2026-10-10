@@ -2,6 +2,7 @@
   "title": "クラウドネイティブ",
   "pages": [
     "cortex",
-    "flux"
+    "flux",
+    "celld"
   ]
 }
