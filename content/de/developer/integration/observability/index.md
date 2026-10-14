@@ -3,7 +3,7 @@ title: "Observability"
 description: "Verbinden Sie Observability-Plattformen über S3-kompatible Objektspeicher-Schnittstellen mit RustFS."
 ---
 
-Nutzen Sie **RustFS** als Objektspeicher-Layer für Observability-Plattformen, die einen S3-kompatiblen Endpunkt unterstützen.
+Nutzen Sie **RustFS** als Objektspeicher-Backend für Observability-Plattformen mit S3-kompatiblem Endpunkt.
 
 ## Plattformen
 
@@ -16,4 +16,4 @@ Nutzen Sie **RustFS** als Objektspeicher-Layer für Observability-Plattformen, d
 - [Thanos](./thanos.md)
 - [VictoriaMetrics](./victoriametrics.md)
 
-Speichern Sie Telemetriedaten in einem dedizierten Bucket und beschränken Sie die Anmeldeinformationen auf die erforderlichen Bucket-Operationen.
+Speichern Sie Telemetriedaten in einem dedizierten Bucket und beschränken Sie die Zugangsdaten auf die erforderlichen Bucket-Operationen.

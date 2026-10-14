@@ -15,7 +15,7 @@ flowchart LR
 	Init["init-bucket job"] -->|"create my-bucket"| RustFS
 ```
 
-Spark spricht über das `hadoop-aws`-S3A-Dateisystem mit RustFS. Die Connector-Einstellungen — Endpunkt, Path-Style-Adressierung, Plain HTTP und Anmeldeinformationen — werden als `spark.hadoop.fs.s3a.*`-Properties übergeben.
+Spark spricht über das `hadoop-aws`-S3A-Dateisystem mit RustFS. Die Connector-Einstellungen — Endpunkt, pfadbasierte Adressierung (Path-Style), Plain HTTP und Zugangsdaten — werden als `spark.hadoop.fs.s3a.*`-Properties übergeben.
 
 ## 1. Projektdateien anlegen
 
@@ -26,14 +26,14 @@ mkdir rustfs-spark
 cd rustfs-spark
 ```
 
-Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Anmeldeinformationen:
+Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Zugangsdaten:
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Verwenden Sie dedizierte Anmeldeinformationen für den Bucket. Committen Sie `.env` nicht in die Versionsverwaltung.
+Verwenden Sie dedizierte Zugangsdaten für den Bucket. Nehmen Sie `.env` nicht in die Versionsverwaltung auf.
 
 Erstellen Sie den Spark-Job:
 
@@ -177,7 +177,7 @@ Sie können das Präfix auch in der RustFS-Konsole anzeigen:
 
 ## 4. RustFS S3 Tables verwenden
 
-RustFS S3 Tables bietet einen integrierten Apache-Iceberg-REST-Katalog, sodass Spark einen Table-Bucket als verwaltetes Iceberg-Warehouse nutzen kann, während die Daten in RustFS bleiben. Aktivieren Sie einen Table-Bucket und verbinden Sie den Iceberg-REST-Katalog von Spark wie in [S3 Tables](/administration/data/s3-tables) beschrieben: Die REST-Katalog-URI ist `http://<rustfs-host>:9000/iceberg`, das Warehouse ist der Bucket-Name, und sowohl Kataloganfragen (AWS Signature Version 4, Signing-Name `s3`) als auch der S3-Dateizugriff verwenden Path-Style-Adressierung.
+RustFS S3 Tables bietet einen integrierten Apache-Iceberg-REST-Katalog, sodass Spark einen Tabellen-Bucket als verwaltetes Iceberg-Warehouse nutzen kann, während die Daten in RustFS bleiben. Aktivieren Sie einen Tabellen-Bucket und verbinden Sie den Iceberg-REST-Katalog von Spark wie in [S3 Tables](/administration/data/s3-tables) beschrieben: Die REST-Katalog-URI ist `http://<rustfs-host>:9000/iceberg`, das Warehouse ist der Bucket-Name, und sowohl Kataloganfragen (AWS Signature Version 4, Signing-Name `s3`) als auch der S3-Dateizugriff verwenden pfadbasierte Adressierung (Path-Style).
 
 Laut der S3-Tables-Support-Matrix validieren Sie die exakten Spark- und Iceberg-Versionen Ihrer Bereitstellung gegen den Katalog, bevor Sie diesen Pfad in Produktion übernehmen.
 
@@ -207,7 +207,7 @@ Die `hadoop-aws`-Version passt nicht zur Hadoop-Version im Spark-Image. Spark-4.
 
 ### AccessDenied- oder 403-Antworten
 
-Stellen Sie sicher, dass die Connector-Einstellungen mit den RustFS-Anmeldeinformationen übereinstimmen und dass der Dienst `create-bucket` erfolgreich abgeschlossen wurde:
+Stellen Sie sicher, dass die Connector-Einstellungen mit den RustFS-Zugangsdaten übereinstimmen und dass der Dienst `create-bucket` erfolgreich abgeschlossen wurde:
 
 ```bash
 docker compose logs create-bucket
@@ -216,5 +216,5 @@ docker compose logs create-bucket
 ## Nächste Schritte
 
 - Lesen Sie die [S3-Kompatibilitätshinweise](/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
-- Erstellen Sie dedizierte Produktions-Anmeldeinformationen mit dem [Access Key Management](/security-compliance/iam/access-token).
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
 - Folgen Sie der [Spark-Dokumentation](https://spark.apache.org/docs/latest/) für Structured Streaming und Datenquellenoptionen.

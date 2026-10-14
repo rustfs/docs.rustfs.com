@@ -3,7 +3,7 @@ title: "DuckDB"
 description: "Abfragen und Schreiben von Parquet-Dateien im RustFS-Objektspeicher mit DuckDB und dessen httpfs-Erweiterung, bereitgestellt mit Docker Compose."
 ---
 
-Diese Anleitung betreibt **DuckDB** mit **RustFS** als S3-kompatiblem Speicher. Sie starten beide Dienste mit Docker Compose, konfigurieren DuckDBs `httpfs`-Erweiterung für den RustFS-Endpunkt, schreiben Abfrageergebnisse als Parquet in den Bucket, lesen sie zurück und prüfen die Objekte in RustFS. Der Ablauf wurde mit dem Image `duckdb/duckdb:latest` (v1.5.5) und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
+In dieser Anleitung betreiben Sie **DuckDB** mit **RustFS** als S3-kompatiblem Speicher. Sie starten beide Dienste mit Docker Compose, konfigurieren DuckDBs `httpfs`-Erweiterung für den RustFS-Endpunkt, schreiben Abfrageergebnisse als Parquet in den Bucket, lesen sie zurück und prüfen die Objekte in RustFS. Der Ablauf wurde mit dem Image `duckdb/duckdb:latest` (v1.5.5) und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
 Sie benötigen Docker mit dem Compose-Plugin. Dieses Setup ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
@@ -16,7 +16,7 @@ flowchart LR
 	Init["init-bucket job"] -->|"create my-bucket"| RustFS
 ```
 
-DuckDB liest und schreibt Objekte über die [`httpfs`-Erweiterung](https://duckdb.org/docs/stable/extensions/httpfs/overview), die die S3-API implementiert. Ein S3-Secret enthält den RustFS-Endpunkt, die Anmeldeinformationen, Path-Style-Adressierung und die Plain-HTTP-Einstellung; anschließend lassen sich Parquet-Dateien über `s3://my-bucket/...`-Pfade wie lokale Dateien laden und schreiben.
+DuckDB liest und schreibt Objekte über die [`httpfs`-Erweiterung](https://duckdb.org/docs/stable/extensions/httpfs/overview), die die S3-API implementiert. Ein S3-Secret enthält den RustFS-Endpunkt, die Zugangsdaten, pfadbasierte Adressierung (Path-Style) und die Plain-HTTP-Einstellung; anschließend lassen sich Parquet-Dateien über `s3://my-bucket/...`-Pfade wie lokale Dateien laden und schreiben.
 
 ## 1. Projektdateien anlegen
 
@@ -27,14 +27,14 @@ mkdir rustfs-duckdb
 cd rustfs-duckdb
 ```
 
-Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Anmeldeinformationen:
+Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Zugangsdaten:
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Verwenden Sie dedizierte Anmeldeinformationen für den Bucket. Committen Sie `.env` nicht in die Versionsverwaltung.
+Verwenden Sie dedizierte Zugangsdaten für den Bucket. Nehmen Sie `.env` nicht in die Versionsverwaltung auf.
 
 Erstellen Sie die Compose-Datei:
 
@@ -142,7 +142,7 @@ CREATE SECRET rustfs (
 );
 ```
 
-Der Endpunkt wird als `host:port` ohne Schema angegeben. `USE_SSL FALSE` wählt Plain HTTP innerhalb des Compose-Netzwerks, und `URL_STYLE 'path'` wählt Path-Style-Adressierung, die RustFS erwartet. Secrets gelten nur für die aktuelle Sitzung — erstellen Sie das Secret bei jeder neuen Sitzung erneut.
+Der Endpunkt wird als `host:port` ohne Schema angegeben. `USE_SSL FALSE` wählt Plain HTTP innerhalb des Compose-Netzwerks, und `URL_STYLE 'path'` wählt pfadbasierte Adressierung (Path-Style), die RustFS erwartet. Secrets gelten nur für die aktuelle Sitzung — erstellen Sie das Secret bei jeder neuen Sitzung erneut.
 
 ## 4. Abfrageergebnisse nach RustFS schreiben
 
@@ -227,7 +227,7 @@ Innerhalb des Compose-Netzwerks lautet der Endpunkt `rustfs:9000`. Für einen Du
 
 ### AccessDenied-Antworten
 
-Prüfen Sie, ob die Anmeldeinformationen im Secret mit den RustFS-Anmeldeinformationen übereinstimmen und ob die Bucket-Initialisierung erfolgreich abgeschlossen wurde:
+Prüfen Sie, ob die Zugangsdaten im Secret mit den RustFS-Zugangsdaten übereinstimmen und ob die Bucket-Initialisierung erfolgreich abgeschlossen wurde:
 
 ```bash
 docker compose logs create-bucket
@@ -240,5 +240,5 @@ docker compose logs create-bucket
 ## Nächste Schritte
 
 - Lesen Sie die [S3-Kompatibilitätshinweise](/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
-- Erstellen Sie dedizierte Produktions-Anmeldeinformationen mit dem [Access Key Management](/security-compliance/iam/access-token).
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
 - Folgen Sie der [DuckDB-httpfs-Dokumentation](https://duckdb.org/docs/stable/extensions/httpfs/overview) für erweiterte Optionen wie Regions-Overrides und Verbindungslimits.

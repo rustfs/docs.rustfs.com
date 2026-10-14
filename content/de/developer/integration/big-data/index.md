@@ -1,11 +1,11 @@
 ---
 title: "Datenanalyse"
-description: "Connect big data systems to RustFS through S3-compatible object storage interfaces."
+description: "Verbinden Sie Datenanalysesysteme über S3-kompatible Objektspeicher-Schnittstellen mit RustFS."
 ---
 
-Use **RustFS** as the object storage layer for data analytics systems that support an S3-compatible endpoint.
+Nutzen Sie **RustFS** als Objektspeicher-Backend für Datenanalysesysteme mit S3-kompatiblem Endpunkt.
 
-## Systems
+## Systeme
 
 - [Airflow](./airflow.md)
 - [Delta Lake](./delta-lake.md)
@@ -22,4 +22,4 @@ Use **RustFS** as the object storage layer for data analytics systems that suppo
 - [Hive](./hive.md)
 - [Zeppelin](./zeppelin.md)
 
-Keep big data workload data in a dedicated bucket and prefix, and use credentials scoped to the required bucket operations.
+Halten Sie die Daten der Analyse-Workloads in einem eigenen Bucket und unter einem eigenen Präfix und verwenden Sie Zugangsdaten, die auf die erforderlichen Bucket-Operationen beschränkt sind.
