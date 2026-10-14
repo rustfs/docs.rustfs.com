@@ -65,11 +65,11 @@ rustfs-3   1/1     Running   0          2m27s
 
 | 模式 | 值 | 工作负载 | 布局 |
 | --- | --- | --- | --- |
-| 分布式（**默认**） | `mode.distributed.enabled=true` | StatefulSet | `replicaCount: 4` 个 Pod，每个 Pod 4 个数据 PVC（共 16 个驱动器）；或设置 `replicaCount: 16`，使用 16 个 Pod，每个 Pod 1 个数据 PVC |
+| 分布式（**默认**） | `mode.distributed.enabled=true` | StatefulSet | `replicaCount` 个 Pod（`>= 2`，默认 `4`）× 每个 Pod `drivesPerNode` 个数据 PVC（`>= 1`，当 `replicaCount: 4` 时推断为 `4`，其他情况推断为 `1`；默认共 16 个驱动器） |
 | 单机 | `mode.standalone.enabled=true`、`mode.distributed.enabled=false` | Deployment | 1 个 Pod、1 个数据 PVC（单节点单磁盘） |
 
 - **单机模式**对应单节点单磁盘：节点之间不提供纠删码冗余。适用于开发、测试或底层存储自身提供持久性的小型部署。它可以通过 `mode.standalone.existingClaim.dataClaim` / `mode.standalone.existingClaim.logsClaim` 复用现有 PVC。
-- **分布式模式**的行为类似[多节点多磁盘](../linux/multiple-node-multiple-disk.md)：对象通过纠删码分布到各 Pod 和 PVC。`replicaCount` 必须为 `4`（每个 Pod 获得 4 个 PVC）或 `16`（每个 Pod 获得 1 个 PVC）；请根据集群能够将 Pod 分布到多少个节点来选择。
+- **分布式模式**的行为类似[多节点多磁盘](../linux/multiple-node-multiple-disk.md)：对象通过纠删码分布到各 Pod 和 PVC。`replicaCount` 设置 Pod 数量（`>= 2`），`drivesPerNode` 设置每个 Pod 的数据 PVC 数量（`>= 1`），驱动器总数为 `replicaCount * drivesPerNode`。当 `drivesPerNode` 未设置（`null`）时，chart 会在 `replicaCount` 为 `4` 时推断每个 Pod 挂载 `4` 个数据 PVC（共 16 个驱动器），在其他 `replicaCount` 值下推断每个 Pod 挂载 `1` 个数据 PVC（例如 `replicaCount: 16` 对应 16 个 Pod、每个 Pod 1 个 PVC）。如需使用其他拓扑，请显式设置 `replicaCount` 和 `drivesPerNode`（例如设置 `replicaCount: 4` 和 `drivesPerNode: 2` 以使用 8 个驱动器）。
 
 ```bash
 # Standalone mode
@@ -93,7 +93,7 @@ storageclass:
 
 :::warning[默认 PVC 大小为 256Mi，请更改]
 
-chart 的数据卷和日志卷默认大小为 **256Mi**，仅足以验证 chart 是否可用。对于任何实际工作负载，请在安装时设置 `storageclass.dataStorageSize`（例如 `1Ti`）和 `storageclass.logStorageSize`（例如 `1Gi`）。在分布式模式下，数据大小应用于**每个**数据 PVC（默认 16 个 PVC）。
+chart 的数据卷和日志卷默认大小为 **256Mi**，仅足以验证 chart 是否可用。对于任何实际工作负载，请在安装时设置 `storageclass.dataStorageSize`（例如 `1Ti`）和 `storageclass.logStorageSize`（例如 `1Gi`）。在分布式模式下，数据大小应用于**每个**数据 PVC（`replicaCount * drivesPerNode`，默认 16 个 PVC）。
 
 :::
 
@@ -157,12 +157,12 @@ pools:
   list:
     - {}                  # pool 0: inherits top-level values and keeps the
                           # existing StatefulSet/pod/PVC names and data
-    - replicaCount: 4     # pool 1: new capacity (4 or 16)
+    - replicaCount: 4     # pool 1: new capacity (replicaCount >= 2)
       storageclass:
         dataStorageSize: 10Gi
 ```
 
-然后使用 `helm upgrade` 应用。每个条目可以设置 `replicaCount`（4 或 16）和/或 `storageclass` 区块；省略的字段继承顶层值。其他存储池渲染为 `<fullname>-pool<N>` StatefulSet；所有存储池共享无头 Service、主 Service、配置和凭证。
+然后使用 `helm upgrade` 应用。每个条目可以设置 `replicaCount`（`>= 2`）和/或 `storageclass` 区块；省略的字段继承顶层值。如果显式设置了顶层 `drivesPerNode`，该驱动器数量将应用于所有存储池；如果 `drivesPerNode` 保持未设置（`null`），chart 会根据各存储池自身的 `replicaCount` 为每个存储池推断驱动器数量（当 `replicaCount` 为 `4` 时每个 Pod 挂载 `4` 个驱动器，其他情况下每个 Pod 挂载 `1` 个驱动器）。其他存储池渲染为 `<fullname>-pool<N>` StatefulSet；所有存储池共享无头 Service、主 Service、配置和凭证。
 
 :::warning[存储池仅可追加]
 
