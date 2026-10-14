@@ -78,7 +78,7 @@ Le chart expose l’API S3 et la Console indépendamment l’une de l’autre. L
 
 | Mode | Accessible depuis |
 | - | - |
-| `none` (par défaut) | Uniquement les services connectés au réseau overlay `rustfs-net`, à l’adresse `http://<release>_rustfs:9000` |
+| `none` (par défaut) | Uniquement les services connectés au réseau overlay `rustfs-net`, à l’adresse `http://<release>-rustfs:9000` |
 | `published` | Un port publié sur le maillage de routage du swarm : `publish.port` pour l’API S3, `console.publish.port` (9001) pour la Console |
 | `traefik` | Un nom d’hôte routé par Traefik : `ingress.host` pour l’API S3, `console.ingress.host` pour la Console |
 

@@ -78,7 +78,7 @@ Das Chart stellt die S3-API und die Console unabhängig voneinander bereit. Die 
 
 | Modus | Erreichbar von |
 | - | - |
-| `none` (Standard) | Nur Diensten im Overlay-Netzwerk `rustfs-net`, unter `http://<release>_rustfs:9000` |
+| `none` (Standard) | Nur Diensten im Overlay-Netzwerk `rustfs-net`, unter `http://<release>-rustfs:9000` |
 | `published` | Einem im Routing-Mesh des Swarms veröffentlichten Port: `publish.port` für die S3-API, `console.publish.port` (9001) für die Console |
 | `traefik` | Einem von Traefik gerouteten Hostnamen: `ingress.host` für die S3-API, `console.ingress.host` für die Console |
 

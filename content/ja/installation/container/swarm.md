@@ -78,7 +78,7 @@ Chart は S3 API と Console を個別に公開します。Console はデフォ�
 
 | モード | アクセス元 |
 | - | - |
-| `none`（デフォルト） | `rustfs-net` オーバーレイネットワークに接続されたサービスのみ。アドレスは `http://<release>_rustfs:9000` |
+| `none`（デフォルト） | `rustfs-net` オーバーレイネットワークに接続されたサービスのみ。アドレスは `http://<release>-rustfs:9000` |
 | `published` | Swarm のルーティングメッシュに公開されたポート。S3 API は `publish.port`、Console は `console.publish.port`（9001） |
 | `traefik` | Traefik がルーティングするホスト名。S3 API は `ingress.host`、Console は `console.ingress.host` |
 
