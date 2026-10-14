@@ -13,7 +13,7 @@ These procedures run RustFS as a desktop process, not as a macOS background serv
 
 ## 1. Check your Mac architecture
 
-RustFS distinguishes between Apple Silicon (`arm64`) and Intel (`x86_64`) Macs. Open Terminal and run:
+RustFS provides different builds for Apple silicon (`arm64`) and Intel (`x86_64`) Macs. Open Terminal and run:
 
 ```bash
 uname -m

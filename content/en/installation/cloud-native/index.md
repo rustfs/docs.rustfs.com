@@ -106,7 +106,7 @@ The chart templates HTTP probes on the S3 port (9000) out of the box, matching t
 - **Liveness**: `GET /health` (`livenessProbe.httpGet.path`), initial delay 30s, period 5s
 - **Readiness**: `GET /health/ready` (`readinessProbe.httpGet.path`), initial delay 10s, period 5s
 
-A pod is only added to the Service endpoints once `/health/ready` returns `200`, which in distributed mode requires the storage quorum to be met. Thresholds and timings are tunable via the `livenessProbe.*` and `readinessProbe.*` values.
+A Pod is added to the Service endpoints only after `/health/ready` returns `200`, which in distributed mode requires the storage quorum to be met. Thresholds and timings are tunable via the `livenessProbe.*` and `readinessProbe.*` values.
 
 ## 5. Production hardening
 
@@ -147,7 +147,7 @@ Log in to the Console with the access key and secret key you set at install time
 
 ## 7. Scaling out with server pools
 
-In distributed mode the chart can run multiple **server pools** — independent StatefulSets whose drives together form one cluster. This is the chart-level equivalent of adding a Server Pool as described in [Pool Expansion](../../operations/scaling/storage-pool-expansion.md).
+In distributed mode the chart can run multiple **server pools** — independent StatefulSets whose drives together form one cluster. This is the chart-level equivalent of adding a server pool as described in [Pool Expansion](../../operations/scaling/storage-pool-expansion.md).
 
 To expand an existing deployment, enable pools and describe the current layout as pool 0 plus your new capacity:
 
@@ -172,7 +172,7 @@ The list index determines the StatefulSet name — never remove or reorder entri
 
 What to expect during the rollout, per the chart's documentation:
 
-- **Crash/restart cycles are normal.** Pods restart until every pod of every pool is resolvable — the server refuses to start with unresolvable peers, so expect a few crash loops before the cluster converges. This is harmless.
+- **Expect restarts.** Pods restart until every Pod in every pool is resolvable — the server refuses to start with unresolvable peers, so expect a few crash loops before the cluster converges. This is harmless.
 - **Rebalance afterwards.** After the cluster converges, run `rc admin rebalance start <alias>` to spread existing objects across the new pool.
 - The PodDisruptionBudget spans all pools: with the default `pdb.maxUnavailable: 1`, at most one pod of the whole cluster may be evicted at a time.
 

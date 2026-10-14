@@ -1,29 +1,29 @@
 ---
-title: "RustFS Access Key Management"
-description: "Creation, usage, and deletion of RustFS access keys."
+title: "Access Keys"
+description: "Create and delete RustFS access keys in the Console."
 ---
 
-RustFS access keys are the core credentials of the RustFS system, used for identity authentication and operation authorization, and are very useful in API and SDK scenarios. This chapter introduces the creation and deletion of RustFS access keys.
+Access keys are the credentials that applications and tools use to authenticate to RustFS and to authorize their requests. This page shows how to create and delete access keys in the Console.
 
-Prerequisites:
+## Prerequisites
 
-- An available RustFS instance. You can refer to the [Installation Guide](../../installation/index.md) for installation.
+- A running RustFS instance. See the [Installation Guide](../../installation/index.md).
 
 ## Creating Access Keys
 
-1. Log in to the RustFS UI console.
+1. Sign in to the RustFS Console.
 2. In the left navigation bar, select **Access Keys**.
 3. On the access keys page, in the upper right corner, click **Add Access Key**.
-4. Enter the key's **expiration time, name, and description**, then click **Submit**.
-5. (Optional but recommended). On the access key page that appears, select **Copy** or **Export** to save the access key for future use.
+4. Enter an **Expiration**, **Name**, and **Description** for the key, and then select **Submit**.
+5. (Recommended) On the page that appears, select **Copy** or **Export** to save the key.
 
 ![access key list page](images/access_token_creation.png)
 
 ## Deleting Access Keys
 
-1. Log in to the RustFS UI console.
+1. Sign in to the RustFS Console.
 2. In the left navigation bar, select **Access Keys**.
 3. On the access keys page, select the access key you want to delete.
-4. Select the **Delete** button on the right side of the access key or **Delete Selected Items** in the upper right corner to delete the access key.
+4. Select **Delete** next to the access key, or select **Delete Selected Items** in the upper-right corner.
 
 ![access key deletion](images/access_token_deletion.png)

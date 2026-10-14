@@ -22,7 +22,7 @@ Objects are the fundamental storage units in RustFS, containing data, metadata, 
 
 ![object creation from ui](images/upload_file_from_ui.png)
 
-Click on an object to view its details.
+Select an object to view its details.
 
 ![object details info](images/object_details_info.png)
 
@@ -63,7 +63,7 @@ Verify the upload in the RustFS Console.
 
 See [Object Deletion](./deletion.md).
 
-Use the following API for file deletion:
+To delete an object with the S3 API, use:
 
 ```http
 DELETE /{bucketName}/{objectName} HTTP/1.1
@@ -78,4 +78,4 @@ aws s3api delete-object \
   --endpoint-url http://localhost:9000
 ```
 
-You can confirm the file has been deleted on the RustFS UI.
+Confirm in the RustFS Console that the object no longer appears.

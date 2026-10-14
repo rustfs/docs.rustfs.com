@@ -27,7 +27,7 @@ RustFS accepts part numbers from `1` through `10000`. `ListParts` and `ListMulti
 
 ![Console upload dialog with a selected large file](./images/multipart-upload-console.png)
 
-The observed Console upload dialog supports up to 10,000 selected files and reports a 512 GB maximum for a single file. These are Console upload limits; S3 clients can have different local limits.
+The Console upload dialog supports up to 10,000 files and reports a 512 GB maximum for a single file. These are Console upload limits; S3 clients can have different local limits.
 
 After upload starts, **Task Management** groups tasks into Pending, Processing, Completed, Failed, and Canceled states. Each processing task shows progress and a **Cancel** action. Canceling an active multipart task aborts the current part request and marks the task as canceled.
 
@@ -42,7 +42,7 @@ rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt
 rc object stat rustfs/my-bucket/hello.txt --json
 ```
 
-:::note[rc 0.1.29 multipart boundary]
+:::note[Multipart limitations in rc 0.1.29]
 
 `rc 0.1.29` does not expose create, upload-part, complete, list-parts, or abort multipart commands. A validated 20 MiB `rc object copy` used a single `PutObject` request rather than multipart upload. Use the Console or an S3 SDK when explicit multipart behavior is required; use `rc object stat` to verify the completed object.
 

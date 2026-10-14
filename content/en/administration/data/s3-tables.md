@@ -3,7 +3,7 @@ title: "S3 Tables"
 description: "Enable a RustFS table bucket and connect Iceberg clients to the built-in REST catalog."
 ---
 
-RustFS S3 Tables manages **Apache Iceberg** tables through a built-in REST catalog. Table data, manifests, and Iceberg metadata remain S3 objects in RustFS. This guide enables a dedicated table bucket and explains client connections, permissions, and maintenance boundaries.
+RustFS S3 Tables manages **Apache Iceberg** tables through a built-in REST catalog. Table data, manifests, and Iceberg metadata remain S3 objects in RustFS. This guide shows how to enable a dedicated table bucket and explains client connections, permissions, and maintenance limits.
 
 :::note[Preview and version scope]
 

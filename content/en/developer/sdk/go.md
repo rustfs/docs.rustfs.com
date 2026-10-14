@@ -1,9 +1,9 @@
 ---
-title: "Golang SDK Guide"
+title: "Go SDK Guide"
 description: "Use the AWS SDK for Go v2 to operate on RustFS instances, including creating and deleting buckets and objects."
 ---
 
-RustFS ships no first-party Go SDK — it is fully S3-compatible, so you use the official AWS SDK for Go v2 configured to point at your RustFS server. Through the SDK, you can operate on RustFS, including creating and deleting buckets/objects, uploading and downloading files, etc.
+RustFS ships no first-party Go SDK — it is fully S3-compatible, so you use the official AWS SDK for Go v2 configured to point at your RustFS server. With the SDK, you can create and delete buckets, and upload and download objects.
 
 ## Prerequisites
 
@@ -104,7 +104,7 @@ Buckets:
 
 You can now perform bucket and object operations. The snippets below run inside the `main` function above, reusing `client` and `ctx`.
 
-## Create Bucket
+## Create a bucket
 
 ```go
 _, err = client.CreateBucket(ctx, &s3.CreateBucketInput{

@@ -30,7 +30,7 @@ firewall-cmd --reload
 
 :::warning[Restrict console access]
 
-Expose port 9001 only to trusted networks. If you do not need the console, set `RUSTFS_CONSOLE_ENABLE=false` and leave the port closed.
+Expose port 9001 only to trusted networks. If you do not need the Console, set `RUSTFS_CONSOLE_ENABLE=false` and leave the port closed.
 
 :::
 
