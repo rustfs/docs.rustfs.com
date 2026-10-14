@@ -11,7 +11,9 @@ This guide explains how to delete buckets using the RustFS UI, `rc`, or the S3 A
 - Empty the target bucket before deleting it, or use `--force` only after reviewing the objects that will be removed.
 
 :::warning[Deletion is permanent]
+
 Deleting a bucket is irreversible and can break applications that depend on it. Back up any data you need before you continue.
+
 :::
 
 ## Using the RustFS UI

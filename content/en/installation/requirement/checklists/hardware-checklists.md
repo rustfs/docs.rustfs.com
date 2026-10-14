@@ -148,11 +148,13 @@ UUID=xxxx /mnt/disk1 xfs defaults,noatime,nodiratime,logbsize=256k 0 0
    - Standardize on the same firmware versions across nodes.
 
 :::tip[Before go-live]
+
 We recommend running a 72-hour stress test before production go-live that covers the following scenarios:
 
 1. Node failover testing
 2. Network partition tests
 3. Burst write load tests (we recommend testing at 120% of the theoretical maximum)
+
 :::
 
 ---

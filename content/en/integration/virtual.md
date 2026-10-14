@@ -58,6 +58,8 @@ http://my-bucket.rustfs.yourdomain.com:8000/
 are routed correctly with virtual-hosted–style addressing.
 
 :::warning[Match the Host header]
+
 The value of `RUSTFS_SERVER_DOMAINS` must exactly match the `Host` header (including the port, if present) that clients send.
+
 :::
 

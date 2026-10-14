@@ -39,9 +39,11 @@ mkfs.xfs -L DISK1 /dev/sdb
 ```
 
 :::note[Requirements]
+
 * The new disk is at least as large as the original disk.
 * Use the same file system as the other disks (XFS; see the [installation guide](../installation/linux/index.md)).
 * We recommend mounting file systems by label (LABEL) or UUID so that mounts remain correct if device names change after a restart.
+
 :::
 
 <a id="update-etcfstab-or-rustfs-configuration"></a>
@@ -93,7 +95,9 @@ df -h | grep /data/rustfs
 ```
 
 :::note[Mount failures]
+
 If a mount fails, check that the labels or UUIDs in `/etc/fstab` match those on the target file system.
+
 :::
 
 <a id="trigger-and-monitor-data-healing"></a>
