@@ -1,66 +1,66 @@
 ---
 title: "Keycloak"
-description: "Configure Keycloak as an OpenID Connect identity provider for RustFS Console single sign-on."
+description: "Configurez Keycloak comme fournisseur d’identité OpenID Connect pour l’authentification unique de la Console RustFS."
 ---
 
-RustFS integrates with **Keycloak** through the OpenID Connect (OIDC) Authorization Code Flow. The examples on this page use the default RustFS provider ID, `default`.
+RustFS s’intègre à **Keycloak** via le flux Authorization Code d’OpenID Connect (OIDC). Les exemples de cette page utilisent l’identifiant de fournisseur RustFS par défaut, `default`.
 
-## Overview
+## Vue d’ensemble
 
-The browser login flow is:
+Le flux de connexion dans le navigateur est le suivant :
 
-1. RustFS sends an authorization-code request with a Proof Key for Code Exchange (PKCE) S256 challenge.
-2. Keycloak authenticates the user and redirects the browser to RustFS with `code` and `state`.
-3. RustFS exchanges the code at the Keycloak token endpoint.
-4. RustFS verifies the ID token signature, issuer, audience, expiry, and nonce.
-5. RustFS maps ID token claim values to local RustFS Identity and Access Management (IAM) policies and issues temporary credentials for the Console session.
+1. RustFS envoie une demande de code d’autorisation avec un défi Proof Key for Code Exchange (PKCE) S256.
+2. Keycloak authentifie l’utilisateur et redirige le navigateur vers RustFS avec `code` et `state`.
+3. RustFS échange le code auprès du point de terminaison de jeton de Keycloak.
+4. RustFS vérifie la signature du jeton d’identité, l’émetteur, l’audience, l’expiration et le nonce.
+5. RustFS associe les claims du jeton d’identité à des politiques locales de gestion des identités et des accès (IAM) RustFS, puis émet des identifiants temporaires pour la session Console.
 
-Keycloak authenticates the user, while RustFS policies authorize S3 and administration operations. RustFS does not use Keycloak Authorization Services for object or Console authorization.
+Keycloak authentifie l’utilisateur, tandis que les politiques RustFS autorisent les opérations S3 et d’administration. RustFS n’utilise pas les Authorization Services de Keycloak pour l’autorisation des objets ou de la Console.
 
-The examples use the following values. Replace the hostnames and client secret for your environment:
+Les exemples utilisent les valeurs suivantes. Remplacez les noms d’hôte et le secret client pour votre environnement :
 
-| Setting | Example |
+| Réglage | Exemple |
 | --- | --- |
-| Keycloak realm | `rustfs` |
-| Keycloak issuer | `https://keycloak.example.com/realms/rustfs` |
-| Keycloak client ID | `rustfs-console` |
-| Public RustFS origin | `https://rustfs.example.com` |
-| RustFS callback URL | `https://rustfs.example.com/rustfs/admin/v3/oidc/callback/default` |
+| Domaine Keycloak (realm) | `rustfs` |
+| Émetteur Keycloak (issuer) | `https://keycloak.example.com/realms/rustfs` |
+| ID client Keycloak | `rustfs-console` |
+| Origine publique RustFS | `https://rustfs.example.com` |
+| URL de rappel RustFS | `https://rustfs.example.com/rustfs/admin/v3/oidc/callback/default` |
 
 ## Configuration
 
-### Keycloak configuration
+### Configuration de Keycloak
 
-#### Create the realm and client
+#### Créer le domaine et le client
 
-1. Open the Keycloak Admin Console and create or select the `rustfs` realm.
-2. Open **Clients** and create an OpenID Connect client with the client ID `rustfs-console`.
-3. Enable **Client authentication** and **Standard flow**.
-4. Disable unused flows, including **Implicit flow**, **Direct access grants**, and **Service accounts roles**.
-5. Set **Valid redirect URIs** to the exact RustFS callback URL:
+1. Ouvrez la console d’administration Keycloak, puis créez ou sélectionnez le domaine `rustfs`.
+2. Ouvrez **Clients** et créez un client OpenID Connect dont l’ID client est `rustfs-console`.
+3. Activez **Client authentication** et **Standard flow**.
+4. Désactivez les flux inutilisés, notamment **Implicit flow**, **Direct access grants** et **Service accounts roles**.
+5. Réglez **Valid redirect URIs** sur l’URL de rappel RustFS exacte :
 
   ```text
   https://rustfs.example.com/rustfs/admin/v3/oidc/callback/default
   ```
 
-6. Set **Web origins** to the public RustFS origin:
+6. Réglez **Web origins** sur l’origine publique RustFS :
 
   ```text
   https://rustfs.example.com
   ```
 
-7. Set **Proof Key for Code Exchange Code Challenge Method** to `S256`.
-8. Save the client and copy its secret from **Credentials**.
+7. Réglez **Proof Key for Code Exchange Code Challenge Method** sur `S256`.
+8. Enregistrez le client et copiez son secret depuis **Credentials**.
 
-RustFS submits the client secret in the token request body. Do not apply a Keycloak client policy that disables `client_secret_post`.
+RustFS transmet le secret client dans le corps de la requête de jeton. N’appliquez pas une politique client Keycloak qui désactive `client_secret_post`.
 
-#### Map Keycloak groups to RustFS policies
+#### Associer les groupes Keycloak aux politiques RustFS
 
-RustFS maps values in the ID token `groups` claim to RustFS policy names. Create Keycloak groups that match the policies required by your users, such as `consoleAdmin`, `readwrite`, or `readonly`, then assign users to those groups.
+RustFS associe les valeurs du claim `groups` du jeton d’identité aux noms de politiques RustFS. Créez des groupes Keycloak qui correspondent aux politiques requises par vos utilisateurs, par exemple `consoleAdmin`, `readwrite` ou `readonly`, puis affectez les utilisateurs à ces groupes.
 
-Add a **Group Membership** mapper to a dedicated client scope and attach it to `rustfs-console`:
+Ajoutez un mapper **Group Membership** à un périmètre de client (client scope) dédié et attachez-le à `rustfs-console` :
 
-| Mapper field | Value |
+| Champ du mapper | Valeur |
 | --- | --- |
 | Name | `rustfs-groups` |
 | Token Claim Name | `groups` |
@@ -70,21 +70,21 @@ Add a **Group Membership** mapper to a dedicated client scope and attach it to `
 | Add to userinfo | On |
 | Multivalued | On |
 
-Keep **Full group path** disabled. A value such as `/consoleAdmin` does not match the RustFS policy named `consoleAdmin`.
+Laissez **Full group path** désactivé. Une valeur telle que `/consoleAdmin` ne correspond pas à la politique RustFS nommée `consoleAdmin`.
 
-:::note[Using Keycloak roles]
+:::note[Utiliser des rôles Keycloak]
 
-If you use realm or client roles instead of groups, add a role mapper that emits a flat top-level `roles` array. RustFS does not parse Keycloak's nested `realm_access.roles` claim.
+Si vous utilisez des rôles de domaine ou de client plutôt que des groupes, ajoutez un mapper de rôles qui émet un tableau `roles` plat à la racine du jeton. RustFS n’analyse pas le claim imbriqué `realm_access.roles` de Keycloak.
 
-:::
+:: :
 
-### RustFS configuration
+### Configuration de RustFS
 
-Configure the Keycloak provider through environment variables.
+Configurez le fournisseur Keycloak au moyen de variables d’environnement.
 
-#### Configure with environment variables
+#### Configurer avec des variables d’environnement
 
-Add the Keycloak provider and public browser origin to the RustFS service environment:
+Ajoutez le fournisseur Keycloak et l’origine publique du navigateur à l’environnement du service RustFS :
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_BROWSER_REDIRECT_URL="https://rustfs.example.com"
@@ -103,11 +103,11 @@ RUSTFS_IDENTITY_OPENID_EMAIL_CLAIM="email"
 RUSTFS_IDENTITY_OPENID_USERNAME_CLAIM="preferred_username"
 ```
 
-Restart RustFS after applying the configuration.
+Redémarrez RustFS après avoir appliqué la configuration.
 
 :::note[Keycloak sur un réseau privé]
 
-Si Keycloak se résout en une adresse IP privée ou de boucle locale, ajoutez son origine à `RUSTFS_OUTBOUND_ALLOW_ORIGINS` dans l’environnement du service RustFS. Par exemple, pour un service Docker nommé `kc` sur le port `8080` :
+Si Keycloak se résout en une adresse IP privée ou de boucle locale, ajoutez son origine à `RUSTFS_OUTBOUND_ALLOW_ORIGINS` dans l’environnement du service RustFS. Par exemple, pour un service Docker nommé `kc` sur le port `8080` :
 
 ```ini
 RUSTFS_OUTBOUND_ALLOW_ORIGINS="http://kc:8080"
@@ -115,25 +115,25 @@ RUSTFS_OUTBOUND_ALLOW_ORIGINS="http://kc:8080"
 
 Utilisez le format `scheme://host:port`, sans chemin tel que `/realms/rustfs`. Séparez les origines par des virgules et ajoutez toute autre origine privée utilisée par `jwks_uri` ou `token_endpoint` dans le document de découverte. Redémarrez RustFS après cette modification. Les points de terminaison publics qui se résolvent en adresses IP publiques ne nécessitent pas cette liste d’autorisation.
 
-Sans l’autorisation requise, la découverte échoue au démarrage et le fournisseur reste indisponible pour la connexion à la Console et STS, même si sa configuration indique `enabled: true`.
+Sans l’autorisation requise, la découverte échoue au démarrage et le fournisseur reste indisponible pour la connexion à la Console et pour STS, même si sa configuration indique `enabled: true`.
 
-:::
+:: :
 
-`RUSTFS_BROWSER_REDIRECT_URL` must contain the public scheme and authority without a path. It controls the Console success redirect and logout fallback URL. The provider callback URL must exactly match the URL registered in Keycloak.
+`RUSTFS_BROWSER_REDIRECT_URL` doit contenir le schéma et l’autorité publics, sans chemin. Cette variable contrôle la redirection de succès de la Console et l’URL de repli lors de la déconnexion. L’URL de rappel du fournisseur doit correspondre exactement à l’URL enregistrée dans Keycloak.
 
-:::warning[Map claims in production]
+:::warning[Associer les claims en production]
 
-Do not use `RUSTFS_IDENTITY_OPENID_ROLE_POLICY=consoleAdmin` as a permanent shortcut. Map Keycloak groups or roles to RustFS policies so each user receives only the required permissions.
+N’utilisez pas `RUSTFS_IDENTITY_OPENID_ROLE_POLICY=consoleAdmin` comme raccourci permanent. Associez les groupes ou les rôles Keycloak à des politiques RustFS afin que chaque utilisateur ne reçoive que les autorisations requises.
 
-:::
+:: :
 
-For a reverse proxy or load balancer, preserve the callback query string and route the authorize and callback requests to the same RustFS node. The in-flight OIDC `state` is local to that node.
+Avec un reverse proxy ou un répartiteur de charge, conservez la chaîne de requête du rappel et acheminez les requêtes d’autorisation et de rappel vers le même nœud RustFS. L’état OIDC en cours (`state`) est local à ce nœud.
 
-## Verification
+## Vérification
 
-### Verify Keycloak discovery
+### Vérifier la découverte Keycloak
 
-Query the realm discovery document:
+Interrogez le document de découverte du domaine :
 
 ```bash
 curl -fsS "https://keycloak.example.com/realms/rustfs/.well-known/openid-configuration" | jq '{
@@ -146,42 +146,42 @@ curl -fsS "https://keycloak.example.com/realms/rustfs/.well-known/openid-configu
 }'
 ```
 
-Confirm that:
+Vérifiez que :
 
-- `issuer` is `https://keycloak.example.com/realms/rustfs`.
-- `authorization_endpoint`, `token_endpoint`, and `jwks_uri` are present.
-- `code_challenge_methods_supported` includes `S256`.
-- The token endpoint supports client-secret authentication in the request body.
+- `issuer` vaut `https://keycloak.example.com/realms/rustfs`.
+- `authorization_endpoint`, `token_endpoint` et `jwks_uri` sont présents.
+- `code_challenge_methods_supported` contient `S256`.
+- Le point de terminaison de jeton accepte l’authentification par secret client dans le corps de la requête.
 
-### Verify the RustFS provider
+### Vérifier le fournisseur RustFS
 
-After restarting RustFS, check that the provider is available:
+Après le redémarrage de RustFS, vérifiez que le fournisseur est disponible :
 
 ```bash
 curl -fsS "https://rustfs.example.com/rustfs/admin/v3/oidc/providers" | jq
 ```
 
-The response should include the `default` provider with the display name `Keycloak`.
+La réponse devrait inclure le fournisseur `default` avec le nom d’affichage `Keycloak`.
 
-### Test Console login
+### Tester la connexion à la Console
 
-Open the RustFS Console and select **Keycloak**, or open the authorization endpoint directly:
+Ouvrez la Console RustFS et sélectionnez **Keycloak**, ou ouvrez directement le point de terminaison d’autorisation :
 
 ```text
 https://rustfs.example.com/rustfs/admin/v3/oidc/authorize/default
 ```
 
-Verify the complete flow:
+Vérifiez le flux complet :
 
-1. The browser redirects to Keycloak.
-2. The user signs in.
-3. Keycloak redirects to the RustFS callback URL with `code` and `state`.
-4. RustFS validates the ID token and creates the Console session.
-5. The Console opens with the permissions mapped from the user's `groups` or `roles` claim.
+1. Le navigateur redirige vers Keycloak.
+2. L’utilisateur se connecte.
+3. Keycloak redirige vers l’URL de rappel RustFS avec `code` et `state`.
+4. RustFS valide le jeton d’identité et crée la session Console.
+5. La Console s’ouvre avec les autorisations associées au claim `groups` ou `roles` de l’utilisateur.
 
-If authentication succeeds but access is denied, confirm that the ID token contains a flat `groups` or `roles` claim and that each value exactly matches an existing RustFS policy name.
+Si l’authentification réussit mais que l’accès est refusé, confirmez que le jeton d’identité contient un claim `groups` ou `roles` plat et que chaque valeur correspond exactement au nom d’une politique RustFS existante.
 
-## Next steps
+## Étapes suivantes
 
-- Review [users, groups, and policies](../iam/policies.md) before assigning Keycloak groups.
-- Review the [Console security notes](/administration/console) before exposing the login endpoint publicly.
+- Consultez [Utilisateurs, groupes et politiques](../iam/policies.md) avant d’affecter des groupes Keycloak.
+- Consultez les [notes de sécurité de la Console](/administration/console) avant d’exposer publiquement le point de terminaison de connexion.
