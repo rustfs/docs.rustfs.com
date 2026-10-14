@@ -23,6 +23,8 @@ description: Hardware requirements for RustFS.
 
 ## Production Environment
 
+Die Windows-Version von RustFS ist ausschließlich für Entwicklung und Debugging vorgesehen und wird **nicht für Produktionsumgebungen empfohlen**. Für Produktionsumgebungen empfehlen wir [Linux](/de/installation/linux).
+
 | Component | Requirement |
 | - | - |
 | CPU | 2 x 12 cores+ |

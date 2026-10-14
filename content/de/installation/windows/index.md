@@ -5,7 +5,9 @@ description: "Install a local RustFS instance on Windows with RustFS Launcher or
 
 This guide provides two ways to run **RustFS** on Windows: use the graphical **RustFS Launcher**, or download and run the standalone server binary from PowerShell. Both methods create a local, single-node instance suitable for evaluation, development, and testing.
 
-:::note[Deployment scope]
+:::warning[Nur für Entwicklung und Debugging]
+
+Die Windows-Version von RustFS ist ausschließlich für Entwicklung und Debugging vorgesehen und wird **nicht für Produktionsumgebungen empfohlen**. Für Produktionsumgebungen empfehlen wir [Linux](/de/installation/linux).
 
 These procedures run RustFS as a desktop process, not as a Windows service. For a production or distributed deployment, use the [Linux installation guides](/installation/linux).
 

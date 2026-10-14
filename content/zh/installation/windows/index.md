@@ -5,7 +5,9 @@ description: "使用 RustFS Launcher 或独立服务器二进制文件在 Window
 
 本指南提供两种在 Windows 上运行 **RustFS** 的方式：使用图形化 **RustFS Launcher**，或通过 PowerShell 下载并运行独立服务器二进制文件。两种方式都会创建适合评估、开发和测试的本地单节点实例。
 
-:::note[部署范围]
+:::warning[仅用于开发和调试]
+
+Windows 版本的 RustFS 仅适用于开发和调试，**不建议用于生产环境**。生产部署建议使用 [Linux](/zh/installation/linux)。
 
 这些步骤将 RustFS 作为桌面进程运行，而不是 Windows 服务。对于生产或分布式部署，请使用 [Linux 安装指南](/installation/linux)。
 
