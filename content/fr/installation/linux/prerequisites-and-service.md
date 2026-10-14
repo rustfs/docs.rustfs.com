@@ -1,30 +1,30 @@
 ---
-title: "Linux Prerequisites and Service Setup"
-description: "Common prerequisites, disk preparation, binary installation, and systemd service setup shared by all RustFS Linux deployment modes."
+title: "Prérequis Linux et configuration du service"
+description: "Cette page décrit les prérequis communs, la préparation des disques, l’installation du binaire et la configuration du service systemd partagés par tous les modes de déploiement Linux de RustFS."
 ---
 
-This page contains the prerequisites and service setup steps shared by all three Linux deployment modes — [SNSD](./single-node-single-disk.md), [SNMD](./single-node-multiple-disk.md), and [MNMD](./multiple-node-multiple-disk.md). Complete these steps first, then return to your mode page to configure the environment file and start the service.
+Cette page regroupe les prérequis et la configuration du service communs aux trois modes de déploiement Linux — [SNSD](./single-node-single-disk.md), [SNMD](./single-node-multiple-disk.md) et [MNMD](./multiple-node-multiple-disk.md). Terminez d’abord ces étapes, puis revenez à la page de votre mode pour configurer le fichier d’environnement et démarrer le service.
 
-## Operating System Version
+## Version du système d’exploitation
 
-We recommend Linux kernel version 4.x or later; versions 5.x/6.x achieve better I/O throughput and network performance. Ubuntu 22.04 and RHEL 8.x are both suitable for installing RustFS.
+Nous recommandons un noyau Linux 4.x ou ultérieur ; les versions 5.x et 6.x offrent un meilleur débit d’E/S et de meilleures performances réseau. Ubuntu 22.04 et RHEL 8.x conviennent tous deux à l’installation de RustFS.
 
-## Firewall
+## Pare-feu
 
-Linux systems have firewalls enabled by default. Check the firewall status with:
+Les systèmes Linux ont un pare-feu activé par défaut. Vérifiez son état avec :
 
 ```bash
 systemctl status firewalld
 ```
 
-If your firewall status is "active", you can disable the firewall:
+Si l’état du pare-feu est « active », vous pouvez le désactiver :
 
 ```bash
 systemctl stop firewalld
 systemctl disable firewalld
 ```
 
-Or allow the RustFS S3 port (9000) and console port (9001):
+Ou autorisez le port S3 de RustFS (9000) et le port de la Console (9001) :
 
 ```bash
 firewall-cmd --zone=public --add-port=9000/tcp --permanent
@@ -32,36 +32,36 @@ firewall-cmd --zone=public --add-port=9001/tcp --permanent
 firewall-cmd --reload
 ```
 
-All RustFS servers in a deployment **must** use the same listening port. If you use port 9000, every other server must also use port 9000.
+Tous les serveurs RustFS d’un déploiement **doivent** utiliser le même port d’écoute. Si vous utilisez le port 9000, chaque autre serveur doit aussi utiliser le port 9000.
 
-## Memory Requirements
+## Exigences de mémoire
 
-RustFS requires at least 2 GB of memory for a test environment; production environments require a minimum of 128 GB of memory.
+RustFS exige au moins 2 Go de mémoire pour un environnement de test ; un environnement de production exige au minimum 128 Go.
 
-## Time Synchronization
+## Synchronisation de l’heure
 
-Tous les nœuds d'un déploiement distribué RustFS **doivent** maintenir des horloges synchronisées. RustFS s'appuie sur les horodatages pour la signature des requêtes, le versionnement des objets, le verrouillage distribué et la réplication. Une dérive significative de l'horloge entre les nœuds peut provoquer :
+Tous les nœuds d’un déploiement distribué RustFS **doivent** maintenir des horloges synchronisées. RustFS s’appuie sur les horodatages pour la signature des requêtes, la gestion des versions des objets, le verrouillage distribué et la réplication. Une dérive significative de l’horloge entre les nœuds peut provoquer :
 
-- **Échecs de signature de requête** — La vérification des signatures S3 dépend d'horodatages précis.
-- **Problèmes de réplication et de cohérence** — Un décalage d'horloge peut entraîner des versions d'objets obsolètes ou conflictuelles.
-- **Problèmes de contention de verrouillage** — Les verrous distribués utilisent des horodatages pour l'expiration des baux.
-- **Échecs de démarrage du service** — RustFS refuse de démarrer si le décalage d'horloge entre les nœuds dépasse les seuils de sécurité.
+- **Échecs de signature de requête** — La vérification des signatures S3 dépend d’horodatages précis.
+- **Problèmes de réplication et de cohérence** — Un décalage d’horloge peut entraîner des versions d’objets obsolètes ou conflictuelles.
+- **Problèmes de contention de verrouillage** — Les verrous distribués utilisent des horodatages pour l’expiration des baux.
+- **Échecs de démarrage du service** — RustFS refuse de démarrer si le décalage d’horloge entre les nœuds dépasse les seuils de sécurité.
 
 :::warning
 
-La dérive d'horloge entre deux nœuds ne doit pas dépasser **15 minutes**. Pour les environnements de production, nous recommandons de maintenir la dérive en dessous d'**1 seconde**.
+La dérive d’horloge entre deux nœuds ne doit pas dépasser **15 minutes**. Pour les environnements de production, nous recommandons de maintenir la dérive en dessous d'**1 seconde**.
 
-:::
+:: :
 
 ### Outils NTP recommandés
 
-Utilisez l'un des services de synchronisation temporelle suivants sur **chaque nœud**. Choisissez un outil et configurez-le de manière cohérente sur l'ensemble du déploiement.
+Utilisez l’un des services de synchronisation temporelle suivants sur **chaque nœud**. Choisissez un outil et configurez-le de manière cohérente sur l’ensemble du déploiement.
 
-#### chrony (Recommandé)
+#### chrony (recommandé)
 
-`chrony` est l'implémentation NTP préférée pour les distributions Linux modernes. Il synchronise plus rapidement et gère mieux la connectivité réseau intermittente que l'ancien `ntpd`.
+`chrony` est l’implémentation NTP préférée pour les distributions Linux modernes. Il synchronise plus rapidement et gère mieux la connectivité réseau intermittente que l’ancien `ntpd`.
 
-Installer chrony :
+Installez chrony :
 
 ```bash
 # RHEL / CentOS / Rocky Linux
@@ -71,7 +71,7 @@ sudo dnf install chrony -y
 sudo apt install chrony -y
 ```
 
-Modifiez le fichier de configuration `/etc/chrony.conf` (RHEL) ou `/etc/chrony/chrony.conf` (Debian/Ubuntu) pour pointer vers vos serveurs NTP préférés :
+Modifiez le fichier de configuration `/etc/chrony.conf` (RHEL) ou `/etc/chrony/chrony.conf` (Debian/Ubuntu) pour pointer vers vos serveurs NTP préférés :
 
 ```ini
 server time1.google.com iburst
@@ -80,9 +80,9 @@ server time3.google.com iburst
 server time4.google.com iburst
 ```
 
-> Remplacez les adresses serveur par les serveurs NTP internes de votre organisation, si disponibles. L'utilisation d'`iburst` accélère la synchronisation initiale.
+> Remplacez les adresses serveur par les serveurs NTP internes de votre organisation, si disponibles. L’option `iburst` accélère la synchronisation initiale.
 
-Activer et démarrer le service :
+Activez et démarrez le service :
 
 ```bash
 sudo systemctl enable chronyd
@@ -91,9 +91,9 @@ sudo systemctl start chronyd
 
 #### systemd-timesyncd
 
-`systemd-timesyncd` est un client SNTP léger intégré aux distributions basées sur systemd. Il convient aux environnements où un démon NTP complet n'est pas nécessaire.
+`systemd-timesyncd` est un client SNTP léger intégré aux distributions basées sur systemd. Il convient aux environnements où un démon NTP complet n’est pas nécessaire.
 
-Modifiez `/etc/systemd/timesyncd.conf` pour configurer les serveurs NTP :
+Modifiez `/etc/systemd/timesyncd.conf` pour configurer les serveurs NTP :
 
 ```ini
 [Time]
@@ -101,7 +101,7 @@ NTP=time1.google.com time2.google.com time3.google.com time4.google.com
 FallbackNTP=0.pool.ntp.org 1.pool.ntp.org
 ```
 
-Activer et démarrer le service :
+Activez et démarrez le service :
 
 ```bash
 sudo timedatectl set-ntp true
@@ -109,9 +109,9 @@ sudo systemctl enable systemd-timesyncd
 sudo systemctl start systemd-timesyncd
 ```
 
-#### ntpd (Ancien)
+#### ntpd (ancien)
 
-Le classique `ntpd` de l'implémentation de référence NTP est toujours largement disponible. Utilisez `chrony` à la place, sauf si votre environnement nécessite spécifiquement `ntpd`.
+Le classique `ntpd` de l’implémentation de référence NTP est toujours largement disponible. Utilisez `chrony` à la place, sauf si votre environnement nécessite spécifiquement `ntpd`.
 
 ```bash
 # RHEL / CentOS / Rocky Linux
@@ -121,7 +121,7 @@ sudo dnf install ntp -y
 sudo apt install ntp -y
 ```
 
-Modifiez `/etc/ntp.conf` pour définir vos serveurs NTP, puis activez et démarrez :
+Modifiez `/etc/ntp.conf` pour définir vos serveurs NTP, puis activez et démarrez :
 
 ```bash
 sudo systemctl enable ntpd
@@ -130,9 +130,9 @@ sudo systemctl start ntpd
 
 ### Vérification de la synchronisation temporelle
 
-Après avoir configuré le service NTP, vérifiez l'état de la synchronisation sur chaque nœud.
+Après avoir configuré le service NTP, vérifiez l’état de la synchronisation sur chaque nœud.
 
-Vérifier l'état de l'horloge système :
+Vérifiez l’état de l’horloge système :
 
 ```bash
 timedatectl status
@@ -140,32 +140,32 @@ timedatectl status
 
 La sortie doit afficher `System clock synchronized: yes` et `NTP service: active`.
 
-Pour `chrony`, utilisez la commande suivante pour un état détaillé de la synchronisation :
+Pour `chrony`, utilisez la commande suivante pour un état détaillé de la synchronisation :
 
 ```bash
 chronyc tracking
 ```
 
-Champs clés à vérifier :
+Champs clés à vérifier :
 
 - **Leap status** — Doit être `Normal` (pas `Not synchronised`).
 - **System time** — Le décalage par rapport au serveur de référence. Doit être proche de `0.000000000 seconds`.
 - **Root delay** — Temps aller-retour vers le serveur de référence.
 
-Lister les sources NTP actuelles et leur statut :
+Listez les sources NTP actuelles et leur état :
 
 ```bash
 chronyc sources -v
 ```
 
-Colonnes à surveiller :
+Colonnes à surveiller :
 
 - **`*`** — La source de synchronisation actuellement sélectionnée.
 - **`+`** — Autres sources acceptables.
-- **`-`** — Sources rejetées par l'algorithme de sélection.
+- **`-`** — Sources rejetées par l’algorithme de sélection.
 - **`?`** — Sources dont la connectivité est incertaine.
 
-Pour `ntpd` :
+Pour `ntpd` :
 
 ```bash
 ntpq -p
@@ -173,14 +173,14 @@ ntpq -p
 
 ### Vérification de la cohérence inter-nœuds
 
-Après la synchronisation de tous les nœuds, vérifiez que les horloges sont cohérentes dans tout le cluster. Comparez les horodatages sur chaque nœud :
+Après la synchronisation de tous les nœuds, vérifiez que les horloges sont cohérentes dans tout le cluster. Comparez les horodatages sur chaque nœud :
 
 ```bash
 # Run on each node and compare the output
 date -u '+%Y-%m-%d %H:%M:%S'
 ```
 
-Pour une comparaison plus précise, installez `sshpass` et exécutez :
+Pour une comparaison plus précise, installez `sshpass` et exécutez :
 
 ```bash
 for host in node1 node2 node3 node4; do
@@ -191,43 +191,43 @@ done
 
 Dans un environnement correctement configuré, la différence entre deux nœuds doit être négligeable (inférieure à 1 milliseconde).
 
-## Capacity Planning
+## Planification de la capacité
 
-When planning object storage capacity, we recommend considering:
+Pour planifier la capacité de stockage objet, nous recommandons de prendre en compte :
 
-- Initial data volume: How much data do you plan to migrate or store at once? (e.g., 500 TB)
-- Data growth volume: Daily/weekly/monthly data growth capacity
-- Planning cycle: How long should this hardware planning last? (recommended: 3 years)
-- Your company's hardware iteration and update cycles.
+- Volume initial : quelle quantité de données prévoyez-vous de migrer ou de stocker en une fois ? (par exemple, 500 To)
+- Croissance : capacité de croissance quotidienne, hebdomadaire ou mensuelle
+- Horizon : combien de temps cette planification matérielle doit-elle couvrir ? (recommandation : 3 ans)
+- Cycles de renouvellement matériel de votre organisation.
 
-Review [EC Configuration](../requirement/ec-configuration.md) to calculate usable capacity, understand the automatic parity defaults, and validate any explicit parity or erasure-set width before deployment.
+Consultez la [configuration EC](../requirement/ec-configuration.md) pour calculer la capacité utile, comprendre les valeurs de parité automatiques et valider toute parité explicite ou largeur d’ensemble d’effacement avant le déploiement.
 
-## Disk Planning
+## Planification des disques
 
-Because NFS generates phantom writes and lock issues under high I/O, **NFS is prohibited** as the underlying storage medium for RustFS. We strongly recommend **JBOD (Just a Bunch of Disks)** mode: expose physical disks directly and independently to the operating system, and let the RustFS software layer handle data redundancy and protection.
+NFS produit des écritures fantômes et des problèmes de verrouillage sous forte charge d’E/S. **NFS est interdit** comme support de stockage sous-jacent pour RustFS. Nous recommandons vivement le mode **JBOD (Just a Bunch of Disks)** : exposez les disques physiques directement et individuellement au système d’exploitation, et laissez la couche logicielle RustFS assurer la redondance et la protection des données.
 
-The reasons are as follows:
+Les raisons sont les suivantes :
 
-- **Better Performance:** RustFS's Erasure Coding engine is highly optimized and reads/writes multiple disks concurrently, achieving higher throughput than hardware RAID controllers. Hardware RAID becomes a performance bottleneck.
-- **Lower Cost:** No expensive RAID cards needed, reducing hardware procurement costs.
-- **Simpler Management:** RustFS manages disks uniformly, simplifying storage layer operations and maintenance.
-- **Faster Fault Recovery:** The RustFS healing process is faster than a traditional RAID rebuild and has less impact on cluster performance.
+- **Performances.** Le moteur de codage d’effacement de RustFS est fortement optimisé et lit ou écrit plusieurs disques en parallèle, avec un débit supérieur à celui des contrôleurs RAID matériels. Le RAID matériel devient un goulet d’étranglement.
+- **Coût.** Aucune carte RAID coûteuse n’est nécessaire, ce qui réduit le coût d’acquisition.
+- **Exploitation.** RustFS gère les disques de façon uniforme, ce qui simplifie l’exploitation de la couche de stockage.
+- **Reprise après incident.** Le processus de réparation des données (healing) de RustFS est plus rapide qu’une reconstruction RAID classique et affecte moins les performances du cluster.
 
-We recommend NVMe SSDs as the storage medium for higher performance and throughput.
+Nous recommandons des SSD NVMe comme support de stockage, pour de meilleures performances et un meilleur débit.
 
-## File System Selection
+## Choix du système de fichiers
 
-RustFS strongly recommends formatting all storage disks with the XFS file system. RustFS development and testing are based on XFS, ensuring optimal performance and stability. Avoid other file systems such as ext4, BTRFS, or ZFS, as they may cause performance degradation or unpredictable issues.
+Nous recommandons vivement de formater tous les disques de stockage en XFS. Le développement et les tests de RustFS s’appuient sur XFS, ce qui assure les meilleures performances et la meilleure stabilité. Évitez les autres systèmes de fichiers tels que ext4, BTRFS ou ZFS : ils peuvent dégrader les performances ou provoquer des comportements imprévisibles.
 
-XFS suits RustFS's workload for three reasons:
+XFS convient à la charge de RustFS pour trois raisons :
 
-- **High-concurrency I/O:** XFS was designed for high performance and scalability. Its internal journaling and data structures (such as B+ trees) efficiently handle large numbers of parallel read/write requests, matching how RustFS shards large objects and reads/writes multiple disks in an erasure set in parallel.
-- **Massive files and large file sizes:** XFS is a 64-bit file system supporting extremely large files (up to 8 EB). Its metadata management stays efficient even with millions of files in a single directory — important because RustFS stores each object (or object version) as an independent file.
-- **Space reservation:** XFS provides an efficient `fallocate` API. RustFS uses it to reserve contiguous disk space before writing objects, avoiding the overhead of dynamic expansion and metadata updates during writes and minimizing file fragmentation.
+- **E/S fortement concurrentes.** XFS a été conçu pour la performance et le passage à l’échelle. Sa journalisation et ses structures internes (notamment les arbres B+) traitent efficacement un grand nombre de lectures et d’écritures parallèles, ce qui correspond à la façon dont RustFS découpe les objets volumineux et lit ou écrit plusieurs disques d’un ensemble d’effacement en parallèle.
+- **Fichiers très nombreux et très volumineux.** XFS est un système de fichiers 64 bits qui prend en charge des fichiers extrêmement volumineux (jusqu’à 8 Eo). Sa gestion des métadonnées reste efficace même avec des millions de fichiers dans un seul répertoire, ce qui compte parce que RustFS stocke chaque objet (ou version d’objet) comme un fichier indépendant sur le disque.
+- **Réservation d’espace.** XFS fournit une API `fallocate` efficace. RustFS l’utilise pour réserver un espace disque contigu avant d’écrire les objets, ce qui évite le coût de l’extension dynamique et des mises à jour de métadonnées pendant l’écriture, et limite la fragmentation.
 
-For better disk discovery, we recommend using **Label** tags when formatting XFS file systems.
+Pour faciliter la découverte des disques, nous recommandons d’utiliser des étiquettes **Label** lors du formatage des systèmes de fichiers XFS.
 
-First, check the disk layout:
+Vérifiez d’abord la disposition des disques :
 
 ```bash
 sudo lsblk
@@ -241,19 +241,19 @@ nvme1n1           8:32   0   3.7T  0 disk  <-- if this is our format new disk
 nvme2n1          8:48   0   3.7T   0  disk
 ```
 
-Format each data disk:
+Formatez chaque disque de données :
 
 ```bash
 sudo mkfs.xfs  -i size=512 -n ftype=1 -L RUSTFS0 /dev/sdb
 ```
 
-Formatting options:
+Options de formatage :
 
-- `-L <label>`: Set a label for the file system for easier identification and mounting.
-- `-i size=512`: We recommend an inode size of 512 bytes, which benefits scenarios storing large numbers of small objects (metadata).
-- `-n ftype=1`: Enable ftype so the file system records file types in directory structures, improving operations such as readdir and unlink.
+- `-L <label>` : définit une étiquette de système de fichiers pour faciliter l’identification et le montage.
+- `-i size=512` : nous recommandons une taille d’inode de 512 octets, utile lorsque vous stockez un grand nombre de petits objets (métadonnées).
+- `-n ftype=1` : active ftype afin que le système de fichiers enregistre le type des fichiers dans les répertoires, ce qui accélère des opérations telles que readdir et unlink.
 
-Mounting:
+Montage :
 
 ```bash
 # write new line
@@ -266,14 +266,14 @@ LABEL=RUSTFS0 /data/rustfs0   xfs   defaults,noatime,nodiratime   0   0
 sudo mount -a
 ```
 
-## Configure Service User
+## Configurer l’utilisateur du service
 
-We recommend running RustFS as a dedicated user without login permissions.
+Nous recommandons d’exécuter RustFS sous un utilisateur dédié, sans droit de connexion.
 
-1. **Keep the default account:** The default user and group in the service unit are `root` and `root`; no changes are needed if you use them.
-2. **Use a dedicated account:** Create a user and group, then update the service unit accordingly.
+1. **Conserver le compte par défaut.** L’utilisateur et le groupe par défaut de l’unité de service sont `root` et `root` ; aucune modification n’est nécessaire si vous les conservez.
+2. **Utiliser un compte dédié.** Créez un utilisateur et un groupe, puis mettez à jour l’unité de service en conséquence.
 
-The following example creates the user and group and grants access to the RustFS data directories (optional):
+L’exemple suivant crée l’utilisateur et le groupe, puis leur accorde l’accès aux répertoires de données RustFS (facultatif) :
 
 ```bash
 groupadd -r rustfs-user
@@ -283,14 +283,14 @@ chown rustfs-user:rustfs-user  /data/rustfs*
 
 :::note
 
-- If you created the rustfs-user user and group, change `User` and `Group` in `/etc/systemd/system/rustfs.service` to `rustfs-user`.
-- Adjust `/data/rustfs*` to your actual mount directories.
+- Si vous avez créé l’utilisateur et le groupe `rustfs-user`, remplacez `User` et `Group` dans `/etc/systemd/system/rustfs.service` par `rustfs-user`.
+- Adaptez `/data/rustfs*` à vos répertoires de montage réels.
 
-:::
+:: :
 
-## Download the Installation Package
+## Télécharger le paquet d’installation
 
-Install wget or curl first, then download and install the RustFS binary:
+Installez d’abord wget ou curl, puis téléchargez et installez le binaire RustFS :
 
 ```bash
 # Download address
@@ -300,9 +300,9 @@ chmod +x rustfs
 mv rustfs /usr/local/bin/
 ```
 
-## Configure the systemd Service
+## Configurer le service systemd
 
-1. Create the systemd service file
+1. Créez le fichier d’unité systemd
 
 ```bash
 sudo tee /etc/systemd/system/rustfs.service <<EOF
@@ -355,18 +355,18 @@ WantedBy=multi-user.target
 EOF
 ```
 
-The service reads `RUSTFS_VOLUMES` and the other settings from `/etc/default/rustfs`, which is mode-specific — your deployment mode page shows the exact content.
+Le service lit `RUSTFS_VOLUMES` et les autres réglages dans `/etc/default/rustfs`, dont le contenu dépend du mode. La page de votre mode de déploiement indique le contenu exact.
 
-2. Reload the service configuration
+2. Rechargez la configuration du service
 
 ```bash
 sudo systemctl daemon-reload
 ```
 
-## Next Steps
+## Étapes suivantes
 
-Return to your deployment mode page to configure the environment file and start the service:
+Revenez à la page de votre mode de déploiement pour configurer le fichier d’environnement et démarrer le service :
 
-- [Single Node Single Disk Mode (SNSD)](./single-node-single-disk.md)
-- [Single Node Multiple Disk Mode (SNMD)](./single-node-multiple-disk.md)
-- [Multiple Node Multiple Disk Mode (MNMD)](./multiple-node-multiple-disk.md)
+- [Mode nœud unique, disque unique (SNSD)](./single-node-single-disk.md)
+- [Mode nœud unique, disques multiples (SNMD)](./single-node-multiple-disk.md)
+- [Mode nœuds multiples, disques multiples (MNMD)](./multiple-node-multiple-disk.md)

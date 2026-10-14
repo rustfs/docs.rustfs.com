@@ -3,16 +3,16 @@ title: "PyIceberg"
 description: "Créez, écrivez et lisez une table Iceberg avec PyIceberg via le catalogue REST de RustFS S3 Tables."
 ---
 
-Utilisez **PyIceberg** pour créer un espace de noms et une table dans le catalogue RustFS S3 Tables, ajouter deux lignes et vérifier les données après avoir rechargé la table. Ce tutoriel utilise PyIceberg `0.10.0` et Python `3.12`, avec des informations d’identification configurées explicitement.
+Utilisez **PyIceberg** pour créer un espace de noms et une table dans le catalogue RustFS S3 Tables, ajouter deux lignes et vérifier les données après avoir rechargé la table. Ce tutoriel utilise PyIceberg `0.10.0` et Python `3.12`, avec des identifiants configurés explicitement.
 
 ## Prérequis
 
-- Terminez la [configuration de S3 Tables](/administration/data/s3-tables) : créez et activez `my-bucket` et respectez les exigences relatives au compte et à TLS.
+- Terminez la [configuration de S3 Tables](/administration/data/s3-tables) : créez et activez `my-bucket` et respectez les exigences relatives au compte et à TLS.
 - Conservez les variables `RUSTFS_ENDPOINT`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` et `AWS_DEFAULT_REGION` définies dans ce guide.
 
 ## 1. Installer le client
 
-Créez un répertoire et un environnement Python isolé :
+Créez un répertoire et un environnement Python isolé :
 
 ```bash
 mkdir rustfs-s3-tables
@@ -90,15 +90,15 @@ catalog = RustFSRestCatalog(
 
 L’adaptateur redéfinit le hook `_init_sigv4` de PyIceberg afin que la découverte soit signée avant la fin du constructeur du catalogue. Conservez la version PyIceberg fixée pour ce module et réexécutez tout le tutoriel avant d’en changer.
 
-:::
+:: :
 
 ## 3. Créer et lire une table
 
-L’exemple crée l’espace de noms `analytics` et la table `events` et s’arrête si l’une de ces ressources existe déjà. Chaque segment d’espace de noms et chaque nom de table doit comporter 1–64 caractères ASCII : lettres minuscules, chiffres, `_` ou `-`, avec une lettre ou un chiffre à chaque extrémité. L’espace de noms complet est limité à 512 caractères, points compris.
+L’exemple crée l’espace de noms `analytics` et la table `events` et s’arrête si l’une de ces ressources existe déjà. Chaque segment d’espace de noms et chaque nom de table doit comporter 1–64 caractères ASCII : lettres minuscules, chiffres, `_` ou `-`, avec une lettre ou un chiffre à chaque extrémité. L’espace de noms complet est limité à 512 caractères, points compris.
 
 Pour utiliser d’autres noms, modifiez `identifier` dans `example.py` ainsi que les noms dans les commandes d’inspection et de suppression ci-dessous.
 
-Enregistrez le programme suivant dans le même répertoire :
+Enregistrez le programme suivant dans le même répertoire :
 
 ```python title="example.py"
 import json
@@ -128,13 +128,13 @@ print("rows:", json.dumps(actual))
 print("metadata:", loaded.metadata_location)
 ```
 
-Exécutez-le :
+Exécutez-le :
 
 ```bash
 python example.py
 ```
 
-La sortie contient les deux lignes complètes et l’URI S3 de l’objet de métadonnées courant :
+La sortie contient les deux lignes complètes et l’URI S3 de l’objet de métadonnées courant :
 
 ```text
 rows: [{"id": 1, "payload": "alpha"}, {"id": 2, "payload": "beta"}]
@@ -145,7 +145,7 @@ La clé générée pour l’objet de métadonnées varie. Une vérification réu
 
 ## 4. Inspecter l’exemple ou le retirer du catalogue
 
-Listez la table dans un nouveau processus Python avec le même module de connexion :
+Listez la table dans un nouveau processus Python avec le même module de connexion :
 
 ```bash
 python - <<'PY'
@@ -159,9 +159,9 @@ Le résultat devrait contenir `("analytics", "events")`.
 
 :::note[Suppression des entrées du catalogue uniquement]
 
-Les commandes suivantes retirent l’entrée de table de ce tutoriel et son espace de noms devenu vide. Le compartiment et les objets sous-jacents sont conservés. Planifiez tout nettoyage de données avant de continuer : après `drop_table`, la maintenance ne peut plus trouver la table. Consultez la [maintenance et la protection des données](/administration/data/s3-tables).
+Les commandes suivantes retirent l’entrée de table de ce tutoriel et son espace de noms devenu vide. Le compartiment et les objets sous-jacents sont conservés. Planifiez tout nettoyage de données avant de continuer : après `drop_table`, la maintenance ne peut plus trouver la table. Consultez la [maintenance et la protection des données](/administration/data/s3-tables).
 
-:::
+:: :
 
 ```bash
 python - <<'PY'

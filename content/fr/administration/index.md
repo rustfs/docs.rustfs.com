@@ -1,17 +1,17 @@
 ---
 title: "Administration"
-description: "Administer RustFS data, access protocols, and browser-based management."
+description: "Administrez les données RustFS, les protocoles d’accès et la gestion dans le navigateur."
 ---
 
-Use this section to manage RustFS through the Console, administer buckets and objects, and configure access protocols.
+Utilisez cette section pour gérer RustFS via la Console, administrer les compartiments et les objets, et configurer les protocoles d’accès.
 
-## Administration areas
+## Domaines d’administration
 
-- [Console](./console/index.md) covers browser-based administration and sign-in methods.
-- [Data Management](./data/object/object-lock.md) covers buckets, objects, lifecycle behavior, and data protection features.
+- [Console](./console/index.md) couvre l’administration via le navigateur et les modes de connexion.
+- [Gestion des données](./data/object/object-lock.md) couvre les compartiments, les objets, le cycle de vie et les fonctions de protection des données.
 - [S3 Tables](/administration/data/s3-tables) présente les compartiments de tables et le catalogue REST Iceberg intégré.
-- [Protocol Support](./protocols/s3.md) covers S3, WebDAV, FTPS, and SFTP access.
-- [CORS Configuration](./cors/index.md) covers cross-origin access to RustFS services.
-- [Virtual-Host Access](/integration/virtual) covers domain-based S3 addressing.
+- [Protocoles](./protocols/s3.md) couvre l’accès S3, WebDAV, FTPS et SFTP.
+- [Configuration CORS](./cors/index.md) couvre l’accès entre origines (cross-origin) aux services RustFS.
+- [Accès par hôte virtuel](/integration/virtual) couvre l’adressage S3 fondé sur le nom de domaine.
 
-For identity, encryption, transport security, and auditing, continue with [Security & Compliance](/security-compliance).
+Pour l’identité, le chiffrement, la sécurité du transport et l’audit, poursuivez avec [Sécurité et conformité](/security-compliance).
