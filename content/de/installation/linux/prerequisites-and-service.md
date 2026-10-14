@@ -283,7 +283,7 @@ chown rustfs-user:rustfs-user  /data/rustfs*
 
 :::note
 
-- Wenn Sie den Benutzer und die Gruppe `rustfs-user` angelegt haben, setzen Sie `User` und `Group` in `/etc/systemd/system/rustfs.service` auf `rustfs-user`.
+- Wenn Sie den Benutzer und die Gruppe rustfs-user angelegt haben, setzen Sie `User` und `Group` in `/etc/systemd/system/rustfs.service` auf `rustfs-user`.
 - Passen Sie `/data/rustfs*` an Ihre tatsächlichen Einhängeverzeichnisse an.
 
 :::
