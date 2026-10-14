@@ -3,7 +3,7 @@ title: "Apache Flink"
 description: "RustFS オブジェクトストレージ内の CSV データを Apache Flink とその S3 ファイルシステムプラグインで読み書きします。"
 ---
 
-このガイドでは、Flink の S3 ファイルシステムプラグイン（`flink-s3-fs-hadoop`）を通じて [Apache Flink](https://github.com/apache/flink) を **RustFS** に接続します。Docker Compose でセッションクラスタを起動し、バッチモードで有界结果セットをバケットに書き込み、Flink SQL で読み戻します。この流れは `flink:1.20` と `rustfs/rustfs-x86-musl:v2.3.1` で検証済みです。
+このガイドでは、Flink の S3 ファイルシステムプラグイン（`flink-s3-fs-hadoop`）を通じて [Apache Flink](https://github.com/apache/flink) を **RustFS** に接続します。Docker Compose でセッションクラスターを起動し、バッチモードで有界結果セットをバケットに書き込み、Flink SQL で読み戻します。この流れは `flink:1.20` と `rustfs/rustfs-x86-musl:v2.3.1` で検証済みです。
 
 Docker と Compose プラグインが必要です。このデプロイはローカルでの統合テストを目的としており、本番環境向けではありません。
 
@@ -16,7 +16,7 @@ flowchart LR
 	Init["init-bucket job"] -->|"create my-bucket"| RustFS
 ```
 
-`flink-s3-fs-hadoop` プラグインは、Flink の filesystem コネクタ向けに `s3://` スキームを登録します。エンドポイント、パススタイルアドレス指定、平文 HTTP、認証情報は、`FLINK_PROPERTIES` 経由で渡す `flink-conf.yaml` の `s3.*` プロパティで設定します。
+`flink-s3-fs-hadoop` プラグインは、Flink の filesystem コネクタ向けに `s3://` スキームを登録します。エンドポイント、パススタイルアクセス、平文 HTTP、認証情報は、`FLINK_PROPERTIES` 経由で渡す `flink-conf.yaml` の `s3.*` プロパティで設定します。
 
 ## 1. プロジェクトファイルを作成する
 
@@ -157,7 +157,7 @@ docker compose up -d
 docker compose ps -a
 ```
 
-## 3. 结果セットを RustFS に書き込む
+## 3. 結果セットを RustFS に書き込む
 
 SQL ジョブを作成します。バッチモードと filesystem シンクを使います。
 
@@ -239,9 +239,9 @@ RustFS コンソールでこのプレフィックスを参照することもで�
 
 ## 6. RustFS S3 Tables を使用する
 
-RustFS S3 Tables は組み込みの Apache Iceberg REST カタログを提供します。Flink はテーブルバケットを管理された Iceberg ウェアハウスとして扱え、データは RustFS 内に保持されます。[S3 Tables](/administration/data/s3-tables) の説明に従ってテーブルバケットを有効化し、Flink Iceberg コネクタの REST カタログを RustFS に向けてください。REST カタログ URI は `http://<rustfs-host>:9000/iceberg`、ウェアハウスはバケット名で、カタログリクエスト（AWS Signature Version 4、署名名 `s3`）と S3 ファイルアクセスの両方がパススタイルのアドレス指定を使います。
+RustFS S3 Tables は組み込みの Apache Iceberg REST カタログを提供します。Flink はテーブルバケットを管理された Iceberg ウェアハウスとして扱え、データは RustFS 内に保持されます。[S3 Tables](/administration/data/s3-tables) の説明に従ってテーブルバケットを有効化し、Flink Iceberg コネクタの REST カタログを RustFS に向けてください。REST カタログ URI は `http://<rustfs-host>:9000/iceberg`、ウェアハウスはバケット名で、カタログリクエスト（AWS Signature Version 4、署名名 `s3`）と S3 ファイルアクセスの両方がパススタイルアクセスを使います。
 
-S3 Tables のサポートマトリクスに従い、本番でこの経路を採用する前に、実際にデプロイする Flink と Iceberg のバージョンでカタログを検証してください。
+S3 Tables のサポートマトリックスに従い、本番でこの経路を採用する前に、実際にデプロイする Flink と Iceberg のバージョンでカタログを検証してください。
 
 ## 7. スタックを停止・リセットする
 

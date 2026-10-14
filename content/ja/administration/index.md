@@ -1,17 +1,17 @@
 ---
-title: "Administration"
-description: "Administer RustFS data, access protocols, and browser-based management."
+title: "管理"
+description: "RustFS のデータ、アクセスプロトコル、ブラウザからの管理を扱います。"
 ---
 
-Use this section to manage RustFS through the Console, administer buckets and objects, and configure access protocols.
+このセクションでは、コンソールからの管理、バケットとオブジェクトの運用、アクセスプロトコルの設定について説明します。
 
-## Administration areas
+## 管理の領域
 
-- [Console](./console/index.md) covers browser-based administration and sign-in methods.
-- [Data Management](./data/object/object-lock.md) covers buckets, objects, lifecycle behavior, and data protection features.
-- [S3 Tables](/administration/data/s3-tables)では、テーブルバケットと組み込み Iceberg REST カタログを説明します。
-- [Protocol Support](./protocols/s3.md) covers S3, WebDAV, FTPS, and SFTP access.
-- [CORS Configuration](./cors/index.md) covers cross-origin access to RustFS services.
-- [Virtual-Host Access](/integration/virtual) covers domain-based S3 addressing.
+- [コンソール](./console/index.md)では、ブラウザからの管理とサインイン方法を説明します。
+- [データ管理](./data/object/object-lock.md)では、バケット、オブジェクト、ライフサイクルの動作、データ保護機能を説明します。
+- [S3 Tables](/administration/data/s3-tables)では、テーブルバケットと組み込みの Iceberg REST カタログを説明します。
+- [プロトコル](./protocols/s3.md)では、S3、WebDAV、FTPS、SFTP によるアクセスを説明します。
+- [CORS の設定](./cors/index.md)では、RustFS サービスへのクロスオリジンアクセスを説明します。
+- [仮想ホスト形式のアクセス](/integration/virtual)では、ドメインに基づく S3 のアドレス指定を説明します。
 
-For identity, encryption, transport security, and auditing, continue with [Security & Compliance](/security-compliance).
+ID、暗号化、通信の保護、監査については、[セキュリティとコンプライアンス](/security-compliance)に進んでください。
