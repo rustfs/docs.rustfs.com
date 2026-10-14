@@ -31,7 +31,7 @@ http://<server-ip>:9001
 
 ![RustFS Console login page with key, STS, and OIDC sign-in options](./images/rustfs-console-login.png)
 
-For a local deployment, use `http://localhost:9001`. Windows and macOS desktop launchers use port `7001` instead.
+For a local deployment, including the Windows and macOS desktop launchers, open `http://localhost:9001`. The S3 API listens on port `9000`.
 
 If the login page cannot reach the target RustFS service, select **Server Configuration** or open `/config`. Enter the externally reachable RustFS service address and save it after the health check succeeds. **Reset** clears the saved address; **Skip** returns to login without changing it.
 
