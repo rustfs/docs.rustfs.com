@@ -46,7 +46,7 @@ Add AWS SDK dependencies in `pom.xml`:
 </dependencies>
 ```
 
-> Recommend using AWS SDK v2, which has more complete features and supports async, reactive, and other patterns.
+We recommend AWS SDK for Java v2, which is more complete and supports asynchronous and reactive programming.
 
 ---
 
@@ -133,14 +133,14 @@ Deleted hello.txt
 
 ---
 
-## 3. Common Issues and Troubleshooting
+## 3. Troubleshooting
 
 | Issue | Cause | Solution |
 | -------------------------------------- | ------------------------------------ | ----------------------------------------- |
 | `S3Exception: 301 Moved Permanently` | Path-style not enabled or region error | Set `.forcePathStyle(true)` and use region `us-east-1` |
 | `ConnectException: Connection refused` | RustFS not started or incorrect port | Check RustFS status and port |
-| `403 Forbidden` | AccessKey / SecretKey error | Check authentication configuration |
-| Upload fails with no response | SDK defaults to HTTPS, RustFS only supports HTTP (or needs certificates) | Use `http://` address and configure `endpointOverride` |
+| `403 Forbidden` | Incorrect access key or secret key | Check your credentials |
+| Upload fails with no response | The SDK defaults to HTTPS. RustFS only supports HTTP (or needs certificates). | Use an `http://` address and set `endpointOverride` |
 
 ---
 
@@ -148,38 +148,38 @@ Deleted hello.txt
 
 ### 4.1 Maven Package and Run
 
-Package project:
+Package the project:
 
 ```bash
 mvn clean package
 ```
 
-Execute:
+Run it:
 
 ```bash
 java -cp target/rustfs-java-s3-demo-1.0-SNAPSHOT.jar com.example.RustfsS3Example
 ```
 
-### 4.2 RustFS Configuration Recommendations
+### 4.2 Recommended RustFS settings
 
-* Ensure SSL validation is disabled when service uses HTTP protocol.
+* If RustFS serves plain HTTP, disable TLS certificate validation in the SDK.
 * Enable CORS support (if used for web frontend).
-* Recommend setting limits like `max_object_size` and `max_part_size` to prevent large file transfer failures.
+* We recommend setting limits such as `max_object_size` and `max_part_size` to prevent large transfers from failing.
 
 ---
 
 The following advanced examples cover:
 
 * Presigned URL generation and usage
-* Multipart Upload complete process
+* The complete multipart upload workflow
 
 ---
 
-## 5. Java Advanced Features Examples
+## 5. Advanced examples
 
 ### 5.1 Generate and Use Presigned URLs
 
-> Presigned URLs allow clients to temporarily access private objects without exposing credentials, widely used for browser direct upload or download file scenarios.
+Presigned URLs give clients temporary access to private objects without exposing credentials. They are commonly used for direct uploads and downloads from a browser.
 
 #### 5.1.1 Generate Download Link (GET)
 
@@ -229,11 +229,11 @@ System.out.println("Presigned URL: " + presignedRequest.url());
 Presigned URL: http://localhost:9000/my-bucket/hello.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&...
 ```
 
-> 🔗 Open the link in browser to access the object.
+Open the URL in a browser to access the object.
 
 #### 5.1.2 Upload Presigned URL (PUT)
 
-Similarly, you can also generate upload URLs:
+You can also generate upload URLs:
 
 ```java
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -259,7 +259,7 @@ System.out.println("Upload URL: " + presignedPut.url());
 
 ### 5.2 Implement Multipart Upload
 
-> Multipart Upload is the recommended way for large file uploads, enabling resume from breakpoint during network fluctuations.
+Multipart upload is the recommended way to upload large files. If the network is interrupted, you can retry failed parts instead of restarting the whole upload.
 
 The examples below reuse the `s3` client from section 2 and need these additional imports:
 
@@ -342,4 +342,4 @@ s3.abortMultipartUpload(abortRequest);
 
 ---
 
-For other operations (object tagging, bucket policies, and more), see the [AWS SDK for Java v2 documentation](https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/) — every S3-compatible call works against RustFS the same way.
+For other operations (object tagging, bucket policies, and more), see the [AWS SDK for Java v2 documentation](https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/) — most S3 operations work the same way against RustFS; see [S3 compatibility](/reference/s3-compatibility) for exceptions.

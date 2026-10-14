@@ -204,7 +204,7 @@ curl -X PUT --upload-file /path/to/hello.txt "http://localhost:9000/my-bucket/up
 
 ### 5.2 Multipart Upload
 
-Suitable for files larger than 10 MB, allows manual control of each part.
+Use multipart upload for files larger than 10 MB when you need control over each part.
 
 ```python
 file_path = 'largefile.bin'
@@ -260,13 +260,13 @@ Multipart upload complete.
 
 ---
 
-## 6. Common Issue Troubleshooting
+## 6. Troubleshooting
 
 | Issue | Cause | Solution |
 | ------------------------- | ----------------- | -------------------------------------------------------------- |
 | `SignatureDoesNotMatch` | Not using v4 signature | Set `signature_version='s3v4'` |
 | `EndpointConnectionError` | Wrong RustFS address or service not started | Check endpoint and RustFS service status |
-| `AccessDenied` | Wrong credentials or insufficient permissions | Check AccessKey/SecretKey or bucket policies |
+| `AccessDenied` | Wrong credentials or insufficient permissions | Check the access key, secret key, and bucket policies |
 | `PermanentRedirect` / wrong bucket URL | Path-style not enabled | Set `s3={'addressing_style': 'path'}` in the `Config` |
 
 ---
@@ -284,6 +284,6 @@ def download_file(bucket, object_key, local_path):
     print(f"Downloaded s3://{bucket}/{object_key} to {local_path}")
 ```
 
-For other operations (object tagging, bucket policies, and more), see the [Boto3 S3 documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html) — every S3-compatible call works against RustFS the same way.
+For other operations (object tagging, bucket policies, and more), see the [Boto3 S3 documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html) — most S3 operations work the same way against RustFS; see [S3 compatibility](/reference/s3-compatibility) for exceptions.
 
 If you prefer native async support and full type hints, the community-driven [capo](https://github.com/kap-sh/capo) SDK also works with RustFS — see the [capo (Python) integration guide](../integration/others/capo.md).

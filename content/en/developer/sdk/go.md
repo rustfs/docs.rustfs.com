@@ -1,9 +1,9 @@
 ---
-title: "Golang SDK Guide"
+title: "Go SDK Guide"
 description: "Use the AWS SDK for Go v2 to operate on RustFS instances, including creating and deleting buckets and objects."
 ---
 
-RustFS ships no first-party Go SDK — it is fully S3-compatible, so you use the official AWS SDK for Go v2 configured to point at your RustFS server. Through the SDK, you can operate on RustFS, including creating and deleting buckets/objects, uploading and downloading files, etc.
+RustFS ships no first-party Go SDK — it is S3-compatible, so you use the official AWS SDK for Go v2 configured to point at your RustFS server. With the SDK, you can create and delete buckets, and upload, download, and delete objects.
 
 ## Prerequisites
 
@@ -26,7 +26,7 @@ go get github.com/aws/aws-sdk-go-v2/credentials
 go get github.com/aws/aws-sdk-go-v2/service/s3
 ```
 
-## Initializing the Client
+## Initialize the client
 
 The following is a complete, runnable program. It reads its configuration from environment variables and initializes the client from an `aws.Config`:
 
@@ -104,7 +104,7 @@ Buckets:
 
 You can now perform bucket and object operations. The snippets below run inside the `main` function above, reusing `client` and `ctx`.
 
-## Create Bucket
+## Create a bucket
 
 ```go
 _, err = client.CreateBucket(ctx, &s3.CreateBucketInput{
@@ -120,7 +120,7 @@ fmt.Println("bucket created")
 bucket created
 ```
 
-## List Buckets
+## List buckets
 
 ```go
 resp, err := client.ListBuckets(ctx, &s3.ListBucketsInput{})
@@ -139,7 +139,7 @@ Buckets:
  - my-bucket
 ```
 
-## Delete Bucket
+## Delete a bucket
 
 ```go
 _, err = client.DeleteBucket(ctx, &s3.DeleteBucketInput{
@@ -155,7 +155,7 @@ fmt.Println("bucket deleted")
 bucket deleted
 ```
 
-## List Objects
+## List objects
 
 ```go
 resp, err := client.ListObjectsV2(ctx, &s3.ListObjectsV2Input{
@@ -173,7 +173,7 @@ for _, obj := range resp.Contents {
  - hello.txt
 ```
 
-## Upload Object
+## Upload an object
 
 Uploading a string body (add `"strings"` to your imports):
 
@@ -193,7 +193,7 @@ fmt.Println("object uploaded")
 object uploaded
 ```
 
-## Download Object
+## Download an object
 
 Reading the object body (add `"io"` to your imports):
 
@@ -219,4 +219,4 @@ fmt.Println("content is :", string(data))
 content is : hello rustfs
 ```
 
-For other operations (presigned URLs, multipart uploads, and more), see the [AWS SDK for Go v2 documentation](https://aws.github.io/aws-sdk-go-v2/docs/) — every S3-compatible call works against RustFS the same way.
+For other operations (presigned URLs, multipart uploads, and more), see the [AWS SDK for Go v2 documentation](https://aws.github.io/aws-sdk-go-v2/docs/) — most S3 operations work the same way against RustFS; see [S3 compatibility](/reference/s3-compatibility) for exceptions.

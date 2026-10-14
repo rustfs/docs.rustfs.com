@@ -1,13 +1,13 @@
 ---
 title: "RustFS Single Node Multiple Disk Installation"
-description: "Install RustFS on a single server with multiple disks, data will be stored on multiple disks."
+description: "Install RustFS on a single server and distribute data across multiple disks."
 ---
 
-In Single Node Multiple Disk (SNMD) mode, one server stores data in sharded form across multiple data disks. Each object is split into K data shards and M parity shards (erasure coding), so the loss of up to M disks does not cause data loss.
+In Single Node Multiple Disk (SNMD) mode, one server shards data across multiple data disks. Each object is split into K data shards and M parity shards (erasure coding), so the loss of up to M disks does not cause data loss.
 
 :::warning
 
-SNMD is suitable for medium, non-critical business. Damage to at most M disks does not pose a data risk, but if the entire server fails or more than M disks are damaged, data will be lost. Keep backups of important data. For node-level fault tolerance, use [MNMD](./multiple-node-multiple-disk.md).
+SNMD is suitable for mid-sized, non-critical workloads. The deployment can lose up to M disks without losing data, but if the entire server fails or more than M disks are damaged, data will be lost. Keep backups of important data. For node-level fault tolerance, use [MNMD](./multiple-node-multiple-disk.md).
 
 :::
 
@@ -55,9 +55,9 @@ sudo mkdir -p /data/rustfs{0..3} /var/log/rustfs /opt/tls
 sudo chmod -R 750 /data/rustfs* /var/log/rustfs
 ```
 
-## Start Service and Verification
+## Start and Verify the Service
 
-1. Start the service and enable auto-start on boot:
+1. Start the service and enable it to start at boot:
 
 ```bash
 sudo systemctl enable --now rustfs

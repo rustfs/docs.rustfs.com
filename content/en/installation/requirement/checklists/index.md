@@ -1,5 +1,5 @@
 ---
-title: "Checklist"
+title: "Pre-Installation Checklists"
 description: "Pre-installation checklists."
 ---
 
@@ -13,7 +13,7 @@ These are general guidelines. Adjust them based on your specific architecture an
 
 For professional support, contact us at hello@rustfs.com.
 
-For community support, submit an issue on GitHub.
+For community support, open an issue on GitHub.
 
 ## Checklist
 

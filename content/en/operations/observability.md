@@ -1,6 +1,6 @@
 ---
 title: "Observability"
-description: "This article explains RustFS telemetry exports, monitoring integrations, metric names and labels, recommended alerts, and log collection."
+description: "Export RustFS metrics, traces, and logs over OTLP, integrate with monitoring tools, and configure recommended alerts."
 ---
 
 ## How RustFS Exposes Telemetry
