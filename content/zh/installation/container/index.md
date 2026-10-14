@@ -1,6 +1,6 @@
 ---
 title: "容器"
-description: "使用 Docker 或 Podman 运行官方 RustFS 容器镜像。"
+description: "使用 Docker、Podman 或 Docker Swarm 运行官方 RustFS 容器镜像。"
 ---
 
 RustFS 是高性能、兼容 S3 的开源分布式对象存储系统。在单节点单磁盘（SNSD）部署模式下，后端使用零纠删码，不提供额外数据冗余，适合本地测试和小规模场景。官方 RustFS 镜像将 RustFS 二进制及其运行环境打包到容器中，一条命令即可启动带持久化存储的服务。
@@ -11,6 +11,7 @@ RustFS 是高性能、兼容 S3 的开源分布式对象存储系统。在单节
 
 - [Docker](./docker.md)：运行带持久化存储的单节点实例，并可扩展 Docker Compose、TLS 和多节点网络。
 - [Podman](./podman.md)：以无守护进程的方式运行同一镜像。
+- [Docker Swarm](./swarm.md)：使用 swarmcli 的 `rustfs` Chart 运行单节点服务，凭证以 Docker Secret 形式保存。
 
 :::note[目录权限]
 
