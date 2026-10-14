@@ -3,7 +3,7 @@ title: "Loki"
 description: "Betreiben Sie Grafana Loki mit RustFS als S3-Objektspeicher-Backend, bereitgestellt mit Docker Compose."
 ---
 
-Diese Anleitung betreibt [Grafana Loki](https://github.com/grafana/loki) — das Log-Aggregationssystem von Grafana Labs — mit **RustFS** als Objektspeicher-Backend. Sie starten einen Single-Binary-Loki mit Docker Compose, pushen Log-Streams über die HTTP-API, fragen sie ab und prüfen, dass die Log-Chunks als Objekte in RustFS gespeichert werden. Der Ablauf wurde mit `grafana/loki:latest` (v3.7.8) und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
+In dieser Anleitung betreiben Sie [Grafana Loki](https://github.com/grafana/loki) — das Log-Aggregationssystem von Grafana Labs — mit **RustFS** als Objektspeicher-Backend. Sie starten Loki im Single-Binary-Modus mit Docker Compose, senden (pushen) Log-Streams über die HTTP-API, fragen sie ab und prüfen, dass die Log-Chunks als Objekte in RustFS gespeichert werden. Der Ablauf wurde mit `grafana/loki:latest` (v3.7.8) und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
 Sie benötigen Docker mit dem Compose-Plugin. Dieses Setup ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
@@ -27,16 +27,16 @@ mkdir rustfs-loki
 cd rustfs-loki
 ```
 
-Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Anmeldeinformationen:
+Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Zugangsdaten:
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Verwenden Sie dedizierte Anmeldeinformationen für den Bucket. Committen Sie `.env` nicht in die Versionsverwaltung.
+Verwenden Sie dedizierte Zugangsdaten für den Bucket. Nehmen Sie `.env` nicht in die Versionsverwaltung auf.
 
-Erstellen Sie die Loki-Konfiguration — ein Single-Binary-Setup mit dem TSDB-Schema und dem S3-Backend, das auf RustFS zeigt:
+Erstellen Sie die Loki-Konfiguration — eine Single-Binary-Konfiguration mit dem TSDB-Schema und dem S3-Backend auf RustFS:
 
 ```yaml title="loki.yml"
 auth_enabled: false
@@ -78,7 +78,7 @@ ruler:
   alertmanager_url: http://localhost:9093
 ```
 
-`s3forcepathstyle: true` und `insecure: true` wählen Path-Style-Adressierung über Plain HTTP, was der Container-Netzwerk-Endpunkt von RustFS erwartet. `chunk_idle_period` und `max_chunk_age` sind verkürzt, damit ein Verifikationslauf nicht die standardmäßigen 30 Minuten auf den Chunk-Flush warten muss.
+`s3forcepathstyle: true` und `insecure: true` wählen pfadbasierte Adressierung (Path-Style) über unverschlüsseltes HTTP (Plain HTTP) — so erwartet es der Container-Netzwerk-Endpunkt von RustFS. `chunk_idle_period` und `max_chunk_age` sind verkürzt, damit ein Prüflauf nicht die üblichen 30 Minuten auf den Chunk-Flush warten muss.
 
 Erstellen Sie die Compose-Datei:
 
@@ -282,7 +282,7 @@ Der Ingester hat keinen laufenden Zustand erreicht — meist ein übrig gebliebe
 
 ### AccessDenied- oder 403-Antworten
 
-Stellen Sie sicher, dass die Anmeldeinformationen in `loki.yml` mit den RustFS-Anmeldeinformationen übereinstimmen und dass der Dienst `create-bucket` erfolgreich abgeschlossen wurde:
+Stellen Sie sicher, dass die Zugangsdaten in `loki.yml` mit den RustFS-Zugangsdaten übereinstimmen und dass der Dienst `create-bucket` erfolgreich abgeschlossen wurde:
 
 ```bash
 docker compose logs create-bucket
@@ -291,5 +291,5 @@ docker compose logs create-bucket
 ## Nächste Schritte
 
 - Lesen Sie die [S3-Kompatibilitätshinweise](/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
-- Erstellen Sie dedizierte Produktions-Anmeldeinformationen mit dem [Access Key Management](/security-compliance/iam/access-token).
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
 - Folgen Sie der [Grafana-Loki-Dokumentation](https://grafana.com/docs/loki/latest/), um Promtail, Alloy oder den OpenTelemetry Collector als Log-Producer anzubinden.
