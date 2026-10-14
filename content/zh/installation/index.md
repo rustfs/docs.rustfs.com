@@ -11,6 +11,7 @@ RustFS 是使用 Rust 编写并采用 Apache 2.0 许可证发布的分布式对�
 
 - 对于 Linux 二进制文件或 systemd 安装，请在 `/etc/default/rustfs` 中设置这两个值，然后重启 `rustfs` 服务。
 - 对于 Docker、Podman 或 Docker Compose，请在创建容器时将这两个值作为容器环境变量传入。如果现有容器启动时未设置这些值，请重新创建该容器。
+- 对于 Docker Swarm，请在安装 Chart 前将这两个值创建为 Docker Secret。
 
 :::
 

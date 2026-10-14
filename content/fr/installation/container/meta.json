@@ -2,6 +2,7 @@
   "title": "Conteneurs",
   "pages": [
     "docker",
-    "podman"
+    "podman",
+    "swarm"
   ]
 }
