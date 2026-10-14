@@ -78,7 +78,7 @@ S3 API 在每个 Swarm 节点上均可通过 `http://localhost:9000` 访问。�
 
 | 模式 | 可访问范围 |
 | - | - |
-| `none`（默认） | 仅限连接到 `rustfs-net` 覆盖网络的服务，地址为 `http://<release>_rustfs:9000` |
+| `none`（默认） | 仅限连接到 `rustfs-net` 覆盖网络的服务，地址为 `http://<release>-rustfs:9000` |
 | `published` | 在 Swarm 路由网格上发布的端口：S3 API 使用 `publish.port`，控制台使用 `console.publish.port`（9001） |
 | `traefik` | 由 Traefik 路由的主机名：S3 API 使用 `ingress.host`，控制台使用 `console.ingress.host` |
 
