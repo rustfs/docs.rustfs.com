@@ -1,18 +1,18 @@
 ---
-title: "Virtual Host Style"
-description: "RustFS S3 Virtual Host Style and Path Style configuration."
+title: "Virtual-Hosted–Style Requests"
+description: "Configure path-style and virtual-hosted–style S3 URLs for RustFS."
 ---
 
-RustFS complies with S3 protocols. S3 supports two request modes:
+RustFS supports both S3 URL addressing styles:
 
 1. Virtual Host Style
 2. Path Style
 
-The difference lies in the bucket name placement.
+The two styles differ in where the bucket name appears in the URL.
 
 ## Path Style
 
-Path Style is the default. In Path Style, the bucket name follows the endpoint.
+Path-style addressing is the default. In a path-style URL, the bucket name follows the endpoint.
 
 Example (Bucket: `test`, Host: `rustfs.yourdomain.com`):
 
@@ -34,7 +34,7 @@ http://test.rustfs.yourdomain.com/
 
 ### Configuration
 
-1. **DNS**: Configure wildcard DNS resolution (e.g., `*.rustfs.yourdomain.com` -> Server IP).
+1. **DNS**: Create a wildcard DNS record (for example, `*.rustfs.yourdomain.com` → your server's IP address).
 2. **Configuration**: Modify the configuration file (Linux: `/etc/default/rustfs`, Docker/K8s: env vars).
 3. **Set Domain**: Set `RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com"`.
 4. **Restart**: Restart the service (`systemctl restart rustfs`).
@@ -55,7 +55,11 @@ This ensures that requests like:
 http://my-bucket.rustfs.yourdomain.com:8000/
 ```
 
-can be correctly resolved in Virtual Host Style mode.
+are routed correctly with virtual-hosted–style addressing.
 
-> ⚠️ Note: The value of `RUSTFS_SERVER_DOMAINS` must exactly match the **Host header** (including the port, if present) used by the client request
+:::warning[Match the Host header]
+
+The value of `RUSTFS_SERVER_DOMAINS` must exactly match the `Host` header (including the port, if present) that clients send.
+
+:::
 

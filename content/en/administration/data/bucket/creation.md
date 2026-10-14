@@ -1,5 +1,5 @@
 ---
-title: "RustFS Bucket Creation"
+title: "Create a Bucket"
 description: "Create buckets using the RustFS UI, rc, or the S3 API."
 ---
 
@@ -10,11 +10,11 @@ This guide explains how to create buckets using the RustFS UI, `rc`, or the S3 A
 - A running RustFS instance (see [Installation Guide](../../../installation/index.md)).
 - [`rc`](/operations/rc) installed and configured with an alias for the command-line workflow.
 
-## Using the RustFS UI
+## Use the RustFS Console
 
 1. Log in to the RustFS Console.
 2. On the Buckets page, in the top right corner, select **Create Bucket**.
-3. Enter the bucket name and click **Create** to complete bucket creation.
+3. Enter a bucket name and select **Create**.
 
 ![bucket creation](images/bucket-creation-by-ui.png)
 
@@ -49,4 +49,4 @@ aws s3api create-bucket \
   --endpoint-url http://localhost:9000
 ```
 
-Verify the bucket creation in the RustFS Console.
+Confirm that the bucket appears in the RustFS Console.

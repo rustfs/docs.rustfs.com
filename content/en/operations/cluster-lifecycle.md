@@ -7,7 +7,7 @@ This runbook is the operator entry point for erasure-coded RustFS deployments: l
 
 Related task pages: [Storage Pool Expansion](./scaling/storage-pool-expansion.md), [Data Rebalancing](./scaling/data-rebalancing.md), [Storage Pool Decommission](./scaling/storage-pool-decommission.md), and [Node Healing](./high-availability/node-healing.md).
 
-## Layout boundaries
+## Layout constraints
 
 A pool's endpoint count, set count, drives per set, and position in the pool list are persisted layout. On startup RustFS compares the stored format with the configured drive count and set width and fails permanently with `PoolTopologyMismatch` (or `UnsupportedSnsdExpansion` for a single-drive deployment) instead of migrating. Restore the original endpoints and set width; do not delete `format.json` to get past the error.
 
@@ -50,7 +50,7 @@ A storage-class error stops startup before any disk is touched. Startup then ini
 
 ## Startup configuration
 
-| Variable | Effect | Boundary |
+| Variable | Effect | Constraints |
 |---|---|---|
 | `RUSTFS_ERASURE_SET_DRIVE_COUNT` | Pin the set width | Must be a valid symmetric divisor of the pool, at most 16; cannot change an initialized pool |
 | `RUSTFS_STORAGE_CLASS_STANDARD` | STANDARD parity as `EC:<n>` | Validated per pool; affects new writes only |
@@ -95,7 +95,7 @@ Writes resolve the layout per pool, encode with Reed-Solomon in 1 MiB blocks, wr
 
 `EC:0` is accepted for STANDARD, for RRS, or for both, on any set width. It gives raw capacity and no redundancy.
 
-:::danger[EC:0 means one drive loss equals set loss]
+:::danger[With EC:0, losing one drive loses data across the set]
 
 A replaced or wiped drive permanently loses every zero-parity object that had a shard on it, unless a copy exists outside the set. Healing cannot rebuild zero-parity objects: heal reports `no-parity object is unrecoverable` for them. Production deployments should use `EC:1` or higher; `EC:2` or more per set is the usual floor once a set spans more than one node. Use `EC:0` only where an external layer (RAID, replication, backup, or a re-creatable source) owns durability and availability, and only with explicit sign-off.
 

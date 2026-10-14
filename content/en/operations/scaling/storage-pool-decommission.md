@@ -81,7 +81,7 @@ To cancel a running operation, use:
 rc admin decommission cancel rustfs 0 --by-id
 ```
 
-If a decommission is failed or canceled, clear its metadata before retrying:
+If a decommission failed or was canceled, clear its metadata before you retry:
 
 ```bash
 rc admin decommission clear rustfs 0 --by-id

@@ -25,7 +25,7 @@ Ensure the following requirements are met before deployment.
 ## File System & Disks
 
 - **Dedicated Data Disks**: Use dedicated disks for RustFS data. Do not share with the OS.
-- **File System**: Use XFS or Ext4 with performance options (e.g., `noatime`).
+- **File system**: Use XFS or ext4 with performance options (for example, `noatime`).
 - **Disk Configuration**: Use JBOD (independent volumes). Do not use hardware RAID.
 - **Permissions**: Ensure the RustFS user has read/write access to data directories.
 
@@ -42,7 +42,7 @@ Ensure the following requirements are met before deployment.
 - **Dedicated User**: Run RustFS as a dedicated user (e.g., `rustfs-user`).
 - **File Permissions**: Restrict access to binaries and configuration files.
 - **SELinux/AppArmor**: Configure policies to allow RustFS operations, or disable if appropriate.
-- **Systemd**: Configure the systemd service file correctly (`User=`, `ExecStart=`, environment variables).
+- **systemd**: Configure the systemd service file correctly (`User=`, `ExecStart=`, environment variables).
 
 ## Other
 

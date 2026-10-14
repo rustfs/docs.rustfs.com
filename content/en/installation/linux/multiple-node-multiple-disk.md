@@ -1,16 +1,16 @@
 ---
 title: "RustFS Multiple Node Multiple Disk Installation"
-description: "Install RustFS on multiple servers with multiple disks, data will be stored on multiple disks across multiple servers."
+description: "Install a distributed RustFS cluster across multiple servers, each with multiple disks."
 ---
 
-Multiple Node Multiple Disk (MNMD) mode is the deployment mode for production workloads, providing enterprise-grade performance, security, and scalability. A minimum of **4 servers** is required, each with at least 1 disk, to safely start a distributed object storage cluster.
+Multiple Node Multiple Disk (MNMD) mode is used for production workloads. It provides node-level fault tolerance and horizontal scalability. A minimum of **4 servers** is required, each with at least 1 disk, to safely start a distributed object storage cluster.
 
 ## Topology and Planning
 
 In the following architecture, requests are distributed to the servers through load balancing. With the default 12 + 4 erasure coding layout, each object is split into 12 data shards and 4 parity shards stored on different disks across different servers:
 
-- Any single server failure or maintenance does not affect data security.
-- Corruption of up to 4 disks does not affect data security.
+- The cluster stays available and loses no data if any single server fails or is taken down for maintenance.
+- The cluster can tolerate the loss of up to 4 disks without data loss.
 
 ```mermaid
 flowchart TD
@@ -29,19 +29,19 @@ flowchart TD
     class N1D1,N1D2,N1D3,N1D4,N2D1,N2D2,N2D3,N2D4,N3D1,N3D2,N3D3,N3D4,N4D1,N4D2,N4D3,N4D4 disk
 ```
 
-Before installation, review the [Pre-Installation Checklists](../requirement/checklists/index.md) and ensure all items meet production guidance.
+Before installation, review the [Pre-Installation Checklists](../requirement/checklists/index.md) and make sure that every item meets production requirements.
 
 ## Hostnames
 
-Creating a RustFS cluster requires **identical, sequential** hostnames. There are two ways to achieve sequential hostnames:
+A RustFS cluster requires hostnames that follow a consistent, sequentially numbered pattern (for example, `node1` through `node4`). There are two ways to achieve sequential hostnames:
 
 **1. DNS Configuration:**
 
-Configure your DNS resolution server to ensure name continuity.
+Create DNS records so that each sequential hostname resolves to the correct node.
 
-**2. HOSTS Configuration:**
+**2. `/etc/hosts` configuration:**
 
-Modify the local alias settings in `/etc/hosts` as follows:
+Add the following entries to `/etc/hosts` on every node:
 
 ```bash title="/etc/hosts"
 vim /etc/hosts
@@ -86,7 +86,7 @@ sudo mkdir -p /data/rustfs{0..3} /var/log/rustfs /opt/tls
 sudo chmod -R 750 /data/rustfs* /var/log/rustfs
 ```
 
-## Start Service and Verification
+## Start and Verify the Service
 
 1. Start the service on every node and enable auto-start on boot:
 

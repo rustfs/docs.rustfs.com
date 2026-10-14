@@ -29,7 +29,7 @@ COMPLIANCE retention cannot be bypassed or shortened before its retain-until dat
 2. Select **Create Bucket** and enter the bucket name.
 3. Enable **Object Lock**. The Console also enables **Version** because Object Lock requires versioning.
 4. To apply retention automatically to new object versions, enable **Retention**.
-5. Select **COMPLIANCE** or **GOVERNANCE**, enter the validity, and select **Day** or **Year**.
+5. Select **COMPLIANCE** or **GOVERNANCE**, enter the retention period, and select **Day** or **Year**.
 6. Select **Create**.
 
 ![Create Bucket dialog with versioning, Object Lock, and default retention enabled](./images/object-lock-create-bucket.png)
@@ -48,7 +48,7 @@ rc alias set rustfs http://localhost:9000 \
 	--region us-east-1 --bucket-lookup path
 ```
 
-:::note[rc 0.1.29 bucket creation boundary]
+:::note[Bucket creation limitation in rc 0.1.29]
 
 `rc bucket create --with-lock` and `--with-versioning` appear in the `rc 0.1.29` help output but return `not implemented` when executed. Create the Object Lock bucket in the Console. The upload headers shown below are supported and were validated against RustFS.
 

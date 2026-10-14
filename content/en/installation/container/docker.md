@@ -7,8 +7,8 @@ This page covers running the official RustFS image with Docker: a single-node in
 
 ## 1. Prerequisites
 
-* Docker Engine (≥ 20.10) installed and able to pull images and run containers normally
-* Host ports 9000 (S3 API) and 9001 (Console) available, or consistent with your custom ports
+* Docker Engine (≥ 20.10) installed, with the ability to pull images and run containers
+* Host ports 9000 (S3 API) and 9001 (Console) available, or the custom ports you plan to use
 * If you bind-mount a host directory, the directory owner must match the container user — see [Bind-mount a host directory](#bind-mount-a-host-directory)
 
 ## 2. Pull the image
@@ -186,7 +186,7 @@ If [using TLS](../../integration/tls-configured.md), mount the certificate direc
 
 ## Before production
 
-Work through the [Pre-Installation Checklists](../requirement/checklists/index.md) — hardware, network, software, and security — before deploying to production. Use a multi-node deployment architecture, [enable TLS encrypted communication](../../integration/tls-configured.md), configure a log rotation strategy, and set up a regular backup strategy.
+Work through the [Pre-Installation Checklists](../requirement/checklists/index.md) — hardware, network, software, and security — before deploying to production. Use a multi-node deployment, [enable TLS](../../integration/tls-configured.md), configure log rotation, and schedule regular backups.
 
 ## Next steps
 

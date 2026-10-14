@@ -173,7 +173,7 @@ Stop the conflicting application or select unused ports, then start RustFS again
 
 ### The Console does not open
 
-For Launcher, confirm that **Console Endpoint** is enabled. For the standalone binary, confirm that the process is still running and that `--console-enable true` is present. The current Console default is port `9001`; port `7001` is not used by the current Launcher configuration.
+For Launcher, confirm that **Console Endpoint** is enabled. For the standalone binary, confirm that the process is still running and that `--console-enable true` is present. The S3 API listens on port `9000` and the Console on port `9001`.
 
 ### Launcher reports an external RustFS process
 

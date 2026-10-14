@@ -8,7 +8,7 @@ description: "Security checklist for enterprise deployments."
 ## Authentication & Access Control
 
 - **Use S3-Compatible Key Authentication**
- RustFS uses AWS Signature V4. Ensure all requests are authenticated with valid Access Keys and Secret Keys.
+ RustFS uses AWS Signature V4. Make sure that all requests are signed with a valid access key and secret key.
 
 - **Policy-Based Access Control**
  Define access policies based on the principle of least privilege. Explicitly define allowed operations; deny all others by default.
@@ -16,13 +16,13 @@ description: "Security checklist for enterprise deployments."
 ## Encryption (TLS/SSL)
 
 - **Enable TLS/SSL**
- Configure valid SSL certificates. We recommend using different certificates for external and internal access, and enforcing TLS 1.2+.
+ Configure valid TLS certificates. We recommend using different certificates for external and internal access, and enforcing TLS 1.2+.
 
 - **Certificate Management**
  Use certificates from trusted CAs. Protect private keys with strict file permissions.
 
 - **Multi-Domain and Cipher Suites**
- Configure independent certificates for multiple domains. Use strong encryption algorithms (e.g., 2048-bit RSA or 256-bit ECC).
+ Use separate certificates for each domain. Use strong key algorithms (for example, RSA 2048-bit or ECDSA P-256).
 
 ## Credential Protection
 
@@ -38,13 +38,13 @@ description: "Security checklist for enterprise deployments."
  Export audit logs to external systems (HTTP Webhook, Kafka, ELK, Splunk).
 
 - **Log Collection**
- Collect logs using standard tools (systemd, Docker, K8s) and analyze with ELK or Grafana Loki.
+ Collect logs with standard tools (journald, Docker, Kubernetes) and analyze them with ELK or Grafana Loki.
 
 - **Monitoring and Alerts**
  Set alerts for abnormal behavior (login failures, unusual access patterns, mass deletions).
 
 - **Observability**
- Monitor function execution times to optimize performance.
+ Monitor request latency to identify performance issues.
 
 ## API Security
 
@@ -59,7 +59,7 @@ description: "Security checklist for enterprise deployments."
 
 ## WORM Compliance
 
-- **Version Control and Object Locking**
+- **Versioning and Object Lock**
  Enable versioning and object locking to meet regulatory requirements.
 
 ## Updates

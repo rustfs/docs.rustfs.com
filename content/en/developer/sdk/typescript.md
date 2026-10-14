@@ -1,14 +1,14 @@
 ---
-title: "RustFS TypeScript SDK Usage Guide"
+title: "TypeScript SDK Guide"
 description: "Operate RustFS from TypeScript with the AWS SDK for JavaScript v3, including creation and deletion of buckets and objects."
 ---
 
-RustFS ships no first-party TypeScript SDK — it is fully S3-compatible, so you use the official AWS SDK for JavaScript v3 (which ships its own TypeScript type definitions) configured to point at your RustFS server. Through the SDK, you can operate RustFS, including creation and deletion of buckets/objects, file upload and download, etc.
+RustFS ships no first-party TypeScript SDK — it is S3-compatible, so you use the official AWS SDK for JavaScript v3 (which includes TypeScript type definitions) configured to point at your RustFS server. With the SDK, you can create and delete buckets and upload, download, and delete objects.
 
 ## Prerequisites
 
 - Node.js 18 or later (the examples use ES modules — set `"type": "module"` in your `package.json`)
-- An available RustFS instance (refer to [Installation Guide](../../installation/index.md) for installation) — the S3 API listens on port `9000`, the Console on port `9001`
+- A running RustFS instance (see the [Installation Guide](../../installation/index.md)) — the S3 API listens on port `9000`, the Console on port `9001`
 - Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (refer to [Access Key Management](../../security-compliance/iam/access-token.md) for creation)
 
 :::tip[Local test]
@@ -201,4 +201,4 @@ async function getObject() {
 Object content: hello rustfs
 ```
 
-For other operations (presigned URLs, multipart uploads, and more), see the [AWS SDK for JavaScript v3 documentation](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/) — every S3-compatible call works against RustFS the same way.
+For other operations (presigned URLs, multipart uploads, and more), see the [AWS SDK for JavaScript v3 documentation](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/) — most S3 operations work the same way against RustFS; see [S3 compatibility](/reference/s3-compatibility) for exceptions.

@@ -5,13 +5,13 @@ description: "Common prerequisites, disk preparation, binary installation, and s
 
 This page contains the prerequisites and service setup steps shared by all three Linux deployment modes — [SNSD](./single-node-single-disk.md), [SNMD](./single-node-multiple-disk.md), and [MNMD](./multiple-node-multiple-disk.md). Complete these steps first, then return to your mode page to configure the environment file and start the service.
 
-## Operating System Version
+## Operating system version
 
 We recommend Linux kernel version 4.x or later; versions 5.x/6.x achieve better I/O throughput and network performance. Ubuntu 22.04 and RHEL 8.x are both suitable for installing RustFS.
 
 ## Firewall
 
-Linux systems have firewalls enabled by default. Check the firewall status with:
+Many Linux distributions enable a firewall by default. Check the firewall status with:
 
 ```bash
 systemctl status firewalld
@@ -196,36 +196,36 @@ The difference between any two nodes should be negligible (under 1 millisecond i
 When planning object storage capacity, we recommend considering:
 
 - Initial data volume: How much data do you plan to migrate or store at once? (e.g., 500 TB)
-- Data growth volume: Daily/weekly/monthly data growth capacity
-- Planning cycle: How long should this hardware planning last? (recommended: 3 years)
-- Your company's hardware iteration and update cycles.
+- Data growth rate: expected daily, weekly, or monthly growth
+- Planning horizon: How long should this hardware last? (We recommend 3 years.)
+- Your organization's hardware refresh cycle.
 
 Review [EC Configuration](../requirement/ec-configuration.md) to calculate usable capacity, understand the automatic parity defaults, and validate any explicit parity or erasure-set width before deployment.
 
 ## Disk Planning
 
-Because NFS generates phantom writes and lock issues under high I/O, **NFS is prohibited** as the underlying storage medium for RustFS. We strongly recommend **JBOD (Just a Bunch of Disks)** mode: expose physical disks directly and independently to the operating system, and let the RustFS software layer handle data redundancy and protection.
+**Do not use NFS** as the underlying storage for RustFS: under heavy I/O, NFS can cause phantom writes and locking problems. We strongly recommend **JBOD (Just a Bunch of Disks)** mode: expose physical disks directly and independently to the operating system, and let the RustFS software layer handle data redundancy and protection.
 
-The reasons are as follows:
+This approach has several advantages:
 
-- **Better Performance:** RustFS's Erasure Coding engine is highly optimized and reads/writes multiple disks concurrently, achieving higher throughput than hardware RAID controllers. Hardware RAID becomes a performance bottleneck.
+- **Better Performance:** The RustFS erasure coding engine is highly optimized and reads/writes multiple disks concurrently, achieving higher throughput than hardware RAID controllers. Hardware RAID becomes a performance bottleneck.
 - **Lower Cost:** No expensive RAID cards needed, reducing hardware procurement costs.
-- **Simpler Management:** RustFS manages disks uniformly, simplifying storage layer operations and maintenance.
+- **Simpler Management:** RustFS manages disks uniformly, simplifying storage operations.
 - **Faster Fault Recovery:** The RustFS healing process is faster than a traditional RAID rebuild and has less impact on cluster performance.
 
 We recommend NVMe SSDs as the storage medium for higher performance and throughput.
 
 ## File System Selection
 
-RustFS strongly recommends formatting all storage disks with the XFS file system. RustFS development and testing are based on XFS, ensuring optimal performance and stability. Avoid other file systems such as ext4, BTRFS, or ZFS, as they may cause performance degradation or unpredictable issues.
+We strongly recommend formatting all data disks with XFS. RustFS is developed and tested on XFS. Avoid other file systems such as ext4, Btrfs, or ZFS, as they may cause performance degradation or unpredictable issues.
 
 XFS suits RustFS's workload for three reasons:
 
 - **High-concurrency I/O:** XFS was designed for high performance and scalability. Its internal journaling and data structures (such as B+ trees) efficiently handle large numbers of parallel read/write requests, matching how RustFS shards large objects and reads/writes multiple disks in an erasure set in parallel.
-- **Massive files and large file sizes:** XFS is a 64-bit file system supporting extremely large files (up to 8 EB). Its metadata management stays efficient even with millions of files in a single directory — important because RustFS stores each object (or object version) as an independent file.
+- **Many files and very large files:** XFS is a 64-bit file system supporting extremely large files (up to 8 EB). Its metadata management stays efficient even with millions of files in a single directory — important because RustFS stores each object (or object version) as an independent file.
 - **Space reservation:** XFS provides an efficient `fallocate` API. RustFS uses it to reserve contiguous disk space before writing objects, avoiding the overhead of dynamic expansion and metadata updates during writes and minimizing file fragmentation.
 
-For better disk discovery, we recommend using **Label** tags when formatting XFS file systems.
+To make disks easier to identify and mount, we recommend assigning a file system label (`-L`) when you format each disk.
 
 First, check the disk layout:
 
@@ -250,7 +250,7 @@ sudo mkfs.xfs  -i size=512 -n ftype=1 -L RUSTFS0 /dev/sdb
 Formatting options:
 
 - `-L <label>`: Set a label for the file system for easier identification and mounting.
-- `-i size=512`: We recommend an inode size of 512 bytes, which benefits scenarios storing large numbers of small objects (metadata).
+- `-i size=512`: We recommend an inode size of 512 bytes, which helps workloads that store many small objects.
 - `-n ftype=1`: Enable ftype so the file system records file types in directory structures, improving operations such as readdir and unlink.
 
 Mounting:
@@ -266,9 +266,9 @@ LABEL=RUSTFS0 /data/rustfs0   xfs   defaults,noatime,nodiratime   0   0
 sudo mount -a
 ```
 
-## Configure Service User
+## Configure the Service User
 
-We recommend running RustFS as a dedicated user without login permissions.
+We recommend running RustFS as a dedicated user with no login shell.
 
 1. **Keep the default account:** The default user and group in the service unit are `root` and `root`; no changes are needed if you use them.
 2. **Use a dedicated account:** Create a user and group, then update the service unit accordingly.
