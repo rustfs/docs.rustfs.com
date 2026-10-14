@@ -78,7 +78,7 @@ ruler:
   alertmanager_url: http://localhost:9093
 ```
 
-`s3forcepathstyle: true` と `insecure: true` は、コンテナネットワークのエンドポイントに対して RustFS が期待する、平文 HTTP 上のパススタイルアドレス指定を選択します。`chunk_idle_period` と `max_chunk_age` は短縮しており、検証時にデフォルトの 30 分間チャンクのフラッシュを待つ必要がありません。
+`s3forcepathstyle: true` と `insecure: true` は、コンテナネットワークのエンドポイントに対して RustFS が期待する、平文 HTTP 上のパススタイルアクセスを選択します。`chunk_idle_period` と `max_chunk_age` は短縮しており、検証時にデフォルトの 30 分間チャンクのフラッシュを待つ必要がありません。
 
 Compose ファイルを作成します。
 

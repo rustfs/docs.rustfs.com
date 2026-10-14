@@ -69,7 +69,7 @@ storage:
     blocklist_poll: 30s
 ```
 
-`forcepathstyle: true` と `insecure: true` は、コンテナネットワークのエンドポイントに対して RustFS が期待する、平文 HTTP 上のパススタイルアドレス指定を選択します。`max_block_duration: 1m` と `blocklist_poll: 30s` は、テスト向けにフラッシュと発見のサイクルを高速化します。
+`forcepathstyle: true` と `insecure: true` は、コンテナネットワークのエンドポイントに対して RustFS が期待する、平文 HTTP 上のパススタイルアクセスを選択します。`max_block_duration: 1m` と `blocklist_poll: 30s` は、テスト向けにフラッシュと発見のサイクルを高速化します。
 
 Compose ファイルを作成します。
 
@@ -284,7 +284,7 @@ docker compose logs create-bucket
 
 ### 接続エラーや証明書エラー
 
-`endpoint` にスキーマは指定しません。`insecure: true` が平文 HTTP を、`forcepathstyle: true` がコンテナネットワークエンドポイント向けのパススタイルアドレス指定を選択します。Compose ネットワーク内では `rustfs:9000` を、ホストからは `localhost:9000` を使用してください。
+`endpoint` にスキーマは指定しません。`insecure: true` が平文 HTTP を、`forcepathstyle: true` がコンテナネットワークエンドポイント向けのパススタイルアクセスを選択します。Compose ネットワーク内では `rustfs:9000` を、ホストからは `localhost:9000` を使用してください。
 
 ## 次のステップ
 

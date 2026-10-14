@@ -7,9 +7,9 @@ Restic は、スナップショットをリポジトリに保存するコマン�
 
 実行中の RustFS インスタンス、`my-bucket` のようなバケット、インストール済みの Restic、バケット用のアクセスキー、Restic リポジトリ用のパスワードが必要です。
 
-:::note[パス形式のアドレス指定]
+:::note[パススタイルアクセス]
 
-Restic の S3 backend では、RustFS に対してパス形式のアドレス指定を使用します。このページでは `-o s3.bucket-lookup=path` を設定し、リポジトリ URL にバケット名を含めます。
+Restic の S3 バックエンドでは、RustFS に対してパススタイルアクセスを使用します。このページでは `-o s3.bucket-lookup=path` を設定し、リポジトリ URL にバケット名を含めます。
 
 :::
 
@@ -44,7 +44,7 @@ export RESTIC_PASSWORD=<your-restic-password>
 export RESTIC_REPOSITORY=s3:http://localhost:9000/my-bucket/restic
 ```
 
-`restic init` をパス形式のバケット参照で実行します。
+`restic init` をパススタイルのバケット参照で実行します。
 
 ```bash
 restic -o s3.bucket-lookup=path init
@@ -85,7 +85,7 @@ RustFS Console で `my-bucket` を開き、Restic が `restic/` プレフィッ�
 restic -o s3.bucket-lookup=path check
 ```
 
-## 次の手順
+## 次のステップ
 
-- [CLI Client (rc)](/operations/rc) でバケットを作成し、コマンドラインからオブジェクトを確認します。
-- RustFS を信頼できないネットワークの外に公開する場合は [TLS Configuration](/integration/tls-configured) を確認します。
+- [CLI クライアント（rc）](/operations/rc) でバケットを作成し、コマンドラインからオブジェクトを確認します。
+- RustFS を信頼できるネットワークの外に公開する場合は、[TLS の設定](/integration/tls-configured)を確認してください。
