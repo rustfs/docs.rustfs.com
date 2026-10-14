@@ -1,9 +1,9 @@
 ---
 title: "Rust SDK Guide"
-description: "Operate RustFS instances through the AWS SDK for Rust, including creation and deletion of buckets and objects."
+description: "Use the AWS SDK for Rust to create and delete buckets and objects in RustFS."
 ---
 
-RustFS ships no first-party Rust client crate — it is fully S3-compatible, so you use the official AWS SDK for Rust (`aws-sdk-s3`) configured to point at your RustFS server. Through the SDK, you can operate RustFS, including creation and deletion of buckets/objects, file upload and download, etc.
+RustFS ships no first-party Rust client crate — it is fully S3-compatible, so you use the official AWS SDK for Rust (`aws-sdk-s3`) configured to point at your RustFS server. With the SDK, you can create and delete buckets and upload, download, and delete objects.
 
 ## Prerequisites
 

@@ -13,9 +13,9 @@ This guide covers object deletion.
 ## Using the RustFS UI
 
 1. Log in to the RustFS Console.
-2. Select the bucket containing the file to be deleted.
+2. Select the bucket that contains the object you want to delete.
 3. On the bucket page, select the file to be deleted.
-4. Click **Delete Selected Items** in the upper right corner, then click **Confirm** in the popup dialog.
+4. Select **Delete Selected Items** in the upper-right corner, and then select **Confirm**.
 
 ![object deletion from ui](images/delete_file_from_ui.png)
 

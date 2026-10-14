@@ -25,7 +25,7 @@ Suspending versioning stops normal creation of new version IDs but preserves exi
 3. Enable **Version**.
 4. Select **Create**.
 
-### Enable or suspend an existing bucket
+### Enable or suspend versioning on an existing bucket
 
 1. Open **Buckets**, locate the bucket, and select **Settings**.
 2. Under **Data Protection**, locate **Versioning**.
@@ -94,7 +94,7 @@ rc bucket version suspend rustfs/my-bucket
 rc bucket version info rustfs/my-bucket
 ```
 
-:::warning[rc 0.1.29 version deletion boundary]
+:::warning[Version deletion limitation in rc 0.1.29]
 
 `rc object remove --versions` is listed in the `rc 0.1.29` help output but returns `not implemented`. Use the Console or an S3 SDK to permanently delete selected version IDs. Do not remove an entire version history unless you have verified retention, replication, and recovery requirements.
 
