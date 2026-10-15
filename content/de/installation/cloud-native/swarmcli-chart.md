@@ -1,16 +1,23 @@
 ---
 title: "SwarmCLI-Chart"
-description: "Führen Sie einen RustFS-Dienst auf einem Knoten in Docker Swarm aus, mit Anmeldedaten als Docker-Secrets und dem rustfs-Chart von swarmcli."
+description: "Stellen Sie einen RustFS-Dienst auf einem Knoten in Docker Swarm mit dem rustfs-Chart von SwarmCLI bereit: Anmeldedaten in Docker-Secrets, versionierte Upgrades und Rollbacks sowie optional HTTPS über Traefik."
 ---
 
-Diese Seite stellt RustFS als Docker-Swarm-Dienst bereit, dessen Root-Anmeldedaten als Docker-Secrets statt als Umgebungsvariablen vorliegen: RustFS liest sie über `RUSTFS_ACCESS_KEY_FILE` und `RUSTFS_SECRET_KEY_FILE` aus Dateien, sodass keiner der beiden Werte in der Dienstdefinition oder in `docker inspect` erscheint. Die Bereitstellung verwendet das [`rustfs`-Chart](https://github.com/Eldara-Tech/swarmcli-charts/tree/main/charts/rustfs) aus dem Community-Repository swarmcli-charts und wird mit [swarmcli](https://github.com/Eldara-Tech/swarmcli) installiert. Beide werden von Eldara Tech gepflegt, nicht vom RustFS-Projekt.
+[SwarmCLI](https://github.com/Eldara-Tech/swarmcli) ist ein von Helm inspirierter Paketmanager und eine Terminal-Oberfläche für Docker Swarm. Sein quelloffenes [`rustfs`-Chart](https://github.com/Eldara-Tech/swarmcli-charts/tree/main/charts/rustfs) stellt RustFS als Swarm-Dienst bereit. Beide werden von Eldara Tech gepflegt, nicht vom RustFS-Projekt.
+
+Gegenüber einer von Hand geschriebenen Stack-Datei bietet das Chart zusätzlich:
+
+- **Anmeldedaten in Docker-Secrets.** RustFS liest seine Root-Schlüssel über `RUSTFS_ACCESS_KEY_FILE` und `RUSTFS_SECRET_KEY_FILE` aus Dateien, sodass keiner der beiden Werte in der Dienstdefinition oder in `docker inspect` erscheint. Der Standardschlüssel `rustfsadmin` wird abgelehnt.
+- **Versionierte Releases.** Prüfen Sie ein Upgrade vorab, wenden Sie es an und kehren Sie zu einer früheren Revision zurück. SwarmCLI speichert den Revisionsverlauf im Swarm selbst, sodass keine zusätzliche Datenbank nötig ist.
+- **HTTPS über Traefik.** Mit dem zugehörigen [`traefik`-Chart](https://github.com/Eldara-Tech/swarmcli-charts/tree/main/charts/traefik) erhalten die S3-API und die Console eigene Hostnamen und Zertifikate von Let's Encrypt, und die Console kann Single Sign-on über OpenID Connect nutzen.
+- **Rollouts mit Health-Check.** In den Werten aufgeführte Buckets werden beim Start angelegt, und jeder Rollout wird über den Endpunkt `/health/ready` von RustFS überwacht, sodass `--wait` bei einem fehlerhaften Upgrade einen Fehler statt eines Erfolgs meldet.
 
 Das Chart führt einen RustFS-Dienst mit einem Laufwerk auf einem Knoten aus (Single Node Single Disk, SNSD). Ein einzelnes Laufwerk bietet keine Redundanz durch Erasure Coding. Das Chart eignet sich daher für Build-Caches, Backup-Ziele und Blob-Speicher von Anwendungen in einem kleinen Swarm; eine RustFS-Bereitstellung über mehrere Knoten führt es nicht aus.
 
 ## 1. Voraussetzungen
 
 * Ein Docker Swarm (`docker swarm init`) und eine Shell auf einem Manager-Knoten
-* swarmcli 1.11.0 oder neuer – siehe die [Installationsanleitung von swarmcli](https://github.com/Eldara-Tech/swarmcli/blob/main/docs/installation.md)
+* SwarmCLI 1.13.0 oder neuer – siehe die [Installationsanleitung von SwarmCLI](https://github.com/Eldara-Tech/swarmcli/blob/main/docs/installation.md)
 * Port 9000 (S3-API) ist auf den Swarm-Knoten frei, da Schritt 5 ihn im Routing-Mesh des Swarms veröffentlicht
 
 ## 2. Anmeldedaten als Docker-Secrets anlegen
@@ -26,7 +33,7 @@ Jeder Wert muss in einer Zeile stehen und darf keine Leerzeichen enthalten. Eine
 
 :::warning[Der Dienst lehnt schwache Anmeldedaten ab]
 
-Der Container des Charts beendet sich beim Start, wenn eines der Secrets fehlt, leer ist, Leerzeichen enthält oder den allgemein bekannten Wert `rustfsadmin` hat. Docker-Secrets lassen sich nicht bearbeiten: Um die Anmeldedaten zu rotieren, legen Sie Secrets unter neuen Namen an, verweisen mit den Chart-Werten `s3.accessKeySecret` und `s3.secretKeySecret` darauf und aktualisieren anschließend das Release.
+SwarmCLI verweigert die Installation des Charts, solange eines der Secrets fehlt, und der Container beendet sich beim Start, wenn ein Schlüssel leer ist, Leerzeichen enthält oder den allgemein bekannten Wert `rustfsadmin` hat. Docker-Secrets lassen sich nicht bearbeiten: Um die Anmeldedaten zu rotieren, legen Sie Secrets unter neuen Namen an und aktualisieren anschließend das Release, wobei `s3.accessKeySecret` und `s3.secretKeySecret` auf die neuen Secrets verweisen.
 
 :::
 
@@ -62,15 +69,37 @@ Der Dienst speichert seine Daten unter `/data` auf dem benannten Volume `rustfs-
 
 ## 6. Bereitstellung prüfen
 
-Prüfen Sie das Release, den Task des Dienstes und den Endpunkt für die Integritätsprüfung der S3-API:
+Prüfen Sie das Release, den Task des Dienstes und den Bereitschaftsendpunkt der S3-API:
 
 ```bash
 swarmcli charts status rustfs
 docker service ps rustfs_rustfs
-curl --fail http://localhost:9000/health
+curl --fail http://localhost:9000/health/ready
 ```
 
-Die S3-API ist auf jedem Swarm-Knoten unter `http://localhost:9000` erreichbar. Clients verwenden pfadbasierte Adressierung und die Region `us-east-1`.
+Die S3-API ist auf jedem Swarm-Knoten unter `http://localhost:9000` erreichbar. Clients verwenden pfadbasierte Adressierung und die Region `us-east-1`. Bleibt der Task mit `no suitable node` im Status Pending, trägt kein Knoten das Label `rustfs-data=true` aus Schritt 3.
+
+## Upgrade und Rollback
+
+Jede Installation, jedes Upgrade und jeder Rollback erzeugt eine nummerierte Revision des Releases. Prüfen Sie eine Änderung vorab, wenden Sie sie an und listen Sie die Revisionen auf:
+
+```bash
+swarmcli charts diff upgrade rustfs swarmcli-charts/rustfs \
+  --set exposure.mode=published \
+  --set 'buckets={my-bucket,backups}'
+swarmcli charts upgrade rustfs swarmcli-charts/rustfs --wait \
+  --set exposure.mode=published \
+  --set 'buckets={my-bucket,backups}'
+swarmcli charts history rustfs
+```
+
+Ein Upgrade geht von den Standardwerten des Charts aus; übergeben Sie daher alle Werte erneut oder speichern Sie die Werte in einer Datei und übergeben Sie diese mit `-f`. So kehren Sie zu einer früheren Revision zurück:
+
+```bash
+swarmcli charts rollback rustfs 1
+```
+
+Ein Rollback stellt die Dienstdefinition dieser Revision erneut bereit; Daten stellt er nicht wieder her.
 
 ## Bereitstellungsmodi
 
@@ -78,11 +107,20 @@ Das Chart stellt die S3-API und die Console unabhängig voneinander bereit. Die 
 
 | Modus | Erreichbar von |
 | - | - |
-| `none` (Standard) | Nur Diensten im Overlay-Netzwerk `rustfs-net`, unter `http://<release>-rustfs:9000` |
+| `none` (Standard) | Nur Diensten im Overlay-Netzwerk `rustfs-net`, unter `http://<release>-rustfs:9000` (die Console, sofern aktiviert, auf Port 9001) |
 | `published` | Einem im Routing-Mesh des Swarms veröffentlichten Port: `publish.port` für die S3-API, `console.publish.port` (9001) für die Console |
-| `traefik` | Einem von Traefik gerouteten Hostnamen: `ingress.host` für die S3-API, `console.ingress.host` für die Console |
+| `traefik` | Einem von Traefik über HTTPS gerouteten Hostnamen: `ingress.host` für die S3-API, `console.ingress.host` für die Console |
 
-So veröffentlichen Sie zum Beispiel zusätzlich die Console auf Port 9001:
+Der Modus `traefik` setzt ein zuvor installiertes [`traefik`-Chart](https://github.com/Eldara-Tech/swarmcli-charts/tree/main/charts/traefik) voraus: Es legt das Netzwerk `traefik-public` an, dem RustFS beitritt, und bezieht die Zertifikate von Let's Encrypt. Stellen Sie anschließend die S3-API unter ihrem Hostnamen bereit:
+
+```bash
+swarmcli charts install rustfs swarmcli-charts/rustfs \
+  --set exposure.mode=traefik \
+  --set ingress.host=s3.example.com \
+  --set 'buckets={my-bucket}'
+```
+
+Ohne Traefik veröffentlichen Sie die Console so neben der S3-API auf Port 9001:
 
 ```bash
 swarmcli charts install rustfs swarmcli-charts/rustfs \
@@ -107,6 +145,7 @@ Der Console-Listener bedient zusätzlich die vollständige signierte S3- und Adm
 | `buckets` | Buckets, die beim Start angelegt werden, falls sie fehlen | `[]` |
 | `exposure.mode` | Bereitstellung der S3-API: `none`, `published` oder `traefik` | `none` |
 | `publish.port` | Veröffentlichter Port der S3-API | `9000` |
+| `ingress.host` | Hostname, den Traefik zur S3-API routet | `s3.example.com` |
 | `console.enabled` | Console-Listener ausführen | `false` |
 | `console.exposure.mode` | Bereitstellung der Console: `none`, `published` oder `traefik` | `none` |
 | `persistence.nodeLabel` | Knoten-Label, an das der Dienst gebunden wird; `""` für keine Bindung | `rustfs-data` |
@@ -121,11 +160,11 @@ Die [README des Charts](https://github.com/Eldara-Tech/swarmcli-charts/tree/main
 swarmcli charts uninstall rustfs
 ```
 
-Die Deinstallation entfernt den Dienst und den Release-Verlauf. Erhalten bleiben das Daten-Volume, die beiden Docker-Secrets und das Netzwerk `rustfs-net`, das swarmcli zusammen mit dem Befehl zum Entfernen auflistet.
+Die Deinstallation entfernt den Dienst und den Release-Verlauf. Erhalten bleiben das Daten-Volume, die beiden Docker-Secrets und das Netzwerk `rustfs-net`, das SwarmCLI zusammen mit dem Befehl zum Entfernen auflistet.
 
 :::note[Das Daten-Volume bleibt nach der Deinstallation erhalten]
 
-Eine spätere Installation mit demselben Release-Namen bindet das Volume samt Daten wieder ein. Um die Daten zu verwerfen, entfernen Sie das Volume auf dem gekennzeichneten Knoten und, falls Sie sie nicht mehr benötigen, die Secrets:
+Eine spätere Installation mit demselben Release-Namen bindet das Volume samt Daten wieder ein. Um die Daten zu verwerfen, entfernen Sie das Volume auf dem gekennzeichneten Knoten, sobald der Task beendet ist (nach bis zu 30 Sekunden), und, falls Sie sie nicht mehr benötigen, die Secrets:
 
 ```bash
 docker volume rm rustfs_rustfs-data
