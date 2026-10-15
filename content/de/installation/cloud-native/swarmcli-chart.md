@@ -1,5 +1,5 @@
 ---
-title: "Docker Swarm"
+title: "SwarmCLI-Chart"
 description: "Führen Sie einen RustFS-Dienst auf einem Knoten in Docker Swarm aus, mit Anmeldedaten als Docker-Secrets und dem rustfs-Chart von swarmcli."
 ---
 
