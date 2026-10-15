@@ -1,5 +1,5 @@
 ---
-title: "Docker Swarm"
+title: "SwarmCLI Chart"
 description: "使用 swarmcli 的 rustfs Chart 在 Docker Swarm 上运行单节点 RustFS 服务，并将凭证保存为 Docker Secret。"
 ---
 

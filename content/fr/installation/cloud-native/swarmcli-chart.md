@@ -1,5 +1,5 @@
 ---
-title: "Docker Swarm"
+title: "Chart SwarmCLI"
 description: "Exécutez un service RustFS sur un seul nœud Docker Swarm, avec des informations d’identification stockées dans des secrets Docker, à l’aide du chart rustfs de swarmcli."
 ---
 

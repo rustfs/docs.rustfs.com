@@ -1,5 +1,5 @@
 ---
-title: "Docker Swarm"
+title: "SwarmCLI チャート"
 description: "swarmcli の rustfs Chart を使い、認証情報を Docker シークレットとして保持した単一ノードの RustFS サービスを Docker Swarm 上で実行します。"
 ---
 
