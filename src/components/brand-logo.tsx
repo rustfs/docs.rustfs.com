@@ -1,6 +1,7 @@
 "use client";
 
 import { FaApple, FaLinux, FaWindows } from "react-icons/fa6";
+import { LuTerminal } from "react-icons/lu";
 import { SiDocker, SiHelm, SiKubernetes, SiPodman } from "react-icons/si";
 
 const logos = {
@@ -10,6 +11,7 @@ const logos = {
   kubernetes: SiKubernetes,
   linux: FaLinux,
   podman: SiPodman,
+  swarmcli: LuTerminal,
   windows: FaWindows,
 } as const;
 
