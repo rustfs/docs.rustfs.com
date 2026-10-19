@@ -15,7 +15,7 @@ import { docs } from "./.source/server";
 import { BrandLogo } from "./src/components/brand-logo";
 import { Mermaid } from "./src/components/mermaid";
 import { Tab, Tabs } from "./src/components/tabs";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { localSearchPlugin } from "./src/plugins/local-search";
 import LocalSearchDialog from "./src/components/local-search-dialog";
 
@@ -338,6 +338,7 @@ gtag('config', 'G-TWW7WMTWL9');`,
           Tabs,
           BrandLogo,
           ArrowRight,
+          ArrowUpRight,
         };
       },
     }),
