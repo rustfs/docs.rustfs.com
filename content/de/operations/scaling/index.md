@@ -1,10 +1,10 @@
 ---
-title: "Scaling"
-description: "Expand, rebalance, and retire RustFS storage pools."
+title: "Skalierung"
+description: "Erweitern Sie RustFS-Speicherpools, führen Sie ein Rebalancing aus und nehmen Sie Speicherpools außer Betrieb."
 ---
 
-Choose the workflow that matches the topology change:
+Wählen Sie den Ablauf, der zur Topologieänderung passt:
 
-- [Pool Expansion](./storage-pool-expansion.md)
+- [Speicherpool-Erweiterung](./storage-pool-expansion.md)
 - [Rebalancing](./data-rebalancing.md)
-- [Pool Decommission](./storage-pool-decommission.md)
+- [Speicherpool-Außerbetriebnahme](./storage-pool-decommission.md)

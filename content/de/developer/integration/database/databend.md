@@ -1,13 +1,13 @@
 ---
 title: "Databend"
-description: "Run Databend with RustFS as the S3-compatible storage backend."
+description: "Betreiben Sie Databend mit RustFS als S3-kompatiblem Objektspeicher-Backend."
 ---
 
-This guide connects [Databend](https://github.com/datafuselabs/databend) — the open-source cloud data warehouse — to **RustFS** as its object storage backend. You will start the meta service and query node, point the storage backend at a RustFS bucket, create a database and table, and verify the Parquet files in the bucket. The workflow was verified with Databend v1.2.925-patch-13 against `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [Databend](https://github.com/datafuselabs/databend) — das quelloffene Cloud-Data-Warehouse — mit **RustFS** als Objektspeicher-Backend. Sie starten den Meta-Dienst und den Query-Knoten, richten das Speicher-Backend auf einen RustFS-Bucket aus, legen eine Datenbank und eine Tabelle an und prüfen die Parquet-Dateien im Bucket. Der Ablauf wurde mit Databend v1.2.925-patch-13 gegen `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need the Databend release tarball on a Linux host (or Docker). This deployment is intended for local integration testing, not production.
+Sie benötigen das Release-Tarball von Databend auf einem Linux-Host (oder Docker). Diese Bereitstellung ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -16,11 +16,11 @@ flowchart LR
 	Query -->|"Parquet SSTs + indexes"| RustFS["RustFS :9000"]
 ```
 
-Databend stores table data as Parquet files with bloom-filter indexes in object storage, so the bucket holds the entire table dataset and the query node stays stateless.
+Databend speichert Tabellendaten als Parquet-Dateien mit Bloom-Filter-Indizes im Objektspeicher. Der Bucket enthält damit den gesamten Tabellendatensatz, und der Query-Knoten bleibt zustandslos.
 
-## 1. Download and install
+## 1. Herunterladen und installieren
 
-Grab a release tarball and unpack the binaries:
+Laden Sie ein Release-Tarball herunter und entpacken Sie die Binärdateien:
 
 ```bash
 curl -Lo /tmp/databend.tgz \
@@ -28,15 +28,15 @@ curl -Lo /tmp/databend.tgz \
 tar -xzf /tmp/databend.tgz -C /opt
 ```
 
-Create the data directories:
+Legen Sie die Datenverzeichnisse an:
 
 ```bash
 mkdir -p /opt/databend/data /opt/databend/logs /opt/databend/meta-logs
 ```
 
-## 2. Configure the meta service
+## 2. Den Meta-Dienst konfigurieren
 
-Create `databend-meta.toml` — note the top-level addresses and the `[raft_config]` section with `single = true`:
+Legen Sie `databend-meta.toml` an. Beachten Sie die Adressen auf oberster Ebene und den Abschnitt `[raft_config]` mit `single = true`:
 
 ```toml title="databend-meta.toml"
 admin_api_address = "0.0.0.0:28002"
@@ -57,9 +57,9 @@ raft_advertise_host = "127.0.0.1"
 single = true
 ```
 
-## 3. Configure the query node
+## 3. Den Query-Knoten konfigurieren
 
-Create `databend-query.toml`. The `tenant_id` and `cluster_id` keys must live inside the `[query]` section, and `[storage.s3]` points at RustFS:
+Legen Sie `databend-query.toml` an. Die Schlüssel `tenant_id` und `cluster_id` müssen im Abschnitt `[query]` stehen, und `[storage.s3]` zeigt auf RustFS:
 
 ```toml title="databend-query.toml"
 [query]
@@ -96,9 +96,9 @@ secret_access_key = "<your-secret-key>"
 enable_virtual_host_style = false
 ```
 
-Keep all keys before the `[[query.users]]` array entry — TOML treats everything after it as part of that array element, and misplaced keys fail validation with confusing errors.
+Belassen Sie alle Schlüssel vor dem Array-Eintrag `[[query.users]]`. TOML behandelt alles danach als Teil dieses Array-Elements, und falsch platzierte Schlüssel scheitern bei der Validierung mit irreführenden Fehlern.
 
-## 4. Start the services
+## 4. Die Dienste starten
 
 ```bash
 nohup /opt/databend/bin/databend-meta -c /opt/databend/databend-meta.toml > /opt/databend/meta.out 2>&1 &
@@ -107,9 +107,9 @@ nohup /opt/databend/bin/databend-query -c /opt/databend/databend-query.toml > /o
 sleep 20
 ```
 
-## 5. Create a table and query
+## 5. Eine Tabelle anlegen und abfragen
 
-Databend serves an HTTP API on port 8000. Create a database and a table, insert rows, and read them back — quotes inside SQL must be single quotes (double quotes mean identifiers):
+Databend stellt eine HTTP-API auf Port 8000 bereit. Legen Sie eine Datenbank und eine Tabelle an, fügen Sie Zeilen ein und lesen Sie sie zurück. Anführungszeichen innerhalb von SQL müssen einfache Anführungszeichen sein. Doppelte Anführungszeichen bedeuten Bezeichner:
 
 ```bash
 curl -s -m 90 -u databend: http://127.0.0.1:8000/v1/query \
@@ -129,9 +129,9 @@ curl -s -m 120 -u databend: http://127.0.0.1:8000/v1/query \
 {"id":"...","state":"Succeeded",...,"data":[["1","alpha"],["2","beta"],["3","gamma"]],...}
 ```
 
-## 6. Verify objects in RustFS
+## 6. Objekte in RustFS prüfen
 
-List the bucket — the table lives as Parquet blocks with index files under numeric prefixes:
+Listen Sie den Bucket auf. Die Tabelle liegt als Parquet-Blöcke mit Indexdateien unter numerischen Präfixen:
 
 ```bash
 rc ls rustfs/databend-demo/ -r | head -4
@@ -142,35 +142,35 @@ rc ls rustfs/databend-demo/ -r | head -4
 73/116/_i_b_v2/01a1192b11b07c38b9ae1178abc78882_v4.parquet
 ```
 
-![Databend Parquet files stored in the RustFS Console](./images/rustfs-databend-parquet.png)
+![In der RustFS-Console gespeicherte Databend-Parquet-Dateien](./images/rustfs-databend-parquet.png)
 
-## 7. Stop or reset
+## 7. Stoppen oder zurücksetzen
 
 ```bash
 pkill -f databend-query; pkill -f databend-meta
 rc rm rustfs/databend-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
 ### `cluster_id is empty without resources management`
 
-`tenant_id` and `cluster_id` were placed outside the `[query]` section. In TOML, every key belongs to the most recent section header — move them back under `[query]`.
+`tenant_id` und `cluster_id` standen außerhalb des Abschnitts `[query]`. In TOML gehört jeder Schlüssel zum letzten Abschnittskopf. Verschieben Sie sie zurück unter `[query]`.
 
 ### `CannotListenerPort ... 127.0.0.1:9090`
 
-The flight API defaults to 9090, which other local services often occupy. Set `flight_api_address`, `metric_api_address`, and `admin_api_address` to free ports inside `[query]`.
+Die Flight-API verwendet standardmäßig 9090, das andere lokale Dienste oft belegen. Setzen Sie `flight_api_address`, `metric_api_address` und `admin_api_address` innerhalb von `[query]` auf freie Ports.
 
-### Query returns `Authentication error: no authorization header provided`
+### Die Abfrage liefert `Authentication error: no authorization header provided`
 
-The HTTP API requires basic auth matching the `[[query.users]]` entry, e.g. `-u databend:` with `auth_type = "no_password"`.
+Die HTTP-API verlangt Basic Auth passend zum Eintrag `[[query.users]]`, zum Beispiel `-u databend:` bei `auth_type = "no_password"`.
 
-### `Unknown table` right after CREATE succeeded
+### `Unknown table` direkt nach erfolgreichem CREATE
 
-Double-quoted strings in SQL are identifiers, not literals. Use single quotes for VALUES and for the CONNECTION/LOCATION options.
+Doppelt zitierte Zeichenketten in SQL sind Bezeichner, keine Literale. Verwenden Sie einfache Anführungszeichen für VALUES und für die Optionen CONNECTION und LOCATION.
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Databend storage options.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Databend documentation](https://docs.databend.com/) for multi-node clusters and share tables on top of the same bucket.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere Databend-Speicheroptionen einsetzen.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [Databend-Dokumentation](https://docs.databend.com/) für Cluster mit mehreren Knoten und Share-Tabellen auf demselben Bucket.

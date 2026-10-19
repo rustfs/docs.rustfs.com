@@ -1,27 +1,27 @@
 ---
-title: "Object Deletion"
-description: "Delete objects using the RustFS UI, rc, or the S3 API."
+title: "Objekt löschen"
+description: "Löschen Sie Objekte über die RustFS-Oberfläche, mit rc oder über die S3-API."
 ---
 
-This guide covers object deletion.
+Diese Anleitung beschreibt das Löschen von Objekten.
 
-## Requirements
+## Voraussetzungen
 
-- Install and configure [`rc`](/operations/rc) before using the command-line workflow.
-- Confirm the alias, bucket, and object key before deleting an object.
+- Installieren und konfigurieren Sie [`rc`](/de/operations/rc), bevor Sie den Kommandozeilenablauf verwenden.
+- Prüfen Sie Alias, Bucket und Objektschlüssel, bevor Sie ein Objekt löschen.
 
-## Using the RustFS UI
+## RustFS-Oberfläche verwenden
 
-1. Log in to the RustFS Console.
-2. Select the bucket containing the file to be deleted.
-3. On the bucket page, select the file to be deleted.
-4. Click **Delete Selected Items** in the upper right corner, then click **Confirm** in the popup dialog.
+1. Melden Sie sich an der RustFS-Console an.
+2. Wählen Sie den Bucket, der das zu löschende Objekt enthält.
+3. Wählen Sie auf der Bucket-Seite das zu löschende Objekt aus.
+4. Wählen Sie oben rechts **Delete Selected Items** (Ausgewählte Elemente löschen) und anschließend **Confirm** (Bestätigen).
 
-![object deletion from ui](images/delete_file_from_ui.png)
+![Objektlöschung über die Oberfläche](images/delete_file_from_ui.png)
 
-## Using `rc`
+## `rc` verwenden
 
-Delete a file:
+Löschen Sie ein Objekt:
 
 ```bash
 rc object remove rustfs/my-bucket/hello.txt
@@ -33,17 +33,17 @@ Removed: rustfs/my-bucket/hello.txt
 ✓ Removed 1 object(s).
 ```
 
-Verify the deletion in the RustFS Console.
+Prüfen Sie die Löschung in der RustFS-Console.
 
-## Using the API
+## API verwenden
 
-Delete a file via API:
+Löschen Sie ein Objekt über die API:
 
 ```http
 DELETE /{bucketName}/{objectName} HTTP/1.1
 ```
 
-S3 requests must be signed with AWS Signature V4, so use an S3 client rather than hand-crafting headers. With the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) configured for your access keys:
+S3-Anfragen müssen mit AWS Signature V4 signiert sein. Verwenden Sie deshalb einen S3-Client, anstatt Header von Hand zu setzen. Mit der für Ihre Zugriffsschlüssel konfigurierten [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html):
 
 ```bash
 aws s3api delete-object \
@@ -52,4 +52,4 @@ aws s3api delete-object \
   --endpoint-url http://localhost:9000
 ```
 
-Verify the deletion in the RustFS Console.
+Prüfen Sie die Löschung in der RustFS-Console.

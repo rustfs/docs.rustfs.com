@@ -213,9 +213,9 @@ Katalog, Write-Ahead-Log und später die Parquet-Datendateien liegen unter dem K
 [2026-09-20 23:20:19]       31 B influxdb-demo/table-index-conversion-completed
 ```
 
-Sie können das Präfix auch in der RustFS-Konsole anzeigen:
+Sie können das Präfix auch in der RustFS Console anzeigen:
 
-![Das InfluxDB-Knoten-Präfix in der RustFS-Konsole](./images/rustfs-influxdb-objects.png)
+![Das InfluxDB-Knoten-Präfix in der RustFS Console](./images/rustfs-influxdb-objects.png)
 
 ## 7. Persistenz über einen Neustart bestätigen
 
@@ -274,6 +274,6 @@ docker compose logs create-bucket
 
 ## Nächste Schritte
 
-- Lesen Sie die [S3-Kompatibilitätshinweise](/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
 - Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
 - Folgen Sie der [InfluxDB-3-Core-Dokumentation](https://docs.influxdata.com/influxdb3/core/), um Telegraf oder die Write-APIs als Datenproduzenten anzubinden.

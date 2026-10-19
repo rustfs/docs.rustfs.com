@@ -1,13 +1,13 @@
 ---
 title: "DolphinScheduler"
-description: "Store DolphinScheduler resources on RustFS over S3."
+description: "Speichern Sie DolphinScheduler-Ressourcen über S3 auf RustFS."
 ---
 
-This guide connects [Apache DolphinScheduler](https://github.com/apache/dolphinscheduler) — the workflow scheduler — to **RustFS** as its resource center storage. You will run the standalone server, switch the resource storage to S3, upload a resource file through the API, and verify the object in the bucket. The workflow was verified with DolphinScheduler 3.2.1 (standalone server) against `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [Apache DolphinScheduler](https://github.com/apache/dolphinscheduler) — den Workflow-Scheduler — mit **RustFS** als Speicher für das Resource Center. Sie betreiben den Standalone-Server, stellen den Ressourcenspeicher auf S3 um, laden eine Ressourcendatei über die API hoch und prüfen das Objekt im Bucket. Der Ablauf wurde mit DolphinScheduler 3.2.1 (Standalone-Server) gegen `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker.
+Sie benötigen Docker.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -15,9 +15,9 @@ flowchart LR
 	DS -->|"S3 API"| RustFS["RustFS :9000"]
 ```
 
-The resource center stores workflow scripts, dependency JARs, and other files. With S3 storage every uploaded file becomes an object under `dolphinscheduler/<tenant>/resources/` in the bucket.
+Das Resource Center speichert Workflow-Skripte, Abhängigkeits-JARs und weitere Dateien. Bei S3-Speicher wird jede hochgeladene Datei zu einem Objekt unter `dolphinscheduler/<tenant>/resources/` im Bucket.
 
-## 1. Run the standalone server
+## 1. Den Standalone-Server starten
 
 ```bash
 docker run -d --name dolphinscheduler --hostname dolphinscheduler \
@@ -25,11 +25,11 @@ docker run -d --name dolphinscheduler --hostname dolphinscheduler \
   apache/dolphinscheduler-standalone-server:3.2.1
 ```
 
-The single container bundles master, worker, API, alert, and an embedded ZooKeeper. The UI is at `http://localhost:12345/dolphinscheduler/ui` (default login `admin` / `dolphinscheduler123`).
+Der einzelne Container bündelt Master, Worker, API, Alert und ein eingebettetes ZooKeeper. Die Oberfläche liegt unter `http://localhost:12345/dolphinscheduler/ui` (Standardanmeldung `admin` / `dolphinscheduler123`).
 
-## 2. Switch the resource center to RustFS
+## 2. Das Resource Center auf RustFS umstellen
 
-The storage backend lives in `/opt/dolphinscheduler/conf/common.properties`. Append the S3 properties to the existing file — do not replace the file, it holds many other settings:
+Das Speicher-Backend liegt in `/opt/dolphinscheduler/conf/common.properties`. Hängen Sie die S3-Properties an die vorhandene Datei an. Ersetzen Sie die Datei nicht, sie enthält viele weitere Einstellungen:
 
 ```bash
 docker exec dolphinscheduler bash -c "cat >> /opt/dolphinscheduler/conf/common.properties << 'EOF'
@@ -45,15 +45,15 @@ EOF"
 docker restart dolphinscheduler
 ```
 
-Wait for the API to come back (about a minute), then create the bucket:
+Warten Sie, bis die API wieder verfügbar ist (etwa eine Minute), und legen Sie dann den Bucket an:
 
 ```bash
 rc mb rustfs/ds-demo
 ```
 
-## 3. Upload a resource file
+## 3. Eine Ressourcendatei hochladen
 
-Log in through the API to get a session id, then upload a file. The endpoint requires both `name` and `fullName` parameters:
+Melden Sie sich über die API an, um eine Sitzungs-ID zu erhalten, und laden Sie dann eine Datei hoch. Der Endpunkt verlangt sowohl den Parameter `name` als auch `fullName`:
 
 ```bash
 printf "ds resource file stored in rustfs" > /tmp/ds-file.txt
@@ -71,9 +71,9 @@ curl -s -m 30 -X POST "http://localhost:12345/dolphinscheduler/resources" \
 {"code":0,"msg":"success","data":null,"failed":false,"success":true}
 ```
 
-## 4. Verify in DolphinScheduler and RustFS
+## 4. In DolphinScheduler und RustFS prüfen
 
-Read the file back through the API:
+Lesen Sie die Datei über die API zurück:
 
 ```bash
 curl -s -m 30 "http://localhost:12345/dolphinscheduler/resources/view-ui?fullName=/ds-file.txt&skipLineNum=100&limit=100" \
@@ -84,7 +84,7 @@ curl -s -m 30 "http://localhost:12345/dolphinscheduler/resources/view-ui?fullNam
 ds resource file stored in rustfs
 ```
 
-List the bucket — the file sits under the tenant's resources prefix:
+Listen Sie den Bucket auf. Die Datei liegt unter dem Ressourcenpräfix des Tenants:
 
 ```bash
 rc ls rustfs/ds-demo/ -r
@@ -95,31 +95,31 @@ dolphinscheduler/default/resources/ds-file.txt
 dolphinscheduler/default/udfs/
 ```
 
-![DolphinScheduler resources stored in the RustFS Console](./images/rustfs-ds-resources.png)
+![In der RustFS-Console gespeicherte DolphinScheduler-Ressourcen](./images/rustfs-ds-resources.png)
 
-## 5. Stop or reset
+## 5. Stoppen oder zurücksetzen
 
 ```bash
 docker rm -f dolphinscheduler
 rc rm rustfs/ds-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
-### Server fails to start with an Azure `clientId/tenantId/clientSecret` error
+### Der Server startet mit einem Azure-Fehler zu `clientId/tenantId/clientSecret` nicht
 
-The storage config was written as a brand-new file instead of appended, so `resource.storage.type=S3` was lost and the defaults pointed at Azure. Always append to the existing `common.properties` as in step 2.
+Die Speicherkonfiguration wurde als neue Datei geschrieben statt angehängt, dadurch ging `resource.storage.type=S3` verloren und die Standardwerte zeigten auf Azure. Hängen Sie die Einstellungen immer an die vorhandene `common.properties` an, wie in Schritt 2.
 
 ### `Required request parameter 'name'/'fullName' is not present`
 
-The resource create endpoint requires both `name` and `fullName` form fields alongside `file`, `type`, and `currentDir`.
+Der Endpunkt zum Anlegen von Ressourcen verlangt die Formularfelder `name` und `fullName` zusätzlich zu `file`, `type` und `currentDir`.
 
-### API returns 405 for the token call
+### Die API antwortet mit 405 auf den Token-Aufruf
 
-The login/token endpoints accept POST but `/api/v2/token` style endpoints differ per version — use the login form shown in step 3 and pass `session-id` header plus `Cookie: sessionId=...` on every call.
+Die Login- und Token-Endpunkte akzeptieren POST. Endpunkte im Stil von `/api/v2/token` unterscheiden sich je nach Version. Verwenden Sie das Login-Formular aus Schritt 3 und übergeben Sie bei jedem Aufruf den Header `session-id` sowie `Cookie: sessionId=...`.
 
-## Next steps
+## Nächste Schritte
 
-- Compare with the [Airflow](/developer/integration/big-data/airflow) guide for orchestration without a built-in resource center.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [DolphinScheduler documentation](https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/common/resource-management.html) to wire the same S3 resource center into worker task execution.
+- Vergleichen Sie die Anleitung mit [Airflow](/de/developer/integration/big-data/airflow) für Orchestrierung ohne eingebautes Resource Center.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [DolphinScheduler-Dokumentation](https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/common/resource-management.html), um dasselbe S3-Resource-Center in die Ausführung von Worker-Tasks einzubinden.

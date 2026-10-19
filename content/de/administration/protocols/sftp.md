@@ -1,74 +1,74 @@
 ---
 title: "SFTP"
-description: "Build, configure, and use the RustFS SFTP gateway to access buckets and objects with SFTP clients."
+description: "Bauen, konfigurieren und verwenden Sie das SFTP-Gateway von RustFS, um mit SFTP-Clients auf Buckets und Objekte zuzugreifen."
 ---
 
-RustFS includes an SSH File Transfer Protocol (SFTP) gateway that exposes buckets and objects to SFTP clients over an encrypted SSH connection. You can list and create buckets and upload, download, rename, or delete objects while RustFS enforces the permissions of the authenticated Identity and Access Management (IAM) user.
+RustFS enthält ein Gateway für das SSH File Transfer Protocol (SFTP), das Buckets und Objekte über eine verschlüsselte SSH-Verbindung für SFTP-Clients bereitstellt. Sie können Buckets auflisten und erstellen sowie Objekte hochladen, herunterladen, umbenennen oder löschen, während RustFS die Berechtigungen des authentifizierten Benutzers von Identity and Access Management (IAM) durchsetzt.
 
-SFTP is an optional compile-time feature and is not included in the default RustFS build. Build RustFS with the `sftp` or `full` feature before enabling the listener. The listener is disabled at runtime by default.
+SFTP ist ein optionales Feature zur Build-Zeit und nicht im Standard-Build von RustFS enthalten. Bauen Sie RustFS mit dem Feature `sftp` oder `full`, bevor Sie den Listener aktivieren. Der Listener ist zur Laufzeit standardmäßig deaktiviert.
 
-## Overview
+## Überblick
 
-The gateway maps SFTP paths to RustFS resources:
+Das Gateway bildet SFTP-Pfade auf RustFS-Ressourcen ab:
 
-| SFTP path | RustFS resource |
+| SFTP-Pfad | RustFS-Ressource |
 | --- | --- |
-| `/` | All buckets visible to the authenticated user |
-| `/my-bucket/` | The `my-bucket` bucket |
-| `/my-bucket/hello.txt` | The `hello.txt` object in `my-bucket` |
-| `/my-bucket/docs/hello.txt` | The `docs/hello.txt` object in `my-bucket` |
+| `/` | Alle Buckets, die für den authentifizierten Benutzer sichtbar sind |
+| `/my-bucket/` | Der Bucket `my-bucket` |
+| `/my-bucket/hello.txt` | Das Objekt `hello.txt` in `my-bucket` |
+| `/my-bucket/docs/hello.txt` | Das Objekt `docs/hello.txt` in `my-bucket` |
 
-Creating or removing a directory directly below `/` creates or removes a bucket. Directories below a bucket map to object key prefixes and do not exist as independent filesystem directories.
+Das Erstellen oder Entfernen eines Verzeichnisses direkt unter `/` erstellt oder entfernt einen Bucket. Verzeichnisse unterhalb eines Buckets werden auf Präfixe von Objektschlüsseln abgebildet und existieren nicht als eigenständige Dateisystemverzeichnisse.
 
-RustFS supports the following operations through the SFTP gateway:
+RustFS unterstützt die folgenden Operationen über das SFTP-Gateway:
 
-| SFTP operation | RustFS operation |
+| SFTP-Operation | RustFS-Operation |
 | --- | --- |
-| List `/` | List visible buckets |
-| List a bucket or prefix | List objects and prefixes |
-| `mkdir` at `/` | Create a bucket |
-| `put` | Upload an object |
-| `get` | Download an object |
-| `rename` | Copy an object and then delete the source |
-| `rm` | Delete an object |
-| `rmdir` at `/` | Delete an empty bucket |
+| `/` auflisten | Sichtbare Buckets auflisten |
+| Bucket oder Präfix auflisten | Objekte und Präfixe auflisten |
+| `mkdir` unter `/` | Bucket erstellen |
+| `put` | Objekt hochladen |
+| `get` | Objekt herunterladen |
+| `rename` | Objekt kopieren und anschließend die Quelle löschen |
+| `rm` | Objekt löschen |
+| `rmdir` unter `/` | Leeren Bucket löschen |
 
-Enter a RustFS access key as the SFTP username and its secret key as the password. RustFS checks the IAM user's S3 policies for every operation.
+Geben Sie einen RustFS-Zugriffsschlüssel als SFTP-Benutzernamen und den zugehörigen geheimen Zugriffsschlüssel als Passwort ein. RustFS prüft die S3-Richtlinien des IAM-Benutzers für jede Operation.
 
-:::warning[Password authentication only]
+:::warning[Nur Passwortauthentifizierung]
 
-The SFTP gateway does not support client public-key authentication or anonymous access. SSH host keys identify the server; they do not authenticate clients. Do not configure an `authorized_keys` file for RustFS SFTP.
+Das SFTP-Gateway unterstützt keine Authentifizierung mit öffentlichen Client-Schlüsseln und keinen anonymen Zugriff. SSH-Host-Schlüssel identifizieren den Server. Sie authentifizieren keine Clients. Konfigurieren Sie für RustFS-SFTP keine Datei `authorized_keys`.
 
 :::
 
-## Configuration
+## Konfiguration
 
-### Build with SFTP support
+### Mit SFTP-Unterstützung bauen
 
-Build RustFS with the SFTP feature:
+Bauen Sie RustFS mit dem SFTP-Feature:
 
 ```bash
 cargo build --release --features sftp
 ```
 
-To enable all optional RustFS features, including SFTP, use `--features full` instead. Setting `RUSTFS_SFTP_ENABLE=true` has no effect in a binary built without the `sftp` feature.
+Um alle optionalen RustFS-Features einschließlich SFTP zu aktivieren, verwenden Sie stattdessen `--features full`. `RUSTFS_SFTP_ENABLE=true` hat in einem Binary ohne das Feature `sftp` keine Wirkung.
 
-### SFTP variables
+### SFTP-Variablen
 
-| Variable | Description | Default |
+| Variable | Beschreibung | Standard |
 | --- | --- | --- |
-| `RUSTFS_SFTP_ENABLE` | Enables the SFTP listener. | `false` |
-| `RUSTFS_SFTP_ADDRESS` | Bind address for SFTP connections. | `0.0.0.0:2222` |
-| `RUSTFS_SFTP_HOST_KEY_DIR` | Directory containing at least one unencrypted SSH private host key. Required when SFTP is enabled. | Not set |
-| `RUSTFS_SFTP_READ_ONLY` | Rejects operations that modify buckets or objects. | `false` |
-| `RUSTFS_SFTP_IDLE_TIMEOUT` | SSH inactivity timeout in seconds. Must be greater than zero. | `600` |
-| `RUSTFS_SFTP_PART_SIZE` | Multipart upload part size in bytes. | `16777216` (16 MiB) |
+| `RUSTFS_SFTP_ENABLE` | Aktiviert den SFTP-Listener. | `false` |
+| `RUSTFS_SFTP_ADDRESS` | Bind-Adresse für SFTP-Verbindungen. | `0.0.0.0:2222` |
+| `RUSTFS_SFTP_HOST_KEY_DIR` | Verzeichnis mit mindestens einem unverschlüsselten privaten SSH-Host-Schlüssel. Erforderlich, wenn SFTP aktiviert ist. | Nicht gesetzt |
+| `RUSTFS_SFTP_READ_ONLY` | Lehnt Operationen ab, die Buckets oder Objekte ändern. | `false` |
+| `RUSTFS_SFTP_IDLE_TIMEOUT` | SSH-Inaktivitätszeitlimit in Sekunden. Muss größer als null sein. | `600` |
+| `RUSTFS_SFTP_PART_SIZE` | Teilgröße des mehrteiligen Uploads in Bytes. | `16777216` (16 MiB) |
 
-The default port `2222` avoids the privileged SSH port `22`. The address can use IPv4 or IPv6 syntax, for example `127.0.0.1:2222` or `[::]:2222`.
+Der Standardport `2222` vermeidet den privilegierten SSH-Port `22`. Die Adresse kann IPv4- oder IPv6-Syntax verwenden, zum Beispiel `127.0.0.1:2222` oder `[::]:2222`.
 
-### Prepare a host key
+### Host-Schlüssel vorbereiten
 
-Create a persistent host-key directory and generate an Ed25519 host key:
+Erstellen Sie ein dauerhaftes Verzeichnis für Host-Schlüssel und erzeugen Sie einen Ed25519-Host-Schlüssel:
 
 ```bash
 mkdir -p /path/to/sftp-keys
@@ -78,19 +78,19 @@ ssh-keygen -t ed25519 \
 chmod 600 /path/to/sftp-keys/ssh_host_ed25519_key*
 ```
 
-The host key must not use a passphrase. RustFS also accepts decodable ECDSA and RSA private host keys.
+Der Host-Schlüssel darf keine Passphrase verwenden. RustFS akzeptiert außerdem private ECDSA- und RSA-Host-Schlüssel, die es einlesen kann.
 
-On Unix, every regular file in the host-key directory must be accessible only by its owner. The `ssh-keygen` command also creates a `.pub` file; either keep it with owner-only permissions as shown or remove it because RustFS does not read it. RustFS refuses to start if the directory is missing, contains no usable private key, or contains a regular file with group or other permission bits set.
+Unter Unix darf jede reguläre Datei im Verzeichnis der Host-Schlüssel nur für ihren Eigentümer zugänglich sein. Der Befehl `ssh-keygen` erzeugt außerdem eine `.pub`-Datei. Belassen Sie sie wie gezeigt mit Berechtigungen nur für den Eigentümer oder entfernen Sie sie, weil RustFS sie nicht liest. RustFS verweigert den Start, wenn das Verzeichnis fehlt, keinen verwendbaren privaten Schlüssel enthält oder eine reguläre Datei enthält, bei der Bits für die Gruppe oder für andere Benutzer gesetzt sind.
 
-:::warning[Protect the host key]
+:::warning[Host-Schlüssel schützen]
 
-Keep the same host key across restarts so clients can verify the server identity. Restrict access to the account that runs RustFS and back up the key securely. A changed host key causes clients to display a possible man-in-the-middle warning.
+Behalten Sie denselben Host-Schlüssel über Neustarts hinweg, damit Clients die Serveridentität prüfen können. Beschränken Sie den Zugriff auf das Konto, unter dem RustFS läuft, und sichern Sie den Schlüssel geschützt. Ein geänderter Host-Schlüssel führt dazu, dass Clients eine mögliche Man-in-the-Middle-Warnung anzeigen.
 
 :::
 
-### Start the SFTP listener
+### SFTP-Listener starten
 
-The following example starts SFTP on the loopback interface for local testing:
+Das folgende Beispiel startet SFTP für lokale Tests auf der Loopback-Schnittstelle:
 
 ```bash
 export RUSTFS_SFTP_ENABLE=true
@@ -102,23 +102,23 @@ export RUSTFS_SECRET_KEY=<your-secret-key>
 rustfs /path/to/data
 ```
 
-For remote connections, bind to an appropriate network interface and allow inbound TCP traffic to the configured SFTP port. This listener is separate from the S3 API and Console listeners.
+Binden Sie für entfernte Verbindungen an eine passende Netzwerkschnittstelle und lassen Sie eingehenden TCP-Verkehr zum konfigurierten SFTP-Port zu. Dieser Listener ist von den Listenern der S3-API und der Console getrennt.
 
-## Usage
+## Verwendung
 
-The following examples use the OpenSSH `sftp` client, the canonical `my-bucket` and `hello.txt` names, and a local listener on port `2222`.
+Die folgenden Beispiele verwenden den OpenSSH-Client `sftp`, die kanonischen Namen `my-bucket` und `hello.txt` sowie einen lokalen Listener auf Port `2222`.
 
-### Connect
+### Verbinden
 
 ```bash
 sftp -P 2222 <your-access-key>@127.0.0.1
 ```
 
-Enter the RustFS secret key when prompted for the password. On the first connection, verify the displayed host-key fingerprint before accepting it.
+Geben Sie den geheimen Zugriffsschlüssel von RustFS ein, wenn nach dem Passwort gefragt wird. Prüfen Sie bei der ersten Verbindung den angezeigten Fingerabdruck des Host-Schlüssels, bevor Sie ihn akzeptieren.
 
-### List and create buckets
+### Buckets auflisten und erstellen
 
-At the `sftp` prompt, list the buckets visible to the IAM user and create `my-bucket`:
+Listen Sie an der `sftp`-Eingabeaufforderung die für den IAM-Benutzer sichtbaren Buckets auf und erstellen Sie `my-bucket`:
 
 ```text
 sftp> ls /
@@ -126,11 +126,11 @@ sftp> mkdir /my-bucket
 sftp> cd /my-bucket
 ```
 
-Bucket names must follow the same naming rules as buckets created through the S3 API. Files cannot be created directly under `/`.
+Bucket-Namen müssen denselben Namensregeln folgen wie Buckets, die über die S3-API erstellt werden. Objekte können nicht direkt unter `/` angelegt werden.
 
-### Upload and download an object
+### Objekt hochladen und herunterladen
 
-Upload `/path/to/hello.txt`, list the bucket, and download the object:
+Laden Sie `/path/to/hello.txt` hoch, listen Sie den Bucket auf und laden Sie das Objekt herunter:
 
 ```text
 sftp> put /path/to/hello.txt /my-bucket/hello.txt
@@ -138,44 +138,44 @@ sftp> ls /my-bucket
 sftp> get /my-bucket/hello.txt hello.txt
 ```
 
-Uploads must be sequential from the beginning of the file. Resume, append, in-place edits, and segmented multi-connection uploads of one object are not supported.
+Uploads müssen sequenziell vom Anfang der Datei erfolgen. Fortsetzen, Anfügen, Änderungen an Ort und Stelle und segmentierte Uploads eines Objekts über mehrere Verbindungen werden nicht unterstützt.
 
-### Rename an object
+### Objekt umbenennen
 
 ```text
 sftp> rename /my-bucket/hello.txt /my-bucket/greeting.txt
 ```
 
-RustFS implements rename as a server-side copy followed by deletion of the source. The operation is not atomic, and renaming a bucket is not supported. The IAM user needs permission to read and delete the source and to write the destination.
+RustFS implementiert das Umbenennen als serverseitige Kopie mit anschließendem Löschen der Quelle. Die Operation ist nicht atomar, und das Umbenennen eines Buckets wird nicht unterstützt. Der IAM-Benutzer benötigt die Berechtigung, die Quelle zu lesen und zu löschen und das Ziel zu schreiben.
 
-### Delete an object and bucket
+### Objekt und Bucket löschen
 
-Delete the object and then remove the empty bucket:
+Löschen Sie das Objekt und entfernen Sie anschließend den leeren Bucket:
 
 ```text
 sftp> rm /my-bucket/greeting.txt
 sftp> rmdir /my-bucket
 ```
 
-RustFS does not recursively delete a non-empty bucket through SFTP.
+RustFS löscht einen nicht leeren Bucket über SFTP nicht rekursiv.
 
-### Connect a desktop client
+### Desktop-Client verbinden
 
-Use these settings in graphical clients such as FileZilla, Cyberduck, or WinSCP:
+Verwenden Sie diese Einstellungen in grafischen Clients wie FileZilla, Cyberduck oder WinSCP:
 
-| Setting | Value |
+| Einstellung | Wert |
 | --- | --- |
-| Protocol | SFTP (SSH File Transfer Protocol) |
-| Host | Your RustFS SFTP hostname |
-| Port | `2222`, or the port in `RUSTFS_SFTP_ADDRESS` |
-| Username | RustFS access key |
-| Password | RustFS secret key |
-| Authentication | Password |
+| Protokoll | SFTP (SSH File Transfer Protocol) |
+| Host | Ihr RustFS-SFTP-Hostname |
+| Port | `2222` oder der Port in `RUSTFS_SFTP_ADDRESS` |
+| Benutzername | RustFS-Zugriffsschlüssel |
+| Passwort | Geheimer Zugriffsschlüssel von RustFS |
+| Authentifizierung | Passwort |
 
-Configure the client for whole-file, single-connection uploads. Symbolic links and POSIX ownership, permission, or timestamp changes are not supported because the gateway maps SFTP operations to object storage.
+Konfigurieren Sie den Client für Uploads der vollständigen Datei über eine einzelne Verbindung. Symbolische Links sowie Änderungen an POSIX-Eigentümerschaft, Berechtigungen oder Zeitstempeln werden nicht unterstützt, weil das Gateway SFTP-Operationen auf Objektspeicher abbildet.
 
-## Next steps
+## Nächste Schritte
 
-- [Manage credentials](/operations/credentials)
-- [Check service status](/operations/status-check)
-- [Configure lifecycle management](/administration/data/lifecycle-management)
+- [Zugangsdaten verwalten](/de/operations/credentials)
+- [Dienststatus prüfen](/de/operations/status-check)
+- [Lebenszyklusverwaltung konfigurieren](/de/administration/data/lifecycle-management)

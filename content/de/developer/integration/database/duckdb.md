@@ -116,7 +116,7 @@ docker compose up -d
 docker compose ps -a
 ```
 
-Der Dienst `create-bucket` sollte mit dem Exit-Code `0` enden. Die RustFS-Konsole erreichen Sie jederzeit unter `http://localhost:9001/rustfs/console/`.
+Der Dienst `create-bucket` sollte mit dem Exit-Code `0` enden. Die RustFS Console erreichen Sie jederzeit unter `http://localhost:9001/rustfs/console/`.
 
 ## 3. Das S3-Secret in DuckDB konfigurieren
 
@@ -197,9 +197,9 @@ docker compose run --rm --entrypoint /bin/sh create-bucket -c \
 [2026-09-20 06:52:45]   5.32 KiB duckdb-demo/events.parquet
 ```
 
-Sie können das Präfix `duckdb-demo` auch in der RustFS-Konsole anzeigen:
+Sie können das Präfix `duckdb-demo` auch in der RustFS Console anzeigen:
 
-![Das Präfix duckdb-demo in der RustFS-Konsole](./images/rustfs-duckdb-objects.png)
+![Das Präfix duckdb-demo in der RustFS Console](./images/rustfs-duckdb-objects.png)
 
 ## 7. Stack stoppen oder zurücksetzen
 
@@ -239,6 +239,6 @@ docker compose logs create-bucket
 
 ## Nächste Schritte
 
-- Lesen Sie die [S3-Kompatibilitätshinweise](/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
 - Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
 - Folgen Sie der [DuckDB-httpfs-Dokumentation](https://duckdb.org/docs/stable/extensions/httpfs/overview) für erweiterte Optionen wie Regions-Overrides und Verbindungslimits.

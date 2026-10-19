@@ -1,26 +1,26 @@
 ---
-title: "Quick Start"
-description: "Install RustFS with the one-click script, log in to the Console, and store your first object — in about ten minutes."
+title: "Schnellstart"
+description: "Installieren Sie RustFS mit dem Installationsskript, melden Sie sich an der Console an und speichern Sie Ihr erstes Objekt — in etwa zehn Minuten."
 ---
 
-This guide takes you from an empty Linux server to a working RustFS instance: install, log in to the Console, create a bucket, and upload your first object. Production planning (multi-node layout, hardware sizing) is deliberately left for [the next step](#next-steps).
+Diese Anleitung führt Sie von einem leeren Linux-Server zu einer laufenden RustFS-Instanz. Sie installieren RustFS, melden sich an der Console (Weboberfläche) an, legen einen Bucket an und laden Ihr erstes Objekt hoch. Die Produktionsplanung (Aufbau mit mehreren Knoten, Dimensionierung der Hardware) bleibt bewusst dem [nächsten Schritt](#nächste-schritte) vorbehalten.
 
-**Prerequisites**
+**Voraussetzungen**
 
-- A Linux server (x86_64 or aarch64) with `systemd`, and root or sudo access
-- `unzip` installed, and outbound network access to download the package
-- Ports `9000` (S3 API) and `9001` (Console) reachable from your machine
-- [`rc`](/operations/rc) installed on your workstation for the command-line verification workflow
+- Ein Linux-Server (x86_64 oder aarch64) mit `systemd` sowie Root- oder sudo-Zugriff
+- `unzip` ist installiert, und ausgehender Netzwerkzugriff zum Herunterladen des Pakets ist vorhanden
+- Die Ports `9000` (S3-API) und `9001` (Console) sind von Ihrem Rechner aus erreichbar
+- [`rc`](/de/operations/rc) ist auf Ihrer Arbeitsstation für den Prüflauf auf der Kommandozeile installiert
 
-## 1. Install and start RustFS
+## 1. RustFS installieren und starten
 
-Run the official installation script:
+Führen Sie das offizielle Installationsskript aus:
 
 ```bash
 curl -O https://rustfs.com/install_rustfs.sh && bash install_rustfs.sh
 ```
 
-The script installs the binary to `/usr/local/bin/rustfs`, registers a `rustfs` systemd service, and starts it. By default it stores data in `/data/rustfs0` and listens on port `9000` (S3 API) and `9001` (Console); the data path and ports can be adjusted during installation. On success it prints a summary like:
+Das Skript installiert die Binärdatei nach `/usr/local/bin/rustfs`, registriert einen systemd-Dienst `rustfs` und startet ihn. Standardmäßig speichert es die Daten in `/data/rustfs0` und lauscht auf den Ports `9000` (S3-API) und `9001` (Console). Datenpfad und Ports lassen sich während der Installation anpassen. Bei Erfolg gibt es eine Zusammenfassung in dieser Form aus:
 
 ```text
 RustFS has been installed and started successfully!
@@ -30,41 +30,41 @@ Service port: 9000,  Console port: 9001,  Data directory: /data/rustfs0
   Config file: /etc/default/rustfs
 ```
 
-## 2. Set your credentials
+## 2. Zugangsdaten festlegen
 
-The generated config file ships placeholder credentials. Set your own access key and secret key, then restart the service:
+Die erzeugte Konfigurationsdatei enthält Platzhalter für die Zugangsdaten. Legen Sie Ihren eigenen Zugriffsschlüssel und Ihren eigenen geheimen Zugriffsschlüssel fest und starten Sie den Dienst anschließend neu:
 
 ```ini title="/etc/default/rustfs" {1,2}
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>   ; e.g. output of: openssl rand -base64 24
 ```
 
-Use an uppercase alphanumeric access key. Do not use unmodified Base64 output for `RUSTFS_ACCESS_KEY`, because Base64 can contain `/`, which conflicts with the AWS Signature Version 4 credential scope. See [Credential Management](/operations/credentials) for details.
+Verwenden Sie einen Zugriffsschlüssel aus Großbuchstaben und Ziffern. Verwenden Sie die unveränderte Base64-Ausgabe nicht für `RUSTFS_ACCESS_KEY`. Base64 kann `/` enthalten. Das kollidiert mit dem Credential Scope von AWS Signature Version 4, also dem Geltungsbereich der Signatur. Einzelheiten stehen in der [Zugangsdatenverwaltung](/de/operations/credentials).
 
 ```bash
 sudo systemctl restart rustfs
 sudo systemctl status rustfs --no-pager   # should report: active (running)
 ```
 
-:::warning[Do not keep default credentials]
+:::warning[Standardzugangsdaten nicht beibehalten]
 
-If `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` are not set, the server falls back to the built-in default `rustfsadmin` / `rustfsadmin` — acceptable for a throwaway local test, never for anything reachable by others.
+Wenn `RUSTFS_ACCESS_KEY` und `RUSTFS_SECRET_KEY` nicht gesetzt sind, fällt der Server auf den eingebauten Standard `rustfsadmin` / `rustfsadmin` zurück. Das ist nur für einen lokalen Test akzeptabel, den Sie anschließend verwerfen, und niemals für eine Instanz, die andere erreichen können.
 
 :::
 
-## 3. Log in to the Console
+## 3. An der Console anmelden
 
-Open `http://<server-ip>:9001` in your browser and sign in with the access key and secret key from step 2.
+Öffnen Sie `http://<server-ip>:9001` im Browser und melden Sie sich mit dem Zugriffsschlüssel und dem geheimen Zugriffsschlüssel aus Schritt 2 an.
 
-![RustFS Console login](./images/console.jpg)
+![Anmeldung an der RustFS Console](./images/console.jpg)
 
-## 4. Create a bucket and upload a file
+## 4. Bucket anlegen und eine Datei hochladen
 
-1. In the Console home page, select **Create Bucket**, name it (for example `my-bucket`), and confirm.
-2. Open the bucket and use the upload action to add any local file.
-3. Click the uploaded object to view its details — you have a working object store.
+1. Wählen Sie auf der Startseite der Console **Create Bucket** (Bucket erstellen), vergeben Sie einen Namen (zum Beispiel `my-bucket`) und bestätigen Sie.
+2. Öffnen Sie den Bucket und verwenden Sie die Aktion zum Hochladen, um eine beliebige lokale Datei hinzuzufügen.
+3. Klicken Sie auf das hochgeladene Objekt, um die Details anzuzeigen. Damit verfügen Sie über einen funktionierenden Objektspeicher.
 
-Prefer the command line? Configure [`rc`](/operations/rc), then perform the same operations:
+Sie arbeiten lieber auf der Kommandozeile? Konfigurieren Sie [`rc`](/de/operations/rc) und führen Sie dieselben Operationen aus:
 
 ```bash
 rc alias set rustfs http://<server-ip>:9000 <your-access-key> <your-secret-key>
@@ -80,13 +80,13 @@ rc object list rustfs/my-bucket
 
 <a id="mode"></a>
 
-## Next steps
+## Nächste Schritte
 
-The quick install runs RustFS in **Single Node Single Disk (SNSD)** mode — zero redundancy, right for evaluation and development. Where to go from here:
+Mit der Schnellinstallation betreiben Sie RustFS im Modus **Einzelner Knoten mit einem Datenträger (SNSD)** — ohne Redundanz, geeignet für Evaluierung und Entwicklung. So geht es weiter:
 
-- **Plan a production deployment** — choose a topology, then follow its guide:
-  - [Single Node Single Disk (SNSD)](./single-node-single-disk.md) — dev and small workloads
-  - [Single Node Multiple Disk (SNMD)](./single-node-multiple-disk.md) — disk-level fault tolerance on one machine
-  - [Multiple Node Multiple Disk (MNMD)](./multiple-node-multiple-disk.md) — production-grade availability and scale, with the [pre-installation checklists](../requirement/checklists/index.md)
-- **Prefer containers?** — [Install with a container](../container/index.md)
-- **Connect your application** — [SDKs and examples](../../developer/sdk/index.md)
+- **Produktionsbereitstellung planen** — wählen Sie eine Topologie und folgen Sie der zugehörigen Anleitung:
+  - [Einzelner Knoten mit einem Datenträger (SNSD)](./single-node-single-disk.md) — Entwicklung und kleine Arbeitslasten
+  - [Einzelner Knoten mit mehreren Datenträgern (SNMD)](./single-node-multiple-disk.md) — Fehlertoleranz auf Datenträgerebene auf einem Rechner
+  - [Mehrere Knoten mit mehreren Datenträgern (MNMD)](./multiple-node-multiple-disk.md) — Verfügbarkeit und Skalierung auf Produktionsniveau, mit den [Checklisten vor der Installation](../requirement/checklists/index.md)
+- **Sie bevorzugen Container?** — [Mit einem Container installieren](../container/index.md)
+- **Anwendung anbinden** — [SDKs und Beispiele](../../developer/sdk/index.md)

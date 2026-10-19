@@ -8,6 +8,6 @@
     "oidc",
     "[TLS-Konfiguration](/de/integration/tls-configured)",
     "audit-logs",
-    "[Zugangsdatenverwaltung](/de/operations/credentials)"
+    "[Anmeldedatenverwaltung](/de/operations/credentials)"
   ]
 }

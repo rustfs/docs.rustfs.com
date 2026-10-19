@@ -1,84 +1,84 @@
 ---
 title: "Rebalancing"
-description: "Redistribute existing objects across active RustFS storage pools through the Console or rc."
+description: "Verteilen Sie vorhandene Objekte über aktive RustFS-Speicherpools neu, über die Console oder mit rc."
 ---
 
-## Overview
+## Überblick
 
-### Requirements
+### Voraussetzungen
 
-- Install [`rc`](/operations/rc) on the administration host before using the `rc` workflow in this guide.
-- Configure credentials with rebalance administration permission.
+- Installieren Sie [`rc`](/de/operations/rc) auf dem Administrationshost, bevor Sie den `rc`-Ablauf in dieser Anleitung verwenden.
+- Konfigurieren Sie Zugangsdaten mit der Berechtigung zur Rebalancing-Verwaltung.
 
-After [Pool Expansion](./storage-pool-expansion.md), new writes can use the added capacity, but existing objects remain in their original pools. **Rebalancing** moves existing objects across all active pools so their used-capacity ratios converge.
+Nach der [Speicherpool-Erweiterung](./storage-pool-expansion.md) können neue Schreibvorgänge die zusätzliche Kapazität nutzen. Vorhandene Objekte bleiben in ihren ursprünglichen Speicherpools. **Rebalancing** verschiebt vorhandene Objekte über alle aktiven Speicherpools, sodass sich die Verhältnisse der genutzten Kapazität angleichen.
 
-Rebalancing requires at least two active pools. RustFS rejects a new rebalance while another rebalance or a pool decommission is running. Stopping a rebalance does not move already relocated objects back to their original pools.
+Rebalancing erfordert mindestens zwei aktive Speicherpools. RustFS lehnt ein neues Rebalancing ab, solange ein anderes Rebalancing oder eine Speicherpool-Außerbetriebnahme läuft. Wenn Sie ein Rebalancing stoppen, werden bereits verlagerte Objekte nicht in ihre ursprünglichen Speicherpools zurückverschoben.
 
-Before starting, verify that all nodes and disks are healthy, no decommission is active, and the cluster has enough free capacity for normal writes during the operation. Schedule the operation during a lower-traffic period because object movement consumes disk, network, and CPU resources.
+Prüfen Sie vor dem Start, dass alle Knoten und Laufwerke betriebsbereit sind, keine Außerbetriebnahme aktiv ist und der Cluster während des Vorgangs genug freie Kapazität für normale Schreibvorgänge hat. Planen Sie den Vorgang in eine Zeit mit geringerer Last, weil die Objektverschiebung Laufwerks-, Netzwerk- und CPU-Ressourcen verbraucht.
 
-## Operation
+## Ablauf
 
-### Start rebalancing in the Console
+### Rebalancing in der Console starten
 
-1. Sign in to the RustFS Console with an account that has rebalance administration permission.
-2. Open **Rebalance**.
-3. Review the active pools and their used-capacity ratios.
-4. Select **Start Rebalance** and confirm the operation.
-5. Keep the page open or return to it periodically to review per-pool progress.
-6. Use **Stop Rebalance** only when you need to halt the operation. Data already moved remains in its new pool.
+1. Melden Sie sich an der RustFS Console (Weboberfläche) mit einem Konto an, das die Berechtigung zur Rebalancing-Verwaltung hat.
+2. Öffnen Sie **Rebalance** (Rebalancing).
+3. Prüfen Sie die aktiven Speicherpools und die Verhältnisse der genutzten Kapazität.
+4. Wählen Sie **Start Rebalance** (Rebalancing starten) und bestätigen Sie den Vorgang.
+5. Lassen Sie die Seite geöffnet oder kehren Sie regelmäßig dorthin zurück, um den Fortschritt je Speicherpool zu prüfen.
+6. Verwenden Sie **Stop Rebalance** (Rebalancing stoppen) nur, wenn Sie den Vorgang anhalten müssen. Bereits verschobene Daten bleiben im neuen Speicherpool.
 
-![RustFS Console showing a rebalance in progress with moved bytes and objects](./images/rebalance-running-console.png)
+![RustFS Console mit laufendem Rebalancing, verschobenen Bytes und Objekten](./images/rebalance-running-console.png)
 
-### Start rebalancing with rc
+### Rebalancing mit rc starten
 
-Configure the cluster alias if it does not already exist:
+Konfigurieren Sie den Cluster-Alias, falls er noch nicht existiert:
 
 ```bash
 rc alias set rustfs http://<server-ip>:9000 <your-access-key> <your-secret-key>
 ```
 
-Start the rebalance:
+Starten Sie das Rebalancing:
 
 ```bash
 rc admin rebalance start rustfs
 ```
 
-Check progress:
+Prüfen Sie den Fortschritt:
 
 ```bash
 rc admin rebalance status rustfs
 ```
 
-The status includes the operation ID and per-pool usage, moved bytes, object and version counts, remaining buckets, elapsed time, and estimated completion time when available.
+Der Status enthält die Vorgangs-ID sowie je Speicherpool die Nutzung, verschobene Bytes, Objekt- und Versionszahlen, verbleibende Buckets, die vergangene Zeit und, falls verfügbar, die geschätzte Abschlusszeit.
 
-To stop a running rebalance:
+So stoppen Sie ein laufendes Rebalancing:
 
 ```bash
 rc admin rebalance stop rustfs
 ```
 
-`rc admin expand start|status|stop` and the `scale` alias expose the same post-expansion rebalance workflow.
+`rc admin expand start|status|stop` und der Alias `scale` stellen denselben Rebalancing-Ablauf nach einer Erweiterung bereit.
 
-## Verification
+## Überprüfung
 
-### Verify rebalancing in the Console
+### Rebalancing in der Console prüfen
 
-Wait until the Rebalance page reports `Completed`. Confirm that:
+Warten Sie, bis die Seite **Rebalance** den Status `Completed` meldet. Bestätigen Sie Folgendes:
 
-![RustFS Console showing a completed rebalance and balanced pool usage](./images/rebalance-completed-console.png)
+![RustFS Console mit abgeschlossenem Rebalancing und ausgeglichener Speichernutzung der Speicherpools](./images/rebalance-completed-console.png)
 
-- No pool reports a failed or stopped state.
-- Used-capacity ratios are closer across the active pools.
-- All nodes and disks remain online.
-- Normal object reads and writes succeed.
+- Kein Speicherpool meldet einen fehlgeschlagenen oder gestoppten Zustand.
+- Die Verhältnisse der genutzten Kapazität liegen über die aktiven Speicherpools hinweg näher beieinander.
+- Alle Knoten und Laufwerke bleiben online.
+- Normale Lese- und Schreibvorgänge für Objekte gelingen.
 
-### Verify rebalancing with rc
+### Rebalancing mit rc prüfen
 
-Run:
+Führen Sie aus:
 
 ```bash
 rc admin rebalance status rustfs
 rc admin pool list rustfs
 ```
 
-Verify that the rebalance status is `Completed`, remaining bucket counts are zero, and no failure is reported. Compare the per-pool usage ratios with the values recorded before the operation, then read an existing object and write a new test object through the S3 endpoint.
+Prüfen Sie, dass der Rebalancing-Status `Completed` ist, die Zahl der verbleibenden Buckets null ist und kein Fehler gemeldet wird. Vergleichen Sie die Nutzungsverhältnisse je Speicherpool mit den vor dem Vorgang notierten Werten. Lesen Sie anschließend ein vorhandenes Objekt und schreiben Sie ein neues Testobjekt über den S3-Endpunkt.

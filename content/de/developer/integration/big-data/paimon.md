@@ -1,13 +1,13 @@
 ---
 title: "Paimon"
-description: "Run Paimon lakehouse tables on RustFS with Spark."
+description: "Betreiben Sie Paimon-Lakehouse-Tabellen auf RustFS mit Spark."
 ---
 
-This guide connects [Apache Paimon](https://github.com/apache/paimon) — the streaming lakehouse table format — to **RustFS** as its warehouse storage. You will create a Paimon catalog over a RustFS bucket with Spark, write a primary-key table, and read it back. The workflow was verified with Paimon 1.2.0 on Spark 3.5.6 against `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [Apache Paimon](https://github.com/apache/paimon) — das Streaming-Lakehouse-Tabellenformat — mit **RustFS** als Warehouse-Speicher. Sie legen mit Spark einen Paimon-Katalog über einem RustFS-Bucket an, schreiben eine Tabelle mit Primärschlüssel und lesen sie zurück. Der Ablauf wurde mit Paimon 1.2.0 auf Spark 3.5.6 gegen `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker and the `rc` client.
+Sie benötigen Docker und den Client `rc`.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -15,9 +15,9 @@ flowchart LR
 	Paimon -->|"schemas, snapshots, data files"| RustFS["RustFS :9000"]
 ```
 
-Paimon stores each table under the catalog warehouse as a `*.db` directory containing `schema/`, `snapshot/`, and data files. All I/O goes through Paimon's own S3 FileIO (`paimon-s3`), not Hadoop S3A.
+Paimon speichert jede Tabelle unter dem Warehouse des Katalogs als Verzeichnis `*.db` mit `schema/`, `snapshot/` und Datendateien. Die gesamte Ein- und Ausgabe läuft über Paimons eigenes S3-FileIO (`paimon-s3`), nicht über Hadoop S3A.
 
-## 1. Run Spark
+## 1. Spark starten
 
 ```bash
 docker run -d --name spark-paimon --hostname spark --network oo-rustfs_default \
@@ -25,7 +25,7 @@ docker run -d --name spark-paimon --hostname spark --network oo-rustfs_default \
 docker cp paimon_test.sql spark-paimon:/tmp/paimon_test.sql
 ```
 
-Create the SQL file (note: the catalog options are passed on the CLI below, not in the file):
+Legen Sie die SQL-Datei an. Die Katalogoptionen werden unten auf der CLI übergeben, nicht in der Datei:
 
 ```sql title="paimon_test.sql"
 CREATE TABLE paimon.default.events (id INT, label STRING) TBLPROPERTIES ("primary-key"="id");
@@ -33,9 +33,9 @@ INSERT INTO paimon.default.events VALUES (1,'alpha'),(2,'beta'),(3,'gamma');
 SELECT * FROM paimon.default.events ORDER BY id;
 ```
 
-## 2. Run the SQL script
+## 2. Das SQL-Skript ausführen
 
-Three pieces are required: the Spark extensions, Paimon's own S3 FileIO (`paimon-s3` — the Hadoop S3A jars are not used by Paimon's reader), and the catalog-level `s3.*` options:
+Drei Bestandteile sind erforderlich: die Spark-Erweiterungen, Paimons eigenes S3-FileIO (`paimon-s3`; die Hadoop-S3A-JARs verwendet der Reader von Paimon nicht) und die `s3.*`-Optionen auf Katalogebene:
 
 ```bash
 docker exec -u root spark-paimon bash -c "cd /opt/spark && \
@@ -59,9 +59,9 @@ Time taken: 9.447 seconds
 Time taken: 1.257 seconds, Fetched 3 row(s)
 ```
 
-Without the extensions line Paimon fails fast with a `requiredSparkConfsCheck` error; without `paimon-s3` the catalog fails with `UnsupportedSchemeException: Could not find a file io implementation for scheme 's3'`.
+Ohne die Zeile mit den Erweiterungen bricht Paimon sofort mit einem Fehler `requiredSparkConfsCheck` ab. Ohne `paimon-s3` scheitert der Katalog mit `UnsupportedSchemeException: Could not find a file io implementation for scheme 's3'`.
 
-## 3. Verify objects in RustFS
+## 3. Objekte in RustFS prüfen
 
 ```bash
 rc ls rustfs/paimon-demo/warehouse/ -r | head -6
@@ -74,37 +74,37 @@ warehouse/default.db/events/bucket-0/data-...
 warehouse/default.db/events/manifest/...
 ```
 
-The bucket holds the full lakehouse layout: schemas, snapshots, manifests, and data files per bucket.
+Der Bucket enthält das vollständige Lakehouse-Layout: Schemas, Snapshots, Manifeste und Datendateien je Bucket.
 
-![Paimon warehouse stored in the RustFS Console](./images/rustfs-paimon-warehouse.png)
+![In der RustFS-Console gespeichertes Paimon-Warehouse](./images/rustfs-paimon-warehouse.png)
 
-## 4. Stop or reset
+## 4. Stoppen oder zurücksetzen
 
 ```bash
 docker rm -f spark-paimon
 rc rm rustfs/paimon-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
 ### `UnsupportedSchemeException: Could not find a file io implementation for scheme 's3'`
 
-Paimon's own FileIO needs its S3 plugin on the classpath. Add `org.apache.paimon:paimon-s3:1.2.0` to `--packages` alongside the Spark connector.
+Das eigene FileIO von Paimon braucht sein S3-Plugin auf dem Classpath. Fügen Sie `org.apache.paimon:paimon-s3:1.2.0` in `--packages` neben dem Spark-Connector hinzu.
 
 ### `When using Paimon, it is necessary to configure spark.sql.extensions...`
 
-Add `--conf spark.sql.extensions=org.apache.paimon.spark.extensions.PaimonSparkSessionExtensions` — Paimon fails fast without it.
+Fügen Sie `--conf spark.sql.extensions=org.apache.paimon.spark.extensions.PaimonSparkSessionExtensions` hinzu. Ohne diese Zeile bricht Paimon sofort ab.
 
 ### `SCHEMA_NOT_FOUND: The schema paimon cannot be found`
 
-The catalog was not registered. Register it as `spark.sql.catalog.paimon` and qualify table names with `paimon.`.
+Der Katalog wurde nicht registriert. Registrieren Sie ihn als `spark.sql.catalog.paimon` und qualifizieren Sie Tabellennamen mit `paimon.`.
 
-### Writes fail with S3 errors on the exec side
+### Schreibvorgänge schlagen auf der Executor-Seite mit S3-Fehlern fehl
 
-The catalog-level `s3.*` options (`s3.endpoint`, `s3.access-key`, `s3.secret-key`, `s3.path-style-access`) are what Paimon's FileIO reads — Hadoop `fs.s3a.*` settings alone are not used by the exec-side file operations.
+Die `s3.*`-Optionen auf Katalogebene (`s3.endpoint`, `s3.access-key`, `s3.secret-key`, `s3.path-style-access`) liest das FileIO von Paimon. Die Hadoop-Einstellungen `fs.s3a.*` allein verwendet die Dateioperation auf der Executor-Seite nicht.
 
-## Next steps
+## Nächste Schritte
 
-- Compare with the [Iceberg](/developer/integration/big-data/iceberg), [Hudi](/developer/integration/big-data/hudi), and [Delta Lake](/developer/integration/big-data/delta-lake) guides for the other lakehouse formats on the same bucket.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Paimon documentation](https://paimon.apache.org/docs/master/) for compaction, changelog producers, and Flink streaming writes on the same bucket.
+- Vergleichen Sie die Anleitungen zu [Iceberg](/de/developer/integration/big-data/iceberg), [Hudi](/de/developer/integration/big-data/hudi) und [Delta Lake](/de/developer/integration/big-data/delta-lake) für die anderen Lakehouse-Formate auf demselben Bucket.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [Paimon-Dokumentation](https://paimon.apache.org/docs/master/) für Compaction, Changelog-Producer und Streaming-Schreibvorgänge mit Flink auf demselben Bucket.

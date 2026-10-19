@@ -240,9 +240,9 @@ docker compose run --rm --entrypoint /bin/sh create-bucket -c \
 [2026-09-20 15:03:54]  25.16 KiB single-tenant/619118dc-a512-4ca6-90f5-e8b15bc9013f/data.parquet
 ```
 
-Sie können das Präfix auch in der RustFS-Konsole anzeigen:
+Sie können das Präfix auch in der RustFS Console anzeigen:
 
-![Der in der RustFS-Konsole gespeicherte Tempo-Trace-Block](./images/rustfs-tempo-blocks.png)
+![Der in der RustFS Console gespeicherte Tempo-Trace-Block](./images/rustfs-tempo-blocks.png)
 
 Da der Block in RustFS liegt, bleibt der Trace über Tempo-Neustarts hinweg abfragbar — starten Sie den Container neu und wiederholen Sie die Suche zur Bestätigung.
 
@@ -288,6 +288,6 @@ docker compose logs create-bucket
 
 ## Nächste Schritte
 
-- Lesen Sie die [S3-Kompatibilitätshinweise](/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
 - Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
 - Folgen Sie der [Grafana-Tempo-Dokumentation](https://grafana.com/docs/tempo/latest/), um den OpenTelemetry Collector oder instrumentierte Anwendungen als Trace-Producer anzubinden.
