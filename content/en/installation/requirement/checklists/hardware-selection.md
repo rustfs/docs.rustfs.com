@@ -23,6 +23,8 @@ Minimum requirements for testing:
 
 ## Production Environment
 
+The Windows version of RustFS is intended for development and debugging only and is **not recommended for production deployments**. We recommend [Linux](/en/installation/linux) for production workloads.
+
 | Component | Requirement |
 | - | - |
 | CPU | 2 x 12 cores+ |

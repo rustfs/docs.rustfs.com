@@ -5,6 +5,12 @@ description: "Choose the right RustFS deployment path: local trial, single-node 
 
 RustFS is a distributed object storage system written in Rust and released under the Apache 2.0 license. It runs on Linux, Windows, macOS, FreeBSD, and containers, across x86, ARM, RISC-V, and other CPU architectures.
 
+:::warning[Development and debugging only]
+
+The Windows version of RustFS is intended for development and debugging only and is **not recommended for production deployments**. We recommend [Linux](/en/installation/linux) for production workloads.
+
+:::
+
 :::warning[Change the default credentials immediately]
 
 After installation, set unique values for `RUSTFS_ACCESS_KEY` and `RUSTFS_SECRET_KEY` before exposing RustFS to a network. Do not use the well-known `rustfsadmin` value for either credential.
