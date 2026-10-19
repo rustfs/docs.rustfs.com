@@ -1,9 +1,9 @@
 ---
 title: "Quick Start"
-description: "Install RustFS with the installation script, log in to the Console, and store your first object — in about ten minutes."
+description: "Install RustFS with the installation script, sign in to the Console, and store your first object."
 ---
 
-This guide takes you from an empty Linux server to a working RustFS instance: install, log in to the Console, create a bucket, and upload your first object. Production planning (multi-node layout, hardware sizing) is deliberately left for [the next step](#next-steps).
+This guide takes you from an empty Linux server to a working RustFS instance: install, sign in to the Console, create a bucket, and upload your first object. Production planning (multi-node layout, hardware sizing) is covered in [Next steps](#next-steps).
 
 **Prerequisites**
 
@@ -52,7 +52,7 @@ If `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` are not set, the server falls back 
 
 :::
 
-## 3. Log in to the Console
+## 3. Sign in to the Console
 
 Open `http://<server-ip>:9001` in your browser and sign in with the access key and secret key from step 2.
 

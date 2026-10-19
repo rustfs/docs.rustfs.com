@@ -69,7 +69,7 @@ All snippets below reuse this `s3` client.
 
 ## Basic operations
 
-### 4.1 Create a bucket
+### Create a bucket
 
 ```js
 import { CreateBucketCommand } from "@aws-sdk/client-s3";
@@ -84,7 +84,7 @@ Bucket created
 
 ---
 
-### 4.2 Upload an object
+### Upload an object
 
 ```js
 import { PutObjectCommand } from "@aws-sdk/client-s3";
@@ -109,7 +109,7 @@ File uploaded
 
 ---
 
-### 4.3 Download an object
+### Download an object
 
 ```js
 import { GetObjectCommand } from "@aws-sdk/client-s3";
@@ -137,7 +137,7 @@ File downloaded
 
 ---
 
-### 4.4 List objects
+### List objects
 
 ```js
 import { ListObjectsV2Command } from "@aws-sdk/client-s3";
@@ -152,7 +152,7 @@ hello.txt (12 bytes)
 
 ---
 
-### 4.5 Delete an object
+### Delete an object
 
 ```js
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
@@ -169,7 +169,7 @@ File deleted
 
 ## Advanced features
 
-### 5.1 Generate presigned URLs
+### Generate presigned URLs
 
 Presigned URLs let browser clients or third parties upload or download objects through temporary links.
 
@@ -209,7 +209,7 @@ console.log("Presigned PUT URL:", url);
 
 ---
 
-### 5.2 Multipart upload
+### Upload an object in parts
 
 ```js
 import {
@@ -280,8 +280,8 @@ Multipart upload completed
 | Problem | Cause | Solution |
 | --------------------------- | -------------------- | --------------------------------------- |
 | SignatureDoesNotMatch | Signature mismatch | SDK v3 signs with SigV4 by default; check credentials, region, and endpoint |
-| EndpointConnectionError | Endpoint address misconfigured or not started | Check if RustFS address is accessible |
-| NoSuchKey | File does not exist | Check if `Key` is spelled correctly |
+| EndpointConnectionError | Endpoint address misconfigured or not started | Check that the RustFS address is reachable |
+| NoSuchKey | Object does not exist | Check the object key |
 | InvalidAccessKeyId / Secret | Credentials misconfigured | Check `accessKeyId` / `secretAccessKey` configuration |
 | Upload failure (path issue) | Path-style not enabled | Set `forcePathStyle: true` |
 

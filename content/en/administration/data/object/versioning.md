@@ -16,7 +16,7 @@ When versioning is enabled:
 
 Suspending versioning stops normal creation of new version IDs but preserves existing versions and delete markers. Suspension is not the same as disabling or removing version history.
 
-## Configure in the Console
+## Configure on the Console
 
 ### Enable at bucket creation
 

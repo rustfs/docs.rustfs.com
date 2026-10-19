@@ -5,7 +5,7 @@ description: "Install a distributed RustFS cluster across multiple servers, each
 
 Multiple Node Multiple Disk (MNMD) mode is the production deployment for clusters that span multiple servers. A minimum of **4 servers** is required, each with at least 1 disk, to safely start a distributed object storage cluster.
 
-## Topology and Planning
+## Topology and planning
 
 In the following architecture, requests are distributed to the servers through load balancing. With the default 12 + 4 erasure coding layout, each object is split into 12 data shards and 4 parity shards stored on different disks across different servers:
 
@@ -43,8 +43,7 @@ Create DNS records so that each sequential hostname resolves to the correct node
 
 Add the following entries to `/etc/hosts` on every node:
 
-```bash title="/etc/hosts"
-vim /etc/hosts
+```text title="/etc/hosts"
 127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1 localhost localhost.localdomain localhost6 localhost6.localdomain6
 192.168.1.1 node1
@@ -53,11 +52,11 @@ vim /etc/hosts
 192.168.1.4 node4
 ```
 
-## Prerequisites and Service Setup
+## Prerequisites and service setup
 
 On **every node**, complete the [common prerequisites and service setup](./prerequisites-and-service.md) — operating system, firewall, time synchronization, disk formatting, service user, binary download, and systemd unit — then continue below. Remember that all nodes must use the same listening port and must have synchronized clocks.
 
-## Configure Environment Variables
+## Configure environment variables
 
 1. Create the same configuration file on every node. `RUSTFS_VOLUMES` uses brace expansion to enumerate all nodes and all disk mount points (this example: 4 nodes × 4 disks):
 
@@ -73,9 +72,9 @@ RUSTFS_OBS_LOGGER_LEVEL=error
 RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
 ```
 
-:::note
+:::note[Keep the cluster configuration identical]
 
-The access key, secret key, and `RUSTFS_VOLUMES` value must be identical on all nodes. The hostnames (`node1` – `node4`) must match the DNS or `/etc/hosts` configuration above.
+The access key, secret key, and `RUSTFS_VOLUMES` value must be identical on all nodes. The hostnames (`node1` through `node4`) must match the DNS or `/etc/hosts` configuration above.
 
 :::
 
@@ -112,11 +111,11 @@ netstat -ntpl
 tail -f /var/log/rustfs/rustfs*.log
 ```
 
-5. Access the console: enter any node's IP address (or the load balancer address) and the console port (default 9001) in a browser. You should see:
+5. Open the Console: in a browser, go to `http://<server-ip>:9001` (or the load balancer address). You should see:
 
 ![Console](./images/console.jpg)
 
-## Next Steps
+## Next steps
 
 - Put a load balancer in front of the cluster — see the [Nginx integration guide](/developer/integration/reverse-proxy/nginx).
 - Enable TLS for production traffic — see [TLS configuration](../../integration/tls-configured.md).

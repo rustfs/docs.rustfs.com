@@ -104,7 +104,7 @@ Do not suspend source-bucket versioning while replication is configured.
 
 ## Usage
 
-### Configure replication in the Console
+### Configure replication on the Console
 
 The RustFS Console combines remote-target registration and replication-rule configuration in one form.
 

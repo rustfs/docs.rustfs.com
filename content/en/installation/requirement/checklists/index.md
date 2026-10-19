@@ -1,6 +1,6 @@
 ---
-title: "Pre-Installation Checklists"
-description: "Pre-installation checklists."
+title: "Pre-installation checklists"
+description: "Review hardware, network, software, and security before a production RustFS installation."
 ---
 
 These checklists cover the necessary preparations for a production environment.

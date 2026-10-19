@@ -18,7 +18,7 @@ Before starting, verify that all nodes and disks are healthy, no decommission is
 
 ## Operation
 
-### Start rebalancing in the Console
+### Start rebalancing on the Console
 
 1. Sign in to the RustFS Console with an account that has rebalance administration permission.
 2. Open **Rebalance**.
@@ -61,7 +61,7 @@ rc admin rebalance stop rustfs
 
 ## Verification
 
-### Verify rebalancing in the Console
+### Verify rebalancing on the Console
 
 Wait until the Rebalance page reports `Completed`. Confirm that:
 

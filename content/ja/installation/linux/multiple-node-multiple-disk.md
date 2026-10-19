@@ -43,8 +43,7 @@ RustFS クラスターには、一貫した連番のホスト名（例: `node1` 
 
 すべてのノードの `/etc/hosts` に、次のエントリを追加します。
 
-```bash title="/etc/hosts"
-vim /etc/hosts
+```text title="/etc/hosts"
 127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1 localhost localhost.localdomain localhost6 localhost6.localdomain6
 192.168.1.1 node1

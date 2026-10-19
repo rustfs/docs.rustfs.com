@@ -3,7 +3,7 @@ title: "Python SDK Guide"
 description: "Use the official AWS SDK for Python (Boto3) with RustFS."
 ---
 
-## 1. Overview
+## Overview
 
 RustFS ships no first-party SDKs — it is S3-compatible, so you use the official AWS SDK for Python, [Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html), configured to point at your RustFS server.
 
@@ -17,7 +17,7 @@ This guide covers:
 
 ---
 
-## 2. Prerequisites
+## Prerequisites
 
 * Python 3.8 or later
 * A running RustFS instance (see the [Installation Guide](../../installation/index.md)) — the S3 API listens on port `9000`, the Console on port `9001`
@@ -29,7 +29,7 @@ If you did not set credentials at install time, the server defaults to `rustfsad
 
 :::
 
-### 2.1 Install Boto3
+### Install Boto3
 
 We recommend using a virtual environment:
 
@@ -43,7 +43,7 @@ pip install boto3
 
 ---
 
-## 3. Connecting to RustFS
+## Connect to RustFS
 
 The following is a complete, runnable script. Replace `localhost` with your server's IP address if RustFS runs on another machine, and fill in your own access keys:
 
@@ -85,9 +85,9 @@ python main.py
 
 ---
 
-## 4. Basic Operations
+## Basic operations
 
-### 4.1 Create Bucket
+### Create a bucket
 
 ```python
 bucket_name = 'my-bucket'
@@ -105,7 +105,7 @@ Bucket my-bucket created.
 
 ---
 
-### 4.2 Upload File
+### Upload an object
 
 ```python
 s3.upload_file('/path/to/hello.txt', bucket_name, 'hello.txt')
@@ -118,7 +118,7 @@ File uploaded.
 
 ---
 
-### 4.3 Download File
+### Download an object
 
 ```python
 s3.download_file(bucket_name, 'hello.txt', 'hello-downloaded.txt')
@@ -131,7 +131,7 @@ File downloaded.
 
 ---
 
-### 4.4 List Objects
+### List objects
 
 ```python
 response = s3.list_objects_v2(Bucket=bucket_name)
@@ -145,7 +145,7 @@ for obj in response.get('Contents', []):
 
 ---
 
-### 4.5 Delete Object and Bucket
+### Delete an object and a bucket
 
 ```python
 s3.delete_object(Bucket=bucket_name, Key='hello.txt')
@@ -162,17 +162,17 @@ Bucket deleted.
 
 ---
 
-## 5. Advanced Features
+## Advanced operations
 
-### 5.1 Generate Presigned URLs
+### Generate presigned URLs
 
-#### 5.1.1 Download Link (GET)
+#### Download (GET)
 
 ```python
 url = s3.generate_presigned_url(
     ClientMethod='get_object',
     Params={'Bucket': bucket_name, 'Key': 'hello.txt'},
-    ExpiresIn=600,  # 10 minutes validity
+    ExpiresIn=600,  # expires in 10 minutes
 )
 
 print('Presigned GET URL:', url)
@@ -182,7 +182,7 @@ print('Presigned GET URL:', url)
 Presigned GET URL: http://localhost:9000/my-bucket/hello.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&...
 ```
 
-#### 5.1.2 Upload Link (PUT)
+#### Upload (PUT)
 
 ```python
 url = s3.generate_presigned_url(
@@ -202,7 +202,7 @@ curl -X PUT --upload-file /path/to/hello.txt "http://localhost:9000/my-bucket/up
 
 ---
 
-### 5.2 Multipart Upload
+### Upload an object in parts
 
 Use multipart upload for files larger than 10 MB when you need control over each part.
 
@@ -260,7 +260,7 @@ Multipart upload complete.
 
 ---
 
-## 6. Troubleshooting
+## Troubleshooting
 
 | Issue | Cause | Solution |
 | ------------------------- | ----------------- | -------------------------------------------------------------- |
@@ -271,7 +271,7 @@ Multipart upload complete.
 
 ---
 
-## 7. Appendix: Quick Upload/Download Script Template
+## Upload and download helpers
 
 ```python
 def upload_file(local_path, bucket, object_key):

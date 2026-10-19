@@ -1,11 +1,11 @@
 ---
 title: "Troubleshooting"
-description: "Diagnose and resolve RustFS issues."
+description: "Recover a failed node or drive, and follow data healing after the replacement is online."
 ---
 
 This section covers:
 
-- [Node Failures](./node.md)
-- [Drive Failures](./driver.md)
-- [Node Healing](../operations/high-availability/node-healing.md)
+- [Node failures](./node.md)
+- [Drive failures](./driver.md)
+- [Node healing](../operations/high-availability/node-healing.md)
 

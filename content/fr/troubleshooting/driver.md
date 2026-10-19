@@ -12,8 +12,7 @@ RustFS utilise le codage d’effacement pour que les données restent lisibles e
 Avant de remplacer le disque dur physique, démontez le disque défaillant au niveau du système d’exploitation afin d’éviter des erreurs d’E/S dans le système de fichiers ou dans RustFS pendant le remplacement.
 
 ```bash
-# Assume the failed disk is /dev/sdb
-umount /dev/sdb
+sudo umount /data/rustfs0
 ```
 
 :::note[Remarques]
@@ -22,7 +21,7 @@ umount /dev/sdb
 * Si l’erreur « device is busy » apparaît, arrêtez d’abord le service RustFS :
 
 ```bash
-systemctl stop rustfs
+sudo systemctl stop rustfs
 ```
 
 :::
@@ -34,8 +33,7 @@ systemctl stop rustfs
 Après avoir physiquement remplacé le disque défaillant, vous devez partitionner et formater le nouveau disque, puis lui appliquer la même étiquette que le disque d’origine.
 
 ```bash
-# Format as XFS and apply the same label as the original disk (RustFS requires XFS, like the other disks in the deployment)
-mkfs.xfs -L DISK1 /dev/sdb
+sudo mkfs.xfs -f -i size=512 -n ftype=1 -L RUSTFS0 /dev/sdb
 ```
 
 :::note[Exigences]
@@ -52,12 +50,8 @@ mkfs.xfs -L DISK1 /dev/sdb
 
 Vérifiez que les étiquettes ou les UUID des entrées de `/etc/fstab` pointent vers le nouveau disque. Le point de montage doit rester identique à celui indiqué dans `RUSTFS_VOLUMES` (dans `/etc/default/rustfs`), afin que le disque réparé rejoigne le cluster au même chemin.
 
-```bash
-# View current fstab
-cat /etc/fstab
-
-# Example fstab entry (no modification needed if labels are the same)
-LABEL=DISK1 /data/rustfs0 xfs defaults,noatime 0 2
+```ini title="/etc/fstab"
+UUID=<filesystem-uuid> /data/rustfs0 xfs defaults,noatime,nodiratime 0 0
 ```
 
 :::tip[Conseils]
@@ -65,14 +59,14 @@ LABEL=DISK1 /data/rustfs0 xfs defaults,noatime 0 2
 * Si vous utilisez un UUID :
 
 ```bash
-blkid /dev/sdb
-# Get the new partition's UUID, then replace the corresponding field in fstab
+sudo blkid -s UUID -o value /dev/sdb
 ```
 
 * Après avoir modifié `/etc/fstab`, validez la syntaxe :
 
 ```bash
-mount -a # If no errors, configuration is correct
+sudo mount -a
+findmnt /data/rustfs0
 ```
 
 :::
@@ -84,14 +78,13 @@ mount -a # If no errors, configuration is correct
 Exécutez les commandes suivantes pour monter tous les systèmes de fichiers configurés et démarrer RustFS :
 
 ```bash
-mount -a
-systemctl start rustfs
+sudo systemctl start rustfs
 ```
 
 Vérifiez que tous les systèmes de fichiers attendus sont montés :
 
 ```bash
-df -h | grep /data/rustfs
+df -hT /data/rustfs0
 ```
 
 :::note[Échecs de montage]
@@ -107,10 +100,7 @@ Si un montage échoue, vérifiez que les étiquettes ou les UUID de `/etc/fstab`
 Dès que RustFS détecte un disque fraîchement formaté sur un point de montage connu, son scanner en arrière-plan y répare automatiquement les données manquantes. Aucune commande manuelle n’est requise. Confirmez que la récupération a commencé et suivez sa progression dans les journaux du service :
 
 ```bash
-# For systemd-managed installations
 journalctl -u rustfs -f
-
-# Or view the log files under the directory set by RUSTFS_OBS_LOG_DIRECTORY
 tail -f /var/log/rustfs/rustfs.log
 ```
 

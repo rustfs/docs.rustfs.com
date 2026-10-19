@@ -5,7 +5,7 @@ description: "Use the official AWS SDK for Java v2 with RustFS."
 
 RustFS ships no first-party Java SDK — it is S3-compatible, so you use the official AWS SDK for Java v2 configured to point at your RustFS server.
 
-## 1. Prerequisites
+## Prerequisites
 
 * Java 8 or later and Maven (or Gradle)
 * A running RustFS instance (see the [Installation Guide](../../installation/index.md)) — the S3 API listens on port `9000`, the Console on port `9001`
@@ -17,7 +17,7 @@ If you did not set credentials at install time, the server defaults to `rustfsad
 
 :::
 
-### 1.1 Maven Project Setup
+### Set up the Maven project
 
 Create a new Maven project:
 
@@ -32,7 +32,7 @@ rustfs-java-s3-demo/
                     └── RustfsS3Example.java
 ```
 
-### 1.2 Add Dependencies
+### Add dependencies
 
 Add AWS SDK dependencies in `pom.xml`:
 
@@ -50,9 +50,9 @@ We recommend AWS SDK for Java v2, which is more complete and supports asynchrono
 
 ---
 
-## 2. Connecting to RustFS
+## Connect to RustFS
 
-### 2.1 Complete Example
+### Complete example
 
 The following class compiles and runs as-is. Replace `localhost` with your server's IP address if RustFS runs on another machine, and fill in your own access keys:
 
@@ -133,20 +133,18 @@ Deleted hello.txt
 
 ---
 
-## 3. Troubleshooting
+## Troubleshoot common errors
 
 | Issue | Cause | Solution |
 | -------------------------------------- | ------------------------------------ | ----------------------------------------- |
 | `S3Exception: 301 Moved Permanently` | Path-style not enabled or region error | Set `.forcePathStyle(true)` and use region `us-east-1` |
 | `ConnectException: Connection refused` | RustFS not started or incorrect port | Check RustFS status and port |
 | `403 Forbidden` | Incorrect access key or secret key | Check your credentials |
-| Upload fails with no response | The SDK defaults to HTTPS, and RustFS only supports HTTP (or needs certificates) | Use an `http://` address and set `endpointOverride` |
+| Upload hangs with no response | The SDK uses HTTPS by default, but RustFS is serving HTTP (or TLS is not configured) | Set `endpointOverride` to an `http://` URL |
 
 ---
 
-## 4. Appendix
-
-### 4.1 Maven Package and Run
+## Package and run
 
 Package the project:
 
@@ -160,28 +158,18 @@ Run it:
 java -cp target/rustfs-java-s3-demo-1.0-SNAPSHOT.jar com.example.RustfsS3Example
 ```
 
-### 4.2 Recommended RustFS settings
+### Recommended settings
 
-* If RustFS is serving plain HTTP, disable TLS certificate validation in the SDK.
-* Enable CORS support (if used for web frontend).
-* We recommend setting limits such as `max_object_size` and `max_part_size` to prevent large-file transfer failures.
+* If RustFS serves plain HTTP, you do not need TLS certificate validation. Point the client at an `http://` endpoint.
+* Enable CORS when a browser calls RustFS directly. See [CORS](/administration/cors).
 
----
+## Advanced examples
 
-The following advanced examples cover:
-
-* Presigned URL generation and usage
-* The complete multipart upload workflow
-
----
-
-## 5. Advanced examples
-
-### 5.1 Generate and Use Presigned URLs
+### Generate presigned URLs
 
 Presigned URLs give clients temporary access to private objects without exposing credentials. They are commonly used for direct uploads and downloads from a browser.
 
-#### 5.1.1 Generate Download Link (GET)
+#### Download (GET)
 
 ```java
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -217,7 +205,7 @@ GetObjectRequest getObjectRequest = GetObjectRequest.builder()
 
 GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
     .getObjectRequest(getObjectRequest)
-    .signatureDuration(Duration.ofMinutes(15)) // 15 minutes validity
+    .signatureDuration(Duration.ofMinutes(15)) // expires in 15 minutes
     .build();
 
 PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
@@ -231,7 +219,7 @@ Presigned URL: http://localhost:9000/my-bucket/hello.txt?X-Amz-Algorithm=AWS4-HM
 
 Open the URL in a browser to access the object.
 
-#### 5.1.2 Upload Presigned URL (PUT)
+#### Upload (PUT)
 
 You can also generate upload URLs:
 
@@ -257,7 +245,7 @@ System.out.println("Upload URL: " + presignedPut.url());
 
 ---
 
-### 5.2 Implement Multipart Upload
+### Upload an object in parts
 
 Multipart upload is the recommended way to upload large files. If the network is interrupted, you can retry failed parts instead of restarting the whole upload.
 
@@ -271,7 +259,7 @@ import java.util.ArrayList;
 import java.util.List;
 ```
 
-#### 5.2.1 Start Multipart Upload
+#### Start the multipart upload
 
 ```java
 CreateMultipartUploadRequest createRequest = CreateMultipartUploadRequest.builder()
@@ -283,7 +271,7 @@ CreateMultipartUploadResponse createResponse = s3.createMultipartUpload(createRe
 String uploadId = createResponse.uploadId();
 ```
 
-#### 5.2.2 Upload Each Part
+#### Upload each part
 
 ```java
 List<CompletedPart> completedParts = new ArrayList<>();
@@ -306,7 +294,7 @@ for (int i = 1; i <= 3; i++) {
 }
 ```
 
-#### 5.2.3 Complete Multipart Upload
+#### Complete the multipart upload
 
 ```java
 CompletedMultipartUpload completedUpload = CompletedMultipartUpload.builder()
@@ -328,7 +316,7 @@ System.out.println("Multipart upload completed.");
 Multipart upload completed.
 ```
 
-#### 5.2.4 Abort Upload on Exception (Optional)
+#### Abort the upload on failure
 
 ```java
 AbortMultipartUploadRequest abortRequest = AbortMultipartUploadRequest.builder()

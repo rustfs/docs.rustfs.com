@@ -122,11 +122,7 @@ def calc_memory(data_tb, access_pattern):
 ### Configuration du système de fichiers
 
 ```bash
-# XFS formatting example
-mkfs.xfs -f -L rustfs_disk1 -d su=256k,sw=10 /dev/sdb
-
-# Recommended mount parameters
-UUID=xxxx /mnt/disk1 xfs defaults,noatime,nodiratime,logbsize=256k 0 0
+sudo mkfs.xfs -f -i size=512 -n ftype=1 -L RUSTFS0 /dev/sdb
 ```
 
 ## Haute disponibilité

@@ -34,11 +34,11 @@ firewall-cmd --reload
 
 All RustFS servers in a deployment **must** use the same listening port. If you use port 9000, every other server must also use port 9000.
 
-## Memory Requirements
+## Memory requirements
 
 RustFS requires at least 2 GB of memory for a test environment; production environments require a minimum of 128 GB of memory.
 
-## Time Synchronization
+## Time synchronization
 
 All nodes in a RustFS distributed deployment **must** maintain synchronized clocks. RustFS relies on timestamps for request signing, object versioning, distributed locking, and replication. Significant clock drift between nodes can cause:
 
@@ -53,7 +53,7 @@ Clock drift between any two nodes should not exceed **15 minutes**. For producti
 
 :::
 
-### Recommended NTP Tools
+### Recommended NTP tools
 
 Use any of the following time synchronization services on **every** node. Choose one and configure it consistently across the deployment.
 
@@ -128,7 +128,7 @@ sudo systemctl enable ntpd
 sudo systemctl start ntpd
 ```
 
-### Verifying Time Synchronization
+### Verify time synchronization
 
 After configuring your NTP service, verify synchronization on each node.
 
@@ -171,7 +171,7 @@ For `ntpd`, use:
 ntpq -p
 ```
 
-### Verifying Cross-Node Clock Consistency
+### Verify clocks across nodes
 
 After all nodes are synchronized, verify that clocks are consistent across the cluster. On each node, compare timestamps:
 
@@ -191,7 +191,7 @@ done
 
 The difference between any two nodes should be negligible (under 1 millisecond in a well-configured environment).
 
-## Capacity Planning
+## Capacity planning
 
 When planning object storage capacity, we recommend considering:
 
@@ -202,26 +202,25 @@ When planning object storage capacity, we recommend considering:
 
 Review [EC Configuration](../requirement/ec-configuration.md) to calculate usable capacity, understand the automatic parity defaults, and validate any explicit parity or erasure-set width before deployment.
 
-## Disk Planning
+## Drive planning
 
 **Do not use NFS** as the underlying storage for RustFS: under heavy I/O, NFS can cause phantom writes and locking problems. We strongly recommend **JBOD (Just a Bunch of Disks)** mode: expose physical disks directly and independently to the operating system, and let the RustFS software layer handle data redundancy and protection.
 
 This approach has several advantages:
 
-- **Better Performance:** The RustFS erasure coding engine is highly optimized and reads/writes multiple disks concurrently, achieving higher throughput than hardware RAID controllers. Hardware RAID becomes a performance bottleneck.
-- **Lower Cost:** No expensive RAID cards needed, reducing hardware procurement costs.
-- **Simpler Management:** RustFS manages disks uniformly, simplifying storage operations.
-- **Faster Fault Recovery:** The RustFS healing process is faster than a traditional RAID rebuild and has less impact on cluster performance.
+- **Per-drive access:** RustFS reads and writes multiple drives in an erasure set. A hardware RAID volume hides those drives, so RustFS cannot heal a single failed drive.
+- **Healing:** RustFS reconstructs missing shards onto a replacement drive. A hardware RAID rebuild is a different operation and is not required.
+- **Operations:** RustFS manages the drives directly, using the mount paths in `RUSTFS_VOLUMES`.
 
-We recommend NVMe SSDs as the storage medium for higher performance and throughput.
+We recommend NVMe SSDs when the workload needs lower latency than hard drives provide.
 
-## File System Selection
+## File system selection
 
 We strongly recommend formatting all data disks with XFS. RustFS is developed and tested on XFS. Avoid other file systems such as ext4, Btrfs, or ZFS, as they may cause performance degradation or unpredictable issues.
 
 XFS suits RustFS's workload for three reasons:
 
-- **High-concurrency I/O:** XFS was designed for high performance and scalability. Its internal journaling and data structures (such as B+ trees) efficiently handle large numbers of parallel read/write requests, matching how RustFS shards large objects and reads/writes multiple disks in an erasure set in parallel.
+- **Concurrent I/O:** XFS journaling and its B+ tree indexes handle large numbers of parallel reads and writes. That matches how RustFS shards a large object and reads or writes several drives in an erasure set at once.
 - **Many files and very large files:** XFS is a 64-bit file system supporting extremely large files (up to 8 EB). Its metadata management stays efficient even with millions of files in a single directory — important because RustFS stores each object (or object version) as an independent file.
 - **Space reservation:** XFS provides an efficient `fallocate` API. RustFS uses it to reserve contiguous disk space before writing objects, avoiding the overhead of dynamic expansion and metadata updates during writes and minimizing file fragmentation.
 
@@ -288,7 +287,7 @@ chown rustfs-user:rustfs-user  /data/rustfs*
 
 :::
 
-## Download the Installation Package
+## Download the installation package
 
 Install wget or curl first, then download and install the RustFS binary:
 
@@ -300,7 +299,7 @@ chmod +x rustfs
 mv rustfs /usr/local/bin/
 ```
 
-## Configure the systemd Service
+## Configure the systemd service
 
 1. Create the systemd service file
 
@@ -363,7 +362,7 @@ The service reads `RUSTFS_VOLUMES` and the other settings from `/etc/default/rus
 sudo systemctl daemon-reload
 ```
 
-## Next Steps
+## Next steps
 
 Return to your deployment mode page to configure the environment file and start the service:
 

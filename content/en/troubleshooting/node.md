@@ -1,5 +1,5 @@
 ---
-title: "Node Failures"
+title: "Node failures"
 description: "Prepare a replacement node, update its configuration, restore cluster membership, and verify data healing."
 ---
 
@@ -13,16 +13,16 @@ A distributed RustFS cluster uses erasure coding to stay readable and writable w
 
 ## 1. Prepare the replacement node
 
-* **Hardware and System Preparation**
-  Make sure that the replacement node's hardware (CPU, memory, network, and disk type) roughly matches the failed node. Using higher-spec hardware does not affect cluster performance.
-  Use software versions that match the other nodes, including the operating system, kernel, and dependencies, to avoid problems caused by inconsistent environments.
+* **Hardware**
+  Make sure that the replacement node's hardware (CPU, memory, network, and drive type) roughly matches the failed node. Higher-spec hardware does not hurt cluster performance.
+  Run the same operating system, kernel, and library versions as the other nodes so the replacement does not behave differently from the rest of the cluster.
 
-* **Exclusive access to drives**
+* **Exclusive drive access**
   As with physical drive operations, RustFS requires exclusive access to its storage volumes. Do not let other processes or scripts modify data on these volumes directly, as this can corrupt data or reduce redundancy.
 
 ## 2. Update hostname and network resolution
 
-* **DNS/Hosts Configuration**
+* **DNS or `/etc/hosts`**
   If the replacement node's IP address differs from the failed node, point the old node's hostname (for example, `rustfs-node-2.example.net`) to the new node's IP address so that cluster nodes can still reach each other by the same name.
 
  ```bash
@@ -34,17 +34,17 @@ A distributed RustFS cluster uses erasure coding to stay readable and writable w
 
 ## 3. Deploy and configure RustFS services
 
-* **Download and Installation**
+* **Install the same version**
   Install the same RustFS version as the existing nodes, using the same installation method and directory. Make sure that startup scripts, environment variables, and configuration files (such as `/etc/default/rustfs`) are identical to those on the other nodes.
 
-* **Configuration Verification**
+* **Check the configuration**
 
  * Check that `RUSTFS_VOLUMES` in `/etc/default/rustfs` is byte-for-byte identical to the other nodes, and that it covers the replacement node's hostname and port.
  * Make sure that all nodes use the same access keys and permission settings; otherwise, the new node fails to authenticate and cannot join the cluster.
 
 ## 4. Rejoin the cluster and trigger data healing
 
-* **Start Service**
+* **Start the service**
 
  ```bash
  systemctl start rustfs
@@ -52,7 +52,7 @@ A distributed RustFS cluster uses erasure coding to stay readable and writable w
 
   Alternatively, start RustFS with your own startup script. Then run `journalctl -u rustfs -f` to confirm that the new node has detected the other nodes and started healing.
 
-* **Monitor Healing Status**
+* **Watch healing**
   Healing runs in the background once the node rejoins; no manual command is required. Watch its progress through the service logs on the replacement node, and check node and disk status in the RustFS Console:
 
  ```bash
@@ -72,11 +72,11 @@ A distributed RustFS cluster uses erasure coding to stay readable and writable w
 * **Regular failure testing**
   Run regular node failure drills and practice the full recovery procedure so your team is familiar with the commands and incident response process.
 
-* **Root Cause Analysis**
-  Run detailed hardware diagnostics (for example, SMART data and BIOS logs) on nodes or disks that fail repeatedly, and put a preventive maintenance plan in place.
+* **Find the cause**
+  Run detailed hardware diagnostics (for example, SMART data and BIOS logs) on nodes or drives that fail repeatedly, and put a preventive maintenance plan in place.
 
-* **Professional Support**
-  For help diagnosing the cause of a failure or recovering the cluster, contact the RustFS development team or community.
+* **Ask for help**
+  For in-depth troubleshooting and recovery help, contact the RustFS team or the community.
 
 ---
 

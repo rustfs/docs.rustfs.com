@@ -35,7 +35,7 @@ For a local deployment, including the Windows and macOS desktop launchers, open 
 
 If the login page cannot reach the target RustFS service, select **Server Configuration** or open `/config`. Enter the externally reachable RustFS service address and save it after the health check succeeds. **Reset** clears the saved address; **Skip** returns to login without changing it.
 
-## Log in
+## Sign in
 
 The login methods shown depend on the deployment configuration:
 

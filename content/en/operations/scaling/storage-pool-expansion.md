@@ -41,7 +41,7 @@ The Console displays storage pools but does not add a pool to the server startup
 2. Install the same RustFS version and service configuration on the new pool node or nodes.
 3. Append the new pool expression to `RUSTFS_VOLUMES` on every existing and new node. Keep the existing expressions unchanged and in the same order.
 4. Restart RustFS across all nodes so every process starts with the same expanded topology.
-5. Wait for all nodes to become ready, then refresh the pool list in the Console.
+5. Wait for all nodes to become ready, then refresh the pool list on the Console.
 
 ![RustFS Console showing the original and newly added storage pools](./images/pool-expansion-console.png)
 
@@ -83,7 +83,7 @@ rc admin pool status rustfs 1 --by-id
 
 ## Verification
 
-### Verify the expansion in the Console
+### Verify the expansion on the Console
 
 Confirm that:
 

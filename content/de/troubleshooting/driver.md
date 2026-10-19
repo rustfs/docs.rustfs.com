@@ -12,8 +12,7 @@ RustFS verwendet Erasure Coding, damit Daten lesbar und schreibbar bleiben, wenn
 Hängen Sie das ausgefallene Laufwerk auf Betriebssystemebene aus, bevor Sie die physische Festplatte ersetzen. So vermeiden Sie I/O-Fehler im Dateisystem oder in RustFS während des Austauschs.
 
 ```bash
-# Assume the failed disk is /dev/sdb
-umount /dev/sdb
+sudo umount /data/rustfs0
 ```
 
 :::note[Hinweise]
@@ -22,7 +21,7 @@ umount /dev/sdb
 * Wenn Sie den Fehler „device is busy“ sehen, stoppen Sie zuerst den RustFS-Dienst:
 
 ```bash
-systemctl stop rustfs
+sudo systemctl stop rustfs
 ```
 
 :::
@@ -34,8 +33,7 @@ systemctl stop rustfs
 Nachdem Sie das ausgefallene Laufwerk physisch ersetzt haben, partitionieren und formatieren Sie das neue Laufwerk und vergeben Sie dieselbe Bezeichnung wie beim ursprünglichen Laufwerk.
 
 ```bash
-# Format as XFS and apply the same label as the original disk (RustFS requires XFS, like the other disks in the deployment)
-mkfs.xfs -L DISK1 /dev/sdb
+sudo mkfs.xfs -f -i size=512 -n ftype=1 -L RUSTFS0 /dev/sdb
 ```
 
 :::note[Anforderungen]
@@ -52,12 +50,8 @@ mkfs.xfs -L DISK1 /dev/sdb
 
 Prüfen Sie, dass Bezeichnungen oder UUIDs in den Einträgen von `/etc/fstab` auf das neue Laufwerk zeigen. Der Einhängepunkt muss mit dem in `RUSTFS_VOLUMES` (in `/etc/default/rustfs`) genannten identisch bleiben, damit das wiederhergestellte Laufwerk dem Cluster unter demselben Pfad beitritt.
 
-```bash
-# View current fstab
-cat /etc/fstab
-
-# Example fstab entry (no modification needed if labels are the same)
-LABEL=DISK1 /data/rustfs0 xfs defaults,noatime 0 2
+```ini title="/etc/fstab"
+UUID=<filesystem-uuid> /data/rustfs0 xfs defaults,noatime,nodiratime 0 0
 ```
 
 :::tip[Tipps]
@@ -65,14 +59,14 @@ LABEL=DISK1 /data/rustfs0 xfs defaults,noatime 0 2
 * Bei Verwendung einer UUID:
 
 ```bash
-blkid /dev/sdb
-# Get the new partition's UUID, then replace the corresponding field in fstab
+sudo blkid -s UUID -o value /dev/sdb
 ```
 
 * Nachdem Sie `/etc/fstab` bearbeitet haben, prüfen Sie die Syntax:
 
 ```bash
-mount -a # If no errors, configuration is correct
+sudo mount -a
+findmnt /data/rustfs0
 ```
 
 :::
@@ -84,14 +78,13 @@ mount -a # If no errors, configuration is correct
 Führen Sie die folgenden Befehle aus, um alle konfigurierten Dateisysteme einzuhängen und RustFS zu starten:
 
 ```bash
-mount -a
-systemctl start rustfs
+sudo systemctl start rustfs
 ```
 
 Prüfen Sie, dass alle erwarteten Dateisysteme eingehängt sind:
 
 ```bash
-df -h | grep /data/rustfs
+df -hT /data/rustfs0
 ```
 
 :::note[Fehler beim Einhängen]
@@ -107,10 +100,7 @@ Wenn ein Einhängen fehlschlägt, prüfen Sie, dass Bezeichnungen oder UUIDs in 
 Sobald RustFS an einem bekannten Einhängepunkt ein frisch formatiertes Laufwerk erkennt, stellt der Hintergrund-Scanner die fehlenden Daten automatisch darauf wieder her. Ein manueller Befehl ist nicht erforderlich. Bestätigen Sie, dass die Wiederherstellung begonnen hat, und verfolgen Sie den Fortschritt in den Dienstprotokollen:
 
 ```bash
-# For systemd-managed installations
 journalctl -u rustfs -f
-
-# Or view the log files under the directory set by RUSTFS_OBS_LOG_DIRECTORY
 tail -f /var/log/rustfs/rustfs.log
 ```
 

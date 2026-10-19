@@ -21,8 +21,7 @@ RustFS 通过类似纠删码的机制，在部分磁盘故障时仍可提供读�
 更换物理硬盘前，需要在操作系统层面安全卸载故障磁盘，避免更换过程中在文件系统或 RustFS 中产生 I/O 错误。
 
 ```bash
-# Assume the failed disk is /dev/sdb
-umount /dev/sdb
+sudo umount /data/rustfs0
 ```
 
 :::note[注意事项]
@@ -31,7 +30,7 @@ umount /dev/sdb
 * 如果遇到“device is busy”，可以先停止 RustFS 服务：
 
 ```bash
-systemctl stop rustfs
+sudo systemctl stop rustfs
 ```
 
 :::
@@ -43,8 +42,7 @@ systemctl stop rustfs
 更换物理磁盘后，需要对新磁盘进行分区和格式化，并应用与原磁盘相同的标签。
 
 ```bash
-# Format as XFS and apply the same label as the original disk (RustFS requires XFS, like the other disks in the deployment)
-mkfs.xfs -L DISK1 /dev/sdb
+sudo mkfs.xfs -f -i size=512 -n ftype=1 -L RUSTFS0 /dev/sdb
 ```
 
 > **要求**
@@ -59,12 +57,8 @@ mkfs.xfs -L DISK1 /dev/sdb
 
 确认 `/etc/fstab` 中挂载项的标签或 UUID 指向新磁盘。挂载点必须与 `RUSTFS_VOLUMES`（位于 `/etc/default/rustfs`）中列出的路径保持一致，使修复后的磁盘以相同路径重新加入集群。
 
-```bash
-# View current fstab
-cat /etc/fstab
-
-# Example fstab entry (no modification needed if labels are the same)
-LABEL=DISK1 /data/rustfs0 xfs defaults,noatime 0 2
+```ini title="/etc/fstab"
+UUID=<filesystem-uuid> /data/rustfs0 xfs defaults,noatime,nodiratime 0 0
 ```
 
 :::tip[提示]
@@ -72,14 +66,14 @@ LABEL=DISK1 /data/rustfs0 xfs defaults,noatime 0 2
 * 如果使用 UUID：
 
 ```bash
-blkid /dev/sdb
-# Get the new partition's UUID, then replace the corresponding field in fstab
+sudo blkid -s UUID -o value /dev/sdb
 ```
 
 * 修改 fstab 后，务必验证语法：
 
 ```bash
-mount -a # If no errors, configuration is correct
+sudo mount -a
+findmnt /data/rustfs0
 ```
 
 :::
@@ -91,14 +85,13 @@ mount -a # If no errors, configuration is correct
 执行以下命令批量挂载所有磁盘并启动 RustFS 服务：
 
 ```bash
-mount -a
-systemctl start rustfs
+sudo systemctl start rustfs
 ```
 
 确认所有磁盘均已正常挂载：
 
 ```bash
-df -h | grep /data/rustfs
+df -hT /data/rustfs0
 ```
 
 :::note
@@ -114,10 +107,7 @@ df -h | grep /data/rustfs
 RustFS 在已知挂载点检测到新格式化的磁盘后，后台扫描器会自动将缺失数据修复到该磁盘，无需手动命令。通过服务日志确认恢复已开始并跟踪进度：
 
 ```bash
-# For systemd-managed installations
 journalctl -u rustfs -f
-
-# Or view the log files under the directory set by RUSTFS_OBS_LOG_DIRECTORY
 tail -f /var/log/rustfs/rustfs.log
 ```
 

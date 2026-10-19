@@ -17,7 +17,7 @@ L’adressage de type chemin est le mode par défaut. Dans une URL de ce type, l
 Exemple (compartiment : `test`, hôte : `rustfs.yourdomain.com`) :
 
 ```text
-http://rustfs.yourdomain.com/test
+http://rustfs.example.com/my-bucket
 ```
 
 **Remarque** : aucune configuration n’est requise pour l’adressage de type chemin.
@@ -29,7 +29,7 @@ En adressage de type hôte virtuel, le nom du compartiment fait partie du domain
 Exemple (compartiment : `test`, hôte : `rustfs.yourdomain.com`) :
 
 ```text
-http://test.rustfs.yourdomain.com/
+http://my-bucket.rustfs.example.com/
 ```
 
 ### Configuration
@@ -45,14 +45,14 @@ Le routage en adressage de type hôte virtuel s’applique à l’écouteur de l
 
 Exemple (`rustfs.yourdomain.com:8000`) :
 
-```ini
-RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com:8000"
+```ini title="/etc/default/rustfs"
+RUSTFS_SERVER_DOMAINS=rustfs.example.com:8000
 ```
 
 Cela garantit que des requêtes comme :
 
 ```text
-http://my-bucket.rustfs.yourdomain.com:8000/
+http://my-bucket.rustfs.example.com:8000/
 ```
 
 sont acheminées correctement en adressage de type hôte virtuel.

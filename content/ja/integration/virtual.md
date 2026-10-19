@@ -17,7 +17,7 @@ RustFS は、次の 2 つの S3 URL 形式に対応しています。
 例（バケット: `test`、ホスト: `rustfs.yourdomain.com`）:
 
 ```text
-http://rustfs.yourdomain.com/test
+http://rustfs.example.com/my-bucket
 ```
 
 **注意**: パススタイルアクセスに設定は不要です。
@@ -29,7 +29,7 @@ http://rustfs.yourdomain.com/test
 例（バケット: `test`、ホスト: `rustfs.yourdomain.com`）:
 
 ```text
-http://test.rustfs.yourdomain.com/
+http://my-bucket.rustfs.example.com/
 ```
 
 ### 設定
@@ -45,14 +45,14 @@ http://test.rustfs.yourdomain.com/
 
 例（`rustfs.yourdomain.com:8000`）:
 
-```ini
-RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com:8000"
+```ini title="/etc/default/rustfs"
+RUSTFS_SERVER_DOMAINS=rustfs.example.com:8000
 ```
 
 これにより、次のようなリクエストが、
 
 ```text
-http://my-bucket.rustfs.yourdomain.com:8000/
+http://my-bucket.rustfs.example.com:8000/
 ```
 
 仮想ホスト形式で正しくルーティングされます。

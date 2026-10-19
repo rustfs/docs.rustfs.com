@@ -30,7 +30,7 @@ Si vous ne souhaitez pas implémenter les signatures vous-même, vous pouvez :
 Par exemple, exécutez la commande suivante depuis votre application, à l’aide d’un shell :
 
 ```bash
-aws s3 cp local.txt s3://mybucket/myfile.txt --endpoint-url http://rustfs.local:9000
+aws s3 cp /path/to/hello.txt s3://my-bucket/hello.txt --endpoint-url http://localhost:9000
 ```
 
 Vous pouvez aussi construire un petit service relais avec un SDK Node.js ou Python, puis l’appeler depuis votre application pour charger (upload) ou télécharger des objets.
