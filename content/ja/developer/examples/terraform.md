@@ -1,13 +1,13 @@
 ---
 title: "Terraform"
-description: "Manage RustFS buckets and objects with Terraform using the AWS provider pointed at a custom endpoint."
+description: "カスタムエンドポイントを指定した AWS プロバイダーを使い、Terraform で RustFS のバケットとオブジェクトを管理します。"
 ---
 
-The [Terraform AWS provider](https://registry.terraform.io/providers/hashicorp/aws/latest) works against RustFS when you point its S3 endpoint at your server and enable path-style addressing.
+[Terraform の AWS プロバイダー](https://registry.terraform.io/providers/hashicorp/aws/latest)は、S3 エンドポイントをサーバーに向け、パススタイルアクセスを有効にすると、RustFS に対して動作します。
 
-## Configure
+## 設定
 
-Replace `http://localhost:9000` with your server address and use your own [access keys](../../security-compliance/iam/access-token.md). The skip flags stop the provider from calling AWS-only metadata and STS endpoints:
+`http://localhost:9000` を実際のサーバーアドレスに置き換え、独自の[アクセスキー](../../security-compliance/iam/access-token.md)を使います。skip フラグにより、プロバイダーは AWS 専用のメタデータエンドポイントと STS エンドポイントを呼び出しません。
 
 ```hcl title="main.tf"
 provider "aws" {
@@ -35,7 +35,7 @@ resource "aws_s3_object" "hello" {
 }
 ```
 
-## Apply
+## 適用
 
 ```bash
 terraform init
@@ -51,6 +51,6 @@ aws_s3_object.hello: Creation complete after 0s [id=hello.txt]
 Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
 ```
 
-## Next steps
+## 次のステップ
 
-See the [SDK overview](../sdk/index.md) to connect an application, or the [AWS CLI example](aws-cli.md) for ad-hoc commands.
+アプリケーションを接続するには [SDK の概要](../sdk/index.md)を参照するか、都度実行するコマンドについては [AWS CLI の例](aws-cli.md)を参照します。

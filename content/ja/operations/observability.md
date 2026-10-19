@@ -1,11 +1,11 @@
 ---
-title: "Observability"
-description: "This article explains RustFS telemetry exports, monitoring integrations, metric names and labels, recommended alerts, and log collection."
+title: "オブザーバビリティ"
+description: "OTLP で RustFS のメトリクス、トレース、ログをエクスポートし、監視ツールと連携して、推奨アラートを設定する方法を説明します。"
 ---
 
-## How RustFS Exposes Telemetry
+## テレメトリの公開方法
 
-RustFS **pushes** metrics, traces, and logs over OTLP (OpenTelemetry Protocol). It does **not** expose a native Prometheus `/metrics` scrape endpoint — there is no HTTP route on port 9000 or 9001 that serves Prometheus text format. To get RustFS metrics into Prometheus you must run an OpenTelemetry Collector that receives OTLP from RustFS and re-exposes the data in Prometheus format:
+RustFS は、メトリクス、トレース、ログを OTLP（OpenTelemetry Protocol）で**プッシュします**。ネイティブの Prometheus `/metrics` スクレイプエンドポイントは**公開しません**。ポート 9000 と 9001 のどちらにも、Prometheus のテキスト形式を返す HTTP ルートはありません。RustFS のメトリクスを Prometheus へ取り込むには、RustFS から OTLP を受信し、データを Prometheus 形式で再公開する OpenTelemetry Collector を実行する必要があります。
 
 ```text
 RustFS (RUSTFS_OBS_ENDPOINT) --OTLP--> OpenTelemetry Collector --> Prometheus --> Grafana
@@ -13,27 +13,27 @@ RustFS (RUSTFS_OBS_ENDPOINT) --OTLP--> OpenTelemetry Collector --> Prometheus --
                                                               \--> Tempo / Jaeger (traces)
 ```
 
-Point RustFS at the Collector with:
+Collector の宛先は、次のように指定します。
 
 ```bash
 # OTLP over HTTP (the Collector's default HTTP receiver port is 4318; gRPC is 4317)
 RUSTFS_OBS_ENDPOINT=http://otel-collector:4318
 ```
 
-Related environment variables (all defined in the server configuration):
+関連する環境変数（いずれもサーバー設定で定義されています）は次のとおりです。
 
-| Variable | Purpose |
+| 変数 | 用途 |
 | --- | --- |
-| `RUSTFS_OBS_ENDPOINT` | Base OTLP endpoint for traces, metrics, and logs |
-| `RUSTFS_OBS_TRACE_ENDPOINT` / `RUSTFS_OBS_METRIC_ENDPOINT` / `RUSTFS_OBS_LOG_ENDPOINT` | Per-signal endpoint overrides |
-| `RUSTFS_OBS_METRICS_EXPORT_ENABLED` / `RUSTFS_OBS_TRACES_EXPORT_ENABLED` / `RUSTFS_OBS_LOGS_EXPORT_ENABLED` | Toggle each signal |
-| `RUSTFS_OBS_METER_INTERVAL` | Metric export interval |
-| `RUSTFS_OBS_SERVICE_NAME` / `RUSTFS_OBS_ENVIRONMENT` | Resource attributes attached to exported telemetry |
-| `RUSTFS_OBS_LOGGER_LEVEL` | Log verbosity (e.g. `info`) |
+| `RUSTFS_OBS_ENDPOINT` | トレース、メトリクス、ログのベースとなる OTLP エンドポイント |
+| `RUSTFS_OBS_TRACE_ENDPOINT` / `RUSTFS_OBS_METRIC_ENDPOINT` / `RUSTFS_OBS_LOG_ENDPOINT` | シグナルごとのエンドポイント上書き |
+| `RUSTFS_OBS_METRICS_EXPORT_ENABLED` / `RUSTFS_OBS_TRACES_EXPORT_ENABLED` / `RUSTFS_OBS_LOGS_EXPORT_ENABLED` | 各シグナルのエクスポートを切り替える |
+| `RUSTFS_OBS_METER_INTERVAL` | メトリクスのエクスポート間隔 |
+| `RUSTFS_OBS_SERVICE_NAME` / `RUSTFS_OBS_ENVIRONMENT` | エクスポートするテレメトリに付けるリソース属性 |
+| `RUSTFS_OBS_LOGGER_LEVEL` | ログの詳細度（例: `info`） |
 
-## Reference Deployment (Docker Compose Observability Profile)
+## 参照デプロイ（Docker Compose の Observability プロファイル）
 
-The upstream `rustfs/rustfs` repository ships a complete reference stack in `docker-compose.yml` behind the `observability` profile: **otel-collector**, **Prometheus**, **Grafana**, **Loki** (logs), **Tempo** and **Jaeger** (traces). Its Collector configuration receives OTLP on 4317 (gRPC) and 4318 (HTTP) and re-exports metrics for Prometheus on port `8889`:
+アップストリームの `rustfs/rustfs` リポジトリは、`docker-compose.yml` の `observability` プロファイル配下に、参照用スタック一式を同梱しています。構成は **otel-collector**、**Prometheus**、**Grafana**、**Loki**（ログ）、**Tempo** と **Jaeger**（トレース）です。Collector の設定は 4317（gRPC）と 4318（HTTP）で OTLP を受信し、Prometheus 向けにポート `8889` でメトリクスを再エクスポートします。
 
 ```yaml
 # OpenTelemetry Collector (excerpt from the upstream reference config)
@@ -54,7 +54,7 @@ service:
       exporters: [prometheus]
 ```
 
-Prometheus then scrapes the Collector, not RustFS:
+Prometheus は RustFS をスクレイプせず、Collector をスクレイプします。
 
 ```yaml
 # prometheus.yml (excerpt)
@@ -69,150 +69,150 @@ scrape_configs:
 
 :::note
 
-If Prometheus shows no `rustfs_*` series, check the chain in order: is `RUSTFS_OBS_ENDPOINT` set on every node, is the Collector reachable from the nodes, and is Prometheus scraping the Collector's `8889` exporter port.
+Prometheus に `rustfs_*` の系列が出ない場合は、次の順で経路を確認します。すべてのノードに `RUSTFS_OBS_ENDPOINT` が設定されているか、ノードから Collector へ到達できるか、Prometheus が Collector の `8889` エクスポーターポートをスクレイプしているかです。
 
 :::
 
-## Metrics Reference
+## メトリクスリファレンス
 
-Every name below is verified against the server source. The list covers the operations-relevant subset exported via OTLP; internal and experimental instruments are omitted, and new releases may add metrics not listed here. Label sets are those recorded at the emission site. The Collector and Prometheus may attach additional resource labels, such as `service_name` and instance.
+以下の名前は、いずれもサーバーのソースコードに照らして確認済みです。一覧は、OTLP でエクスポートされる運用に関係するサブセットです。内部向けと実験的な計器は省略しており、新しいリリースではここにないメトリクスが追加されることがあります。ラベルセットは、メトリクスを出力する箇所で記録されるものです。Collector と Prometheus は、`service_name` や instance などのリソースラベルを追加することがあります。
 
-### Readiness and Process
+### 準備完了とプロセス
 
-| Metric | Type | Labels | Meaning |
+| メトリクス | タイプ | ラベル | 意味 |
 | --- | --- | --- | --- |
-| `rustfs_start_total` | counter | — | Process starts; a rising rate indicates restart loops |
-| `rustfs_runtime_readiness_ready` | gauge | — | `1` when the node is fully ready, `0` while degraded |
-| `rustfs_runtime_readiness_degraded_total` | counter | `reason` | Degraded readiness evaluations, by `degradedReasons` value (e.g. `storage_quorum_unavailable`) |
+| `rustfs_start_total` | counter | — | プロセスの起動回数。増加率が上がっている場合は、再起動ループを示します |
+| `rustfs_runtime_readiness_ready` | gauge | — | ノードが完全に準備完了のとき `1`、劣化している間は `0` |
+| `rustfs_runtime_readiness_degraded_total` | counter | `reason` | 準備完了が劣化した評価の回数。`degradedReasons` の値ごと（例: `storage_quorum_unavailable`） |
 
-### Scanner
+### スキャナー
 
-| Metric | Type | Labels | Meaning |
+| メトリクス | タイプ | ラベル | 意味 |
 | --- | --- | --- | --- |
-| `rustfs_scanner_objects_scanned_total` | counter | — | Objects visited by the background scanner |
-| `rustfs_scanner_directories_scanned_total` | counter | — | Directories visited |
-| `rustfs_scanner_buckets_scanned_total` | counter | `result`, `bucket`, `disk` | Bucket/drive scans completed, by outcome (`success` / `error` / `partial`) |
-| `rustfs_scanner_cycles_total` | counter | `result` | Scanner cycles finished (`success` / `error` / `partial` / `unknown`) |
-| `rustfs_scanner_cycle_duration_seconds` | gauge | — | Duration of the last completed scan cycle |
-| `rustfs_scanner_bucket_drive_duration_seconds` | histogram | `bucket`, `disk` | Time to scan one bucket on one drive |
-| `rustfs_scanner_leader_lock_total` | counter | `state` | Scanner leader-lock acquisition events |
-| `rustfs_scanner_inline_heal_total` | counter | — | Objects queued for heal directly by the scanner |
-| `rustfs_scanner_cache_save_duration_seconds` | histogram | `cache` | Time to persist the data-usage cache |
-| `rustfs_scanner_set_scan_concurrency_limit` | gauge | — | Current per-set scan concurrency limit |
-| `rustfs_scanner_disk_scan_concurrency_limit` | gauge | `pool`, `set` | Current per-disk scan concurrency limit |
+| `rustfs_scanner_objects_scanned_total` | counter | — | バックグラウンドスキャナーが走査したオブジェクト数 |
+| `rustfs_scanner_directories_scanned_total` | counter | — | 走査したディレクトリ数 |
+| `rustfs_scanner_buckets_scanned_total` | counter | `result`, `bucket`, `disk` | 完了したバケットとドライブのスキャン数。結果ごと（`success` / `error` / `partial`） |
+| `rustfs_scanner_cycles_total` | counter | `result` | 完了したスキャナーのサイクル（`success` / `error` / `partial` / `unknown`） |
+| `rustfs_scanner_cycle_duration_seconds` | gauge | — | 最後に完了したスキャンサイクルの所要時間 |
+| `rustfs_scanner_bucket_drive_duration_seconds` | histogram | `bucket`, `disk` | 1 つのドライブ上で 1 つのバケットをスキャンする時間 |
+| `rustfs_scanner_leader_lock_total` | counter | `state` | スキャナーのリーダーロック取得イベント |
+| `rustfs_scanner_inline_heal_total` | counter | — | スキャナーが直接、データ修復のキューへ入れたオブジェクト数 |
+| `rustfs_scanner_cache_save_duration_seconds` | histogram | `cache` | データ使用量キャッシュの永続化にかかった時間 |
+| `rustfs_scanner_set_scan_concurrency_limit` | gauge | — | セットあたりの、現在のスキャン同時実行数の上限 |
+| `rustfs_scanner_disk_scan_concurrency_limit` | gauge | `pool`, `set` | ディスクあたりの、現在のスキャン同時実行数の上限 |
 
-### Heal
+### データ修復
 
-| Metric | Type | Labels | Meaning |
+| メトリクス | タイプ | ラベル | 意味 |
 | --- | --- | --- | --- |
-| `rustfs_heal_task_running` | gauge | `type`, `set` | Currently running heal tasks per erasure set |
-| `rustfs_heal_task_start_total` | counter | `type`, `set` | Heal tasks started |
-| `rustfs_heal_queue_delay_seconds` | histogram | `type`, `set` | Time a heal task waited in queue before starting |
-| `rustfs_heal_admission_total` | counter | `source`, `result`, `reason`, `context` | Heal admission decisions (accepted / rejected and why) |
-| `rustfs_heal_mainline_throttle_total` | counter | `source`, `result`, `reason` | Background heal throttled to protect foreground traffic |
-| `rustfs_heal_scheduler_skip_total` | counter | `reason`, `set` | Heal scheduling skipped (e.g. per-set limit reached) |
-| `rustfs_heal_page_concurrency_current` | gauge | — | Current page-level heal concurrency |
-| `rustfs_heal_candidate_enqueue_total` | counter | — | Heal candidates enqueued by the scanner |
-| `rustfs_heal_candidate_merge_total` | counter | — | Candidates merged with an existing queue entry |
-| `rustfs_heal_candidate_drop_total` | counter | — | Candidates dropped |
-| `rustfs_heal_candidate_priority_reject_total` | counter | — | Candidates rejected by priority policy |
-| `rustfs_heal_read_repair_dedup_total` | counter | `reason` | Read-path repair requests deduplicated |
+| `rustfs_heal_task_running` | gauge | `type`, `set` | イレイジャーセットごとに、現在実行中のデータ修復タスク |
+| `rustfs_heal_task_start_total` | counter | `type`, `set` | 開始されたデータ修復タスク |
+| `rustfs_heal_queue_delay_seconds` | histogram | `type`, `set` | データ修復タスクが開始前にキューで待機した時間 |
+| `rustfs_heal_admission_total` | counter | `source`, `result`, `reason`, `context` | データ修復の受付判定（受理または拒否と、その理由） |
+| `rustfs_heal_mainline_throttle_total` | counter | `source`, `result`, `reason` | フォアグラウンドのトラフィックを守るため抑制された、バックグラウンドのデータ修復 |
+| `rustfs_heal_scheduler_skip_total` | counter | `reason`, `set` | スキップされたデータ修復のスケジューリング（例: セットあたりの上限に到達） |
+| `rustfs_heal_page_concurrency_current` | gauge | — | 現在の、ページ単位のデータ修復の同時実行数 |
+| `rustfs_heal_candidate_enqueue_total` | counter | — | スキャナーがキューへ入れたデータ修復の候補 |
+| `rustfs_heal_candidate_merge_total` | counter | — | 既存のキュー項目へマージされた候補 |
+| `rustfs_heal_candidate_drop_total` | counter | — | 破棄された候補 |
+| `rustfs_heal_candidate_priority_reject_total` | counter | — | 優先度ポリシーによって拒否された候補 |
+| `rustfs_heal_read_repair_dedup_total` | counter | `reason` | 重複排除された、読み取りパスの修復リクエスト |
 
-### API / IO Path
+### API／IO パス
 
-| Metric | Type | Labels | Meaning |
+| メトリクス | タイプ | ラベル | 意味 |
 | --- | --- | --- | --- |
-| `rustfs_io_get_object_request_duration_seconds` | histogram | `status` | End-to-end GetObject latency |
-| `rustfs_io_get_object_stage_duration_seconds` | histogram | `path`, `stage` | GetObject latency broken down by internal stage |
-| `rustfs_io_get_object_response_size_bytes` | histogram | — | GetObject response sizes |
-| `rustfs_io_operation_duration_seconds` | histogram | `operation` | Duration of IO operations |
-| `rustfs_io_timeout_events_total` | counter | `operation` | IO operations that hit a timeout |
-| `rustfs_operation_progress` | gauge | `operation` | Progress percentage of long-running operations |
-| `rustfs_operation_stalled` | counter | `operation` | Operations detected as stalled |
-| `rustfs_operation_completions` | counter | `operation`, `status` | Operation completions by status |
-| `rustfs_io_queue_operations` | counter | `operation`, `priority` | IO queue enqueue/dequeue operations |
-| `rustfs_io_queue_size` | gauge | `priority` | Current IO queue depth per priority |
-| `rustfs_io_starvation_events` | counter | `priority` | Low-priority IO starvation events |
-| `rustfs_io_bandwidth_bps` | gauge | — | Observed IO bandwidth (bytes/s) |
-| `rustfs_io_scheduler_decisions` | counter | — | IO scheduler decisions taken |
-| `rustfs_io_scheduler_load` | counter | `level` | Scheduler decisions by load level |
-| `rustfs_io_load_changes` | counter | `from`, `to` | IO load-level transitions |
+| `rustfs_io_get_object_request_duration_seconds` | histogram | `status` | GetObject のエンドツーエンドのレイテンシ |
+| `rustfs_io_get_object_stage_duration_seconds` | histogram | `path`, `stage` | 内部ステージ別に分解した GetObject のレイテンシ |
+| `rustfs_io_get_object_response_size_bytes` | histogram | — | GetObject のレスポンスサイズ |
+| `rustfs_io_operation_duration_seconds` | histogram | `operation` | IO 操作の所要時間 |
+| `rustfs_io_timeout_events_total` | counter | `operation` | タイムアウトした IO 操作 |
+| `rustfs_operation_progress` | gauge | `operation` | 長時間実行される操作の進捗率 |
+| `rustfs_operation_stalled` | counter | `operation` | 停滞として検出された操作 |
+| `rustfs_operation_completions` | counter | `operation`, `status` | ステータス別の操作完了数 |
+| `rustfs_io_queue_operations` | counter | `operation`, `priority` | IO キューのエンキューとデキュー |
+| `rustfs_io_queue_size` | gauge | `priority` | 優先度ごとの、現在の IO キュー深度 |
+| `rustfs_io_starvation_events` | counter | `priority` | 低優先度 IO の枯渇イベント |
+| `rustfs_io_bandwidth_bps` | gauge | — | 観測された IO 帯域（バイト/秒） |
+| `rustfs_io_scheduler_decisions` | counter | — | 実行された IO スケジューラの判定 |
+| `rustfs_io_scheduler_load` | counter | `level` | 負荷レベル別のスケジューラ判定 |
+| `rustfs_io_load_changes` | counter | `from`, `to` | IO 負荷レベルの遷移 |
 
-### Backpressure
+### バックプレッシャー
 
-| Metric | Type | Labels | Meaning |
+| メトリクス | タイプ | ラベル | 意味 |
 | --- | --- | --- | --- |
-| `rustfs_backpressure_state_changes` | counter | `from`, `to` | Backpressure state transitions |
-| `rustfs_backpressure_activations` | counter | — | Times backpressure engaged |
-| `rustfs_backpressure_deactivations` | counter | — | Times backpressure released |
-| `rustfs_backpressure_rejections` | counter | — | Requests rejected due to backpressure |
-| `rustfs_backpressure_concurrent` | gauge | — | Current concurrent requests tracked by the limiter |
+| `rustfs_backpressure_state_changes` | counter | `from`, `to` | バックプレッシャー状態の遷移 |
+| `rustfs_backpressure_activations` | counter | — | バックプレッシャーが働いた回数 |
+| `rustfs_backpressure_deactivations` | counter | — | バックプレッシャーが解除された回数 |
+| `rustfs_backpressure_rejections` | counter | — | バックプレッシャーにより拒否されたリクエスト |
+| `rustfs_backpressure_concurrent` | gauge | — | リミッターが追跡している、現在の同時リクエスト数 |
 
-### Capacity
+### 容量
 
-| Metric | Type | Labels | Meaning |
+| メトリクス | タイプ | ラベル | 意味 |
 | --- | --- | --- | --- |
-| `rustfs_capacity_current_bytes` | gauge | — | Current used capacity in bytes |
-| `rustfs_capacity_update_total` | counter | `source` | Capacity recalculations |
-| `rustfs_capacity_update_duration_seconds` | histogram | `source` | Time to recalculate capacity |
-| `rustfs_capacity_cache_hits` | counter | — | Capacity cache hits |
-| `rustfs_capacity_cache_misses` | counter | — | Capacity cache misses |
-| `rustfs_capacity_cache_served_total` | counter | `state` | Capacity responses served from cache, by freshness state |
+| `rustfs_capacity_current_bytes` | gauge | — | 現在の使用済み容量（バイト） |
+| `rustfs_capacity_update_total` | counter | `source` | 容量の再計算回数 |
+| `rustfs_capacity_update_duration_seconds` | histogram | `source` | 容量の再計算にかかった時間 |
+| `rustfs_capacity_cache_hits` | counter | — | 容量キャッシュのヒット |
+| `rustfs_capacity_cache_misses` | counter | — | 容量キャッシュのミス |
+| `rustfs_capacity_cache_served_total` | counter | `state` | キャッシュから返した容量の応答。鮮度の状態ごと |
 
-### Locking
+### ロック
 
-| Metric | Type | Labels | Meaning |
+| メトリクス | タイプ | ラベル | 意味 |
 | --- | --- | --- | --- |
-| `rustfs_lock_contentions` | counter | — | Lock contention events |
-| `rustfs_lock_hold_time_secs` | histogram | — | How long locks were held |
-| `rustfs_lock_spin_successes` / `rustfs_lock_spin_failures` | counter | — | Spin-lock acquisition outcomes |
-| `rustfs_lock_early_releases` | counter | — | Locks released early by optimization |
-| `rustfs_object_lock_diag_acquire_duration_seconds` | histogram | — | Object-lock acquire latency (diagnostics mode) |
-| `rustfs_object_lock_diag_hold_duration_seconds` | histogram | — | Object-lock hold duration (diagnostics mode) |
-| `rustfs_object_lock_diag_slow_acquire_total` / `rustfs_object_lock_diag_slow_hold_total` | counter | — | Slow lock acquire/hold events (diagnostics mode) |
+| `rustfs_lock_contentions` | counter | — | ロック競合のイベント |
+| `rustfs_lock_hold_time_secs` | histogram | — | ロックを保持していた時間 |
+| `rustfs_lock_spin_successes` / `rustfs_lock_spin_failures` | counter | — | スピンロック取得の結果 |
+| `rustfs_lock_early_releases` | counter | — | 最適化によって早期に解放されたロック |
+| `rustfs_object_lock_diag_acquire_duration_seconds` | histogram | — | オブジェクトロックの取得レイテンシ（診断モード） |
+| `rustfs_object_lock_diag_hold_duration_seconds` | histogram | — | オブジェクトロックの保持時間（診断モード） |
+| `rustfs_object_lock_diag_slow_acquire_total` / `rustfs_object_lock_diag_slow_hold_total` | counter | — | 取得または保持が遅かったロックのイベント（診断モード） |
 
-### Log Cleaner
+### ログクリーナー
 
-| Metric | Type | Labels | Meaning |
+| メトリクス | タイプ | ラベル | 意味 |
 | --- | --- | --- | --- |
-| `rustfs_log_cleaner_runs_total` | counter | — | Log-cleaner runs |
-| `rustfs_log_cleaner_deleted_files_total` | counter | — | Log files deleted |
-| `rustfs_log_cleaner_freed_bytes_total` | counter | — | Bytes reclaimed |
-| `rustfs_log_cleaner_rotation_total` / `rustfs_log_cleaner_rotation_failures_total` | counter | — | Log rotations and rotation failures |
-| `rustfs_log_cleaner_rotation_duration_seconds` | histogram | — | Rotation duration |
-| `rustfs_log_cleaner_active_file_size_bytes` | gauge | — | Size of the active log file |
+| `rustfs_log_cleaner_runs_total` | counter | — | ログクリーナーの実行回数 |
+| `rustfs_log_cleaner_deleted_files_total` | counter | — | 削除されたログファイル数 |
+| `rustfs_log_cleaner_freed_bytes_total` | counter | — | 回収したバイト数 |
+| `rustfs_log_cleaner_rotation_total` / `rustfs_log_cleaner_rotation_failures_total` | counter | — | ログのローテーションとその失敗 |
+| `rustfs_log_cleaner_rotation_duration_seconds` | histogram | — | ローテーションの所要時間 |
+| `rustfs_log_cleaner_active_file_size_bytes` | gauge | — | アクティブなログファイルのサイズ |
 
-:::note[Additional metrics]
+:::note[追加のメトリクス]
 
-Additional verified metric names exist whose type/label details are not documented here, including `rustfs_scanner_cache_save_attempt_total`, `rustfs_scanner_cache_save_timeout_total`, `rustfs_scanner_cache_save_retry_total`, `rustfs_scanner_excess_object_versions_total`, `rustfs_scanner_excess_object_version_size_total`, `rustfs_scanner_excess_folders_total`, `rustfs_scanner_pending_heal_prune_total`, `rustfs_scanner_pending_heal_malformed_total`, and the `rustfs_io_scheduler_*` / `rustfs_io_buffer_*` / `rustfs_timeout_dynamic_*` families. Inspect them in Prometheus once the pipeline is live.
+型やラベルの詳細をここでは文書化していない、確認済みのメトリクス名がほかにもあります。対象は `rustfs_scanner_cache_save_attempt_total`、`rustfs_scanner_cache_save_timeout_total`、`rustfs_scanner_cache_save_retry_total`、`rustfs_scanner_excess_object_versions_total`、`rustfs_scanner_excess_object_version_size_total`、`rustfs_scanner_excess_folders_total`、`rustfs_scanner_pending_heal_prune_total`、`rustfs_scanner_pending_heal_malformed_total`、および `rustfs_io_scheduler_*` / `rustfs_io_buffer_*` / `rustfs_timeout_dynamic_*` の系統です。パイプラインが稼働したら、Prometheus で確認します。
 
 :::
 
-## Suggested Alerts
+## 推奨アラート
 
-| Alert | Signal | Suggested rule |
+| アラート | シグナル | 推奨ルール |
 | --- | --- | --- |
-| Node not ready > 2 min | `rustfs_runtime_readiness_ready` gauge, or an external probe on `GET /health/ready` returning non-200 | `rustfs_runtime_readiness_ready == 0` for `2m` |
-| Restart loop | `rustfs_start_total` | `increase(rustfs_start_total[10m]) > 3` |
-| Heal backlog growing | `rustfs_heal_task_running` and `rustfs_heal_queue_delay_seconds` | sustained non-zero running tasks plus rising queue delay for `30m` |
-| Scanner stalled | `rustfs_scanner_cycles_total` | `increase(rustfs_scanner_cycles_total[24h]) == 0` |
-| Cluster used capacity watermark | `rustfs_capacity_current_bytes` | compare against your deployed raw capacity (a constant you set), e.g. `rustfs_capacity_current_bytes > 0.8 * <total-bytes>` |
+| ノードが 2 分を超えて準備完了でない | `rustfs_runtime_readiness_ready` ゲージ、または `GET /health/ready` への外部プローブが 200 以外を返す | `2m` の間 `rustfs_runtime_readiness_ready == 0` |
+| 再起動ループ | `rustfs_start_total` | `increase(rustfs_start_total[10m]) > 3` |
+| データ修復のバックログが増加 | `rustfs_heal_task_running` と `rustfs_heal_queue_delay_seconds` | 実行中タスクがゼロ以外のまま続き、キュー遅延が `30m` にわたって上昇 |
+| スキャナーの停滞 | `rustfs_scanner_cycles_total` | `increase(rustfs_scanner_cycles_total[24h]) == 0` |
+| クラスター使用容量のウォーターマーク | `rustfs_capacity_current_bytes` | デプロイ済みの総容量（自ら設定する定数）と比較します。例: `rustfs_capacity_current_bytes > 0.8 * <total-bytes>` |
 
 :::note
 
-Per-disk usage and disk online/offline state are currently surfaced through the console and the admin API (server/storage info), not as dedicated OTLP metrics. For a per-disk watermark alert, poll the admin API from your own exporter or watch the console dashboard.
+ディスクごとの使用量と、ディスクのオンライン／オフライン状態は、現時点では専用の OTLP メトリクスとしては出てきません。Console（管理画面）と管理 API（サーバーとストレージの情報）で確認できます。ディスクごとのウォーターマークアラートにするには、独自のエクスポーターから管理 API をポーリングするか、Console のダッシュボードを監視します。
 
 :::
 
-## Log Collection
+## ログの収集
 
-Where logs go is controlled by `RUSTFS_OBS_LOG_DIRECTORY`:
+ログの出力先は `RUSTFS_OBS_LOG_DIRECTORY` で制御します。
 
-- **Unset** — logs go to stdout. In containers, use your log driver; on systemd hosts, stdout/stderr is captured by **journald**, so `journalctl -u rustfs -f` works without extra configuration.
-- **A local directory** (e.g. `/var/log/rustfs/`) — RustFS writes rotating log files there. Rotation is tuned with `RUSTFS_OBS_LOG_FILENAME`, `RUSTFS_OBS_LOG_ROTATION_SIZE_MB`, `RUSTFS_OBS_LOG_ROTATION_TIME`, and `RUSTFS_OBS_LOG_KEEP_FILES`.
-- **A URL** (contains `://`) — logs are shipped to a remote endpoint.
+- **未設定**の場合、ログは stdout に出力されます。コンテナではログドライバーを使います。systemd のホストでは、stdout と stderr を **journald** が捕捉するため、追加設定なしで `journalctl -u rustfs -f` を使えます。
+- **ローカルディレクトリ**（例: `/var/log/rustfs/`）の場合、RustFS はそこにローテーションするログファイルを書き込みます。ローテーションは `RUSTFS_OBS_LOG_FILENAME`、`RUSTFS_OBS_LOG_ROTATION_SIZE_MB`、`RUSTFS_OBS_LOG_ROTATION_TIME`、`RUSTFS_OBS_LOG_KEEP_FILES` で調整します。
+- **URL**（`://` を含む）の場合、ログはリモートのエンドポイントへ送られます。
 
-When `RUSTFS_OBS_ENDPOINT` is set and log export is enabled, logs are additionally exported via OTLP; the reference stack routes them into Loki for querying from Grafana.
+`RUSTFS_OBS_ENDPOINT` が設定され、ログのエクスポートが有効なときは、ログは OTLP でも追加でエクスポートされます。参照スタックは、Grafana から照会できるよう、これらを Loki へ送ります。
 
 ```bash title="Example: file logs plus OTLP export"
 RUSTFS_ADDRESS=":9000"

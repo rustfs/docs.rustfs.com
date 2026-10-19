@@ -1,13 +1,13 @@
 ---
 title: "Docker Registry"
-description: "Store container images from Docker Registry in RustFS."
+description: "Docker Registry のコンテナイメージを RustFS に保存します。"
 ---
 
-This guide connects the open-source [Docker Registry](https://github.com/distribution/distribution) (distribution) to **RustFS** as its S3 storage backend. You will run a registry that stores all layers and manifests in a RustFS bucket, then push and pull an image. The workflow was verified with `registry:2` against `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、オープンソースの [Docker Registry](https://github.com/distribution/distribution)（distribution）を、S3 ストレージのバックエンドとして **RustFS** に接続します。すべてのレイヤーとマニフェストを RustFS のバケットに保存するレジストリを実行し、イメージを push および pull します。手順は `registry:2` と `rustfs/rustfs-x86-musl:v2.3.1` の組み合わせで確認済みです。
 
-You need Docker on the registry host.
+レジストリのホストに Docker が必要です。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -15,11 +15,11 @@ flowchart LR
 	Reg -->|"blobs + manifests"| RustFS["RustFS :9000"]
 ```
 
-The registry stores every blob (layers and configs) and manifest as objects under `docker/registry/v2/` in the bucket. The container itself is stateless, so registry nodes can be scaled horizontally against the same bucket.
+レジストリは、すべての blob（レイヤーと設定）とマニフェストを、バケット内の `docker/registry/v2/` 配下のオブジェクトとして保存します。コンテナ自体はステートレスなので、同じバケットに対してレジストリのノードを水平にスケールできます。
 
-## 1. Run the registry
+## 1. レジストリを実行する
 
-Configure the S3 driver entirely through environment variables. `REGISTRY_STORAGE_S3_REGIONENDPOINT` points the AWS SDK at RustFS:
+S3 ドライバーは、環境変数だけで設定します。`REGISTRY_STORAGE_S3_REGIONENDPOINT` は、AWS SDK の接続先を RustFS に向けます。
 
 ```bash
 docker run -d --name registry --network oo-rustfs_default -p 5000:5000 \
@@ -32,7 +32,7 @@ docker run -d --name registry --network oo-rustfs_default -p 5000:5000 \
   registry:2
 ```
 
-Check that the v2 API is up:
+v2 API が起動していることを確認します。
 
 ```bash
 curl -s -o /dev/null -w "%{http_code}\n" http://localhost:5000/v2/
@@ -42,9 +42,9 @@ curl -s -o /dev/null -w "%{http_code}\n" http://localhost:5000/v2/
 200
 ```
 
-## 2. Push an image
+## 2. イメージを push する
 
-Tag any local image for the registry and push it:
+ローカルの任意のイメージにレジストリ用のタグを付け、push します。
 
 ```bash
 docker pull alpine:3.20
@@ -56,7 +56,7 @@ docker push localhost:5000/rustfs-demo/alpine:3.20
 3.20: digest: sha256:c64c687cbea9300178b30c95835354e34c4e4febc4badfe27102879de0483b5e
 ```
 
-## 3. Verify objects in RustFS
+## 3. RustFS でオブジェクトを確認する
 
 ```bash
 rc ls rustfs/registry-demo/docker/registry/v2/repositories/rustfs-demo/alpine/ -r | head -4
@@ -68,13 +68,13 @@ _repositories/rustfs-demo/alpine/_manifests/revisions/sha256/c64c687c.../link
 _repositories/rustfs-demo/alpine/_manifests/tags/3.20/current/link
 ```
 
-Every `_layers` link points at a blob object stored in the same bucket — the image data itself lives in RustFS, not on the registry host.
+各 `_layers` リンクは、同じバケットに保存された blob オブジェクトを指します。イメージデータ自体は RustFS にあり、レジストリのホスト上にはありません。
 
-![Registry layers stored in the RustFS Console](./images/rustfs-registry-layers.png)
+![RustFS Console に保存されたレジストリのレイヤー](./images/rustfs-registry-layers.png)
 
-## 4. Pull the image back
+## 4. イメージを pull し直す
 
-Remove the local copy and pull from the registry — the layers come back from RustFS:
+ローカルのコピーを削除し、レジストリから pull します。レイヤーは RustFS から戻ってきます。
 
 ```bash
 docker rmi localhost:5000/rustfs-demo/alpine:3.20
@@ -87,29 +87,29 @@ Digest: sha256:c64c687cbea9300178b30c95835354e34c4e4febc4badfe27102879de0483b5e
 Status: Downloaded newer image for localhost:5000/rustfs-demo/alpine:3.20
 ```
 
-## 5. Stop or reset
+## 5. 停止またはリセットする
 
 ```bash
 docker rm -f registry
 rc rm rustfs/registry-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### Push fails with `unknown` or empty digest
+### push が `unknown` または空のダイジェストで失敗する
 
-Confirm `REGISTRY_STORAGE_S3_REGIONENDPOINT` is set — without it the registry sends requests to real AWS. Also check the bucket exists.
+`REGISTRY_STORAGE_S3_REGIONENDPOINT` が設定されていることを確認します。未設定だと、レジストリは実際の AWS へリクエストを送ります。バケットが存在することも確認します。
 
-### `InvalidAccessKeyId` at push time
+### push 時の `InvalidAccessKeyId`
 
-The access key and secret key must be passed with `REGISTRY_STORAGE_S3_ACCESSKEY` / `SECRETKEY`; the registry does not read the AWS credential environment chain in this driver.
+アクセスキーとシークレットキーは、`REGISTRY_STORAGE_S3_ACCESSKEY` と `SECRETKEY` で渡す必要があります。このドライバーは、AWS 認証情報の環境変数チェーンを読みません。
 
-### Pull returns `manifest unknown` after the registry restarted
+### レジストリ再起動後の pull が `manifest unknown` を返す
 
-Manifests and blobs live in the bucket, so a restart cannot lose them — check that both registry instances point at the same `REGISTRY_STORAGE_S3_BUCKET` and `REGIONENDPOINT`.
+マニフェストと blob はバケットにあるため、再起動で失われることはありません。両方のレジストリインスタンスが、同じ `REGISTRY_STORAGE_S3_BUCKET` と `REGIONENDPOINT` を指していることを確認します。
 
-## Next steps
+## 次のステップ
 
-- Compare with the [Harbor](/developer/integration/registry/harbor) guide when you need a UI, RBAC, or replication on top of the same bucket.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [distribution documentation](https://distribution.github.io/distribution/) for storage driver tuning and proxy-caching setups.
+- UI、RBAC、または同じバケット上のレプリケーションが必要な場合は、[Harbor](/ja/developer/integration/registry/harbor) のガイドと比較します。
+- [アクセスキーの管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- ストレージドライバーの調整とプロキシキャッシュの構成については、[distribution のドキュメント](https://distribution.github.io/distribution/)に従います。

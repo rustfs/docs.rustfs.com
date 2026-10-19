@@ -1,17 +1,17 @@
 ---
-title: KMS Integration
-description: Configure local or HashiCorp Vault key management for a RustFS Tenant through the Operator encryption API.
+title: KMS 連携
+description: Operator の暗号化 API を通じて、RustFS の Tenant にローカルまたは HashiCorp Vault のキー管理を設定します。
 ---
 
-Configure Key Management Service (KMS) integration through `spec.encryption`. Do not add `RUSTFS_KMS_*` variables to `spec.env`; the Operator generates them from the structured Tenant configuration and Secret references.
+`spec.encryption` でキー管理サービス（KMS）の連携を設定します。`RUSTFS_KMS_*` 変数を `spec.env` へ追加してはなりません。Operator は、構造化された Tenant の設定と Secret の参照から、これらの変数を生成します。
 
-## Choose a backend
+## バックエンドを選ぶ
 
-Use `local` only for a single-server Tenant. Use `vault` for distributed deployments where every Tenant Pod can reach HashiCorp Vault.
+`local` は、サーバーが 1 台の Tenant に限り使います。すべての Tenant Pod が HashiCorp Vault へ到達できる分散デプロイでは、`vault` を使います。
 
-## Local KMS
+## ローカル KMS
 
-Create a master key Secret:
+マスターキーの Secret を作成します。
 
 ```yaml title="local-kms-secret.yaml"
 apiVersion: v1
@@ -24,7 +24,7 @@ stringData:
   local-master-key: "replace-with-a-random-master-key"
 ```
 
-Add the encryption block to the existing Tenant manifest:
+既存の Tenant マニフェストに、encryption ブロックを追加します。
 
 ```yaml title="tenant.yaml"
 spec:
@@ -39,11 +39,11 @@ spec:
     defaultKeyId: tenant-default
 ```
 
-The key directory must be inside a mounted data path so it survives Pod replacement.
+キーディレクトリは、マウントされたデータパスの内部にある必要があります。これにより、Pod が置き換わっても残ります。
 
-## HashiCorp Vault KMS
+## HashiCorp Vault の KMS
 
-Create a Secret containing a Vault token:
+Vault トークンを含む Secret を作成します。
 
 ```yaml title="vault-kms-secret.yaml"
 apiVersion: v1
@@ -56,7 +56,7 @@ stringData:
   vault-token: "replace-with-vault-token"
 ```
 
-Add the Vault configuration to the existing Tenant manifest:
+既存の Tenant マニフェストに、Vault の設定を追加します。
 
 ```yaml title="tenant.yaml"
 spec:
@@ -70,9 +70,9 @@ spec:
     defaultKeyId: tenant-default
 ```
 
-Every Tenant Pod must be able to resolve and connect to the Vault endpoint and trust its certificate.
+すべての Tenant Pod は、Vault のエンドポイントを名前解決して接続でき、その証明書を信頼する必要があります。
 
-## Apply the configuration
+## 設定を適用する
 
 ```bash
 kubectl apply -f local-kms-secret.yaml
@@ -80,10 +80,10 @@ kubectl apply -f tenant.yaml
 kubectl -n storage-a describe tenant tenant-a
 ```
 
-For Vault, apply `vault-kms-secret.yaml` before `tenant.yaml`. Changing encryption settings rolls the affected StatefulSets.
+Vault の場合は、`tenant.yaml` の前に `vault-kms-secret.yaml` を適用します。暗号化の設定を変更すると、影響を受ける StatefulSet がローリング更新されます。
 
-:::warning[Protect encryption keys]
+:::warning[暗号鍵を保護する]
 
-Back up key material and test recovery before storing production data. Losing the local master key or Vault keys can make encrypted objects unrecoverable.
+本番データを保存する前に、鍵材料をバックアップし、復旧をテストします。ローカルのマスターキーまたは Vault の鍵を失うと、暗号化されたオブジェクトを復旧できなくなる可能性があります。
 
 :::

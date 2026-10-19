@@ -1,28 +1,28 @@
 ---
-title: "Kubernetes Installation (Helm)"
-description: "Deploy RustFS on Kubernetes with the official Helm chart: standalone or distributed mode, storage sizing, probes, production hardening, and server-pool expansion."
+title: "Kubernetes インストール（Helm）"
+description: "公式の Helm チャートを使い、スタンドアロンまたは分散モード、ストレージ容量、プローブ、本番向けの強化、ストレージプールの拡張を含めて、Kubernetes 上に RustFS をデプロイします。"
 ---
 
-RustFS ships an official Helm chart that deploys either a single-node instance (a `Deployment` with one PVC) or a distributed cluster (a `StatefulSet` with multiple pods and PVCs). This guide walks through installing the chart, choosing a deployment mode, sizing storage correctly, and the production options the chart provides.
+RustFS の公式 Helm チャートは、単一ノードのインスタンス（PVC が 1 つの `Deployment`）、または分散クラスター（複数の Pod と PVC を持つ `StatefulSet`）をデプロイします。このガイドでは、チャートのインストール、デプロイモードの選択、ストレージ容量の適切な設定、チャートが提供する本番向けのオプションを説明します。
 
-**Prerequisites**
+**前提条件**
 
-- A Kubernetes cluster and `kubectl` access
+- Kubernetes クラスターと `kubectl` によるアクセス
 - Helm 3
-- RustFS image version `>= 1.0.0-alpha.69` (the chart requirement)
-- A StorageClass with a working provisioner — the chart defaults to [`local-path`](https://github.com/rancher/local-path-provisioner); set `storageclass.name` to use your own
-- [`rc`](/operations/rc) installed on the administration host before using the server-pool commands in this guide
+- RustFS イメージのバージョン `>= 1.0.0-alpha.69`（チャートの要件）
+- 動作するプロビジョナーを備えた StorageClass。チャートのデフォルトは [`local-path`](https://github.com/rancher/local-path-provisioner) です。独自の StorageClass を使う場合は `storageclass.name` を設定します
+- このガイドのストレージプール用コマンドを使う前に、管理用ホストへ [`rc`](/ja/operations/rc) をインストールします
 
-The chart lives in the RustFS source repository under `helm/rustfs`:
+チャートは、RustFS のソースリポジトリ内の `helm/rustfs` にあります。
 
 ```bash
 git clone https://github.com/rustfs/rustfs.git
 cd rustfs/helm/rustfs
 ```
 
-## 1. Quick install
+## 1. クイックインストール
 
-Install into a dedicated namespace, setting your own credentials and a realistic data size:
+専用の名前空間へインストールし、独自の認証情報と実際の使用量に見合うデータサイズを設定します。
 
 ```bash
 helm install rustfs . \
@@ -33,19 +33,19 @@ helm install rustfs . \
   --set storageclass.logStorageSize=1Gi
 ```
 
-:::note[The chart refuses default credentials]
+:::note[チャートはデフォルトの認証情報を拒否します]
 
-Rendering fails by default unless one of the following is true:
+デフォルトでは、次のいずれかを満たさない限り、マニフェストの生成に失敗します。
 
-1. `secret.existingSecret` names a Kubernetes Secret you control, or
-2. `secret.rustfs.access_key` and `secret.rustfs.secret_key` are **both** set to non-empty, non-default values, or
-3. `secret.allowInsecureDefaults: true` is set (only for local development).
+1. `secret.existingSecret` に、管理している Kubernetes の Secret の名前を指定する。
+2. `secret.rustfs.access_key` と `secret.rustfs.secret_key` の**両方**に、空でなくデフォルトでもない値を設定する。
+3. `secret.allowInsecureDefaults: true` を設定する（ローカル開発のみ）。
 
-This prevents accidental deployment with the well-known default `rustfsadmin`/`rustfsadmin` credentials. Setting only one of the two keys is also rejected, so the chart never silently falls back to a default for the missing key.
+これにより、周知のデフォルト認証情報 `rustfsadmin`/`rustfsadmin` での誤ったデプロイを防ぎます。2 つのキーのうち一方だけを設定した場合も拒否されるため、欠けているキーが通知なくデフォルトへ戻ることはありません。
 
 :::
 
-Watch the pods come up:
+Pod の起動を確認します。
 
 ```bash
 kubectl -n rustfs get pods -w
@@ -59,17 +59,17 @@ rustfs-2   1/1     Running   0          2m27s
 rustfs-3   1/1     Running   0          2m27s
 ```
 
-## 2. Choose a deployment mode
+## 2. デプロイモードを選ぶ
 
-The chart supports two modes, selected via the `mode` values:
+チャートは、`mode` の値で選ぶ 2 つのモードに対応しています。
 
-| Mode | Values | Workload | Layout |
+| モード | 値 | ワークロード | 構成 |
 | --- | --- | --- | --- |
-| Distributed (**default**) | `mode.distributed.enabled=true` | StatefulSet | `replicaCount` pods (`>= 2`, default `4`) × `drivesPerNode` data PVCs per pod (`>= 1`, inferred as `4` when `replicaCount: 4` or `1` otherwise; 16 drives by default) |
-| Standalone | `mode.standalone.enabled=true`, `mode.distributed.enabled=false` | Deployment | 1 pod, 1 data PVC (single node single disk) |
+| 分散（**デフォルト**） | `mode.distributed.enabled=true` | StatefulSet | `replicaCount` 個の Pod（`>= 2`、デフォルト `4`）× Pod あたり `drivesPerNode` 個のデータ PVC（`>= 1`。`replicaCount: 4` のときは `4`、それ以外は `1` と推定。デフォルトはドライブ 16 台） |
+| スタンドアロン | `mode.standalone.enabled=true`、`mode.distributed.enabled=false` | Deployment | Pod 1 つ、データ PVC 1 つ（シングルノード・シングルディスク） |
 
-- **Standalone** matches single-node single-disk: no erasure-coding redundancy across nodes. Use it for development, testing, or small setups where the underlying storage provides its own durability. It can reuse existing PVCs via `mode.standalone.existingClaim.dataClaim` / `mode.standalone.existingClaim.logsClaim`.
-- **Distributed** behaves like [multiple node multiple disk](../linux/multiple-node-multiple-disk.md): objects are erasure-coded across pods and PVCs. `replicaCount` sets the number of pods (`>= 2`) and `drivesPerNode` sets the number of data PVCs per pod (`>= 1`), giving `replicaCount * drivesPerNode` total drives. When `drivesPerNode` is left unset (`null`), the chart infers `4` data PVCs per pod when `replicaCount` is `4` (16 drives total) and `1` data PVC per pod for any other `replicaCount` (such as `replicaCount: 16` for 16 pods with 1 PVC each). Set both `replicaCount` and `drivesPerNode` explicitly (for example, `replicaCount: 4` and `drivesPerNode: 2` for 8 drives) to choose another layout.
+- **スタンドアロン**はシングルノード・シングルディスクに相当し、ノードをまたぐイレイジャーコーディングの冗長性はありません。開発、テスト、または基盤のストレージ自身が耐久性を提供する小規模な構成に使います。既存の PVC は `mode.standalone.existingClaim.dataClaim` / `mode.standalone.existingClaim.logsClaim` で再利用できます。
+- **分散**は[マルチノード・マルチディスク](../linux/multiple-node-multiple-disk.md)と同様に動作し、オブジェクトは Pod と PVC にまたがってイレイジャーコーディングされます。`replicaCount` は Pod 数（`>= 2`）、`drivesPerNode` は Pod あたりのデータ PVC 数（`>= 1`）を指定し、合計ドライブ数は `replicaCount * drivesPerNode` になります。`drivesPerNode` を未設定（`null`）にすると、`replicaCount` が `4` のときは Pod あたりのデータ PVC を `4` つ（合計 16 ドライブ）、それ以外の `replicaCount`（たとえば Pod 16 台に PVC を 1 つずつ割り当てる `replicaCount: 16`）では Pod あたりのデータ PVC を `1` つと推定します。別の構成にするには `replicaCount` と `drivesPerNode` の両方を明示します（たとえば 8 ドライブにする場合は `replicaCount: 4` と `drivesPerNode: 2`）。
 
 ```bash
 # Standalone mode
@@ -80,9 +80,9 @@ helm install rustfs . -n rustfs --create-namespace \
   --set secret.rustfs.secret_key=<your-secret-key>
 ```
 
-## 3. Storage sizing
+## 3. ストレージ容量の設定
 
-PVC sizes come from the `storageclass` block:
+PVC のサイズは `storageclass` ブロックで指定します。
 
 ```yaml title="values-prod.yaml"
 storageclass:
@@ -91,50 +91,50 @@ storageclass:
   logStorageSize: 256Mi   # per logs PVC
 ```
 
-:::warning[The default PVC size is 256Mi — change it]
+:::warning[デフォルトの PVC サイズ 256Mi は変更が必要です]
 
-The chart's default size for the data and logs volumes is **256Mi**, which is only enough to verify the chart works. For any real workload set `storageclass.dataStorageSize` (for example `1Ti`) and `storageclass.logStorageSize` (for example `1Gi`) at install time. In distributed mode the data size applies to **each** data PVC (`replicaCount * drivesPerNode`, 16 PVCs by default).
+データボリュームとログボリュームについて、チャートの既定サイズは **256Mi** であり、チャートの動作確認に足りるだけです。実際のワークロードでは、インストール時に `storageclass.dataStorageSize`（例: `1Ti`）と `storageclass.logStorageSize`（例: `1Gi`）を設定します。分散モードでは、データサイズは**各**データ PVC（`replicaCount * drivesPerNode`、デフォルトでは PVC 16 個）に適用されます。
 
 :::
 
-Setting `config.rustfs.obs_log_directory` to `""` disables the log PVCs and mounts entirely. Custom PVC annotations go under `storageclass.pvcAnnotations.data` / `storageclass.pvcAnnotations.logs`.
+`config.rustfs.obs_log_directory` を `""` に設定すると、ログ用 PVC とマウントが完全に無効になります。PVC のカスタムアノテーションは `storageclass.pvcAnnotations.data` / `storageclass.pvcAnnotations.logs` に指定します。
 
-## 4. Health probes
+## 4. ヘルスプローブ
 
-The chart templates HTTP probes on the S3 port (9000) out of the box, matching the server's health endpoints:
+チャートは、サーバーのヘルスエンドポイントに合わせ、S3 ポート（9000）の HTTP プローブを標準で含みます。
 
-- **Liveness**: `GET /health` (`livenessProbe.httpGet.path`), initial delay 30s, period 5s
-- **Readiness**: `GET /health/ready` (`readinessProbe.httpGet.path`), initial delay 10s, period 5s
+- **Liveness**（生存確認）: `GET /health`（`livenessProbe.httpGet.path`）。初期遅延は 30 秒、間隔は 5 秒です
+- **Readiness**（準備完了）: `GET /health/ready`（`readinessProbe.httpGet.path`）。初期遅延は 10 秒、間隔は 5 秒です
 
-A pod is only added to the Service endpoints once `/health/ready` returns `200`, which in distributed mode requires the storage quorum to be met. Thresholds and timings are tunable via the `livenessProbe.*` and `readinessProbe.*` values.
+Pod が Service のエンドポイントに追加されるのは、`/health/ready` が `200` を返したあとだけです。分散モードでは、この応答にストレージのクォーラムが満たされている必要があります。しきい値とタイミングは `livenessProbe.*` と `readinessProbe.*` の値で調整できます。
 
-## 5. Production hardening
+## 5. 本番向けの強化
 
-### Pod Disruption Budget
+### PodDisruptionBudget
 
-Disabled by default. Enable it so voluntary evictions (node drains, cluster upgrades) never take more than one pod down at a time:
+デフォルトでは無効です。有効にすると、自発的な退避（ノードのドレインやクラスターのアップグレード）で同時に停止する Pod は 1 つまでになります。
 
 ```bash
 --set pdb.create=true    # pdb.maxUnavailable defaults to 1
 ```
 
-### Anti-affinity and topology spread
+### アンチアフィニティとトポロジースプレッド
 
-`affinity.podAntiAffinity.enabled` defaults to `true` with `topologyKey: kubernetes.io/hostname`, spreading pods across distinct nodes. For zone-level spreading, enable `topologySpreadConstraints.enabled` and supply raw constraint entries under `topologySpreadConstraints.constraints` (applied to the distributed StatefulSet).
+`affinity.podAntiAffinity.enabled` のデフォルトは `true` で、`topologyKey: kubernetes.io/hostname` により Pod を別々のノードへ分散します。ゾーン単位で分散するには `topologySpreadConstraints.enabled` を有効にし、`topologySpreadConstraints.constraints` に制約エントリをそのまま指定します（分散モードの StatefulSet に適用されます）。
 
-### Inter-pod mTLS (cert-manager)
+### Pod 間の mTLS（cert-manager）
 
-Set `mtls.enabled=true` to encrypt traffic between pods; the chart renders cert-manager `Issuer`/`Certificate` resources for a CA, server, and client certificates. To use an issuer you already operate, set `mtls.existingIssuerRef.enabled=true` with its `name`, `kind` (`Issuer` or `ClusterIssuer`), and `group`.
+`mtls.enabled=true` にすると、Pod 間のトラフィックが暗号化されます。チャートは、CA、サーバー証明書、クライアント証明書用に、cert-manager の `Issuer` と `Certificate` リソースを生成します。既に運用している Issuer を使う場合は、`mtls.existingIssuerRef.enabled=true` とともに `name`、`kind`（`Issuer` または `ClusterIssuer`）、`group` を指定します。
 
-### Ingress and Gateway API
+### Ingress と Gateway API
 
-Ingress is enabled by default (`ingress.enabled=true`) with `ingress.className: nginx`; set it to `traefik` if that is your controller — the chart applies the matching session-stickiness annotations for each. Set your domain via `ingress.hosts[0].host` (default `example.rustfs.com`). For HTTPS, enable `ingress.tls.enabled` and either pass the certificate with `--set-file ingress.tls.crt=./tls.crt --set-file ingress.tls.key=./tls.key`, point at an existing secret (`ingress.tls.existingSecret`), or let cert-manager issue one (`ingress.tls.certManager.enabled=true`).
+Ingress はデフォルトで有効です（`ingress.enabled=true`）。`ingress.className: nginx` が設定されています。コントローラーが Traefik の場合は `traefik` にします。チャートは、コントローラーに対応するセッション固定のアノテーションを適用します。ドメインは `ingress.hosts[0].host` で設定します（デフォルトは `example.rustfs.com`）。HTTPS では `ingress.tls.enabled` を有効にし、`--set-file ingress.tls.crt=./tls.crt --set-file ingress.tls.key=./tls.key` で証明書を渡すか、既存の Secret を指定するか（`ingress.tls.existingSecret`）、cert-manager に発行させます（`ingress.tls.certManager.enabled=true`）。
 
-The chart also has alpha [Gateway API](https://gateway-api.sigs.k8s.io/) support (`gatewayApi.enabled=true` together with `ingress.enabled=false`, Traefik gateway class), rendering `Gateway` and `HTTPRoute` resources.
+チャートには、アルファ版の [Gateway API](https://gateway-api.sigs.k8s.io/) サポートもあります（`gatewayApi.enabled=true` と `ingress.enabled=false` を併用し、Gateway クラスは Traefik）。`Gateway` と `HTTPRoute` リソースを生成します。
 
-## 6. Access RustFS
+## 6. RustFS へアクセスする
 
-Without an ingress, port-forward the Service:
+Ingress を使わない場合は、Service をポートフォワードします。
 
 ```bash
 kubectl -n rustfs port-forward svc/rustfs 9000:9000 9001:9001
@@ -143,13 +143,13 @@ kubectl -n rustfs port-forward svc/rustfs 9000:9000 9001:9001
 - S3 API: `http://localhost:9000`
 - Console: `http://localhost:9001`
 
-Log in to the Console with the access key and secret key you set at install time. With ingress enabled, use your configured host instead (check `kubectl -n rustfs get ing`). The Service defaults to `ClusterIP`; `service.type` can be switched to `NodePort` (S3 on `service.endpoint.nodePort: 32000`, Console on `service.console.nodePort: 32001`) or `LoadBalancer`.
+インストール時に設定したアクセスキーとシークレットキーで Console にログインします。Ingress を有効にしている場合は、設定したホストを使います（`kubectl -n rustfs get ing` で確認します）。Service のデフォルトは `ClusterIP` です。`service.type` は `NodePort`（S3 は `service.endpoint.nodePort: 32000`、Console は `service.console.nodePort: 32001`）または `LoadBalancer` に切り替えられます。
 
-## 7. Scaling out with server pools
+## 7. ストレージプールでスケールアウトする
 
-In distributed mode the chart can run multiple **server pools** — independent StatefulSets whose drives together form one cluster. This is the chart-level equivalent of adding a Server Pool as described in [Pool Expansion](../../operations/scaling/storage-pool-expansion.md).
+分散モードでは、チャートは複数の**ストレージプール**を実行できます。各プールは独立した StatefulSet であり、それらのドライブがまとまって 1 つのクラスターを構成します。これは、[ストレージプールの拡張](../../operations/scaling/storage-pool-expansion.md)で説明するストレージプールの追加を、チャート上で行う操作に相当します。
 
-To expand an existing deployment, enable pools and describe the current layout as pool 0 plus your new capacity:
+既存のデプロイを拡張するには、プールを有効にし、現在の構成をプール 0 として残したうえで、新しい容量を追記します。
 
 ```yaml title="values-prod.yaml (pools)"
 pools:
@@ -162,27 +162,27 @@ pools:
         dataStorageSize: 10Gi
 ```
 
-Then apply with `helm upgrade`. Each entry may set `replicaCount` (`>= 2`) and/or a `storageclass` block; omitted fields inherit the top-level values. When top-level `drivesPerNode` is set explicitly, that drive count applies to every pool; when `drivesPerNode` is left unset (`null`), the chart infers the drive count per pool from that pool's `replicaCount` (`4` drives per pod when `replicaCount` is `4`, or `1` drive per pod otherwise). Additional pools render as `<fullname>-pool<N>` StatefulSets; all pools share the headless service, the main service, the configuration, and the credentials.
+その後、`helm upgrade` で適用します。各エントリでは `replicaCount`（`>= 2`）と `storageclass` ブロックの一方または両方を設定できます。省略したフィールドはトップレベルの値を継承します。トップレベルの `drivesPerNode` を明示すると、そのドライブ数はすべてのプールに適用されます。`drivesPerNode` を未設定（`null`）にすると、チャートは各プールの `replicaCount` からドライブ数を推定します（`replicaCount` が `4` のときは Pod あたり `4` ドライブ、それ以外は Pod あたり `1` ドライブ）。追加のプールは `<fullname>-pool<N>` という名前の StatefulSet として生成されます。すべてのプールは、ヘッドレス Service、メインの Service、設定、認証情報を共有します。
 
-:::warning[Pools are append-only]
+:::warning[プールは追記のみです]
 
-The list index determines the StatefulSet name — never remove or reorder entries. Retire a pool with `rc admin decommission` before removing it from the list.
+リストのインデックスが StatefulSet 名を決めます。エントリを削除したり、順序を変えたりしてはなりません。リストから除く前に `rc admin decommission` を実行し、データを排出してプールをデコミッションします。
 
 :::
 
-What to expect during the rollout, per the chart's documentation:
+ロールアウト中に想定される動作は、チャートのドキュメントでは次のとおりです。
 
-- **Crash/restart cycles are normal.** Pods restart until every pod of every pool is resolvable — the server refuses to start with unresolvable peers, so expect a few crash loops before the cluster converges. This is harmless.
-- **Rebalance afterwards.** After the cluster converges, run `rc admin rebalance start <alias>` to spread existing objects across the new pool.
-- The PodDisruptionBudget spans all pools: with the default `pdb.maxUnavailable: 1`, at most one pod of the whole cluster may be evicted at a time.
+- **再起動を想定します。** すべてのプールですべての Pod が名前解決できるようになるまで、Pod は再起動します。解決できないピアがあるとサーバーは起動を拒否するため、クラスターが収束するまでにクラッシュループが数回発生することがあります。これは問題ありません。
+- **その後にリバランスします。** クラスターが収束したら、`rc admin rebalance start <alias>` を実行して、既存のオブジェクトを新しいプールへ分散します。
+- PodDisruptionBudget はすべてのプールに適用されます。デフォルトの `pdb.maxUnavailable: 1` では、クラスター全体で同時に退避できる Pod は最大 1 つです。
 
 :::note
 
-`rc` is the RustFS command-line client. Use `rc admin pool list`, `expand`, `rebalance`, and `decommission` for the server-pool workflows described by the chart.
+`rc` は RustFS のコマンドラインクライアントです。チャートが説明するストレージプールの操作には、`rc admin pool list`、`expand`、`rebalance`、`decommission` を使います。
 
 :::
 
-## 8. Uninstall
+## 8. アンインストール
 
 ```bash
 helm uninstall rustfs -n rustfs
@@ -190,12 +190,12 @@ helm uninstall rustfs -n rustfs
 
 :::note
 
-Helm does not delete PVCs created by StatefulSet volume claim templates. If you intend to discard the data, remove the PVCs explicitly (`kubectl -n rustfs delete pvc -l app.kubernetes.io/name=rustfs`) — otherwise a later reinstall with the same release name reattaches them.
+Helm は、StatefulSet の volumeClaimTemplates が作成した PVC を削除しません。データを破棄する場合は、PVC を明示的に削除します（`kubectl -n rustfs delete pvc -l app.kubernetes.io/name=rustfs`）。削除しない場合、同じリリース名で再インストールすると、それらの PVC が再び接続されます。
 
 :::
 
-## Next steps
+## 次のステップ
 
-- [Pool Expansion](../../operations/scaling/storage-pool-expansion.md) — how Server Pool expansion works at the cluster level
-- [Kubernetes Upgrade](../../operations/upgrade/kubernetes/index.md) — upgrade Helm- and Operator-managed deployments
-- [TLS configuration](../../integration/tls-configured.md) — end-to-end TLS options
+- [ストレージプールの拡張](../../operations/scaling/storage-pool-expansion.md) — クラスターレベルでのストレージプール拡張の仕組み
+- [Kubernetes のアップグレード](../../operations/upgrade/kubernetes/index.md) — Helm と Operator で管理するデプロイのアップグレード
+- [TLS の設定](../../integration/tls-configured.md) — エンドツーエンドの TLS オプション

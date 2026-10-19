@@ -1,52 +1,52 @@
 ---
-title: "Node Healing"
-description: "Recover failed RustFS nodes and disks, monitor automatic healing, and run bounded manual heal tasks with rc."
+title: "ノードのデータ修復"
+description: "障害が発生した RustFS のノードとディスクを復旧し、自動のデータ修復を監視し、rc で範囲を限定した手動のデータ修復タスクを実行します。"
 ---
 
-RustFS healing reconstructs missing or inconsistent erasure-coded data from the healthy shards that remain in a storage set. Use this workflow after restoring an unavailable node, replacing a failed disk, or investigating scanner and heal alerts.
+RustFS のデータ修復は、ストレージセットに残っている正常なシャードから、欠落または不整合なイレイジャーコーディングのデータを再構築します。利用できないノードを復旧したあと、障害ディスクを交換したあと、またはスキャナーと heal のアラートを調べるときに、この手順を使います。
 
-Healing is a cluster storage operation. It is different from [site replication](/operations/high-availability/site-replication), which copies data and identity configuration between independent RustFS deployments.
+データ修復は、クラスターのストレージ操作です。独立した RustFS デプロイのあいだでデータとアイデンティティ設定をコピーする [サイトレプリケーション](/ja/operations/high-availability/site-replication) とは別の機能です。
 
-:::warning[Healing is not a backup]
+:::warning[データ修復はバックアップではない]
 
-RustFS can reconstruct data only while enough healthy shards remain in the affected erasure set. Healing cannot recover an object after failures exceed the set's available redundancy, and it does not protect against intentional deletion or application-level corruption. Maintain independent backups or replication according to your recovery requirements.
-
-:::
-
-## How healing works
-
-RustFS coordinates several healing sources through the cluster heal queue:
-
-- `autoHeal`: The automatic disk scanner detects disks that are unformatted or have returned after an outage and queues erasure-set healing.
-- `scanner`: The background data scanner can queue object and bucket healing when it finds inconsistent storage state.
-- `readRepair`: Read-repair paths can submit work discovered while serving requests.
-- `internal`: Internal recovery paths can submit system-initiated work.
-- `admin`: Administrators can submit a recursive, bucket, or prefix heal with `rc admin heal start`.
-
-Automatic disk healing runs at low priority. The `healOperations` status object uses these source names to separate queued, active, and retrying work.
-
-:::note[Reconstruction consumes cluster resources]
-
-Healing reads healthy shards and writes reconstructed data. Deep scans add read and checksum work. Monitor client latency, disk utilization, available capacity, and the heal queue while recovery is active.
+RustFS がデータを再構築できるのは、影響を受けるイレイジャーセットに十分な正常シャードが残っているあいだだけです。障害がセットの利用可能な冗長性を超えたあと、データ修復でオブジェクトを復旧することはできません。意図的な削除や、アプリケーション層の破損からも保護しません。復旧要件に合わせて、独立したバックアップまたはレプリケーションを維持します。
 
 :::
 
-## Requirements
+## データ修復の仕組み
 
-Before recovering a node or disk, prepare:
+RustFS は、クラスターの heal キューを通じて、複数のデータ修復ソースを調整します。
 
-- A RustFS deployment that still has enough healthy shards to reconstruct the affected data.
-- Stable node addresses and the original configured storage mount paths.
-- Replacement storage with capacity appropriate for the affected erasure set.
-- The RustFS [`rc`](/operations/rc) client on a secured administration host.
-- Administrative credentials that permit cluster information, scanner, and heal operations.
-- A maintenance window when replacing hardware or running a deep recursive scan.
+- `autoHeal`: 自動ディスクスキャナーは、未フォーマットのディスク、または障害のあと復帰したディスクを検出し、イレイジャーセットのデータ修復をキューに入れます。
+- `scanner`: バックグラウンドのデータスキャナーは、不整合なストレージ状態を見つけると、オブジェクトとバケットのデータ修復をキューに入れることができます。
+- `readRepair`: read-repair の経路は、リクエストの処理中に見つかった作業を投入できます。
+- `internal`: 内部の復旧経路は、システムが開始した作業を投入できます。
+- `admin`: 管理者は `rc admin heal start` で、再帰、バケット、またはプレフィックスの heal を投入できます。
 
-Record the failed node, pool, set, disk endpoint, mount path, and file-system UUID before changing hardware. Do not remove additional disks from the same erasure set while recovery is incomplete.
+自動のディスク修復は、低い優先度で実行されます。`healOperations` 状態オブジェクトは、これらのソース名を使って、キュー待ち、実行中、再試行中の作業を分けます。
 
-## 1. Identify the failed component
+:::note[再構築はクラスターのリソースを消費する]
 
-Configure an `rc` alias if you do not already have one:
+データ修復は正常なシャードを読み、再構築したデータを書き込みます。ディープスキャンは、読み取りとチェックサムの作業を追加します。復旧が進んでいるあいだ、クライアントのレイテンシ、ディスク使用率、空き容量、heal キューを監視します。
+
+:::
+
+## 要件
+
+ノードまたはディスクを復旧する前に、次を準備します。
+
+- 影響を受けるデータを再構築できるだけの正常シャードが残っている RustFS デプロイ。
+- 安定したノードアドレスと、当初設定したストレージのマウントパス。
+- 影響を受けるイレイジャーセットに見合う容量の交換用ストレージ。
+- 保護された管理ホスト上の RustFS [`rc`](/ja/operations/rc) クライアント。
+- クラスター情報、スキャナー、heal の操作を許可する管理用認証情報。
+- ハードウェアを交換するとき、または再帰的なディープスキャンを実行するときのメンテナンス時間。
+
+ハードウェアを変更する前に、障害ノード、プール、セット、ディスクエンドポイント、マウントパス、ファイルシステムの UUID を記録します。復旧が完了するまで、同じイレイジャーセットから別のディスクを取り外さないでください。
+
+## 1. 障害のあるコンポーネントを特定する
+
+まだなければ、`rc` のエイリアスを設定します。
 
 ```bash
 rc alias set rustfs https://rustfs.example.com:9000 \
@@ -54,7 +54,7 @@ rc alias set rustfs https://rustfs.example.com:9000 \
 	--region us-east-1 --bucket-lookup path
 ```
 
-Check cluster readiness, topology, storage health, and heal activity:
+クラスターの準備完了、トポロジ、ストレージの健全性、heal の活動を確認します。
 
 ```bash
 rc ready rustfs
@@ -64,35 +64,35 @@ rc admin scanner status rustfs
 rc admin heal status rustfs
 ```
 
-Readiness can fail while the cluster is degraded. Use the administrative information commands to identify which node or disk is unavailable and note its pool and erasure-set location.
+クラスターが縮退しているあいだは、準備完了の確認が失敗することがあります。管理情報のコマンドを使い、利用できないノードまたはディスクを特定し、そのプールとイレイジャーセットの位置を控えます。
 
-For machine-readable output, request JSON:
+機械可読の出力が必要な場合は、JSON を要求します。
 
 ```bash
 rc --json admin info storage rustfs
 rc --json admin heal status rustfs
 ```
 
-The aggregate heal status reports runtime state, queued and active tasks, retrying work, request sources, priorities, and available progress counters. A zero-length queue does not prove that an offline disk has been replaced or that every object is recoverable; correlate it with storage topology and readiness.
+集約された heal 状態は、実行時の状態、キュー待ちと実行中のタスク、再試行中の作業、リクエストのソース、優先度、利用可能な進捗カウンタを報告します。キューの長さが 0 でも、オフラインのディスクが交換されたことや、すべてのオブジェクトを復旧できることの証明にはなりません。ストレージのトポロジと準備完了の状態と突き合わせます。
 
-## 2. Restore the node or disk
+## 2. ノードまたはディスクを復旧する
 
-Correct the underlying failure before starting a manual heal.
+手動 heal を始める前に、根本原因の障害を直します。
 
-For a node outage:
+ノード障害の場合は、次の手順です。
 
-1. Restore the node's configured network identity and connectivity to every other RustFS node on the S3 API port, normally `9000`.
-2. Mount the original data disks at their configured paths.
-3. Confirm that the RustFS process uses the same storage endpoint configuration as the rest of the cluster.
-4. Start RustFS and verify that the node rejoins the cluster.
+1. ノードに設定されていたネットワーク識別情報を復旧し、S3 API ポート（通常は `9000`）で、他のすべての RustFS ノードと通信できる状態にします。
+2. 元のデータディスクを、設定されていたパスへマウントします。
+3. RustFS プロセスが、クラスターの他のノードと同じストレージエンドポイント設定を使っていることを確認します。
+4. RustFS を起動し、ノードがクラスターへ再参加したことを確認します。
 
-For a failed disk:
+障害ディスクの場合は、次の手順です。
 
-1. Stop the RustFS process on the affected node before removing or remounting storage.
-2. Replace the failed device and prepare its file system according to [Disk Preparation](/installation/requirement/disk-preparation).
-3. Mount the replacement at the exact path used by the failed disk and update `/etc/fstab` with its file-system UUID.
-4. Verify the mount, file-system type, ownership, and available capacity before starting RustFS.
-5. Start RustFS and confirm that the disk appears in the expected pool and erasure set.
+1. ストレージを取り外す、または再マウントする前に、影響を受けるノードの RustFS プロセスを停止します。
+2. 障害デバイスを交換し、[ディスクの準備](/ja/installation/requirement/disk-preparation)に従ってファイルシステムを準備します。
+3. 交換用ディスクを、障害ディスクが使っていたパスそのものへマウントし、`/etc/fstab` をそのファイルシステムの UUID で更新します。
+4. RustFS を起動する前に、マウント、ファイルシステムの種類、所有権、空き容量を確認します。
+5. RustFS を起動し、ディスクが想定したプールとイレイジャーセットに現れることを確認します。
 
 ```bash
 findmnt /data/rustfs0
@@ -100,15 +100,15 @@ df -hT /data/rustfs0
 rc admin info storage rustfs
 ```
 
-:::warning[Do not reuse stale storage blindly]
+:::warning[古いストレージを確認せずに再利用しない]
 
-Confirm the identity and contents of every device before mounting it at a RustFS data path. Do not copy internal metadata between disks, combine multiple configured endpoints on one replacement file system, or mount a replacement over a path that still contains required data.
+RustFS のデータパスへマウントする前に、各デバイスの識別情報と内容を確認します。ディスク間で内部メタデータをコピーしないでください。設定済みの複数のエンドポイントを、1 つの交換用ファイルシステムにまとめないでください。必要なデータが残っているパスの上に、交換用ディスクをマウントしないでください。
 
 :::
 
-## 3. Monitor automatic healing
+## 3. 自動のデータ修復を監視する
 
-After the node or replacement disk is online, RustFS can detect the recovery candidate and queue erasure-set healing. Check both storage state and aggregate heal activity:
+ノードまたは交換ディスクがオンラインになったあと、RustFS は復旧候補を検出し、イレイジャーセットのデータ修復をキューに入れることができます。ストレージの状態と、集約された heal の活動の両方を確認します。
 
 ```bash
 rc admin info storage rustfs
@@ -116,24 +116,24 @@ rc admin heal status rustfs
 rc admin scanner status rustfs
 ```
 
-In JSON output, watch these groups:
+JSON 出力では、次のグループを監視します。
 
-| Field | Meaning |
+| フィールド | 意味 |
 | --- | --- |
-| `state` | Heal runtime state, such as `active` or `idle`. |
-| `healQueueLength` | Total work waiting in the heal queue. |
-| `healActiveTasks` | Total heal tasks currently running. |
-| `healOperations` | Queue, active, and retry counts grouped by source (`scanner`, `admin`, `autoHeal`, `internal`, and `readRepair`) and priority. |
-| `progress` | Available totals for objects scanned, healed, failed, and bytes processed. |
-| `clusterStatusComplete` | Whether the response includes every expected node. |
+| `state` | `active` や `idle` などの、heal の実行時状態。 |
+| `healQueueLength` | heal キューで待機している作業の合計。 |
+| `healActiveTasks` | 現在実行中の heal タスクの合計。 |
+| `healOperations` | ソース（`scanner`、`admin`、`autoHeal`、`internal`、`readRepair`）と優先度で分けた、キュー、実行中、再試行の件数。 |
+| `progress` | スキャン済み、修復済み、失敗、処理済みバイト数について、利用できる合計。 |
+| `clusterStatusComplete` | 応答が、想定されるすべてのノードを含むかどうか。 |
 
-Do not treat `idle` as successful recovery by itself. Confirm that the replacement disk is online, no heal failures remain, the cluster is ready, and representative objects are readable.
+`idle` であることだけを、復旧の成功と見なさないでください。交換ディスクがオンラインであること、heal の失敗が残っていないこと、クラスターが準備完了であること、代表的なオブジェクトが読めることを確認します。
 
-## 4. Run a targeted manual heal
+## 4. 対象を絞った手動 heal を実行する
 
-Use a manual task when automatic recovery does not cover the required path or when you need an explicit scan after an incident. Start with the narrowest bucket or prefix that contains affected data.
+自動復旧が必要なパスをカバーしない場合、またはインシデントのあと明示的なスキャンが必要な場合に、手動タスクを使います。影響を受けたデータを含む、最も狭いバケットまたはプレフィックスから始めます。
 
-Preview a bucket heal without applying changes:
+変更を適用せずに、バケット heal をプレビューします。
 
 ```bash
 rc admin heal start rustfs \
@@ -142,7 +142,7 @@ rc admin heal start rustfs \
 	--dry-run
 ```
 
-Run the targeted heal after reviewing the preview:
+プレビューを確認したあと、対象を絞った heal を実行します。
 
 ```bash
 rc admin heal start rustfs \
@@ -150,7 +150,7 @@ rc admin heal start rustfs \
 	--scan-mode normal
 ```
 
-Limit the task to an object prefix when the affected scope is known:
+影響範囲が分かっている場合は、オブジェクトプレフィックスにタスクを限定します。
 
 ```bash
 rc admin heal start rustfs \
@@ -159,19 +159,19 @@ rc admin heal start rustfs \
 	--scan-mode deep
 ```
 
-`normal` is the default scan mode. Use `deep` when you need deeper data verification and have planned for the additional disk I/O. Omit `--bucket` only when a recursive scan of all buckets is necessary.
+`normal` が既定のスキャンモードです。より深いデータ検証が必要で、追加のディスク I/O を見込んでいる場合に `deep` を使います。`--bucket` を省略するのは、すべてのバケットを再帰スキャンする必要がある場合だけです。
 
-:::warning[Review mutation options separately]
+:::warning[変更オプションは別に確認する]
 
-The `--remove` option removes dangling objects or parts, and `--recreate` requests recreation of missing data. Do not add either option to an incident command until you have inspected the affected storage state, tested with `--dry-run`, and confirmed the intended result.
+`--remove` は孤立したオブジェクトまたはパートを削除し、`--recreate` は欠落データの再作成を要求します。影響を受けたストレージの状態を調べ、`--dry-run` で確認し、意図した結果だと確かめるまで、インシデント対応のコマンドにどちらのオプションも足さないでください。
 
 :::
 
-## 5. Track the manual task
+## 5. 手動タスクを追跡する
 
-Every manual heal returns a `clientToken`. Save it with the incident record because status and stop operations for that task require the token.
+手動 heal は毎回 `clientToken` を返します。そのタスクの状態確認と停止にはトークンが必要なため、インシデントの記録と一緒に保存します。
 
-For a bucket or prefix task, pass the original target and token:
+バケットまたはプレフィックスのタスクでは、元の対象とトークンを渡します。
 
 ```bash
 rc admin heal status rustfs \
@@ -180,23 +180,23 @@ rc admin heal status rustfs \
 	--client-token <client-token>
 ```
 
-For a recursive task started without `--bucket`, use the token alone:
+`--bucket` なしで開始した再帰タスクでは、トークンだけを使います。
 
 ```bash
 rc admin heal status rustfs --client-token <client-token>
 ```
 
-The tokenless command remains the cluster-wide background summary:
+トークンを付けないコマンドは、これまでどおりクラスター全体のバックグラウンド概要を表示します。
 
 ```bash
 rc admin heal status rustfs
 ```
 
-Task status can include scanned, healed, and failed item totals, bytes processed, the current item, scan mode, start time, and last update. Investigate failed items rather than relying only on the task's aggregate state.
+タスクの状態には、スキャン済み、修復済み、失敗の項目合計、処理済みバイト数、現在の項目、スキャンモード、開始時刻、最終更新が含まれることがあります。タスクの集計状態だけに頼らず、失敗した項目を調べます。
 
-## 6. Validate recovery
+## 6. 復旧を検証する
 
-After the heal queue drains, verify the cluster and the recovered data path:
+heal キューが空になったあと、クラスターと復旧したデータパスを検証します。
 
 ```bash
 rc ready rustfs
@@ -205,20 +205,20 @@ rc admin info storage rustfs
 rc admin heal status rustfs
 ```
 
-Read representative objects from affected buckets and versions. For a known test object:
+影響を受けたバケットとバージョンから、代表的なオブジェクトを読みます。既知のテストオブジェクトの場合は次のとおりです。
 
 ```bash
 rc object stat rustfs/my-bucket/hello.txt
 rc object copy rustfs/my-bucket/hello.txt ./hello-recovered.txt
 ```
 
-Compare the downloaded object with an independent checksum or trusted source when one is available. A successful object read validates that request, not every object or every shard in the cluster.
+独立したチェックサム、または信頼できるソースがある場合は、ダウンロードしたオブジェクトと照合します。オブジェクトの読み取りが成功しても、検証されるのはそのリクエストだけです。クラスター内のすべてのオブジェクトや、すべてのシャードが検証されるわけではありません。
 
-Continue monitoring storage health and heal failures after the cluster becomes ready. Preserve the incident timeline, failed-device information, task token, and final status output for review.
+クラスターが準備完了になったあとも、ストレージの健全性と heal の失敗を監視し続けます。インシデントの時系列、障害デバイスの情報、タスクのトークン、最終的な状態の出力を、レビュー用に残します。
 
-## 7. Stop a manual heal
+## 7. 手動 heal を停止する
 
-Stop only the task you have identified. For a bucket or prefix task, include the original target and token:
+特定したタスクだけを停止します。バケットまたはプレフィックスのタスクでは、元の対象とトークンを含めます。
 
 ```bash
 rc admin heal stop rustfs \
@@ -227,44 +227,44 @@ rc admin heal stop rustfs \
 	--client-token <client-token>
 ```
 
-Stop a recursive token-scoped task with:
+トークンで対象を限定した再帰タスクは、次のコマンドで停止します。
 
 ```bash
 rc admin heal stop rustfs --client-token <client-token>
 ```
 
-The tokenless stop command targets the global background heal operation:
+トークンなしの停止コマンドは、グローバルなバックグラウンド heal を対象にします。
 
 ```bash
 rc admin heal stop rustfs
 ```
 
-Use the global stop only when continued background work creates a larger operational risk. Stopping healing leaves recovery incomplete; record the reason and confirm how healing will resume before closing the incident.
+グローバルな停止を使うのは、バックグラウンドの処理を続ける方が運用上のリスクが大きい場合だけです。データ修復を止めると、復旧は完了しないまま残ります。インシデントを閉じる前に、理由を記録し、データ修復をどのように再開するかを確認します。
 
-## Troubleshooting
+## トラブルシューティング
 
-### The replacement disk is not healing
+### 交換ディスクでデータ修復が進まない
 
-Confirm that the replacement is mounted at the configured endpoint and appears in `rc admin info storage`. Check the RustFS logs for disk identification, formatting, permission, or queue-admission failures. Also confirm that healing services are initialized with `rc admin heal status`.
+交換用ディスクが、設定されたエンドポイントにマウントされ、`rc admin info storage` に現れることを確認します。RustFS のログで、ディスクの識別、フォーマット、権限、キュー受付の失敗を確認します。あわせて、`rc admin heal status` でデータ修復サービスが初期化されていることを確認します。
 
-### Heal status is partial
+### heal の状態が部分的である
 
-If `clusterStatusComplete` is false, one or more expected nodes did not contribute to the aggregate response. Restore node-to-node connectivity and check each node's storage and process health before trusting cluster totals.
+`clusterStatusComplete` が false の場合、想定していたノードのうち 1 つ以上が、集約応答に含まれていません。クラスターの合計値を信頼する前に、ノード間の接続を復旧し、各ノードのストレージとプロセスの健全性を確認します。
 
-### The queue remains active
+### キューが active のままである
 
-Compare queued, active, and retrying work by source. A growing `autoHeal` count points to disk or erasure-set recovery; scanner work points to background discovery; admin work belongs to manually submitted tasks. Check disk latency, free capacity, node connectivity, and repeated item failures before starting another task.
+ソースごとに、キュー待ち、実行中、再試行中の作業を比較します。`autoHeal` の件数が増えているときは、ディスクまたはイレイジャーセットの復旧を示します。スキャナーの作業は、バックグラウンドでの検出を示します。admin の作業は、手動で投入したタスクのものです。別のタスクを開始する前に、ディスクのレイテンシ、空き容量、ノード間の接続、項目の繰り返し失敗を確認します。
 
-### Objects cannot be reconstructed
+### オブジェクトを再構築できない
 
-Stop additional maintenance on the affected erasure set. Preserve the remaining disks and logs, then determine whether enough healthy shards survive. Repeated deep scans cannot reconstruct data when the available redundancy has already been exceeded.
+影響を受けるイレイジャーセットに対する追加のメンテナンスを止めます。残っているディスクとログを保存し、十分な正常シャードが残っているかを判断します。利用できる冗長性をすでに超えている場合、ディープスキャンを繰り返してもデータは再構築できません。
 
-### A manual task cannot be queried
+### 手動タスクを照会できない
 
-Use the `clientToken` returned by `heal start`. Bucket and prefix tasks must be queried with the same `--bucket` and `--prefix` target used at start; a recursive root task uses the token without a bucket.
+`heal start` が返した `clientToken` を使います。バケットとプレフィックスのタスクは、開始時と同じ `--bucket` と `--prefix` を指定して照会する必要があります。再帰的なルートタスクは、バケットを付けずトークンだけを使います。
 
-## Next steps
+## 次のステップ
 
-- Review [Status Check](/operations/status-check) for readiness, cluster, and capacity checks.
-- Configure [Observability](/operations/observability) to alert on disk health and sustained recovery work.
-- Review [Site Replication](/operations/high-availability/site-replication) when recovery requires an independent RustFS deployment.
+- 準備完了、クラスター、容量の確認は [ステータスチェック](/ja/operations/status-check) を参照してください。
+- ディスクの健全性と、継続する復旧作業へのアラートは [オブザーバビリティ](/ja/operations/observability) で設定します。
+- 復旧に独立した RustFS デプロイが必要な場合は、[サイトレプリケーション](/ja/operations/high-availability/site-replication) を参照してください。

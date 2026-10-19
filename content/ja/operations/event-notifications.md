@@ -1,36 +1,36 @@
 ---
-title: "Event Notifications"
-description: "Configure RustFS bucket event notifications and deliver filtered object events to external targets."
+title: "イベント通知"
+description: "RustFS のバケットイベント通知を設定し、絞り込んだオブジェクトイベントを外部ターゲットへ配信する方法を説明します。"
 ---
 
-RustFS Event Notifications deliver S3 bucket activity to external systems. This guide configures a webhook target, associates it with a bucket, and verifies delivery with AWS CLI.
+RustFS のイベント通知は、S3 バケットのアクティビティを外部システムへ配信します。このガイドでは、Webhook ターゲットを設定してバケットに関連付け、AWS CLI で配信を確認します。
 
-## Overview
+## 概要
 
-An event notification has two independent parts:
+イベント通知は、互いに独立した 2 つの部分で構成されます。
 
-- A **notification target** defines where RustFS sends events.
-- A **bucket notification configuration** selects the target, event types, and optional object-key filters for one bucket.
+- **通知ターゲット**は、RustFS がイベントを送る先を定義します。
+- **バケット通知設定**は、1 つのバケットについて、ターゲット、イベント種別、任意のオブジェクトキーフィルタを選びます。
 
-RustFS supports webhook, Kafka, MQTT, MySQL, PostgreSQL, NATS, Redis, AMQP, and Pulsar target families. The webhook workflow below is useful for HTTP services, serverless functions, and integration platforms.
+RustFS は、Webhook、Kafka、MQTT、MySQL、PostgreSQL、NATS、Redis、AMQP、Pulsar のターゲット系統をサポートします。以下の Webhook の手順は、HTTP サービス、サーバーレス関数、連携プラットフォームに向いています。
 
-Bucket rules use the S3 `PutBucketNotificationConfiguration` and `GetBucketNotificationConfiguration` APIs. RustFS currently accepts queue configurations; AWS SNS topic and Lambda function configurations are not supported.
+バケットのルールは、S3 の `PutBucketNotificationConfiguration` と `GetBucketNotificationConfiguration` API を使います。RustFS が現在受け付けるのはキュー設定です。AWS SNS のトピックと Lambda 関数の設定はサポートしていません。
 
-Common event families include:
+主なイベントの系統は次のとおりです。
 
-| Event family | Example events |
+| イベントの系統 | 例 |
 | --- | --- |
-| Object creation | `s3:ObjectCreated:Put`, `s3:ObjectCreated:Copy`, `s3:ObjectCreated:CompleteMultipartUpload` |
-| Object removal | `s3:ObjectRemoved:Delete`, `s3:ObjectRemoved:DeleteMarkerCreated` |
-| Object access | `s3:ObjectAccessed:Get`, `s3:ObjectAccessed:Head` |
-| Object tagging | `s3:ObjectTagging:Put`, `s3:ObjectTagging:Delete` |
-| Lifecycle and tiering | Expiration, restore, replication, and transition events |
+| オブジェクトの作成 | `s3:ObjectCreated:Put`、`s3:ObjectCreated:Copy`、`s3:ObjectCreated:CompleteMultipartUpload` |
+| オブジェクトの削除 | `s3:ObjectRemoved:Delete`、`s3:ObjectRemoved:DeleteMarkerCreated` |
+| オブジェクトへのアクセス | `s3:ObjectAccessed:Get`、`s3:ObjectAccessed:Head` |
+| オブジェクトのタグ付け | `s3:ObjectTagging:Put`、`s3:ObjectTagging:Delete` |
+| ライフサイクルと階層化 | 有効期限切れ、復元、レプリケーション、移行の各イベント |
 
-Use a wildcard such as `s3:ObjectCreated:*` to subscribe to every event in a family.
+系統内のすべてのイベントを購読するには、`s3:ObjectCreated:*` のようなワイルドカードを使います。
 
-## Configuration
+## 設定
 
-Event Notifications are disabled by default. The following environment variables enable the module and create a webhook target named `primary`:
+イベント通知は既定で無効です。次の環境変数でモジュールを有効にし、`primary` という名前の Webhook ターゲットを作成します。
 
 ```bash
 export RUSTFS_NOTIFY_ENABLE="true"
@@ -41,40 +41,40 @@ export RUSTFS_NOTIFY_WEBHOOK_QUEUE_DIR_PRIMARY="/var/lib/rustfs/notify-primary"
 export RUSTFS_OUTBOUND_ALLOW_ORIGINS="https://events.example.com"
 ```
 
-Restart RustFS after changing environment-managed targets. The target name is the lowercase form of the environment-variable suffix, so `_PRIMARY` creates `primary`. Use the target ARN `arn:rustfs:sqs:us-east-1:primary:webhook` in the bucket configuration.
+環境変数で管理するターゲットを変更したあとは、RustFS を再起動します。ターゲット名は環境変数の接尾辞を小文字にしたものなので、`_PRIMARY` は `primary` を作成します。バケット設定では、ターゲット ARN `arn:rustfs:sqs:us-east-1:primary:webhook` を使います。
 
-RustFS sends a `HEAD` health check to the endpoint origin's root path, such as `https://events.example.com/`, and sends JSON `POST` requests to the complete configured endpoint. The origin must respond to `HEAD`, while delivery requests must return a successful HTTP status. Allow the RustFS service account to write to the queue directory.
+RustFS は、エンドポイントのオリジンのルートパス（`https://events.example.com/` など）へ `HEAD` のヘルスチェックを送り、設定された完全なエンドポイントへ JSON の `POST` リクエストを送ります。オリジンは `HEAD` に応答する必要があります。配信リクエストは、成功を示す HTTP ステータスを返す必要があります。RustFS プロセスの実行アカウントには、キューディレクトリへの書き込みを許可します。
 
-### Webhook settings
+### Webhook の設定
 
-Use the same `_PRIMARY` suffix on all settings for this target:
+このターゲットのすべての設定で、同じ `_PRIMARY` 接尾辞を使います。
 
-| Variable | Purpose |
+| 変数 | 用途 |
 | --- | --- |
-| `RUSTFS_NOTIFY_WEBHOOK_ENDPOINT_PRIMARY` | HTTP or HTTPS delivery endpoint |
-| `RUSTFS_NOTIFY_WEBHOOK_AUTH_TOKEN_PRIMARY` | Bearer token sent in the `Authorization` header |
-| `RUSTFS_NOTIFY_WEBHOOK_QUEUE_DIR_PRIMARY` | Directory for queued deliveries |
-| `RUSTFS_NOTIFY_WEBHOOK_QUEUE_LIMIT_PRIMARY` | Maximum number of queued events |
-| `RUSTFS_NOTIFY_WEBHOOK_CLIENT_CERT_PRIMARY` | Client certificate for mutual TLS (mTLS) |
-| `RUSTFS_NOTIFY_WEBHOOK_CLIENT_KEY_PRIMARY` | Private key paired with the client certificate |
-| `RUSTFS_NOTIFY_WEBHOOK_CLIENT_CA_PRIMARY` | Certificate authority used to verify the receiver |
-| `RUSTFS_NOTIFY_WEBHOOK_SKIP_TLS_VERIFY_PRIMARY` | Disable server certificate verification |
+| `RUSTFS_NOTIFY_WEBHOOK_ENDPOINT_PRIMARY` | HTTP または HTTPS の配信エンドポイント |
+| `RUSTFS_NOTIFY_WEBHOOK_AUTH_TOKEN_PRIMARY` | `Authorization` ヘッダーで送る Bearer トークン |
+| `RUSTFS_NOTIFY_WEBHOOK_QUEUE_DIR_PRIMARY` | キューに入れた配信を置くディレクトリ |
+| `RUSTFS_NOTIFY_WEBHOOK_QUEUE_LIMIT_PRIMARY` | キューに入れられるイベントの最大数 |
+| `RUSTFS_NOTIFY_WEBHOOK_CLIENT_CERT_PRIMARY` | 相互 TLS（mTLS）用のクライアント証明書 |
+| `RUSTFS_NOTIFY_WEBHOOK_CLIENT_KEY_PRIMARY` | クライアント証明書と対になる秘密鍵 |
+| `RUSTFS_NOTIFY_WEBHOOK_CLIENT_CA_PRIMARY` | 受信側の検証に使う認証局 |
+| `RUSTFS_NOTIFY_WEBHOOK_SKIP_TLS_VERIFY_PRIMARY` | サーバー証明書の検証を無効にします |
 
-:::warning[Keep certificate verification enabled]
+:::warning[証明書の検証は有効のままにする]
 
-Do not enable `RUSTFS_NOTIFY_WEBHOOK_SKIP_TLS_VERIFY_PRIMARY` in production. Configure `RUSTFS_NOTIFY_WEBHOOK_CLIENT_CA_PRIMARY` when the receiver uses a private certificate authority. If you use mTLS, provide both the client certificate and private key.
+本番では `RUSTFS_NOTIFY_WEBHOOK_SKIP_TLS_VERIFY_PRIMARY` を有効にしないでください。受信側がプライベート認証局を使う場合は、`RUSTFS_NOTIFY_WEBHOOK_CLIENT_CA_PRIMARY` を設定します。mTLS を使う場合は、クライアント証明書と秘密鍵の両方を指定します。
 
 :::
 
-For all target families and target-specific keys, see [Environment Variables](/reference/environment-variables#event--audit-targets).
+すべてのターゲット系統と、ターゲット固有のキーについては、[環境変数](/ja/reference/environment-variables#event--audit-targets)を参照します。
 
-## Usage
+## 使い方
 
-The following example sends creation and removal events for `.dat` objects under `uploads/` to the `primary` webhook.
+次の例では、`uploads/` 配下の `.dat` オブジェクトに対する作成イベントと削除イベントを、`primary` の Webhook へ送ります。
 
-### Configure the bucket rule
+### バケットルールを設定する
 
-Create the notification configuration:
+通知設定を作成します。
 
 ```json title="notification.json"
 {
@@ -99,7 +99,7 @@ Create the notification configuration:
 }
 ```
 
-Apply it to `my-bucket` with [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html):
+[AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) で `my-bucket` に適用します。
 
 ```bash
 aws --endpoint-url http://localhost:9000 \
@@ -109,9 +109,9 @@ aws --endpoint-url http://localhost:9000 \
 	--notification-configuration file://notification.json
 ```
 
-Saving a bucket rule does not prove that its target exists or is online. Confirm that the module and target are enabled, the receiver answers health checks, and a test object operation produces a delivery.
+バケットルールを保存しても、そのターゲットが存在することやオンラインであることは証明されません。モジュールとターゲットが有効であること、受信側がヘルスチェックに応答すること、テストのオブジェクト操作で配信が行われることを確認します。
 
-Read the active configuration:
+有効な設定を読み取ります。
 
 ```bash
 aws --endpoint-url http://localhost:9000 \
@@ -120,13 +120,13 @@ aws --endpoint-url http://localhost:9000 \
 	--bucket my-bucket
 ```
 
-Prefix and suffix filters are case-sensitive and are combined with AND logic. A rule can contain at most one prefix and one suffix filter.
+プレフィックスとサフィックスのフィルタは大文字と小文字を区別し、AND 条件で組み合わせます。1 つのルールに含められるプレフィックスフィルタとサフィックスフィルタは、それぞれ最大 1 つです。
 
-### Manage rules with rc
+### rc でルールを管理する
 
-The `rc` client can add, list, and remove bucket notification rules. It does not configure the notification module or create the underlying webhook, broker, or database target; configure those first through environment variables or the Console.
+`rc` クライアントでは、バケット通知ルールの追加、一覧、削除ができます。通知モジュールの設定や、基盤となる Webhook、ブローカー、データベースのターゲット作成は行いません。それらは先に、環境変数または Console（管理画面）で設定します。
 
-Add creation and removal events for the `primary` target:
+`primary` ターゲットに、作成イベントと削除イベントを追加します。
 
 ```bash
 rc bucket event add \
@@ -135,13 +135,13 @@ rc bucket event add \
 	--event put,delete
 ```
 
-List the active rules:
+有効なルールを一覧します。
 
 ```bash
 rc --json bucket event list rustfs/my-bucket
 ```
 
-Remove every rule associated with that target ARN:
+そのターゲット ARN に関連付けられたルールをすべて削除します。
 
 ```bash
 rc bucket event remove \
@@ -149,11 +149,11 @@ rc bucket event remove \
 	arn:rustfs:sqs:us-east-1:primary:webhook
 ```
 
-The current `rc bucket event add` command does not expose prefix or suffix filter options. Use AWS CLI when the rule must filter object keys.
+現在の `rc bucket event add` コマンドには、プレフィックスやサフィックスのフィルタオプションがありません。ルールでオブジェクトキーをフィルタする必要がある場合は、AWS CLI を使います。
 
-### Trigger and inspect events
+### イベントを発生させて確認する
 
-Upload and remove a matching object:
+条件に一致するオブジェクトをアップロードし、削除します。
 
 ```bash
 printf 'hello from RustFS\n' > hello.txt
@@ -167,7 +167,7 @@ aws --endpoint-url http://localhost:9000 \
 	s3 rm s3://my-bucket/uploads/hello.dat
 ```
 
-The webhook receives an S3-compatible JSON envelope. Important fields include the event name, bucket, object key, size, ETag, and request identifiers:
+Webhook は S3 互換の JSON エンベロープを受け取ります。重要なフィールドには、イベント名、バケット、オブジェクトキー、サイズ、ETag、リクエスト識別子があります。
 
 ```json
 {
@@ -184,13 +184,13 @@ The webhook receives an S3-compatible JSON envelope. Important fields include th
 }
 ```
 
-Decode the object key as URL-encoded data before using it. Consumers should also be idempotent: queued delivery provides store-and-forward recovery, but a receiver can observe the same event more than once.
+オブジェクトキーは、使う前に URL エンコードされたデータとしてデコードします。あわせて、コンシューマーは冪等であることを推奨します。キュー経由の配信は蓄積転送による回復を提供しますが、受信側は同じイベントを複数回観測できます。
 
-### Replace or remove rules
+### ルールを置き換える、または削除する
 
-`PutBucketNotificationConfiguration` replaces the complete notification configuration for the bucket. Include every rule that you want to retain when updating it.
+`PutBucketNotificationConfiguration` は、バケットの通知設定全体を置き換えます。更新するときは、残すルールをすべて含めます。
 
-Remove all rules by applying an empty configuration:
+空の設定を適用して、すべてのルールを削除します。
 
 ```bash
 aws --endpoint-url http://localhost:9000 \
@@ -200,6 +200,6 @@ aws --endpoint-url http://localhost:9000 \
 	--notification-configuration '{}'
 ```
 
-## Next steps
+## 次のステップ
 
-Configure [Audit Targets](/security-compliance/audit-logs) when you need request-level security and compliance records instead of bucket-scoped object events. Review [Observability](/operations/observability) to monitor the RustFS service.
+バケット単位のオブジェクトイベントではなく、リクエスト単位のセキュリティとコンプライアンスの記録が必要な場合は、[監査ターゲット](/ja/security-compliance/audit-logs)を設定します。RustFS サービスを監視するには、[オブザーバビリティ](/ja/operations/observability)を確認します。

@@ -1,77 +1,77 @@
 ---
 title: "SSE-S3"
-description: "Configure server-managed SSE-S3 encryption for RustFS buckets and object writes."
+description: "RustFS のバケットとオブジェクト書き込みに、サーバー管理の SSE-S3 暗号化を設定します。"
 ---
 
-SSE-S3 uses the S3 `AES256` encryption mode. RustFS generates a unique data encryption key for each encrypted object and uses the configured KMS service to wrap that key. Clients do not provide or retain the encryption key.
+SSE-S3 は、S3 の `AES256` 暗号化モードを使います。RustFS は、暗号化するオブジェクトごとに一意のデータ暗号化鍵を生成し、設定した KMS サービスでその鍵をラップします。クライアントは暗号化鍵を提供せず、保持もしません。
 
-## Requirements
+## 要件
 
-- Configure and start [KMS](./kms.md), create its default key, and verify the key is available before enabling SSE-S3.
-- Install and configure [`rc`](/operations/rc).
-- Create the target bucket and verify that normal object writes succeed.
+- [KMS](./kms.md) を設定して起動し、デフォルト鍵を作成し、SSE-S3 を有効にする前にその鍵が利用できることを確認します。
+- [`rc`](/ja/operations/rc) をインストールして設定します。
+- 対象のバケットを作成し、通常のオブジェクト書き込みが成功することを確認します。
 
-:::warning[KMS availability is required]
+:::warning[KMS が利用できることが必要です]
 
-RustFS accepts an SSE-S3 bucket default even when KMS is unavailable, but encrypted object writes then fail. Verify an encrypted write and read before using the bucket for production data.
+KMS が利用できない場合でも、RustFS は SSE-S3 のバケットデフォルトを受け付けます。ただし、その状態で暗号化したオブジェクトの書き込みは失敗します。本番データにバケットを使う前に、暗号化された書き込みと読み取りを確認します。
 
 :::
 
-## Set bucket default encryption
+## バケットのデフォルト暗号化を設定する
 
-Apply SSE-S3 to new writes that do not specify an object-level encryption mode:
+オブジェクト単位の暗号化モードを指定しない新しい書き込みに、SSE-S3 を適用します。
 
 ```bash
 rc bucket encryption set rustfs/my-bucket --mode sse-s3
 rc bucket encryption info rustfs/my-bucket
 ```
 
-The reported mode should be `SSE-S3`.
+報告されるモードは `SSE-S3` になるはずです。
 
-Upload and read a test object:
+テストオブジェクトをアップロードして読み取ります。
 
 ```bash
 rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt
 rc object show rustfs/my-bucket/hello.txt
 ```
 
-## Encrypt one object explicitly
+## 1 つのオブジェクトを明示的に暗号化する
 
-Apply SSE-S3 to a single destination without changing the bucket default:
+バケットのデフォルトを変えずに、単一の宛先へ SSE-S3 を適用します。
 
 ```bash
 rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt \
 	--enc-s3 rustfs/my-bucket/hello.txt
 ```
 
-For recursive writes, the encryption selector must exactly match the destination prefix:
+再帰的な書き込みでは、暗号化セレクターが宛先のプレフィックスと完全に一致する必要があります。
 
 ```bash
 rc object copy ./reports/ rustfs/my-bucket/reports/ --recursive \
 	--enc-s3 rustfs/my-bucket/reports/
 ```
 
-## Clear the bucket default
+## バケットのデフォルトを解除する
 
-Remove the default rule:
+デフォルトルールを削除します。
 
 ```bash
 rc bucket encryption clear rustfs/my-bucket
 rc bucket encryption info rustfs/my-bucket
 ```
 
-Clearing or changing the bucket default affects only later writes. It does not decrypt or rewrite existing objects.
+バケットのデフォルトを解除または変更しても、影響するのは以降の書き込みだけです。既存のオブジェクトは復号も書き換えもされません。
 
-## Request contract
+## リクエストヘッダー
 
-S3 clients request SSE-S3 with:
+S3 クライアントは、次のヘッダーで SSE-S3 を要求します。
 
 ```http
 x-amz-server-side-encryption: AES256
 ```
 
-An object-level request overrides the bucket default for that write. If no object-level mode is supplied, RustFS resolves the effective mode from the bucket encryption configuration.
+オブジェクト単位のリクエストは、その書き込みについてバケットのデフォルトを上書きします。オブジェクト単位のモードが指定されていない場合、RustFS はバケットの暗号化設定から有効なモードを解決します。
 
-## Next steps
+## 次のステップ
 
-Use [SSE-KMS](./kms.md#verify-kms-backed-encryption) when you need an explicit KMS key ID, or compare [SSE-C](./sse-c.md) for client-held keys.
+明示的な KMS 鍵 ID が必要な場合は [SSE-KMS](./kms.md#verify-kms-backed-encryption) を使います。クライアントが保持する鍵については [SSE-C](./sse-c.md) と比較します。

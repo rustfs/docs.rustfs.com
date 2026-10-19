@@ -239,7 +239,7 @@ RustFS コンソールでこのプレフィックスを参照することもで�
 
 ## 6. RustFS S3 Tables を使用する
 
-RustFS S3 Tables は組み込みの Apache Iceberg REST カタログを提供します。Flink はテーブルバケットを管理された Iceberg ウェアハウスとして扱え、データは RustFS 内に保持されます。[S3 Tables](/administration/data/s3-tables) の説明に従ってテーブルバケットを有効化し、Flink Iceberg コネクタの REST カタログを RustFS に向けてください。REST カタログ URI は `http://<rustfs-host>:9000/iceberg`、ウェアハウスはバケット名で、カタログリクエスト（AWS Signature Version 4、署名名 `s3`）と S3 ファイルアクセスの両方がパススタイルアクセスを使います。
+RustFS S3 Tables は組み込みの Apache Iceberg REST カタログを提供します。Flink はテーブルバケットを管理された Iceberg ウェアハウスとして扱え、データは RustFS 内に保持されます。[S3 Tables](/ja/administration/data/s3-tables) の説明に従ってテーブルバケットを有効化し、Flink Iceberg コネクタの REST カタログを RustFS に向けてください。REST カタログ URI は `http://<rustfs-host>:9000/iceberg`、ウェアハウスはバケット名で、カタログリクエスト（AWS Signature Version 4、署名名 `s3`）と S3 ファイルアクセスの両方がパススタイルアクセスを使います。
 
 S3 Tables のサポートマトリックスに従い、本番でこの経路を採用する前に、実際にデプロイする Flink と Iceberg のバージョンでカタログを検証してください。
 
@@ -273,6 +273,6 @@ S3 プラグインは `flink-conf.yaml` の `s3.*` プロパティから認証�
 
 ## 次のステップ
 
-- 追加の S3 オペレーションを採用する前に、[S3 互換性ノート](/administration/protocols/s3)を確認してください。
-- [アクセスキー管理](/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
+- 追加の S3 オペレーションを採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認してください。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
 - [Apache Flink ドキュメント](https://nightlies.apache.org/flink/flink-docs-stable/)で、パーティショニングやコンパクションなど filesystem コネクタのオプションを確認してください。

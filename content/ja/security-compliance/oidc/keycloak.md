@@ -184,4 +184,4 @@ https://rustfs.example.com/rustfs/admin/v3/oidc/authorize/default
 ## 次のステップ
 
 - Keycloak のグループを割り当てる前に、[ユーザー、グループ、ポリシー](../iam/policies.md)を確認します。
-- ログインエンドポイントを公開する前に、[Console のセキュリティに関する注意](/administration/console)を確認します。
+- ログインエンドポイントを公開する前に、[Console のセキュリティに関する注意](/ja/administration/console)を確認します。

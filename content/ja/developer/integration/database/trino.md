@@ -203,7 +203,7 @@ RustFS コンソールでこのプレフィックスを参照することもで�
 
 ## 6. RustFS S3 Tables を使用する
 
-RustFS S3 Tables は組み込みの Apache Iceberg REST カタログを提供します。Trino はテーブルバケットを管理された Iceberg ウェアハウスとして扱え、データは RustFS 内に保持されます。[S3 Tables](/administration/data/s3-tables) の説明に従ってテーブルバケットを有効化し、Trino の Iceberg コネクタを REST カタログに接続してください。REST カタログ URI は `http://<rustfs-host>:9000/iceberg`、ウェアハウスはバケット名で、カタログリクエスト（AWS Signature Version 4、署名名 `s3`）と S3 ファイルアクセスの両方がパススタイルアクセスを使います。
+RustFS S3 Tables は組み込みの Apache Iceberg REST カタログを提供します。Trino はテーブルバケットを管理された Iceberg ウェアハウスとして扱え、データは RustFS 内に保持されます。[S3 Tables](/ja/administration/data/s3-tables) の説明に従ってテーブルバケットを有効化し、Trino の Iceberg コネクタを REST カタログに接続してください。REST カタログ URI は `http://<rustfs-host>:9000/iceberg`、ウェアハウスはバケット名で、カタログリクエスト（AWS Signature Version 4、署名名 `s3`）と S3 ファイルアクセスの両方がパススタイルアクセスを使います。
 
 S3 Tables のサポートマトリックスでは、Trino はカタログに対する読み取り専用プローブが行われた段階です。本番でこの経路を採用する前に、書き込み互換性と実際にデプロイする Trino バージョンを検証してください。
 
@@ -245,6 +245,6 @@ docker compose logs create-bucket
 
 ## 次のステップ
 
-- 追加の S3 オペレーションを採用する前に、[S3 互換性ノート](/administration/protocols/s3)を確認してください。
-- [アクセスキー管理](/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
+- 追加の S3 オペレーションを採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認してください。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
 - [Trino ドキュメント](https://trino.io/docs/current/)に従って、BI ツールを接続したりオブジェクトストレージカタログを追加したりしてください。

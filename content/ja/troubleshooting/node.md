@@ -1,83 +1,83 @@
 ---
-title: "Node Failures"
-description: "Complete steps for handling node failures in RustFS clusters. Mainly includes: replacement node hardware preparation, configuration updates, service deployment, rejoining the cluster, data healing, and subsequent checks and best practices."
+title: "ノード障害"
+description: "代替ノードを準備し、設定を更新してクラスターへの参加を復旧し、データ修復を確認します。"
 ---
 
-In distributed RustFS clusters, erasure coding mechanisms are adopted to ensure read/write access can still be provided when some nodes fail, and automatic data healing occurs after nodes rejoin. This document will guide you through the following process:
+分散構成の RustFS クラスターは、イレイジャーコーディングにより一部のノードが故障しても読み書きを継続し、ノードが再参加するとデータを自動的に修復します。このガイドでは、次の手順を説明します。
 
-1. Start replacement node and synchronize environment
-2. Update DNS/hostname to point old node identifiers to new nodes
-3. Download and deploy RustFS services consistent with the cluster
-4. Rejoin new nodes to the cluster and trigger data healing
-5. Monitor healing progress and perform subsequent checks and optimization
+1. 代替ノードを起動し、ソフトウェア環境をクラスターに合わせます。
+2. DNS または `/etc/hosts` を更新し、以前のホスト名が新しいノードへ解決されるようにします。
+3. ほかのノードと同じ RustFS バージョンをインストールします。
+4. 代替ノードを起動してクラスターへ再参加させ、データ修復を開始します。
+5. データ修復の進捗を監視したあと、事後確認を行います。
 
-## 1) Start Replacement Node
+## 1. 代替ノードの準備
 
-* **Hardware and System Preparation**
-  Ensure the replacement node server hardware is roughly consistent with the failed node, including CPU, memory, network configuration, and disk type; even using higher configurations won't affect cluster performance.
-  Software environment needs to maintain version consistency with other nodes (operating system, kernel, dependency libraries, etc.) to avoid cluster abnormal behavior caused by environment differences.
+* **ハードウェアとシステムの準備**
+  代替ノードのハードウェア（CPU、メモリ、ネットワーク、ディスク種別）が、障害ノードとおおむね揃っていることを確認します。より高いスペックのハードウェアを使っても、クラスターの性能には影響しません。
+  オペレーティングシステム、カーネル、依存関係を含め、ほかのノードと一致するソフトウェアバージョンを使い、環境の不一致による問題を避けます。
 
-* **Drive Exclusive Access**
-  As with physical drive operations, RustFS requires exclusive access to storage volumes, prohibiting any other processes or scripts from directly modifying data within storage volumes, otherwise data corruption or redundancy loss can easily occur.
+* **ドライブへの排他アクセス**
+  物理ドライブの操作と同様に、RustFS はそのストレージボリュームへの排他的なアクセスを必要とします。ほかのプロセスやスクリプトがこれらのボリュームのデータを直接変更しないようにします。直接変更すると、データが破損したり、冗長性が低下したりする可能性があります。
 
-## 2) Update Hostname and Network Resolution
+## 2. ホスト名と名前解決の更新
 
-* **DNS/Hosts Configuration**
-  If the replacement node's IP address differs from the failed node, you need to re-resolve the old node's hostname (such as `rustfs-node-2.example.net`) to the new node to ensure nodes within the cluster discover each other through the same address.
+* **DNS と hosts の設定**
+  代替ノードの IP アドレスが障害ノードと異なる場合は、旧ノードのホスト名（例: `rustfs-node-2.example.net`）を新しいノードの IP アドレスへ向けます。これにより、クラスター内のノードは同じ名前で互いに到達できます。
 
  ```bash
  # Example: Add or modify line in /etc/hosts
  192.168.1.12 rustfs-node-2.example.net
  ```
 
-  After correct resolution, you can verify the hostname points to the new node through `ping` or `nslookup`.
+  `ping` または `nslookup` を使い、ホスト名が新しいノードに解決されることを確認します。
 
-## 3) Deploy and Configure RustFS Services
+## 3. RustFS サービスのデプロイと設定
 
-* **Download and Installation**
-  Follow the same version deployment process as RustFS official, download binaries or installation packages consistent with existing nodes, and extract to a unified directory. Ensure startup scripts, environment variables, and configuration files (such as `/etc/default/rustfs`) are completely consistent with other nodes in the cluster.
+* **ダウンロードとインストール**
+  既存ノードと同じ RustFS バージョンを、同じインストール方法とディレクトリでインストールします。起動スクリプト、環境変数、設定ファイル（`/etc/default/rustfs` など）が、ほかのノードと同一であることを確認します。
 
-* **Configuration Verification**
+* **設定の確認**
 
- * Check that `RUSTFS_VOLUMES` in `/etc/default/rustfs` is byte-for-byte identical to the other nodes, and that it covers the replacement node's hostname and port.
- * Ensure all nodes have the same access keys and permission configurations to avoid new nodes being unable to join due to authentication failures.
+ * `/etc/default/rustfs` 内の `RUSTFS_VOLUMES` がほかのノードとバイト単位で同一であり、代替ノードのホスト名とポートを含んでいることを確認します。
+ * すべてのノードが同じアクセスキーと権限設定を使っていることを確認します。異なると、新しいノードは認証に失敗し、クラスターに参加できません。
 
-## 4) Rejoin Cluster and Trigger Data Healing
+## 4. クラスターへの再参加とデータ修復の開始
 
-* **Start Service**
+* **サービスの起動**
 
  ```bash
  systemctl start rustfs
  ```
 
-  Or use your custom startup script to start RustFS services, and view startup logs through `journalctl -u rustfs -f` to confirm the new node has detected other online nodes and started the data healing process.
+  独自の起動スクリプトで RustFS を起動する方法もあります。続いて `journalctl -u rustfs -f` を実行し、新しいノードがほかのノードを検出してデータ修復を開始したことを確認します。
 
-* **Monitor Healing Status**
-  Healing runs in the background once the node rejoins; no manual command is required. Watch its progress through the service logs on the replacement node, and check node and disk status in the RustFS Console:
+* **データ修復状態の監視**
+  ノードが再参加すると、データ修復はバックグラウンドで実行されます。手動コマンドは不要です。代替ノードのサービスログで進捗を確認し、RustFS Console でノードとディスクの状態を見ます。
 
  ```bash
  journalctl -u rustfs -f
  ```
 
-* **Community Experience Reference**
-  Community testing shows that when nodes go offline and rejoin, RustFS will only perform healing operations on new nodes, not fully rebalance the cluster, thus avoiding unnecessary network and I/O peaks.
+* **コミュニティでの観測結果**
+  コミュニティでの検証では、ノードがオフラインになってから再参加したとき、RustFS はクラスター全体をリバランスせず、そのノードだけを修復します。これにより、不要なネットワークと I/O の急増を避けられます。
 
-## 5) Subsequent Checks and Best Practices
+## 5. 事後確認と推奨事項
 
-* **Monitoring and Alerts**
+* **監視とアラート**
 
- * During healing, monitor disk and network load to ensure the cluster meets read/write and network bandwidth requirements.
- * Set up alerts to notify operations teams when node healing fails or progress stalls beyond thresholds.
+ * データ修復中はディスクとネットワークの負荷を監視し、クラスターが読み取り、書き込み、帯域幅の要件を満たしていることを確認します。
+ * ノードのデータ修復が失敗したとき、または進捗がしきい値を超えて停滞したときに、運用チームへ通知するアラートを設定します。
 
-* **Repeated Failure Drills**
-  Regularly simulate node failures and drill the entire recovery process to ensure team familiarity with operation commands and emergency procedures.
+* **定期的な障害試験**
+  定期的にノード障害の訓練を行い、復旧手順の全体を練習して、コマンドとインシデント対応の流れに慣れておきます。
 
-* **Root Cause Analysis**
-  Conduct in-depth hardware health diagnostics (SMART, BIOS logs, etc.) on frequently failing nodes or disks, and implement preventive maintenance plans.
+* **根本原因分析**
+  繰り返し故障するノードやディスクでは、SMART データや BIOS ログなどの詳細なハードウェア診断を実施し、予防保守の計画を用意します。
 
-* **Professional Support**
-  If deeper-level fault location and recovery guidance is needed, contact the RustFS development team or community for help.
+* **サポート**
+  障害原因の診断やクラスター復旧の支援が必要な場合は、RustFS の開発チームまたはコミュニティへ連絡します。
 
 ---
 
-**Summary**: Through the above process, RustFS can quickly and safely replace nodes and complete data healing after node hardware completely fails, minimizing cluster availability interruptions. Be sure to cross-reference with your own environment and specific command-line tools to ensure configuration consistency and correct operation sequence.
+これらの手順で、障害ノードを交換し、そのデータを修復します。コマンドは環境に合わせて調整し、ノード間の設定は同一に保ちます。

@@ -1,13 +1,13 @@
 ---
 title: "Velero"
-description: "Back up Kubernetes cluster resources to RustFS with Velero's AWS object store provider."
+description: "Velero の AWS オブジェクトストアプロバイダーを使い、Kubernetes クラスターのリソースを RustFS にバックアップします。"
 ---
 
-This guide connects [Velero](https://github.com/vmware-tanzu/velero) — the Kubernetes backup and restore tool — to **RustFS** as its object storage backend. You will install Velero into a Kubernetes cluster with a RustFS backup location, back up cluster resources, delete them, restore from the bucket, and verify the restored objects. The workflow was verified with Velero CLI 1.16.2, `velero-plugin-for-aws:v1.12.2` on k3s (Kubernetes 1.30), and `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、Kubernetes のバックアップおよび復元ツールである [Velero](https://github.com/vmware-tanzu/velero) を、オブジェクトストレージのバックエンドとして **RustFS** に接続します。Kubernetes クラスターに Velero をインストールして RustFS のバックアップロケーションを設定し、クラスターリソースをバックアップして削除し、バケットから復元して、復元されたオブジェクトを確認します。この流れは、k3s（Kubernetes 1.30）上の Velero CLI 1.16.2 と `velero-plugin-for-aws:v1.12.2`、および `rustfs/rustfs-x86-musl:v2.3.1` で検証済みです。
 
-You need a Kubernetes cluster with `kubectl` access and the Velero CLI. This guide is intended for integration testing, not production.
+`kubectl` でアクセスできる Kubernetes クラスターと、Velero CLI が必要です。このガイドは統合テストを目的としており、本番向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -15,20 +15,20 @@ flowchart LR
 	V -->|"backups + logs"| RustFS["RustFS :9000"]
 ```
 
-Velero serializes Kubernetes resources and (optionally) pod volume data into gzip archives under `backups/<name>/` in the bucket. Restores download those archives and recreate the resources in the cluster.
+Velero は、Kubernetes リソースと（任意で）Pod のボリュームデータを、バケット内の `backups/<name>/` 配下にある gzip アーカイブへシリアライズします。復元ではそれらのアーカイブをダウンロードし、クラスター内にリソースを再作成します。
 
-## 1. Create the backup bucket
+## 1. バックアップバケットを作成する
 
-Create a dedicated bucket — Velero does not create buckets:
+専用バケットを作成します。Velero はバケットを作成しません。
 
 ```bash
 rc alias set rustfs http://<your-rustfs-endpoint>:9000 <your-access-key> <your-secret-key>
 rc mb rustfs/velero-backups
 ```
 
-## 2. Install Velero
+## 2. Velero をインストールする
 
-Write the credentials to a file and install the Velero server. The `s3Url` must be an endpoint reachable from the cluster pods themselves — use the node IP or an internal address, not a port forward from your workstation:
+認証情報をファイルに書き込み、Velero サーバーをインストールします。`s3Url` は、クラスターの Pod 自身から到達できるエンドポイントである必要があります。ノードの IP または内部アドレスを使います。作業用マシンからのポートフォワードは使えません。
 
 ```bash
 cat > velero-creds <<EOF
@@ -50,7 +50,7 @@ velero install \
   --use-volume-snapshots=false
 ```
 
-Wait for the deployment to become ready and the backup location to turn `Available`:
+デプロイが準備完了になり、バックアップロケーションが `Available` になるまで待ちます。
 
 ```bash
 kubectl -n velero get pods
@@ -62,9 +62,9 @@ NAME      PROVIDER   BUCKET/PREFIX    PHASE      LAST VALIDATED   ACCESS MODE   
 default   aws        velero-backups   Available  2026-09-22 ...   ReadWrite     true
 ```
 
-## 3. Back up cluster resources
+## 3. クラスターリソースをバックアップする
 
-Create two demo resources and back up the whole default namespace scope:
+デモ用リソースを 2 つ作成し、default 名前空間全体をバックアップします。
 
 ```bash
 kubectl create configmap demo-cm --from-literal=key=rustfs-velero-demo
@@ -74,17 +74,17 @@ velero backup create demo-backup --wait
 velero backup get
 ```
 
-The backup uploads the resource archives and logs to RustFS.
+バックアップは、リソースのアーカイブとログを RustFS にアップロードします。
 
-## 4. Verify the backup in RustFS
+## 4. RustFS でバックアップを確認する
 
-List the bucket:
+バケットを一覧表示します。
 
 ```bash
 rc ls rustfs/velero-backups/ -r
 ```
 
-The backup archive set is stored under the `backups/` prefix:
+バックアップアーカイブ一式は、`backups/` プレフィックス配下に保存されます。
 
 ```text
 backups/demo-backup/demo-backup-resources.json.gz
@@ -92,11 +92,11 @@ backups/demo-backup/demo-backup-logs.gz
 backups/demo-backup/demo-backup-itemoperations.json.gz
 ```
 
-![Velero backups stored in the RustFS Console](./images/rustfs-velero-backups.png)
+![RustFS Console に保存された Velero のバックアップ](./images/rustfs-velero-backups.png)
 
-## 5. Restore and verify
+## 5. 復元して確認する
 
-Delete the demo resources and restore them from the backup. The restore reads the archives from RustFS and recreates the resources:
+デモ用リソースを削除し、バックアップから復元します。復元は RustFS からアーカイブを読み取り、リソースを再作成します。
 
 ```bash
 kubectl delete configmap demo-cm
@@ -105,7 +105,7 @@ kubectl delete deployment nginx
 velero restore create --from-backup demo-backup --wait
 ```
 
-Confirm the resources are back with their original content:
+リソースが元の内容で戻っていることを確認します。
 
 ```bash
 kubectl get configmap demo-cm -o jsonpath="{.data.key}"
@@ -118,36 +118,36 @@ NAME    READY   UP-TO-DATE   AVAILABLE   AGE
 nginx   1/1     1            1           10s
 ```
 
-## 6. Stop or reset
+## 6. 停止またはリセット
 
-The backups stay in the `velero-backups` bucket and restore into any cluster that runs Velero against the same bucket. To remove the demo backup from RustFS:
+バックアップは `velero-backups` バケットに残り、同じバケットを対象に Velero を実行する任意のクラスターへ復元できます。RustFS からデモ用バックアップを削除するには、次を実行します。
 
 ```bash
 velero backup delete demo-backup --confirm
 rc rm rustfs/velero-backups/backups/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### The backup location stays `Unavailable`
+### バックアップロケーションが `Unavailable` のままになる
 
-The Velero pod cannot reach the `s3Url`. Endpoints on a Docker custom bridge network are not routable from Kubernetes pods — use the Docker host bridge IP (for example `http://172.17.0.1:9000` on a single-host cluster) or a node address. Patch the location and let Velero revalidate:
+Velero の Pod が `s3Url` に到達できません。Docker のカスタムブリッジネットワーク上のエンドポイントは、Kubernetes の Pod からルーティングできません。Docker ホストのブリッジ IP（シングルホストのクラスターでは例として `http://172.17.0.1:9000` ）、またはノードのアドレスを使います。ロケーションをパッチし、Velero に再検証させます。
 
 ```bash
 kubectl -n velero patch backupstoragelocation default --type merge -p \
   '{"spec":{"config":{"s3Url":"http://172.17.0.1:9000"}}}'
 ```
 
-### The backup ends `PartiallyFailed` with a daemonset error
+### daemonset エラーでバックアップが `PartiallyFailed` になる
 
-The error `daemonset pod not found in running state` means the node-agent pod (used for pod volume backups) was not running. It does not affect the cluster-resource archives. Wait for the agent or keep `--default-volumes-to-fs-backup` only when the agent is running.
+エラー `daemonset pod not found in running state` は、Pod ボリュームのバックアップに使う node-agent Pod が実行中でなかったことを意味します。クラスターリソースのアーカイブには影響しません。エージェントの起動を待つか、エージェントが実行中の場合にのみ `--default-volumes-to-fs-backup` を維持します。
 
-### `FailedValidation` right after install
+### インストール直後の `FailedValidation`
 
-The first backup attempt runs against a location that has not validated yet. Wait for `velero backup-location get` to report `Available` before creating backups.
+最初のバックアップ試行は、まだ検証されていないロケーションに対して実行されます。バックアップを作成する前に、`velero backup-location get` が `Available` を報告するまで待ちます。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Velero operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Velero documentation](https://velero.io/docs/main/) to add schedules, volume snapshots, and cluster migration flows.
+- 追加の Velero 操作を採用する前に、[S3 互換性に関する注意](/ja/administration/protocols/s3)を確認します。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- [Velero ドキュメント](https://velero.io/docs/main/)に従い、スケジュール、ボリュームスナップショット、クラスター移行の手順を追加します。

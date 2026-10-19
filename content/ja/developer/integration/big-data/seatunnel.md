@@ -1,13 +1,13 @@
 ---
 title: "SeaTunnel"
-description: "Move data between SeaTunnel and RustFS with the S3File connector."
+description: "S3File コネクタを使い、SeaTunnel と RustFS の間でデータを移動します。"
 ---
 
-This guide connects [Apache SeaTunnel](https://github.com/apache/seatunnel) — the data integration engine — to **RustFS** through the S3File connector. You will run a batch job that generates rows with FakeSource and writes them as JSON files into a RustFS bucket. The workflow was verified with SeaTunnel 2.3.12 against `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、データ統合エンジンである [Apache SeaTunnel](https://github.com/apache/seatunnel) を、S3File コネクタを通じて **RustFS** に接続します。FakeSource で行を生成し、JSON ファイルとして RustFS バケットへ書き込むバッチジョブを実行します。この流れは SeaTunnel 2.3.12 と `rustfs/rustfs-x86-musl:v2.3.1` で検証済みです。
 
-You need Docker and the `rc` client.
+Docker と `rc` クライアントが必要です。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -15,11 +15,11 @@ flowchart LR
 	Job -->|"S3File sink"| RustFS["RustFS :9000"]
 ```
 
-The S3File sink writes through the Hadoop S3A filesystem, so the connector accepts both its own credential options and the standard `fs.s3a.*` Hadoop keys.
+S3File シンクは Hadoop S3A ファイルシステム経由で書き込むため、コネクタ独自の認証情報オプションと、標準の `fs.s3a.*` Hadoop キーの両方を受け付けます。
 
-## 1. Run the engine
+## 1. エンジンを実行する
 
-The connector and the Hadoop AWS jars ship inside the image:
+コネクタと Hadoop AWS の JAR はイメージに同梱されています。
 
 ```bash
 docker run --rm apache/seatunnel:2.3.12 \
@@ -31,9 +31,9 @@ connector-file-s3-2.3.12.jar
 seatunnel-hadoop-aws.jar
 ```
 
-## 2. Write the job config
+## 2. ジョブ設定を書く
 
-The tricky part: the sink validates `access_key`/`secret_key` at compile time, while the actual S3A client reads the `fs.s3a.*` keys. Provide both, and keep the endpoint without a scheme — the bundled Hadoop version rejects `http://` endpoints:
+注意点は次のとおりです。シンクはコンパイル時に `access_key` と `secret_key` を検証しますが、実際の S3A クライアントが読むのは `fs.s3a.*` キーです。両方を指定し、エンドポイントはスキームなしにします。同梱の Hadoop バージョンは `http://` のエンドポイントを拒否します。
 
 ```text title="seatunnel-rustfs.conf"
 env {
@@ -71,7 +71,7 @@ sink {
 }
 ```
 
-## 3. Run the job
+## 3. ジョブを実行する
 
 ```bash
 docker run --rm --network oo-rustfs_default \
@@ -84,7 +84,7 @@ docker run --rm --network oo-rustfs_default \
 2026-10-07 ... INFO  ... Submit job finished, job id: 1159846059493556225
 ```
 
-## 4. Verify objects in RustFS
+## 4. RustFS 内のオブジェクトを確認する
 
 ```bash
 rc ls rustfs/seatunnel-demo/out/
@@ -96,38 +96,38 @@ out/T_1159846059493556225_2de3d99235_0_1_0.json
 {"id":168282592,"name":"ELyqD","value":1.594479327987022E308}
 ```
 
-Five FakeSource rows landed as one JSON file in the bucket.
+FakeSource の 5 行が、バケット内の 1 つの JSON ファイルになりました。
 
-![SeaTunnel output files stored in the RustFS Console](./images/rustfs-seatunnel-out.png)
+![RustFS Console に保存された SeaTunnel の出力ファイル](./images/rustfs-seatunnel-out.png)
 
-## 5. Stop or reset
+## 5. 停止またはリセットする
 
-SeaTunnel in `-e local` mode is stateless. To delete the output:
+`-e local` モードの SeaTunnel はステートレスです。出力を削除します。
 
 ```bash
 rc rm rustfs/seatunnel-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
 ### `Plugin PluginIdentifier{... pluginName='S3'} not found`
 
-The sink class is registered as `S3File`, not `S3`.
+シンククラスは `S3` ではなく `S3File` として登録されています。
 
 ### `There are unconfigured options, the options('access_key', 'secret_key') are required`
 
-The S3File sink requires its own `access_key`/`secret_key` options even when `fs.s3a.*` keys are present. Provide both sets as in step 2.
+`fs.s3a.*` キーがあっても、S3File シンクには独自の `access_key` と `secret_key` オプションが必要です。手順 2 のとおり両方の組を指定します。
 
 ### `No AWS Credentials provided by InstanceProfileCredentialsProvider`
 
-The S3A client on the coordinator side fell back to the instance-profile provider because `fs.s3a.aws.credentials.provider` and the `fs.s3a.access.key`/`fs.s3a.secret.key` pair were missing. Add all three as in step 2.
+コーディネーター側の S3A クライアントは、`fs.s3a.aws.credentials.provider` と `fs.s3a.access.key` / `fs.s3a.secret.key` の組が無いため、インスタンスプロファイルのプロバイダーへフォールバックしました。手順 2 のとおり 3 つすべてを追加します。
 
-### Job hangs on `doesBucketExist`
+### `doesBucketExist` でジョブがハングする
 
-The bundled Hadoop version rejects `http://` scheme endpoints. Use the bare `host:port` form for `fs.s3a.endpoint` and add `fs.s3a.connection.ssl.enabled = "false"`.
+同梱の Hadoop バージョンは `http://` スキームのエンドポイントを拒否します。`fs.s3a.endpoint` には `host:port` 形式だけを使い、`fs.s3a.connection.ssl.enabled = "false"` を追加します。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional SeaTunnel connectors.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [SeaTunnel S3File documentation](https://seatunnel.apache.org/docs/connector-v2/sink/S3File) for parquet/orc formats, partitioned writes, and the matching S3File source.
+- 追加の SeaTunnel コネクタを採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認します。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- Parquet / ORC フォーマット、パーティション書き込み、対応する S3File ソースについては、[SeaTunnel S3File のドキュメント](https://seatunnel.apache.org/docs/connector-v2/sink/S3File)に従います。

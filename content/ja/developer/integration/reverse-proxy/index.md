@@ -1,13 +1,13 @@
 ---
-title: "Reverse Proxy"
-description: "Choose and configure a reverse proxy for the RustFS S3 API and Console."
+title: "リバースプロキシ"
+description: "RustFS の S3 API と Console 向けに、リバースプロキシを選択して設定します。"
 ---
 
-Use a reverse proxy to expose the **RustFS** S3 API and Console through managed hostnames and TLS endpoints.
+リバースプロキシを使い、管理しているホスト名と TLS エンドポイント経由で **RustFS** の S3 API と Console を公開します。
 
-We recommend using separate hostnames for the S3 API on port `9000` and the Console on port `9001`. Serve the S3 API from the root of its hostname because S3 clients sign the request path.
+S3 API（ポート `9000`）と Console（ポート `9001`）には、別々のホスト名を使うことを推奨します。S3 クライアントはリクエストパスに署名するため、S3 API はそのホスト名のルートから提供します。
 
-## Supported guides
+## 対応ガイド
 
 - [Nginx](./nginx.md)
 - [Traefik](./traefik.md)
@@ -16,6 +16,6 @@ We recommend using separate hostnames for the S3 API on port `9000` and the Cons
 - [Envoy](./envoy.md)
 - [Apache HTTP Server](./httpd.md)
 
-## Related configuration
+## 関連する設定
 
-See [Virtual-Host Access](/integration/virtual) when clients access buckets through virtual-hosted-style URLs.
+クライアントが仮想ホスト形式の URL でバケットにアクセスする場合は、[仮想ホスト形式のアクセス](/ja/integration/virtual)を参照します。

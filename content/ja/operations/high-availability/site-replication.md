@@ -1,51 +1,51 @@
 ---
-title: "Site Replication"
-description: "Configure and operate multi-site RustFS replication with the rc command-line client."
+title: "サイトレプリケーション"
+description: "rc コマンドラインクライアントを使い、複数サイトの RustFS レプリケーションを設定して運用します。"
 ---
 
-Site replication links two or more independent **RustFS** deployments. It synchronizes buckets, object versions, and supported identity and access management (IAM) data across the linked sites. Use this workflow when applications need to write to separate RustFS sites while keeping their storage and identity configuration aligned.
+サイトレプリケーションは、2 つ以上の独立した **RustFS** デプロイを結びます。リンクしたサイトのあいだで、バケット、オブジェクトバージョン、対応しているアイデンティティとアクセス管理（IAM）のデータを同期します。アプリケーションが別々の RustFS サイトへ書き込みつつ、ストレージとアイデンティティの設定を揃えておく必要がある場合に、この手順を使います。
 
-Site replication is different from [bucket replication](/administration/data/bucket/replication). Bucket replication is a directional rule between selected buckets; site replication establishes a broader relationship between complete RustFS deployments.
+サイトレプリケーションは [バケットレプリケーション](/ja/administration/data/bucket/replication) とは別です。バケットレプリケーションは、選択したバケットのあいだの、方向を持つルールです。サイトレプリケーションは、RustFS デプロイ全体のあいだに、より広い関係を作ります。
 
-:::warning[Plan recovery separately]
+:::warning[復旧は別に計画する]
 
-Site replication is asynchronous. A successful write at one site does not confirm that another site already has the replicated version. Site replication also does not provide DNS failover, traffic routing, or application recovery orchestration.
-
-:::
-
-## Replicated resources
-
-RustFS site replication synchronizes these resource families across linked sites:
-
-- Buckets and object versions, including delete markers.
-- Bucket metadata required by the site replication workflow.
-- IAM users, groups, policies, policy mappings, and service accounts.
-
-Bucket versioning support is required at every participating site. RustFS configures the site relationship and the underlying replication targets when you add the sites.
-
-## Requirements
-
-Before linking sites, prepare:
-
-- Two or more independent RustFS deployments running a release that exposes the site replication Admin API.
-- A unique, stable S3 API endpoint for each deployment.
-- Bidirectional network connectivity between every site endpoint on the S3 API port, normally `9000`.
-- Trusted TLS certificates for production endpoints.
-- The RustFS [`rc`](/operations/rc) client on a secured administration host.
-- Root administrative credentials for every participating site.
-- Compatible bucket-versioning support on every site.
-
-Use empty test sites when first validating the workflow. Before linking existing sites, inventory bucket names, object-lock settings, IAM identities, and policies for conflicts.
-
-:::warning[Protect administrative credentials]
-
-The `add` operation resolves every peer endpoint and root credential from your local `rc` alias store. Run it only from a trusted administration host, restrict access to the local `rc` configuration, and do not place credentials in shell history, logs, or screenshots.
+サイトレプリケーションは非同期です。一方のサイトで書き込みが成功しても、もう一方のサイトが複製されたバージョンをすでに持っていることにはなりません。サイトレプリケーションは、DNS フェイルオーバー、トラフィックの振り分け、アプリケーション復旧のオーケストレーションも提供しません。
 
 :::
 
-## 1. Configure site aliases
+## 複製されるリソース
 
-Configure one alias for each site. Replace the endpoint and credentials for both deployments:
+RustFS のサイトレプリケーションは、リンクしたサイトのあいだで次のリソース群を同期します。
+
+- バケットとオブジェクトバージョン（削除マーカーを含む）。
+- サイトレプリケーションの処理に必要なバケットメタデータ。
+- IAM のユーザー、グループ、ポリシー、ポリシーのマッピング、サービスアカウント。
+
+参加するすべてのサイトで、バケットのバージョニングに対応している必要があります。サイトを追加すると、RustFS がサイト間の関係と、その基礎になるレプリケーションターゲットを設定します。
+
+## 要件
+
+サイトをリンクする前に、次を準備します。
+
+- サイトレプリケーションの Admin API を公開しているリリースで動作する、2 つ以上の独立した RustFS デプロイ。
+- 各デプロイに固有で安定した S3 API エンドポイント。
+- すべてのサイトエンドポイントのあいだで、S3 API ポート（通常は `9000`）の双方向ネットワーク接続。
+- 本番エンドポイント向けの、信頼された TLS 証明書。
+- 保護された管理ホスト上の RustFS [`rc`](/ja/operations/rc) クライアント。
+- 参加するすべてのサイトの、ルートの管理認証情報。
+- すべてのサイトで、互換性のあるバケットバージョニングの対応。
+
+手順を初めて検証するときは、空のテストサイトを使います。既存のサイトをリンクする前に、バケット名、オブジェクトロックの設定、IAM のアイデンティティ、ポリシーを洗い出し、競合がないか確認します。
+
+:::warning[管理用認証情報を保護する]
+
+`add` 操作は、ローカルの `rc` エイリアスストアから、すべてのピアエンドポイントとルート認証情報を解決します。信頼できる管理ホストだけで実行し、ローカルの `rc` 設定へのアクセスを制限し、認証情報をシェルの履歴、ログ、スクリーンショットに残さないでください。
+
+:::
+
+## 1. サイトのエイリアスを設定する
+
+サイトごとにエイリアスを 1 つ設定します。両方のデプロイについて、エンドポイントと認証情報を置き換えます。
 
 ```bash
 rc alias set site1 https://site1.example.com:9000 \
@@ -57,7 +57,7 @@ rc alias set site2 https://site2.example.com:9000 \
 	--region us-east-1 --bucket-lookup path
 ```
 
-Check that both sites are reachable and ready:
+両方のサイトに到達でき、準備完了であることを確認します。
 
 ```bash
 rc ready site1
@@ -66,48 +66,48 @@ rc admin info cluster site1
 rc admin info cluster site2
 ```
 
-Use HTTPS endpoints in production. If a site uses a private certificate authority, install that authority in the administration host's trust store before continuing.
+本番では HTTPS のエンドポイントを使います。サイトがプライベート認証局を使う場合は、先にその認証局を管理ホストの信頼ストアへインストールします。
 
-:::warning[Loopback endpoints are for tests only]
+:::warning[ループバックのエンドポイントはテスト専用]
 
-RustFS rejects loopback replication targets by default as an outbound-request security control. The server option `RUSTFS_REPLICATION_ALLOW_LOOPBACK_TARGET=true` exists only for single-host development and automated tests. Never enable it in production.
+RustFS は、送信リクエストのセキュリティ制御として、既定でループバックのレプリケーションターゲットを拒否します。サーバーオプション `RUSTFS_REPLICATION_ALLOW_LOOPBACK_TARGET=true` は、単一ホストでの開発と自動テストのためだけに存在します。本番では有効にしないでください。
 
 :::
 
-## 2. Link the sites
+## 2. サイトをリンクする
 
-Submit all participating aliases in one command. The first alias receives the administration request:
+参加するエイリアスを、すべて 1 つのコマンドで指定します。管理リクエストを受け取るのは、最初のエイリアスです。
 
 ```bash
 rc admin replicate add site1 site2
 ```
 
-To create a relationship with more than two sites, include every alias in the initial command:
+3 サイト以上の関係を作る場合は、最初のコマンドにすべてのエイリアスを含めます。
 
 ```bash
 rc admin replicate add site1 site2 site3
 ```
 
-Do not run separate pairwise `add` commands to build the same multi-site relationship.
+同じマルチサイトの関係を、ペアごとの `add` を別々に実行して作らないでください。
 
-Inspect the resulting configuration from at least two sites:
+結果の設定を、少なくとも 2 つのサイトから確認します。
 
 ```bash
 rc admin replicate info site1
 rc admin replicate info site2
 ```
 
-The output identifies each linked deployment by its deployment ID, site name, and endpoint. Save the deployment IDs because edit and resync operations can select a site by exact deployment ID or exact unique name.
+出力は、リンクされた各デプロイを、デプロイ ID、サイト名、エンドポイントで識別します。edit と resync は、デプロイ ID の完全一致、または一意な名前の完全一致でサイトを選べます。デプロイ ID を保存します。
 
-## 3. Check replication status
+## 3. レプリケーションの状態を確認する
 
-Request the default bucket and IAM summaries:
+既定のバケットと IAM の概要を要求します。
 
 ```bash
 rc admin replicate status site1
 ```
 
-Select specific status sections when investigating an issue:
+問題を調査するときは、特定の状態セクションを選びます。
 
 ```bash
 rc admin replicate status site1 --buckets
@@ -115,11 +115,11 @@ rc admin replicate status site1 --users --groups --policies
 rc admin replicate status site1 --metrics
 ```
 
-Check status from each site. A healthy response from `site1` confirms that site's view of the relationship; it does not replace checking the other deployments.
+各サイトから状態を確認します。`site1` からの正常な応答が示すのは、そのサイトから見た関係です。ほかのデプロイの確認に代わるものではありません。
 
-## 4. Validate data and IAM replication
+## 4. データと IAM のレプリケーションを検証する
 
-Create a test bucket and object at the first site:
+最初のサイトで、テスト用のバケットとオブジェクトを作成します。
 
 ```bash
 rc bucket create site1/my-bucket
@@ -127,20 +127,20 @@ printf 'hello rustfs\n' > hello.txt
 rc object copy hello.txt site1/my-bucket/hello.txt
 ```
 
-Poll the second site until the object appears:
+オブジェクトが現れるまで、2 番目のサイトをポーリングします。
 
 ```bash
 rc object stat site2/my-bucket/hello.txt
 rc object copy site2/my-bucket/hello.txt ./hello-from-site2.txt
 ```
 
-Compare the downloaded content before treating the data path as validated:
+データパスを検証済みと見なす前に、ダウンロードした内容を比較します。
 
 ```bash
 cmp hello.txt hello-from-site2.txt
 ```
 
-For IAM validation, create a temporary user and attach a test policy at one site, then inspect the user and policy mapping at another site. Remove the temporary identity after validation:
+IAM の検証では、一方のサイトで一時ユーザーを作成してテストポリシーを付与し、もう一方のサイトでユーザーとポリシーのマッピングを確認します。検証後に、一時アイデンティティを削除します。
 
 ```bash
 rc admin user add site1 replication-test <temporary-secret-key>
@@ -152,17 +152,17 @@ rc admin policy entities site2 --user replication-test
 rc admin user rm site1 replication-test
 ```
 
-Use a randomly generated temporary secret and do not reuse an application or administrator credential.
+ランダムに生成した一時シークレットを使い、アプリケーションや管理者の認証情報は再利用しないでください。
 
-## 5. Edit a site
+## 5. サイトを編集する
 
-Use `edit` when a linked site's name, endpoint, or TLS trust settings change. First inspect the current deployment IDs and names:
+リンクしたサイトの名前、エンドポイント、または TLS の信頼設定が変わるときに `edit` を使います。まず、現在のデプロイ ID と名前を確認します。
 
 ```bash
 rc admin replicate info site1
 ```
 
-Rename a site:
+サイトの名前を変更します。
 
 ```bash
 rc admin replicate edit site1 \
@@ -171,7 +171,7 @@ rc admin replicate edit site1 \
 	--yes
 ```
 
-Replace an endpoint and keep TLS verification enabled:
+エンドポイントを置き換え、TLS 検証は有効のままにします。
 
 ```bash
 rc admin replicate edit site1 \
@@ -181,7 +181,7 @@ rc admin replicate edit site1 \
 	--yes
 ```
 
-For a private certificate authority, provide a certificate-only PEM bundle:
+プライベート認証局の場合は、証明書のみの PEM バンドルを指定します。
 
 ```bash
 rc admin replicate edit site1 \
@@ -190,7 +190,7 @@ rc admin replicate edit site1 \
 	--yes
 ```
 
-Clear a previously configured custom CA when the endpoint moves to a certificate trusted by the system trust store:
+エンドポイントが、システム信頼ストアで信頼される証明書へ移るときは、以前設定したカスタム CA を消去します。
 
 ```bash
 rc admin replicate edit site1 \
@@ -200,11 +200,11 @@ rc admin replicate edit site1 \
 	--yes
 ```
 
-The endpoint must be an HTTP or HTTPS origin without a path, query, fragment, or embedded credentials. Prefer a trusted certificate over `--skip-tls-verify`.
+エンドポイントは、パス、クエリ、フラグメント、埋め込まれた認証情報を含まない HTTP または HTTPS のオリジンである必要があります。`--skip-tls-verify` より、信頼された証明書を使います。
 
-## 6. Resynchronize a site
+## 6. サイトを再同期する
 
-Use resynchronization after repairing a site that was unavailable or when status checks show missing replicated state. Start a resync for one exact peer:
+利用できなかったサイトを修復したあと、または状態確認で複製された状態の欠落が見つかったときに、再同期を使います。対象のピアを 1 つ厳密に指定して、resync を開始します。
 
 ```bash
 rc admin replicate resync start site1 \
@@ -212,14 +212,14 @@ rc admin replicate resync start site1 \
 	--yes
 ```
 
-Read the last persisted resync snapshot:
+最後に永続化された resync のスナップショットを読みます。
 
 ```bash
 rc admin replicate resync status site1 \
 	--site <deployment-id>
 ```
 
-Cancel the selected resync only when you have confirmed it should stop:
+選択した resync をキャンセルするのは、停止すべきだと確認したときだけです。
 
 ```bash
 rc admin replicate resync cancel site1 \
@@ -227,23 +227,23 @@ rc admin replicate resync cancel site1 \
 	--yes
 ```
 
-:::warning[Resync status is not live progress]
+:::warning[resync の状態はライブの進捗ではない]
 
-The current RustFS resync status endpoint returns the persisted result of the most recent start or cancel request. It does not inspect live workers, and its lifecycle state is reported as unknown. Start operations can overlap, cancellation is not idempotent, and a network timeout can leave the mutation outcome unknown. After an ambiguous result, inspect `replicate info`, `replicate status`, and the target data before issuing another mutation.
+現在の RustFS の resync 状態エンドポイントが返すのは、直近の開始またはキャンセル要求を永続化した結果です。実行中のワーカーは調べず、ライフサイクル状態は unknown と報告されます。開始操作は重なることがあり、キャンセルは冪等ではなく、ネットワークのタイムアウトで変更の結果が不明になることがあります。結果が曖昧なときは、次の変更を発行する前に `replicate info`、`replicate status`、対象データを確認します。
 
 :::
 
-## 7. Remove site replication
+## 7. サイトレプリケーションを解除する
 
-Removing a site changes the replication relationship. It does not provide an application cutover or prove that every queued object has arrived. Check status and preserve any required data before proceeding.
+サイトを外すと、レプリケーションの関係が変わります。アプリケーションの切り替えにはならず、キューに入っていたオブジェクトがすべて到着した証明にもなりません。先に状態を確認し、必要なデータを残してから進めます。
 
-Remove one named site:
+名前を指定して、1 つのサイトを外します。
 
 ```bash
 rc admin replicate remove site1 --site site2-dr
 ```
 
-Repeat `--site` to remove multiple named sites in one request:
+1 回の要求で、名前を指定したサイトを複数外すには、`--site` を繰り返します。
 
 ```bash
 rc admin replicate remove site1 \
@@ -251,41 +251,41 @@ rc admin replicate remove site1 \
 	--site site3
 ```
 
-Dissolve the complete site replication relationship:
+サイトレプリケーションの関係をすべて解消します。
 
 ```bash
 rc admin replicate remove site1 --all
 ```
 
-Verify the result from the remaining deployments:
+残っているデプロイから、結果を確認します。
 
 ```bash
 rc admin replicate info site1
 rc admin replicate status site1
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### A peer endpoint is rejected
+### ピアのエンドポイントが拒否される
 
-Confirm that the endpoint is a reachable HTTP or HTTPS origin and does not resolve to loopback. For production, make every site reachable through its stable network address and keep the loopback override disabled.
+エンドポイントが到達可能な HTTP または HTTPS のオリジンであり、ループバックへ解決されないことを確認します。本番では、各サイトを安定したネットワークアドレスで到達できるようにし、ループバックの上書きは無効のままにします。
 
-### TLS validation fails
+### TLS 検証が失敗する
 
-Confirm that the endpoint certificate contains the peer hostname and that the issuing certificate authority is trusted. Use `replicate edit --ca-cert` for a private CA bundle. Do not make `--skip-tls-verify` the permanent fix.
+エンドポイント証明書にピアのホスト名が含まれ、発行した認証局が信頼されていることを確認します。プライベート CA のバンドルには `replicate edit --ca-cert` を使います。`--skip-tls-verify` を恒久的な対処にしないでください。
 
-### A mutation times out
+### 変更がタイムアウトする
 
-Do not immediately repeat `add`, `edit`, `resync start`, `resync cancel`, or `remove`. The server may have applied the change before the client lost the response. Inspect the relationship and data first:
+`add`、`edit`、`resync start`、`resync cancel`、`remove` をすぐには繰り返さないでください。クライアントが応答を失う前に、サーバー側で変更が適用されていることがあります。まず関係とデータを確認します。
 
 ```bash
 rc admin replicate info site1
 rc admin replicate status site1
 ```
 
-### Replication falls behind
+### レプリケーションが遅れる
 
-Check the site status and metrics from every deployment, then verify endpoint reachability and storage readiness:
+すべてのデプロイからサイトの状態とメトリクスを確認し、そのあとエンドポイントへの到達性と、ストレージの準備完了を検証します。
 
 ```bash
 rc admin replicate status site1 --metrics
@@ -293,10 +293,10 @@ rc ready site1
 rc ready site2
 ```
 
-Application writes can outpace asynchronous replication. Do not infer a recovery point objective from a single status sample; measure lag under your workload and alert on sustained backlog.
+アプリケーションの書き込みが、非同期レプリケーションより速くなることがあります。状態を 1 回見ただけで、目標復旧時点（RPO）を判断しないでください。実際のワークロードで遅延を測り、バックログが続く場合はアラートします。
 
-## Next steps
+## 次のステップ
 
-- Review [Bucket Replication](/administration/data/bucket/replication) when you need directional replication for selected buckets instead of a complete site relationship.
-- Monitor [cluster status and readiness](/operations/status-check) at every site.
-- Review the [`rc` command guide](/operations/rc) and keep the client aligned with the RustFS server release.
+- サイト全体の関係ではなく、選択したバケットの方向付きレプリケーションが必要な場合は、[バケットレプリケーション](/ja/administration/data/bucket/replication) を参照してください。
+- すべてのサイトで、[クラスターの状態と準備完了](/ja/operations/status-check) を監視します。
+- [`rc` コマンドガイド](/ja/operations/rc) を確認し、クライアントを RustFS サーバーのリリースに合わせます。

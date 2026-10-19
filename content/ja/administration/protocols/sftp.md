@@ -1,74 +1,74 @@
 ---
 title: "SFTP"
-description: "Build, configure, and use the RustFS SFTP gateway to access buckets and objects with SFTP clients."
+description: "RustFS の SFTP ゲートウェイをビルドして設定し、SFTP クライアントでバケットとオブジェクトへアクセスする方法を説明します。"
 ---
 
-RustFS includes an SSH File Transfer Protocol (SFTP) gateway that exposes buckets and objects to SFTP clients over an encrypted SSH connection. You can list and create buckets and upload, download, rename, or delete objects while RustFS enforces the permissions of the authenticated Identity and Access Management (IAM) user.
+RustFS には、暗号化された SSH 接続でバケットとオブジェクトを SFTP クライアントへ公開する SSH File Transfer Protocol（SFTP）ゲートウェイが含まれます。バケットの一覧と作成、オブジェクトのアップロード、ダウンロード、名前変更、削除ができます。RustFS は、認証されたアイデンティティとアクセス管理（IAM）ユーザーの権限を各操作に適用します。
 
-SFTP is an optional compile-time feature and is not included in the default RustFS build. Build RustFS with the `sftp` or `full` feature before enabling the listener. The listener is disabled at runtime by default.
+SFTP は任意のコンパイル時機能であり、既定の RustFS ビルドには含まれません。リスナーを有効にする前に、`sftp` または `full` 機能を付けて RustFS をビルドします。リスナーは実行時に既定で無効です。
 
-## Overview
+## 概要
 
-The gateway maps SFTP paths to RustFS resources:
+ゲートウェイは、SFTP のパスを RustFS のリソースへ対応付けます。
 
-| SFTP path | RustFS resource |
+| SFTP パス | RustFS のリソース |
 | --- | --- |
-| `/` | All buckets visible to the authenticated user |
-| `/my-bucket/` | The `my-bucket` bucket |
-| `/my-bucket/hello.txt` | The `hello.txt` object in `my-bucket` |
-| `/my-bucket/docs/hello.txt` | The `docs/hello.txt` object in `my-bucket` |
+| `/` | 認証されたユーザーから見えるすべてのバケット |
+| `/my-bucket/` | `my-bucket` バケット |
+| `/my-bucket/hello.txt` | `my-bucket` 内の `hello.txt` オブジェクト |
+| `/my-bucket/docs/hello.txt` | `my-bucket` 内の `docs/hello.txt` オブジェクト |
 
-Creating or removing a directory directly below `/` creates or removes a bucket. Directories below a bucket map to object key prefixes and do not exist as independent filesystem directories.
+`/` の直下でディレクトリを作成または削除すると、バケットが作成または削除されます。バケットより下のディレクトリはオブジェクトキーのプレフィックスに対応し、独立したファイルシステムディレクトリとしては存在しません。
 
-RustFS supports the following operations through the SFTP gateway:
+RustFS は、SFTP ゲートウェイ経由で次の操作に対応しています。
 
-| SFTP operation | RustFS operation |
+| SFTP 操作 | RustFS の操作 |
 | --- | --- |
-| List `/` | List visible buckets |
-| List a bucket or prefix | List objects and prefixes |
-| `mkdir` at `/` | Create a bucket |
-| `put` | Upload an object |
-| `get` | Download an object |
-| `rename` | Copy an object and then delete the source |
-| `rm` | Delete an object |
-| `rmdir` at `/` | Delete an empty bucket |
+| `/` の一覧 | 見えるバケットを一覧します |
+| バケットまたはプレフィックスの一覧 | オブジェクトとプレフィックスを一覧します |
+| `/` での `mkdir` | バケットを作成します |
+| `put` | オブジェクトをアップロードします |
+| `get` | オブジェクトをダウンロードします |
+| `rename` | オブジェクトをコピーしたあと、ソースを削除します |
+| `rm` | オブジェクトを削除します |
+| `/` での `rmdir` | 空のバケットを削除します |
 
-Enter a RustFS access key as the SFTP username and its secret key as the password. RustFS checks the IAM user's S3 policies for every operation.
+SFTP のユーザー名には RustFS のアクセスキーを、パスワードにはそのシークレットキーを入力します。RustFS は、すべての操作について IAM ユーザーの S3 ポリシーを確認します。
 
-:::warning[Password authentication only]
+:::warning[パスワード認証のみ]
 
-The SFTP gateway does not support client public-key authentication or anonymous access. SSH host keys identify the server; they do not authenticate clients. Do not configure an `authorized_keys` file for RustFS SFTP.
+SFTP ゲートウェイは、クライアントの公開鍵認証と匿名アクセスには対応していません。SSH ホストキーはサーバーを識別するものであり、クライアントを認証しません。RustFS の SFTP 向けに `authorized_keys` ファイルを設定しないでください。
 
 :::
 
-## Configuration
+## 設定
 
-### Build with SFTP support
+### SFTP 対応でビルドする
 
-Build RustFS with the SFTP feature:
+SFTP 機能を付けて RustFS をビルドします。
 
 ```bash
 cargo build --release --features sftp
 ```
 
-To enable all optional RustFS features, including SFTP, use `--features full` instead. Setting `RUSTFS_SFTP_ENABLE=true` has no effect in a binary built without the `sftp` feature.
+SFTP を含むすべての任意機能を有効にするには、代わりに `--features full` を使います。`sftp` 機能なしでビルドしたバイナリでは、`RUSTFS_SFTP_ENABLE=true` を設定しても効果はありません。
 
-### SFTP variables
+### SFTP の変数
 
-| Variable | Description | Default |
+| 変数 | 説明 | 既定値 |
 | --- | --- | --- |
-| `RUSTFS_SFTP_ENABLE` | Enables the SFTP listener. | `false` |
-| `RUSTFS_SFTP_ADDRESS` | Bind address for SFTP connections. | `0.0.0.0:2222` |
-| `RUSTFS_SFTP_HOST_KEY_DIR` | Directory containing at least one unencrypted SSH private host key. Required when SFTP is enabled. | Not set |
-| `RUSTFS_SFTP_READ_ONLY` | Rejects operations that modify buckets or objects. | `false` |
-| `RUSTFS_SFTP_IDLE_TIMEOUT` | SSH inactivity timeout in seconds. Must be greater than zero. | `600` |
-| `RUSTFS_SFTP_PART_SIZE` | Multipart upload part size in bytes. | `16777216` (16 MiB) |
+| `RUSTFS_SFTP_ENABLE` | SFTP リスナーを有効にします。 | `false` |
+| `RUSTFS_SFTP_ADDRESS` | SFTP 接続のバインドアドレスです。 | `0.0.0.0:2222` |
+| `RUSTFS_SFTP_HOST_KEY_DIR` | 暗号化されていない SSH の秘密ホストキーを 1 つ以上含むディレクトリです。SFTP を有効にする場合は必須です。 | 未設定 |
+| `RUSTFS_SFTP_READ_ONLY` | バケットまたはオブジェクトを変更する操作を拒否します。 | `false` |
+| `RUSTFS_SFTP_IDLE_TIMEOUT` | SSH の無操作タイムアウト（秒）です。ゼロより大きい必要があります。 | `600` |
+| `RUSTFS_SFTP_PART_SIZE` | マルチパートアップロードのパートサイズ（バイト）です。 | `16777216`（16 MiB） |
 
-The default port `2222` avoids the privileged SSH port `22`. The address can use IPv4 or IPv6 syntax, for example `127.0.0.1:2222` or `[::]:2222`.
+既定のポート `2222` は、特権が必要な SSH ポート `22` を避けます。アドレスには IPv4 または IPv6 の構文を使えます。たとえば `127.0.0.1:2222` や `[::]:2222` です。
 
-### Prepare a host key
+### ホストキーを用意する
 
-Create a persistent host-key directory and generate an Ed25519 host key:
+永続的なホストキーのディレクトリを作成し、Ed25519 のホストキーを生成します。
 
 ```bash
 mkdir -p /path/to/sftp-keys
@@ -78,19 +78,19 @@ ssh-keygen -t ed25519 \
 chmod 600 /path/to/sftp-keys/ssh_host_ed25519_key*
 ```
 
-The host key must not use a passphrase. RustFS also accepts decodable ECDSA and RSA private host keys.
+ホストキーにパスフレーズを設定してはいけません。RustFS は、復号できる ECDSA と RSA の秘密ホストキーも受け付けます。
 
-On Unix, every regular file in the host-key directory must be accessible only by its owner. The `ssh-keygen` command also creates a `.pub` file; either keep it with owner-only permissions as shown or remove it because RustFS does not read it. RustFS refuses to start if the directory is missing, contains no usable private key, or contains a regular file with group or other permission bits set.
+Unix では、ホストキーディレクトリ内のすべての通常ファイルを、所有者だけがアクセスできるようにする必要があります。`ssh-keygen` コマンドは `.pub` ファイルも作成します。表示のとおり所有者だけの権限で残すか、削除します。RustFS はこのファイルを読みません。ディレクトリがない、使える秘密鍵がない、またはグループやその他の権限ビットが立った通常ファイルがある場合、RustFS は起動を拒否します。
 
-:::warning[Protect the host key]
+:::warning[ホストキーを保護する]
 
-Keep the same host key across restarts so clients can verify the server identity. Restrict access to the account that runs RustFS and back up the key securely. A changed host key causes clients to display a possible man-in-the-middle warning.
+再起動をまたいで同じホストキーを維持し、クライアントがサーバーの識別情報を検証できるようにします。アクセスは RustFS を実行するアカウントに限定し、鍵を安全にバックアップします。ホストキーが変わると、クライアントは中間者攻撃の可能性があるという警告を表示します。
 
 :::
 
-### Start the SFTP listener
+### SFTP リスナーを起動する
 
-The following example starts SFTP on the loopback interface for local testing:
+次の例は、ローカルテスト用にループバックインターフェースで SFTP を起動します。
 
 ```bash
 export RUSTFS_SFTP_ENABLE=true
@@ -102,23 +102,23 @@ export RUSTFS_SECRET_KEY=<your-secret-key>
 rustfs /path/to/data
 ```
 
-For remote connections, bind to an appropriate network interface and allow inbound TCP traffic to the configured SFTP port. This listener is separate from the S3 API and Console listeners.
+リモート接続では、適切なネットワークインターフェースにバインドし、設定した SFTP ポートへの受信 TCP トラフィックを許可します。このリスナーは、S3 API と Console のリスナーとは別です。
 
-## Usage
+## 使い方
 
-The following examples use the OpenSSH `sftp` client, the canonical `my-bucket` and `hello.txt` names, and a local listener on port `2222`.
+次の例では、OpenSSH の `sftp` クライアント、標準の名前である `my-bucket` と `hello.txt`、ポート `2222` のローカルリスナーを使います。
 
-### Connect
+### 接続する
 
 ```bash
 sftp -P 2222 <your-access-key>@127.0.0.1
 ```
 
-Enter the RustFS secret key when prompted for the password. On the first connection, verify the displayed host-key fingerprint before accepting it.
+パスワードを求められたら、RustFS のシークレットキーを入力します。初回接続では、表示されたホストキーのフィンガープリントを確認してから受け入れます。
 
-### List and create buckets
+### バケットを一覧して作成する
 
-At the `sftp` prompt, list the buckets visible to the IAM user and create `my-bucket`:
+`sftp` のプロンプトで、IAM ユーザーから見えるバケットを一覧し、`my-bucket` を作成します。
 
 ```text
 sftp> ls /
@@ -126,11 +126,11 @@ sftp> mkdir /my-bucket
 sftp> cd /my-bucket
 ```
 
-Bucket names must follow the same naming rules as buckets created through the S3 API. Files cannot be created directly under `/`.
+バケット名は、S3 API で作成するバケットと同じ命名規則に従う必要があります。`/` の直下にファイルを作成することはできません。
 
-### Upload and download an object
+### オブジェクトをアップロードおよびダウンロードする
 
-Upload `/path/to/hello.txt`, list the bucket, and download the object:
+`/path/to/hello.txt` をアップロードし、バケットを一覧して、オブジェクトをダウンロードします。
 
 ```text
 sftp> put /path/to/hello.txt /my-bucket/hello.txt
@@ -138,44 +138,44 @@ sftp> ls /my-bucket
 sftp> get /my-bucket/hello.txt hello.txt
 ```
 
-Uploads must be sequential from the beginning of the file. Resume, append, in-place edits, and segmented multi-connection uploads of one object are not supported.
+アップロードは、ファイルの先頭から順に行う必要があります。再開、追記、その場での編集、1 つのオブジェクトを分割した複数接続アップロードには対応していません。
 
-### Rename an object
+### オブジェクトの名前を変更する
 
 ```text
 sftp> rename /my-bucket/hello.txt /my-bucket/greeting.txt
 ```
 
-RustFS implements rename as a server-side copy followed by deletion of the source. The operation is not atomic, and renaming a bucket is not supported. The IAM user needs permission to read and delete the source and to write the destination.
+RustFS は名前変更を、サーバー側のコピーと、そのあとのソース削除として実装します。この操作はアトミックではなく、バケットの名前変更には対応していません。IAM ユーザーには、ソースの読み取りと削除、および宛先への書き込みの権限が必要です。
 
-### Delete an object and bucket
+### オブジェクトとバケットを削除する
 
-Delete the object and then remove the empty bucket:
+オブジェクトを削除し、そのあと空のバケットを削除します。
 
 ```text
 sftp> rm /my-bucket/greeting.txt
 sftp> rmdir /my-bucket
 ```
 
-RustFS does not recursively delete a non-empty bucket through SFTP.
+RustFS は、SFTP 経由で空でないバケットを再帰的に削除しません。
 
-### Connect a desktop client
+### デスクトップクライアントから接続する
 
-Use these settings in graphical clients such as FileZilla, Cyberduck, or WinSCP:
+FileZilla、Cyberduck、WinSCP などのグラフィカルクライアントでは、次の設定を使います。
 
-| Setting | Value |
+| 設定 | 値 |
 | --- | --- |
-| Protocol | SFTP (SSH File Transfer Protocol) |
-| Host | Your RustFS SFTP hostname |
-| Port | `2222`, or the port in `RUSTFS_SFTP_ADDRESS` |
-| Username | RustFS access key |
-| Password | RustFS secret key |
-| Authentication | Password |
+| プロトコル | SFTP（SSH File Transfer Protocol） |
+| ホスト | 使用する RustFS の SFTP ホスト名 |
+| ポート | `2222`、または `RUSTFS_SFTP_ADDRESS` のポート |
+| ユーザー名 | RustFS のアクセスキー |
+| パスワード | RustFS のシークレットキー |
+| 認証 | パスワード |
 
-Configure the client for whole-file, single-connection uploads. Symbolic links and POSIX ownership, permission, or timestamp changes are not supported because the gateway maps SFTP operations to object storage.
+クライアントは、ファイル全体を単一接続でアップロードする設定にします。ゲートウェイは SFTP 操作をオブジェクトストレージへ対応付けるため、シンボリックリンクや、POSIX の所有者、権限、タイムスタンプの変更には対応していません。
 
-## Next steps
+## 次のステップ
 
-- [Manage credentials](/operations/credentials)
-- [Check service status](/operations/status-check)
-- [Configure lifecycle management](/administration/data/lifecycle-management)
+- [認証情報を管理する](/ja/operations/credentials)
+- [サービスの状態を確認する](/ja/operations/status-check)
+- [ライフサイクル管理を設定する](/ja/administration/data/lifecycle-management)

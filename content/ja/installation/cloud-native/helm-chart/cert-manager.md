@@ -1,26 +1,26 @@
 ---
 title: cert-manager
-description: Use cert-manager to issue and renew TLS certificates for a RustFS Helm deployment.
+description: cert-manager を使い、RustFS の Helm デプロイ向け TLS 証明書を発行し、更新します。
 ---
 
-Use **cert-manager** to issue the certificate referenced by the RustFS Ingress. This provides HTTPS for the public S3 API and Console endpoint and allows cert-manager to renew the certificate.
+**cert-manager** を使い、RustFS の Ingress が参照する証明書を発行します。公開する S3 API と Console のエンドポイントで HTTPS を提供し、cert-manager が証明書を更新できます。
 
-## Requirements
+## 要件
 
-- cert-manager is installed and its controller Pods are ready.
-- An `Issuer` or `ClusterIssuer` is ready.
-- The RustFS hostname resolves to the Ingress controller.
+- cert-manager がインストールされ、コントローラーの Pod が準備完了である。
+- `Issuer` または `ClusterIssuer` が準備完了である。
+- RustFS のホスト名が Ingress コントローラーへ解決される。
 
-Verify the issuer before installing RustFS:
+RustFS をインストールする前に、Issuer を確認します。
 
 ```bash
 kubectl get clusterissuer letsencrypt-prod
 kubectl -n cert-manager get pods
 ```
 
-## 1. Configure Ingress TLS
+## 1. Ingress の TLS を設定する
 
-Add the Ingress and certificate settings to your standalone or distributed values file:
+スタンドアロン用または分散用の values ファイルに、Ingress と証明書の設定を追加します。
 
 ```yaml title="values.yaml"
 ingress:
@@ -42,9 +42,9 @@ ingress:
       name: ""
 ```
 
-Replace the Ingress class, issuer, and hostname for your cluster. For a namespace-scoped Issuer, use the `cert-manager.io/issuer` annotation instead.
+クラスターに合わせて、Ingress クラス、Issuer、ホスト名を置き換えます。名前空間スコープの Issuer には、`cert-manager.io/issuer` アノテーションを使います。
 
-## 2. Apply the configuration
+## 2. 設定を適用する
 
 ```bash
 helm upgrade rustfs ./helm/rustfs \
@@ -52,9 +52,9 @@ helm upgrade rustfs ./helm/rustfs \
   -f values.yaml
 ```
 
-The Ingress references the `rustfs-tls` Secret for a release named `rustfs`. cert-manager ingress-shim reads the issuer annotation and creates a Certificate that writes to this Secret.
+リリース名が `rustfs` の場合、Ingress は `rustfs-tls` Secret を参照します。cert-manager の ingress-shim は Issuer のアノテーションを読み取り、この Secret へ書き込む Certificate を作成します。
 
-## 3. Verify the certificate
+## 3. 証明書を確認する
 
 ```bash
 kubectl -n rustfs get ingress,certificate,certificaterequest
@@ -62,8 +62,8 @@ kubectl -n rustfs describe certificate rustfs-tls
 kubectl -n rustfs get secret rustfs-tls
 ```
 
-Wait for the Certificate to report `Ready=True`, then open `https://s3.example.com`.
+Certificate が `Ready=True` を報告するまで待ち、その後 `https://s3.example.com` を開きます。
 
-## Use cert-manager with mTLS
+## mTLS で cert-manager を使う
 
-The chart also uses cert-manager to issue server and client certificates when `mtls.enabled=true`. See [mTLS](./mtls.md) to use the chart-managed CA or reference an existing issuer.
+`mtls.enabled=true` のとき、チャートはサーバー証明書とクライアント証明書の発行にも cert-manager を使います。チャートが管理する CA、または既存の Issuer の参照については、[mTLS](./mtls.md) を参照します。

@@ -1,35 +1,35 @@
 ---
 title: "Caddy"
-description: "Deploy RustFS behind Caddy with automatic HTTPS for separate S3 API and Console hostnames."
+description: "S3 API と Console を別々のホスト名で公開し、HTTPS を自動取得する Caddy の背後に RustFS をデプロイします。"
 ---
 
-Use **Caddy** to obtain and renew TLS certificates automatically and route separate hostnames to the RustFS S3 API and Console. This deployment runs Caddy and a single-node RustFS instance with Docker Compose. You need Docker Engine, Docker Compose, a public server, and two DNS records that resolve to that server.
+**Caddy** で TLS 証明書の取得と更新を自動化し、別々のホスト名を RustFS の S3 API と Console へ振り分けます。このデプロイでは、Docker Compose で Caddy とシングルノードの RustFS を動かします。Docker Engine、Docker Compose、公開サーバー、およびそのサーバーへ解決する DNS レコードが 2 件必要です。
 
-This guide uses these example hostnames:
+このガイドでは、次のホスト名を例に使います。
 
-- `s3.example.com` for the S3 API
-- `console.example.com` for the Console
+- S3 API 用の `s3.example.com`
+- Console 用の `console.example.com`
 
-Replace them with your public hostnames. Caddy's default ACME challenges require inbound access to ports `80` and `443`.
+公開するホスト名に置き換えます。Caddy の既定の ACME チャレンジでは、ポート `80` と `443` への着信アクセスが必要です。
 
-:::warning[Serve S3 from the root path]
+:::warning[S3 はルートパスから公開する]
 
-Do not publish the S3 API under a path such as `/s3/`. AWS Signature Version 4 includes the request path and host, so rewriting either value can invalidate signed requests.
+`/s3/` のようなパスの下に S3 API を公開しないでください。AWS Signature Version 4 はリクエストパスとホストを署名対象に含めるため、どちらかを書き換えると署名済みリクエストが無効になることがあります。
 
 :::
 
-## 1. Create the deployment directory
+## 1. デプロイ用ディレクトリを作成する
 
-Create a directory for the deployment:
+デプロイ用のディレクトリを作成します。
 
 ```bash
 mkdir rustfs-caddy
 cd rustfs-caddy
 ```
 
-## 2. Set deployment variables
+## 2. デプロイ変数を設定する
 
-Create an environment file and replace each value:
+環境ファイルを作成し、各値を置き換えます。
 
 ```ini title=".env"
 S3_HOSTNAME=s3.example.com
@@ -39,11 +39,11 @@ RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Use an email address that receives certificate notices. Do not commit `.env` to source control.
+証明書の通知を受け取るメールアドレスを使います。`.env` はソース管理にコミットしないでください。
 
-## 3. Configure Caddy
+## 3. Caddy を設定する
 
-Create a Caddyfile with one site block for each RustFS endpoint:
+RustFS のエンドポイントごとに、サイトブロックを 1 つ持つ Caddyfile を作成します。
 
 ```text title="Caddyfile"
 {
@@ -73,11 +73,11 @@ Create a Caddyfile with one site block for each RustFS endpoint:
 }
 ```
 
-Caddy preserves the incoming `Host` header, HTTP method, and request URI by default. It also forwards client information through `X-Forwarded-*` headers and handles Console WebSocket upgrades without additional header rules.
+Caddy は既定で、受信した `Host` ヘッダー、HTTP メソッド、リクエスト URI をそのまま保持します。クライアント情報は `X-Forwarded-*` ヘッダーで転送し、追加のヘッダー規則なしで Console の WebSocket アップグレードも処理します。
 
-## 4. Create the Compose file
+## 4. Compose ファイルを作成する
 
-Create the Caddy and RustFS services:
+Caddy と RustFS のサービスを作成します。
 
 ```yaml title="compose.yaml"
 services:
@@ -136,24 +136,24 @@ networks:
   rustfs:
 ```
 
-The persistent `caddy-data` volume stores certificates, private keys, and ACME account state. Back up this volume and do not share its contents. Only Caddy publishes host ports; RustFS remains reachable inside the Compose network.
+永続ボリューム `caddy-data` には、証明書、秘密鍵、ACME アカウントの状態が保存されます。このボリュームはバックアップし、内容は共有しないでください。ホストのポートを公開するのは Caddy だけで、RustFS には Compose ネットワークの内部からのみ到達できます。
 
-## 5. Validate and start the deployment
+## 5. デプロイを検証して起動する
 
-Render the Compose configuration and start RustFS:
+Compose の設定を展開し、RustFS を起動します。
 
 ```bash
 docker compose config
 docker compose up -d rustfs
 ```
 
-Validate the Caddyfile with the same image used by the deployment:
+デプロイと同じイメージで Caddyfile を検証します。
 
 ```bash
 docker compose run --rm --no-deps caddy caddy validate --config /etc/caddy/Caddyfile
 ```
 
-Start Caddy and check both services:
+Caddy を起動し、両方のサービスを確認します。
 
 ```bash
 docker compose up -d caddy
@@ -161,22 +161,22 @@ docker compose ps
 docker compose logs --follow caddy
 ```
 
-Caddy obtains certificates in the background and redirects HTTP requests to HTTPS. If issuance fails, confirm that both DNS records resolve to this host, ports `80` and `443` are reachable, and the `caddy-data` volume is writable.
+Caddy はバックグラウンドで証明書を取得し、HTTP リクエストを HTTPS へリダイレクトします。発行に失敗した場合は、両方の DNS レコードがこのホストへ解決すること、ポート `80` と `443` へ到達できること、`caddy-data` ボリュームへ書き込めることを確認します。
 
-## 6. Verify both endpoints
+## 6. 両方のエンドポイントを確認する
 
-Verify the API and Console through their public HTTPS hostnames:
+公開 HTTPS ホスト名経由で API と Console を確認します。
 
 ```bash
 curl --fail https://s3.example.com/health/ready
 curl --fail https://console.example.com/rustfs/console/health
 ```
 
-Configure S3 clients with `https://s3.example.com` as the endpoint and enable path-style addressing. Open `https://console.example.com/rustfs/console/` to sign in to the Console.
+S3 クライアントのエンドポイントを `https://s3.example.com` に設定し、パススタイルアクセスを有効にします。`https://console.example.com/rustfs/console/` を開いて Console にサインインします。
 
-## Multi-node upstreams
+## マルチノードのアップストリーム
 
-For a distributed RustFS deployment, list every node in the corresponding site block:
+分散構成の RustFS デプロイでは、対応するサイトブロックにすべてのノードを列挙します。
 
 ```text title="Caddyfile"
 {$S3_HOSTNAME} {
@@ -200,10 +200,10 @@ For a distributed RustFS deployment, list every node in the corresponding site b
 }
 ```
 
-Replace `<your-cookie-secret>` with a random secret shared by all Caddy instances. Console affinity keeps an in-progress OpenID Connect login on the RustFS node that created its `state`. Keep port `9000` open directly between RustFS nodes because internal node RPC uses the same listener.
+`<your-cookie-secret>` は、すべての Caddy インスタンスで共有するランダムなシークレットに置き換えます。Console のアフィニティにより、進行中の OpenID Connect ログインは、その `state` を作成した RustFS ノードに留まります。ノード間の内部 RPC は同じリスナーを使うため、RustFS ノード間ではポート `9000` を直接開けたままにします。
 
-## Next steps
+## 次のステップ
 
-- [Configure an S3 client](/developer/examples/aws-cli)
-- [Enable virtual-hosted-style bucket URLs](/integration/virtual)
-- [Review health and readiness endpoints](/operations/status-check)
+- [S3 クライアントを設定する](/ja/developer/examples/aws-cli)
+- [仮想ホスト形式のバケット URL を有効にする](/ja/integration/virtual)
+- [ヘルスと準備完了のエンドポイントを確認する](/ja/operations/status-check)

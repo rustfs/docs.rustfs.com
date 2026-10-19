@@ -1,37 +1,37 @@
 ---
-title: "Python SDK Guide"
-description: "Use the official AWS SDK for Python (Boto3) with RustFS."
+title: "Python"
+description: "公式の AWS SDK for Python（Boto3）を RustFS で使います。"
 ---
 
-## 1. Overview
+## 1. 概要
 
-RustFS ships no first-party SDKs — it is S3-compatible, so you use the official AWS SDK for Python, [Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html), configured to point at your RustFS server.
+RustFS は独自の SDK を提供していません。S3 互換であるため、公式の AWS SDK for Python である [Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) を、RustFS サーバーを指すように設定して使います。
 
-This guide covers:
+このガイドでは、次の内容を扱います。
 
-* Bucket creation/deletion
-* Object upload/download/deletion
-* Listing objects
-* Generating presigned URLs
-* Multipart upload for large files
+* バケットの作成と削除
+* オブジェクトのアップロード、ダウンロード、削除
+* オブジェクトの一覧
+* 署名付き URL の生成
+* 大きなファイルのマルチパートアップロード
 
 ---
 
-## 2. Prerequisites
+## 2. 前提条件
 
-* Python 3.8 or later
-* A running RustFS instance (see the [Installation Guide](../../installation/index.md)) — the S3 API listens on port `9000`, the Console on port `9001`
-* Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (see [Access Key Management](../../security-compliance/iam/access-token.md))
+* Python 3.8 以降
+* 稼働している RustFS インスタンス（[インストールガイド](../../installation/index.md)を参照）。S3 API はポート `9000`、Console はポート `9001` で待ち受けます
+* インストール時に環境変数 `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` で設定するアクセスキー（[アクセスキーの管理](../../security-compliance/iam/access-token.md)を参照）
 
-:::tip[Local test]
+:::tip[ローカル検証]
 
-If you did not set credentials at install time, the server defaults to `rustfsadmin` / `rustfsadmin` — fine for a throwaway local trial, never for anything reachable by others.
+インストール時に認証情報を設定しなかった場合、サーバーの既定値は `rustfsadmin` / `rustfsadmin` です。使い捨てのローカル検証であれば問題ありませんが、外部から到達できる環境では使わないでください。
 
 :::
 
-### 2.1 Install Boto3
+### 2.1 Boto3 のインストール
 
-We recommend using a virtual environment:
+仮想環境の使用を推奨します。
 
 ```bash
 python3 -m venv venv
@@ -39,13 +39,13 @@ source venv/bin/activate
 pip install boto3
 ```
 
-> Boto3 depends on `botocore`, which will be installed automatically.
+> Boto3 は `botocore` に依存しており、自動的にインストールされます。
 
 ---
 
-## 3. Connecting to RustFS
+## 3. RustFS への接続
 
-The following is a complete, runnable script. Replace `localhost` with your server's IP address if RustFS runs on another machine, and fill in your own access keys:
+次のスクリプトは、そのまま実行できます。RustFS が別のマシンで動作している場合は `localhost` をサーバーの IP アドレスに置き換え、アクセスキーも自分の値にします。
 
 ```python title="main.py"
 import boto3
@@ -68,26 +68,26 @@ for bucket in response['Buckets']:
     print(bucket['Name'])
 ```
 
-Run it:
+実行します。
 
 ```bash
 python main.py
 ```
 
-:::note[Client parameters explained]
+:::note[クライアントパラメータの説明]
 
-- `endpoint_url` — points to your RustFS S3 API (port `9000`, not the Console port `9001`)
-- `signature_version='s3v4'` — RustFS supports v4 signatures
-- `region_name='us-east-1'` — RustFS's default region
-- `addressing_style='path'` — RustFS uses path-style URLs by default; virtual-host style requires `RUSTFS_SERVER_DOMAINS`
+- `endpoint_url` — RustFS の S3 API を指します（ポート `9000`。Console のポート `9001` ではありません）
+- `signature_version='s3v4'` — RustFS は v4 署名に対応しています
+- `region_name='us-east-1'` — RustFS の既定リージョンです
+- `addressing_style='path'` — RustFS は既定でパススタイルアクセスを使います。仮想ホスト形式には `RUSTFS_SERVER_DOMAINS` が必要です
 
 :::
 
 ---
 
-## 4. Basic Operations
+## 4. 基本操作
 
-### 4.1 Create Bucket
+### 4.1 バケットの作成
 
 ```python
 bucket_name = 'my-bucket'
@@ -105,7 +105,7 @@ Bucket my-bucket created.
 
 ---
 
-### 4.2 Upload File
+### 4.2 ファイルのアップロード
 
 ```python
 s3.upload_file('/path/to/hello.txt', bucket_name, 'hello.txt')
@@ -118,7 +118,7 @@ File uploaded.
 
 ---
 
-### 4.3 Download File
+### 4.3 ファイルのダウンロード
 
 ```python
 s3.download_file(bucket_name, 'hello.txt', 'hello-downloaded.txt')
@@ -131,7 +131,7 @@ File downloaded.
 
 ---
 
-### 4.4 List Objects
+### 4.4 オブジェクトの一覧
 
 ```python
 response = s3.list_objects_v2(Bucket=bucket_name)
@@ -145,7 +145,7 @@ for obj in response.get('Contents', []):
 
 ---
 
-### 4.5 Delete Object and Bucket
+### 4.5 オブジェクトとバケットの削除
 
 ```python
 s3.delete_object(Bucket=bucket_name, Key='hello.txt')
@@ -162,11 +162,11 @@ Bucket deleted.
 
 ---
 
-## 5. Advanced Features
+## 5. 高度な機能
 
-### 5.1 Generate Presigned URLs
+### 5.1 署名付き URL の生成
 
-#### 5.1.1 Download Link (GET)
+#### 5.1.1 ダウンロードリンク（GET）
 
 ```python
 url = s3.generate_presigned_url(
@@ -182,7 +182,7 @@ print('Presigned GET URL:', url)
 Presigned GET URL: http://localhost:9000/my-bucket/hello.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&...
 ```
 
-#### 5.1.2 Upload Link (PUT)
+#### 5.1.2 アップロードリンク（PUT）
 
 ```python
 url = s3.generate_presigned_url(
@@ -194,7 +194,7 @@ url = s3.generate_presigned_url(
 print('Presigned PUT URL:', url)
 ```
 
-You can use the `curl` tool to upload:
+`curl` でアップロードできます。
 
 ```bash
 curl -X PUT --upload-file /path/to/hello.txt "http://localhost:9000/my-bucket/upload-by-url.txt?X-Amz-Algorithm=..."
@@ -202,9 +202,9 @@ curl -X PUT --upload-file /path/to/hello.txt "http://localhost:9000/my-bucket/up
 
 ---
 
-### 5.2 Multipart Upload
+### 5.2 マルチパートアップロード
 
-Suitable for files larger than 10 MB, allows manual control of each part.
+各パートを制御する必要がある場合は、10 MB を超えるファイルにマルチパートアップロードを使います。
 
 ```python
 file_path = 'largefile.bin'
@@ -260,18 +260,18 @@ Multipart upload complete.
 
 ---
 
-## 6. Common Issue Troubleshooting
+## 6. トラブルシューティング
 
-| Issue | Cause | Solution |
-| ------------------------- | ----------------- | -------------------------------------------------------------- |
-| `SignatureDoesNotMatch` | Not using v4 signature | Set `signature_version='s3v4'` |
-| `EndpointConnectionError` | Wrong RustFS address or service not started | Check endpoint and RustFS service status |
-| `AccessDenied` | Wrong credentials or insufficient permissions | Check AccessKey/SecretKey or bucket policies |
-| `PermanentRedirect` / wrong bucket URL | Path-style not enabled | Set `s3={'addressing_style': 'path'}` in the `Config` |
+| 問題 | 原因 | 対処 |
+| --- | --- | --- |
+| `SignatureDoesNotMatch` | v4 署名を使っていない | `signature_version='s3v4'` を設定します |
+| `EndpointConnectionError` | RustFS のアドレスが誤っている、またはサービスが起動していない | エンドポイントと RustFS のサービス状態を確認します |
+| `AccessDenied` | 認証情報が誤っている、または権限が不足している | アクセスキー、シークレットキー、バケットポリシーを確認します |
+| `PermanentRedirect`、または誤ったバケット URL | パススタイルアクセスが有効になっていない | `Config` で `s3={'addressing_style': 'path'}` を設定します |
 
 ---
 
-## 7. Appendix: Quick Upload/Download Script Template
+## 7. 付録: アップロードとダウンロードの簡易スクリプトテンプレート
 
 ```python
 def upload_file(local_path, bucket, object_key):
@@ -284,6 +284,6 @@ def download_file(bucket, object_key, local_path):
     print(f"Downloaded s3://{bucket}/{object_key} to {local_path}")
 ```
 
-For other operations (object tagging, bucket policies, and more), see the [Boto3 S3 documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html) — every S3-compatible call works against RustFS the same way.
+オブジェクトのタグ付けやバケットポリシーなどの操作については、[Boto3 S3 のドキュメント](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html)を参照します。ほとんどの S3 操作は、RustFS に対しても同じように動作します。例外は [S3 互換性](/ja/reference/s3-compatibility) を参照します。
 
-If you prefer native async support and full type hints, the community-driven [capo](https://github.com/kap-sh/capo) SDK also works with RustFS — see the [capo (Python) integration guide](../integration/others/capo.md).
+ネイティブな非同期と、一通りの型ヒントを重視する場合は、コミュニティ主導の [capo](https://github.com/kap-sh/capo) SDK も RustFS で動作します。[capo（Python）連携ガイド](../integration/others/capo.md)を参照します。

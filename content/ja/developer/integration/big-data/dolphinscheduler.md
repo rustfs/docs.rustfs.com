@@ -1,13 +1,13 @@
 ---
 title: "DolphinScheduler"
-description: "Store DolphinScheduler resources on RustFS over S3."
+description: "S3 経由で DolphinScheduler のリソースを RustFS に保存します。"
 ---
 
-This guide connects [Apache DolphinScheduler](https://github.com/apache/dolphinscheduler) — the workflow scheduler — to **RustFS** as its resource center storage. You will run the standalone server, switch the resource storage to S3, upload a resource file through the API, and verify the object in the bucket. The workflow was verified with DolphinScheduler 3.2.1 (standalone server) against `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、ワークフロースケジューラーである [Apache DolphinScheduler](https://github.com/apache/dolphinscheduler) を、リソースセンターのストレージとして **RustFS** に接続します。スタンドアロンサーバーを実行し、リソースストレージを S3 に切り替え、API でリソースファイルをアップロードし、バケット内のオブジェクトを確認します。この流れは、DolphinScheduler 3.2.1（スタンドアロンサーバー）を `rustfs/rustfs-x86-musl:v2.3.1` に対して検証済みです。
 
-You need Docker.
+Docker が必要です。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -15,9 +15,9 @@ flowchart LR
 	DS -->|"S3 API"| RustFS["RustFS :9000"]
 ```
 
-The resource center stores workflow scripts, dependency JARs, and other files. With S3 storage every uploaded file becomes an object under `dolphinscheduler/<tenant>/resources/` in the bucket.
+リソースセンターは、ワークフローのスクリプト、依存 JAR、その他のファイルを保存します。S3 ストレージでは、アップロードした各ファイルがバケット内の `dolphinscheduler/<tenant>/resources/` 配下のオブジェクトになります。
 
-## 1. Run the standalone server
+## 1. スタンドアロンサーバーを実行する
 
 ```bash
 docker run -d --name dolphinscheduler --hostname dolphinscheduler \
@@ -25,11 +25,11 @@ docker run -d --name dolphinscheduler --hostname dolphinscheduler \
   apache/dolphinscheduler-standalone-server:3.2.1
 ```
 
-The single container bundles master, worker, API, alert, and an embedded ZooKeeper. The UI is at `http://localhost:12345/dolphinscheduler/ui` (default login `admin` / `dolphinscheduler123`).
+単一のコンテナに master、worker、API、alert、組み込み ZooKeeper が含まれます。UI は `http://localhost:12345/dolphinscheduler/ui` です（既定のログインは `admin` / `dolphinscheduler123`）。
 
-## 2. Switch the resource center to RustFS
+## 2. リソースセンターを RustFS に切り替える
 
-The storage backend lives in `/opt/dolphinscheduler/conf/common.properties`. Append the S3 properties to the existing file — do not replace the file, it holds many other settings:
+ストレージのバックエンドは `/opt/dolphinscheduler/conf/common.properties` にあります。既存ファイルへ S3 のプロパティを追記します。ファイルには他の設定も多数あるため、置き換えないでください。
 
 ```bash
 docker exec dolphinscheduler bash -c "cat >> /opt/dolphinscheduler/conf/common.properties << 'EOF'
@@ -45,15 +45,15 @@ EOF"
 docker restart dolphinscheduler
 ```
 
-Wait for the API to come back (about a minute), then create the bucket:
+API が復帰するまで待ち（およそ 1 分）、その後バケットを作成します。
 
 ```bash
 rc mb rustfs/ds-demo
 ```
 
-## 3. Upload a resource file
+## 3. リソースファイルをアップロードする
 
-Log in through the API to get a session id, then upload a file. The endpoint requires both `name` and `fullName` parameters:
+API でログインしてセッション ID を取得し、ファイルをアップロードします。エンドポイントには `name` と `fullName` の両方のパラメーターが必要です。
 
 ```bash
 printf "ds resource file stored in rustfs" > /tmp/ds-file.txt
@@ -71,9 +71,9 @@ curl -s -m 30 -X POST "http://localhost:12345/dolphinscheduler/resources" \
 {"code":0,"msg":"success","data":null,"failed":false,"success":true}
 ```
 
-## 4. Verify in DolphinScheduler and RustFS
+## 4. DolphinScheduler と RustFS で確認する
 
-Read the file back through the API:
+API 経由でファイルを読み戻します。
 
 ```bash
 curl -s -m 30 "http://localhost:12345/dolphinscheduler/resources/view-ui?fullName=/ds-file.txt&skipLineNum=100&limit=100" \
@@ -84,7 +84,7 @@ curl -s -m 30 "http://localhost:12345/dolphinscheduler/resources/view-ui?fullNam
 ds resource file stored in rustfs
 ```
 
-List the bucket — the file sits under the tenant's resources prefix:
+バケットを一覧表示します。ファイルはテナントの resources プレフィックス配下にあります。
 
 ```bash
 rc ls rustfs/ds-demo/ -r
@@ -95,31 +95,31 @@ dolphinscheduler/default/resources/ds-file.txt
 dolphinscheduler/default/udfs/
 ```
 
-![DolphinScheduler resources stored in the RustFS Console](./images/rustfs-ds-resources.png)
+![RustFS Console に保存された DolphinScheduler のリソース](./images/rustfs-ds-resources.png)
 
-## 5. Stop or reset
+## 5. 停止またはリセット
 
 ```bash
 docker rm -f dolphinscheduler
 rc rm rustfs/ds-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### Server fails to start with an Azure `clientId/tenantId/clientSecret` error
+### Azure の `clientId/tenantId/clientSecret` エラーでサーバーが起動しない
 
-The storage config was written as a brand-new file instead of appended, so `resource.storage.type=S3` was lost and the defaults pointed at Azure. Always append to the existing `common.properties` as in step 2.
+ストレージ設定を追記せず新規ファイルとして書いたため、`resource.storage.type=S3` が失われ、既定値が Azure を向いたままです。手順 2 のとおり、必ず既存の `common.properties` へ追記します。
 
 ### `Required request parameter 'name'/'fullName' is not present`
 
-The resource create endpoint requires both `name` and `fullName` form fields alongside `file`, `type`, and `currentDir`.
+リソース作成エンドポイントには、`file`、`type`、`currentDir` に加えて、`name` と `fullName` のフォームフィールドが両方必要です。
 
-### API returns 405 for the token call
+### トークン呼び出しで API が 405 を返す
 
-The login/token endpoints accept POST but `/api/v2/token` style endpoints differ per version — use the login form shown in step 3 and pass `session-id` header plus `Cookie: sessionId=...` on every call.
+ログインおよびトークンのエンドポイントは POST を受け付けます。バージョンによって `/api/v2/token` 形式のエンドポイントは異なります。手順 3 のログインフォームを使い、すべての呼び出しで `session-id` ヘッダーと `Cookie: sessionId=...` を渡します。
 
-## Next steps
+## 次のステップ
 
-- Compare with the [Airflow](/developer/integration/big-data/airflow) guide for orchestration without a built-in resource center.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [DolphinScheduler documentation](https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/common/resource-management.html) to wire the same S3 resource center into worker task execution.
+- 組み込みのリソースセンターを使わないオーケストレーションについては、[Airflow](/ja/developer/integration/big-data/airflow) のガイドと比較します。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- [DolphinScheduler ドキュメント](https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/common/resource-management.html)に従い、同じ S3 リソースセンターをワーカーのタスク実行へ接続します。

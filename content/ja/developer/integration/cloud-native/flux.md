@@ -1,13 +1,13 @@
 ---
 title: "Flux"
-description: "Deliver Kubernetes manifests to Flux CD from RustFS through the Bucket source API."
+description: "Bucket ソース API を通じて、Kubernetes マニフェストを RustFS から Flux CD へ配信します。"
 ---
 
-This guide connects [Flux CD](https://github.com/fluxcd/flux2) — the GitOps toolkit for Kubernetes — to **RustFS** through the source-controller Bucket API. You will seed a RustFS bucket with Kubernetes manifests, register the bucket as a Flux `Bucket` source with the `generic` provider, and let a Kustomization apply everything it contains. The workflow was verified with `flux v2.9.5` (source-controller) on `k3s v1.36.4+k3s1` against `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、Kubernetes 向け GitOps ツールキットである [Flux CD](https://github.com/fluxcd/flux2) を、source-controller の Bucket API 経由で **RustFS** に接続します。Kubernetes マニフェストを RustFS のバケットに配置し、`generic` プロバイダーの Flux `Bucket` ソースとして登録し、Kustomization で含まれる内容をすべて適用します。この流れは `k3s v1.36.4+k3s1` 上の `flux v2.9.5`（source-controller）を `rustfs/rustfs-x86-musl:v2.3.1` に対して検証済みです。
 
-You need a Kubernetes cluster with Flux installed (`flux install`) and the `rc` client. This deployment is intended for local integration testing, not production.
+Flux をインストールした Kubernetes クラスター（`flux install`）と、`rc` クライアントが必要です。このデプロイはローカルでの統合テストを目的としており、本番環境向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -17,11 +17,11 @@ flowchart LR
 	kustomize-controller -->|"apply"| Cluster["Kubernetes cluster"]
 ```
 
-The source-controller lists and downloads objects from the bucket over the S3 API, packs them into an artifact, and the kustomize-controller applies the manifests from that artifact. RustFS acts as the pull-based source of truth for the cluster.
+source-controller は S3 API でバケット内のオブジェクトを一覧してダウンロードし、アーティファクトにまとめます。kustomize-controller はそのアーティファクトからマニフェストを適用します。RustFS はクラスターにとってプル型の正本になります。
 
-## 1. Seed the bucket
+## 1. バケットに初期データを入れる
 
-Store a Kustomize overlay in the bucket, replacing all connection placeholders:
+接続情報のプレースホルダーをすべて置き換え、Kustomize オーバーレイをバケットに保存します。
 
 ```yaml title="clusters/staging/kustomization.yaml"
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -41,7 +41,7 @@ data:
   source: s3-bucket
 ```
 
-Upload the files:
+ファイルをアップロードします。
 
 ```bash
 rc mb rustfs/flux-src
@@ -54,9 +54,9 @@ staging/kustomization.yaml
 staging/rustfs-demo-configmap.yaml
 ```
 
-## 2. Create the credentials secret
+## 2. 認証情報の Secret を作成する
 
-Flux reads the credentials from a secret in the same namespace as the source, using lowercase keys:
+Flux は、ソースと同じ名前空間の Secret から、小文字のキーで認証情報を読みます。
 
 ```bash
 kubectl -n flux-system create secret generic rustfs-creds \
@@ -64,11 +64,11 @@ kubectl -n flux-system create secret generic rustfs-creds \
   --from-literal=secretkey=<your-secret-key>
 ```
 
-The field names must be `accesskey` and `secretkey` — capitalization such as `accessKey` fails with an `AuthenticationFailed` status.
+フィールド名は `accesskey` と `secretkey` である必要があります。`accessKey` のような大文字を含む名前は `AuthenticationFailed` ステータスで失敗します。
 
-## 3. Register the Bucket source
+## 3. Bucket ソースを登録する
 
-Create the Bucket source with the `generic` provider:
+`generic` プロバイダーで Bucket ソースを作成します。
 
 ```bash
 flux create source bucket rustfs-demo \
@@ -85,18 +85,18 @@ flux create source bucket rustfs-demo \
 ✔ Bucket source reconciliation completed
 ```
 
-If reconciliation is still running, check the status with `flux get sources bucket`:
+リコンシリエーションがまだ実行中の場合は、`flux get sources bucket` でステータスを確認します。
 
 ```text
 NAME        REVISION       SUSPENDED READY MESSAGE
 rustfs-demo sha256:481816d1 False     True  stored artifact: revision 'sha256:481816d1'
 ```
 
-The `generic` provider uses path-style requests and plain HTTP with `--insecure`, so the endpoint is the bare `host:port`.
+`generic` プロバイダーは `--insecure` でパススタイルのリクエストと平文 HTTP を使います。そのためエンドポイントは `host:port` だけです。
 
-## 4. Apply the manifests
+## 4. マニフェストを適用する
 
-Create a Kustomization that consumes the artifact:
+アーティファクトを取り込む Kustomization を作成します。
 
 ```bash
 flux create kustomization rustfs-demo \
@@ -111,7 +111,7 @@ flux create kustomization rustfs-demo \
 ✔ applied revision sha256:481816d1
 ```
 
-Confirm the manifest landed on the cluster:
+マニフェストがクラスターに反映されたことを確認します。
 
 ```bash
 kubectl -n default get configmap rustfs-flux-demo -o jsonpath="{.data}"
@@ -121,37 +121,37 @@ kubectl -n default get configmap rustfs-flux-demo -o jsonpath="{.data}"
 {"source":"s3-bucket","storage":"rustfs"}
 ```
 
-## 5. Stop or reset
+## 5. 停止またはリセットする
 
-Suspend or delete the Flux resources without touching the bucket:
+バケットには触れずに、Flux リソースを一時停止または削除します。
 
 ```bash
 flux suspend source bucket rustfs-demo --namespace=flux-system
 flux delete kustomization rustfs-demo --namespace=flux-system
 ```
 
-To delete the bucket contents:
+バケットの内容を削除します。
 
 ```bash
 rc rm rustfs/flux-src/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
 ### `invalid 'rustfs-creds' secret data: required fields 'accesskey' and 'secretkey'`
 
-The secret keys are lowercase. Recreate the secret with `accesskey` and `secretkey` as literal key names.
+Secret のキーは小文字です。`accesskey` と `secretkey` をリテラルのキー名として Secret を作り直します。
 
-### Reconciliation never becomes ready
+### リコンシリエーションが Ready にならない
 
-Confirm the endpoint is reachable from inside the cluster — pods cannot use `localhost`, so point the source at the host IP or the Docker bridge gateway (commonly `172.17.0.1`) that publishes the RustFS port. `--insecure` is required for plain HTTP.
+エンドポイントがクラスター内から到達できることを確認します。Pod は `localhost` を使えません。ソースは、RustFS のポートを公開しているホストの IP、または Docker ブリッジのゲートウェイ（一般的には `172.17.0.1`）に向けます。平文 HTTP では `--insecure` が必要です。
 
-### `AuthenticationFailed` despite valid credentials
+### 認証情報が正しいのに `AuthenticationFailed` になる
 
-Check that the secret lives in the same namespace as the Bucket source and that the keys have no trailing whitespace or quoting.
+Secret が Bucket ソースと同じ名前空間にあること、およびキーに末尾の空白や引用符がないことを確認します。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional source types.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Flux Bucket source documentation](https://fluxcd.io/flux/components/source/buckets/) to combine bucket sources with Helm releases and image automation.
+- 追加のソースタイプを採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認してください。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
+- [Flux の Bucket ソースドキュメント](https://fluxcd.io/flux/components/source/buckets/)に従い、バケットソースを Helm リリースやイメージ自動化と組み合わせてください。
