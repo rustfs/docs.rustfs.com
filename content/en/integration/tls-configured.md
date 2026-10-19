@@ -56,6 +56,6 @@ TLS now applies to both listeners: the S3 API at `https://rustfs.example.com:900
 
 :::note[Certificate file ownership]
 
-The RustFS container runs as the `rustfs` user by default. Make sure that user owns `rustfs_key.pem` and `rustfs_cert.pem`. Otherwise, RustFS cannot read the certificates and TLS fails to start.
+The RustFS container runs as the `rustfs` user (UID `10001`) by default. Make sure that user owns `rustfs_key.pem` and `rustfs_cert.pem`. Otherwise, RustFS cannot read the certificates and TLS fails to start.
 
 :::

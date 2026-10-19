@@ -16,7 +16,7 @@ flowchart LR
 	Init["init-bucket job"] -->|"create my-bucket"| RustFS
 ```
 
-InfluxDB 3 Core は、カタログ・先行書き込みログ（WAL）・Parquet データファイルを設定されたオブジェクトストアに保持します。書き込みはまず WAL に記録されて RustFS へ永続化されるため、コンパクションが Parquet ファイルを生成する前でも、すべての書き込みが再起動後も保持されます。サーバーは設定されたエンドポイントに対してデフォルトでパススタイルのアドレス指定を使用します。
+InfluxDB 3 Core は、カタログ・先行書き込みログ（WAL）・Parquet データファイルを設定されたオブジェクトストアに保持します。書き込みはまず WAL に記録されて RustFS へ永続化されるため、コンパクションが Parquet ファイルを生成する前でも、すべての書き込みが再起動後も保持されます。サーバーは設定されたエンドポイントに対してデフォルトでパススタイルアクセスを使用します。
 
 ## 1. プロジェクトファイルを作成する
 
@@ -115,7 +115,7 @@ volumes:
   rustfs-data:
 ```
 
-`--object-store s3` と `--aws-endpoint` により、カタログ・WAL・Parquet のすべての書き込みが RustFS にルーティングされます。InfluxDB はエンドポイントに対してデフォルトでパススタイルのアドレス指定を使用し、`--aws-allow-http` は Compose ネットワーク内での平文 HTTP を許可します。
+`--object-store s3` と `--aws-endpoint` により、カタログ・WAL・Parquet のすべての書き込みが RustFS にルーティングされます。InfluxDB はエンドポイントに対してデフォルトでパススタイルアクセスを使用し、`--aws-allow-http` は Compose ネットワーク内での平文 HTTP を許可します。
 
 ## 2. デプロイを起動する
 

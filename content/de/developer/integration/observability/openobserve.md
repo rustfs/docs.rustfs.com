@@ -3,21 +3,21 @@ title: "OpenObserve"
 description: "Betreiben Sie OpenObserve mit RustFS als S3-kompatiblem Objektspeicher-Backend über Docker Compose und prüfen Sie Login, Speicherung und Suche von Protokollen."
 ---
 
-In dieser Anleitung betreiben Sie **OpenObserve** mit **RustFS** als Objektspeicher-Backend. Sie starten beide Dienste mit Docker Compose, erfassen Logdaten in OpenObserve, leeren den Schreibpuffer in den Objektspeicher, prüfen die entstandenen Parquet-Dateien in RustFS und fragen die Daten über die OpenObserve-Weboberfläche und die Such-API wieder ab.
+In dieser Anleitung betreiben Sie **OpenObserve** mit **RustFS** als Objektspeicher-Backend. Sie starten beide Dienste mit Docker Compose, erfassen Logdaten in OpenObserve, leeren den Schreibpuffer in den Objektspeicher, prüfen die entstandenen Parquet-Dateien in RustFS und fragen die Daten über die OpenObserve-Oberfläche (UI) und die Such-API wieder ab.
 
 Sie benötigen Docker mit dem Compose-Plugin und eine Maschine, die drei Container ausführen kann. Dieses Setup ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Produktvorstellung
+## Überblick
 
 ### OpenObserve
 
-[OpenObserve](https://openobserve.ai/) ist eine Open-Source-Observability-Plattform für Logs, Metriken, Traces und Real User Monitoring. Sie trennt Speicherung und Berechnung: erfasste Daten landen zuerst in einem lokalen Write-Ahead-Log (WAL), werden dann in Parquet-Dateien mit Volltextindizes umgewandelt und in den Objektspeicher hochgeladen, der als einzige persistente Datenschicht dient. Abfragen lokalisieren ferne Parquet-Dateien über File-List-Metadaten und laden sie bei Bedarf in einen lokalen Cache.
+[OpenObserve](https://openobserve.ai/) ist eine Open-Source-Observability-Plattform für Logs, Metriken, Traces und Real User Monitoring. Sie trennt Speicherung und Berechnung: erfasste Daten landen zuerst in einem lokalen Write-Ahead-Log (WAL), werden dann in Parquet-Dateien mit Volltextindizes umgewandelt und in den Objektspeicher hochgeladen, der als einzige persistente Datenschicht dient. Abfragen lokalisieren entfernte Parquet-Dateien über File-List-Metadaten und laden sie bei Bedarf in einen lokalen Cache.
 
-OpenObserve spricht über den Rust-Client `object_store` mit dem Objektspeicher. Standardmäßig verwendet er **Path-Style**-Anfragen mit SigV4-Signatur, sodass jeder S3-kompatible Endpunkt funktioniert — auch RustFS — solange Sie Endpunkt-URL, Region, Anmeldeinformationen und Bucket-Namen angeben.
+OpenObserve spricht über den Rust-Client `object_store` mit dem Objektspeicher. Standardmäßig verwendet er Anfragen mit **pfadbasierter Adressierung** (Path-Style) und SigV4-Signatur, sodass jeder S3-kompatible Endpunkt funktioniert — auch RustFS —, solange Sie Endpunkt-URL, Region, Zugangsdaten und Bucket-Namen angeben.
 
 ### RustFS
 
-RustFS ist ein in Rust entwickeltes verteiltes Objektspeichersystem. Es implementiert die Amazon-S3-API einschließlich SigV4-Signatur, Path-Style- und Virtual-Host-Adressierung sowie Multipart-Uploads und bietet eine Web-Konsole sowie Multi-Tenant-IAM. RustFS läuft von einem einzelnen Knoten bis zu Multi-Node-Clustern und deckt die S3-Operationen ab, die OpenObserve für seine Telemetriedaten benötigt.
+RustFS ist ein in Rust entwickeltes verteiltes Objektspeichersystem. Es implementiert die Amazon-S3-API einschließlich SigV4-Signatur, pfadbasierter Adressierung (Path-Style) und Adressierung im Virtual-Hosted-Stil sowie Multipart-Uploads und bietet eine Console sowie Multi-Tenant-IAM. RustFS läuft von einem einzelnen Knoten bis zu Multi-Node-Clustern und deckt die S3-Operationen ab, die OpenObserve für seine Telemetriedaten benötigt.
 
 ### Funktionsweise der Integration
 
@@ -44,7 +44,7 @@ mkdir rustfs-openobserve
 cd rustfs-openobserve
 ```
 
-Erstellen Sie eine Umgebungsdatei und ersetzen Sie die Platzhalter für die Anmeldeinformationen:
+Erstellen Sie eine Umgebungsdatei und ersetzen Sie die Platzhalter für die Zugangsdaten:
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
@@ -210,7 +210,7 @@ curl -s -u "root@example.com:Complexpass#123" -X PUT "http://localhost:5080/node
 
 Der Ingester wandelt die WAL-Einträge in eine Parquet-Datei um und lädt sie im Hintergrund nach RustFS hoch, sobald die Datei älter als `ZO_MAX_FILE_RETENTION_TIME` ist (in dieser Compose-Datei 60 Sekunden, Standard 600 Sekunden).
 
-## Verifikation
+## Überprüfung
 
 ### Objekte in RustFS prüfen
 
@@ -307,5 +307,5 @@ Das RustFS-Image läuft mit Benutzer und Gruppe `10001`. Wenn Sie statt des Name
 ## Nächste Schritte
 
 - Lesen Sie die [S3-Kompatibilitätshinweise](/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
-- Erstellen Sie dedizierte Produktions-Anmeldeinformationen mit dem [Access Key Management](/security-compliance/iam/access-token).
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
 - Folgen Sie der [OpenObserve-Dokumentation](https://openobserve.ai/docs/), um echte Log-Producer wie Fluent Bit oder den OpenTelemetry Collector anzubinden.

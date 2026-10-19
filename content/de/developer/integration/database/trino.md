@@ -17,7 +17,7 @@ flowchart LR
 	Init["init-bucket job"] -->|"create my-bucket"| RustFS
 ```
 
-Der hive-Connector mit `hive.metastore=file` hält Schema- und Tabellenmetadaten als JSON-Objekte unter dem Katalogverzeichnis, und das native S3-Dateisystem (`fs.s3.enabled`) speichert Metadaten und Datendateien in RustFS mit Path-Style-Adressierung über Plain HTTP.
+Der hive-Connector mit `hive.metastore=file` hält Schema- und Tabellenmetadaten als JSON-Objekte unter dem Katalogverzeichnis, und das native S3-Dateisystem (`fs.s3.enabled`) speichert Metadaten und Datendateien in RustFS mit pfadbasierter Adressierung (Path-Style) über unverschlüsseltes HTTP (Plain HTTP).
 
 ## 1. Projektdateien anlegen
 
@@ -28,14 +28,14 @@ mkdir rustfs-trino
 cd rustfs-trino
 ```
 
-Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Anmeldeinformationen:
+Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Zugangsdaten:
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Verwenden Sie dedizierte Anmeldeinformationen für den Bucket. Committen Sie `.env` nicht in die Versionsverwaltung.
+Verwenden Sie dedizierte Zugangsdaten für den Bucket. Nehmen Sie `.env` nicht in die Versionsverwaltung auf.
 
 Erstellen Sie die Katalog-Konfiguration für Trino:
 
@@ -203,7 +203,7 @@ Sie können das Präfix auch in der RustFS-Konsole anzeigen:
 
 ## 6. RustFS S3 Tables verwenden
 
-RustFS S3 Tables bietet einen integrierten Apache-Iceberg-REST-Katalog, sodass Trino einen Table-Bucket als verwaltetes Iceberg-Warehouse nutzen kann, während die Daten in RustFS bleiben. Aktivieren Sie einen Table-Bucket und verbinden Sie den Iceberg-Connector von Trino mit dem REST-Katalog, wie in [S3 Tables](/administration/data/s3-tables) beschrieben: Die REST-Katalog-URI ist `http://<rustfs-host>:9000/iceberg`, das Warehouse ist der Bucket-Name, und sowohl Kataloganfragen (AWS Signature Version 4, Signing-Name `s3`) als auch der S3-Dateizugriff verwenden Path-Style-Adressierung.
+RustFS S3 Tables bietet einen integrierten Apache-Iceberg-REST-Katalog, sodass Trino einen Tabellen-Bucket als verwaltetes Iceberg-Warehouse nutzen kann, während die Daten in RustFS bleiben. Aktivieren Sie einen Tabellen-Bucket und verbinden Sie den Iceberg-Connector von Trino mit dem REST-Katalog, wie in [S3 Tables](/administration/data/s3-tables) beschrieben: Die REST-Katalog-URI ist `http://<rustfs-host>:9000/iceberg`, das Warehouse ist der Bucket-Name, und sowohl Kataloganfragen (AWS Signature Version 4, Signing-Name `s3`) als auch der S3-Dateizugriff verwenden pfadbasierte Adressierung (Path-Style).
 
 Laut der S3-Tables-Support-Matrix wurde Trino nur als Read-only-Probe gegen den Katalog geprüft; validieren Sie die Schreibkompatibilität und die exakte Trino-Version Ihrer Bereitstellung, bevor Sie diesen Pfad in Produktion übernehmen.
 
@@ -237,7 +237,7 @@ Das CSV-Format lehnt Nicht-String-Spalten ab. Verwenden Sie für typisierte Tabe
 
 ### AccessDenied- oder 403-Antworten
 
-Stellen Sie sicher, dass die Anmeldeinformationen in `hive.properties` mit den RustFS-Anmeldeinformationen übereinstimmen und dass der Dienst `create-bucket` erfolgreich abgeschlossen wurde:
+Stellen Sie sicher, dass die Zugangsdaten in `hive.properties` mit den RustFS-Zugangsdaten übereinstimmen und dass der Dienst `create-bucket` erfolgreich abgeschlossen wurde:
 
 ```bash
 docker compose logs create-bucket
@@ -246,5 +246,5 @@ docker compose logs create-bucket
 ## Nächste Schritte
 
 - Lesen Sie die [S3-Kompatibilitätshinweise](/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
-- Erstellen Sie dedizierte Produktions-Anmeldeinformationen mit dem [Access Key Management](/security-compliance/iam/access-token).
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
 - Folgen Sie der [Trino-Dokumentation](https://trino.io/docs/current/), um BI-Tools anzubinden und weitere Objektspeicher-Kataloge hinzuzufügen.

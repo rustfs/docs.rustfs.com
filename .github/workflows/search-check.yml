@@ -1,0 +1,33 @@
+name: Search build check
+
+on:
+  pull_request:
+    paths:
+      - "content/**"
+      - "src/**"
+      - "public/**"
+      - "press.config.tsx"
+      - "source.config.ts"
+      - "vite.config.ts"
+      - "package.json"
+      - "package-lock.json"
+      - "scripts/**"
+      - ".github/workflows/search-check.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  search-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - run: npm run docs:check
+      - run: npm run build
+      - run: npm run test:search
+      - run: npm run test:worker

@@ -25,7 +25,7 @@ Ensure the following requirements are met before deployment.
 ## File System & Disks
 
 - **Dedicated Data Disks**: Use dedicated disks for RustFS data. Do not share with the OS.
-- **File system**: Use XFS or ext4 with performance options (for example, `noatime`).
+- **File system**: Use XFS or ext4 with performance mount options such as `noatime`.
 - **Disk Configuration**: Use JBOD (independent volumes). Do not use hardware RAID.
 - **Permissions**: Ensure the RustFS user has read/write access to data directories.
 

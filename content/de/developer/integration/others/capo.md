@@ -31,7 +31,7 @@ s3 = S3Client(
 )
 ```
 
-## Verifikation
+## Überprüfung
 
 Erstellen Sie einen Bucket, laden Sie ein Objekt hoch und listen Sie den Bucket auf:
 
@@ -59,7 +59,7 @@ with s3.get_object(bucket="my-bucket", key="hello.txt") as response:
 print(content.decode())
 ```
 
-Sie können außerdem vorsignierte URLs generieren, die zeitlich begrenzten Zugriff ohne Anmeldeinformationen gewähren:
+Außerdem können Sie vorsignierte URLs erzeugen, die zeitlich begrenzten Zugriff ohne Zugangsdaten gewähren:
 
 ```python
 url = s3.presigned_get_object(bucket="my-bucket", key="hello.txt", expire_in=3600)
@@ -68,7 +68,7 @@ print(url)
 
 ## Asynchroner Client
 
-Der asynchrone Client akzeptiert dieselben Argumente und spiegelt jede Operation. Awaiten Sie jeden Aufruf und verwenden Sie asynchrone Kontextmanager für den Client sowie für Streaming-Antworten:
+Der asynchrone Client akzeptiert dieselben Argumente und spiegelt jede Operation. Warten Sie jeden Aufruf mit `await` ab und verwenden Sie asynchrone Kontextmanager für den Client sowie für Streaming-Antworten:
 
 ```python
 import asyncio

@@ -19,7 +19,7 @@ If you did not set credentials at install time, the server defaults to `rustfsad
 
 :::
 
-### 2.1 Install the SDK
+### Install the SDK
 
 Install the required AWS SDK v3 modules with npm:
 

@@ -5,7 +5,9 @@ description: "Install a local RustFS instance on Windows with RustFS Launcher or
 
 This guide provides two ways to run **RustFS** on Windows: use the graphical **RustFS Launcher**, or download and run the standalone server binary from PowerShell. Both methods create a local, single-node instance suitable for evaluation, development, and testing.
 
-:::note[Deployment scope]
+:::warning[Development and debugging only]
+
+The Windows version of RustFS is intended for development and debugging only and is **not recommended for production deployments**. We recommend [Linux](/en/installation/linux) for production workloads.
 
 These procedures run RustFS as a desktop process, not as a Windows service. For a production or distributed deployment, use the [Linux installation guides](/installation/linux).
 
@@ -173,7 +175,7 @@ Stop the conflicting application or select unused ports, then start RustFS again
 
 ### The Console does not open
 
-For Launcher, confirm that **Console Endpoint** is enabled. For the standalone binary, confirm that the process is still running and that `--console-enable true` is present. The S3 API listens on port `9000` and the Console on port `9001`.
+For Launcher, confirm that **Console Endpoint** is enabled. For the standalone binary, confirm that the process is still running and that `--console-enable true` is present. The current Console default is port `9001`; port `7001` is not used by the current Launcher configuration.
 
 ### Launcher reports an external RustFS process
 

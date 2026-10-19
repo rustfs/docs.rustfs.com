@@ -16,7 +16,7 @@ flowchart LR
 	Init["init-bucket job"] -->|"create my-bucket"| RustFS
 ```
 
-registry は、S3 ストレージドライバーを通じて、すべての blob・マニフェスト・リポジトリリンクをバケット内の `docker/registry/v2/` の下に保存します。ドライバー設定の `regionendpoint`、`secure: false`、`skipverify: true` により、ドライバーが使用する AWS S3 クライアントが、平文 HTTP 上のパススタイルアドレス指定で RustFS エンドポイントに向くようになります。
+registry は、S3 ストレージドライバーを通じて、すべての blob・マニフェスト・リポジトリリンクをバケット内の `docker/registry/v2/` の下に保存します。ドライバー設定の `regionendpoint`、`secure: false`、`skipverify: true` により、ドライバーが使用する AWS S3 クライアントが、平文 HTTP 上のパススタイルアクセスで RustFS エンドポイントに向くようになります。
 
 ## 1. プロジェクトファイルを作成する
 

@@ -55,7 +55,7 @@ sudo mkdir -p /data/rustfs{0..3} /var/log/rustfs /opt/tls
 sudo chmod -R 750 /data/rustfs* /var/log/rustfs
 ```
 
-## Start and Verify the Service
+## Start and verify the service
 
 1. Start the service and enable it to start at boot:
 

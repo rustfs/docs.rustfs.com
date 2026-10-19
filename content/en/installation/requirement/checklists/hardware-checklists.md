@@ -3,26 +3,26 @@ title: "Production Hardware Guide"
 description: "This page provides hardware sizing and configuration guidance for production RustFS deployments."
 ---
 
-## Planning Considerations
+## Planning considerations
 
 Before deploying RustFS in production, assess your workload and capacity requirements over a two- to three-week period. Focus on the following factors:
 
 1. **Data volume**
 
-- **Initial data volume**: Estimate the usable data volume at go-live (in TiB), including the ratio of hot to cold data.
-- **Growth forecast**: Estimate data growth for the next 24 months based on business plans. We recommend modeling growth quarterly.
-- **Object count**: Estimate the total number of objects from the average object size (ideally 128 KB to 1 MB). Deployments with more than 100 million objects need additional tuning.
+   - **Initial data volume**: Estimate the usable data volume at go-live (in TiB), including the ratio of hot to cold data.
+   - **Growth forecast**: Estimate data growth for the next 24 months based on business plans. We recommend modeling growth quarterly.
+   - **Object count**: Estimate the total number of objects from the average object size (ideally 128 KB to 1 MB). Deployments with more than 100 million objects need additional tuning.
 
 2. **Workload characteristics**
 
-- **Access Patterns**: Distinguish read-intensive (such as content distribution) from write-intensive (such as log collection) scenarios
-- **Compliance requirements**: Retention periods must meet industry regulations (for example, some financial regulations require at least five years of retention).
-- **Multi-site deployment**: For cross-region deployments, assess network latency (ideally under 50 ms) and bandwidth costs.
+   - **Access patterns**: Distinguish read-intensive workloads (such as content distribution) from write-intensive workloads (such as log collection).
+   - **Compliance requirements**: Retention periods must meet industry regulations (for example, some financial regulations require at least five years of retention).
+   - **Multi-site deployment**: For cross-region deployments, assess network latency (ideally under 50 ms) and bandwidth costs.
 
-3. **Storage Architecture Design**
+3. **Storage architecture**
 
-- **Bucket planning**: Organize buckets by business unit. We recommend no more than 500 active buckets per cluster.
-- **Disaster recovery**: Choose active-active replication (recommended) or asynchronous replication based on how critical the data is.
+   - **Bucket planning**: Organize buckets by business unit. We recommend no more than 500 active buckets per cluster.
+   - **Disaster recovery**: Choose active-active replication (recommended) or asynchronous replication based on how critical the data is.
 
 ## Hardware Configuration Matrix
 
@@ -49,25 +49,25 @@ Baseline configurations based on load-test results:
 
 - **Bandwidth sizing**: Provision 0.5 Gbps of bandwidth per TB of usable data (for example, 100 TB of data needs 50 Gbps of dedicated bandwidth).
 - **Latency Requirements**:
-- Inter-node P99 latency ≤ 2ms
-- Cross-rack latency ≤ 5ms
+  - Inter-node P99 latency ≤ 2ms
+  - Cross-rack latency ≤ 5ms
 
 ### Storage Subsystem Tuning
 
 - **Controller Configuration**:
-- Enable read-ahead cache (recommended 256 MB+)
-- Disable all RAID features and use pass-through (HBA/JBOD) mode.
-- Check BBU health regularly
+  - Enable read-ahead cache (recommended 256 MB+)
+  - Disable all RAID features and use pass-through (HBA/JBOD) mode.
+  - Check BBU health regularly.
 - **SSD Parameters**:
-- Reserve 20% over-provisioning (OP) space to improve endurance
-- Enable atomic writes (requires hardware support)
+  - Reserve 20% over-provisioning (OP) space to improve endurance.
+  - Enable atomic writes (requires hardware support).
 
 ### Memory allocation
 
 - **Allocation Ratios**:
-- Metadata cache: 60% of total memory
-- Read/write buffers: 30%
-- System reserve: 10%
+  - Metadata cache: 60% of total memory
+  - Read/write buffers: 30%
+  - System reserve: 10%
 
 ## Network Design Reference Model
 
@@ -133,25 +133,25 @@ UUID=xxxx /mnt/disk1 xfs defaults,noatime,nodiratime,logbsize=256k 0 0
 
 1. **Power Supply**:
 
-- Use dual (redundant) power supplies
-- Connect each PDU to a separate power feed
-- Provide a UPS with at least 30 minutes of runtime.
+   - Use dual (redundant) power supplies.
+   - Connect each PDU to a separate power feed.
+   - Provide a UPS with at least 30 minutes of runtime.
 
 2. **Cooling Requirements**:
 
-- Rack power density ≤ 15 kW per rack
-- Keep the inlet-to-outlet temperature difference (ΔT) within 8 °C
+   - Rack power density ≤ 15 kW per rack.
+   - Keep the inlet-to-outlet temperature difference (ΔT) within 8 °C.
 
 3. **Firmware Management**:
 
-- Maintain a hardware compatibility matrix
-- Standardize on the same firmware versions across nodes
+   - Maintain a hardware compatibility matrix.
+   - Standardize on the same firmware versions across nodes.
 
 :::tip[Before go-live]
 
 We recommend running a 72-hour stress test before production go-live that covers the following scenarios:
 
-1. Node failover tests
+1. Node failover testing
 2. Network partition tests
 3. Burst write load tests (we recommend testing at 120% of the theoretical maximum)
 

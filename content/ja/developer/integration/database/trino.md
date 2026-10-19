@@ -3,7 +3,7 @@ title: "Trino"
 description: "hive コネクタのファイルメタストアとネイティブ S3 ファイルシステムを使って、RustFS オブジェクトストレージ内の CSV・Parquet データを Trino で照会します。"
 ---
 
-このガイドでは、分散 SQL クエリエンジンである [Trino](https://github.com/trinodb/trino) を、hive コネクタのファイルメタストアとネイティブ S3 ファイルシステムを通じて **RustFS** に接続します。スキーマとテーブルを作成し、行を插入して読み戻し、RustFS 内のオブジェクトを確認します。テーブルのメタデータもデータファイルも RustFS 内に保存されます。この流れは `trinodb/trino:435` と `rustfs/rustfs-x86-musl:v2.3.1` で検証済みです。
+このガイドでは、分散 SQL クエリエンジンである [Trino](https://github.com/trinodb/trino) を、hive コネクタのファイルメタストアとネイティブ S3 ファイルシステムを通じて **RustFS** に接続します。スキーマとテーブルを作成し、行を挿入して読み戻し、RustFS 内のオブジェクトを確認します。テーブルのメタデータもデータファイルも RustFS 内に保存されます。この流れは `trinodb/trino:435` と `rustfs/rustfs-x86-musl:v2.3.1` で検証済みです。
 
 Docker と Compose プラグインが必要です。このデプロイはローカルでの統合テストを目的としており、本番環境向けではありません。
 
@@ -17,7 +17,7 @@ flowchart LR
 	Init["init-bucket job"] -->|"create my-bucket"| RustFS
 ```
 
-`hive.metastore=file` の hive コネクタは、スキーマとテーブルのメタデータをカタログディレクトリ配下の JSON オブジェクトとして保持し、ネイティブ S3 ファイルシステム（`fs.s3.enabled`）がメタデータとデータファイルの両方を、平文 HTTP 上のパススタイルアドレス指定で RustFS に保存します。
+`hive.metastore=file` の hive コネクタは、スキーマとテーブルのメタデータをカタログディレクトリ配下の JSON オブジェクトとして保持し、ネイティブ S3 ファイルシステム（`fs.s3.enabled`）がメタデータとデータファイルの両方を、平文 HTTP 上のパススタイルアクセスで RustFS に保存します。
 
 ## 1. プロジェクトファイルを作成する
 
@@ -143,14 +143,14 @@ docker compose exec trino ls -la /data/metastore
 
 ## 3. スキーマとテーブルを作成する
 
-明示的なロケーションを指定せずにスキーマを作成します。Trino が RustFS 内のカタログディレクトリ配下に配置します。
+明示的なロケーションを指定せずにスキーマを作成します。Trino が、スキーマを RustFS 内のカタログディレクトリ配下に配置します。
 
 ```bash
 docker compose exec trino trino --execute \
   "CREATE SCHEMA hive.demo"
 ```
 
-テーブルを作成して 5 行を插入します。
+テーブルを作成して 5 行を挿入します。
 
 ```bash
 docker compose exec trino trino --execute \
@@ -203,9 +203,9 @@ RustFS コンソールでこのプレフィックスを参照することもで�
 
 ## 6. RustFS S3 Tables を使用する
 
-RustFS S3 Tables は組み込みの Apache Iceberg REST カタログを提供します。Trino はテーブルバケットを管理された Iceberg ウェアハウスとして扱え、データは RustFS 内に保持されます。[S3 Tables](/administration/data/s3-tables) の説明に従ってテーブルバケットを有効化し、Trino の Iceberg コネクタを REST カタログに接続してください。REST カタログ URI は `http://<rustfs-host>:9000/iceberg`、ウェアハウスはバケット名で、カタログリクエスト（AWS Signature Version 4、署名名 `s3`）と S3 ファイルアクセスの両方がパススタイルのアドレス指定を使います。
+RustFS S3 Tables は組み込みの Apache Iceberg REST カタログを提供します。Trino はテーブルバケットを管理された Iceberg ウェアハウスとして扱え、データは RustFS 内に保持されます。[S3 Tables](/administration/data/s3-tables) の説明に従ってテーブルバケットを有効化し、Trino の Iceberg コネクタを REST カタログに接続してください。REST カタログ URI は `http://<rustfs-host>:9000/iceberg`、ウェアハウスはバケット名で、カタログリクエスト（AWS Signature Version 4、署名名 `s3`）と S3 ファイルアクセスの両方がパススタイルアクセスを使います。
 
-S3 Tables のサポートマトリクスでは、Trino はカタログに対する読み取り専用プローブが行われた段階です。本番でこの経路を採用する前に、書き込み互換性と実際にデプロイする Trino バージョンを検証してください。
+S3 Tables のサポートマトリックスでは、Trino はカタログに対する読み取り専用プローブが行われた段階です。本番でこの経路を採用する前に、書き込み互換性と実際にデプロイする Trino バージョンを検証してください。
 
 ## 7. スタックを停止・リセットする
 

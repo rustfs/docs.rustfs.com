@@ -54,7 +54,7 @@ sudo mkdir -p /data/rustfs0 /var/log/rustfs /opt/tls
 sudo chmod -R 750 /data/rustfs* /var/log/rustfs
 ```
 
-## Start and Verify the Service
+## Start and verify the service
 
 1. Start the service and enable it to start at boot:
 
@@ -80,7 +80,7 @@ netstat -ntpl
 tail -f /var/log/rustfs/rustfs*.log
 ```
 
-5. Open the Console: in a browser, go to `http://<server-ip>:9001`. You should see the login page:
+5. Open the Console: in a browser, go to `http://<server-ip>:9001`. You should see:
 
 ![Console](./images/console.jpg)
 

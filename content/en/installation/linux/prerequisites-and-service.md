@@ -266,7 +266,7 @@ LABEL=RUSTFS0 /data/rustfs0   xfs   defaults,noatime,nodiratime   0   0
 sudo mount -a
 ```
 
-## Configure the Service User
+## Configure the service user
 
 We recommend running RustFS as a dedicated user with no login shell.
 

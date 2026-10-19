@@ -6,21 +6,21 @@ description: "Prepare a replacement node, update its configuration, restore clus
 A distributed RustFS cluster uses erasure coding to stay readable and writable when some nodes fail, and it heals data automatically when a node rejoins. This guide walks you through the following steps:
 
 1. Start the replacement node and match its software environment to the cluster.
-2. Update DNS or `/etc/hosts` so the old hostname resolves to the new node.
-3. Install the same RustFS version the cluster is already running.
-4. Start the replacement node so it rejoins the cluster and begins data healing.
-5. Monitor healing and finish the follow-up checks.
+2. Update DNS or `/etc/hosts` so that the old hostname resolves to the new node.
+3. Install the same RustFS version as the other nodes.
+4. Start the replacement nodes so they rejoin the cluster and begin data healing.
+5. Monitor healing progress, then run follow-up checks.
 
 ## 1. Prepare the replacement node
 
 * **Hardware and System Preparation**
-  Make sure the replacement node's hardware roughly matches the failed node, including CPU, memory, network, and disk type. Using a higher-spec configuration does not affect cluster performance.
+  Make sure that the replacement node's hardware (CPU, memory, network, and disk type) roughly matches the failed node. Using higher-spec hardware does not affect cluster performance.
   Use software versions that match the other nodes, including the operating system, kernel, and dependencies, to avoid problems caused by inconsistent environments.
 
-* Exclusive access to drives
+* **Exclusive access to drives**
   As with physical drive operations, RustFS requires exclusive access to its storage volumes. Do not let other processes or scripts modify data on these volumes directly, as this can corrupt data or reduce redundancy.
 
-## 2. Update hostname resolution
+## 2. Update hostname and network resolution
 
 * **DNS/Hosts Configuration**
   If the replacement node's IP address differs from the failed node, point the old node's hostname (for example, `rustfs-node-2.example.net`) to the new node's IP address so that cluster nodes can still reach each other by the same name.
@@ -32,7 +32,7 @@ A distributed RustFS cluster uses erasure coding to stay readable and writable w
 
   Use `ping` or `nslookup` to verify that the hostname resolves to the new node.
 
-## 3. Deploy and configure RustFS
+## 3. Deploy and configure RustFS services
 
 * **Download and Installation**
   Install the same RustFS version as the existing nodes, using the same installation method and directory. Make sure that startup scripts, environment variables, and configuration files (such as `/etc/default/rustfs`) are identical to those on the other nodes.
@@ -42,7 +42,7 @@ A distributed RustFS cluster uses erasure coding to stay readable and writable w
  * Check that `RUSTFS_VOLUMES` in `/etc/default/rustfs` is byte-for-byte identical to the other nodes, and that it covers the replacement node's hostname and port.
  * Make sure that all nodes use the same access keys and permission settings; otherwise, the new node fails to authenticate and cannot join the cluster.
 
-## 4. Rejoin the cluster and start healing
+## 4. Rejoin the cluster and trigger data healing
 
 * **Start Service**
 
@@ -80,4 +80,4 @@ A distributed RustFS cluster uses erasure coding to stay readable and writable w
 
 ---
 
-Following these steps lets you replace a failed node and heal its data with minimal disruption. Adapt the commands to your environment, and keep the configuration identical across nodes.
+These steps replace a failed node and heal its data. Adapt the commands to your environment, and keep the configuration identical across nodes.

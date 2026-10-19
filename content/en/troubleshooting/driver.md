@@ -38,11 +38,13 @@ After physically replacing the failed disk, you need to partition and format the
 mkfs.xfs -L DISK1 /dev/sdb
 ```
 
-> **Requirements**
->
-> * The new disk is at least as large as the original disk.
-> * File system type consistent with other disks (XFS, per the [installation guide](../installation/linux/index.md));
-> * We recommend mounting by label (LABEL) or UUID so that disk order is not affected by a system restart.
+:::note[Requirements]
+
+* The new disk is at least as large as the original disk.
+* Use the same file system as the other disks (XFS; see the [installation guide](../installation/linux/index.md)).
+* We recommend mounting file systems by label (LABEL) or UUID so that mounts remain correct if device names change after a restart.
+
+:::
 
 <a id="update-etcfstab-or-rustfs-configuration"></a>
 
@@ -92,7 +94,7 @@ Verify that all expected file systems are mounted:
 df -h | grep /data/rustfs
 ```
 
-:::note[If a mount fails]
+:::note[Mount failures]
 
 If a mount fails, check that the labels or UUIDs in `/etc/fstab` match those on the target file system.
 
@@ -117,7 +119,7 @@ You can also open the RustFS Console and check the disk status of the affected n
 :::note[Notes]
 
 * Healing runs in the background and usually has little impact on client requests.
-* After healing completes, the tool reports success or lists the objects that failed.
+* When healing finishes, the logs report success or list objects that failed to heal.
 
 :::
 

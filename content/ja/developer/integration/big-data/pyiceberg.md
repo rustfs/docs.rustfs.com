@@ -84,7 +84,7 @@ catalog = RustFSRestCatalog(
 )
 ```
 
-`s3.force-virtual-addressing=false` は、このカスタムエンドポイントに対して PyIceberg の PyArrow ファイル実装でパス形式のアドレス指定を選択します。
+`s3.force-virtual-addressing=false` は、このカスタムエンドポイントに対して PyIceberg の PyArrow ファイル実装でパススタイルアクセスを選択します。
 
 :::note[クライアントのバージョン]
 

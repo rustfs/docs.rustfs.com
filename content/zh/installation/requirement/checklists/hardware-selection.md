@@ -23,6 +23,8 @@ description: RustFS 的硬件要求。
 
 ## 生产环境
 
+Windows 版本的 RustFS 仅适用于开发和调试，**不建议用于生产环境**。生产部署建议使用 [Linux](/zh/installation/linux)。
+
 | 组件 | 要求 |
 | - | - |
 | CPU | 2 x 12 核以上 |

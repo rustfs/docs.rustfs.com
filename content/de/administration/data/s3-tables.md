@@ -13,7 +13,7 @@ S3 Tables ist eine Vorschaufunktion; die Client-Kompatibilität beschränkt sich
 
 ## Funktionsweise
 
-Ein Iceberg-Client nutzt den REST-Katalog, um Tabellen zu finden und Metadatenänderungen festzuschreiben. Tabellendateien liest und schreibt er über die S3-API. RustFS stellt beide Schnittstellen am S3-API-Port bereit.
+Ein Iceberg-Client nutzt den REST-Katalog, um Tabellen zu finden und Metadatenänderungen zu committen (festzuschreiben). Tabellendateien liest und schreibt er über die S3-API. RustFS stellt beide Schnittstellen am S3-API-Port bereit.
 
 ```mermaid
 flowchart TB
@@ -25,7 +25,7 @@ flowchart TB
 | Ressource | Zweck |
 | --- | --- |
 | Tabellen-Bucket | Ein vorhandener S3-Bucket, der für den Katalog aktiviert wurde; sein Name ist der `warehouse`-Wert des Clients. |
-| Namespace | Eine logische Gruppe von Tabellen innerhalb dieses Warehouse. |
+| Namespace | Eine logische Gruppe von Tabellen innerhalb dieses Warehouses. |
 | Tabelle | Ein Iceberg-Schema, Snapshots und ein vom Katalog verwalteter aktueller Metadatenpfad. |
 
 Das Aktivieren eines Tabellen-Buckets registriert vorhandene Parquet-Dateien nicht automatisch als Iceberg-Tabellen. Erstellen oder registrieren Sie Tabellen über einen Iceberg-Client. Ohne Angabe von `location` weist RustFS einen Speicherort zu; ein benutzerdefinierter Speicherort muss im selben Bucket liegen. Clients sollten den zurückgegebenen Speicherort verwenden.
@@ -34,12 +34,12 @@ Das standardmäßige Katalog-Backend `object` speichert den Katalogzustand dauer
 
 ## Voraussetzungen
 
-- Starten Sie eine RustFS-Bereitstellung mit den oben beschriebenen S3-Tables-Endpunkten. Siehe [Installation](/installation).
-- Installieren Sie die [AWS CLI](/developer/examples/aws-cli) und `curl` ab Version 7.76 mit Unterstützung für `--aws-sigv4` und `--fail-with-body`.
+- Starten Sie eine RustFS-Bereitstellung mit den oben beschriebenen S3-Tables-Endpunkten. Siehe [Installation](/de/installation).
+- Installieren Sie die [AWS CLI](/de/developer/examples/aws-cli) und `curl` ab Version 7.76 mit Unterstützung für `--aws-sigv4` und `--fail-with-body`.
 - Erstellen Sie für diese Anleitung einen eigenen neuen Bucket. Das Beispiel verwendet `my-bucket`.
 - Verwenden Sie ein vorhandenes Administratorkonto mit Zugriff auf Katalogoperationen und S3-Objekte. Die integrierte Richtlinie `consoleAdmin` deckt diese Anleitung ab; konfigurieren Sie enger begrenzte Richtlinien für Anwendungen.
 
-Die Beispiele verwenden `http://localhost:9000`. Ersetzen Sie dies durch Ihren Server-Endpunkt und verwenden Sie außerhalb lokaler Tests [TLS](/integration/tls-configured) mit aktivierter Zertifikatsprüfung.
+Die Beispiele verwenden `http://localhost:9000`. Ersetzen Sie dies durch Ihren Server-Endpunkt und verwenden Sie außerhalb lokaler Tests [TLS](/de/integration/tls-configured) mit aktivierter Zertifikatsprüfung.
 
 :::warning[Lebenszyklusverhalten von Tabellen-Buckets]
 
@@ -116,13 +116,13 @@ Verwenden Sie für den RustFS-Beispielendpunkt folgende Einstellungen:
 
 Der Client ergänzt den Katalog-URI um `/v1`. Das Warehouse ist ein Bucket-Name, kein S3-URI oder AWS S3 Tables ARN. Konfigurieren Sie sowohl die REST-Anfragesignierung als auch den S3-Dateizugriff, auch wenn beide dasselbe Konto verwenden.
 
-Wenn Sie bereits einen separaten Iceberg-REST-Katalog betreiben, beschreibt die [Apache-Iceberg-Integration](/developer/integration/big-data/iceberg) die Bereitstellung mit einem externen Katalog.
+Wenn Sie bereits einen separaten Iceberg-REST-Katalog betreiben, beschreibt die [Apache-Iceberg-Integration](/de/developer/integration/big-data/iceberg) die Bereitstellung mit einem externen Katalog.
 
 ## Berechtigungen und Zugangsdaten
 
 Zum Aktivieren eines Tabellen-Buckets ist `admin:SetTableBucket` erforderlich, zum Prüfen des Zustands `admin:GetTableBucket`. Die Katalogerkennung verwendet `admin:GetTableCatalog`. Namespace- und Tabellenoperationen besitzen eigene RustFS-Admin-Aktionen, darunter `admin:SetTableNamespace`, `admin:CreateTable`, `admin:GetTableMetadata` und `admin:CommitTable`.
 
-Für das Lesen und Schreiben von Tabellendateien sind zusätzlich normale S3-Berechtigungen erforderlich. RustFS prüft Tabellenberechtigungen für Objektpfade im Warehouse: Lesen erfordert die entsprechende Autorisierung für `admin:GetTableMetadata`, Schreiben für `admin:SetTableMetadata`. Eine Berechtigung für Katalog-Commits allein erlaubt nicht die vorausgehenden S3-Dateischreibvorgänge. Konfigurieren Sie [IAM-Richtlinien](/security-compliance/iam/policies) für beide Schnittstellen.
+Für das Lesen und Schreiben von Tabellendateien sind zusätzlich normale S3-Berechtigungen erforderlich. RustFS prüft Tabellenberechtigungen für Objektpfade im Warehouse: Lesen erfordert die entsprechende Autorisierung für `admin:GetTableMetadata`, Schreiben für `admin:SetTableMetadata`. Eine Berechtigung für Katalog-Commits allein erlaubt nicht die vorausgehenden S3-Dateischreibvorgänge. Konfigurieren Sie [IAM-Richtlinien](/de/security-compliance/iam/policies) für beide Schnittstellen.
 
 Die Ausgabe von Zugangsdaten durch den Katalog ist standardmäßig deaktiviert. Bei aktivierter Funktion muss ein kompatibler Client `X-Iceberg-Access-Delegation: vended-credentials` aushandeln, und der Aufrufer benötigt die Berechtigung, Tabellenzugangsdaten anzufordern. Der erste Katalogzugriff erfordert weiterhin eine autorisierte Identität. Die verlinkte PyIceberg-Anleitung verwendet ausdrücklich konfigurierte Zugangsdaten.
 
@@ -151,6 +151,6 @@ RustFS S3 Tables bietet weder eine SQL-Ausführungsengine noch atomare Transakti
 
 ## Nächste Schritte
 
-- Führen Sie die [PyIceberg-Anleitung](/developer/integration/big-data/pyiceberg) aus.
-- Prüfen Sie die [IAM-Richtlinien](/security-compliance/iam/policies), bevor Sie Anwendungen Zugriff gewähren.
+- Führen Sie die [PyIceberg-Anleitung](/de/developer/integration/big-data/pyiceberg) aus.
+- Prüfen Sie die [IAM-Richtlinien](/de/security-compliance/iam/policies), bevor Sie Anwendungen Zugriff gewähren.
 - Validieren Sie weitere Client-Versionen mit den [Client-Konformitätsprüfungen](https://github.com/rustfs/rustfs/blob/7e0c67111b97703d47e23719b0264a739c8acea8/scripts/table-catalog/README.md) des Repositorys.

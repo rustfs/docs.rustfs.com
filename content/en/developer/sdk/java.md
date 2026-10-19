@@ -140,7 +140,7 @@ Deleted hello.txt
 | `S3Exception: 301 Moved Permanently` | Path-style not enabled or region error | Set `.forcePathStyle(true)` and use region `us-east-1` |
 | `ConnectException: Connection refused` | RustFS not started or incorrect port | Check RustFS status and port |
 | `403 Forbidden` | Incorrect access key or secret key | Check your credentials |
-| Upload fails with no response | The SDK defaults to HTTPS. RustFS only supports HTTP (or needs certificates). | Use an `http://` address and set `endpointOverride` |
+| Upload fails with no response | The SDK defaults to HTTPS, and RustFS only supports HTTP (or needs certificates) | Use an `http://` address and set `endpointOverride` |
 
 ---
 
@@ -162,9 +162,9 @@ java -cp target/rustfs-java-s3-demo-1.0-SNAPSHOT.jar com.example.RustfsS3Example
 
 ### 4.2 Recommended RustFS settings
 
-* If RustFS serves plain HTTP, disable TLS certificate validation in the SDK.
+* If RustFS is serving plain HTTP, disable TLS certificate validation in the SDK.
 * Enable CORS support (if used for web frontend).
-* We recommend setting limits such as `max_object_size` and `max_part_size` to prevent large transfers from failing.
+* We recommend setting limits such as `max_object_size` and `max_part_size` to prevent large-file transfer failures.
 
 ---
 

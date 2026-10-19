@@ -12,12 +12,12 @@ import { zhCN } from "@fumapress/language/zh-cn";
 import { defineI18n } from "fumadocs-core/i18n";
 import defaultMdxComponents, { createRelativeLink } from "fumadocs-ui/mdx";
 import { docs } from "./.source/server";
-import AlgoliaSearchDialog from "./src/components/algolia-search-dialog";
 import { BrandLogo } from "./src/components/brand-logo";
 import { Mermaid } from "./src/components/mermaid";
 import { Tab, Tabs } from "./src/components/tabs";
 import { ArrowRight } from "lucide-react";
-import { algoliaIndexPlugin } from "./src/plugins/algolia-index";
+import { localSearchPlugin } from "./src/plugins/local-search";
+import LocalSearchDialog from "./src/components/local-search-dialog";
 
 const isDev = import.meta.env.DEV;
 
@@ -135,7 +135,7 @@ function createSidebarFooter(locale: keyof typeof layoutLabels) {
 
 export default defineConfig({
   content: docs.toFumadocsSource(),
-  // Keep Algolia and plain image URLs; the preset adds Flexsearch and CDN transforms.
+  // Configure local search explicitly and keep plain image URLs (no CDN transforms).
   preset: false,
   translations,
   loaderOptions: {
@@ -243,7 +243,7 @@ gtag('config', 'G-TWW7WMTWL9');`,
   },
 })
   .plugins(
-    algoliaIndexPlugin(),
+    localSearchPlugin(languages),
     llmsPlugin(),
     takumiPlugin(),
     sitemapPlugin(),
@@ -253,7 +253,7 @@ gtag('config', 'G-TWW7WMTWL9');`,
   .layouts({
     root: createRootLayout({
       providerProps: {
-        search: { SearchDialog: AlgoliaSearchDialog },
+        search: { SearchDialog: LocalSearchDialog },
       },
     }),
     // Use the Notebook layout: a full-width top navbar (main links + search +

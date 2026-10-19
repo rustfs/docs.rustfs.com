@@ -5,6 +5,12 @@ description: "Choose the right RustFS deployment path: local trial, single-node 
 
 RustFS is a distributed object storage system written in Rust and released under the Apache 2.0 license. It runs on Linux, Windows, macOS, FreeBSD, and containers, across x86, ARM, RISC-V, and other CPU architectures.
 
+:::warning[Development and debugging only]
+
+The Windows version of RustFS is intended for development and debugging only and is **not recommended for production deployments**. We recommend [Linux](/en/installation/linux) for production workloads.
+
+:::
+
 :::warning[Change the default credentials immediately]
 
 After installation, set unique values for `RUSTFS_ACCESS_KEY` and `RUSTFS_SECRET_KEY` before exposing RustFS to a network. Do not use the well-known `rustfsadmin` value for either credential.
@@ -21,7 +27,7 @@ After installation, set unique values for `RUSTFS_ACCESS_KEY` and `RUSTFS_SECRET
 | Try RustFS on a local machine | One-command install script, or a container | [Linux Quick Start](./linux/quick-start.md) · [Container](./container/index.md) |
 | Single-server production | SNSD (one disk) or SNMD (multiple disks) | [Installing RustFS on Linux](./linux/index.md) |
 | Multi-server production cluster | MNMD, after completing the production checklists | [Multiple Node Multiple Disk](./linux/multiple-node-multiple-disk.md) · [Checklists](./requirement/checklists/index.md) |
-| Kubernetes / cloud-native | Deploy with the Helm chart | [Cloud Native](./cloud-native/index.md) |
+| Kubernetes / cloud-native | Deploy with the Helm chart or the Operator | [Cloud Native](./cloud-native/index.md) |
 | Windows or macOS host | Native installation | [Windows](./windows/index.md) · [macOS](./macos/index.md) |
 
 ## Deployment Mode Comparison

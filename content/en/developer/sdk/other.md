@@ -7,13 +7,13 @@ If AWS does not provide an official SDK for your language, you can use one of th
 
 ## 1. Send HTTP requests directly to the S3 API
 
-The S3 protocol is a standard RESTful API. You can implement the client logic yourself in any language that can send HTTP requests (such as C, Rust, Lua, Erlang).
+The S3 protocol is a standard RESTful API. You can implement the client logic yourself in any language that can send HTTP requests (such as C, Rust, Lua, or Erlang).
 
 ### Key steps
 
 * **Request signing**: Implement AWS Signature Version 4 (the most complex part).
-* **Construct correct Headers and Canonical Request**
-* **Use HTTPS/HTTP client to send requests**
+* **Headers and canonical request**: Build the canonical request and the required headers.
+* **HTTP client**: Send the signed request with an HTTP or HTTPS client.
 
 We recommend consulting existing open-source implementations of request signing, such as:
 
@@ -64,11 +64,11 @@ Community SDKs vary greatly in stability, so you should evaluate activity, docum
 For example:
 
 * Use presigned URLs to upload directly from a browser or mobile app.
-* Implement the upload logic in a backend service (for example, Node.js, Python, or Go).
+* Implement the upload logic in a backend service (for example, Node.js, Python, or Go)
 
 ---
 
-## Summary
+## Choose an approach
 
 | Situation | Recommended approach |
 | ------------- | ---------------------------------- |

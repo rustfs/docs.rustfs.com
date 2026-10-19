@@ -3,7 +3,7 @@ title: "RustFS Multiple Node Multiple Disk Installation"
 description: "Install a distributed RustFS cluster across multiple servers, each with multiple disks."
 ---
 
-Multiple Node Multiple Disk (MNMD) mode is used for production workloads. It provides node-level fault tolerance and horizontal scalability. A minimum of **4 servers** is required, each with at least 1 disk, to safely start a distributed object storage cluster.
+Multiple Node Multiple Disk (MNMD) mode is the production deployment for clusters that span multiple servers. A minimum of **4 servers** is required, each with at least 1 disk, to safely start a distributed object storage cluster.
 
 ## Topology and Planning
 
@@ -86,7 +86,7 @@ sudo mkdir -p /data/rustfs{0..3} /var/log/rustfs /opt/tls
 sudo chmod -R 750 /data/rustfs* /var/log/rustfs
 ```
 
-## Start and Verify the Service
+## Start and verify the service
 
 1. Start the service on every node and enable auto-start on boot:
 
