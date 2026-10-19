@@ -1,43 +1,43 @@
 ---
-title: "Installation"
-description: "Choose the right RustFS deployment path: local trial, single-node or multi-node production, containers, and Kubernetes."
+title: "インストール"
+description: "ローカルでの試用、シングルノードまたはマルチノードの本番、コンテナ、Kubernetes の中から、目的に合った RustFS のデプロイ方法を選びます。"
 ---
 
-RustFS is a distributed object storage system written in Rust and released under the Apache 2.0 license. It runs on Linux, Windows, macOS, FreeBSD, and containers, across x86, ARM, RISC-V, and other CPU architectures.
+RustFS は、Rust で書かれ、Apache 2.0 ライセンスで公開されている分散オブジェクトストレージです。Linux、Windows、macOS、FreeBSD、およびコンテナ上で動作し、x86、ARM、RISC-V などの CPU アーキテクチャに対応しています。
 
 :::warning[開発とデバッグ専用]
 
-Windows 版の RustFS は開発とデバッグ専用で、**本番環境での使用は推奨していません**。本番環境には [Linux](/ja/installation/linux) を推奨します。
+Windows 版の RustFS は、開発とデバッグ専用であり、**本番デプロイには推奨しません**。本番ワークロードには [Linux](/ja/installation/linux) を推奨します。
 
 :::
 
-:::warning[Change the default credentials immediately]
+:::warning[既定の認証情報は直ちに変更する]
 
-After installation, set unique values for `RUSTFS_ACCESS_KEY` and `RUSTFS_SECRET_KEY` before exposing RustFS to a network. Do not use the well-known `rustfsadmin` value for either credential.
+インストール後、RustFS をネットワークに公開する前に、`RUSTFS_ACCESS_KEY` と `RUSTFS_SECRET_KEY` に一意の値を設定します。よく知られた `rustfsadmin` をいずれの認証情報にも使わないでください。
 
-- For a Linux binary or systemd installation, set both values in `/etc/default/rustfs`, then restart the `rustfs` service.
-- For Docker, Podman, or Docker Compose, pass both values as container environment variables when creating the container. Recreate an existing container if it was started without them.
+- Linux バイナリまたは systemd でインストールした場合は、`/etc/default/rustfs` に両方の値を設定し、`rustfs` サービスを再起動します。
+- Docker、Podman、または Docker Compose の場合は、コンテナ作成時に両方の値をコンテナの環境変数として渡します。これらを設定せずに起動した既存のコンテナは、作り直します。
 
 :::
 
-## Choose Your Path
+## 方法を選ぶ
 
-| Your goal | Recommended path | Guide |
+| 目的 | 推奨する方法 | ガイド |
 | - | - | - |
-| Try RustFS on a local machine | One-command install script, or a container | [Linux Quick Start](./linux/quick-start.md) · [Container](./container/index.md) |
-| Single-server production | SNSD (one disk) or SNMD (multiple disks) | [Installing RustFS on Linux](./linux/index.md) |
-| Multi-server production cluster | MNMD, after completing the production checklists | [Multiple Node Multiple Disk](./linux/multiple-node-multiple-disk.md) · [Checklists](./requirement/checklists/index.md) |
-| Kubernetes / cloud-native | Container orchestration deployment | [Cloud Native](./cloud-native/index.md) |
-| Windows or macOS host | Native installation | [Windows](./windows/index.md) · [macOS](./macos/index.md) |
+| ローカルマシンで RustFS を試す | 1 コマンドのインストールスクリプト、またはコンテナ | [Linux クイックスタート](./linux/quick-start.md) · [コンテナ](./container/index.md) |
+| 単一サーバーの本番 | SNSD（ディスク 1 台）または SNMD（複数ディスク） | [Linux に RustFS をインストールする](./linux/index.md) |
+| 複数サーバーの本番クラスター | 本番チェックリストを完了したうえで MNMD | [マルチノード・マルチディスク（MNMD）](./linux/multiple-node-multiple-disk.md) · [チェックリスト](./requirement/checklists/index.md) |
+| Kubernetes / クラウドネイティブ | Helm チャートまたは Operator でデプロイ | [クラウドネイティブ](./cloud-native/index.md) |
+| Windows または macOS のホスト | ネイティブインストール | [Windows](./windows/index.md) · [macOS](./macos/index.md) |
 
-## Deployment Mode Comparison
+## デプロイ方式の比較 [#deployment-mode-comparison]
 
-| Mode | Nodes | Disks | Fault Tolerance | Typical Use |
+| 方式 | ノード | ディスク | 耐障害性 | 主な用途 |
 | - | - | - | - | - |
-| [SNSD](./linux/single-node-single-disk.md) | 1 | 1 | None — rely on backups | Development, testing, low-density non-critical business |
-| [SNMD](./linux/single-node-multiple-disk.md) | 1 | Multiple | Up to M parity disks within the node | Medium, non-critical business on a single server |
-| [MNMD](./linux/multiple-node-multiple-disk.md) | 4+ | Multiple per node | Disk- and node-level via erasure coding across servers | Production workloads |
+| [SNSD](./linux/single-node-single-disk.md) | 1 | 1 | なし（バックアップに依存） | 開発、テスト、および小規模で重要度の低いワークロード |
+| [SNMD](./linux/single-node-multiple-disk.md) | 1 | 複数 | ノード内で最大 M 台のパリティディスク | 単一サーバー上の中規模で重要度の低いワークロード |
+| [MNMD](./linux/multiple-node-multiple-disk.md) | 4 以上 | ノードごとに複数 | サーバー間のイレイジャーコーディングによるディスクおよびノード単位 | 本番ワークロード |
 
-## Checklist
+## チェックリスト
 
-Before any production deployment, work through the [Pre-Installation Checklists](./requirement/checklists/index.md) — hardware, network, software, and security — to make sure your environment meets production guidance.
+本番デプロイの前に、[インストール前チェックリスト](./requirement/checklists/index.md)（ハードウェア、ネットワーク、ソフトウェア、セキュリティ）を確認し、環境が本番要件を満たしていることを確かめます。

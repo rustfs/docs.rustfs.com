@@ -1,201 +1,201 @@
 ---
-title: "Environment Variables"
-description: "Reference for the environment variables that configure the RustFS server, console, TLS, KMS, observability, scanner, healing, storage classes, credentials, and event targets."
+title: "環境変数"
+description: "RustFS サーバー、Console、TLS、KMS、オブザーバビリティ、スキャナー、データ修復、ストレージクラス、認証情報、イベントターゲットを設定する環境変数のリファレンスです。"
 ---
 
-This page lists the environment variables recognized by the `rustfs` server binary. It covers the operations-relevant subset verified against the RustFS source code; some internal tuning knobs are intentionally omitted. Every variable can also be supplied through the matching command-line flag where one exists (see the [CLI reference](./cli)).
+このページでは、`rustfs` サーバーバイナリが認識する環境変数を一覧します。対象は、RustFS のソースコードで確認した、運用に関係する変数に限ります。内部向けの調整項目の一部は、意図的に省略しています。対応するコマンドラインフラグがある変数は、そのフラグでも指定できます（[CLI リファレンス](./cli) を参照）。
 
-:::note[Boolean values]
+:::note[真偽値]
 
-Boolean variables accept `true`/`false`. Values shown as "unset" have no default and the corresponding feature stays disabled or falls back to built-in behavior.
+真偽値の変数は `true`/`false` を受け付けます。「unset」と示した値には既定値がなく、対応する機能は無効のままか、組み込みの動作にフォールバックします。
 
 :::
 
-## Core server
+## コアサーバー
 
-| Variable | Default | Description |
+| 変数 | 既定値 | 説明 |
 | --- | --- | --- |
-| `RUSTFS_VOLUMES` | unset (required) | Storage volumes or endpoints, space-separated. Supports `{N...M}` ellipses expansion, e.g. `/data/rustfs{0...3}` or `http://node{1...4}:9000/data/rustfs{0...3}`. The Docker image defaults to `/data`. |
-| `RUSTFS_ADDRESS` | `:9000` | Bind address and port for the S3 API listener (also carries internal node RPC). |
-| `RUSTFS_SERVER_DOMAINS` | unset | Comma-separated domain name(s) for virtual-hosted-style S3 requests, e.g. `s3.example.com` so `bucket.s3.example.com` resolves to bucket `bucket`. When unset, only path-style addressing works. |
-| `RUSTFS_REGION` | unset | Region reported to S3 clients. When unset the server falls back to `us-east-1`. |
-| `RUSTFS_LICENSE` | unset | License string. |
-| `RUSTFS_BUFFER_PROFILE` | `GeneralPurpose` | Workload profile for adaptive buffer sizing. Options: `GeneralPurpose`, `AiTraining`, `DataAnalytics`, `WebWorkload`, `IndustrialIoT`, `SecureStorage`. |
-| `RUSTFS_BUFFER_PROFILE_DISABLE` | `false` | Disable adaptive buffer sizing and use legacy fixed-size buffers. |
-| `RUSTFS_HEALTH_ENDPOINT_ENABLE` | `true` | Register the unauthenticated `/health` and `/health/ready` probe endpoints. |
-| `RUSTFS_HEALTH_READINESS_CACHE_TTL_MS` | `1000` | Cache TTL for readiness probe results, in milliseconds. |
-| `RUSTFS_HEALTH_CLUSTER_TIMEOUT_MS` | `2000` | Timeout for cluster health probes (`/minio/health/cluster`), in milliseconds. |
-| `RUSTFS_STARTUP_READINESS_MAX_WAIT_SECS` | `120` | Maximum time the readiness probe reports "starting" before startup is considered failed. |
-| `RUSTFS_CHECK_UPDATE` | `true` | Check for a newer RustFS release at startup by sending one HTTPS request to `version.rustfs.com`; the user agent carries the current version. The result is logged only, and RustFS never updates itself. Set to `false` to skip the outbound request, for example in air-gapped deployments; unrecognized values fall back to `true`. |
+| `RUSTFS_VOLUMES` | unset (required) | ストレージボリュームまたはエンドポイントを、空白区切りで指定します。`{N...M}` 形式の省略記号展開に対応します。例: `/data/rustfs{0...3}`、`http://node{1...4}:9000/data/rustfs{0...3}`。Docker イメージの既定値は `/data` です。 |
+| `RUSTFS_ADDRESS` | `:9000` | S3 API リスナーのバインドアドレスとポートです（ノード間の内部 RPC もこのリスナーを使います）。 |
+| `RUSTFS_SERVER_DOMAINS` | unset | 仮想ホスト形式の S3 リクエストに使うドメイン名を、カンマ区切りで指定します。例: `s3.example.com` を指定すると、`bucket.s3.example.com` はバケット `bucket` として解決されます。未設定の場合は、パススタイルアクセスのみが動作します。 |
+| `RUSTFS_REGION` | unset | S3 クライアントへ報告するリージョンです。未設定の場合、サーバーは `us-east-1` にフォールバックします。 |
+| `RUSTFS_LICENSE` | unset | ライセンス文字列です。 |
+| `RUSTFS_BUFFER_PROFILE` | `GeneralPurpose` | 適応的なバッファサイズ決定に使うワークロードプロファイルです。選択肢は `GeneralPurpose`、`AiTraining`、`DataAnalytics`、`WebWorkload`、`IndustrialIoT`、`SecureStorage` です。 |
+| `RUSTFS_BUFFER_PROFILE_DISABLE` | `false` | 適応的なバッファサイズ決定を無効にし、従来の固定サイズバッファを使います。 |
+| `RUSTFS_HEALTH_ENDPOINT_ENABLE` | `true` | 認証不要のプローブエンドポイント `/health` と `/health/ready` を登録します。 |
+| `RUSTFS_HEALTH_READINESS_CACHE_TTL_MS` | `1000` | 準備完了プローブの結果をキャッシュする TTL です。単位はミリ秒です。 |
+| `RUSTFS_HEALTH_CLUSTER_TIMEOUT_MS` | `2000` | クラスターのヘルスチェック（`/minio/health/cluster`）のタイムアウトです。単位はミリ秒です。 |
+| `RUSTFS_STARTUP_READINESS_MAX_WAIT_SECS` | `120` | 準備完了プローブが「starting」と報告する最長時間です。この時間を超えると、起動に失敗したとみなします。単位は秒です。 |
+| `RUSTFS_CHECK_UPDATE` | `true` | 起動時に `version.rustfs.com` へ HTTPS リクエストを 1 回送り、新しい RustFS リリースがあるか確認します。ユーザーエージェントには現在のバージョンが含まれます。結果はログに記録されるだけで、RustFS が自ら更新することはありません。エアギャップ環境などでは `false` に設定し、外部へのリクエストを省略します。認識できない値は `true` にフォールバックします。 |
 
 ## Console
 
-| Variable | Default | Description |
+| 変数 | 既定値 | 説明 |
 | --- | --- | --- |
-| `RUSTFS_CONSOLE_ENABLE` | `true` | Enable the embedded web console (served on a separate listener). |
-| `RUSTFS_CONSOLE_ADDRESS` | `:9001` | Bind address and port for the console listener. |
+| `RUSTFS_CONSOLE_ENABLE` | `true` | 組み込みの Web Console を有効にします（別のリスナーで提供されます）。 |
+| `RUSTFS_CONSOLE_ADDRESS` | `:9001` | Console リスナーのバインドアドレスとポートです。 |
 
-## CORS
+## CORS [#cors]
 
-| Variable | Default | Description |
+| 変数 | 既定値 | 説明 |
 | --- | --- | --- |
-| `RUSTFS_CORS_ALLOWED_ORIGINS` | empty | Comma-separated origins allowed to access the S3 API from a browser. Set `*` for wildcard origins without credentials. |
-| `RUSTFS_CONSOLE_CORS_ALLOWED_ORIGINS` | `*` | Comma-separated origins allowed to access the Console from a browser, or `*` for all origins. |
+| `RUSTFS_CORS_ALLOWED_ORIGINS` | empty | ブラウザから S3 API へアクセスできるオリジンを、カンマ区切りで指定します。認証情報を伴わないワイルドカードオリジンにする場合は `*` を設定します。 |
+| `RUSTFS_CONSOLE_CORS_ALLOWED_ORIGINS` | `*` | ブラウザから Console へアクセスできるオリジンをカンマ区切りで指定します。すべてのオリジンを許可する場合は `*` です。 |
 
-See [CORS Configuration](/administration/cors) for configuration and verification steps.
+設定と確認の手順は [CORS の設定](/ja/administration/cors) を参照します。
 
-## TLS & KMS
+## TLS と KMS
 
-| Variable | Default | Description |
+| 変数 | 既定値 | 説明 |
 | --- | --- | --- |
-| `RUSTFS_TLS_PATH` | unset | Directory containing the TLS certificate and key (`rustfs_cert.pem` / `rustfs_key.pem`) for the S3 API and console. TLS is enabled when set. |
-| `RUSTFS_TLS_RELOAD_ENABLE` | `false` | Watch the TLS directory and hot-reload certificates. |
-| `RUSTFS_TLS_KEYLOG` | `false` | Write TLS session keys to a keylog file for debugging. Do not enable in production. |
-| `RUSTFS_TRUST_SYSTEM_CA` | `false` | Also trust the operating system CA store for outbound TLS connections. |
-| `RUSTFS_TRUST_LEAF_CERT_AS_CA` | `false` | Trust a leaf certificate as if it were a CA (self-signed setups). |
-| `RUSTFS_SERVER_MTLS_ENABLE` | `false` | Require client certificates (mutual TLS) on the server listeners. |
-| `RUSTFS_MTLS_CLIENT_CERT` | unset | Client certificate presented for internode mTLS connections. |
-| `RUSTFS_MTLS_CLIENT_KEY` | unset | Client private key for internode mTLS connections. |
-| `RUSTFS_KMS_ENABLE` | `false` | Enable KMS-backed server-side encryption. |
-| `RUSTFS_KMS_BACKEND` | `local` | KMS backend: `local`, `vault` / `vault-kv2` (Vault KV2 storage with local data-key wrapping), or `vault-transit`. |
-| `RUSTFS_KMS_KEY_DIR` | unset | Key directory for the `local` backend. |
-| `RUSTFS_KMS_LOCAL_MASTER_KEY` | unset | Master key protecting local KMS key files. |
-| `RUSTFS_KMS_VAULT_ADDRESS` | unset | Vault server address for the Vault backends. |
-| `RUSTFS_KMS_VAULT_TOKEN` | unset | Vault token for the Vault backends. |
-| `RUSTFS_KMS_VAULT_MOUNT_PATH` | `transit` | Transit mount for `vault-transit`; deprecated and unused for `vault` / `vault-kv2`. |
-| `RUSTFS_KMS_VAULT_KV_MOUNT` | `secret` | KV v2 mount for the `vault` / `vault-kv2` backend. |
-| `RUSTFS_KMS_VAULT_KEY_PREFIX` | `rustfs/kms/keys` | Key record prefix within the KV v2 mount for `vault` / `vault-kv2`. |
-| `RUSTFS_KMS_DEFAULT_KEY_ID` | unset | Default KMS key ID used for encryption. |
-| `RUSTFS_KMS_ALLOW_INSECURE_DEV_DEFAULTS` | `false` | Allow development-only insecure KMS defaults. Never enable in production. |
+| `RUSTFS_TLS_PATH` | unset | S3 API と Console 用の TLS 証明書と鍵（`rustfs_cert.pem` / `rustfs_key.pem`）を置くディレクトリです。設定すると TLS が有効になります。 |
+| `RUSTFS_TLS_RELOAD_ENABLE` | `false` | TLS ディレクトリを監視し、証明書を再読み込みします。 |
+| `RUSTFS_TLS_KEYLOG` | `false` | デバッグのため、TLS セッション鍵を keylog ファイルへ書き出します。本番では有効にしないでください。 |
+| `RUSTFS_TRUST_SYSTEM_CA` | `false` | 外向きの TLS 接続で、オペレーティングシステムの CA ストアも信頼します。 |
+| `RUSTFS_TRUST_LEAF_CERT_AS_CA` | `false` | リーフ証明書を CA であるかのように信頼します（自己署名の構成向けです）。 |
+| `RUSTFS_SERVER_MTLS_ENABLE` | `false` | サーバーリスナーでクライアント証明書（相互 TLS）を要求します。 |
+| `RUSTFS_MTLS_CLIENT_CERT` | unset | ノード間の mTLS 接続で提示するクライアント証明書です。 |
+| `RUSTFS_MTLS_CLIENT_KEY` | unset | ノード間の mTLS 接続に使うクライアント秘密鍵です。 |
+| `RUSTFS_KMS_ENABLE` | `false` | KMS を使ったサーバー側の暗号化を有効にします。 |
+| `RUSTFS_KMS_BACKEND` | `local` | KMS バックエンドです。指定できる値は `local`、`vault` / `vault-kv2`（ローカルでデータキーをラップする Vault KV2 ストレージ）、`vault-transit` です。 |
+| `RUSTFS_KMS_KEY_DIR` | unset | `local` バックエンドのキーディレクトリです。 |
+| `RUSTFS_KMS_LOCAL_MASTER_KEY` | unset | ローカル KMS のキーファイルを保護するマスターキーです。 |
+| `RUSTFS_KMS_VAULT_ADDRESS` | unset | Vault バックエンドが使う Vault サーバーのアドレスです。 |
+| `RUSTFS_KMS_VAULT_TOKEN` | unset | Vault バックエンドが使う Vault トークンです。 |
+| `RUSTFS_KMS_VAULT_MOUNT_PATH` | `transit` | `vault-transit` の Transit マウントです。`vault` / `vault-kv2` では非推奨であり、使用されません。 |
+| `RUSTFS_KMS_VAULT_KV_MOUNT` | `secret` | `vault` / `vault-kv2` バックエンドの KV v2 マウントです。 |
+| `RUSTFS_KMS_VAULT_KEY_PREFIX` | `rustfs/kms/keys` | `vault` / `vault-kv2` で、KV v2 マウント内のキーレコードに付けるプレフィックスです。 |
+| `RUSTFS_KMS_DEFAULT_KEY_ID` | unset | 暗号化に使う既定の KMS キー ID です。 |
+| `RUSTFS_KMS_ALLOW_INSECURE_DEV_DEFAULTS` | `false` | 開発専用の、安全でない KMS 既定値を許可します。本番では決して有効にしないでください。 |
 
-## Observability
+## オブザーバビリティ
 
-The observability pipeline exports traces, metrics, and logs over OTLP/HTTP.
+オブザーバビリティのパイプラインは、トレース、メトリクス、ログを OTLP/HTTP でエクスポートします。
 
-| Variable | Default | Description |
+| 変数 | 既定値 | 説明 |
 | --- | --- | --- |
-| `RUSTFS_OBS_ENDPOINT` | empty | Root OTLP/HTTP base URL for traces, metrics, and logs, e.g. `http://otel-collector:4318`. When empty, logs go to stdout or local files. |
-| `RUSTFS_OBS_TRACE_ENDPOINT` | unset | Per-signal override for the traces endpoint. |
-| `RUSTFS_OBS_METRIC_ENDPOINT` | unset | Per-signal override for the metrics endpoint. |
-| `RUSTFS_OBS_LOG_ENDPOINT` | unset | Per-signal override for the logs endpoint. |
-| `RUSTFS_OBS_TRACES_EXPORT_ENABLED` | `true` | Export traces to the OTLP endpoint. |
-| `RUSTFS_OBS_METRICS_EXPORT_ENABLED` | `true` | Export metrics to the OTLP endpoint. |
-| `RUSTFS_OBS_LOGS_EXPORT_ENABLED` | `true` | Export logs to the OTLP endpoint. |
-| `RUSTFS_OBS_USE_STDOUT` | unset | Force telemetry output to stdout. |
-| `RUSTFS_OBS_SAMPLE_RATIO` | unset | Trace sampling ratio (0.0–1.0). |
-| `RUSTFS_OBS_METER_INTERVAL` | unset | Metrics export interval in seconds. |
-| `RUSTFS_OBS_SERVICE_NAME` | unset | Service name reported in telemetry resource attributes. |
-| `RUSTFS_OBS_ENVIRONMENT` | unset | Deployment environment label (`production`, `development`, `test`, `staging`). |
-| `RUSTFS_OBS_LOGGER_LEVEL` | unset | Log level filter (e.g. `info`, `debug`). |
-| `RUSTFS_OBS_LOG_STDOUT_ENABLED` | unset | Also mirror logs to stdout when file/OTLP logging is active. |
-| `RUSTFS_OBS_LOG_DIRECTORY` | unset | Local log directory. Unset means logs go to stdout; a URL value sends logs to a remote endpoint. |
-| `RUSTFS_OBS_LOG_FILENAME` | `rustfs.log` | Log filename inside the log directory. |
-| `RUSTFS_OBS_LOG_ROTATION_TIME` | `hourly` | Time-based log rotation: `daily`, `hourly`, `minutely`. |
-| `RUSTFS_OBS_LOG_KEEP_FILES` | `30` | Number of rotated log files to keep. |
-| `RUSTFS_OBS_LOG_MAX_TOTAL_SIZE_BYTES` | `2147483648` | Total size budget (2 GiB) for the log directory before cleanup. |
-| `RUSTFS_OBS_LOG_COMPRESS_OLD_FILES` | `true` | Compress rotated log files (`zstd` by default, controllable via `RUSTFS_OBS_LOG_COMPRESSION_ALGORITHM`). |
+| `RUSTFS_OBS_ENDPOINT` | empty | トレース、メトリクス、ログ共通の OTLP/HTTP ベース URL です。例: `http://otel-collector:4318` 。空の場合、ログは標準出力またはローカルファイルへ出力されます。 |
+| `RUSTFS_OBS_TRACE_ENDPOINT` | unset | トレースエンドポイントに対する、シグナル別の上書きです。 |
+| `RUSTFS_OBS_METRIC_ENDPOINT` | unset | メトリクスエンドポイントに対する、シグナル別の上書きです。 |
+| `RUSTFS_OBS_LOG_ENDPOINT` | unset | ログエンドポイントに対する、シグナル別の上書きです。 |
+| `RUSTFS_OBS_TRACES_EXPORT_ENABLED` | `true` | トレースを OTLP エンドポイントへエクスポートします。 |
+| `RUSTFS_OBS_METRICS_EXPORT_ENABLED` | `true` | メトリクスを OTLP エンドポイントへエクスポートします。 |
+| `RUSTFS_OBS_LOGS_EXPORT_ENABLED` | `true` | ログを OTLP エンドポイントへエクスポートします。 |
+| `RUSTFS_OBS_USE_STDOUT` | unset | テレメトリ出力を標準出力へ強制します。 |
+| `RUSTFS_OBS_SAMPLE_RATIO` | unset | トレースのサンプリング率です（0.0〜1.0）。 |
+| `RUSTFS_OBS_METER_INTERVAL` | unset | メトリクスのエクスポート間隔です。単位は秒です。 |
+| `RUSTFS_OBS_SERVICE_NAME` | unset | テレメトリのリソース属性として報告するサービス名です。 |
+| `RUSTFS_OBS_ENVIRONMENT` | unset | デプロイ環境のラベルです（`production`、`development`、`test`、`staging`）。 |
+| `RUSTFS_OBS_LOGGER_LEVEL` | unset | ログレベルのフィルタです（例: `info`、`debug`）。 |
+| `RUSTFS_OBS_LOG_STDOUT_ENABLED` | unset | ファイルまたは OTLP へのログ出力が有効なとき、ログを標準出力へも複製します。 |
+| `RUSTFS_OBS_LOG_DIRECTORY` | unset | ローカルのログディレクトリです。未設定の場合、ログは標準出力へ出力されます。URL を指定すると、ログはリモートエンドポイントへ送信されます。 |
+| `RUSTFS_OBS_LOG_FILENAME` | `rustfs.log` | ログディレクトリ内のログファイル名です。 |
+| `RUSTFS_OBS_LOG_ROTATION_TIME` | `hourly` | 時間に基づくログローテーションです。指定できる値は `daily`、`hourly`、`minutely` です。 |
+| `RUSTFS_OBS_LOG_KEEP_FILES` | `30` | 保持するローテーション済みログファイルの数です。 |
+| `RUSTFS_OBS_LOG_MAX_TOTAL_SIZE_BYTES` | `2147483648` | クリーンアップ前における、ログディレクトリの合計サイズ上限です（2 GiB）。 |
+| `RUSTFS_OBS_LOG_COMPRESS_OLD_FILES` | `true` | ローテーション済みのログファイルを圧縮します（既定は `zstd`。`RUSTFS_OBS_LOG_COMPRESSION_ALGORITHM` で変更できます）。 |
 
-Metrics collection intervals follow the pattern `RUSTFS_METRICS_<SCOPE>_INTERVAL_SEC` with scopes `DEFAULT`, `SYSTEM`, `CLUSTER`, `BUCKET`, `NODE`, `RESOURCE`, `AUDIT`, `NOTIFICATION`, and `BUCKET_REPLICATION_BANDWIDTH` — for example `RUSTFS_METRICS_CLUSTER_INTERVAL_SEC=60`.
+メトリクスの収集間隔は、`RUSTFS_METRICS_<SCOPE>_INTERVAL_SEC` というパターンに従います。スコープは `DEFAULT`、`SYSTEM`、`CLUSTER`、`BUCKET`、`NODE`、`RESOURCE`、`AUDIT`、`NOTIFICATION`、`BUCKET_REPLICATION_BANDWIDTH` です。例: `RUSTFS_METRICS_CLUSTER_INTERVAL_SEC=60`。
 
-## Scanner & Healing
+## スキャナーとデータ修復
 
-| Variable | Default | Description |
+| 変数 | 既定値 | 説明 |
 | --- | --- | --- |
-| `RUSTFS_SCANNER_SPEED` | `default` | Scanner speed preset: `fastest`, `fast`, `default`, `slow`, `slowest`. Controls sleep factor, max sleep, and cycle interval. |
-| `RUSTFS_SCANNER_DELAY` | preset | Overrides the scanner sleep multiplier (e.g. `30.0`). |
-| `RUSTFS_SCANNER_MAX_WAIT_SECS` | preset | Overrides the maximum scanner sleep in seconds. |
-| `RUSTFS_SCANNER_CYCLE` | preset | Overrides the scan cycle interval in seconds (e.g. `3600`). |
-| `RUSTFS_SCANNER_START_DELAY_SECS` | unset | Startup delay in seconds before the first scan cycle. |
-| `RUSTFS_SCANNER_CYCLE_MAX_DURATION_SECS` | `1800` | Caps one cycle's runtime in seconds; `0` disables the budget. |
-| `RUSTFS_SCANNER_CYCLE_MAX_OBJECTS` | `0` | Caps objects processed per cycle; `0` disables the budget. |
-| `RUSTFS_SCANNER_CYCLE_MAX_DIRECTORIES` | `0` | Caps directories entered per cycle; `0` disables the budget. |
-| `RUSTFS_SCANNER_BITROT_CYCLE_SECS` | `2592000` | Periodic deep (bitrot) scan cycle in seconds (30 days). `0`/`true`/`on` makes every cycle deep; `false`/`off` disables deep scans. |
-| `RUSTFS_SCANNER_IDLE_MODE` | `true` | When `true` the scanner throttles itself; `false` runs at full speed. |
-| `RUSTFS_SCANNER_CACHE_SAVE_TIMEOUT_SECS` | `14` | Scanner cache save timeout in seconds (minimum `1`). |
-| `RUSTFS_SCANNER_MAX_CONCURRENT_SET_SCANS` | `4` | Caps concurrent erasure-set scan tasks; `0` keeps topology-based concurrency. |
-| `RUSTFS_SCANNER_MAX_CONCURRENT_DISK_SCANS` | `4` | Caps concurrent disk bucket walks per set; `0` keeps disk-count-based concurrency. |
-| `RUSTFS_SCANNER_YIELD_EVERY_N_OBJECTS` | `128` | How often scanner object loops yield to the async runtime; `0` disables the extra yield. |
-| `RUSTFS_SCANNER_ALERT_EXCESS_VERSIONS` | `100` | Object version count that triggers scanner alerts. |
-| `RUSTFS_SCANNER_ALERT_EXCESS_VERSION_SIZE` | `1099511627776` | Cumulative version bytes (1 TiB) that trigger scanner alerts. |
-| `RUSTFS_SCANNER_ALERT_EXCESS_FOLDERS` | `65538` | Direct subfolder count that triggers scanner alerts. |
-| `RUSTFS_HEAL_AUTO_HEAL_ENABLE` | `true` | Enable automatic background healing of degraded objects. |
-| `RUSTFS_HEAL_QUEUE_SIZE` | `10000` | Capacity of the heal-candidate queue. |
-| `RUSTFS_HEAL_INTERVAL_SECS` | `10` | Interval between heal scheduler runs, in seconds. |
-| `RUSTFS_HEAL_TASK_TIMEOUT_SECS` | `300` | Timeout for a single heal task, in seconds. |
-| `RUSTFS_HEAL_MAX_CONCURRENT_HEALS` | `4` | Maximum concurrent heal tasks. |
-| `RUSTFS_HEAL_MAX_CONCURRENT_PER_SET` | `1` | Maximum concurrent heal tasks per erasure set. |
+| `RUSTFS_SCANNER_SPEED` | `default` | スキャナー速度のプリセットです。指定できる値は `fastest`、`fast`、`default`、`slow`、`slowest` です。スリープ係数、最大スリープ、サイクル間隔を制御します。 |
+| `RUSTFS_SCANNER_DELAY` | preset | スキャナーのスリープ倍率を上書きします（例: `30.0`）。 |
+| `RUSTFS_SCANNER_MAX_WAIT_SECS` | preset | スキャナーの最大スリープ時間を秒単位で上書きします。 |
+| `RUSTFS_SCANNER_CYCLE` | preset | スキャンサイクルの間隔を秒単位で上書きします（例: `3600`）。 |
+| `RUSTFS_SCANNER_START_DELAY_SECS` | unset | 最初のスキャンサイクルまでの起動遅延です。単位は秒です。 |
+| `RUSTFS_SCANNER_CYCLE_MAX_DURATION_SECS` | `1800` | 1 サイクルの実行時間の上限です。単位は秒です。`0` でこの上限を無効にします。 |
+| `RUSTFS_SCANNER_CYCLE_MAX_OBJECTS` | `0` | 1 サイクルで処理するオブジェクト数の上限です。`0` でこの上限を無効にします。 |
+| `RUSTFS_SCANNER_CYCLE_MAX_DIRECTORIES` | `0` | 1 サイクルで進入するディレクトリ数の上限です。`0` でこの上限を無効にします。 |
+| `RUSTFS_SCANNER_BITROT_CYCLE_SECS` | `2592000` | 定期的なディープ（bitrot）スキャンのサイクルです。単位は秒です（30 日）。`0` / `true` / `on` ですべてのサイクルをディープにし、`false` / `off` でディープスキャンを無効にします。 |
+| `RUSTFS_SCANNER_IDLE_MODE` | `true` | `true` のとき、スキャナーは自ら処理を抑制します。`false` では全速で実行します。 |
+| `RUSTFS_SCANNER_CACHE_SAVE_TIMEOUT_SECS` | `14` | スキャナーキャッシュの保存タイムアウトです。単位は秒です（最小値は `1`）。 |
+| `RUSTFS_SCANNER_MAX_CONCURRENT_SET_SCANS` | `4` | 同時に実行するイレイジャーセットのスキャンタスク数の上限です。`0` ではトポロジーに基づく同時実行数を維持します。 |
+| `RUSTFS_SCANNER_MAX_CONCURRENT_DISK_SCANS` | `4` | セットあたりで同時に行うディスク上のバケット走査数の上限です。`0` ではディスク数に基づく同時実行数を維持します。 |
+| `RUSTFS_SCANNER_YIELD_EVERY_N_OBJECTS` | `128` | スキャナーのオブジェクトループが、非同期ランタイムへ処理を譲る頻度です。`0` で、この追加の譲り渡しを無効にします。 |
+| `RUSTFS_SCANNER_ALERT_EXCESS_VERSIONS` | `100` | スキャナーアラートを発生させる、オブジェクトのバージョン数です。 |
+| `RUSTFS_SCANNER_ALERT_EXCESS_VERSION_SIZE` | `1099511627776` | スキャナーアラートを発生させる、バージョンの累積バイト数です（1 TiB）。 |
+| `RUSTFS_SCANNER_ALERT_EXCESS_FOLDERS` | `65538` | スキャナーアラートを発生させる、直下のサブフォルダー数です。 |
+| `RUSTFS_HEAL_AUTO_HEAL_ENABLE` | `true` | 劣化したオブジェクトの自動バックグラウンドデータ修復を有効にします。 |
+| `RUSTFS_HEAL_QUEUE_SIZE` | `10000` | 修復候補キューの容量です。 |
+| `RUSTFS_HEAL_INTERVAL_SECS` | `10` | 修復スケジューラの実行間隔です。単位は秒です。 |
+| `RUSTFS_HEAL_TASK_TIMEOUT_SECS` | `300` | 1 件の修復タスクのタイムアウトです。単位は秒です。 |
+| `RUSTFS_HEAL_MAX_CONCURRENT_HEALS` | `4` | 同時に実行する修復タスクの最大数です。 |
+| `RUSTFS_HEAL_MAX_CONCURRENT_PER_SET` | `1` | イレイジャーセットあたりの、同時修復タスクの最大数です。 |
 
-## Storage & Erasure
+## ストレージとイレイジャーコーディング [#storage--erasure]
 
-| Variable | Default | Description |
+| 変数 | 既定値 | 説明 |
 | --- | --- | --- |
-| `RUSTFS_STORAGE_CLASS_STANDARD` | auto | Parity for the STANDARD storage class in `EC:n` format, e.g. `EC:4`. When unset, parity is derived from the erasure set size. |
-| `RUSTFS_STORAGE_CLASS_RRS` | `EC:1` | Parity for the REDUCED_REDUNDANCY storage class in `EC:n` format. |
-| `RUSTFS_STORAGE_CLASS_OPTIMIZE` | `availability` | Optimization goal for parity selection. |
-| `RUSTFS_STORAGE_CLASS_INLINE_BLOCK` | `131072` | Threshold (128 KiB) below which object data is inlined into metadata. |
-| `RUSTFS_ERASURE_SET_DRIVE_COUNT` | `0` | Force the number of drives per erasure set; `0` selects the layout automatically. |
-| `RUSTFS_DURABILITY_MODE` | unset | Write durability mode: `strict`, `relaxed`, or `none`. Takes precedence over the legacy drive-sync switch when set to a valid value. |
+| `RUSTFS_STORAGE_CLASS_STANDARD` | auto | STANDARD ストレージクラスのパリティです。形式は `EC:n` です。例: `EC:4`。未設定の場合、パリティはイレイジャーセットのサイズから決まります。 |
+| `RUSTFS_STORAGE_CLASS_RRS` | `EC:1` | REDUCED_REDUNDANCY ストレージクラスのパリティです。形式は `EC:n` です。 |
+| `RUSTFS_STORAGE_CLASS_OPTIMIZE` | `availability` | パリティ選択における最適化の目標です。 |
+| `RUSTFS_STORAGE_CLASS_INLINE_BLOCK` | `131072` | オブジェクトデータをメタデータへインライン化するサイズのしきい値です（128 KiB）。この値未満が対象です。 |
+| `RUSTFS_ERASURE_SET_DRIVE_COUNT` | `0` | イレイジャーセットあたりのドライブ数を強制します。`0` ではレイアウトを自動選択します。 |
+| `RUSTFS_DURABILITY_MODE` | unset | 書き込みの耐久性モードです。指定できる値は `strict`、`relaxed`、`none` です。有効な値を設定すると、従来のドライブ同期スイッチより優先されます。 |
 
-## Credentials & Internal
+## 認証情報と内部設定
 
-| Variable | Default | Description |
+| 変数 | 既定値 | 説明 |
 | --- | --- | --- |
-| `RUSTFS_ACCESS_KEY` | `rustfsadmin` | Root access key. Mutually exclusive with `RUSTFS_ACCESS_KEY_FILE`. |
-| `RUSTFS_SECRET_KEY` | `rustfsadmin` | Root secret key. Mutually exclusive with `RUSTFS_SECRET_KEY_FILE`. |
-| `RUSTFS_ACCESS_KEY_FILE` | unset | Path to a file containing the access key (e.g. a Docker/Kubernetes secret mount). |
-| `RUSTFS_SECRET_KEY_FILE` | unset | Path to a file containing the secret key. |
-| `RUSTFS_RPC_SECRET` | derived | Secret used to authenticate internode RPC. When unset it is derived from the active access/secret key pair; with an all-default credential pair, multi-node clusters must set it explicitly. |
+| `RUSTFS_ACCESS_KEY` | `rustfsadmin` | ルートアクセスキーです。`RUSTFS_ACCESS_KEY_FILE` とは同時に指定できません。 |
+| `RUSTFS_SECRET_KEY` | `rustfsadmin` | ルートシークレットキーです。`RUSTFS_SECRET_KEY_FILE` とは同時に指定できません。 |
+| `RUSTFS_ACCESS_KEY_FILE` | unset | アクセスキーを格納したファイルのパスです（例: Docker や Kubernetes の Secret マウント）。 |
+| `RUSTFS_SECRET_KEY_FILE` | unset | シークレットキーを格納したファイルのパスです。 |
+| `RUSTFS_RPC_SECRET` | derived | ノード間 RPC の認証に使うシークレットです。未設定の場合は、有効なアクセスキーとシークレットキーの組から導出されます。認証情報がすべて既定値の組である場合、マルチノードクラスターではこの値を明示的に設定する必要があります。 |
 
 :::warning
 
-The built-in default credentials `rustfsadmin`/`rustfsadmin` are for first-boot convenience only. Always set non-default credentials for production deployments.
+組み込みの既定認証情報 `rustfsadmin`/`rustfsadmin` は、初回起動を簡単にするためのものです。本番デプロイでは、既定以外の認証情報を設定する必要があります。
 
 :::
 
-## Event & Audit targets
+## イベントと監査のターゲット [#event--audit-targets]
 
-Module switches:
+モジュールのスイッチ:
 
-| Variable | Default | Description |
+| 変数 | 既定値 | 説明 |
 | --- | --- | --- |
-| `RUSTFS_NOTIFY_ENABLE` | `false` | Enable the bucket event notification module. |
-| `RUSTFS_AUDIT_ENABLE` | `false` | Enable the audit logging module. |
+| `RUSTFS_NOTIFY_ENABLE` | `false` | バケットイベント通知モジュールを有効にします。 |
+| `RUSTFS_AUDIT_ENABLE` | `false` | 監査ログモジュールを有効にします。 |
 
-Target configuration is pattern-based: `RUSTFS_NOTIFY_<TARGET>_<KEY>` for event notification and `RUSTFS_AUDIT_<TARGET>_<KEY>` for audit logs. Supported targets in both families: `WEBHOOK`, `KAFKA`, `MQTT`, `MYSQL`, `POSTGRES`, `NATS`, `REDIS`, `AMQP`, `PULSAR`.
+ターゲットの設定はパターンに基づきます。イベント通知は `RUSTFS_NOTIFY_<TARGET>_<KEY>`、監査ログは `RUSTFS_AUDIT_<TARGET>_<KEY>` です。両系統でサポートされるターゲットは `WEBHOOK`、`KAFKA`、`MQTT`、`MYSQL`、`POSTGRES`、`NATS`、`REDIS`、`AMQP`、`PULSAR` です。
 
-Sub-keys for the webhook target (the same keys exist under `RUSTFS_AUDIT_WEBHOOK_*`):
+Webhook ターゲットのサブキーです（同じキーが `RUSTFS_AUDIT_WEBHOOK_*` にもあります）。
 
-| Variable | Default | Description |
+| 変数 | 既定値 | 説明 |
 | --- | --- | --- |
-| `RUSTFS_NOTIFY_WEBHOOK_ENABLE` | `false` | Enable the webhook target. |
-| `RUSTFS_NOTIFY_WEBHOOK_ENDPOINT` | unset | Webhook HTTP(S) endpoint URL. |
-| `RUSTFS_NOTIFY_WEBHOOK_AUTH_TOKEN` | unset | Bearer token sent with each delivery. |
-| `RUSTFS_NOTIFY_WEBHOOK_QUEUE_DIR` | unset | Directory for the persistent delivery queue. |
-| `RUSTFS_NOTIFY_WEBHOOK_QUEUE_LIMIT` | unset | Maximum queued events. |
-| `RUSTFS_NOTIFY_WEBHOOK_CLIENT_CERT` | unset | Client certificate for mTLS to the endpoint. |
-| `RUSTFS_NOTIFY_WEBHOOK_CLIENT_KEY` | unset | Client private key for mTLS to the endpoint. |
-| `RUSTFS_NOTIFY_WEBHOOK_CLIENT_CA` | unset | CA certificate used to verify the endpoint. |
-| `RUSTFS_NOTIFY_WEBHOOK_SKIP_TLS_VERIFY` | unset | Skip TLS verification of the endpoint (not recommended). |
+| `RUSTFS_NOTIFY_WEBHOOK_ENABLE` | `false` | Webhook ターゲットを有効にします。 |
+| `RUSTFS_NOTIFY_WEBHOOK_ENDPOINT` | unset | Webhook の HTTP(S) エンドポイント URL です。 |
+| `RUSTFS_NOTIFY_WEBHOOK_AUTH_TOKEN` | unset | 各配信に付与する Bearer トークンです。 |
+| `RUSTFS_NOTIFY_WEBHOOK_QUEUE_DIR` | unset | 永続的な配信キューのディレクトリです。 |
+| `RUSTFS_NOTIFY_WEBHOOK_QUEUE_LIMIT` | unset | キューに入れられるイベントの最大数です。 |
+| `RUSTFS_NOTIFY_WEBHOOK_CLIENT_CERT` | unset | エンドポイントへの mTLS に使うクライアント証明書です。 |
+| `RUSTFS_NOTIFY_WEBHOOK_CLIENT_KEY` | unset | エンドポイントへの mTLS に使うクライアント秘密鍵です。 |
+| `RUSTFS_NOTIFY_WEBHOOK_CLIENT_CA` | unset | エンドポイントの検証に使う CA 証明書です。 |
+| `RUSTFS_NOTIFY_WEBHOOK_SKIP_TLS_VERIFY` | unset | エンドポイントの TLS 検証を省略します（推奨しません）。 |
 
-Other targets follow the same shape with target-specific keys, e.g. `RUSTFS_NOTIFY_KAFKA_BROKERS`, `RUSTFS_NOTIFY_KAFKA_TOPIC`, `RUSTFS_NOTIFY_MQTT_BROKER`, `RUSTFS_NOTIFY_MQTT_TOPIC`, `RUSTFS_NOTIFY_MYSQL_DSN_STRING`, `RUSTFS_NOTIFY_NATS_ADDRESS`, `RUSTFS_NOTIFY_REDIS_URL`, `RUSTFS_NOTIFY_AMQP_URL`, `RUSTFS_NOTIFY_PULSAR_BROKER`.
+ほかのターゲットも同じ形で、ターゲット固有のキーを持ちます。例: `RUSTFS_NOTIFY_KAFKA_BROKERS`、`RUSTFS_NOTIFY_KAFKA_TOPIC`、`RUSTFS_NOTIFY_MQTT_BROKER`、`RUSTFS_NOTIFY_MQTT_TOPIC`、`RUSTFS_NOTIFY_MYSQL_DSN_STRING`、`RUSTFS_NOTIFY_NATS_ADDRESS`、`RUSTFS_NOTIFY_REDIS_URL`、`RUSTFS_NOTIFY_AMQP_URL`、`RUSTFS_NOTIFY_PULSAR_BROKER`。
 
-## Legacy compatibility
+## 従来互換
 
-### MINIO_* variable mapping
+### MINIO_* 変数の対応
 
-For migration convenience, RustFS maps a fixed allowlist of `MINIO_*` variables to their `RUSTFS_*` equivalents at startup:
+移行を簡単にするため、RustFS は起動時に、許可リストで固定された `MINIO_*` 変数を、対応する `RUSTFS_*` へ割り当てます。
 
-- If only the `MINIO_`-prefixed variable is set, its value is used and a deprecation warning is logged.
-- If both `MINIO_*` and `RUSTFS_*` are set with different values, the `RUSTFS_*` value wins and a conflict is recorded.
+- `MINIO_` 接頭辞の変数だけが設定されている場合は、その値が使われ、非推奨である旨の警告がログに記録されます。
+- `MINIO_*` と `RUSTFS_*` が異なる値で両方設定されている場合は、`RUSTFS_*` の値が優先され、競合が記録されます。
 
-The mapped suffixes include `ACCESS_KEY`, `SECRET_KEY`, `ACCESS_KEY_FILE`, `SECRET_KEY_FILE`, `ROOT_USER`, `ROOT_PASSWORD`, `ADDRESS`, `CONSOLE_ADDRESS`, `VOLUMES`, `REGION`, `LICENSE`, `ERASURE_SET_DRIVE_COUNT`, `STORAGE_CLASS_STANDARD`, `STORAGE_CLASS_RRS`, `STORAGE_CLASS_OPTIMIZE`, `STORAGE_CLASS_INLINE_BLOCK`, `SCANNER_SPEED`, `SCANNER_CYCLE`, `COMPRESS_ENABLE`, `COMPRESS_EXTENSIONS`, `COMPRESS_MIME_TYPES`, `DRIVE_ACTIVE_MONITORING`, `ILM_EXPIRATION_WORKERS`, `API_XFF_HEADER`, `POLICY_PLUGIN_URL`, `POLICY_PLUGIN_AUTH_TOKEN`, the `IDENTITY_OPENID_*` keys, and every variable starting with `NOTIFY_WEBHOOK_`, `NOTIFY_MQTT_`, `AUDIT_WEBHOOK_`, or `AUDIT_MQTT_`. For example, `MINIO_ROOT_USER` maps to `RUSTFS_ROOT_USER` and `MINIO_NOTIFY_WEBHOOK_ENDPOINT` maps to `RUSTFS_NOTIFY_WEBHOOK_ENDPOINT`.
+対応する接尾辞には、`ACCESS_KEY`、`SECRET_KEY`、`ACCESS_KEY_FILE`、`SECRET_KEY_FILE`、`ROOT_USER`、`ROOT_PASSWORD`、`ADDRESS`、`CONSOLE_ADDRESS`、`VOLUMES`、`REGION`、`LICENSE`、`ERASURE_SET_DRIVE_COUNT`、`STORAGE_CLASS_STANDARD`、`STORAGE_CLASS_RRS`、`STORAGE_CLASS_OPTIMIZE`、`STORAGE_CLASS_INLINE_BLOCK`、`SCANNER_SPEED`、`SCANNER_CYCLE`、`COMPRESS_ENABLE`、`COMPRESS_EXTENSIONS`、`COMPRESS_MIME_TYPES`、`DRIVE_ACTIVE_MONITORING`、`ILM_EXPIRATION_WORKERS`、`API_XFF_HEADER`、`POLICY_PLUGIN_URL`、`POLICY_PLUGIN_AUTH_TOKEN`、`IDENTITY_OPENID_*` の各キー、および `NOTIFY_WEBHOOK_`、`NOTIFY_MQTT_`、`AUDIT_WEBHOOK_`、`AUDIT_MQTT_` で始まるすべての変数が含まれます。たとえば、`MINIO_ROOT_USER` は `RUSTFS_ROOT_USER` に、`MINIO_NOTIFY_WEBHOOK_ENDPOINT` は `RUSTFS_NOTIFY_WEBHOOK_ENDPOINT` に対応します。
 
-### Deprecated aliases
+### 非推奨のエイリアス
 
-| Deprecated variable | Use instead |
+| 非推奨の変数 | 代替 |
 | --- | --- |
 | `RUSTFS_ROOT_USER` | `RUSTFS_ACCESS_KEY` |
 | `RUSTFS_ROOT_PASSWORD` | `RUSTFS_SECRET_KEY` |
 | `RUSTFS_DATA_SCANNER_START_DELAY_SECS` | `RUSTFS_SCANNER_START_DELAY_SECS` |
 
-Deprecated aliases still work but log a warning; the canonical `RUSTFS_*` name always takes precedence when both are set.
+非推奨のエイリアスは引き続き動作しますが、警告がログに記録されます。両方を設定した場合、正規の `RUSTFS_*` 名が常に優先されます。

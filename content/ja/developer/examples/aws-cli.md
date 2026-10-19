@@ -1,21 +1,21 @@
 ---
 title: "AWS CLI"
-description: "Connect the AWS CLI to RustFS and perform basic object operations."
+description: "AWS CLI を RustFS に接続し、基本的なオブジェクト操作を行います。"
 ---
 
-The [AWS CLI](https://docs.aws.amazon.com/cli/) is Amazon's official command-line tool for S3, and it works with RustFS via the `--endpoint-url` flag.
+[AWS CLI](https://docs.aws.amazon.com/cli/) は、S3 向けの Amazon 公式コマンドラインツールです。`--endpoint-url` フラグを指定すると、RustFS でも動作します。
 
-## Install
+## インストール
 
-Follow the [official install guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html), or on macOS:
+[公式のインストールガイド](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)に従うか、macOS では次を実行します。
 
 ```bash
 brew install awscli
 ```
 
-## Configure
+## 設定
 
-Set your [access keys](../../security-compliance/iam/access-token.md) and region:
+[アクセスキー](../../security-compliance/iam/access-token.md)とリージョンを設定します。
 
 ```bash
 aws configure
@@ -28,17 +28,17 @@ Default region name [None]: us-east-1
 Default output format [None]: json
 ```
 
-Pass your RustFS address with `--endpoint-url` on every command. Replace `http://localhost:9000` with your server address. When `--endpoint-url` is set, the AWS CLI uses path-style addressing, which is what RustFS requires.
+すべてのコマンドで、`--endpoint-url` に RustFS のアドレスを渡します。`http://localhost:9000` は、実際のサーバーアドレスに置き換えます。`--endpoint-url` を指定すると、AWS CLI はパススタイルアクセスを使います。RustFS では、このパススタイルアクセスが必要です。
 
 :::note
 
-If you did not set credentials at install, the local-test default is `rustfsadmin` / `rustfsadmin` — never use it beyond a throwaway local trial.
+インストール時に認証情報を設定していない場合、ローカル試験用の既定値は `rustfsadmin` / `rustfsadmin` です。使い捨てのローカル試用以外では使わないでください。
 
 :::
 
-## Verify
+## 検証
 
-Create a bucket:
+バケットを作成します。
 
 ```bash
 aws s3 mb s3://my-bucket --endpoint-url http://localhost:9000
@@ -48,7 +48,7 @@ aws s3 mb s3://my-bucket --endpoint-url http://localhost:9000
 make_bucket: my-bucket
 ```
 
-Upload a file:
+ファイルをアップロードします。
 
 ```bash
 aws s3 cp /path/to/hello.txt s3://my-bucket/ --endpoint-url http://localhost:9000
@@ -58,7 +58,7 @@ aws s3 cp /path/to/hello.txt s3://my-bucket/ --endpoint-url http://localhost:900
 upload: ../path/to/hello.txt to s3://my-bucket/hello.txt
 ```
 
-List the bucket:
+バケットの内容を一覧表示します。
 
 ```bash
 aws s3 ls s3://my-bucket --endpoint-url http://localhost:9000
@@ -68,6 +68,6 @@ aws s3 ls s3://my-bucket --endpoint-url http://localhost:9000
 2026-07-15 10:30:00         12 hello.txt
 ```
 
-## Next steps
+## 次のステップ
 
-Build applications against RustFS with an [S3 SDK](../sdk/index.md), or manage objects with [`rc`](/operations/rc).
+[S3 SDK](../sdk/index.md) を使って RustFS 向けのアプリケーションを作成するか、[`rc`](/ja/operations/rc) でオブジェクトを管理します。

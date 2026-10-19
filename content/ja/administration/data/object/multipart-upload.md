@@ -1,79 +1,79 @@
 ---
-title: "Multipart Upload"
-description: "Upload large objects in parts, monitor Console upload tasks, and verify completed objects with rc."
+title: "マルチパートアップロード"
+description: "大きなオブジェクトをパートに分けてアップロードし、Console のアップロードタスクを監視し、完了したオブジェクトを rc で検証する方法を説明します。"
 ---
 
-Multipart upload splits one object into independently uploaded parts and assembles them on the server. Use it for large objects, retryable transfers, and browser uploads that need progress and cancellation controls.
+マルチパートアップロードは、1 つのオブジェクトを個別にアップロードするパートに分割し、サーバー上で組み立てます。大きなオブジェクト、再試行できる転送、進捗とキャンセルの制御が必要なブラウザーアップロードに使います。
 
-## Overview
+## 概要
 
-The S3 multipart workflow has three required phases:
+S3 のマルチパート手順には、必須の 3 段階があります。
 
-1. **CreateMultipartUpload** returns an upload ID.
-2. **UploadPart** uploads numbered parts and returns an ETag for each part.
-3. **CompleteMultipartUpload** submits the ordered part numbers and ETags to create the final object.
+1. **CreateMultipartUpload** がアップロード ID を返します。
+2. **UploadPart** が番号付きのパートをアップロードし、各パートの ETag を返します。
+3. **CompleteMultipartUpload** が、順序付けされたパート番号と ETag を送信し、最終的なオブジェクトを作成します。
 
-Abort an unfinished upload with **AbortMultipartUpload** so temporary parts do not continue consuming storage.
+未完了のアップロードは **AbortMultipartUpload** で中止し、一時パートがストレージを消費し続けないようにします。
 
-RustFS accepts part numbers from `1` through `10000`. `ListParts` and `ListMultipartUploads` return at most 1,000 entries per response and use markers for pagination. The completed object appears only after the completion request succeeds.
+RustFS が受け付けるパート番号は `1` から `10000` までです。`ListParts` と `ListMultipartUploads` は、1 回の応答で最大 1,000 件を返し、ページネーションにはマーカーを使います。完了したオブジェクトは、完了リクエストが成功したあとにだけ現れます。
 
-## Upload in the Console
+## Console でアップロードする
 
-1. Sign in to the RustFS Console and open the destination bucket.
-2. Select **Upload File/Folder**.
-3. Optionally enter a **Current Prefix**.
-4. Select **Select File** or **Select Folder**, then choose the content to upload.
-5. Review the selected names and sizes, then select **Start Upload**.
+1. RustFS Console にサインインし、保存先のバケットを開きます。
+2. **Upload File/Folder**（ファイルまたはフォルダーのアップロード）を選択します。
+3. 必要に応じて **Current Prefix**（現在のプレフィックス）を入力します。
+4. **Select File**（ファイルを選択）または **Select Folder**（フォルダーを選択）を選び、アップロードする内容を指定します。
+5. 選択した名前とサイズを確認し、**Start Upload**（アップロード開始）を選択します。
 
-![Console upload dialog with a selected large file](./images/multipart-upload-console.png)
+![大きなファイルを選択した Console のアップロードダイアログ](./images/multipart-upload-console.png)
 
-The observed Console upload dialog supports up to 10,000 selected files and reports a 512 GB maximum for a single file. These are Console upload limits; S3 clients can have different local limits.
+Console のアップロードダイアログは最大 10,000 ファイルに対応し、単一ファイルの上限として 512 GB を表示します。これらは Console のアップロード上限です。S3 クライアントには、これとは異なるローカル上限がある場合があります。
 
-After upload starts, **Task Management** groups tasks into Pending, Processing, Completed, Failed, and Canceled states. Each processing task shows progress and a **Cancel** action. Canceling an active multipart task aborts the current part request and marks the task as canceled.
+アップロードを開始すると、**Task Management**（タスク管理）がタスクを Pending（保留）、Processing（処理中）、Completed（完了）、Failed（失敗）、Canceled（キャンセル済み）の状態に分けます。処理中の各タスクには、進捗と **Cancel**（キャンセル）操作が表示されます。実行中のマルチパートタスクをキャンセルすると、進行中のパートリクエストが中止され、タスクはキャンセル済みになります。
 
-Refresh the bucket after completion and confirm the object size and modification time.
+完了後にバケットの表示を更新し、オブジェクトのサイズと更新時刻を確認します。
 
-## Use rc
+## rc を使う
 
-Upload and verify an object with `rc`:
+`rc` でオブジェクトをアップロードし、検証します。
 
 ```bash
 rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt
 rc object stat rustfs/my-bucket/hello.txt --json
 ```
 
-:::note[rc 0.1.29 multipart boundary]
+:::note[rc 0.1.29 におけるマルチパートの制限]
 
-`rc 0.1.29` does not expose create, upload-part, complete, list-parts, or abort multipart commands. A validated 20 MiB `rc object copy` used a single `PutObject` request rather than multipart upload. Use the Console or an S3 SDK when explicit multipart behavior is required; use `rc object stat` to verify the completed object.
+`rc 0.1.29` は、マルチパートの create、upload-part、complete、list-parts、abort コマンドを公開していません。検証済みの 20 MiB の `rc object copy` は、マルチパートアップロードではなく、単一の `PutObject` リクエストを使っていました。明示的なマルチパート動作が必要な場合は Console または S3 SDK を使い、完了したオブジェクトの検証には `rc object stat` を使います。
 
 :::
 
-For a versioned bucket, list the version created by a completed multipart upload:
+バージョニングが有効なバケットでは、完了したマルチパートアップロードが作成したバージョンを一覧します。
 
 ```bash
 rc bucket version list rustfs/my-bucket/hello.txt --json
 ```
 
-RustFS returns a version ID when multipart completion succeeds in a versioned bucket.
+バージョニングが有効なバケットでマルチパートの完了が成功すると、RustFS はバージョン ID を返します。
 
-## S3 multipart operations
+## S3 のマルチパート操作
 
-Use an S3 SDK that supports these standard operations:
+次の標準操作に対応した S3 SDK を使います。
 
-| Phase | S3 operation | Required values |
+| 段階 | S3 操作 | 必要な値 |
 | --- | --- | --- |
-| Initiate | `CreateMultipartUpload` | Bucket, key, metadata, encryption, and optional Object Lock settings. |
-| Upload | `UploadPart` | Bucket, key, upload ID, part number, and body. Save the returned ETag. |
-| Inspect | `ListParts` | Bucket, key, and upload ID. Paginate when needed. |
-| Complete | `CompleteMultipartUpload` | Ordered part numbers and their exact ETags. |
-| Cancel | `AbortMultipartUpload` | Bucket, key, and upload ID. |
-| Discover | `ListMultipartUploads` | Bucket and optional prefix. Paginate when needed. |
+| 開始 | `CreateMultipartUpload` | バケット、キー、メタデータ、暗号化、および任意のオブジェクトロック設定。 |
+| アップロード | `UploadPart` | バケット、キー、アップロード ID、パート番号、本文。返された ETag を保存します。 |
+| 検査 | `ListParts` | バケット、キー、アップロード ID。必要に応じてページネーションします。 |
+| 完了 | `CompleteMultipartUpload` | 順序付けされたパート番号と、それぞれの正確な ETag。 |
+| キャンセル | `AbortMultipartUpload` | バケット、キー、アップロード ID。 |
+| 検出 | `ListMultipartUploads` | バケットと任意のプレフィックス。必要に応じてページネーションします。 |
 
-Do not reuse an upload ID for a different key. Submit completed parts in ascending part-number order and preserve each ETag exactly as returned.
+別のキーに対してアップロード ID を再利用しないでください。完了したパートはパート番号の昇順で送信し、各 ETag は返された値をそのまま保持します。
 
-## Verification
+## 検証
 
-After completion:
+完了後に、次を実行します。
 
 ```bash
 rc object stat rustfs/my-bucket/hello.txt --json
@@ -81,21 +81,21 @@ rc object show rustfs/my-bucket/hello.txt > /tmp/hello-downloaded.txt
 cmp /path/to/hello.txt /tmp/hello-downloaded.txt
 ```
 
-Confirm that `size_bytes` matches the local file and that `cmp` exits successfully. For a versioned bucket, also confirm that `rc bucket version list` returns a version ID.
+`size_bytes` がローカルファイルと一致し、`cmp` が正常終了することを確認します。バージョニングが有効なバケットでは、`rc bucket version list` がバージョン ID を返すことも確認します。
 
-## Troubleshooting
+## トラブルシューティング
 
-| Symptom | Check |
+| 現象 | 確認すること |
 | --- | --- |
-| Upload remains in Processing | Check browser connectivity and keep the Console tab open; cancel and retry when the connection is interrupted. |
-| A part request fails | Retry that part with the same upload ID and part number, then use the latest returned ETag. |
-| Completion reports an invalid part | Verify the submitted part numbers, ordering, and ETags against `ListParts`. |
-| Object is absent after uploading parts | Send `CompleteMultipartUpload`; uploaded parts alone do not create the object. |
-| Temporary storage continues growing | List incomplete uploads and abort those that are no longer needed. |
-| Completion fails on a locked key | Check Object Lock retention or Legal Hold on the current destination version. |
+| アップロードが Processing のままになる | ブラウザーの接続を確認し、Console のタブは開いたままにします。接続が中断した場合は、キャンセルして再試行します。 |
+| パートリクエストが失敗する | 同じアップロード ID とパート番号でそのパートを再試行し、最後に返された ETag を使います。 |
+| 完了時に無効なパートが報告される | 送信したパート番号、順序、ETag を `ListParts` と照合します。 |
+| パートをアップロードしたあともオブジェクトがない | `CompleteMultipartUpload` を送信します。アップロードしたパートだけでは、オブジェクトは作成されません。 |
+| 一時ストレージが増え続ける | 未完了のアップロードを一覧し、不要なものを中止します。 |
+| ロックされたキーで完了が失敗する | 現在の宛先バージョンに対するオブジェクトロックの保持、またはリーガルホールドを確認します。 |
 
-## Next steps
+## 次のステップ
 
-- [Create and inspect objects](./creation.md)
-- [Manage object versions](./versioning.md)
-- [Protect objects with Object Lock](./object-lock.md)
+- [オブジェクトを作成して確認する](./creation.md)
+- [オブジェクトのバージョンを管理する](./versioning.md)
+- [オブジェクトロックでオブジェクトを保護する](./object-lock.md)

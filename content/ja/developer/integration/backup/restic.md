@@ -87,5 +87,5 @@ restic -o s3.bucket-lookup=path check
 
 ## 次のステップ
 
-- [CLI クライアント（rc）](/operations/rc) でバケットを作成し、コマンドラインからオブジェクトを確認します。
-- RustFS を信頼できるネットワークの外に公開する場合は、[TLS の設定](/integration/tls-configured)を確認してください。
+- [CLI クライアント（rc）](/ja/operations/rc) でバケットを作成し、コマンドラインからオブジェクトを確認します。
+- RustFS を信頼できるネットワークの外に公開する場合は、[TLS の設定](/ja/integration/tls-configured)を確認してください。

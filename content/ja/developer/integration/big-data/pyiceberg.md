@@ -7,7 +7,7 @@ description: "PyIceberg を使用して、RustFS S3 Tables の REST カタログ
 
 ## 前提条件
 
-- [S3 Tables の設定](/administration/data/s3-tables)を完了し、`my-bucket` を作成して有効にします。アカウントと TLS の要件も満たしてください。
+- [S3 Tables の設定](/ja/administration/data/s3-tables)を完了し、`my-bucket` を作成して有効にします。アカウントと TLS の要件も満たしてください。
 - そのガイドで設定した `RUSTFS_ENDPOINT`、`AWS_ACCESS_KEY_ID`、`AWS_SECRET_ACCESS_KEY`、`AWS_DEFAULT_REGION` を維持します。
 
 ## 1. クライアントをインストールする
@@ -159,7 +159,7 @@ PY
 
 :::note[カタログエントリのみを削除]
 
-以下のコマンドは、このチュートリアルのテーブルエントリと、削除後に空になる名前空間を削除します。バケットと基になるオブジェクトは残ります。データのクリーンアップが必要な場合は、実行前に計画してください。`drop_table` の後は、テーブルメンテナンスでテーブルを見つけられなくなります。[メンテナンスとデータ保護](/administration/data/s3-tables)を参照してください。
+以下のコマンドは、このチュートリアルのテーブルエントリと、削除後に空になる名前空間を削除します。バケットと基になるオブジェクトは残ります。データのクリーンアップが必要な場合は、実行前に計画してください。`drop_table` の後は、テーブルメンテナンスでテーブルを見つけられなくなります。[メンテナンスとデータ保護](/ja/administration/data/s3-tables)を参照してください。
 
 :::
 
@@ -175,4 +175,4 @@ PY
 ## 次のステップ
 
 - クライアント操作は [PyIceberg API ドキュメント](https://py.iceberg.apache.org/api/)を参照し、各操作が RustFS のサポート範囲に含まれるか確認します。
-- 別のカタログサービスを管理している場合は、[外部 Iceberg カタログとの連携](/developer/integration/big-data/iceberg)を使用します。
+- 別のカタログサービスを管理している場合は、[外部 Iceberg カタログとの連携](/ja/developer/integration/big-data/iceberg)を使用します。

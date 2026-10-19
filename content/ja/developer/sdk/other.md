@@ -1,43 +1,43 @@
 ---
-title: "Other SDKs"
-description: "This article mainly explains the usage of various other language SDKs in RustFS."
+title: "その他の SDK"
+description: "公式の AWS SDK がない言語から、RustFS へ接続する方法を説明します。"
 ---
 
-If AWS S3 doesn't officially support your language, you can adopt the following strategies to integrate with RustFS:
+使っている言語向けの公式 SDK を AWS が提供していない場合は、次のいずれかの方法で RustFS と連携できます。
 
-## 1. Use HTTP Interface Direct Requests (Based on S3 API Protocol)
+## 1. S3 API へ HTTP リクエストを直接送る
 
-The S3 protocol is a standard RESTful API. You can encapsulate access logic yourself using any language that supports HTTP requests (such as C, Rust, Lua, Erlang).
+S3 プロトコルは、標準的な RESTful API です。HTTP リクエストを送れる言語（C、Rust、Lua、Erlang など）であれば、クライアントの処理を自分で実装できます。
 
-### Key points include:
+### 主な手順
 
-* **Signature Algorithm**: Implement AWS Signature Version 4 signature (more complex)
-* **Construct correct Headers and Canonical Request**
-* **Use HTTPS/HTTP client to send requests**
+* **リクエスト署名**: AWS Signature Version 4 を実装します（最も複雑な部分です）。
+* **ヘッダーと正規リクエスト**: 正規リクエストと、必要なヘッダーを組み立てます。
+* **HTTP クライアント**: 署名済みのリクエストを、HTTP または HTTPS のクライアントで送ります。
 
-👉 Recommended to reference open-source project signature implementations, for example:
+リクエスト署名については、既存のオープンソース実装を参照することを推奨します。例:
 
 * [https://docs.aws.amazon.com/general/latest/gr/sigv4-signed-request-examples.html](https://docs.aws.amazon.com/general/latest/gr/sigv4-signed-request-examples.html)
 
 ---
 
-## 2. Call CLI Tools or Middleware Services of Existing SDKs
+## 2. AWS CLI、または既存の SDK で構築したサービスを使う
 
-If you don't want to implement signatures yourself, you can:
+自分で署名を実装したくない場合は、次の方法を使えます。
 
-### 2.1. Use AWS CLI tools with existing language support:
+### 2.1. AWS CLI を呼び出す
 
-For example, call through Shell:
+たとえば、アプリケーションからシェルで次のコマンドを実行します。
 
 ```bash
 aws s3 cp local.txt s3://mybucket/myfile.txt --endpoint-url http://rustfs.local:9000
 ```
 
-Or write a simple relay service using Node.js/Python SDK, and your language uploads/downloads by calling this service.
+あるいは、Node.js または Python の SDK で小さな中継サービスを作り、アプリケーションから呼び出してオブジェクトをアップロードまたはダウンロードします。
 
-### 2.2. Set up a Proxy (such as Flask, FastAPI, Express)
+### 2.2. プロキシサービスを動かす（Flask、FastAPI、Express など）
 
-Let clients that don't support S3 call your encapsulated HTTP API:
+S3 に対応していないクライアントが呼び出せる HTTP API を公開します。
 
 ```http
 POST /upload -> Service internally calls SDK to upload objects to RustFS
@@ -46,33 +46,33 @@ GET /presigned-url -> Generate presigned URL for frontend/client use
 
 ---
 
-## 3. Find Third-Party Community SDKs
+## 3. サードパーティのコミュニティ SDK を探す
 
-Although AWS doesn't have official SDKs, some language communities have developed unofficial S3 clients. For example:
+公式の AWS SDK がない言語では、コミュニティが保守している S3 クライアントを探します。例:
 
 * Haskell: `amazonka-s3`
-* Rust: `rusoto` (deprecated) or `aws-sdk-rust`
-* OCaml: May implement through `cohttp` yourself
-* Delphi: Has commercial libraries supporting S3 protocol
+* Rust: `rusoto`（非推奨）、または `aws-sdk-rust`
+* OCaml: `cohttp` の上に、独自のクライアントを構築します
+* Delphi: S3 に対応した商用ライブラリがあります
 
-Community SDKs vary greatly in stability, so you should evaluate activity, documentation, and compatibility before use.
-
----
-
-## 4. Delegate Core Upload Logic to Platform Hosting
-
-For example:
-
-* Delegate frontend (Web/Mobile) upload tasks to browser or App side execution (using presigned URLs)
-* Backend uses Node.js/Python/Go and other proxies to implement upload logic
+コミュニティ SDK は安定性の差が大きいため、使用前に活動状況、ドキュメント、互換性を評価することを推奨します。
 
 ---
 
-## Summary Recommendations
+## 4. 署名付き URL でクライアントから直接アップロードする
 
-| Scenario | Recommended Solution |
-| ------------- | ---------------------------------- |
-| Need complete control/embedded environment | Implement Signature V4 self-signing |
-| Weak language support but has Shell | Call upload through AWS CLI |
-| Can deploy relay service | Use Python/Node to build S3 API gateway |
-| Frontend upload | Use presigned URLs |
+例:
+
+* ブラウザーやモバイルアプリから、署名付き URL を使って直接アップロードします。
+* バックエンドサービス（Node.js、Python、Go など）に、アップロード処理を実装します。
+
+---
+
+## 方法の選び方
+
+| 状況 | 推奨する方法 |
+| --- | --- |
+| すべてを自分で制御する必要がある、または組み込み環境が対象 | SigV4 署名を自分で実装する |
+| SDK の対応は限られるが、シェルは使える | AWS CLI でアップロードする |
+| 中継サービスをデプロイできる | Python または Node.js で、小さな S3 ゲートウェイを構築する |
+| フロントエンドからのアップロード | 署名付き URL を使う |

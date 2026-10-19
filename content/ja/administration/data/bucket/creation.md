@@ -1,28 +1,28 @@
 ---
-title: "RustFS Bucket Creation"
-description: "Create buckets using the RustFS UI, rc, or the S3 API."
+title: "バケットの作成"
+description: "RustFS の UI、rc、または S3 API を使ってバケットを作成します。"
 ---
 
-This guide explains how to create buckets using the RustFS UI, `rc`, or the S3 API.
+このガイドでは、RustFS の UI、`rc`、または S3 API を使ってバケットを作成する方法を説明します。
 
-## Requirements
+## 要件
 
-- A running RustFS instance (see [Installation Guide](../../../installation/index.md)).
-- [`rc`](/operations/rc) installed and configured with an alias for the command-line workflow.
+- 稼働中の RustFS インスタンス（[インストールガイド](../../../installation/index.md) を参照）。
+- コマンドラインの手順では、[`rc`](/ja/operations/rc) をインストールし、エイリアスを設定します。
 
-## Using the RustFS UI
+## RustFS Console を使う
 
-1. Log in to the RustFS Console.
-2. On the Buckets page, in the top right corner, select **Create Bucket**.
-3. Enter the bucket name and click **Create** to complete bucket creation.
+1. RustFS Console にログインします。
+2. **Buckets**（バケット）のページで、右上の **Create Bucket**（バケットを作成）を選びます。
+3. バケット名を入力し、**Create**（作成）を選びます。
 
-![bucket creation](images/bucket-creation-by-ui.png)
+![バケットの作成](images/bucket-creation-by-ui.png)
 
-## Using `rc`
+## `rc` を使う
 
-See the [`rc` guide](/operations/rc) for installation and alias configuration.
+インストールとエイリアスの設定は、[`rc` ガイド](/ja/operations/rc) を参照します。
 
-Create a bucket:
+バケットを作成します。
 
 ```bash
 rc bucket create rustfs/my-bucket
@@ -33,15 +33,15 @@ rc bucket list rustfs/
 ✓ Bucket 'rustfs/my-bucket' created successfully.
 ```
 
-## Using the API
+## API を使う
 
-Create a bucket via API:
+API でバケットを作成します。
 
 ```http
 PUT /{bucketName} HTTP/1.1
 ```
 
-S3 requests must be signed with AWS Signature V4, so use an S3 client rather than hand-crafting headers. With the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) configured for your access keys:
+S3 リクエストは、AWS 署名バージョン 4 で署名する必要があります。ヘッダーを手作業で組み立てず、S3 クライアントを使います。アクセスキーを設定した [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) では、次のように実行します。
 
 ```bash
 aws s3api create-bucket \
@@ -49,4 +49,4 @@ aws s3api create-bucket \
   --endpoint-url http://localhost:9000
 ```
 
-Verify the bucket creation in the RustFS Console.
+RustFS Console に、そのバケットが表示されることを確認します。

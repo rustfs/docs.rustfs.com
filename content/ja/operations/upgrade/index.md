@@ -1,14 +1,14 @@
 ---
-title: "Upgrade"
-description: "Plan and perform RustFS upgrades while preserving cluster availability."
+title: "アップグレード"
+description: "クラスターの可用性を維持したまま、RustFS のアップグレードを計画して実施します。"
 ---
 
-Choose the upgrade workflow that matches how you deploy RustFS. For multi-node clusters, replace one node or pod at a time and wait for it to report ready before continuing.
+RustFS のデプロイ方法に合うアップグレード手順を選びます。マルチノードのクラスターでは、ノードまたは Pod を一度に 1 つずつ置き換え、準備完了を報告するまで待ってから続行します。
 
-## Deployment methods
+## デプロイ方法
 
-- [Binary Upgrade](./binary/index.md) covers systemd-managed executable replacement and rollback.
-- [Container Upgrade](./container/index.md) covers image replacement with persistent data volumes.
-- [Kubernetes Upgrade](./kubernetes/index.md) covers Helm- and Operator-managed workloads.
+- [バイナリ](./binary/index.md) では、systemd で管理する実行ファイルの置き換えとロールバックを扱います。
+- [コンテナ](./container/index.md) では、永続データボリュームを維持したイメージの置き換えを扱います。
+- [Kubernetes](./kubernetes/index.md) では、Helm と Operator が管理するワークロードを扱います。
 
-Before any upgrade, read the target release notes and confirm the cluster is healthy.
+どのアップグレードでも、実施前に対象リリースのリリースノートを読み、クラスターが正常であることを確認します。

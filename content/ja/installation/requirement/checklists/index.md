@@ -1,24 +1,24 @@
 ---
-title: "Checklist"
-description: "Pre-installation checklists."
+title: "インストール前チェックリスト"
+description: "本番環境に必要な準備を確認するための、インストール前チェックリストです。"
 ---
 
-These checklists cover the necessary preparations for a production environment.
+これらのチェックリストは、本番環境に必要な準備をまとめたものです。
 
 :::note
 
-These are general guidelines. Adjust them based on your specific architecture and requirements.
+これらは一般的な指針です。具体的なアーキテクチャと要件に合わせて調整します。
 
 :::
 
-For professional support, contact us at hello@rustfs.com.
+プロフェッショナルサポートが必要な場合は、hello@rustfs.com に問い合わせてください。
 
-For community support, submit an issue on GitHub.
+コミュニティサポートが必要な場合は、GitHub で issue を作成します。
 
-## Checklist
+## チェックリスト
 
-- [Hardware Checklist](./hardware-checklists.md)
-- [Hardware Selection](./hardware-selection.md)
-- [Security Checklist](./security-checklists.md)
-- [Software Checklist](./software-checklists.md)
-- [Network Checklist](./network-checklists.md)
+- [ハードウェアチェックリスト](./hardware-checklists.md)
+- [ハードウェアの選定](./hardware-selection.md)
+- [セキュリティチェックリスト](./security-checklists.md)
+- [ソフトウェアチェックリスト](./software-checklists.md)
+- [ネットワークチェックリスト](./network-checklists.md)

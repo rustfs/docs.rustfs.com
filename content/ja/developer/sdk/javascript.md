@@ -1,39 +1,39 @@
 ---
-title: "JavaScript SDK Guide"
-description: "Use the official AWS SDK for JavaScript v3 with RustFS."
+title: "JavaScript"
+description: "公式の AWS SDK for JavaScript v3 を RustFS で使います。"
 ---
 
-## I. Overview
+## 概要
 
-RustFS ships no first-party JavaScript SDK — it is S3-compatible, so you use the official AWS SDK for JavaScript (v3) configured to point at your RustFS server. This guide shows how to connect to RustFS and perform common object storage operations.
+RustFS は独自の JavaScript SDK を提供していません。S3 互換であるため、公式の AWS SDK for JavaScript（v3）を、RustFS サーバーを指すように設定して使います。このガイドでは、RustFS への接続と、オブジェクトストレージの一般的な操作を説明します。
 
-## II. Prerequisites
+## 前提条件
 
-* Node.js 18 or later
-* A running RustFS instance (see the [Installation Guide](../../installation/index.md)) — the S3 API listens on port `9000`, the Console on port `9001`
-* Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (see [Access Key Management](../../security-compliance/iam/access-token.md))
+* Node.js 18 以降
+* 稼働している RustFS インスタンス（[インストールガイド](../../installation/index.md)を参照）。S3 API はポート `9000`、Console はポート `9001` で待ち受けます
+* インストール時に環境変数 `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` で設定するアクセスキー（[アクセスキーの管理](../../security-compliance/iam/access-token.md)を参照）
 
-:::tip[Local test]
+:::tip[ローカル検証]
 
-If you did not set credentials at install time, the server defaults to `rustfsadmin` / `rustfsadmin` — fine for a throwaway local trial, never for anything reachable by others.
+インストール時に認証情報を設定しなかった場合、サーバーの既定値は `rustfsadmin` / `rustfsadmin` です。使い捨てのローカル検証であれば問題ありませんが、外部から到達できる環境では使わないでください。
 
 :::
 
-### 2.1 SDK Installation
+### SDK のインストール
 
-Install the required AWS SDK v3 modules with NPM:
+npm で、必要な AWS SDK v3 のモジュールをインストールします。
 
 ```bash
 npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
 ```
 
-The examples below use ES modules (`import`). Set `"type": "module"` in your `package.json`, or save the files with the `.mjs` extension.
+以下の例は ES modules（`import`）を使います。`package.json` に `"type": "module"` を設定するか、ファイルの拡張子を `.mjs` にします。
 
 ---
 
-## III. Initializing the Client
+## クライアントの初期化
 
-The following is a complete, runnable script. Replace `localhost` with your server's IP address if RustFS runs on another machine, and fill in your own access keys:
+次のスクリプトは、そのまま実行できます。RustFS が別のマシンで動作している場合は `localhost` をサーバーの IP アドレスに置き換え、アクセスキーも自分の値にします。
 
 ```js title="main.mjs"
 import { S3Client, ListBucketsCommand } from "@aws-sdk/client-s3";
@@ -53,7 +53,7 @@ const { Buckets } = await s3.send(new ListBucketsCommand({}));
 console.log(Buckets?.map((b) => b.Name) ?? []);
 ```
 
-Run it:
+実行します。
 
 ```bash
 node main.mjs
@@ -63,13 +63,13 @@ node main.mjs
 [ 'my-bucket' ]
 ```
 
-All snippets below reuse this `s3` client.
+以下のコード片は、すべてこの `s3` クライアントを再利用します。
 
 ---
 
-## IV. Basic Operations
+## 基本操作
 
-### 4.1 Create Bucket
+### 4.1 バケットの作成
 
 ```js
 import { CreateBucketCommand } from "@aws-sdk/client-s3";
@@ -84,7 +84,7 @@ Bucket created
 
 ---
 
-### 4.2 Upload Object
+### 4.2 オブジェクトのアップロード
 
 ```js
 import { PutObjectCommand } from "@aws-sdk/client-s3";
@@ -109,7 +109,7 @@ File uploaded
 
 ---
 
-### 4.3 Download Object
+### 4.3 オブジェクトのダウンロード
 
 ```js
 import { GetObjectCommand } from "@aws-sdk/client-s3";
@@ -137,7 +137,7 @@ File downloaded
 
 ---
 
-### 4.4 List Objects
+### 4.4 オブジェクトの一覧
 
 ```js
 import { ListObjectsV2Command } from "@aws-sdk/client-s3";
@@ -152,7 +152,7 @@ hello.txt (12 bytes)
 
 ---
 
-### 4.5 Delete Object
+### 4.5 オブジェクトの削除
 
 ```js
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
@@ -167,13 +167,13 @@ File deleted
 
 ---
 
-## V. Advanced Features
+## 高度な機能
 
-### 5.1 Generate Presigned URLs
+### 5.1 署名付き URL の生成
 
-> Allows frontend or third parties to use temporary links for uploading/downloading files
+署名付き URL を使うと、ブラウザーのクライアントや第三者が、一時的なリンク経由でオブジェクトをアップロードまたはダウンロードできます。
 
-#### Download (GET)
+#### ダウンロード（GET）
 
 ```js
 import { GetObjectCommand } from "@aws-sdk/client-s3";
@@ -192,7 +192,7 @@ console.log("Presigned GET URL:", url);
 Presigned GET URL: http://localhost:9000/my-bucket/hello.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&...
 ```
 
-#### Upload (PUT)
+#### アップロード（PUT）
 
 ```js
 import { PutObjectCommand } from "@aws-sdk/client-s3";
@@ -209,7 +209,7 @@ console.log("Presigned PUT URL:", url);
 
 ---
 
-### 5.2 Multipart Upload
+### 5.2 マルチパートアップロード
 
 ```js
 import {
@@ -275,23 +275,23 @@ Multipart upload completed
 
 ---
 
-## VI. Common Issues and Notes
+## トラブルシューティング
 
-| Problem | Cause | Solution |
-| --------------------------- | -------------------- | --------------------------------------- |
-| SignatureDoesNotMatch | Wrong signature version | JS SDK v3 uses v4 by default, ensure RustFS supports v4 |
-| EndpointConnectionError | Endpoint address misconfigured or not started | Check if RustFS address is accessible |
-| NoSuchKey | File does not exist | Check if `Key` is spelled correctly |
-| InvalidAccessKeyId / Secret | Credentials misconfigured | Check `accessKeyId` / `secretAccessKey` configuration |
-| Upload failure (path issue) | Path-style not enabled | Set `forcePathStyle: true` |
+| 問題 | 原因 | 対処 |
+| --- | --- | --- |
+| SignatureDoesNotMatch | 署名の不一致 | SDK v3 は既定で SigV4 による署名を行います。認証情報、リージョン、エンドポイントを確認します |
+| EndpointConnectionError | エンドポイントのアドレス設定が誤っているか、サービスが起動していない | RustFS のアドレスへ到達できるか確認します |
+| NoSuchKey | オブジェクトが存在しない | `Key` の綴りが正しいか確認します |
+| InvalidAccessKeyId / Secret | 認証情報の設定が誤っている | `accessKeyId` / `secretAccessKey` の設定を確認します |
+| アップロードの失敗（パスの問題） | パススタイルアクセスが有効になっていない | `forcePathStyle: true` を設定します |
 
 ---
 
-## VII. Appendix: Frontend Upload Adaptation
+## 付録: ブラウザーからのアップロード
 
-Using presigned URLs allows browsers to upload files directly without passing AccessKey.
+署名付き URL を使うと、ブラウザーは認証情報を持たずにオブジェクトを直接アップロードできます。
 
-Frontend (HTML+JS) upload example:
+フロントエンド（HTML と JS）のアップロード例:
 
 ```html
 <input type="file" id="fileInput" />
@@ -312,4 +312,4 @@ Frontend (HTML+JS) upload example:
 </script>
 ```
 
-For other operations (object tagging, bucket policies, and more), see the [AWS SDK for JavaScript v3 documentation](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/) — every S3-compatible call works against RustFS the same way.
+オブジェクトのタグ付けやバケットポリシーなどの操作については、[AWS SDK for JavaScript v3 のドキュメント](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/)を参照します。ほとんどの S3 操作は、RustFS に対しても同じように動作します。例外は [S3 互換性](/ja/reference/s3-compatibility) を参照します。

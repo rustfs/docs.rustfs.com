@@ -1,17 +1,17 @@
 ---
-title: RustFS Single Node Single Disk Installation
-description: Install RustFS on a single disk of a single server, data will be stored on this one disk.
+title: シングルノード・シングルディスク（SNSD）
+description: すべてのデータを 1 台のディスクに保存する単一サーバーへ、RustFS をインストールします。
 ---
 
-In Single Node Single Disk (SNSD) mode, one server stores all data on a single data disk. It is the simplest deployment mode and the same topology that the [Linux Quick Start](./quick-start.md) script sets up.
+シングルノード・シングルディスク（SNSD）モードでは、1 台のサーバーがすべてのデータを 1 台のデータディスクに保存します。最も単純なデプロイ方式であり、[Linux クイックスタート](./quick-start.md) のスクリプトが設定するトポロジーと同じです。
 
 :::warning
 
-A single disk offers no redundancy: if the disk fails, data is lost. SNSD is suitable for development, testing, and low-density non-critical business. For production use, maintain regular data backups or choose [SNMD](./single-node-multiple-disk.md) / [MNMD](./multiple-node-multiple-disk.md).
+ディスクが 1 台の場合、冗長性はありません。ディスクが故障するとデータは失われます。SNSD は、開発、テスト、および小規模で重要度の低いワークロードに適しています。本番で使う場合は、定期的なデータバックアップを維持するか、[SNMD](./single-node-multiple-disk.md) または [MNMD](./multiple-node-multiple-disk.md) を選びます。
 
 :::
 
-## Topology and Planning
+## トポロジーと計画
 
 ```mermaid
 flowchart TD
@@ -23,17 +23,17 @@ flowchart TD
     class D1 disk
 ```
 
-- 1 server, 1 data disk (e.g., an XFS-formatted disk mounted at `/data/rustfs0`).
-- No erasure coding across disks — fault tolerance depends entirely on backups.
-- For production deployments, also review the [Pre-Installation Checklists](../requirement/checklists/index.md).
+- サーバー 1 台、データディスク 1 台（例: `/data/rustfs0` にマウントした XFS フォーマットのディスク）。
+- ディスク間のイレイジャーコーディングはありません。耐障害性はすべてバックアップに依存します。
+- 本番デプロイでは、[インストール前チェックリスト](../requirement/checklists/index.md) も確認します。
 
-## Prerequisites and Service Setup
+## 前提条件とサービスのセットアップ
 
-Complete the [common prerequisites and service setup](./prerequisites-and-service.md) — operating system, firewall, time synchronization, disk formatting, service user, binary download, and systemd unit — then continue below.
+[共通の前提条件とサービスのセットアップ](./prerequisites-and-service.md)（オペレーティングシステム、ファイアウォール、時刻同期、ディスクのフォーマット、サービスユーザー、バイナリのダウンロード、systemd ユニット）を完了してから、以下に進みます。
 
-## Configure Environment Variables
+## 環境変数を設定する
 
-1. Create the configuration file with the single-disk volume path:
+1. シングルディスクのボリュームパスを含む設定ファイルを作成します。
 
 ```ini title="/etc/default/rustfs"
 # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
@@ -47,44 +47,44 @@ RUSTFS_OBS_LOGGER_LEVEL=error
 RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
 ```
 
-2. Create the storage and log directories:
+2. ストレージとログのディレクトリを作成します。
 
 ```bash
 sudo mkdir -p /data/rustfs0 /var/log/rustfs /opt/tls
 sudo chmod -R 750 /data/rustfs* /var/log/rustfs
 ```
 
-## Start Service and Verification
+## サービスを起動して確認する
 
-1. Start the service and enable auto-start on boot:
+1. サービスを起動し、起動時に開始するよう有効にします。
 
 ```bash
 sudo systemctl enable --now rustfs
 ```
 
-2. Verify the service status:
+2. サービスの状態を確認します。
 
 ```bash
 systemctl status rustfs
 ```
 
-3. Check the service port:
+3. サービスのポートを確認します。
 
 ```bash
 netstat -ntpl
 ```
 
-4. View log files:
+4. ログファイルを表示します。
 
 ```bash
 tail -f /var/log/rustfs/rustfs*.log
 ```
 
-5. Access the console: enter the server's IP address and the console port (default 9001) in a browser. You should see:
+5. Console を開きます。ブラウザーで `http://<server-ip>:9001` にアクセスすると、次のように表示されます。
 
-![Console](./images/console.jpg)
+![Console の画面](./images/console.jpg)
 
-## Next Steps
+## 次のステップ
 
-- Need disk-level redundancy on one server? See [Single Node Multiple Disk Mode (SNMD)](./single-node-multiple-disk.md).
-- Need a production cluster? See [Multiple Node Multiple Disk Mode (MNMD)](./multiple-node-multiple-disk.md).
+- 1 台のサーバーでディスク単位の冗長性が必要な場合は、[シングルノード・マルチディスク（SNMD）](./single-node-multiple-disk.md) を参照します。
+- 本番クラスターが必要な場合は、[マルチノード・マルチディスク（MNMD）](./multiple-node-multiple-disk.md) を参照します。

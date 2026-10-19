@@ -1,83 +1,83 @@
 ---
 title: "FTP(S)"
-description: "Configure the RustFS FTP or FTPS gateway and manage buckets and objects with FTP clients."
+description: "RustFS の FTP または FTPS ゲートウェイを設定し、FTP クライアントでバケットとオブジェクトを管理する方法を説明します。"
 ---
 
-RustFS includes an FTP gateway that exposes buckets and objects to standard FTP clients. You can run it as unencrypted FTP for isolated local testing or as explicit FTP over TLS (FTPS) for encrypted connections. RustFS authenticates each session against Identity and Access Management (IAM) and applies the user's S3 policies to storage operations.
+RustFS には、バケットとオブジェクトを標準の FTP クライアントへ公開する FTP ゲートウェイが含まれます。隔離したローカルテストでは暗号化しない FTP として、暗号化接続では明示的な FTP over TLS（FTPS）として実行できます。RustFS は各セッションをアイデンティティとアクセス管理（IAM）に対して認証し、そのユーザーの S3 ポリシーをストレージ操作へ適用します。
 
-FTP and FTPS support is compiled into the standard RustFS binary, but both listeners are disabled at runtime by default. Enable only the listener you intend to use.
+FTP と FTPS のサポートは標準の RustFS バイナリにコンパイルされていますが、両方のリスナーは実行時に既定で無効です。使う予定のリスナーだけを有効にします。
 
-## Overview
+## 概要
 
-The gateway maps FTP paths to RustFS resources:
+ゲートウェイは、FTP のパスを RustFS のリソースへ対応付けます。
 
-| FTP path | RustFS resource |
+| FTP パス | RustFS のリソース |
 | --- | --- |
-| `/` | All buckets visible to the authenticated user |
-| `/my-bucket/` | The `my-bucket` bucket |
-| `/my-bucket/hello.txt` | The `hello.txt` object in `my-bucket` |
+| `/` | 認証されたユーザーから見えるすべてのバケット |
+| `/my-bucket/` | `my-bucket` バケット |
+| `/my-bucket/hello.txt` | `my-bucket` 内の `hello.txt` オブジェクト |
 
-The following FTP operations are supported:
+次の FTP 操作に対応しています。
 
-| FTP command | Operation |
+| FTP コマンド | 操作 |
 | --- | --- |
-| `LIST` | List buckets at the root or objects and prefixes in a bucket |
-| `MKD` | Create a bucket |
-| `CWD` | Enter a bucket |
-| `STOR` | Upload an object |
-| `RETR` | Download an object |
-| `DELE` | Delete an object |
-| `RMD` | Recursively delete a bucket and its objects |
+| `LIST` | ルートのバケット、またはバケット内のオブジェクトとプレフィックスを一覧します |
+| `MKD` | バケットを作成します |
+| `CWD` | バケットに入ります |
+| `STOR` | オブジェクトをアップロードします |
+| `RETR` | オブジェクトをダウンロードします |
+| `DELE` | オブジェクトを削除します |
+| `RMD` | バケットとそのオブジェクトを再帰的に削除します |
 
-RustFS does not currently support FTP rename operations or uploads that append to an existing object. Because S3 storage has no native working-directory or POSIX directory model, some client-specific filesystem operations may not behave like a traditional FTP server.
+RustFS は現時点では、FTP の名前変更と、既存オブジェクトへ追記するアップロードには対応していません。S3 ストレージにはネイティブな作業ディレクトリや POSIX のディレクトリモデルがないため、クライアント固有のファイルシステム操作は、従来の FTP サーバーと同じようには動作しない場合があります。
 
-Enter a RustFS access key as the FTP username and its secret key as the password. Invalid usernames and passwords both return `530 Not logged in`. After login, RustFS checks the IAM user's S3 permissions for each operation.
+FTP のユーザー名には RustFS のアクセスキーを、パスワードにはそのシークレットキーを入力します。無効なユーザー名とパスワードは、いずれも `530 Not logged in` を返します。ログイン後、RustFS は操作ごとに IAM ユーザーの S3 権限を確認します。
 
-:::danger[Plain FTP exposes credentials]
+:::danger[平文の FTP は認証情報を露出します]
 
-FTP sends credentials and data without encryption. Bind plain FTP to a loopback or isolated test network only. Use FTPS for every remote or production connection.
+FTP は、認証情報とデータを暗号化せずに送信します。平文の FTP は、ループバックまたは隔離したテストネットワークにだけバインドします。リモート接続と本番接続では、すべて FTPS を使います。
 
 :::
 
-:::warning[Bucket deletion is recursive]
+:::warning[バケットの削除は再帰的です]
 
-The current `RMD` implementation deletes the objects in the target bucket before deleting the bucket. Confirm the path before running `rmdir` in an FTP client.
+現在の `RMD` の実装は、バケットを削除する前に、対象バケット内のオブジェクトを削除します。FTP クライアントで `rmdir` を実行する前に、パスを確認します。
 
 :::
 
-## Configuration
+## 設定
 
-FTP and FTPS use separate listeners and environment variables.
+FTP と FTPS は、別々のリスナーと環境変数を使います。
 
-### FTP variables
+### FTP の変数
 
-| Variable | Description | Default |
+| 変数 | 説明 | 既定値 |
 | --- | --- | --- |
-| `RUSTFS_FTP_ENABLE` | Enables the unencrypted FTP listener. | `false` |
-| `RUSTFS_FTP_ADDRESS` | Bind address for FTP control connections. | `0.0.0.0:8021` |
-| `RUSTFS_FTP_PASSIVE_PORTS` | Inclusive passive data port range in `start-end` format. | `40000-50000` |
-| `RUSTFS_FTP_EXTERNAL_IP` | Public IP or hostname advertised to passive clients when RustFS is behind NAT. | Not set |
+| `RUSTFS_FTP_ENABLE` | 暗号化しない FTP リスナーを有効にします。 | `false` |
+| `RUSTFS_FTP_ADDRESS` | FTP 制御接続のバインドアドレスです。 | `0.0.0.0:8021` |
+| `RUSTFS_FTP_PASSIVE_PORTS` | `start-end` 形式の、両端を含むパッシブデータポートの範囲です。 | `40000-50000` |
+| `RUSTFS_FTP_EXTERNAL_IP` | RustFS が NAT の背後にあるとき、パッシブクライアントへ通知する公開 IP またはホスト名です。 | 未設定 |
 
-### FTPS variables
+### FTPS の変数
 
-| Variable | Description | Default |
+| 変数 | 説明 | 既定値 |
 | --- | --- | --- |
-| `RUSTFS_FTPS_ENABLE` | Enables the explicit FTPS listener. | `false` |
-| `RUSTFS_FTPS_ADDRESS` | Bind address for FTPS control connections. | `0.0.0.0:8022` |
-| `RUSTFS_FTPS_TLS_ENABLED` | Enables TLS on the FTPS listener. Keep this enabled for FTPS. | `true` |
-| `RUSTFS_FTPS_CERTS_DIR` | Directory containing the FTPS certificate and private key. Required for FTPS. | Not set |
-| `RUSTFS_FTPS_PASSIVE_PORTS` | Inclusive passive data port range in `start-end` format. | `40000-50000` |
-| `RUSTFS_FTPS_EXTERNAL_IP` | Public IP or hostname advertised to passive clients when RustFS is behind NAT. | Not set |
+| `RUSTFS_FTPS_ENABLE` | 明示的な FTPS リスナーを有効にします。 | `false` |
+| `RUSTFS_FTPS_ADDRESS` | FTPS 制御接続のバインドアドレスです。 | `0.0.0.0:8022` |
+| `RUSTFS_FTPS_TLS_ENABLED` | FTPS リスナーで TLS を有効にします。FTPS では有効のままにします。 | `true` |
+| `RUSTFS_FTPS_CERTS_DIR` | FTPS の証明書と秘密鍵を含むディレクトリです。FTPS では必須です。 | 未設定 |
+| `RUSTFS_FTPS_PASSIVE_PORTS` | `start-end` 形式の、両端を含むパッシブデータポートの範囲です。 | `40000-50000` |
+| `RUSTFS_FTPS_EXTERNAL_IP` | RustFS が NAT の背後にあるとき、パッシブクライアントへ通知する公開 IP またはホスト名です。 | 未設定 |
 
-The standard RustFS build enables the `ftps` compile-time feature, which provides both FTP and FTPS. If you build RustFS with `--no-default-features`, include the feature explicitly:
+標準の RustFS ビルドでは、FTP と FTPS の両方を提供するコンパイル時機能 `ftps` が有効です。`--no-default-features` で RustFS をビルドする場合は、この機能を明示的に含めます。
 
 ```bash
 cargo build --release --features ftps
 ```
 
-### Local testing with FTP
+### FTP でのローカルテスト
 
-Start an unencrypted FTP listener on the loopback interface:
+ループバックインターフェースで、暗号化しない FTP リスナーを起動します。
 
 ```bash
 export RUSTFS_FTP_ENABLE=true
@@ -89,11 +89,11 @@ export RUSTFS_SECRET_KEY=<your-secret-key>
 rustfs /path/to/data
 ```
 
-Binding to `127.0.0.1` prevents remote hosts from connecting to the unencrypted listener.
+`127.0.0.1` にバインドすると、リモートホストは暗号化されていないリスナーへ接続できません。
 
-### Prepare a test certificate
+### テスト用証明書を用意する
 
-FTPS expects `rustfs_cert.pem` and `rustfs_key.pem` in the certificate directory. For local testing, create a short-lived self-signed certificate:
+FTPS は、証明書ディレクトリに `rustfs_cert.pem` と `rustfs_key.pem` があることを前提とします。ローカルテストでは、有効期間の短い自己署名証明書を作成します。
 
 ```bash
 mkdir -p /path/to/ftps-certs
@@ -106,11 +106,11 @@ openssl req -x509 -newkey rsa:2048 -nodes \
 	-addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
 ```
 
-Use a certificate issued by a trusted certificate authority in production. Protect `rustfs_key.pem` from unauthorized access and ensure the certificate subject alternative names match the host clients use.
+本番では、信頼できる認証局が発行した証明書を使います。`rustfs_key.pem` を不正なアクセスから保護し、証明書のサブジェクト代替名が、クライアントの使うホストと一致するようにします。
 
-### Start FTPS
+### FTPS を起動する
 
-Configure an explicit FTPS listener:
+明示的な FTPS リスナーを設定します。
 
 ```bash
 export RUSTFS_FTPS_ENABLE=true
@@ -122,44 +122,44 @@ export RUSTFS_FTPS_PASSIVE_PORTS=40000-50000
 rustfs /path/to/data
 ```
 
-RustFS requires TLS on both the FTPS control and data channels. Configure clients for **explicit FTP over TLS**, sometimes labeled **FTPES** or **Require explicit FTP over TLS**. Implicit FTPS is not the mode implemented by this listener.
+RustFS は、FTPS の制御チャネルとデータチャネルの両方で TLS を必須とします。クライアントは **explicit FTP over TLS**（明示的な FTP over TLS）に設定します。**FTPES**、または **Require explicit FTP over TLS**（明示的な FTP over TLS を必須にする）と表示される場合もあります。暗黙的 FTPS は、このリスナーが実装する方式ではありません。
 
-If the certificate directory is missing, does not exist, or does not contain a usable certificate and key, FTPS initialization fails. See [Configure TLS](/integration/tls-configured) for general certificate guidance.
+証明書ディレクトリが未指定である、存在しない、または使える証明書と鍵を含まない場合、FTPS の初期化は失敗します。証明書全般の手順は、[TLS を設定する](/ja/integration/tls-configured)を参照します。
 
-### Configure passive connections
+### パッシブ接続を設定する
 
-FTP uses the control port for commands and a separate data connection for listings and file transfers. For passive mode:
+FTP はコマンドに制御ポートを使い、一覧とファイル転送には別のデータ接続を使います。パッシブモードでは、次のようにします。
 
-1. Allow inbound TCP traffic to the configured control port.
-2. Allow inbound TCP traffic to every port in the configured passive range.
-3. Set `RUSTFS_FTP_EXTERNAL_IP` or `RUSTFS_FTPS_EXTERNAL_IP` when clients connect through NAT or a load balancer.
+1. 設定した制御ポートへの受信 TCP トラフィックを許可します。
+2. 設定したパッシブ範囲のすべてのポートへの受信 TCP トラフィックを許可します。
+3. クライアントが NAT またはロードバランサー経由で接続する場合は、`RUSTFS_FTP_EXTERNAL_IP` または `RUSTFS_FTPS_EXTERNAL_IP` を設定します。
 
-For example, an FTPS server behind NAT can advertise its public hostname:
+たとえば、NAT の背後にある FTPS サーバーは、公開ホスト名を通知できます。
 
 ```bash
 export RUSTFS_FTPS_EXTERNAL_IP=storage.example.com
 export RUSTFS_FTPS_PASSIVE_PORTS=40000-40100
 ```
 
-Use the corresponding FTP-prefixed variables for the plain FTP listener. RustFS supports both active and passive transfer modes, but passive mode is generally easier to operate through client firewalls.
+平文の FTP リスナーには、対応する FTP 接頭辞の変数を使います。RustFS はアクティブとパッシブの両方の転送モードに対応しますが、クライアントのファイアウォール越しでは、一般にパッシブモードの方が運用しやすいです。
 
-## Usage
+## 使い方
 
-The examples use [`lftp`](https://lftp.yar.ru/) and the canonical `my-bucket` and `hello.txt` names. The IAM user must have the S3 permissions required for each operation.
+例では [`lftp`](https://lftp.yar.ru/) と、標準の名前である `my-bucket` および `hello.txt` を使います。IAM ユーザーには、各操作に必要な S3 権限が必要です。
 
-### Connect with FTP
+### FTP で接続する
 
-Use plain FTP only with the loopback test listener:
+平文の FTP は、ループバックのテストリスナーだけで使います。
 
 ```bash
 lftp -u <your-access-key> ftp://127.0.0.1:8021
 ```
 
-Enter the secret key when `lftp` prompts for a password.
+`lftp` がパスワードを求めたら、シークレットキーを入力します。
 
-### Connect with FTPS
+### FTPS で接続する
 
-Connect to the explicit FTPS listener and require encryption for control and data connections:
+明示的な FTPS リスナーへ接続し、制御接続とデータ接続の暗号化を必須にします。
 
 ```bash
 lftp -u <your-access-key> -e '
@@ -169,9 +169,9 @@ lftp -u <your-access-key> -e '
 '
 ```
 
-Enter the secret key when prompted. Keep certificate verification enabled in production.
+求められたらシークレットキーを入力します。本番では、証明書の検証を有効なままにします。
 
-For the self-signed local test certificate only, connect to `localhost` and disable certificate verification for that session:
+自己署名のローカルテスト証明書に限って、`localhost` へ接続し、そのセッションでは証明書の検証を無効にします。
 
 ```bash
 lftp -u <your-access-key> -e '
@@ -184,13 +184,13 @@ lftp -u <your-access-key> -e '
 
 :::warning
 
-Do not disable certificate verification in production. Install the issuing CA in the client trust store instead.
+本番では、証明書の検証を無効にしないでください。代わりに、発行元の CA をクライアントの信頼ストアへインストールします。
 
 :::
 
-### List buckets and create a bucket
+### バケットを一覧し、バケットを作成する
 
-At the `lftp` prompt, list the visible buckets and create `my-bucket`:
+`lftp` のプロンプトで、見えるバケットを一覧し、`my-bucket` を作成します。
 
 ```text
 lftp> cls -1 /
@@ -198,11 +198,11 @@ lftp> mkdir my-bucket
 lftp> cd my-bucket
 ```
 
-Bucket names must follow the same naming rules as buckets created through the S3 API.
+バケット名は、S3 API で作成するバケットと同じ命名規則に従う必要があります。
 
-### Upload and download an object
+### オブジェクトをアップロードおよびダウンロードする
 
-Upload `/path/to/hello.txt`, list the bucket, and download the object:
+`/path/to/hello.txt` をアップロードし、バケットを一覧して、オブジェクトをダウンロードします。
 
 ```text
 lftp> put /path/to/hello.txt -o hello.txt
@@ -210,11 +210,11 @@ lftp> ls
 lftp> get hello.txt -o hello.txt
 ```
 
-The upload replaces an object with the same key. Appending to an existing object is not supported.
+アップロードは、同じキーのオブジェクトを置き換えます。既存オブジェクトへの追記には対応していません。
 
-### Delete an object and bucket
+### オブジェクトとバケットを削除する
 
-Delete the object, return to the root, and delete the bucket:
+オブジェクトを削除し、ルートに戻って、バケットを削除します。
 
 ```text
 lftp> rm hello.txt
@@ -222,25 +222,25 @@ lftp> cd /
 lftp> rmdir my-bucket
 ```
 
-Remember that `rmdir` recursively removes remaining objects from the bucket before deleting it.
+`rmdir` は、バケットを削除する前に、残っているオブジェクトを再帰的に削除します。
 
-### Connect other clients
+### ほかのクライアントから接続する
 
-Use these settings in graphical FTP clients such as FileZilla or Cyberduck:
+FileZilla や Cyberduck などのグラフィカルな FTP クライアントでは、次の設定を使います。
 
-| Setting | FTP test listener | FTPS listener |
+| 設定 | FTP テストリスナー | FTPS リスナー |
 | --- | --- | --- |
-| Protocol | FTP | FTP over TLS (explicit) |
-| Host | `127.0.0.1` | Your FTPS hostname |
-| Port | `8021` | `8022` |
-| Username | RustFS access key | RustFS access key |
-| Password | RustFS secret key | RustFS secret key |
-| Transfer mode | Passive | Passive |
+| プロトコル | FTP | FTP over TLS（explicit） |
+| ホスト | `127.0.0.1` | 使用する FTPS のホスト名 |
+| ポート | `8021` | `8022` |
+| ユーザー名 | RustFS のアクセスキー | RustFS のアクセスキー |
+| パスワード | RustFS のシークレットキー | RustFS のシークレットキー |
+| 転送モード | パッシブ | パッシブ |
 
-If login succeeds but directory listings or transfers time out, check the passive port firewall rules and external IP setting first.
+ログインには成功しても、ディレクトリ一覧や転送がタイムアウトする場合は、まずパッシブポートのファイアウォール規則と外部 IP の設定を確認します。
 
-## Next steps
+## 次のステップ
 
-- [Manage credentials](/operations/credentials)
-- [Configure TLS](/integration/tls-configured)
-- [Check service status](/operations/status-check)
+- [認証情報を管理する](/ja/operations/credentials)
+- [TLS を設定する](/ja/integration/tls-configured)
+- [サービスの状態を確認する](/ja/operations/status-check)

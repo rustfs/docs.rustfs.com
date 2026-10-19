@@ -1,13 +1,13 @@
 ---
 title: "celld"
-description: "Run denoland celld — self-hosted Durable Objects — with fleet state on RustFS."
+description: "フリートの状態を RustFS に置き、セルフホストの Durable Objects である denoland celld を実行します。"
 ---
 
-This guide connects [celld](https://github.com/denoland/celld) — the self-hosted, distributed Durable Objects runtime from Denoland — to **RustFS** as its fleet bucket. You will run `celld diagnose` against a RustFS bucket (including the conditional-write probe), deploy a Counter worker, mutate Durable Object state over HTTP, restart celld, and confirm the state survives. The workflow was verified with celld v0.6.2 against `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、Denoland のセルフホスト型で分散した Durable Objects ランタイムである [celld](https://github.com/denoland/celld) を、フリートバケットとして **RustFS** に接続します。RustFS のバケットに対して `celld diagnose` を実行し（条件付き書き込みのプローブを含む）、Counter ワーカーをデプロイし、HTTP 経由で Durable Object の状態を変更し、celld を再起動して状態が残ることを確認します。この流れは celld v0.6.2 を `rustfs/rustfs-x86-musl:v2.3.1` に対して検証済みです。
 
-You need the `celld` binary, `esbuild` (for bundling), and Node.js to drive the deployed worker.
+`celld` バイナリ、バンドル用の `esbuild`、デプロイしたワーカーを操作するための Node.js が必要です。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -15,9 +15,9 @@ flowchart LR
 	celld -->|"LTX replicas + ownership + deploy"| RustFS["RustFS :9000"]
 ```
 
-celld keeps only a local WAL. Every committed SQLite write is captured in LTX format and uploaded to the fleet bucket; a conditional bucket write (put-if-not-exists) assigns node ownership. The bucket is the source of truth — nodes can crash or restart without losing Durable Object state.
+celld がローカルに持つのは WAL だけです。コミットされた SQLite の書き込みはすべて LTX 形式で捕捉され、フリートバケットへアップロードされます。条件付きのバケット書き込み（put-if-not-exists、存在しない場合のみ書き込み）がノードの所有権を割り当てます。バケットが正本であり、ノードがクラッシュしたり再起動したりしても Durable Object の状態は失われません。
 
-## 1. Install celld
+## 1. celld をインストールする
 
 ```bash
 curl -sLo /tmp/celld.gz \
@@ -31,15 +31,15 @@ celld --version
 celld 0.6.2
 ```
 
-Install esbuild as well — `celld deploy` bundles workers with it:
+esbuild もインストールします。`celld deploy` はこれでワーカーをバンドルします。
 
 ```bash
 npm install -g esbuild
 ```
 
-## 2. Diagnose the bucket
+## 2. バケットを診断する
 
-`celld diagnose` probes the bucket including the conditional write that celld requires for ownership fencing:
+`celld diagnose` は、所有権フェンシングに celld が必要とする条件付き書き込みを含め、バケットをプローブします。
 
 ```bash
 export S3_ENDPOINT=http://<your-rustfs-endpoint>:9000
@@ -58,11 +58,11 @@ ok bucket conditional write: create, reject-create, update, reject-stale
 ok fleet: 0 node lease(s) enumerated
 ```
 
-`ok bucket conditional write` is the important line — RustFS supports put-if-not-exists natively, so no fallback storage is needed.
+重要なのは `ok bucket conditional write` の行です。RustFS は put-if-not-exists をネイティブにサポートするため、フォールバック用のストレージは不要です。
 
-## 3. Start a node
+## 3. ノードを起動する
 
-A non-loopback `--listen` requires an explicit `--internal-listen`:
+ループバック以外の `--listen` には、明示的な `--internal-listen` が必要です。
 
 ```bash
 nohup celld --bucket s3://celld-demo \
@@ -76,9 +76,9 @@ INFO celld: host runtime initialized event="host_runtime" worker_count=4
 INFO celld::fleet: no deployment yet; run `celld deploy` ...
 ```
 
-## 4. Deploy the Counter worker
+## 4. Counter ワーカーをデプロイする
 
-Use the counter example from the celld repository — a Durable Object that increments `n` in SQLite storage on every request:
+celld リポジトリの counter サンプルを使います。リクエストのたびに SQLite ストレージ内の `n` を増やす Durable Object です。
 
 ```bash
 curl -sLo /tmp/celld.zip https://codeload.github.com/denoland/celld/zip/refs/tags/v0.6.2
@@ -93,9 +93,9 @@ Uploaded counter (0.02 sec)
 Current Version ID: bf5806589892a6cc
 ```
 
-## 5. Mutate Durable Object state
+## 5. Durable Object の状態を変更する
 
-Each request routes to the `Counter` Durable Object, which reads `n` from storage, increments, and writes it back:
+各リクエストは `Counter` Durable Object へルーティングされます。ストレージから `n` を読み、インクリメントして書き戻します。
 
 ```bash
 curl -s "http://127.0.0.1:18080/?name=rustfs"
@@ -109,9 +109,9 @@ curl -s "http://127.0.0.1:18080/?name=rustfs"
 {"n":3,"url":"http://127.0.0.1:18080/?name=rustfs"}
 ```
 
-## 6. Restart celld and verify persistence
+## 6. celld を再起動して永続化を確認する
 
-Kill the node, start it again, and hit the same URL — the counter continues from where it stopped, because the state was in RustFS the whole time:
+ノードを停止して再起動し、同じ URL にアクセスします。状態はずっと RustFS にあったため、カウンターは停止したところから続きます。
 
 ```bash
 pkill -f "celld --bucket"
@@ -126,7 +126,7 @@ curl -s "http://127.0.0.1:18080/?name=rustfs"
 {"n":4,"url":"http://127.0.0.1:18080/?name=rustfs"}
 ```
 
-List the bucket — the fleet state is all there:
+バケットを一覧します。フリートの状態がすべて入っています。
 
 ```bash
 rc ls rustfs/celld-demo/ -r | head -5
@@ -139,35 +139,35 @@ deploy/counter/bf5806589892a6cc/index.js
 deploy/counter/current.json
 ```
 
-![celld state stored in the RustFS Console](./images/rustfs-celld-state.png)
+![RustFS Console に保存された celld の状態](./images/rustfs-celld-state.png)
 
-## 7. Stop or reset
+## 7. 停止またはリセットする
 
 ```bash
 pkill -f "celld --bucket"
 rc rm rustfs/celld-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
 ### `bind --listen 127.0.0.0.1:8080 ... Address already in use`
 
-Port 8080 is commonly taken (a local GitLab registry or dev server). Move the Worker listener: `--listen 0.0.0.0:18080`.
+ポート 8080 はよく使われています（ローカルの GitLab レジストリや開発サーバーなど）。Worker のリスナーを移します。`--listen 0.0.0.0:18080` です。
 
 ### `a non-loopback --listen requires an explicit --internal-listen`
 
-Binding a public interface requires a separate peer listener: add `--internal-listen 0.0.0.0:9099 --advertise 127.0.0.1:9099`.
+パブリックなインターフェースにバインドする場合は、別のピア用リスナーが必要です。`--internal-listen 0.0.0.0:9099 --advertise 127.0.0.1:9099` を追加します。
 
 ### `esbuild not found`
 
-`celld deploy` bundles the worker with esbuild. Install it globally (`npm install -g esbuild`) or point `CELLD_ESBUILD` at the binary.
+`celld deploy` は esbuild でワーカーをバンドルします。グローバルにインストールする（`npm install -g esbuild`）か、`CELLD_ESBUILD` でバイナリを指定します。
 
-### `celld deploy` on the example prints `unknown command init for argo` at runtime
+### サンプルで `celld deploy` すると実行時に `unknown command init for argo` と表示される
 
-That means the executor container/pod is running an `argo` CLI binary instead of argoexec — a sign the wrong image was tagged as the executor in your cluster setup, unrelated to celld itself. On a plain host (no cluster) this does not occur.
+executor のコンテナまたは Pod が argoexec ではなく `argo` CLI のバイナリを実行していることを意味します。クラスター設定で誤ったイメージが executor としてタグ付けされている兆候であり、celld 自体とは関係ありません。クラスターのない通常のホストでは発生しません。
 
-## Next steps
+## 次のステップ
 
-- Compare with the [Cloudflare Durable Objects documentation](https://developers.cloudflare.com/durable-objects/) — celld runs the same programming model on your own bucket.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [celld README](https://github.com/denoland/celld) for multi-node fleets: point a second node at the same bucket and let conditional writes elect the owner.
+- [Cloudflare Durable Objects のドキュメント](https://developers.cloudflare.com/durable-objects/)と比較してください。celld は同じプログラミングモデルを、自前のバケット上で実行します。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
+- [celld の README](https://github.com/denoland/celld)に従い、マルチノードのフリートを構成します。2 台目のノードを同じバケットに向け、条件付き書き込みで所有者を選出します。

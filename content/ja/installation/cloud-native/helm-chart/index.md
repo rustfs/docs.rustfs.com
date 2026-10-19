@@ -1,21 +1,21 @@
 ---
-title: Overview
-description: Understand how the RustFS Helm chart deploys standalone and distributed clusters on Kubernetes.
+title: 概要
+description: RustFS の Helm チャートが、Kubernetes 上のスタンドアロンおよび分散クラスターをどのようにデプロイするかを説明します。
 ---
 
-The official **RustFS Helm chart** deploys one RustFS cluster directly into Kubernetes. Helm renders the workload, Services, credentials, configuration, PersistentVolumeClaims (PVCs), Ingress, and optional certificate resources from a single values file.
+公式の **RustFS Helm チャート**は、1 つの RustFS クラスターを Kubernetes へ直接デプロイします。Helm は、1 つの values ファイルから、ワークロード、Service、認証情報、設定、PersistentVolumeClaim（PVC）、Ingress、任意の証明書リソースを生成します。
 
-The chart supports two deployment modes:
+チャートは 2 つのデプロイモードに対応しています。
 
-- **Standalone** creates one Pod with one data PVC. Use it for evaluation and development.
-- **Distributed** creates a StatefulSet with multiple Pods and data PVCs. `replicaCount` controls the number of Pods and `drivesPerNode` controls the number of data PVCs mounted by each Pod.
+- **スタンドアロン**は、データ PVC を 1 つ持つ Pod を 1 つ作成します。評価と開発に使います。
+- **分散**は、複数の Pod とデータ PVC を持つ StatefulSet を作成します。`replicaCount` は Pod 数を、`drivesPerNode` は各 Pod がマウントするデータ PVC の数を制御します。
 
-Distributed mode is enabled by default. The chart also supports multiple append-only server pools, but a single explicit topology is easier to operate for an initial deployment. Credentials must be supplied through chart values or an existing Secret; the chart rejects empty and well-known default credentials unless insecure development defaults are explicitly enabled.
+分散モードはデフォルトで有効です。チャートは、追記のみのストレージプールを複数持つ構成にも対応していますが、初期のデプロイでは、明示した単一のトポロジーの方が運用しやすいです。認証情報は、チャートの値または既存の Secret で指定する必要があります。安全でない開発用のデフォルトを明示的に有効にしない限り、チャートは空の値と周知のデフォルト認証情報を拒否します。
 
-Use the Helm chart when you want Helm to manage one RustFS cluster. Use the [RustFS Operator](../operator/index.md) when you need Kubernetes custom resources, multiple Tenants, or Operator-driven pool management.
+1 つの RustFS クラスターを Helm で管理する場合は、Helm チャートを使います。Kubernetes のカスタムリソース、複数の Tenant、Operator によるプール管理が必要な場合は、[RustFS Operator](../operator/index.md) を使います。
 
-## Helm chart workflows
+## Helm チャートのワークフロー
 
-- [Install](./installation.mdx) covers requirements and standalone or distributed deployment.
-- [mTLS](./mtls.md) encrypts and authenticates traffic between RustFS Pods.
-- [cert-manager](./cert-manager.md) issues and renews certificates for RustFS Ingress and mTLS.
+- [インストール](./installation.mdx)では、要件と、スタンドアロンまたは分散でのデプロイを扱います。
+- [mTLS](./mtls.md)では、RustFS の Pod 間トラフィックを暗号化し、認証します。
+- [cert-manager](./cert-manager.md)では、RustFS の Ingress と mTLS 向けの証明書を発行し、更新します。

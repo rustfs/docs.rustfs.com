@@ -1,13 +1,13 @@
 ---
 title: "OpenSearch"
-description: "Snapshot OpenSearch indices to RustFS with the repository-s3 plugin."
+description: "repository-s3 プラグインで、OpenSearch インデックスのスナップショットを RustFS に保存します。"
 ---
 
-This guide connects [OpenSearch](https://github.com/opensearch-project/OpenSearch) — the open-source search and analytics suite derived from Elasticsearch — to **RustFS** through the `repository-s3` plugin. You will register an S3 snapshot repository backed by a RustFS bucket, take a snapshot of an index, and restore it. The workflow was verified with `opensearchproject/opensearch:3.8.0` and the bundled `repository-s3` plugin against `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、Elasticsearch から派生したオープンソースの検索・分析スイートである [OpenSearch](https://github.com/opensearch-project/OpenSearch) を、`repository-s3` プラグイン経由で **RustFS** に接続します。RustFS のバケットをバックエンドとする S3 スナップショットリポジトリを登録し、インデックスのスナップショットを取得して復元します。この流れは `opensearchproject/opensearch:3.8.0` と同梱の `repository-s3` プラグインを、`rustfs/rustfs-x86-musl:v2.3.1` に対して検証済みです。
 
-You need Docker, or an OpenSearch node where you can install plugins and edit configuration. This deployment is intended for local integration testing, not production.
+Docker、またはプラグインをインストールして設定を編集できる OpenSearch ノードが必要です。このデプロイはローカルでの統合テストを目的としており、本番環境向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -16,11 +16,11 @@ flowchart LR
 	RustFS -->|"restore"| OS
 ```
 
-The `repository-s3` plugin writes snapshots as shard archives plus metadata blobs in the bucket. Registration is cluster-wide, so every node needs the plugin and the same client configuration.
+`repository-s3` プラグインは、スナップショットをシャードアーカイブとメタデータのブロブとしてバケットに書き込みます。登録はクラスター全体に適用されるため、すべてのノードにプラグインと同じクライアント設定が必要です。
 
-## 1. Run OpenSearch
+## 1. OpenSearch を実行する
 
-Start a single node with security disabled and a small heap:
+セキュリティを無効にし、ヒープを小さくしたシングルノードを起動します。
 
 ```bash
 docker run -d --name opensearch --network oo-rustfs_default -p 9200:9200 \
@@ -30,20 +30,20 @@ docker run -d --name opensearch --network oo-rustfs_default -p 9200:9200 \
   opensearchproject/opensearch:3.8.0
 ```
 
-The node is ready when `curl http://localhost:9200` returns the cluster header (allow one to two minutes).
+`curl http://localhost:9200` がクラスター情報を返せば、ノードは準備完了です。1〜2 分かかることがあります。
 
-## 2. Install the repository-s3 plugin
+## 2. repository-s3 プラグインをインストールする
 
-The S3 repository plugin is not preloaded. Install it and restart the node:
+S3 リポジトリプラグインは事前に読み込まれていません。インストールしてノードを再起動します。
 
 ```bash
 docker exec opensearch bin/opensearch-plugin install --batch repository-s3
 docker restart opensearch
 ```
 
-## 3. Configure the S3 client
+## 3. S3 クライアントを設定する
 
-Credentials are secure settings: they belong in the OpenSearch keystore, not in the repository request or `opensearch.yml`. Create the keystore entries, replacing all connection placeholders:
+認証情報はセキュア設定です。リポジトリのリクエストや `opensearch.yml` ではなく、OpenSearch のキーストアに入れます。接続情報のプレースホルダーをすべて置き換えて、キーストアのエントリを作成します。
 
 ```bash
 docker exec opensearch sh -c \
@@ -52,7 +52,7 @@ docker exec opensearch sh -c \
    printf '<your-secret-key>' | bin/opensearch-keystore add -f -x s3.client.default.secret_key"
 ```
 
-Add the non-secure client settings to `config/opensearch.yml`:
+非セキュアなクライアント設定を `config/opensearch.yml` に追加します。
 
 ```yaml title="opensearch.yml"
 network.host: 0.0.0.0
@@ -62,21 +62,21 @@ s3.client.default.protocol: http
 s3.client.default.path_style_access: "true"
 ```
 
-Restart the node once more so it reads both the keystore and the new settings:
+キーストアと新しい設定の両方を読み込むよう、ノードをもう一度再起動します。
 
 ```bash
 docker restart opensearch
 ```
 
-Create the bucket while the node boots:
+ノードの起動中にバケットを作成します。
 
 ```bash
 rc mb rustfs/opensearch-snapshots
 ```
 
-## 4. Register the repository and snapshot
+## 4. リポジトリを登録してスナップショットを取得する
 
-Create a test index with a document, then register the repository:
+ドキュメント入りのテストインデックスを作成してから、リポジトリを登録します。
 
 ```bash
 curl -sX PUT http://localhost:9200/rustfs-demo -H "Content-Type: application/json" \
@@ -89,9 +89,9 @@ curl -sX PUT "http://localhost:9200/_snapshot/rustfs-repo" -H "Content-Type: app
   -d '{"type":"s3","settings":{"bucket":"opensearch-snapshots","region":"us-east-1","server_side_encryption_type":"bucket_default"}}'
 ```
 
-The `server_side_encryption_type: bucket_default` setting matters: without it the plugin requests SSE-S3, which a self-hosted RustFS without a server-side encryption master key rejects.
+`server_side_encryption_type: bucket_default` の設定が重要です。これがないとプラグインは SSE-S3 を要求し、サーバー側の暗号化のマスターキーがないセルフホストの RustFS は拒否します。
 
-Take a snapshot and wait for completion:
+スナップショットを取得し、完了を待ちます。
 
 ```bash
 curl -sX PUT "http://localhost:9200/_snapshot/rustfs-repo/snapshot-1?wait_for_completion=true" \
@@ -102,9 +102,9 @@ curl -sX PUT "http://localhost:9200/_snapshot/rustfs-repo/snapshot-1?wait_for_co
 {"snapshot":{"snapshot":"snapshot-1","state":"SUCCESS","indices":["rustfs-demo"],...}}
 ```
 
-## 5. Verify objects and restore
+## 5. オブジェクトを確認して復元する
 
-List the bucket:
+バケットを一覧します。
 
 ```bash
 rc ls rustfs/opensearch-snapshots/ -r
@@ -119,7 +119,7 @@ meta-kRgFBiuyQIyPo3_-CMp7Hw.dat
 snap-kRgFBiuyQIyPo3_-CMp7Hw.dat
 ```
 
-Delete the index and restore it from the snapshot:
+インデックスを削除し、スナップショットから復元します。
 
 ```bash
 curl -sX DELETE http://localhost:9200/rustfs-demo
@@ -131,42 +131,42 @@ curl -s http://localhost:9200/rustfs-demo/_doc/1
 {"_index":"rustfs-demo","_id":"1","found":true,"_source":{"product":"rustfs","via":"opensearch-snapshot"}}
 ```
 
-![OpenSearch snapshot stored in the RustFS Console](./images/rustfs-opensearch-snapshot.png)
+![RustFS Console に保存された OpenSearch のスナップショット](./images/rustfs-opensearch-snapshot.png)
 
-## 6. Stop or reset
+## 6. 停止またはリセットする
 
-To tear down the demo while keeping the bucket objects:
+バケット内のオブジェクトを残したままデモを破棄します。
 
 ```bash
 docker rm -f opensearch
 ```
 
-To delete the stored snapshots:
+保存したスナップショットを削除します。
 
 ```bash
 rc rm rustfs/opensearch-snapshots/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
 ### `Setting [access_key] is insecure, but property [allow_insecure_settings] is not set`
 
-Inline credentials in the repository request are rejected. Store them in the keystore as shown in step 3 — `access_key` and `secret_key` are secure settings in OpenSearch.
+リポジトリリクエスト内のインライン認証情報は拒否されます。手順 3 のとおりキーストアに保存します。OpenSearch では `access_key` と `secret_key` はセキュア設定です。
 
 ### `SSE-S3 requires RUSTFS_SSE_S3_MASTER_KEY ... (Status Code: 400)`
 
-The plugin encrypts uploads with SSE-S3 by default. Register the repository with `"server_side_encryption_type": "bucket_default"` so no encryption header is sent, as in step 4.
+プラグインはデフォルトで SSE-S3 によりアップロードを暗号化します。手順 4 のとおり `"server_side_encryption_type": "bucket_default"` でリポジトリを登録し、暗号化ヘッダーを送らないようにします。
 
-### `unknown setting [s3.client.default.access_key]` at startup
+### 起動時に `unknown setting [s3.client.default.access_key]` が出る
 
-The settings reference the repository-s3 plugin. If the node fails to start with them present, the plugin is not installed in that container — repeat step 2 (a fresh container loses plugins installed with `docker exec`).
+この設定は repository-s3 プラグインを参照します。設定がある状態でノードが起動に失敗する場合、そのコンテナにプラグインが入っていません。手順 2 をやり直します。新しいコンテナでは、`docker exec` でインストールしたプラグインは失われます。
 
-### Repository verification fails with `path is not accessible`
+### リポジトリ検証が `path is not accessible` で失敗する
 
-The node cannot reach the bucket: check that `s3.client.default.endpoint` is reachable from the container, `path_style_access` is `"true"`, and the keystore credentials were loaded (they are read at startup — restart after adding them).
+ノードがバケットに到達できません。`s3.client.default.endpoint` がコンテナから到達できること、`path_style_access` が `"true"` であること、キーストアの認証情報が読み込まれていることを確認します。認証情報は起動時に読まれるため、追加したあとは再起動します。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional OpenSearch repositories.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [OpenSearch snapshots documentation](https://docs.opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/index/) to automate snapshots with Snapshot Management (SM) policies.
+- 追加の OpenSearch リポジトリを採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認してください。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
+- [OpenSearch のスナップショットドキュメント](https://docs.opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/index/)に従い、Snapshot Management（SM）ポリシーでスナップショットを自動化してください。
