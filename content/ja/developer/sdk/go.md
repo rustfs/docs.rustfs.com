@@ -1,23 +1,23 @@
 ---
-title: "Golang SDK Guide"
-description: "Use the AWS SDK for Go v2 to operate on RustFS instances, including creating and deleting buckets and objects."
+title: "Golang"
+description: "AWS SDK for Go v2 で RustFS インスタンスを操作し、バケットとオブジェクトの作成および削除を行います。"
 ---
 
-RustFS ships no first-party Go SDK — it is fully S3-compatible, so you use the official AWS SDK for Go v2 configured to point at your RustFS server. Through the SDK, you can operate on RustFS, including creating and deleting buckets/objects, uploading and downloading files, etc.
+RustFS は独自の Go SDK を提供していません。S3 互換であるため、公式の AWS SDK for Go v2 を、RustFS サーバーを指すように設定して使います。この SDK で、バケットの作成と削除、およびオブジェクトのアップロード、ダウンロード、削除ができます。
 
-## Prerequisites
+## 前提条件
 
-- Go 1.21 or later
-- A working RustFS instance (refer to [Installation Guide](../../installation/index.md)) — the S3 API listens on port `9000`, the Console on port `9001`
-- Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (refer to [Access Key Management](../../security-compliance/iam/access-token.md))
+- Go 1.21 以降
+- 動作している RustFS インスタンス（[インストールガイド](../../installation/index.md)を参照）。S3 API はポート `9000`、Console はポート `9001` で待ち受けます
+- インストール時に環境変数 `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` で設定するアクセスキー（[アクセスキーの管理](../../security-compliance/iam/access-token.md)を参照）
 
-:::tip[Local test]
+:::tip[ローカル検証]
 
-If you did not set credentials at install time, the server defaults to `rustfsadmin` / `rustfsadmin` — fine for a throwaway local trial, never for anything reachable by others.
+インストール時に認証情報を設定しなかった場合、サーバーの既定値は `rustfsadmin` / `rustfsadmin` です。使い捨てのローカル検証であれば問題ありませんが、外部から到達できる環境では使わないでください。
 
 :::
 
-Install the SDK modules:
+SDK モジュールをインストールします。
 
 ```bash
 go mod init rustfs-go-demo
@@ -26,9 +26,9 @@ go get github.com/aws/aws-sdk-go-v2/credentials
 go get github.com/aws/aws-sdk-go-v2/service/s3
 ```
 
-## Initializing the Client
+## クライアントの初期化
 
-The following is a complete, runnable program. It reads its configuration from environment variables and initializes the client from an `aws.Config`:
+次のプログラムは、そのまま実行できます。環境変数から設定を読み取り、`aws.Config` でクライアントを初期化します。
 
 ```go title="main.go"
 package main
@@ -83,11 +83,11 @@ func main() {
 
 :::note
 
-These environment variable names (`RUSTFS_ENDPOINT_URL`, `RUSTFS_REGION`, `RUSTFS_ACCESS_KEY_ID`, `RUSTFS_SECRET_ACCESS_KEY`) are just this example's client-side conventions — they are read by your Go program, not by RustFS. They are distinct from the server-side `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` variables used when installing RustFS.
+これらの環境変数名（`RUSTFS_ENDPOINT_URL`、`RUSTFS_REGION`、`RUSTFS_ACCESS_KEY_ID`、`RUSTFS_SECRET_ACCESS_KEY`）は、この例だけのクライアント側の取り決めです。Go プログラムが読み取り、RustFS サーバーは参照しません。インストール時に使うサーバー側の `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` とは別の変数です。
 
 :::
 
-Run it (replace `localhost` with your server's IP address if RustFS runs on another machine):
+実行します（RustFS が別のマシンで動作している場合は、`localhost` をそのサーバーの IP アドレスに置き換えます）。
 
 ```bash
 export RUSTFS_ENDPOINT_URL="http://localhost:9000"
@@ -102,9 +102,9 @@ Buckets:
  - my-bucket
 ```
 
-You can now perform bucket and object operations. The snippets below run inside the `main` function above, reusing `client` and `ctx`.
+これで、バケットとオブジェクトを操作できます。以下のコード片は、上の `main` 関数の中で、`client` と `ctx` を再利用して実行します。
 
-## Create Bucket
+## バケットの作成
 
 ```go
 _, err = client.CreateBucket(ctx, &s3.CreateBucketInput{
@@ -120,7 +120,7 @@ fmt.Println("bucket created")
 bucket created
 ```
 
-## List Buckets
+## バケットの一覧
 
 ```go
 resp, err := client.ListBuckets(ctx, &s3.ListBucketsInput{})
@@ -139,7 +139,7 @@ Buckets:
  - my-bucket
 ```
 
-## Delete Bucket
+## バケットの削除
 
 ```go
 _, err = client.DeleteBucket(ctx, &s3.DeleteBucketInput{
@@ -155,7 +155,7 @@ fmt.Println("bucket deleted")
 bucket deleted
 ```
 
-## List Objects
+## オブジェクトの一覧
 
 ```go
 resp, err := client.ListObjectsV2(ctx, &s3.ListObjectsV2Input{
@@ -173,9 +173,9 @@ for _, obj := range resp.Contents {
  - hello.txt
 ```
 
-## Upload Object
+## オブジェクトのアップロード
 
-Uploading a string body (add `"strings"` to your imports):
+文字列をボディとしてアップロードします（import に `"strings"` を追加します）。
 
 ```go
 _, err = client.PutObject(ctx, &s3.PutObjectInput{
@@ -193,9 +193,9 @@ fmt.Println("object uploaded")
 object uploaded
 ```
 
-## Download Object
+## オブジェクトのダウンロード
 
-Reading the object body (add `"io"` to your imports):
+オブジェクトのボディを読み取ります（import に `"io"` を追加します）。
 
 ```go
 resp, err := client.GetObject(ctx, &s3.GetObjectInput{
@@ -219,4 +219,4 @@ fmt.Println("content is :", string(data))
 content is : hello rustfs
 ```
 
-For other operations (presigned URLs, multipart uploads, and more), see the [AWS SDK for Go v2 documentation](https://aws.github.io/aws-sdk-go-v2/docs/) — every S3-compatible call works against RustFS the same way.
+署名付き URL、マルチパートアップロードなどの操作については、[AWS SDK for Go v2 のドキュメント](https://aws.github.io/aws-sdk-go-v2/docs/)を参照します。ほとんどの S3 操作は、RustFS に対しても同じように動作します。例外は [S3 互換性](/ja/reference/s3-compatibility) を参照します。

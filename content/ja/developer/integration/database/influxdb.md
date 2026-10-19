@@ -274,6 +274,6 @@ docker compose logs create-bucket
 
 ## 次のステップ
 
-- 追加の S3 オペレーションを採用する前に、[S3 互換性ノート](/administration/protocols/s3)を確認してください。
-- [アクセスキー管理](/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
+- 追加の S3 オペレーションを採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認してください。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
 - [InfluxDB 3 Core ドキュメント](https://docs.influxdata.com/influxdb3/core/)に従って、telegraf や書き込み API をデータプロデューサーとして接続してください。

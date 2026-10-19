@@ -1,13 +1,13 @@
 ---
 title: "vLLM"
-description: "Serve LLM inference with vLLM loading model weights stored in RustFS."
+description: "RustFS に保存したモデルウェイトを読み込んで、vLLM で LLM 推論を提供します。"
 ---
 
-This guide connects [vLLM](https://github.com/vllm-project/vllm) — the high-throughput LLM inference engine — to **RustFS** as its model-weight store. You will upload a model into a RustFS bucket, expose the bucket to the vLLM host through an rclone mount, and serve the model with the OpenAI-compatible API. The workflow was verified with `vllm/vllm-openai-cpu` (vLLM 0.30.0) serving `facebook/opt-125m` from a RustFS bucket backed by `rustfs/rustfs-x86-musl:v2.3.1`, on a CPU-only host.
+このガイドでは、高スループットの LLM 推論エンジンである [vLLM](https://github.com/vllm-project/vllm) を、モデルウェイトのストアとして **RustFS** に接続します。モデルを RustFS のバケットへアップロードし、rclone マウントで vLLM ホストからバケットを参照し、OpenAI 互換 API でモデルを提供します。この流れは、CPU のみのホストで、`vllm/vllm-openai-cpu`（vLLM 0.30.0）が `rustfs/rustfs-x86-musl:v2.3.1` の RustFS バケットから `facebook/opt-125m` を提供する構成で検証済みです。
 
-You need Docker and an rclone binary on the host that runs vLLM. This deployment is intended for local integration testing, not production.
+vLLM を実行するホストには、Docker と rclone バイナリが必要です。このデプロイはローカルでの統合テストを目的としており、本番向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -17,17 +17,17 @@ flowchart LR
 	Client["OpenAI SDK / curl"] -->|"completions"| vLLM
 ```
 
-The bucket is the single copy of the model. Hosts that serve the model mount the bucket read-only, so every node pulls weights from RustFS and no local model store exists to drift.
+バケットがモデルの唯一のコピーです。モデルを提供するホストはバケットを読み取り専用でマウントするため、各ノードは RustFS からウェイトを取得し、内容がずれるローカルのモデルストアは残りません。
 
-:::note[Why an rclone mount]
+:::note[rclone マウントを使う理由]
 
-vLLM 0.30 loads `s3://` model paths through the RunAI model streamer, whose ranged reads currently fail against custom S3 endpoints such as RustFS (the loader errors with `File access error` on any non-zero offset). Mounting the bucket as a filesystem is the verified way to keep the weights in RustFS while vLLM reads them as local files.
+vLLM 0.30 は `s3://` のモデルパスを RunAI model streamer 経由で読み込みます。その範囲読み取りは、現時点では RustFS のようなカスタム S3 エンドポイントに対して失敗し、0 でないオフセットではローダーが `File access error` を返します。ウェイトを RustFS に置いたまま vLLM がローカルファイルとして読む、検証済みの方法は、バケットをファイルシステムとしてマウントすることです。
 
 :::
 
-## 1. Upload the model to RustFS
+## 1. モデルを RustFS にアップロードする
 
-Create the bucket and copy model weights into it, replacing all connection placeholders:
+接続用のプレースホルダーをすべて置き換え、バケットを作成してモデルウェイトをコピーします。
 
 ```ini title="rclone.conf"
 [rustfs]
@@ -44,11 +44,11 @@ rc mb rustfs/vllm-models
 rclone copy ./opt-125m rustfs:vllm-models/opt-125m --transfers 4
 ```
 
-Any Hugging Face layout works — `config.json`, the tokenizer files, and the weight files (`model.safetensors` or `pytorch_model.bin`). Keep one model per prefix so several models can share the bucket.
+Hugging Face のレイアウトであれば使えます。対象は `config.json`、トークナイザーのファイル、ウェイトファイル（`model.safetensors` または `pytorch_model.bin`）です。複数のモデルでバケットを共有できるよう、プレフィックスごとにモデルを 1 つにします。
 
-## 2. Mount the bucket on the vLLM host
+## 2. vLLM ホストでバケットをマウントする
 
-On the machine that runs vLLM, mount the bucket read-only for clients with `--allow-other`:
+vLLM を実行するマシンで、クライアント向けに `--allow-other` を付け、バケットを読み取り専用でマウントします。
 
 ```bash
 mkdir -p /mnt/vllm-models
@@ -61,9 +61,9 @@ ls /mnt/vllm-models/opt-125m/
 config.json  merges.txt  model.safetensors  tokenizer.json  vocab.json
 ```
 
-## 3. Run vLLM
+## 3. vLLM を実行する
 
-Start the CPU image against the mounted weights:
+マウントしたウェイトを対象に、CPU イメージを起動します。
 
 ```bash
 docker run -d --name vllm -p 8000:8000 --shm-size=2g \
@@ -73,7 +73,7 @@ docker run -d --name vllm -p 8000:8000 --shm-size=2g \
   --dtype float32 --max-model-len 256 --gpu-memory-utilization 0.15
 ```
 
-vLLM reads the weights through the mount — the container stays stateless and the model lives in RustFS. Wait for the server to come up:
+vLLM はマウント経由でウェイトを読みます。コンテナはステートレスのままで、モデルは RustFS にあります。サーバーの起動を待ちます。
 
 ```bash
 curl -s http://localhost:8000/v1/models | head -c 200
@@ -83,11 +83,11 @@ curl -s http://localhost:8000/v1/models | head -c 200
 {"object":"list","data":[{"id":"opt-125m","object":"model","created":...,"root":"/models/opt-125m",...}]}
 ```
 
-`--gpu-memory-utilization` controls the fraction of RAM reserved for the KV cache on the CPU backend; lower it on small hosts. `--dtype float32` matches what the CPU attention kernels support for this model.
+`--gpu-memory-utilization` は、CPU バックエンドで KV キャッシュ用に予約する RAM の割合を制御します。小規模なホストでは値を下げます。`--dtype float32` は、このモデルで CPU アテンションカーネルが対応する形式に合わせます。
 
-## 4. Run inference
+## 4. 推論を実行する
 
-Send an OpenAI-compatible completion request:
+OpenAI 互換の補完リクエストを送信します。
 
 ```bash
 curl -s http://localhost:8000/v1/completions \
@@ -101,7 +101,7 @@ curl -s http://localhost:8000/v1/completions \
  "finish_reason":"length",...}]}
 ```
 
-The request is standard OpenAI schema, so the Python client works unchanged:
+リクエストは標準の OpenAI スキーマなので、Python クライアントはそのまま動作します。
 
 ```python
 from openai import OpenAI
@@ -112,43 +112,44 @@ print(client.completions.create(
 ).choices[0].text)
 ```
 
-![vLLM model weights stored in the RustFS Console](./images/rustfs-vllm-models.png)
+![RustFS Console に保存された vLLM のモデルウェイト](./images/rustfs-vllm-models.png)
 
-## 5. Stop or reset
+## 5. 停止またはリセット
 
-To tear down the demo while keeping the bucket objects:
+バケット内のオブジェクトを残したままデモを解体するには、次を実行します。
 
 ```bash
 docker rm -f vllm
 fusermount -u /mnt/vllm-models
 ```
 
-To delete the stored model:
+保存したモデルを削除するには、次を実行します。
 
 ```bash
 rclone purge rustfs:vllm-models
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
 ### `Cannot find any model weights with /models/...`
 
-The mount had a stale directory cache or the weight files never made it to the bucket. Re-run `rclone copy` and confirm the files through the mount with `ls` before starting vLLM. A short `--dir-cache-time` (for example `10s`) helps while you iterate.
+マウントのディレクトリキャッシュが古いか、ウェイトファイルがバケットに届いていません。`rclone copy` を再実行し、vLLM を起動する前にマウント経由の `ls` でファイルを確認します。反復作業中は、短い `--dir-cache-time`（例: `10s`）が有効です。
 
 ### `Unsupported CPU attention configuration: head_dim=...`
 
-vLLM's CPU kernels support a fixed set of head dimensions. Tiny test models such as `hf-internal-testing/tiny-random-*` use exotic shapes that fail at request time — use a real small model such as `facebook/opt-125m`.
+vLLM の CPU カーネルが対応するヘッド次元は、固定の集合です。`hf-internal-testing/tiny-random-*` のような極小のテストモデルは特殊な形状を使うため、リクエスト時に失敗します。`facebook/opt-125m` のような実際の小型モデルを使います。
 
 ### `Insufficient space in /dev/shm`
 
-vLLM's CPU engine exchanges tensors through shared memory. Run the container with `--shm-size=2g` (or `--ipc=host`).
+vLLM の CPU エンジンは、共有メモリ経由でテンソルを交換します。コンテナは `--shm-size=2g`（または `--ipc=host`）で実行します。
 
-### Server exits with `Available memory on node 0 ... is less than desired CPU memory utilization`
+### `Available memory on node 0 ... is less than desired CPU memory utilization` でサーバーが終了する
 
-The default KV-cache reservation is 90% of system RAM. Lower it with `--gpu-memory-utilization 0.15` (the flag applies to the CPU backend as a memory fraction despite its name).
+KV キャッシュの既定の予約は、システム RAM の 90% です。`--gpu-memory-utilization 0.15` で下げます。このフラグは名前にかかわらず、CPU バックエンドではメモリ割合として適用されます。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional serving setups.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [vLLM documentation](https://docs.vllm.ai/serving/openai_compatible_server.html) for chat templates, tensor parallelism, and quantized weights on top of the same bucket-backed model store.
+- 追加のサービング構成を採用する前に、[S3 互換性に関する注意](/ja/administration/protocols/s3)を確認します。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- [vLLM ドキュメント](https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html)に従い、同じバケットをバックエンドにしたモデルストアの上で、チャットテンプレート、テンソル並列、量子化ウェイトを確認します。
+

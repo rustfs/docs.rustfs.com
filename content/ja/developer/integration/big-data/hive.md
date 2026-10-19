@@ -1,13 +1,13 @@
 ---
 title: "Hive"
-description: "Store Hive table data on RustFS over S3A."
+description: "S3A 経由で Hive のテーブルデータを RustFS に保存します。"
 ---
 
-This guide connects [Apache Hive](https://github.com/apache/hive) — the classic data warehouse — to **RustFS** through the S3A filesystem. You will run the Hive 4.0.1 Docker image with a metastore and HiveServer2, configure S3A in three configuration layers, create an external table over a RustFS location, and load and query data. The workflow was verified with Hive 4.0.1 against `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、従来型のデータウェアハウスである [Apache Hive](https://github.com/apache/hive) を、S3A ファイルシステムを通じて **RustFS** に接続します。メタストアと HiveServer2 を含む Hive 4.0.1 の Docker イメージを実行し、3 つの設定レイヤーで S3A を構成し、RustFS のロケーション上に外部テーブルを作成して、データのロードとクエリを行います。この流れは、Hive 4.0.1 を `rustfs/rustfs-x86-musl:v2.3.1` に対して検証済みです。
 
-You need Docker (two containers: metastore and hiveserver2).
+Docker が必要です（コンテナは 2 つ、metastore と hiveserver2 です）。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -16,9 +16,9 @@ flowchart LR
 	HS2 -->|"Tez tasks: S3A"| RustFS["RustFS :9000"]
 ```
 
-Hive stores table metadata in the metastore (Derby in this test) and table data in the table's S3A location. Query execution runs on Tez inside the hiveserver2 container.
+Hive は、テーブルのメタデータをメタストア（この検証では Derby）に、テーブルデータをテーブルの S3A ロケーションに保存します。クエリの実行は hiveserver2 コンテナ内の Tez で行われます。
 
-## 1. Run the metastore and HiveServer2
+## 1. メタストアと HiveServer2 を実行する
 
 ```bash
 docker run -d --name hive-metastore --hostname hive-meta --network oo-rustfs_default \
@@ -28,11 +28,11 @@ docker run -d --name hive-server --hostname hive-server --network oo-rustfs_defa
   -e SERVICE_NAME=hiveserver2 -e DB_DRIVER=derby apache/hive:4.0.1
 ```
 
-The metastore takes 1-2 minutes to initialize its Derby schema; HiveServer2 listens on 10000, the metastore on 9083.
+メタストアが Derby スキーマを初期化するまで 1〜2 分かかります。HiveServer2 は 10000、メタストアは 9083 で待ち受けます。
 
-## 2. Configure S3A in three places
+## 2. S3A を 3 箇所に設定する
 
-Tez tasks read the Hadoop configuration directory, HiveServer2 reads the Hive configuration, and the metastore needs the endpoint too. Create one properties file and copy it to all three paths:
+Tez のタスクは Hadoop の設定ディレクトリを読み、HiveServer2 は Hive の設定を読みます。メタストアにもエンドポイントが必要です。プロパティファイルを 1 つ作成し、3 つのパスすべてへコピーします。
 
 ```xml title="s3a-core-site.xml"
 <?xml version="1.0"?>
@@ -61,9 +61,9 @@ docker exec hive-server bash -c \
 docker restart hive-server
 ```
 
-The `hadoop-aws` jar ships in `/opt/hadoop/share/hadoop/tools/lib` — the `HADOOP_CLASSPATH` export puts it on the query classpath. `mkdir /home/hive/.beeline` silences a harmless beeline home-directory error.
+`hadoop-aws` の JAR は `/opt/hadoop/share/hadoop/tools/lib` に同梱されています。`HADOOP_CLASSPATH` の export により、クエリのクラスパスに載ります。`mkdir /home/hive/.beeline` は、無害な beeline のホームディレクトリエラーを抑止します。
 
-## 3. Create an external table
+## 3. 外部テーブルを作成する
 
 ```bash
 docker exec hive-server bash -c "cd /opt/hive && beeline -u 'jdbc:hive2://localhost:10000' \
@@ -72,11 +72,11 @@ docker exec hive-server bash -c "cd /opt/hive && beeline -u 'jdbc:hive2://localh
   LOCATION 's3a://hive-demo/warehouse/events';\""
 ```
 
-An `EXTERNAL` table with an S3A `LOCATION` keeps all data in RustFS. (A managed `CREATE TABLE ... LOCATION` on a non-default database path is rejected by Hive 4 managed-table rules — use external tables for S3A locations.)
+S3A の `LOCATION` を持つ `EXTERNAL` テーブルは、すべてのデータを RustFS に保持します。（既定以外のデータベースパスに対する管理テーブルの `CREATE TABLE ... LOCATION` は、Hive 4 の管理テーブル規則により拒否されます。S3A のロケーションには外部テーブルを使います。）
 
-## 4. Load and query data
+## 4. データをロードしてクエリする
 
-`LOAD DATA INPATH` moves a local file into the table's S3A location (the rename is executed by HiveServer2, which has the credentials):
+`LOAD DATA INPATH` はローカルファイルをテーブルの S3A ロケーションへ移動します（リネームは、認証情報を持つ HiveServer2 が実行します）。
 
 ```bash
 docker exec hive-server bash -c "printf '1,alpha\n2,beta\n3,gamma\n' > /tmp/hive-load.txt"
@@ -88,7 +88,7 @@ docker exec hive-server bash -c "cd /opt/hive && beeline -u 'jdbc:hive2://localh
 INFO  : Loading data to table default.events from file:/tmp/hive-load.txt
 ```
 
-## 5. Query and verify in RustFS
+## 5. クエリし、RustFS で確認する
 
 ```bash
 docker exec hive-server bash -c "cd /opt/hive && beeline -u 'jdbc:hive2://localhost:10000' \
@@ -101,7 +101,7 @@ docker exec hive-server bash -c "cd /opt/hive && beeline -u 'jdbc:hive2://localh
 3	gamma
 ```
 
-List the table directory — the loaded file is an ordinary object:
+テーブルディレクトリを一覧表示します。ロードしたファイルは通常のオブジェクトです。
 
 ```bash
 rc ls rustfs/hive-demo/warehouse/events/
@@ -113,35 +113,35 @@ warehouse/events/hive-load_copy_1.txt
 warehouse/events/hive-load_copy_2.txt
 ```
 
-![Hive warehouse files stored in the RustFS Console](./images/rustfs-hive-warehouse.png)
+![RustFS Console に保存された Hive のウェアハウスファイル](./images/rustfs-hive-warehouse.png)
 
-## 6. Stop or reset
+## 6. 停止またはリセット
 
 ```bash
 docker rm -f hive-server hive-metastore
 rc rm rustfs/hive-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### `NoClassDefFoundError: org.apache.tez.mapreduce.hadoop.InputSplitInfo` on INSERT
+### INSERT 時の `NoClassDefFoundError: org.apache.tez.mapreduce.hadoop.InputSplitInfo`
 
-The Tez jars are missing from the query classpath. Add the `HADOOP_CLASSPATH` export from step 2 (tools lib + tez + tez lib) to `/opt/hive/conf/hive-env.sh`.
+クエリのクラスパスに Tez の JAR がありません。手順 2 の `HADOOP_CLASSPATH` の export（tools lib、tez、tez lib）を `/opt/hive/conf/hive-env.sh` に追加します。
 
 ### `NoAwsCredentialsException: SimpleAWSCredentialsProvider: No AWS credentials in the Hadoop configuration`
 
-Tez task processes read `/opt/hadoop/etc/hadoop/core-site.xml`, not only the Hive conf directory. Copy the S3A properties to all three paths from step 2.
+Tez のタスクプロセスが読むのは Hive の設定ディレクトリだけではありません。`/opt/hadoop/etc/hadoop/core-site.xml` も読みます。手順 2 の 3 つのパスすべてに S3A プロパティをコピーします。
 
-### `Permission denied` printed after every beeline command
+### beeline コマンドのたびに `Permission denied` が表示される
 
-beeline tries to create `/home/hive/.beeline`. Run `mkdir -p /home/hive/.beeline && chmod 777` once (as root in the container).
+beeline は `/home/hive/.beeline` の作成を試みます。コンテナ内で root として、`mkdir -p /home/hive/.beeline && chmod 777` を一度実行します。
 
 ### `Unable to create database managed path file:/user/hive/warehouse/...`
 
-Hive 4 keeps managed databases inside the managed warehouse root. Use `CREATE EXTERNAL TABLE ... LOCATION 's3a://...'` for S3A locations.
+Hive 4 は管理データベースを、管理ウェアハウスのルート内に保持します。S3A のロケーションには `CREATE EXTERNAL TABLE ... LOCATION 's3a://...'` を使います。
 
-## Next steps
+## 次のステップ
 
-- Compare with the [Trino](/developer/integration/database/trino) guide when you want interactive SQL over the same objects without a metastore.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Hive documentation](https://hive.apache.org/) to attach a MySQL-backed metastore and share the same warehouse across Hive and Spark on the same bucket.
+- メタストアなしで同じオブジェクトに対する対話的な SQL が必要な場合は、[Trino](/ja/developer/integration/database/trino) のガイドと比較します。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- [Hive ドキュメント](https://hive.apache.org/)に従い、MySQL をバックエンドにしたメタストアを接続し、同じバケット上のウェアハウスを Hive と Spark で共有します。

@@ -1,32 +1,32 @@
 ---
-title: "EC Configuration"
-description: "Plan and configure RustFS erasure-set size and parity before deploying storage pools."
+title: "EC 構成"
+description: "ストレージプールをデプロイする前に、RustFS のイレイジャーセットのサイズとパリティを計画し、設定します。"
 ---
 
-RustFS uses Reed-Solomon erasure coding (EC) to distribute each object across the drives in an erasure set. Use this page to estimate usable capacity, understand the automatic defaults, and decide whether your deployment needs an explicit parity setting.
+RustFS は Reed-Solomon イレイジャーコーディング（EC）を使い、各オブジェクトをイレイジャーセット内のドライブへ分散します。このページでは、使用可能な容量の見積もり、自動デフォルトの内容、デプロイに明示的なパリティ設定が必要かどうかの判断を説明します。
 
-## Understand the layout
+## レイアウトを理解する
 
-Each storage pool is divided into one or more erasure sets. For a set with `N` drives and `M` parity shards:
+各ストレージプールは、1 つ以上のイレイジャーセットに分かれます。ドライブ数 `N`、パリティシャード数 `M` のセットでは、次のとおりです。
 
-- data shards: `N - M`
-- parity shards: `M`
-- maximum unavailable shards that can be reconstructed: `M`
-- approximate capacity efficiency: `(N - M) / N`
+- データシャード: `N - M`
+- パリティシャード: `M`
+- 再構成できる、利用不能なシャードの最大数: `M`
+- おおよその容量効率: `(N - M) / N`
 
-For example, a 16-drive set with `EC:4` stores 12 data shards and 4 parity shards. Its approximate capacity efficiency is 75% before file-system, metadata, and operational overhead.
+たとえば、`EC:4` の 16 ドライブセットは、データシャード 12 個とパリティシャード 4 個を保存します。ファイルシステム、メタデータ、運用上のオーバーヘッドを除くと、おおよその容量効率は 75% です。
 
-:::note[Failure domains]
+:::note[障害ドメイン]
 
-Parity describes unavailable shards within one erasure set. Node-level fault tolerance depends on how the set's drives are distributed across nodes. Do not assume that `EC:4` always tolerates four complete node failures; a node can host multiple drives from the same set.
+パリティが示すのは、1 つのイレイジャーセット内で利用不能になったシャードです。ノード単位の耐障害性は、そのセットのドライブがノード間にどう配置されているかで決まります。`EC:4` であれば、ノード 4 台の完全停止に常に耐えられるわけではありません。1 台のノードが、同じセットに属する複数のドライブを持つことがあります。
 
 :::
 
-## Automatic parity
+## 自動パリティ
 
-We recommend leaving `RUSTFS_STORAGE_CLASS_STANDARD` unset unless you have a specific, validated durability or capacity requirement. RustFS derives STANDARD parity independently for each pool from its drives per erasure set:
+検証済みの特定の耐久性要件または容量要件がない限り、`RUSTFS_STORAGE_CLASS_STANDARD` は未設定のままにすることを推奨します。RustFS は、イレイジャーセットあたりのドライブ数から、プールごとに STANDARD のパリティを独立して算出します。
 
-| Drives per erasure set (`N`) | Automatic STANDARD parity | Data shards | Approximate efficiency |
+| イレイジャーセットあたりのドライブ数（`N`） | 自動の STANDARD パリティ | データシャード | おおよその効率 |
 | --- | --- | --- | --- |
 | 1 | `EC:0` | 1 | 100% |
 | 2–3 | `EC:1` | `N - 1` | 50%–67% |
@@ -34,82 +34,82 @@ We recommend leaving `RUSTFS_STORAGE_CLASS_STANDARD` unset unless you have a spe
 | 6–7 | `EC:3` | `N - 3` | 50%–57% |
 | 8–16 | `EC:4` | `N - 4` | 50%–75% |
 
-Multi-drive erasure sets contain between 2 and 16 drives. A single-drive deployment is a separate layout with zero parity.
+複数ドライブのイレイジャーセットに含まれるドライブ数は 2 から 16 です。シングルドライブのデプロイは、パリティがゼロの別のレイアウトです。
 
-:::warning[Use the set width, not the cluster total]
+:::warning[セット幅でパリティを検証する]
 
-Validate parity against the number of drives in each erasure set, not the total number of drives in the cluster. A cluster can contain multiple sets or pools with different widths.
+パリティは、クラスター内のドライブ総数ではなく、各イレイジャーセットのドライブ数に対して検証します。クラスターには、幅の異なる複数のセットやプールを含められます。
 
 :::
 
-## Estimate usable capacity
+## 使用可能な容量を見積もる
 
-For a pool whose sets all use the same width and parity, estimate EC capacity with:
+セットがすべて同じ幅とパリティを使うプールでは、次の式で EC の容量を見積もります。
 
 $$
 \text{usable capacity} \approx \text{raw capacity} \times \frac{N-M}{N}
 $$
 
-For example, 16 equal 10 TiB drives arranged as one 16-drive set with `EC:4` provide approximately:
+たとえば、それぞれ 10 TiB のドライブ 16 台を、`EC:4` の 16 ドライブセット 1 つとして配置した場合、おおよそ次の容量になります。
 
 $$
 160\ \text{TiB} \times \frac{16-4}{16} = 120\ \text{TiB}
 $$
 
-Reserve additional capacity for XFS, object metadata, versioning, incomplete uploads, healing, and normal operational headroom. Treat the result as a planning estimate, not guaranteed available space.
+XFS、オブジェクトのメタデータ、バージョニング、未完了のアップロード、データ修復、通常の運用上の余裕のために、追加の容量を確保します。この結果は計画用の見積もりであり、利用できる容量を保証するものではありません。
 
-## Configure parity
+## パリティを設定する
 
-Set EC variables in the same environment file used by the RustFS service, such as `/etc/default/rustfs`.
+EC の変数は、RustFS サービスが使う環境ファイル（例: `/etc/default/rustfs`）に設定します。
 
-To use the recommended automatic STANDARD parity, omit `RUSTFS_STORAGE_CLASS_STANDARD` or leave it empty:
+推奨する自動の STANDARD パリティを使うには、`RUSTFS_STORAGE_CLASS_STANDARD` を省略するか、空のままにします。
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_STORAGE_CLASS_STANDARD=
 ```
 
-To pin parity explicitly, use the `EC:<parity>` format:
+パリティを明示的に固定するには、`EC:<parity>` 形式を使います。
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_STORAGE_CLASS_STANDARD=EC:4
 RUSTFS_STORAGE_CLASS_RRS=EC:1
 ```
 
-`RUSTFS_STORAGE_CLASS_STANDARD` controls writes using the `STANDARD` storage class. `RUSTFS_STORAGE_CLASS_RRS` controls `REDUCED_REDUNDANCY` writes and defaults to one parity shard on multi-drive sets. RustFS accepts these two storage classes for local writes.
+`RUSTFS_STORAGE_CLASS_STANDARD` は、`STANDARD` ストレージクラスを使う書き込みを制御します。`RUSTFS_STORAGE_CLASS_RRS` は `REDUCED_REDUNDANCY` の書き込みを制御し、複数ドライブのセットではデフォルトでパリティシャードが 1 個です。RustFS は、ローカル書き込みについて、これら 2 つのストレージクラスを受け付けます。
 
-Explicit settings must satisfy all of these rules:
+明示的な設定は、次の規則をすべて満たす必要があります。
 
-- parity must be no greater than half of the drives in every target set: `M <= N / 2`
-- STANDARD parity must be greater than or equal to REDUCED_REDUNDANCY parity when both are non-zero
-- the configured parity must be valid for every pool, including the narrowest pool
+- パリティは、対象となるすべてのセットで、ドライブ数の半分以下である必要があります: `M <= N / 2`
+- 両方がゼロでない場合、STANDARD のパリティは REDUCED_REDUNDANCY のパリティ以上である必要があります
+- 設定したパリティは、最も狭いプールを含むすべてのプールで有効である必要があります
 
-RustFS validates explicit storage classes against each pool during startup. An invalid value causes startup to fail instead of silently reducing parity. Remove the explicit STANDARD value to return to per-pool automatic parity, or choose a value every pool can satisfy.
+RustFS は起動時に、明示的なストレージクラスを各プールに対して検証します。値が無効な場合、パリティを暗黙に下げることはせず、起動が失敗します。プールごとの自動パリティに戻すには、明示的な STANDARD の値を削除します。すべてのプールが満たせる値を選ぶこともできます。
 
-## Control erasure-set width
+## イレイジャーセットの幅を制御する
 
-RustFS normally selects a valid set width automatically from the volume topology. Multi-drive set widths range from 2 through 16.
+RustFS は通常、ボリュームトポロジーから有効なセット幅を自動的に選びます。複数ドライブのセット幅は 2 から 16 です。
 
-`RUSTFS_ERASURE_SET_DRIVE_COUNT` can pin the width when you need a specific symmetric layout:
+特定の対称レイアウトが必要な場合は、`RUSTFS_ERASURE_SET_DRIVE_COUNT` で幅を固定できます。
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_ERASURE_SET_DRIVE_COUNT=16
 ```
 
-The value must divide the pool topology symmetrically and be valid for every volume expansion pattern. RustFS rejects a width that cannot evenly partition the configured endpoints. Leave this variable unset unless you have verified the complete pool layout.
+この値は、プールトポロジーを対称に分割でき、すべてのボリューム拡張パターンで有効である必要があります。設定されたエンドポイントを均等に分割できない幅は、RustFS が拒否します。プールレイアウト全体を確認していない場合は、この変数を未設定のままにします。
 
-## Validate the configuration
+## 設定を検証する
 
-Before starting or restarting RustFS:
+RustFS を起動または再起動する前に、次を確認します。
 
-1. Determine the drives per erasure set for every pool.
-2. Confirm that explicit parity does not exceed half of the narrowest set width.
-3. Estimate usable capacity and reserve operational headroom.
-4. Keep the same service environment configuration on every node.
+1. すべてのプールについて、イレイジャーセットあたりのドライブ数を特定します。
+2. 明示的なパリティが、最も狭いセット幅の半分を超えないことを確認します。
+3. 使用可能な容量を見積もり、運用上の余裕を確保します。
+4. すべてのノードで、同じサービスの環境設定を維持します。
 
-After startup, use the Console **Status** page or `rc admin info cluster` to confirm the backend layout, erasure-coding parity, drive availability, and pool membership. See [Status Check](/operations/status-check) for the complete workflow.
+起動後は、Console の **Status**（ステータス）ページ、または `rc admin info cluster` で、バックエンドのレイアウト、イレイジャーコーディングのパリティ、ドライブの可用性、プールへの所属を確認します。手順の全体は [ステータス確認](/ja/operations/status-check) を参照してください。
 
-## Next steps
+## 次のステップ
 
-- [Prepare data disks](./disk-preparation.md)
-- [Choose a deployment topology](/installation#deployment-mode-comparison)
-- [Review all storage environment variables](/reference/environment-variables#storage--erasure)
+- [データディスクを準備する](./disk-preparation.md)
+- [デプロイトポロジーを選ぶ](/ja/installation#deployment-mode-comparison)
+- [ストレージ関連の環境変数をすべて確認する](/ja/reference/environment-variables#storage--erasure)

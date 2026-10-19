@@ -7,7 +7,7 @@ description: "RustFS の IAM ユーザーとグループの管理、ポリシー
 
 ## 要件
 
-- RustFS の管理コマンドを使う前に、[`rc`](/operations/rc) をインストールします。
+- RustFS の管理コマンドを使う前に、[`rc`](/ja/operations/rc) をインストールします。
 - 対応する `admin:*` アクションを許可する認証情報で、エイリアスを設定します。
 
 ## ユーザーの管理
@@ -74,7 +74,7 @@ description: "RustFS の IAM ユーザーとグループの管理、ポリシー
 | ポリシーの作成または置換 | `PUT /rustfs/admin/v3/add-canned-policy?name=<policy>` | リクエスト本文はポリシーの JSON ドキュメントです。`admin:CreatePolicy` が必要です。 |
 | ポリシーの削除 | `DELETE /rustfs/admin/v3/remove-canned-policy?name=<policy>` | `admin:DeletePolicy` が必要です。 |
 
-## ポリシードキュメントの形式
+## ポリシードキュメントの形式 [#policy-document-format]
 
 ポリシードキュメントは、`Version` と `Statement` フィールドを持つ JSON オブジェクトです。受け付ける `Version` の値は `2012-10-17` だけです。
 

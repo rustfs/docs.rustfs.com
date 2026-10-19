@@ -1,13 +1,13 @@
 ---
 title: "OpenDAL"
-description: "Access RustFS objects from applications through the Apache OpenDAL data access layer."
+description: "Apache OpenDAL のデータアクセス層を通じて、アプリケーションから RustFS のオブジェクトにアクセスします。"
 ---
 
-This guide connects [Apache OpenDAL](https://github.com/apache/opendal) — the unified data access layer — to **RustFS** through its `s3` service. You will run the OpenDAL Python binding against RustFS, write and read an object, list a prefix, and delete it. The workflow was verified with the `opendal` Python package 0.46 on `python:3.12-slim` and `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、統一データアクセス層である [Apache OpenDAL](https://github.com/apache/opendal) を、`s3` サービス経由で **RustFS** に接続します。OpenDAL の Python バインディングを RustFS に対して実行し、オブジェクトの書き込みと読み取り、プレフィックスの一覧、削除を行います。手順は `python:3.12-slim` 上の `opendal` Python パッケージ 0.46 と `rustfs/rustfs-x86-musl:v2.3.1` の組み合わせで確認済みです。
 
-You need Docker and Python 3.9 or later. OpenDAL supports the same `s3` service from Rust, Java, Node.js, and Go bindings with equivalent settings.
+Docker と Python 3.9 以降が必要です。OpenDAL は、同等の設定であれば、Rust、Java、Node.js、Go のバインディングからも同じ `s3` サービスを使えます。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -15,17 +15,17 @@ flowchart LR
 	OpenDAL -->|"s3 service"| RustFS["RustFS :9000"]
 ```
 
-An OpenDAL `Operator` bound to the `s3` service exposes one uniform API — `write`, `read`, `stat`, `list`, `delete` — over the bucket, so the same code runs against S3, RustFS, or any other supported service by changing the connection settings.
+`s3` サービスに結び付けた OpenDAL の `Operator` は、バケットに対して `write`、`read`、`stat`、`list`、`delete` という統一された API を公開します。接続設定を変えるだけで、同じコードを S3、RustFS、その他の対応サービスに対して実行できます。
 
-## 1. Set up the project
+## 1. プロジェクトをセットアップする
 
-Install the Python binding:
+Python バインディングをインストールします。
 
 ```bash
 pip install opendal
 ```
 
-Create the script, replacing all connection placeholders:
+接続用のプレースホルダーをすべて置き換えて、スクリプトを作成します。
 
 ```python title="opendal_demo.py"
 import opendal
@@ -47,11 +47,11 @@ op.delete("opendal-demo/hello.txt")
 print("deleted:", not op.exists("opendal-demo/hello.txt"))
 ```
 
-The credential option names are `access_key_id` and `secret_access_key` — the shorter `access_key` names do not exist and fail with a signing error. Path-style addressing is the default for non-AWS endpoints.
+認証情報のオプション名は `access_key_id` と `secret_access_key` です。短い `access_key` という名前は存在せず、署名エラーで失敗します。AWS 以外のエンドポイントでは、パススタイルアクセスが既定です。
 
-## 2. Run the demo
+## 2. デモを実行する
 
-Run the script from a machine that can reach RustFS:
+RustFS に到達できるマシンからスクリプトを実行します。
 
 ```bash
 python opendal_demo.py
@@ -64,11 +64,11 @@ listed: opendal-demo/hello.txt
 deleted: True
 ```
 
-The round trip exercises the full object lifecycle: write uploads the bytes, `read` fetches them back, `stat` returns the object size, `list` enumerates the prefix, and `delete` removes the object.
+往復検証では、オブジェクトのライフサイクル全体を確認します。write がバイト列をアップロードし、`read` が読み戻し、`stat` がオブジェクトサイズを返し、`list` がプレフィックスを列挙し、`delete` がオブジェクトを削除します。
 
-## 3. Verify objects in RustFS
+## 3. RustFS でオブジェクトを確認する
 
-Comment out the final `op.delete` line, run the script again, and list the prefix in RustFS:
+最後の `op.delete` 行をコメントアウトし、スクリプトを再実行して、RustFS のプレフィックスを一覧します。
 
 ```bash
 rc ls rustfs/my-bucket/opendal-demo/ -r
@@ -79,30 +79,30 @@ hello.txt
 data/rows.csv
 ```
 
-![OpenDAL objects stored in the RustFS Console](./images/rustfs-opendal-objects.png)
+![RustFS Console に保存された OpenDAL のオブジェクト](./images/rustfs-opendal-objects.png)
 
-The objects visible in the RustFS Console are exactly the paths the OpenDAL API wrote.
+RustFS Console に表示されるオブジェクトは、OpenDAL API が書き込んだパスそのものです。
 
-## 4. Stop or reset
+## 4. 停止またはリセットする
 
-OpenDAL is a library and holds no state of its own. To clean up the demo objects:
+OpenDAL はライブラリであり、自身の状態は持ちません。デモ用オブジェクトを削除するには、次を実行します。
 
 ```bash
 rc rm rustfs/my-bucket/opendal-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
 ### `failed to load signing credential`
 
-The operator received no usable credentials. Use the exact option names `access_key_id` and `secret_access_key`; other spellings are silently ignored and signing then fails.
+オペレーターに使える認証情報が渡されていません。オプション名は `access_key_id` と `secret_access_key` をそのまま使います。ほかの綴りは黙って無視され、その後の署名が失敗します。
 
-### Connection or DNS errors on write
+### 書き込み時の接続エラーまたは DNS エラー
 
-Confirm the endpoint includes the scheme and port and is reachable from the application. Inside a Compose network the hostname is `rustfs`; from the host use `http://localhost:9000`.
+エンドポイントにスキームとポートが含まれ、アプリケーションから到達できることを確認します。Compose ネットワーク内のホスト名は `rustfs` です。ホストからは `http://localhost:9000` を使います。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional OpenDAL operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [OpenDAL documentation](https://opendal.apache.org/docs/) to use the same operator from Rust, Java, or Node.js.
+- ほかの OpenDAL 操作を採用する前に、[S3 互換性に関する注意](/ja/administration/protocols/s3)を確認します。
+- [アクセスキーの管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- Rust、Java、Node.js から同じオペレーターを使うには、[OpenDAL のドキュメント](https://opendal.apache.org/docs/)に従います。

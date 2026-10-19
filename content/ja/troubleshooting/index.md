@@ -1,11 +1,10 @@
 ---
-title: "Troubleshooting"
-description: "Diagnose and resolve RustFS issues."
+title: "トラブルシューティング"
+description: "RustFS の問題を診断し、解決する方法を説明します。"
 ---
 
-Contents:
+このセクションでは、次の内容を扱います。
 
-- [Node Failures](./node.md)
-- [Driver Failures](./driver.md)
-- [Node Healing](../operations/high-availability/node-healing.md)
-
+- [ノード障害](./node.md)
+- [ドライブ障害](./driver.md)
+- [ノードのデータ修復](../operations/high-availability/node-healing.md)

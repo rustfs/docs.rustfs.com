@@ -1,12 +1,12 @@
 ---
-title: Developer
-description: "Integrate applications with RustFS by using STS, MCP, SDKs, and the S3-compatible API."
+title: 開発者向け
+description: "STS、MCP、SDK、および S3 互換 API を使って、アプリケーションを RustFS と連携します。"
 ---
 
-Use this section to integrate applications with RustFS through temporary credentials, the Model Context Protocol (MCP), SDKs, and the S3-compatible API.
+一時認証情報、Model Context Protocol（MCP）、SDK、および S3 互換 API を通じてアプリケーションを RustFS と連携するには、このセクションを使います。
 
-- [Security Token Service (STS)](/security-compliance/iam/sts) explains how to request temporary credentials.
-- [MCP](/developer/mcp) connects AI tools and agents to RustFS.
-- [SDKs](/developer/sdk) provide language-specific integration examples.
-- [Integration guides](/developer/integration) cover proxies and data platforms.
-- [S3 API](/administration/protocols/s3) documents client configuration and compatibility considerations.
+- [セキュリティトークンサービス（STS）](/ja/security-compliance/iam/sts) では、一時認証情報を要求する方法を説明します。
+- [MCP](/ja/developer/mcp) では、AI ツールとエージェントを RustFS に接続します。
+- [SDK](/ja/developer/sdk) では、言語ごとの連携例を示します。
+- [連携ガイド](/ja/developer/integration) では、プロキシとデータ基盤を扱います。
+- [S3 API](/ja/administration/protocols/s3) では、クライアントの設定と、互換性に関する考慮事項を説明します。

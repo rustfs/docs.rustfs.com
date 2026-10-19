@@ -1,55 +1,55 @@
 ---
 title: "HAProxy"
-description: "Deploy RustFS behind HAProxy with separate HTTPS routes for the S3 API and Console."
+description: "S3 API と Console を別々の HTTPS ルートで公開する HAProxy の背後に RustFS をデプロイします。"
 ---
 
-Use **HAProxy** to terminate TLS and route separate hostnames to the RustFS S3 API and Console. This deployment runs HAProxy and a single-node RustFS instance with Docker Compose. You need Docker Engine, Docker Compose, two DNS records, and a TLS certificate that covers both hostnames.
+**HAProxy** で TLS を終端し、別々のホスト名を RustFS の S3 API と Console へ振り分けます。このデプロイでは、Docker Compose で HAProxy とシングルノードの RustFS を動かします。Docker Engine、Docker Compose、DNS レコード 2 件、および両方のホスト名をカバーする TLS 証明書が必要です。
 
-This guide uses these example hostnames:
+このガイドでは、次のホスト名を例に使います。
 
-- `s3.example.com` for the S3 API
-- `console.example.com` for the Console
+- S3 API 用の `s3.example.com`
+- Console 用の `console.example.com`
 
-Replace them with hostnames that resolve to the Docker host.
+Docker ホストへ解決するホスト名に置き換えます。
 
-:::warning[Serve S3 from the root path]
+:::warning[S3 はルートパスから公開する]
 
-Do not publish the S3 API under a path such as `/s3/`. AWS Signature Version 4 includes the request path and host, so rewriting either value can invalidate signed requests.
+`/s3/` のようなパスの下に S3 API を公開しないでください。AWS Signature Version 4 はリクエストパスとホストを署名対象に含めるため、どちらかを書き換えると署名済みリクエストが無効になることがあります。
 
 :::
 
-## 1. Create the deployment directories
+## 1. デプロイ用ディレクトリを作成する
 
-Create directories for the HAProxy configuration and TLS certificate:
+HAProxy の設定と TLS 証明書用のディレクトリを作成します。
 
 ```bash
 mkdir -p rustfs-haproxy/config rustfs-haproxy/certs
 cd rustfs-haproxy
 ```
 
-HAProxy expects the certificate chain and private key in one PEM file. Combine them in this order:
+HAProxy は、証明書チェーンと秘密鍵が 1 つの PEM ファイルにまとまっていることを前提にします。次の順で結合します。
 
 ```bash
 cat fullchain.pem privkey.pem > certs/rustfs.pem
 chmod 600 certs/rustfs.pem
 ```
 
-The certificate must cover both public hostnames.
+証明書は、公開する両方のホスト名をカバーする必要があります。
 
-## 2. Set RustFS credentials
+## 2. RustFS の認証情報を設定する
 
-Create an environment file and replace both credential placeholders:
+環境ファイルを作成し、認証情報のプレースホルダーを両方とも置き換えます。
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Do not commit this file or the certificate private key to source control.
+このファイルと証明書の秘密鍵は、ソース管理にコミットしないでください。
 
-## 3. Configure HAProxy
+## 3. HAProxy を設定する
 
-Create the HAProxy configuration:
+HAProxy の設定を作成します。
 
 ```text title="config/haproxy.cfg"
 global
@@ -96,13 +96,13 @@ backend rustfs_console
     server rustfs rustfs:9001 check inter 10s fall 3 rise 2 cookie rustfs
 ```
 
-HAProxy preserves the incoming host and request path unless you explicitly rewrite them. The long client, server, and tunnel timeouts accommodate streaming S3 operations and Console WebSocket connections.
+明示的に書き換えない限り、HAProxy は受信したホストとリクエストパスを保持します。クライアント、サーバー、トンネルのタイムアウトを長くしてあるのは、ストリーミングの S3 操作と Console の WebSocket 接続に合わせるためです。
 
-The Console backend sets an affinity cookie. With one RustFS server it has no routing effect, but keeping it in the base configuration makes the behavior consistent when you add nodes.
+Console のバックエンドにはアフィニティ用の Cookie を設定します。RustFS サーバーが 1 台のときはルーティングへの影響はありませんが、基本設定に含めておくと、ノードを追加したときの動作が揃います。
 
-## 4. Create the Compose file
+## 4. Compose ファイルを作成する
 
-Create the HAProxy and RustFS services:
+HAProxy と RustFS のサービスを作成します。
 
 ```yaml title="compose.yaml"
 services:
@@ -153,58 +153,58 @@ networks:
   rustfs:
 ```
 
-Only HAProxy publishes host ports. RustFS ports `9000` and `9001` remain reachable inside the Compose network.
+ホストのポートを公開するのは HAProxy だけです。RustFS のポート `9000` と `9001` には、Compose ネットワークの内部からのみ到達できます。
 
-## 5. Validate and start the deployment
+## 5. デプロイを検証して起動する
 
-Render the Compose configuration and start RustFS:
+Compose の設定を展開し、RustFS を起動します。
 
 ```bash
 docker compose config
 docker compose up -d rustfs
 ```
 
-Validate the HAProxy configuration with the same image used by the deployment:
+デプロイと同じイメージで HAProxy の設定を検証します。
 
 ```bash
 docker compose run --rm --no-deps haproxy haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg
 ```
 
-Start HAProxy and check both services:
+HAProxy を起動し、両方のサービスを確認します。
 
 ```bash
 docker compose up -d haproxy
 docker compose ps
 ```
 
-If a service does not become healthy, inspect its logs:
+サービスが正常にならない場合は、ログを確認します。
 
 ```bash
 docker compose logs haproxy
 docker compose logs rustfs
 ```
 
-## 6. Verify both endpoints
+## 6. 両方のエンドポイントを確認する
 
-Verify the API and Console through their public HTTPS hostnames:
+公開 HTTPS ホスト名経由で API と Console を確認します。
 
 ```bash
 curl --fail https://s3.example.com/health/ready
 curl --fail https://console.example.com/rustfs/console/health
 ```
 
-Configure S3 clients with `https://s3.example.com` as the endpoint and enable path-style addressing. Open `https://console.example.com/rustfs/console/` to sign in to the Console.
+S3 クライアントのエンドポイントを `https://s3.example.com` に設定し、パススタイルアクセスを有効にします。`https://console.example.com/rustfs/console/` を開いて Console にサインインします。
 
-When you replace a renewed `certs/rustfs.pem`, validate the configuration and recreate the HAProxy container to load it:
+更新した `certs/rustfs.pem` に差し替えたら、設定を検証し、HAProxy コンテナを再作成して読み込みます。
 
 ```bash
 docker compose run --rm --no-deps haproxy haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg
 docker compose up -d --force-recreate haproxy
 ```
 
-## Multi-node backends
+## マルチノードのバックエンド
 
-For a distributed RustFS deployment, add every RustFS node to both backends:
+分散構成の RustFS デプロイでは、両方のバックエンドにすべての RustFS ノードを追加します。
 
 ```text title="config/haproxy.cfg"
 backend rustfs_s3
@@ -227,10 +227,10 @@ backend rustfs_console
 		server node4 node4.example.net:9001 check inter 10s fall 3 rise 2 cookie node4
 ```
 
-The Console cookie keeps an in-progress OpenID Connect login on the RustFS node that created its `state`. Keep port `9000` open directly between RustFS nodes because internal node RPC uses the same listener.
+Console の Cookie により、進行中の OpenID Connect ログインは、その `state` を作成した RustFS ノードに留まります。ノード間の内部 RPC は同じリスナーを使うため、RustFS ノード間ではポート `9000` を直接開けたままにします。
 
-## Next steps
+## 次のステップ
 
-- [Configure an S3 client](/developer/examples/aws-cli)
-- [Enable virtual-hosted-style bucket URLs](/integration/virtual)
-- [Review health and readiness endpoints](/operations/status-check)
+- [S3 クライアントを設定する](/ja/developer/examples/aws-cli)
+- [仮想ホスト形式のバケット URL を有効にする](/ja/integration/virtual)
+- [ヘルスと準備完了のエンドポイントを確認する](/ja/operations/status-check)

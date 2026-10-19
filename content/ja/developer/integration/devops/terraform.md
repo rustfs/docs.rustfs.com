@@ -1,31 +1,31 @@
 ---
 title: "Terraform"
-description: "Store Terraform state in RustFS object storage with the S3 backend, including state locking."
+description: "ステートロックを含め、S3 バックエンドで Terraform のステートを RustFS のオブジェクトストレージに保存します。"
 ---
 
-This guide connects [Terraform](https://github.com/hashicorp/terraform) — the infrastructure as code tool from HashiCorp — to **RustFS** through the S3 backend: the state file, and the lock file that prevents concurrent runs, are stored as objects in RustFS. You will initialize the backend, apply a small configuration, and verify the state object in RustFS. The workflow was verified with `terraform 1.12.2` and `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、HashiCorp の Infrastructure as Code ツールである [Terraform](https://github.com/hashicorp/terraform) を、S3 バックエンド経由で **RustFS** に接続します。ステートファイルと、同時実行を防ぐロックファイルは、オブジェクトとして RustFS に保存されます。バックエンドを初期化し、小さな設定を apply し、RustFS 内のステートオブジェクトを確認します。この流れは `terraform 1.12.2` と `rustfs/rustfs-x86-musl:v2.3.1` で検証済みです。
 
-You need a RustFS deployment reachable from your workstation (see the guides under [Installation](/installation)) and Terraform 1.10 or later, which supports S3-native locking via `use_lockfile`.
+ワークステーションから到達できる RustFS のデプロイ（[インストール](/ja/installation) 配下のガイドを参照）と、`use_lockfile` による S3 ネイティブのロックに対応した Terraform 1.10 以降が必要です。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
 	Client["terraform init / apply"] -->|"state + lock objects"| RustFS["RustFS :9000"]
 ```
 
-The S3 backend stores the state file under the `key` prefix in the bucket. With `use_lockfile = true`, Terraform writes a `<key>.tflock` object while a run holds the lock, replacing the former DynamoDB-based locking for this setup.
+S3 バックエンドは、バケット内の `key` プレフィックス配下にステートファイルを保存します。`use_lockfile = true` にすると、実行がロックを保持しているあいだ Terraform は `<key>.tflock` オブジェクトを書き込みます。この構成では、以前の DynamoDB ベースのロックに代わる仕組みです。
 
-## 1. Create the project files
+## 1. プロジェクトファイルを作成する
 
-Create a working directory:
+作業ディレクトリを作成します。
 
 ```bash
 mkdir rustfs-terraform
 cd rustfs-terraform
 ```
 
-Create the configuration. Replace the credential placeholders and point the endpoint at your RustFS server — `localhost:9000` when Terraform runs on the same host:
+設定を作成します。認証情報のプレースホルダーを置き換え、エンドポイントを RustFS サーバーに向けます。Terraform を同じホストで実行する場合は `localhost:9000` です。
 
 ```hcl title="main.tf"
 terraform {
@@ -54,11 +54,11 @@ resource "local_file" "demo" {
 }
 ```
 
-`force_path_style` and `insecure` select path-style addressing over plain HTTP, which is what RustFS expects for the local endpoint. `use_lockfile` enables S3-native state locking so concurrent runs cannot corrupt the state.
+`force_path_style` と `insecure` は、ローカルエンドポイントで RustFS が期待する、平文 HTTP 上のパススタイルアクセスを選びます。`use_lockfile` は S3 ネイティブのステートロックを有効にし、同時実行でステートが壊れないようにします。
 
-## 2. Initialize the backend
+## 2. バックエンドを初期化する
 
-Download the provider and configure the S3 backend:
+プロバイダーをダウンロードし、S3 バックエンドを設定します。
 
 ```bash
 terraform init -input=false
@@ -69,9 +69,9 @@ Successfully configured the backend "s3"! Terraform will automatically
 use this backend unless the backend configuration changes.
 ```
 
-## 3. Apply the configuration
+## 3. 設定を apply する
 
-Create the resource and write the state to RustFS:
+リソースを作成し、ステートを RustFS に書き込みます。
 
 ```bash
 terraform apply -auto-approve -input=false
@@ -81,9 +81,9 @@ terraform apply -auto-approve -input=false
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 ```
 
-## 4. Verify the state in RustFS
+## 4. RustFS 内のステートを確認する
 
-List the state objects through the `rc` CLI:
+`rc` CLI でステートオブジェクトを一覧します。
 
 ```bash
 docker run --rm --network <rustfs-network> -v "$PWD:/m" \
@@ -95,13 +95,13 @@ docker run --rm --network <rustfs-network> -v "$PWD:/m" \
 [2026-09-21 03:05:03]   1.62 KiB rustfs-demo/terraform.tfstate
 ```
 
-You can also browse the prefix in the RustFS Console:
+RustFS Console（管理画面）でこのプレフィックスを参照することもできます。
 
-![The Terraform state file stored in the RustFS Console](./images/rustfs-terraform-state.png)
+![RustFS Console に保存された Terraform のステートファイル](./images/rustfs-terraform-state.png)
 
-## 5. Confirm the state is reloaded from RustFS
+## 5. ステートが RustFS から再読み込みされることを確認する
 
-Run a plan — Terraform reads the state from RustFS and compares it against the configuration:
+plan を実行します。Terraform は RustFS からステートを読み込み、設定と比較します。
 
 ```bash
 terraform plan -input=false
@@ -111,34 +111,34 @@ terraform plan -input=false
 No changes. Your infrastructure matches the configuration.
 ```
 
-The plan is clean because the state was read back from RustFS, not from any local file.
+ローカルファイルではなく RustFS からステートが読み戻されているため、plan に差分はありません。
 
-## 6. Destroy and reset
+## 6. 破棄してリセットする
 
-Tear the resource down; the state update is written to RustFS the same way:
+リソースを破棄します。ステートの更新も同じように RustFS へ書き込まれます。
 
 ```bash
 terraform destroy -auto-approve -input=false
 ```
 
-Delete the state objects in the RustFS Console (or with `rc rm`) to start from scratch.
+最初からやり直すには、RustFS Console でステートオブジェクトを削除します（`rc rm` でも削除できます）。
 
-## Troubleshooting
+## トラブルシューティング
 
-### "dial tcp: lookup rustfs ... server misbehaving" or connection failures
+### "dial tcp: lookup rustfs ... server misbehaving" または接続失敗
 
-The `endpoint` must be reachable from the machine where Terraform runs. Inside a Compose network use `http://rustfs:9000`; from the host use `http://localhost:9000`.
+`endpoint` は Terraform を実行するマシンから到達できる必要があります。Compose ネットワーク内では `http://rustfs:9000` を、ホストからは `http://localhost:9000` を使用します。
 
-### "Bucket cannot have ACLs set" or signature errors
+### "Bucket cannot have ACLs set" または署名エラー
 
-`skip_credentials_validation`, `skip_region_validation`, `skip_metadata_api_check`, `skip_requesting_account_id`, `force_path_style`, and `insecure` are all required for a non-AWS endpoint; missing any of them makes the backend talk to AWS defaults instead of RustFS.
+非 AWS エンドポイントでは `skip_credentials_validation`、`skip_region_validation`、`skip_metadata_api_check`、`skip_requesting_account_id`、`force_path_style`、`insecure` がすべて必要です。いずれかが欠けると、バックエンドは RustFS ではなく AWS のデフォルトへ通信します。
 
-### The state does not appear in the bucket
+### ステートがバケットに現れない
 
-Confirm that the bucket exists and that the credentials match the RustFS credentials. The state object appears under the `key` path (`rustfs-demo/terraform.tfstate` in this guide) after the first `init` or `apply`.
+バケットが存在すること、および認証情報が RustFS の認証情報と一致することを確認します。ステートオブジェクトは、最初の `init` または `apply` のあと、`key` のパス（このガイドでは `rustfs-demo/terraform.tfstate`）に現れます。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional S3 operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Terraform S3 backend documentation](https://developer.hashicorp.com/terraform/language/backend/s3) for options such as workspace prefixes and role assumption.
+- 追加の S3 オペレーションを採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認してください。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
+- [Terraform の S3 バックエンドドキュメント](https://developer.hashicorp.com/terraform/language/backend/s3)に従い、ワークスペースのプレフィックスやロールの引き受けなどのオプションを確認してください。

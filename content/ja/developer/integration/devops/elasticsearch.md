@@ -1,13 +1,13 @@
 ---
 title: "Elasticsearch"
-description: "Use RustFS as the S3 snapshot repository for Elasticsearch indices, deployed with Docker Compose."
+description: "Docker Compose でデプロイし、Elasticsearch インデックスの S3 スナップショットリポジトリとして RustFS を使用します。"
 ---
 
-This guide connects [Elasticsearch](https://github.com/elastic/elasticsearch) — the distributed search and analytics engine — to **RustFS** as the S3 snapshot repository for its indices. You will start Elasticsearch with the `repository-s3` plugin, register a snapshot repository backed by RustFS, index documents, take a snapshot, and prove the full cycle by deleting the index and restoring it from RustFS. The workflow was verified with `docker.elastic.co/elasticsearch/elasticsearch:8.18.0` and `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、分散検索・分析エンジンである [Elasticsearch](https://github.com/elastic/elasticsearch) を、インデックスの S3 スナップショットリポジトリとして **RustFS** に接続します。`repository-s3` プラグインを有効にして Elasticsearch を起動し、RustFS をバックエンドとするスナップショットリポジトリを登録し、ドキュメントをインデックスに投入してスナップショットを取得します。その後インデックスを削除し、RustFS から復元して一連の流れを確認します。この流れは `docker.elastic.co/elasticsearch/elasticsearch:8.18.0` と `rustfs/rustfs-x86-musl:v2.3.1` で検証済みです。
 
-You need Docker with the Compose plugin. This deployment is intended for local integration testing, not production.
+Docker と Compose プラグインが必要です。このデプロイはローカルでの統合テストを目的としており、本番環境向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -16,27 +16,27 @@ flowchart LR
 	Init["init-bucket job"] -->|"create my-bucket"| RustFS
 ```
 
-Elasticsearch stores its primary data on local disks and offloads index backups to a snapshot repository. The `repository-s3` plugin writes snapshot metadata and shard data blobs to RustFS through the S3 API with path-style addressing over plain HTTP.
+Elasticsearch は主データをローカルディスクに保持し、インデックスのバックアップをスナップショットリポジトリへ退避します。`repository-s3` プラグインは、平文 HTTP 上のパススタイルアクセスで S3 API を使い、スナップショットのメタデータとシャードデータのブロブを RustFS に書き込みます。
 
-## 1. Create the project files
+## 1. プロジェクトファイルを作成する
 
-Create a working directory:
+作業ディレクトリを作成します。
 
 ```bash
 mkdir rustfs-elasticsearch
 cd rustfs-elasticsearch
 ```
 
-Create an environment file and replace both credential placeholders:
+環境変数ファイルを作成し、2 つの認証情報プレースホルダーを置き換えます。
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Use dedicated credentials for the bucket. Do not commit `.env` to source control.
+バケットには専用の認証情報を使用してください。`.env` をバージョン管理にコミットしないでください。
 
-Elasticsearch splits its S3 settings between `elasticsearch.yml` (non-secret values) and the keystore (credentials). Create the configuration file:
+Elasticsearch は S3 設定を `elasticsearch.yml`（機密でない値）とキーストア（認証情報）に分けます。設定ファイルを作成します。
 
 ```yaml title="elasticsearch.yml"
 discovery.type: single-node
@@ -47,7 +47,7 @@ s3.client.default.path_style_access: "true"
 s3.client.default.region: "us-east-1"
 ```
 
-Create the Compose file:
+Compose ファイルを作成します。
 
 ```yaml title="compose.yaml"
 services:
@@ -121,26 +121,26 @@ volumes:
   rustfs-data:
 ```
 
-`repository-s3` is a bundled plugin and installs without network access. Only the access key and secret key belong in the keystore — non-secure settings such as the endpoint must live in `elasticsearch.yml`, otherwise the node refuses to start.
+`repository-s3` は同梱プラグインであり、ネットワークなしでインストールできます。キーストアに入れるのはアクセスキーとシークレットキーだけです。エンドポイントなどの非セキュア設定は `elasticsearch.yml` に置く必要があります。そうしないとノードは起動を拒否します。
 
-## 2. Start the deployment
+## 2. デプロイを開始する
 
-Resolve the Compose file before starting containers:
+コンテナを起動する前に Compose ファイルを解決します。
 
 ```bash
 docker compose config
 ```
 
-Start the services and wait for Elasticsearch to finish booting (the first start installs the plugin and creates the keystore entries, which takes a minute or two):
+サービスを起動し、Elasticsearch の起動完了を待ちます。初回起動ではプラグインのインストールとキーストアへの登録が行われ、1〜2 分かかります。
 
 ```bash
 docker compose up -d
 curl -s http://localhost:9200
 ```
 
-## 3. Register the snapshot repository and index documents
+## 3. スナップショットリポジトリを登録してドキュメントを投入する
 
-Register RustFS as the snapshot repository, create an index, and index five documents:
+RustFS をスナップショットリポジトリとして登録し、インデックスを作成して 5 件のドキュメントを投入します。
 
 ```bash
 curl -s -X PUT "http://localhost:9200/_snapshot/rustfs_repo" \
@@ -164,9 +164,9 @@ curl -s "http://localhost:9200/rustfs_index/_count"
 {"count":5,...}
 ```
 
-## 4. Take a snapshot
+## 4. スナップショットを取得する
 
-Create a snapshot with `wait_for_completion` so the result is known immediately:
+`wait_for_completion` を付けてスナップショットを作成し、結果をすぐに確認できるようにします。
 
 ```bash
 curl -s -X PUT "http://localhost:9200/_snapshot/rustfs_repo/snap1?wait_for_completion=true"
@@ -176,16 +176,16 @@ curl -s -X PUT "http://localhost:9200/_snapshot/rustfs_repo/snap1?wait_for_compl
 {"snapshot":{"snapshot":"snap1",...,"indices":["rustfs_index"],"shards":{"total":1,"failed":0,"successful":1}}}
 ```
 
-## 5. Verify objects in RustFS
+## 5. RustFS 内のオブジェクトを確認する
 
-List the snapshot objects through the bucket-initializer image:
+バケット初期化用イメージを使ってスナップショットのオブジェクトを一覧します。
 
 ```bash
 docker compose run --rm --entrypoint /bin/sh create-bucket -c \
   '/usr/bin/rc alias set rustfs http://rustfs:9000 "$RUSTFS_ACCESS_KEY" "$RUSTFS_SECRET_KEY" >/dev/null && /usr/bin/rc ls rustfs/my-bucket/indices --recursive'
 ```
 
-Snapshot metadata and shard data blobs live under `indices/` in the bucket:
+スナップショットのメタデータとシャードデータのブロブは、バケット内の `indices/` 配下にあります。
 
 ```text
 [2026-09-21 02:58:01]   3.56 KiB indices/mvyat2-dSEOG3uiCCiFzRA/0/__LbLsSgUUTpqji_EXvqHYCg
@@ -193,13 +193,13 @@ Snapshot metadata and shard data blobs live under `indices/` in the bucket:
 [2026-09-21 02:58:01]   1.00 KiB indices/mvyat2-dSEOG3uiCCiFzRA/0/index-e9P8q6E9QhitpkiOdgjVDQ
 ```
 
-You can also browse the prefix in the RustFS Console:
+RustFS Console（管理画面）でこのプレフィックスを参照することもできます。
 
-![Elasticsearch snapshot blobs stored in the RustFS Console](./images/rustfs-es-snapshots.png)
+![RustFS Console に保存された Elasticsearch のスナップショットブロブ](./images/rustfs-es-snapshots.png)
 
-## 6. Restore the index from RustFS
+## 6. RustFS からインデックスを復元する
 
-Delete the index, then restore it from the snapshot:
+インデックスを削除してから、スナップショットから復元します。
 
 ```bash
 curl -s -X DELETE "http://localhost:9200/rustfs_index" > /dev/null
@@ -211,31 +211,31 @@ curl -s "http://localhost:9200/rustfs_index/_count"
 {"count":5,...}
 ```
 
-The documents come back because the snapshot blobs were read from RustFS.
+スナップショットのブロブが RustFS から読み戻されるため、ドキュメントが戻ります。
 
-## 7. Stop or reset the stack
+## 7. スタックを停止・リセットする
 
-Stop the containers while keeping the RustFS data volume:
+RustFS データボリュームを保持したままコンテナを停止します。
 
 ```bash
 docker compose down
 ```
 
-To delete the snapshots and start from an empty RustFS volume, explicitly include `--volumes`:
+スナップショットを削除して空の RustFS ボリュームからやり直す場合は、明示的に `--volumes` を付けます。
 
 ```bash
 docker compose down --volumes
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### The node refuses to start with "non-secure setting ... must be stored inside elasticsearch.yml"
+### ノードが "non-secure setting ... must be stored inside elasticsearch.yml" で起動を拒否する
 
-Only `s3.client.default.access_key` and `s3.client.default.secret_key` belong in the keystore. Endpoint, protocol, path-style access, and region are non-secure settings and must be defined in `elasticsearch.yml`.
+キーストアに入れるのは `s3.client.default.access_key` と `s3.client.default.secret_key` だけです。エンドポイント、プロトコル、パススタイルアクセス、リージョンは非セキュア設定であり、`elasticsearch.yml` に定義する必要があります。
 
-### Restored or new shards stay unassigned
+### 復元したシャードや新しいシャードが未割り当てのままになる
 
-Elasticsearch stops allocating shards when disk usage passes the low watermark (85 percent by default). Free disk space, or disable the check for a local test:
+ディスク使用率がローウォーターマーク（low watermark、デフォルト 85%）を超えると、Elasticsearch はシャードの割り当てを停止します。ディスクの空きを確保するか、ローカルテストでは次のチェックを無効にします。
 
 ```bash
 curl -s -X PUT "http://localhost:9200/_cluster/settings" \
@@ -243,20 +243,20 @@ curl -s -X PUT "http://localhost:9200/_cluster/settings" \
   -d '{"transient":{"cluster.routing.allocation.disk.threshold_enabled":false}}'
 ```
 
-### Restore fails because the index already exists
+### インデックスが既に存在するため復元に失敗する
 
-A previous failed restore leaves the index behind. Delete it with `DELETE /rustfs_index` and run the restore again.
+以前の失敗した復元でインデックスが残っている場合があります。`DELETE /rustfs_index` で削除してから、復元を再実行します。
 
-### AccessDenied or 403 responses
+### AccessDenied や 403 レスポンス
 
-Confirm that the credentials in the keystore match the RustFS credentials and that the `create-bucket` service completed successfully:
+キーストアの認証情報が RustFS の認証情報と一致しているか、`create-bucket` サービスが正常に完了しているかを確認します。
 
 ```bash
 docker compose logs create-bucket
 ```
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional S3 operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Elasticsearch snapshot documentation](https://www.elastic.co/docs/deploy-manage/tools/snapshot-and-restore) for snapshot lifecycle management (SLM).
+- 追加の S3 オペレーションを採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認してください。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
+- [Elasticsearch のスナップショットドキュメント](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshot-restore.html)に従い、スナップショットライフサイクル管理（SLM）を設定してください。

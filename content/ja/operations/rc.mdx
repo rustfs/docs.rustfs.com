@@ -1,20 +1,20 @@
 ---
-title: "CLI Client (rc)"
-description: "Install the RustFS command-line client and use it to connect to and inspect a RustFS cluster."
+title: "CLI クライアント（rc）"
+description: "RustFS のコマンドラインクライアントをインストールし、クラスターへの接続と状態確認に使う方法を説明します。"
 ---
 
-`rc` is the RustFS command-line client for S3 object operations and RustFS administration. This guide installs `rc`, configures a cluster alias, and introduces the main inspection commands. The download examples use `v0.1.30`; check the [RustFS CLI releases](https://github.com/rustfs/cli/releases) for a newer version before installing.
+`rc` は、S3 のオブジェクト操作と RustFS の管理に使うコマンドラインクライアントです。このガイドでは `rc` のインストール、クラスターエイリアスの設定、主な確認コマンドを説明します。ダウンロード例では `v0.1.30` を使います。インストールの前に、[RustFS CLI のリリース](https://github.com/rustfs/cli/releases)で、より新しいバージョンがないか確認します。
 
-## Installation
+## インストール
 
 ### Linux
 
-The default Linux archives are statically linked with musl for broad compatibility. Choose the tab that matches `uname -m`.
+既定の Linux アーカイブは、広い互換性のために musl で静的リンクされています。`uname -m` と一致するタブを選びます。
 
 <Tabs items={["AMD64", "ARM64"]} updateAnchor={false}>
 	<Tab value="AMD64" id="rc-linux-amd64">
 
-For an `x86_64` host:
+`x86_64` のホストの場合は次のとおりです。
 
 ```bash
 curl -fLO https://github.com/rustfs/cli/releases/download/v0.1.30/rustfs-cli-linux-amd64-v0.1.30.tar.gz
@@ -25,7 +25,7 @@ sudo install -m 0755 rc /usr/local/bin/rc
 	</Tab>
 	<Tab value="ARM64" id="rc-linux-arm64">
 
-For an `aarch64` host:
+`aarch64` のホストの場合は次のとおりです。
 
 ```bash
 curl -fLO https://github.com/rustfs/cli/releases/download/v0.1.30/rustfs-cli-linux-arm64-v0.1.30.tar.gz
@@ -36,16 +36,16 @@ sudo install -m 0755 rc /usr/local/bin/rc
 	</Tab>
 </Tabs>
 
-If your environment specifically requires a glibc-linked binary, select the `linux-amd64-gnu` or `linux-arm64-gnu` archive from the release page.
+環境が特に glibc リンクのバイナリを必要とする場合は、リリースページから `linux-amd64-gnu` または `linux-arm64-gnu` のアーカイブを選びます。
 
 ### macOS
 
-Choose the tab that matches the value returned by `uname -m`.
+`uname -m` が返す値と一致するタブを選びます。
 
 <Tabs items={["Intel", "Apple silicon"]} updateAnchor={false}>
 	<Tab value="Intel" id="rc-macos-amd64">
 
-For an Intel (`x86_64`) Mac:
+Intel（`x86_64`）の Mac の場合は次のとおりです。
 
 ```bash
 curl -fLO https://github.com/rustfs/cli/releases/download/v0.1.30/rustfs-cli-macos-amd64-v0.1.30.tar.gz
@@ -56,7 +56,7 @@ sudo install -m 0755 rc /usr/local/bin/rc
 	</Tab>
 	<Tab value="Apple silicon" id="rc-macos-arm64">
 
-For an Apple silicon (`arm64`) Mac:
+Apple silicon（`arm64`）の Mac の場合は次のとおりです。
 
 ```bash
 curl -fLO https://github.com/rustfs/cli/releases/download/v0.1.30/rustfs-cli-macos-arm64-v0.1.30.tar.gz
@@ -67,7 +67,7 @@ sudo install -m 0755 rc /usr/local/bin/rc
 	</Tab>
 </Tabs>
 
-You can alternatively install the package through Homebrew:
+Homebrew でパッケージをインストールすることもできます。
 
 ```bash
 brew install rustfs/tap/rc
@@ -75,63 +75,63 @@ brew install rustfs/tap/rc
 
 ### Windows
 
-The current Windows release provides an AMD64 binary. Install it through the official Scoop bucket:
+現在の Windows リリースが提供するのは AMD64 バイナリです。公式の Scoop バケットからインストールします。
 
 ```powershell
 scoop bucket add rustfs https://github.com/rustfs/scoop-bucket
 scoop install rustfs/rc
 ```
 
-### Verify the installation
+### インストールを確認する
 
-Open a new terminal and verify that `rc` is available:
+新しいターミナルを開き、`rc` が使えることを確認します。
 
 ```bash
 rc --version
 rc --help
 ```
 
-## Usage
+## 使い方
 
-### Configure an alias
+### エイリアスを設定する
 
-An alias stores the RustFS endpoint and credentials so you do not need to repeat them for every command. Replace the credentials before running:
+エイリアスには、RustFS のエンドポイントと認証情報を保存できます。コマンドごとに繰り返す必要はありません。実行前に認証情報を置き換えます。
 
 ```bash
 rc alias set local http://localhost:9000 <your-access-key> <your-secret-key>
 rc alias list
 ```
 
-`alias set` replaces an existing alias with the same name. `alias list` does not print secret keys.
+`alias set` は、同じ名前の既存エイリアスを置き換えます。`alias list` はシークレットキーを表示しません。
 
-### Check service health
+### サービスの健全性を確認する
 
-Check whether the service is live and whether its required dependencies are ready:
+サービスが生存しているか、必要な依存関係が準備完了かを確認します。
 
 ```bash
 rc ping local
 rc ready local
 ```
 
-### Inspect the cluster
+### クラスターを確認する
 
-Use the administrative cluster information command to inspect cluster status, servers, disks, and storage capacity:
+管理用のクラスター情報コマンドで、クラスターの状態、サーバー、ディスク、ストレージ容量を確認します。
 
 ```bash
 rc admin info cluster local
 ```
 
-List server pools when the deployment uses multiple pools:
+デプロイが複数のプールを使う場合は、サーバープールを一覧します。
 
 ```bash
 rc admin pool list local
 ```
 
-Administrative commands require credentials with the corresponding RustFS Admin API permissions.
+管理コマンドには、対応する RustFS Admin API の権限を持つ認証情報が必要です。
 
-### Inspect buckets and objects
+### バケットとオブジェクトを確認する
 
-Prefer the noun-first command groups for new scripts:
+新しいスクリプトでは、名詞を先頭にしたコマンドグループを使うことを推奨します。
 
 ```bash
 rc bucket list local/
@@ -139,9 +139,9 @@ rc object list local/my-bucket
 rc object stat local/my-bucket/hello.txt
 ```
 
-### Manage lifecycle rules and storage tiers
+### ライフサイクルルールとストレージ階層を管理する
 
-`rc` groups lifecycle rules, remote storage tiers, and restore requests under `bucket lifecycle`:
+`rc` は、ライフサイクルルール、リモートのストレージ階層、復元リクエストを `bucket lifecycle` にまとめています。
 
 ```bash
 rc bucket lifecycle rule list local/my-bucket
@@ -149,13 +149,13 @@ rc bucket lifecycle tier list local
 rc bucket lifecycle restore local/my-bucket/hello.txt --days 7
 ```
 
-Use the `rule` commands to add, edit, remove, export, or import bucket lifecycle rules. Use the `tier` commands to add, inspect, update credentials for, or remove a remote tier. The older `rc ilm` form remains available as a compatibility alias, but we recommend `rc bucket lifecycle` for new scripts.
+`rule` コマンドで、バケットのライフサイクルルールを追加、編集、削除、エクスポート、インポートします。`tier` コマンドで、リモート階層を追加、確認し、認証情報を更新し、削除します。古い `rc ilm` 形式は互換エイリアスとして残っています。新しいスクリプトでは `rc bucket lifecycle` を推奨します。
 
-See [Lifecycle Management](/administration/data/lifecycle-management) for rule and restore workflows, and [Tiered Storage](/administration/data/tiered-storage) for remote-tier configuration and maintenance.
+ルールと復元の手順は[ライフサイクル管理](/ja/administration/data/lifecycle-management)を、リモート階層の設定と保守は[階層化ストレージ](/ja/administration/data/tiered-storage)を参照します。
 
-### Discover more commands
+### ほかのコマンドを確認する
 
-Use `--help` at any command level to see the commands and options supported by your installed version:
+インストールしたバージョンがサポートするコマンドとオプションを見るには、どのコマンド階層でも `--help` を使います。
 
 ```bash
 rc --help
@@ -167,4 +167,4 @@ rc bucket lifecycle --help
 rc object --help
 ```
 
-For the complete source and command reference, see the [RustFS CLI repository](https://github.com/rustfs/cli).
+ソース一式とコマンドリファレンスは、[RustFS CLI リポジトリ](https://github.com/rustfs/cli)を参照します。

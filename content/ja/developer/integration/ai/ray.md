@@ -1,13 +1,13 @@
 ---
 title: "Ray"
-description: "Use Ray Data with RustFS as S3-compatible storage for dataset writes and reads."
+description: "データセットの書き込みと読み取りに、S3 互換ストレージとして RustFS を Ray Data で使用します。"
 ---
 
-This guide connects [Ray](https://github.com/ray-project/ray) — the distributed AI and Python compute framework — to **RustFS** through Ray Data's S3 filesystem support. You will run a Ray job inside the official image, write a dataset as Parquet to a RustFS bucket, read it back, and verify the objects. The workflow was verified with `rayproject/ray:2.44.0-py311` (Ray 2.44, pyarrow filesystem) and `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、分散 AI および Python コンピュートのフレームワークである [Ray](https://github.com/ray-project/ray) を、Ray Data の S3 ファイルシステムサポートを通じて **RustFS** に接続します。公式イメージ内で Ray ジョブを実行し、データセットを Parquet として RustFS のバケットへ書き込み、読み戻してオブジェクトを確認します。この流れは `rayproject/ray:2.44.0-py311`（Ray 2.44、pyarrow のファイルシステム）と `rustfs/rustfs-x86-musl:v2.3.1` で検証済みです。
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Docker が必要です。このデプロイはローカルでの統合テストを目的としており、本番向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -15,11 +15,11 @@ flowchart LR
 	DS -->|"Parquet files"| RustFS["RustFS :9000"]
 ```
 
-Ray Data reads and writes datasets through pyarrow's `S3FileSystem`. Passing an `S3FileSystem` configured for RustFS redirects every dataset operation — Parquet, CSV, JSON — to the bucket.
+Ray Data は pyarrow の `S3FileSystem` を通じてデータセットを読み書きします。RustFS 向けに構成した `S3FileSystem` を渡すと、Parquet、CSV、JSON を含むすべてのデータセット操作がバケットへ向きます。
 
-## 1. Create the job file
+## 1. ジョブファイルを作成する
 
-Create the script, replacing all connection placeholders:
+接続用のプレースホルダーをすべて置き換えて、スクリプトを作成します。
 
 ```python title="ray_s3.py"
 import ray
@@ -45,11 +45,11 @@ print("sample:", back[0])
 ray.shutdown()
 ```
 
-`endpoint_override` takes the full endpoint URL including the scheme. pyarrow's `S3FileSystem` uses path-style requests for custom endpoints, so no extra flag is needed. The same filesystem object works for `write_csv`, `read_json`, and the other Ray Data methods.
+`endpoint_override` には、スキームを含む完全なエンドポイント URL を指定します。pyarrow の `S3FileSystem` はカスタムエンドポイントに対してパススタイルアクセスのリクエストを使うため、追加のフラグは不要です。同じファイルシステムオブジェクトは、`write_csv`、`read_json`、その他の Ray Data メソッドでも使えます。
 
-## 2. Run the job
+## 2. ジョブを実行する
 
-Run the script in the Ray image on the same Docker network as RustFS:
+RustFS と同じ Docker ネットワーク上の Ray イメージで、スクリプトを実行します。
 
 ```bash
 docker run --rm --network oo-rustfs_default \
@@ -62,42 +62,42 @@ rows: 5
 sample: {'id': 0, 'value': 0.0}
 ```
 
-## 3. Verify objects in RustFS
+## 3. RustFS でオブジェクトを確認する
 
-List the dataset prefix:
+データセットのプレフィックスを一覧表示します。
 
 ```bash
 rc ls rustfs/my-bucket/ray-demo/ -r
 ```
 
-Ray Data wrote the dataset as a Parquet block:
+Ray Data はデータセットを Parquet ブロックとして書き込みます。
 
 ```text
 ray-demo/events/0_000000_000000.parquet
 ```
 
-![Ray dataset files stored in the RustFS Console](./images/rustfs-ray-data.png)
+![RustFS Console に保存された Ray のデータセットファイル](./images/rustfs-ray-data.png)
 
-## 4. Stop or reset
+## 4. 停止またはリセット
 
-Ray Data holds no state of its own. To delete the demo dataset:
+Ray Data 自身は状態を持ちません。デモ用データセットを削除するには、次を実行します。
 
 ```bash
 rc rm rustfs/my-bucket/ray-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### `Unable to connect to endpoint` or timeouts
+### `Unable to connect to endpoint` またはタイムアウト
 
-Confirm `endpoint_override` includes the scheme and is reachable from the Ray container. Inside a Compose network the hostname is `rustfs`; from the host use `http://localhost:9000`.
+`endpoint_override` にスキームが含まれ、Ray コンテナから到達できることを確認します。Compose ネットワーク内のホスト名は `rustfs` です。ホストからは `http://localhost:9000` を使います。
 
-### `Access Denied` on write
+### 書き込み時の `Access Denied`
 
-Confirm the access key and secret key are passed to `S3FileSystem` itself — Ray does not read the container's AWS environment variables through this code path.
+アクセスキーとシークレットキーが `S3FileSystem` 自体に渡されていることを確認します。このコードパスでは、Ray はコンテナの AWS 環境変数を読み取りません。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Ray operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Ray Data documentation](https://docs.ray.io/en/latest/data/data.html) to chain transformations, training ingestion, and checkpointing on the same bucket.
+- 追加の Ray 操作を採用する前に、[S3 互換性に関する注意](/ja/administration/protocols/s3)を確認します。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- [Ray Data ドキュメント](https://docs.ray.io/en/latest/data/data.html)に従い、同じバケット上で変換の連鎖、トレーニングへの取り込み、チェックポイントを構成します。

@@ -1,13 +1,13 @@
 ---
 title: "Paimon"
-description: "Run Paimon lakehouse tables on RustFS with Spark."
+description: "Spark を使い、RustFS 上で Paimon のレイクハウステーブルを実行します。"
 ---
 
-This guide connects [Apache Paimon](https://github.com/apache/paimon) — the streaming lakehouse table format — to **RustFS** as its warehouse storage. You will create a Paimon catalog over a RustFS bucket with Spark, write a primary-key table, and read it back. The workflow was verified with Paimon 1.2.0 on Spark 3.5.6 against `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、ストリーミングレイクハウスのテーブルフォーマットである [Apache Paimon](https://github.com/apache/paimon) を、ウェアハウスストレージとして **RustFS** に接続します。Spark で RustFS バケット上に Paimon カタログを作成し、主キーテーブルを書き込んで読み戻します。この流れは Spark 3.5.6 上の Paimon 1.2.0 と `rustfs/rustfs-x86-musl:v2.3.1` で検証済みです。
 
-You need Docker and the `rc` client.
+Docker と `rc` クライアントが必要です。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -15,9 +15,9 @@ flowchart LR
 	Paimon -->|"schemas, snapshots, data files"| RustFS["RustFS :9000"]
 ```
 
-Paimon stores each table under the catalog warehouse as a `*.db` directory containing `schema/`, `snapshot/`, and data files. All I/O goes through Paimon's own S3 FileIO (`paimon-s3`), not Hadoop S3A.
+Paimon はカタログのウェアハウス配下に、各テーブルを `schema/`、`snapshot/`、データファイルを含む `*.db` ディレクトリとして保存します。入出力はすべて Paimon 自身の S3 FileIO（`paimon-s3`）を経由し、Hadoop S3A は使いません。
 
-## 1. Run Spark
+## 1. Spark を実行する
 
 ```bash
 docker run -d --name spark-paimon --hostname spark --network oo-rustfs_default \
@@ -25,7 +25,7 @@ docker run -d --name spark-paimon --hostname spark --network oo-rustfs_default \
 docker cp paimon_test.sql spark-paimon:/tmp/paimon_test.sql
 ```
 
-Create the SQL file (note: the catalog options are passed on the CLI below, not in the file):
+SQL ファイルを作成します（カタログオプションはファイル内ではなく、後述の CLI で渡します）。
 
 ```sql title="paimon_test.sql"
 CREATE TABLE paimon.default.events (id INT, label STRING) TBLPROPERTIES ("primary-key"="id");
@@ -33,9 +33,9 @@ INSERT INTO paimon.default.events VALUES (1,'alpha'),(2,'beta'),(3,'gamma');
 SELECT * FROM paimon.default.events ORDER BY id;
 ```
 
-## 2. Run the SQL script
+## 2. SQL スクリプトを実行する
 
-Three pieces are required: the Spark extensions, Paimon's own S3 FileIO (`paimon-s3` — the Hadoop S3A jars are not used by Paimon's reader), and the catalog-level `s3.*` options:
+必要なものは 3 つです。Spark 拡張、Paimon 自身の S3 FileIO（`paimon-s3`。Paimon のリーダーは Hadoop S3A の JAR を使いません）、カタログレベルの `s3.*` オプションです。
 
 ```bash
 docker exec -u root spark-paimon bash -c "cd /opt/spark && \
@@ -59,9 +59,9 @@ Time taken: 9.447 seconds
 Time taken: 1.257 seconds, Fetched 3 row(s)
 ```
 
-Without the extensions line Paimon fails fast with a `requiredSparkConfsCheck` error; without `paimon-s3` the catalog fails with `UnsupportedSchemeException: Could not find a file io implementation for scheme 's3'`.
+拡張の行がないと Paimon は `requiredSparkConfsCheck` エラーで即座に失敗します。`paimon-s3` がないと、カタログは `UnsupportedSchemeException: Could not find a file io implementation for scheme 's3'` で失敗します。
 
-## 3. Verify objects in RustFS
+## 3. RustFS 内のオブジェクトを確認する
 
 ```bash
 rc ls rustfs/paimon-demo/warehouse/ -r | head -6
@@ -74,37 +74,37 @@ warehouse/default.db/events/bucket-0/data-...
 warehouse/default.db/events/manifest/...
 ```
 
-The bucket holds the full lakehouse layout: schemas, snapshots, manifests, and data files per bucket.
+S3 バケットには、スキーマ、スナップショット、マニフェスト、Paimon バケットごとのデータファイルを含むレイクハウスのレイアウト全体が入ります。
 
-![Paimon warehouse stored in the RustFS Console](./images/rustfs-paimon-warehouse.png)
+![RustFS Console に保存された Paimon ウェアハウス](./images/rustfs-paimon-warehouse.png)
 
-## 4. Stop or reset
+## 4. 停止またはリセットする
 
 ```bash
 docker rm -f spark-paimon
 rc rm rustfs/paimon-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
 ### `UnsupportedSchemeException: Could not find a file io implementation for scheme 's3'`
 
-Paimon's own FileIO needs its S3 plugin on the classpath. Add `org.apache.paimon:paimon-s3:1.2.0` to `--packages` alongside the Spark connector.
+Paimon 自身の FileIO には、クラスパス上の S3 プラグインが必要です。Spark コネクタとあわせて `--packages` に `org.apache.paimon:paimon-s3:1.2.0` を追加します。
 
 ### `When using Paimon, it is necessary to configure spark.sql.extensions...`
 
-Add `--conf spark.sql.extensions=org.apache.paimon.spark.extensions.PaimonSparkSessionExtensions` — Paimon fails fast without it.
+`--conf spark.sql.extensions=org.apache.paimon.spark.extensions.PaimonSparkSessionExtensions` を追加します。これがないと Paimon は即座に失敗します。
 
 ### `SCHEMA_NOT_FOUND: The schema paimon cannot be found`
 
-The catalog was not registered. Register it as `spark.sql.catalog.paimon` and qualify table names with `paimon.`.
+カタログが登録されていません。`spark.sql.catalog.paimon` として登録し、テーブル名は `paimon.` で修飾します。
 
-### Writes fail with S3 errors on the exec side
+### エグゼキューター側の S3 エラーで書き込みが失敗する
 
-The catalog-level `s3.*` options (`s3.endpoint`, `s3.access-key`, `s3.secret-key`, `s3.path-style-access`) are what Paimon's FileIO reads — Hadoop `fs.s3a.*` settings alone are not used by the exec-side file operations.
+Paimon の FileIO が読むのはカタログレベルの `s3.*` オプション（`s3.endpoint`、`s3.access-key`、`s3.secret-key`、`s3.path-style-access`）です。Hadoop の `fs.s3a.*` 設定だけでは、エグゼキューター側のファイル操作には使われません。
 
-## Next steps
+## 次のステップ
 
-- Compare with the [Iceberg](/developer/integration/big-data/iceberg), [Hudi](/developer/integration/big-data/hudi), and [Delta Lake](/developer/integration/big-data/delta-lake) guides for the other lakehouse formats on the same bucket.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Paimon documentation](https://paimon.apache.org/docs/master/) for compaction, changelog producers, and Flink streaming writes on the same bucket.
+- 同じバケット上のほかのレイクハウスフォーマットについては、[Iceberg](/ja/developer/integration/big-data/iceberg)、[Hudi](/ja/developer/integration/big-data/hudi)、[Delta Lake](/ja/developer/integration/big-data/delta-lake) のガイドと比較します。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- 同じバケット上でコンパクション、changelog プロデューサー、Flink のストリーミング書き込みを設定するには、[Paimon ドキュメント](https://paimon.apache.org/docs/master/)に従います。

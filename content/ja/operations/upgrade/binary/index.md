@@ -1,28 +1,28 @@
 ---
-title: "Binary Upgrade"
-description: "Upgrade RustFS binary deployments one node at a time while preserving cluster availability."
+title: "バイナリ"
+description: "クラスターの可用性を維持したまま、RustFS のバイナリデプロイを 1 ノードずつアップグレードします。"
 ---
 
-Use a rolling upgrade to replace the RustFS executable on each node without taking the entire cluster offline. Before you begin, read the target release notes and confirm every node is healthy.
+ローリングアップグレードにより、クラスター全体をオフラインにせず、各ノードの RustFS 実行ファイルを置き換えます。開始前に、対象リリースのリリースノートを読み、すべてのノードが正常であることを確認します。
 
-## Before you upgrade
+## アップグレードの前に
 
-Check readiness on every node:
+すべてのノードで準備完了を確認します。
 
 ```bash
 curl -fsS http://<node-hostname>:9000/health/ready
 ```
 
-Back up the service configuration and retain the currently running executable for rollback:
+サービス設定をバックアップし、ロールバックに備えて、現在実行中の実行ファイルを残します。
 
 ```bash
 sudo cp /etc/default/rustfs /etc/default/rustfs.bak
 sudo cp /usr/local/bin/rustfs /usr/local/bin/rustfs.previous
 ```
 
-## Upgrade each node
+## 各ノードをアップグレードする
 
-Upgrade one node at a time. Do not continue until the restarted node reports ready.
+一度に 1 ノードずつアップグレードします。再起動したノードが準備完了を報告するまで、次のノードには進みません。
 
 ```bash
 sudo systemctl stop rustfs
@@ -32,11 +32,11 @@ sudo systemctl start rustfs
 curl -fsS http://<node-hostname>:9000/health/ready
 ```
 
-Repeat the procedure for each remaining node.
+残りの各ノードでも、同じ手順を繰り返します。
 
-## Roll back
+## ロールバック
 
-If the new version fails validation, restore the previous executable on one node at a time and wait for readiness before continuing:
+新しいバージョンの検証に失敗した場合は、一度に 1 ノードずつ以前の実行ファイルを復元し、準備完了を待ってから続行します。
 
 ```bash
 sudo systemctl stop rustfs
@@ -45,6 +45,6 @@ sudo systemctl start rustfs
 curl -fsS http://<node-hostname>:9000/health/ready
 ```
 
-## Next steps
+## 次のステップ
 
-Review [Status Check](/operations/status-check) for additional post-upgrade validation.
+アップグレード後の追加の検証は、[状態の確認](/ja/operations/status-check) を参照します。

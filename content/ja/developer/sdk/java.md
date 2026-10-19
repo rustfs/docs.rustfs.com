@@ -1,25 +1,25 @@
 ---
-title: "Java SDK Guide"
-description: "Use the official AWS SDK for Java v2 with RustFS."
+title: "Java"
+description: "公式の AWS SDK for Java v2 を RustFS で使います。"
 ---
 
-RustFS ships no first-party Java SDK — it is S3-compatible, so you use the official AWS SDK for Java v2 configured to point at your RustFS server.
+RustFS は独自の Java SDK を提供していません。S3 互換であるため、公式の AWS SDK for Java v2 を、RustFS サーバーを指すように設定して使います。
 
-## 1. Prerequisites
+## 1. 前提条件
 
-* Java 8 or later and Maven (or Gradle)
-* A running RustFS instance (see the [Installation Guide](../../installation/index.md)) — the S3 API listens on port `9000`, the Console on port `9001`
-* Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (see [Access Key Management](../../security-compliance/iam/access-token.md))
+* Java 8 以降と Maven（または Gradle）
+* 稼働している RustFS インスタンス（[インストールガイド](../../installation/index.md)を参照）。S3 API はポート `9000`、Console はポート `9001` で待ち受けます
+* インストール時に環境変数 `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` で設定するアクセスキー（[アクセスキーの管理](../../security-compliance/iam/access-token.md)を参照）
 
-:::tip[Local test]
+:::tip[ローカル検証]
 
-If you did not set credentials at install time, the server defaults to `rustfsadmin` / `rustfsadmin` — fine for a throwaway local trial, never for anything reachable by others.
+インストール時に認証情報を設定しなかった場合、サーバーの既定値は `rustfsadmin` / `rustfsadmin` です。使い捨てのローカル検証であれば問題ありませんが、外部から到達できる環境では使わないでください。
 
 :::
 
-### 1.1 Maven Project Setup
+### 1.1 Maven プロジェクトの準備
 
-Create a new Maven project:
+新しい Maven プロジェクトを作成します。
 
 ```text
 rustfs-java-s3-demo/
@@ -32,9 +32,9 @@ rustfs-java-s3-demo/
                     └── RustfsS3Example.java
 ```
 
-### 1.2 Add Dependencies
+### 1.2 依存関係の追加
 
-Add AWS SDK dependencies in `pom.xml`:
+`pom.xml` に AWS SDK の依存関係を追加します。
 
 ```xml title="pom.xml"
 <dependencies>
@@ -46,15 +46,15 @@ Add AWS SDK dependencies in `pom.xml`:
 </dependencies>
 ```
 
-> Recommend using AWS SDK v2, which has more complete features and supports async, reactive, and other patterns.
+AWS SDK for Java v2 の使用を推奨します。機能が充実しており、非同期プログラミングとリアクティブプログラミングに対応しています。
 
 ---
 
-## 2. Connecting to RustFS
+## 2. RustFS への接続
 
-### 2.1 Complete Example
+### 2.1 完全な例
 
-The following class compiles and runs as-is. Replace `localhost` with your server's IP address if RustFS runs on another machine, and fill in your own access keys:
+次のクラスは、そのままコンパイルして実行できます。RustFS が別のマシンで動作している場合は `localhost` をサーバーの IP アドレスに置き換え、アクセスキーも自分の値にします。
 
 ```java title="RustfsS3Example.java"
 package com.example;
@@ -121,7 +121,7 @@ public class RustfsS3Example {
 }
 ```
 
-Expected output:
+想定される出力:
 
 ```text
 Bucket created: my-bucket
@@ -133,55 +133,55 @@ Deleted hello.txt
 
 ---
 
-## 3. Common Issues and Troubleshooting
+## 3. トラブルシューティング
 
-| Issue | Cause | Solution |
-| -------------------------------------- | ------------------------------------ | ----------------------------------------- |
-| `S3Exception: 301 Moved Permanently` | Path-style not enabled or region error | Set `.forcePathStyle(true)` and use region `us-east-1` |
-| `ConnectException: Connection refused` | RustFS not started or incorrect port | Check RustFS status and port |
-| `403 Forbidden` | AccessKey / SecretKey error | Check authentication configuration |
-| Upload fails with no response | SDK defaults to HTTPS, RustFS only supports HTTP (or needs certificates) | Use `http://` address and configure `endpointOverride` |
+| 問題 | 原因 | 対処 |
+| --- | --- | --- |
+| `S3Exception: 301 Moved Permanently` | パススタイルアクセスが有効でない、またはリージョンが誤っている | `.forcePathStyle(true)` を設定し、リージョンには `us-east-1` を使います |
+| `ConnectException: Connection refused` | RustFS が起動していない、またはポートが誤っている | RustFS の状態とポートを確認します |
+| `403 Forbidden` | アクセスキーまたはシークレットキーが誤っている | 認証情報を確認します |
+| 応答がないままアップロードが失敗する | SDK の既定は HTTPS であり、RustFS は HTTP のみに対応している（HTTPS には証明書が必要） | `http://` のアドレスを使い、`endpointOverride` を設定します |
 
 ---
 
-## 4. Appendix
+## 4. 付録
 
-### 4.1 Maven Package and Run
+### 4.1 Maven でのパッケージ化と実行
 
-Package project:
+プロジェクトをパッケージ化します。
 
 ```bash
 mvn clean package
 ```
 
-Execute:
+実行します。
 
 ```bash
 java -cp target/rustfs-java-s3-demo-1.0-SNAPSHOT.jar com.example.RustfsS3Example
 ```
 
-### 4.2 RustFS Configuration Recommendations
+### 4.2 推奨する RustFS の設定
 
-* Ensure SSL validation is disabled when service uses HTTP protocol.
-* Enable CORS support (if used for web frontend).
-* Recommend setting limits like `max_object_size` and `max_part_size` to prevent large file transfer failures.
-
----
-
-The following advanced examples cover:
-
-* Presigned URL generation and usage
-* Multipart Upload complete process
+* RustFS が平文の HTTP で提供している場合は、SDK 側で TLS 証明書の検証を無効にします。
+* Web フロントエンドで使う場合は、CORS を有効にします。
+* 大きなファイルの転送失敗を防ぐため、`max_object_size` や `max_part_size` などの上限を設定することを推奨します。
 
 ---
 
-## 5. Java Advanced Features Examples
+応用例では、次の内容を扱います。
 
-### 5.1 Generate and Use Presigned URLs
+* 署名付き URL の生成と利用
+* マルチパートアップロードの一連の手順
 
-> Presigned URLs allow clients to temporarily access private objects without exposing credentials, widely used for browser direct upload or download file scenarios.
+---
 
-#### 5.1.1 Generate Download Link (GET)
+## 5. 応用例
+
+### 5.1 署名付き URL の生成と利用
+
+署名付き URL を使うと、認証情報を公開せずに、クライアントが非公開オブジェクトへ一時的にアクセスできます。ブラウザーからの直接アップロードやダウンロードでよく使います。
+
+#### 5.1.1 ダウンロードリンクの生成（GET）
 
 ```java
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -229,11 +229,11 @@ System.out.println("Presigned URL: " + presignedRequest.url());
 Presigned URL: http://localhost:9000/my-bucket/hello.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&...
 ```
 
-> 🔗 Open the link in browser to access the object.
+ブラウザーで URL を開くと、オブジェクトにアクセスできます。
 
-#### 5.1.2 Upload Presigned URL (PUT)
+#### 5.1.2 アップロード用の署名付き URL（PUT）
 
-Similarly, you can also generate upload URLs:
+アップロード用の URL も生成できます。
 
 ```java
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -257,11 +257,11 @@ System.out.println("Upload URL: " + presignedPut.url());
 
 ---
 
-### 5.2 Implement Multipart Upload
+### 5.2 マルチパートアップロードの実装
 
-> Multipart Upload is the recommended way for large file uploads, enabling resume from breakpoint during network fluctuations.
+大きなファイルのアップロードには、マルチパートアップロードを推奨します。ネットワークが中断しても、アップロード全体をやり直さず、失敗したパートだけを再試行できます。
 
-The examples below reuse the `s3` client from section 2 and need these additional imports:
+以下の例では、セクション 2 の `s3` クライアントを再利用します。次の import も必要です。
 
 ```java
 import software.amazon.awssdk.services.s3.model.*;
@@ -271,7 +271,7 @@ import java.util.ArrayList;
 import java.util.List;
 ```
 
-#### 5.2.1 Start Multipart Upload
+#### 5.2.1 マルチパートアップロードの開始
 
 ```java
 CreateMultipartUploadRequest createRequest = CreateMultipartUploadRequest.builder()
@@ -283,7 +283,7 @@ CreateMultipartUploadResponse createResponse = s3.createMultipartUpload(createRe
 String uploadId = createResponse.uploadId();
 ```
 
-#### 5.2.2 Upload Each Part
+#### 5.2.2 各パートのアップロード
 
 ```java
 List<CompletedPart> completedParts = new ArrayList<>();
@@ -306,7 +306,7 @@ for (int i = 1; i <= 3; i++) {
 }
 ```
 
-#### 5.2.3 Complete Multipart Upload
+#### 5.2.3 マルチパートアップロードの完了
 
 ```java
 CompletedMultipartUpload completedUpload = CompletedMultipartUpload.builder()
@@ -328,7 +328,7 @@ System.out.println("Multipart upload completed.");
 Multipart upload completed.
 ```
 
-#### 5.2.4 Abort Upload on Exception (Optional)
+#### 5.2.4 例外時のアップロード中止（任意）
 
 ```java
 AbortMultipartUploadRequest abortRequest = AbortMultipartUploadRequest.builder()
@@ -342,4 +342,4 @@ s3.abortMultipartUpload(abortRequest);
 
 ---
 
-For other operations (object tagging, bucket policies, and more), see the [AWS SDK for Java v2 documentation](https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/) — every S3-compatible call works against RustFS the same way.
+オブジェクトのタグ付けやバケットポリシーなどの操作については、[AWS SDK for Java v2 のドキュメント](https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/)を参照します。ほとんどの S3 操作は、RustFS に対しても同じように動作します。例外は [S3 互換性](/ja/reference/s3-compatibility) を参照します。

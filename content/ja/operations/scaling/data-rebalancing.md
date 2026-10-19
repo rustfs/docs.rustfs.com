@@ -1,84 +1,84 @@
 ---
-title: "Rebalancing"
-description: "Redistribute existing objects across active RustFS storage pools through the Console or rc."
+title: "リバランス"
+description: "Console または rc を使い、既存のオブジェクトを稼働中の RustFS ストレージプールへ再配置します。"
 ---
 
-## Overview
+## 概要
 
-### Requirements
+### 要件
 
-- Install [`rc`](/operations/rc) on the administration host before using the `rc` workflow in this guide.
-- Configure credentials with rebalance administration permission.
+- このガイドで `rc` の手順を使う前に、管理用ホストに [`rc`](/ja/operations/rc) をインストールします。
+- リバランスを管理する権限を持つ認証情報を設定します。
 
-After [Pool Expansion](./storage-pool-expansion.md), new writes can use the added capacity, but existing objects remain in their original pools. **Rebalancing** moves existing objects across all active pools so their used-capacity ratios converge.
+[プールの拡張](./storage-pool-expansion.md) のあと、新しい書き込みは追加された容量を使えます。既存のオブジェクトは元のプールに残ります。**リバランス**は、使用容量の比率が近づくように、既存のオブジェクトを稼働中のすべてのプールへ移動します。
 
-Rebalancing requires at least two active pools. RustFS rejects a new rebalance while another rebalance or a pool decommission is running. Stopping a rebalance does not move already relocated objects back to their original pools.
+リバランスには、稼働中のプールが 2 つ以上必要です。別のリバランス、またはプールのデコミッションが実行中のときは、RustFS は新しいリバランスを拒否します。リバランスを停止しても、すでに移動したオブジェクトは元のプールへは戻りません。
 
-Before starting, verify that all nodes and disks are healthy, no decommission is active, and the cluster has enough free capacity for normal writes during the operation. Schedule the operation during a lower-traffic period because object movement consumes disk, network, and CPU resources.
+開始前に、すべてのノードとディスクが正常であること、デコミッションが実行中でないこと、操作中の通常の書き込みに足りる空き容量がクラスターにあることを確認します。オブジェクトの移動はディスク、ネットワーク、CPU を消費するため、トラフィックの少ない時間帯に実施します。
 
-## Operation
+## 操作
 
-### Start rebalancing in the Console
+### Console でリバランスを開始する
 
-1. Sign in to the RustFS Console with an account that has rebalance administration permission.
-2. Open **Rebalance**.
-3. Review the active pools and their used-capacity ratios.
-4. Select **Start Rebalance** and confirm the operation.
-5. Keep the page open or return to it periodically to review per-pool progress.
-6. Use **Stop Rebalance** only when you need to halt the operation. Data already moved remains in its new pool.
+1. リバランスを管理する権限を持つアカウントで、RustFS Console にサインインします。
+2. **Rebalance**（リバランス）を開きます。
+3. 稼働中のプールと、それぞれの使用容量の比率を確認します。
+4. **Start Rebalance**（リバランスを開始）を選択し、操作を確定します。
+5. ページを開いたままにするか、定期的に戻って、プールごとの進捗を確認します。
+6. 操作を中断する必要がある場合に限り、**Stop Rebalance**（リバランスを停止）を使います。すでに移動したデータは、新しいプールに残ります。
 
-![RustFS Console showing a rebalance in progress with moved bytes and objects](./images/rebalance-running-console.png)
+![移動済みのバイト数とオブジェクト数を伴う、実行中のリバランスを示す RustFS Console](./images/rebalance-running-console.png)
 
-### Start rebalancing with rc
+### rc でリバランスを開始する
 
-Configure the cluster alias if it does not already exist:
+クラスターのエイリアスが未設定の場合は、設定します。
 
 ```bash
 rc alias set rustfs http://<server-ip>:9000 <your-access-key> <your-secret-key>
 ```
 
-Start the rebalance:
+リバランスを開始します。
 
 ```bash
 rc admin rebalance start rustfs
 ```
 
-Check progress:
+進捗を確認します。
 
 ```bash
 rc admin rebalance status rustfs
 ```
 
-The status includes the operation ID and per-pool usage, moved bytes, object and version counts, remaining buckets, elapsed time, and estimated completion time when available.
+ステータスには、操作 ID に加え、プールごとの使用量、移動済みバイト数、オブジェクト数とバージョン数、残りのバケット、経過時間、取得できる場合は完了見込み時刻が含まれます。
 
-To stop a running rebalance:
+実行中のリバランスを停止するには、次を実行します。
 
 ```bash
 rc admin rebalance stop rustfs
 ```
 
-`rc admin expand start|status|stop` and the `scale` alias expose the same post-expansion rebalance workflow.
+`rc admin expand start|status|stop` と `scale` エイリアスは、拡張後のリバランスと同じ手順を提供します。
 
-## Verification
+## 検証
 
-### Verify rebalancing in the Console
+### Console でリバランスを検証する
 
-Wait until the Rebalance page reports `Completed`. Confirm that:
+**Rebalance** ページが `Completed` を報告するまで待ち、次を確認します。
 
-![RustFS Console showing a completed rebalance and balanced pool usage](./images/rebalance-completed-console.png)
+![完了したリバランスと、均衡したプール使用量を示す RustFS Console](./images/rebalance-completed-console.png)
 
-- No pool reports a failed or stopped state.
-- Used-capacity ratios are closer across the active pools.
-- All nodes and disks remain online.
-- Normal object reads and writes succeed.
+- 失敗または停止を報告しているプールがないこと。
+- 稼働中のプールの間で、使用容量の比率がより近づいていること。
+- すべてのノードとディスクがオンラインのままであること。
+- オブジェクトの通常の読み取りと書き込みが成功すること。
 
-### Verify rebalancing with rc
+### rc でリバランスを検証する
 
-Run:
+次を実行します。
 
 ```bash
 rc admin rebalance status rustfs
 rc admin pool list rustfs
 ```
 
-Verify that the rebalance status is `Completed`, remaining bucket counts are zero, and no failure is reported. Compare the per-pool usage ratios with the values recorded before the operation, then read an existing object and write a new test object through the S3 endpoint.
+リバランスのステータスが `Completed` であり、残りのバケット数が 0 で、失敗が報告されていないことを確認します。プールごとの使用量の比率を、操作前に記録した値と比較します。その後、S3 エンドポイント経由で既存のオブジェクトを読み取り、新しいテストオブジェクトを書き込みます。

@@ -5,7 +5,7 @@ description: "Docker Compose を使い、Spark、REST カタログ、RustFS の�
 
 このガイドでは、Spark、Iceberg REST カタログ、S3 互換ウェアハウスとしての **RustFS** を用いて **Apache Iceberg** を実行します。Iceberg テーブルを作成し、行を書き込み、問い合わせ、テーブルファイルが RustFS に保存されていることを確認します。
 
-RustFS の組み込み REST カタログを使う場合は、[S3 Tables の設定](/administration/data/s3-tables)と [PyIceberg ガイド](/developer/integration/big-data/pyiceberg)を参照してください。以下の構成では、別のカタログサービスを起動します。
+RustFS の組み込み REST カタログを使う場合は、[S3 Tables の設定](/ja/administration/data/s3-tables)と [PyIceberg ガイド](/ja/developer/integration/big-data/pyiceberg)を参照してください。以下の構成では、別のカタログサービスを起動します。
 
 Docker と Compose プラグイン、および 4 つのコンテナを動かすだけのローカルリソースが必要です。この構成はローカルの連携テスト向けであり、本番向けではありません。
 
@@ -270,6 +270,6 @@ REST カタログのプロパティでは、`CATALOG_IO__IMPL` と `CATALOG_S3_P
 
 ## 次のステップ
 
-- ほかの Iceberg 操作を採用する前に、[S3 互換性に関する注意](/administration/protocols/s3)を確認します。
-- [アクセスキーの管理](/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- ほかの Iceberg 操作を採用する前に、[S3 互換性に関する注意](/ja/administration/protocols/s3)を確認します。
+- [アクセスキーの管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
 - 既存の Spark 環境を設定するには、[Apache Iceberg の Spark ドキュメント](https://iceberg.apache.org/docs/latest/spark-getting-started/)に従ってください。

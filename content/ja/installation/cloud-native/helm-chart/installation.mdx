@@ -1,22 +1,22 @@
 ---
-title: Install
-description: Install standalone or distributed RustFS on Kubernetes with the official Helm chart.
+title: インストール
+description: 公式の Helm チャートを使い、Kubernetes 上にスタンドアロンまたは分散構成の RustFS をインストールします。
 ---
 
-This guide gets the official RustFS chart from source or the Helm repository, installs it, and verifies access to the S3 API and Console.
+このガイドでは、ソースまたは Helm リポジトリから公式の RustFS チャートを取得し、インストールして、S3 API と Console へのアクセスを確認します。
 
-## Requirements
+## 要件
 
-| Component | Requirement |
+| コンポーネント | 要件 |
 |-----------|-------------|
-| Helm | Version 3 |
-| Kubernetes | A cluster reachable with `kubectl` |
-| StorageClass | Dynamic PVC provisioning for RustFS data |
-| RustFS | `1.0.0-alpha.69` or later |
+| Helm | バージョン 3 |
+| Kubernetes | `kubectl` で到達できるクラスター |
+| StorageClass | RustFS データ向けの動的な PVC プロビジョニング |
+| RustFS | `1.0.0-alpha.69` 以降 |
 
-An Ingress controller is optional. If you enable Ingress, set `ingress.className` to the controller in your cluster, such as `nginx` or `traefik`.
+Ingress コントローラーは任意です。Ingress を有効にする場合は、`ingress.className` をクラスター内のコントローラー（`nginx` や `traefik` など）に設定します。
 
-Check the active cluster and available StorageClasses:
+アクティブなクラスターと、利用できる StorageClass を確認します。
 
 ```bash
 kubectl config current-context
@@ -24,14 +24,14 @@ kubectl get storageclass
 helm version --short
 ```
 
-## 1. Get the chart
+## 1. チャートを取得する
 
-Choose how Helm should access the chart. Both options set `RUSTFS_CHART`, which the installation commands below use.
+Helm がチャートへアクセスする方法を選びます。どちらの方法でも `RUSTFS_CHART` を設定し、以降のインストールコマンドで使います。
 
-<Tabs items={["Clone the repository", "Helm repository"]} updateAnchor={false}>
-  <Tab value="Clone the repository" id="helm-chart-clone">
+<Tabs items={["リポジトリをクローン", "Helm リポジトリ"]} updateAnchor={false}>
+  <Tab value="リポジトリをクローン" id="helm-chart-clone">
 
-Clone the RustFS source repository to use the chart at `helm/rustfs`:
+RustFS のソースリポジトリをクローンし、`helm/rustfs` にあるチャートを使います。
 
 ```bash
 git clone https://github.com/rustfs/rustfs.git
@@ -40,9 +40,9 @@ export RUSTFS_CHART=./helm/rustfs
 ```
 
   </Tab>
-  <Tab value="Helm repository" id="helm-chart-repository">
+  <Tab value="Helm リポジトリ" id="helm-chart-repository">
 
-Add the RustFS repository listed on [Artifact Hub](https://artifacthub.io/packages/helm/rustfs/rustfs), then update the local repository index:
+[Artifact Hub](https://artifacthub.io/packages/helm/rustfs/rustfs) に掲載されている RustFS リポジトリを追加し、ローカルのリポジトリインデックスを更新します。
 
 ```bash
 helm repo add rustfs https://charts.rustfs.com
@@ -53,9 +53,9 @@ export RUSTFS_CHART=rustfs/rustfs
   </Tab>
 </Tabs>
 
-## 2. Install standalone mode
+## 2. スタンドアロンモードをインストールする
 
-Create a values file for a one-Pod development deployment:
+Pod が 1 つの開発用デプロイ向けに、values ファイルを作成します。
 
 ```yaml title="standalone-values.yaml"
 mode:
@@ -78,7 +78,7 @@ ingress:
   enabled: false
 ```
 
-Replace `standard` with a StorageClass in your cluster, then install:
+`standard` をクラスター内の StorageClass に置き換えてから、インストールします。
 
 ```bash
 helm upgrade --install rustfs "$RUSTFS_CHART" \
@@ -87,9 +87,9 @@ helm upgrade --install rustfs "$RUSTFS_CHART" \
   -f standalone-values.yaml
 ```
 
-## 3. Install distributed mode
+## 3. 分散モードをインストールする
 
-For a distributed cluster, set the Pod and drive counts explicitly. Total data drives equal `replicaCount * drivesPerNode`.
+分散クラスターでは、Pod 数とドライブ数を明示します。データドライブの合計は `replicaCount * drivesPerNode` です。
 
 ```yaml title="distributed-values.yaml"
 mode:
@@ -115,7 +115,7 @@ ingress:
   enabled: false
 ```
 
-The example creates four Pods and eight data PVCs. Ensure the cluster can schedule all Pods and provision all PVCs, then install:
+この例では、Pod を 4 つ、データ PVC を 8 つ作成します。すべての Pod をスケジュールでき、すべての PVC をプロビジョニングできることを確認してから、インストールします。
 
 ```bash
 helm upgrade --install rustfs "$RUSTFS_CHART" \
@@ -124,45 +124,45 @@ helm upgrade --install rustfs "$RUSTFS_CHART" \
   -f distributed-values.yaml
 ```
 
-:::warning[Choose the topology before installation]
+:::warning[インストール前にトポロジーを決める]
 
-Kubernetes does not allow updates to StatefulSet `volumeClaimTemplates`. Changing `drivesPerNode` later requires StatefulSet recreation or a new installation.
+Kubernetes では、StatefulSet の `volumeClaimTemplates` を更新できません。後から `drivesPerNode` を変更するには、StatefulSet の再作成か、新規インストールが必要です。
 
 :::
 
-## 4. Verify and access RustFS
+## 4. RustFS を確認してアクセスする
 
 ```bash
 kubectl -n rustfs get pods,pvc,services
 kubectl -n rustfs rollout status statefulset/rustfs
 ```
 
-Standalone mode creates a Deployment instead of a StatefulSet. Check it with:
+スタンドアロンモードでは、StatefulSet ではなく Deployment が作成されます。次のコマンドで確認します。
 
 ```bash
 kubectl -n rustfs rollout status deployment/rustfs
 ```
 
-Forward the S3 API and Console to your workstation:
+S3 API と Console を作業用マシンへポートフォワードします。
 
 ```bash
 kubectl -n rustfs port-forward svc/rustfs 9000:9000 9001:9001
 ```
 
-Use `http://localhost:9000` as the S3 endpoint and open `http://localhost:9001` for the Console.
+S3 エンドポイントには `http://localhost:9000` を使い、Console は `http://localhost:9001` を開きます。
 
-## Key values
+## 主要な値
 
-| Value | Purpose | Chart default |
+| 値 | 目的 | チャートのデフォルト |
 |-------|---------|---------------|
-| `mode.standalone.enabled` | Enable one-Pod standalone mode | `false` |
-| `mode.distributed.enabled` | Enable distributed mode | `true` |
-| `replicaCount` | Distributed Pod count | `4` |
-| `drivesPerNode` | Data PVCs per Pod | Inferred from `replicaCount` |
-| `storageclass.name` | StorageClass for PVCs | `local-path` |
-| `storageclass.dataStorageSize` | Size of each data PVC | `256Mi` |
-| `storageclass.logStorageSize` | Size of each log PVC | `256Mi` |
-| `service.endpoint.port` | S3 API port | `9000` |
-| `service.console.port` | Console port | `9001` |
+| `mode.standalone.enabled` | Pod が 1 つのスタンドアロンモードを有効にする | `false` |
+| `mode.distributed.enabled` | 分散モードを有効にする | `true` |
+| `replicaCount` | 分散モードの Pod 数 | `4` |
+| `drivesPerNode` | Pod あたりのデータ PVC 数 | `replicaCount` から推定 |
+| `storageclass.name` | PVC の StorageClass | `local-path` |
+| `storageclass.dataStorageSize` | 各データ PVC のサイズ | `256Mi` |
+| `storageclass.logStorageSize` | 各ログ PVC のサイズ | `256Mi` |
+| `service.endpoint.port` | S3 API のポート | `9000` |
+| `service.console.port` | Console のポート | `9001` |
 
-We recommend setting storage sizes explicitly; the chart defaults are intended only for basic evaluation.
+ストレージサイズは明示的に設定することを推奨します。チャートのデフォルトは、基本的な評価だけを想定しています。
