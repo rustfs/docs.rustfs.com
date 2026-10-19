@@ -1,13 +1,13 @@
 ---
 title: RustFS Single Node Single Disk Installation
-description: Install RustFS on a single disk of a single server, data will be stored on this one disk.
+description: Install RustFS on a single server that stores all data on one disk.
 ---
 
 In Single Node Single Disk (SNSD) mode, one server stores all data on a single data disk. It is the simplest deployment mode and the same topology that the [Linux Quick Start](./quick-start.md) script sets up.
 
 :::warning
 
-A single disk offers no redundancy: if the disk fails, data is lost. SNSD is suitable for development, testing, and low-density non-critical business. For production use, maintain regular data backups or choose [SNMD](./single-node-multiple-disk.md) / [MNMD](./multiple-node-multiple-disk.md).
+A single disk offers no redundancy: if the disk fails, data is lost. SNSD is suitable for development, testing, and small non-critical workloads. For production use, maintain regular data backups or choose [SNMD](./single-node-multiple-disk.md) / [MNMD](./multiple-node-multiple-disk.md).
 
 :::
 
@@ -54,9 +54,9 @@ sudo mkdir -p /data/rustfs0 /var/log/rustfs /opt/tls
 sudo chmod -R 750 /data/rustfs* /var/log/rustfs
 ```
 
-## Start Service and Verification
+## Start and verify the service
 
-1. Start the service and enable auto-start on boot:
+1. Start the service and enable it to start at boot:
 
 ```bash
 sudo systemctl enable --now rustfs
@@ -80,7 +80,7 @@ netstat -ntpl
 tail -f /var/log/rustfs/rustfs*.log
 ```
 
-5. Access the console: enter the server's IP address and the console port (default 9001) in a browser. You should see:
+5. Open the Console: in a browser, go to `http://<server-ip>:9001`. You should see:
 
 ![Console](./images/console.jpg)
 

@@ -14,24 +14,24 @@ After installation, set unique values for `RUSTFS_ACCESS_KEY` and `RUSTFS_SECRET
 
 :::
 
-## Choose Your Path
+## Choose your path
 
 | Your goal | Recommended path | Guide |
 | - | - | - |
 | Try RustFS on a local machine | One-command install script, or a container | [Linux Quick Start](./linux/quick-start.md) · [Container](./container/index.md) |
 | Single-server production | SNSD (one disk) or SNMD (multiple disks) | [Installing RustFS on Linux](./linux/index.md) |
 | Multi-server production cluster | MNMD, after completing the production checklists | [Multiple Node Multiple Disk](./linux/multiple-node-multiple-disk.md) · [Checklists](./requirement/checklists/index.md) |
-| Kubernetes / cloud-native | Container orchestration deployment | [Cloud Native](./cloud-native/index.md) |
+| Kubernetes / cloud-native | Deploy with the Helm chart or the Operator | [Cloud Native](./cloud-native/index.md) |
 | Windows or macOS host | Native installation | [Windows](./windows/index.md) · [macOS](./macos/index.md) |
 
 ## Deployment Mode Comparison
 
 | Mode | Nodes | Disks | Fault Tolerance | Typical Use |
 | - | - | - | - | - |
-| [SNSD](./linux/single-node-single-disk.md) | 1 | 1 | None — rely on backups | Development, testing, low-density non-critical business |
-| [SNMD](./linux/single-node-multiple-disk.md) | 1 | Multiple | Up to M parity disks within the node | Medium, non-critical business on a single server |
+| [SNSD](./linux/single-node-single-disk.md) | 1 | 1 | None — rely on backups | Development, testing, and small non-critical workloads |
+| [SNMD](./linux/single-node-multiple-disk.md) | 1 | Multiple | Up to M parity disks within the node | Mid-sized, non-critical workloads on a single server |
 | [MNMD](./linux/multiple-node-multiple-disk.md) | 4+ | Multiple per node | Disk- and node-level via erasure coding across servers | Production workloads |
 
 ## Checklist
 
-Before any production deployment, work through the [Pre-Installation Checklists](./requirement/checklists/index.md) — hardware, network, software, and security — to make sure your environment meets production guidance.
+Before any production deployment, work through the [Pre-Installation Checklists](./requirement/checklists/index.md) — hardware, network, software, and security — to make sure your environment meets production requirements.

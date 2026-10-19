@@ -204,7 +204,7 @@ curl -X PUT --upload-file /path/to/hello.txt "http://localhost:9000/my-bucket/up
 
 ### 5.2 Multipart Upload
 
-Suitable for files larger than 10 MB, allows manual control of each part.
+Use multipart upload for files larger than 10 MB when you need control over each part.
 
 ```python
 file_path = 'largefile.bin'
@@ -260,13 +260,13 @@ Multipart upload complete.
 
 ---
 
-## 6. Common Issue Troubleshooting
+## 6. Troubleshooting
 
 | Issue | Cause | Solution |
 | ------------------------- | ----------------- | -------------------------------------------------------------- |
 | `SignatureDoesNotMatch` | Not using v4 signature | Set `signature_version='s3v4'` |
 | `EndpointConnectionError` | Wrong RustFS address or service not started | Check endpoint and RustFS service status |
-| `AccessDenied` | Wrong credentials or insufficient permissions | Check AccessKey/SecretKey or bucket policies |
+| `AccessDenied` | Wrong credentials or insufficient permissions | Check the access key, secret key, and bucket policies |
 | `PermanentRedirect` / wrong bucket URL | Path-style not enabled | Set `s3={'addressing_style': 'path'}` in the `Config` |
 
 ---

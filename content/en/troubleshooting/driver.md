@@ -1,24 +1,15 @@
 ---
-title: "Hard Drive Failures"
-description: "RustFS ensures read/write access can still be provided when some disks fail through mechanisms similar to erasure coding, and automatically heals data after replacing disks."
+title: "Drive Failures"
+description: "Replace a failed drive in a RustFS deployment and let RustFS heal the data automatically."
 ---
 
-RustFS ensures read/write access can still be provided when some disks fail through mechanisms similar to erasure coding, and automatically heals data after replacing disks.
-
-## Table of Contents
-
-1. [Unmount Failed Disk](#unmount-failed-disk)
-2. [Replace Failed Disk](#replace-failed-disk)
-3. [Update `/etc/fstab` or RustFS Configuration](#update-etcfstab-or-rustfs-configuration)
-4. [Remount New Disk](#remount-new-disk)
-5. [Trigger and Monitor Data Healing](#trigger-and-monitor-data-healing)
-6. [Follow-up Checks and Notes](#follow-up-checks-and-notes)
+RustFS uses erasure coding to keep data readable and writable when some drives fail. After you replace a failed drive, RustFS heals the missing data onto it automatically.
 
 <a id="unmount-failed-disk"></a>
 
-### Unmount Failed Disk
+### Unmount the failed disk
 
-Before replacing the physical hard drive, you need to safely unmount the failed disk from the operating system level to avoid I/O errors in the file system or RustFS during the replacement process.
+Before replacing the physical hard drive, unmount the failed disk at the operating system level to prevent I/O errors in the file system or RustFS during replacement.
 
 ```bash
 # Assume the failed disk is /dev/sdb
@@ -27,8 +18,8 @@ umount /dev/sdb
 
 :::note[Notes]
 
-* If there are multiple mount points, execute `umount` separately.
-* If encountering "device is busy", you can first stop the RustFS service:
+* If the disk has multiple mount points, run `umount` on each one.
+* If you see a "device is busy" error, stop the RustFS service first:
 
 ```bash
 systemctl stop rustfs
@@ -38,7 +29,7 @@ systemctl stop rustfs
 
 <a id="replace-failed-disk"></a>
 
-### Replace Failed Disk
+### Replace the failed disk
 
 After physically replacing the failed disk, you need to partition and format the new disk, and apply the same label as the original disk.
 
@@ -47,17 +38,19 @@ After physically replacing the failed disk, you need to partition and format the
 mkfs.xfs -L DISK1 /dev/sdb
 ```
 
-> **Requirements**
->
-> * New disk capacity ≥ original disk capacity;
-> * File system type consistent with other disks (XFS, per the [installation guide](../installation/linux/index.md));
-> * Recommend using labels (LABEL) or UUID for mounting to ensure disk order is not affected by system restarts.
+:::note[Requirements]
+
+* The new disk is at least as large as the original disk.
+* Use the same file system as the other disks (XFS; see the [installation guide](../installation/linux/index.md)).
+* We recommend mounting file systems by label (LABEL) or UUID so that mounts remain correct if device names change after a restart.
+
+:::
 
 <a id="update-etcfstab-or-rustfs-configuration"></a>
 
-### Update `/etc/fstab` or RustFS Configuration
+### Update `/etc/fstab` or the RustFS configuration
 
-Confirm that the mount item labels or UUIDs in `/etc/fstab` point to the new disk. The mount point must stay identical to the one listed in `RUSTFS_VOLUMES` (in `/etc/default/rustfs`), so the healed disk rejoins the cluster at the same path.
+Confirm that the labels or UUIDs in the `/etc/fstab` entries point to the new disk. The mount point must stay identical to the one listed in `RUSTFS_VOLUMES` (in `/etc/default/rustfs`), so the healed disk rejoins the cluster at the same path.
 
 ```bash
 # View current fstab
@@ -76,7 +69,7 @@ blkid /dev/sdb
 # Get the new partition's UUID, then replace the corresponding field in fstab
 ```
 
-* After modifying fstab, be sure to validate syntax:
+* After you edit `/etc/fstab`, validate the syntax:
 
 ```bash
 mount -a # If no errors, configuration is correct
@@ -86,30 +79,30 @@ mount -a # If no errors, configuration is correct
 
 <a id="remount-new-disk"></a>
 
-### Remount New Disk
+### Remount the new disk
 
-Execute the following commands to batch mount all disks and start the RustFS service:
+Run the following commands to mount all configured file systems and start RustFS:
 
 ```bash
 mount -a
 systemctl start rustfs
 ```
 
-Confirm all disks are mounted normally:
+Verify that all expected file systems are mounted:
 
 ```bash
 df -h | grep /data/rustfs
 ```
 
-:::note
+:::note[Mount failures]
 
-If some mounts fail, please check if fstab entries are consistent with disk labels/UUIDs.
+If a mount fails, check that the labels or UUIDs in `/etc/fstab` match those on the target file system.
 
 :::
 
 <a id="trigger-and-monitor-data-healing"></a>
 
-### Trigger and Monitor Data Healing
+### Trigger and monitor data healing
 
 Once RustFS detects a freshly formatted disk at a known mount point, its background scanner heals the missing data onto it automatically — no manual command is required. Confirm that recovery has started and track its progress through the service logs:
 
@@ -125,24 +118,24 @@ You can also open the RustFS Console and check the disk status of the affected n
 
 :::note[Notes]
 
-* The healing process will complete in the background, usually with minimal impact on online access;
-* After healing is complete, the tool will report success or list failed objects.
+* Healing runs in the background and usually has little impact on client requests.
+* When healing finishes, the logs report success or list objects that failed to heal.
 
 :::
 
 <a id="follow-up-checks-and-notes"></a>
 
-### Follow-up Checks and Notes
+### Follow-up checks and notes
 
 1. **Performance Monitoring**
 
- * I/O may fluctuate slightly during healing, recommend monitoring disk and network load.
+ * I/O load may fluctuate during healing. We recommend monitoring disk and network utilization.
 2. **Batch Failures**
 
- * If multiple failures occur in the same batch of disks, consider more frequent hardware inspections.
-3. **Regular Drills**
+ * If several disks from the same manufacturing batch fail, inspect the remaining disks from that batch more often.
+3. **Regular failure tests**
 
- * Regularly simulate disk failure drills to ensure team familiarity with recovery processes.
+ * Run regular disk failure drills so your team can practice the recovery procedure.
 4. **Maintenance Windows**
 
- * When failure rates are high, arrange dedicated maintenance windows to speed up replacement and healing.
+ * When failure rates are high, schedule dedicated maintenance windows to speed up replacement and healing.
