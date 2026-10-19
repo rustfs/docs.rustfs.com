@@ -151,4 +151,4 @@ La réservation par défaut du cache KV représente 90 % de la RAM système. Ré
 
 - Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres configurations de service.
 - Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
-- Suivez la [documentation vLLM](https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html) pour les modèles de conversation, le parallélisme de tenseurs et les poids quantifiés, au-dessus du même magasin de modèles adossé au compartiment.
+- Suivez la [documentation vLLM](https://docs.vllm.ai/serving/openai_compatible_server.html) pour les modèles de conversation, le parallélisme de tenseurs et les poids quantifiés, au-dessus du même magasin de modèles adossé au compartiment.

@@ -259,4 +259,4 @@ docker compose logs create-bucket
 
 - Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres opérations S3.
 - Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
-- Suivez la [documentation des instantanés Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshot-restore.html) pour la gestion du cycle de vie des instantanés (SLM).
+- Suivez la [documentation des instantanés Elasticsearch](https://www.elastic.co/docs/deploy-manage/tools/snapshot-and-restore) pour la gestion du cycle de vie des instantanés (SLM).

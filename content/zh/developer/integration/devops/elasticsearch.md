@@ -259,4 +259,4 @@ docker compose logs create-bucket
 
 - 在采用其他 S3 操作前，请查看 [S3 兼容性说明](/administration/protocols/s3)。
 - 通过[访问密钥管理](/security-compliance/iam/access-token)创建专用的生产凭证。
-- 按照 [Elasticsearch 快照文档](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshot-restore.html)了解快照生命周期管理（SLM）。
+- 按照 [Elasticsearch 快照文档](https://www.elastic.co/docs/deploy-manage/tools/snapshot-and-restore)了解快照生命周期管理（SLM）。

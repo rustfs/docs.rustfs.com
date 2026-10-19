@@ -225,6 +225,27 @@ function extractExternalUrls(content) {
   return urls.sort();
 }
 
+// Vendor docs sometimes put a language code in an absolute URL. Ray's Sphinx
+// site, for example, publishes only https://docs.ray.io/en/latest/... and
+// returns 404 for the same path without /en/. Those are not internal locale
+// links. Keep absolute docs.rustfs.com URLs so a fully qualified /en/ page
+// is still reported.
+function withoutExternalUrls(content) {
+  return content.replace(/https?:\/\/[^\s)<>{}"']+/g, (url) => {
+    try {
+      const hostname = new URL(url).hostname;
+      if (hostname === "docs.rustfs.com" || hostname.endsWith(".rustfs.com")) return url;
+    } catch {
+      return url;
+    }
+    return "";
+  });
+}
+
+function containsInternalLocaleLink(content, sourceLocale) {
+  return withoutExternalUrls(content).includes(`/${sourceLocale}/`);
+}
+
 function normalizeLocaleLinks(content, locale, source) {
   return content.replaceAll(`/${locale}/`, `/${source}/`);
 }
@@ -318,7 +339,7 @@ function auditMeta(sourceContent, targetContent, sourceLocale, locale, file, iss
   if (unchangedVisible.length > 0) {
     addIssue(issues, "warning", "UNLOCALIZED_META", locale, file, `${unchangedVisible.length} visible navigation string(s) remain unchanged from English`);
   }
-  if (targetContent.includes(`/${sourceLocale}/`)) {
+  if (containsInternalLocaleLink(targetContent, sourceLocale)) {
     addIssue(issues, "error", "SOURCE_LOCALE_LINK", locale, file, `contains an internal /${sourceLocale}/ link`);
   }
 }
@@ -364,7 +385,7 @@ function auditDocument(sourceContent, targetContent, source, locale, file, issue
   }
 
   const visibleTarget = removeCodeFences(targetContent);
-  if (visibleTarget.includes(`/${source}/`)) {
+  if (containsInternalLocaleLink(visibleTarget, source)) {
     addIssue(issues, "error", "SOURCE_LOCALE_LINK", locale, file, `contains an internal /${source}/ link`);
   }
 
