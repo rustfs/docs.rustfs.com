@@ -1,37 +1,37 @@
 ---
-title: "Python SDK Guide"
-description: "Use the official AWS SDK for Python (Boto3) with RustFS."
+title: "Guide du SDK Python"
+description: "Utilisez le SDK AWS officiel pour Python (Boto3) avec RustFS."
 ---
 
-## 1. Overview
+## 1. Présentation
 
-RustFS ships no first-party SDKs — it is S3-compatible, so you use the official AWS SDK for Python, [Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html), configured to point at your RustFS server.
+RustFS ne fournit pas de SDK propres. Il est compatible avec S3 : vous utilisez donc le SDK AWS officiel pour Python, [Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html), configuré pour pointer vers votre serveur RustFS.
 
-This guide covers:
+Ce guide couvre :
 
-* Bucket creation/deletion
-* Object upload/download/deletion
-* Listing objects
-* Generating presigned URLs
-* Multipart upload for large files
+* La création et la suppression de compartiments (buckets)
+* Le chargement (upload), le téléchargement et la suppression d’objets
+* Le listage des objets
+* La génération d’URL présignées
+* Le chargement partitionné des fichiers volumineux
 
 ---
 
-## 2. Prerequisites
+## 2. Prérequis
 
-* Python 3.8 or later
-* A running RustFS instance (see the [Installation Guide](../../installation/index.md)) — the S3 API listens on port `9000`, the Console on port `9001`
-* Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (see [Access Key Management](../../security-compliance/iam/access-token.md))
+* Python 3.8 ou ultérieur
+* Une instance RustFS en cours d’exécution (consultez le [guide d’installation](../../installation/index.md)) : l’API S3 écoute sur le port `9000`, la Console sur le port `9001`
+* Des clés d’accès, définies à l’installation par les variables d’environnement `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` (consultez la [gestion des clés d’accès](../../security-compliance/iam/access-token.md))
 
-:::tip[Local test]
+:::tip[Essai local]
 
-If you did not set credentials at install time, the server defaults to `rustfsadmin` / `rustfsadmin` — fine for a throwaway local trial, never for anything reachable by others.
+Si vous n’avez pas défini d’identifiants à l’installation, le serveur utilise par défaut `rustfsadmin` / `rustfsadmin`. Cela convient à un essai local jetable, jamais à une instance accessible à d’autres personnes.
 
 :::
 
-### 2.1 Install Boto3
+### 2.1 Installer Boto3
 
-We recommend using a virtual environment:
+Nous recommandons d’utiliser un environnement virtuel :
 
 ```bash
 python3 -m venv venv
@@ -39,13 +39,13 @@ source venv/bin/activate
 pip install boto3
 ```
 
-> Boto3 depends on `botocore`, which will be installed automatically.
+> Boto3 dépend de `botocore`, qui sera installé automatiquement.
 
 ---
 
-## 3. Connecting to RustFS
+## 3. Connexion à RustFS
 
-The following is a complete, runnable script. Replace `localhost` with your server's IP address if RustFS runs on another machine, and fill in your own access keys:
+Le script suivant est complet et exécutable. Remplacez `localhost` par l’adresse IP de votre serveur si RustFS s’exécute sur une autre machine, et renseignez vos propres clés d’accès :
 
 ```python title="main.py"
 import boto3
@@ -68,26 +68,26 @@ for bucket in response['Buckets']:
     print(bucket['Name'])
 ```
 
-Run it:
+Exécutez-le :
 
 ```bash
 python main.py
 ```
 
-:::note[Client parameters explained]
+:::note[Paramètres du client]
 
-- `endpoint_url` — points to your RustFS S3 API (port `9000`, not the Console port `9001`)
-- `signature_version='s3v4'` — RustFS supports v4 signatures
-- `region_name='us-east-1'` — RustFS's default region
-- `addressing_style='path'` — RustFS uses path-style URLs by default; virtual-host style requires `RUSTFS_SERVER_DOMAINS`
+- `endpoint_url` : pointe vers votre API S3 RustFS (port `9000`, et non le port de la Console `9001`)
+- `signature_version='s3v4'` : RustFS prend en charge les signatures v4
+- `region_name='us-east-1'` : région par défaut de RustFS
+- `addressing_style='path'` : RustFS utilise par défaut des URL en adressage de type chemin (path-style) ; l’adressage de type hôte virtuel exige `RUSTFS_SERVER_DOMAINS`
 
 :::
 
 ---
 
-## 4. Basic Operations
+## 4. Opérations de base
 
-### 4.1 Create Bucket
+### 4.1 Créer un compartiment
 
 ```python
 bucket_name = 'my-bucket'
@@ -105,7 +105,7 @@ Bucket my-bucket created.
 
 ---
 
-### 4.2 Upload File
+### 4.2 Charger un fichier
 
 ```python
 s3.upload_file('/path/to/hello.txt', bucket_name, 'hello.txt')
@@ -118,7 +118,7 @@ File uploaded.
 
 ---
 
-### 4.3 Download File
+### 4.3 Télécharger un fichier
 
 ```python
 s3.download_file(bucket_name, 'hello.txt', 'hello-downloaded.txt')
@@ -131,7 +131,7 @@ File downloaded.
 
 ---
 
-### 4.4 List Objects
+### 4.4 Lister les objets
 
 ```python
 response = s3.list_objects_v2(Bucket=bucket_name)
@@ -145,7 +145,7 @@ for obj in response.get('Contents', []):
 
 ---
 
-### 4.5 Delete Object and Bucket
+### 4.5 Supprimer un objet et un compartiment
 
 ```python
 s3.delete_object(Bucket=bucket_name, Key='hello.txt')
@@ -162,11 +162,11 @@ Bucket deleted.
 
 ---
 
-## 5. Advanced Features
+## 5. Fonctionnalités avancées
 
-### 5.1 Generate Presigned URLs
+### 5.1 Générer des URL présignées
 
-#### 5.1.1 Download Link (GET)
+#### 5.1.1 Lien de téléchargement (GET)
 
 ```python
 url = s3.generate_presigned_url(
@@ -182,7 +182,7 @@ print('Presigned GET URL:', url)
 Presigned GET URL: http://localhost:9000/my-bucket/hello.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&...
 ```
 
-#### 5.1.2 Upload Link (PUT)
+#### 5.1.2 Lien de chargement (PUT)
 
 ```python
 url = s3.generate_presigned_url(
@@ -194,7 +194,7 @@ url = s3.generate_presigned_url(
 print('Presigned PUT URL:', url)
 ```
 
-You can use the `curl` tool to upload:
+Vous pouvez utiliser l’outil `curl` pour charger un fichier :
 
 ```bash
 curl -X PUT --upload-file /path/to/hello.txt "http://localhost:9000/my-bucket/upload-by-url.txt?X-Amz-Algorithm=..."
@@ -202,9 +202,9 @@ curl -X PUT --upload-file /path/to/hello.txt "http://localhost:9000/my-bucket/up
 
 ---
 
-### 5.2 Multipart Upload
+### 5.2 Chargement partitionné
 
-Suitable for files larger than 10 MB, allows manual control of each part.
+Utilisez le chargement partitionné pour les fichiers de plus de 10 MB lorsque vous devez contrôler chaque partie.
 
 ```python
 file_path = 'largefile.bin'
@@ -260,18 +260,18 @@ Multipart upload complete.
 
 ---
 
-## 6. Common Issue Troubleshooting
+## 6. Dépannage
 
-| Issue | Cause | Solution |
+| Problème | Cause | Solution |
 | ------------------------- | ----------------- | -------------------------------------------------------------- |
-| `SignatureDoesNotMatch` | Not using v4 signature | Set `signature_version='s3v4'` |
-| `EndpointConnectionError` | Wrong RustFS address or service not started | Check endpoint and RustFS service status |
-| `AccessDenied` | Wrong credentials or insufficient permissions | Check AccessKey/SecretKey or bucket policies |
-| `PermanentRedirect` / wrong bucket URL | Path-style not enabled | Set `s3={'addressing_style': 'path'}` in the `Config` |
+| `SignatureDoesNotMatch` | Signature v4 non utilisée | Définissez `signature_version='s3v4'` |
+| `EndpointConnectionError` | Adresse RustFS incorrecte, ou service non démarré | Vérifiez le point de terminaison et l’état du service RustFS |
+| `AccessDenied` | Identifiants incorrects ou autorisations insuffisantes | Vérifiez la clé d’accès, la clé secrète et les politiques de compartiment |
+| `PermanentRedirect` / URL de compartiment incorrecte | Adressage de type chemin non activé | Définissez `s3={'addressing_style': 'path'}` dans le `Config` |
 
 ---
 
-## 7. Appendix: Quick Upload/Download Script Template
+## 7. Annexe : modèle de script rapide de chargement et de téléchargement
 
 ```python
 def upload_file(local_path, bucket, object_key):
@@ -284,6 +284,6 @@ def download_file(bucket, object_key, local_path):
     print(f"Downloaded s3://{bucket}/{object_key} to {local_path}")
 ```
 
-For other operations (object tagging, bucket policies, and more), see the [Boto3 S3 documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html) — every S3-compatible call works against RustFS the same way.
+Pour les autres opérations (étiquetage d’objets, politiques de compartiment, etc.), consultez la [documentation S3 de Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html). La plupart des opérations S3 fonctionnent de la même manière avec RustFS ; les exceptions sont décrites dans la [compatibilité S3](/fr/reference/s3-compatibility).
 
-If you prefer native async support and full type hints, the community-driven [capo](https://github.com/kap-sh/capo) SDK also works with RustFS — see the [capo (Python) integration guide](../integration/others/capo.md).
+Si vous préférez une prise en charge asynchrone native et des indications de type complètes, le SDK communautaire [capo](https://github.com/kap-sh/capo) fonctionne aussi avec RustFS. Consultez le [guide d’intégration capo (Python)](../integration/others/capo.md).

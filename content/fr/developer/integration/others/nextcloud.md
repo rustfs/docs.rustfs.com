@@ -1,13 +1,13 @@
 ---
 title: "Nextcloud"
-description: "Use RustFS as S3 external storage for Nextcloud files."
+description: "Utilisez RustFS comme stockage externe S3 pour les fichiers Nextcloud."
 ---
 
-This guide connects [Nextcloud](https://github.com/nextcloud/server) — the self-hosted content collaboration platform — to **RustFS** through its External Storage app with the S3 backend. You will enable `files_external`, mount a RustFS bucket into every user's files view, and upload a file through WebDAV that lands directly in the bucket. The workflow was verified with `nextcloud:32.0.15` (SQLite, single container) against `rustfs/rustfs-x86-musl:v2.3.1`.
+Ce guide connecte [Nextcloud](https://github.com/nextcloud/server) — la plateforme auto-hébergée de collaboration sur le contenu — à **RustFS** via son application External Storage et le backend S3. Vous allez activer `files_external`, monter un compartiment (bucket) RustFS dans la vue des fichiers de chaque utilisateur, puis charger (upload) un fichier via WebDAV qui arrive directement dans le compartiment. Le flux a été validé avec `nextcloud:32.0.15` (SQLite, conteneur unique) et `rustfs/rustfs-x86-musl:v2.3.1`.
 
-You need Docker, or an existing Nextcloud instance with `occ` access. This deployment is intended for local integration testing, not production.
+Vous avez besoin de Docker, ou d’une instance Nextcloud existante avec un accès à `occ`. Ce déploiement est destiné aux tests d’intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -15,11 +15,11 @@ flowchart LR
 	Nextcloud -->|"files_external (S3)"| RustFS["RustFS :9000"]
 ```
 
-Nextcloud proxies file operations on the mount point to the S3 backend. Objects are stored under their mount-relative paths, so the bucket mirrors the names users see.
+Nextcloud relaie les opérations sur les fichiers du point de montage vers le backend S3. Les objets sont stockés sous leurs chemins relatifs au montage, de sorte que le compartiment reflète les noms vus par les utilisateurs.
 
-## 1. Install Nextcloud
+## 1. Installer Nextcloud
 
-Run Nextcloud with an admin account, replacing all connection placeholders. SQLite keeps the test self-contained; use MariaDB or PostgreSQL in production:
+Exécutez Nextcloud avec un compte administrateur, en remplaçant toutes les valeurs indicatives de connexion. SQLite rend le test autonome ; en production, utilisez MariaDB ou PostgreSQL :
 
 ```bash
 docker run -d --name nextcloud --network oo-rustfs_default -p 8080:80 \
@@ -28,16 +28,16 @@ docker run -d --name nextcloud --network oo-rustfs_default -p 8080:80 \
   nextcloud:32.0.15
 ```
 
-If the web UI still shows the installer after startup, finish it manually:
+Si l’interface web affiche encore l’installateur après le démarrage, terminez l’installation manuellement :
 
 ```bash
 docker exec -u www-data nextcloud php occ maintenance:install \
   --admin-user <admin-user> --admin-password <admin-password>
 ```
 
-## 2. Enable the External Storage app
+## 2. Activer l’application External Storage
 
-The `files_external` app ships with Nextcloud but starts disabled, and its `occ` commands only exist once the app is enabled:
+L’application `files_external` est livrée avec Nextcloud, mais elle démarre désactivée, et ses commandes `occ` n’existent qu’une fois l’application activée :
 
 ```bash
 docker exec -u www-data nextcloud php occ app:enable files_external
@@ -47,9 +47,9 @@ docker exec -u www-data nextcloud php occ app:enable files_external
 files_external 1.24.1 enabled
 ```
 
-## 3. Mount the RustFS bucket
+## 3. Monter le compartiment RustFS
 
-Create an external storage of backend type `amazons3` with the `amazons3::accesskey` authentication backend. Replace all connection placeholders:
+Créez un stockage externe de type de backend `amazons3`, avec le backend d’authentification `amazons3::accesskey`. Remplacez toutes les valeurs indicatives de connexion :
 
 ```bash
 docker exec -u www-data nextcloud php occ files_external:create \
@@ -68,7 +68,7 @@ docker exec -u www-data nextcloud php occ files_external:create \
 Storage created with id 1
 ```
 
-The mount point `/rustfs` appears in the files view of the given user. `use_path_style=true` is required for a non-AWS endpoint. Check the connection before using it:
+Le point de montage `/rustfs` apparaît dans la vue des fichiers de l’utilisateur indiqué. `use_path_style=true` est obligatoire pour un point de terminaison autre qu’AWS. Vérifiez la connexion avant de l’utiliser :
 
 ```bash
 docker exec -u www-data nextcloud php occ files_external:verify 1
@@ -79,9 +79,9 @@ docker exec -u www-data nextcloud php occ files_external:verify 1
   - code: 0
 ```
 
-## 4. Upload a file and verify
+## 4. Charger un fichier et vérifier
 
-Upload through the WebDAV endpoint, which writes through the external storage:
+Chargez le fichier via le point de terminaison WebDAV, qui écrit à travers le stockage externe :
 
 ```bash
 echo "nextcloud writes to rustfs" > /tmp/nc-demo.txt
@@ -96,7 +96,7 @@ curl -u <admin-user>:<admin-password> \
 201
 ```
 
-Read it back through the same path, then confirm the object in RustFS:
+Relisez-le par le même chemin, puis confirmez l’objet dans RustFS :
 
 ```bash
 rc ls rustfs/<your-bucket>/ -r
@@ -106,40 +106,40 @@ rc ls rustfs/<your-bucket>/ -r
 [2026-09-29 13:42:48]       27 B nc-demo.txt
 ```
 
-The object key equals the path inside the mount, so files uploaded through Nextcloud can also be read directly with any S3 client.
+La clé d’objet correspond au chemin à l’intérieur du montage, de sorte que les fichiers chargés via Nextcloud peuvent aussi être lus directement avec n’importe quel client S3.
 
-![Nextcloud file stored in the RustFS Console](./images/rustfs-nextcloud-file.png)
+![Fichier Nextcloud stocké dans la Console RustFS](./images/rustfs-nextcloud-file.png)
 
-## 5. Stop or reset
+## 5. Arrêter ou réinitialiser
 
-To remove the mount without touching the bucket:
+Pour supprimer le montage sans toucher au compartiment :
 
 ```bash
 docker exec -u www-data nextcloud php occ files_external:delete 1
 ```
 
-To delete the bucket contents:
+Pour supprimer le contenu du compartiment :
 
 ```bash
 rc rm rustfs/<your-bucket>/ --recursive --force
 ```
 
-## Troubleshooting
+## Dépannage
 
 ### `There are no commands defined in the "files_external" namespace`
 
-The app is not enabled yet. Run `occ app:enable files_external` first; the `occ files_external:*` commands only register afterwards.
+L’application n’est pas encore activée. Exécutez d’abord `occ app:enable files_external` ; les commandes `occ files_external:*` ne s’enregistrent qu’ensuite.
 
 ### `Not enough arguments (missing: "authentication_backend")`
 
-`files_external:create` takes the storage backend and the authentication backend as two separate arguments: `amazons3 amazons3::accesskey`. The backend identifiers are listed by `occ files_external:backends`.
+`files_external:create` prend le backend de stockage et le backend d’authentification comme deux arguments distincts : `amazons3 amazons3::accesskey`. Les identifiants de backend sont listés par `occ files_external:backends`.
 
-### Mount shows but is empty, or uploads fail
+### Le montage s’affiche, mais reste vide, ou les chargements échouent
 
-Confirm `hostname` is reachable from the Nextcloud container (use the container network name, not `localhost`), `use_path_style` is `true`, and the bucket exists. `occ files_external:verify <id>` reports the exact connection error.
+Vérifiez que `hostname` est joignable depuis le conteneur Nextcloud (utilisez le nom sur le réseau de conteneurs, et non `localhost`), que `use_path_style` vaut `true` et que le compartiment existe. `occ files_external:verify <id>` indique l’erreur de connexion exacte.
 
-## Next steps
+## Étapes suivantes
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional external storage backends.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Nextcloud external storage documentation](https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/external_storage_configuration_gui.html) to share the mount with groups and enable versioning.
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres backends de stockage externe.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
+- Suivez la [documentation du stockage externe Nextcloud](https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/external_storage_configuration_gui.html) pour partager le montage avec des groupes et activer la gestion des versions.

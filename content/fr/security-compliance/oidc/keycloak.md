@@ -76,7 +76,7 @@ Laissez **Full group path** désactivé. Une valeur telle que `/consoleAdmin` ne
 
 Si vous utilisez des rôles de domaine ou de client plutôt que des groupes, ajoutez un mapper de rôles qui émet un tableau `roles` plat à la racine du jeton. RustFS n’analyse pas le claim imbriqué `realm_access.roles` de Keycloak.
 
-:: :
+:::
 
 ### Configuration de RustFS
 
@@ -117,7 +117,7 @@ Utilisez le format `scheme://host:port`, sans chemin tel que `/realms/rustfs`. S
 
 Sans l’autorisation requise, la découverte échoue au démarrage et le fournisseur reste indisponible pour la connexion à la Console et pour STS, même si sa configuration indique `enabled: true`.
 
-:: :
+:::
 
 `RUSTFS_BROWSER_REDIRECT_URL` doit contenir le schéma et l’autorité publics, sans chemin. Cette variable contrôle la redirection de succès de la Console et l’URL de repli lors de la déconnexion. L’URL de rappel du fournisseur doit correspondre exactement à l’URL enregistrée dans Keycloak.
 
@@ -125,7 +125,7 @@ Sans l’autorisation requise, la découverte échoue au démarrage et le fourni
 
 N’utilisez pas `RUSTFS_IDENTITY_OPENID_ROLE_POLICY=consoleAdmin` comme raccourci permanent. Associez les groupes ou les rôles Keycloak à des politiques RustFS afin que chaque utilisateur ne reçoive que les autorisations requises.
 
-:: :
+:::
 
 Avec un reverse proxy ou un répartiteur de charge, conservez la chaîne de requête du rappel et acheminez les requêtes d’autorisation et de rappel vers le même nœud RustFS. L’état OIDC en cours (`state`) est local à ce nœud.
 
@@ -184,4 +184,4 @@ Si l’authentification réussit mais que l’accès est refusé, confirmez que 
 ## Étapes suivantes
 
 - Consultez [Utilisateurs, groupes et politiques](../iam/policies.md) avant d’affecter des groupes Keycloak.
-- Consultez les [notes de sécurité de la Console](/administration/console) avant d’exposer publiquement le point de terminaison de connexion.
+- Consultez les [notes de sécurité de la Console](/fr/administration/console) avant d’exposer publiquement le point de terminaison de connexion.

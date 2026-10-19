@@ -9,7 +9,7 @@ RustFS S3 Tables gère les tables **Apache Iceberg** au moyen d’un catalogue R
 
 S3 Tables est une fonctionnalité en préversion (preview) ; la compatibilité des clients se limite aux workflows indiqués ci-dessous. Cette page s’appuie sur le commit RustFS [`7e0c6711`](https://github.com/rustfs/rustfs/commit/7e0c67111b97703d47e23719b0264a739c8acea8), vérifié le 8 septembre 2026. Consultez la [matrice de prise en charge](https://github.com/rustfs/rustfs/blob/7e0c67111b97703d47e23719b0264a739c8acea8/docs/architecture/s3-tables-support-matrix.md) et votre version avant d’utiliser d’autres opérations de catalogue ou clients.
 
-:: :
+:::
 
 ## Fonctionnement
 
@@ -34,18 +34,18 @@ Le backend de catalogue par défaut, `object`, conserve durablement l’état du
 
 ## Prérequis
 
-- Démarrez un déploiement RustFS disposant des points de terminaison S3 Tables décrits ci-dessus. Consultez [Installation](/installation).
-- Installez l’[AWS CLI](/developer/examples/aws-cli) et `curl` 7.76 ou une version ultérieure, avec prise en charge de `--aws-sigv4` et `--fail-with-body`.
+- Démarrez un déploiement RustFS disposant des points de terminaison S3 Tables décrits ci-dessus. Consultez [Installation](/fr/installation).
+- Installez l’[AWS CLI](/fr/developer/examples/aws-cli) et `curl` 7.76 ou une version ultérieure, avec prise en charge de `--aws-sigv4` et `--fail-with-body`.
 - Créez un compartiment dédié à ce tutoriel. L’exemple utilise `my-bucket`.
 - Utilisez un compte d’administration existant autorisé à effectuer les opérations de catalogue et à accéder aux objets S3. La politique intégrée `consoleAdmin` couvre ce tutoriel ; configurez des politiques plus restreintes pour les applications.
 
-Les exemples utilisent `http://localhost:9000`. Remplacez cette adresse par le point de terminaison de votre serveur et utilisez [TLS](/integration/tls-configured) avec vérification des certificats en dehors d’un environnement de test local.
+Les exemples utilisent `http://localhost:9000`. Remplacez cette adresse par le point de terminaison de votre serveur et utilisez [TLS](/fr/integration/tls-configured) avec vérification des certificats en dehors d’un environnement de test local.
 
 :::warning[Cycle de vie des compartiments de tables]
 
 Les compartiments de tables sont exclus du traitement d’expiration habituel du cycle de vie des compartiments. Activer ce mode sur un compartiment existant modifie l’application de ses règles d’expiration. Utilisez une maintenance de catalogue qui tient compte des références Iceberg pour faire expirer les instantanés et nettoyer les fichiers des tables.
 
-:: :
+:::
 
 ## 1. Créer un compartiment
 
@@ -116,13 +116,13 @@ Utilisez les paramètres suivants pour le point de terminaison RustFS de l’exe
 
 Le client ajoute `/v1` à l’URI du catalogue. L’entrepôt est un nom de compartiment, et non un URI S3 ou un ARN AWS S3 Tables. Configurez la signature des requêtes REST et l’accès aux fichiers S3, même si les deux utilisent le même compte.
 
-Si vous exploitez déjà un catalogue REST Iceberg séparé, consultez l’[intégration Apache Iceberg](/developer/integration/big-data/iceberg) pour le modèle de déploiement avec catalogue externe.
+Si vous exploitez déjà un catalogue REST Iceberg séparé, consultez l’[intégration Apache Iceberg](/fr/developer/integration/big-data/iceberg) pour le modèle de déploiement avec catalogue externe.
 
 ## Autorisations et identifiants
 
 L’activation d’un compartiment de tables nécessite `admin:SetTableBucket` ; la consultation de son état nécessite `admin:GetTableBucket`. La découverte du catalogue utilise `admin:GetTableCatalog`. Les opérations sur les espaces de noms et les tables possèdent leurs propres actions d’administration RustFS, notamment `admin:SetTableNamespace`, `admin:CreateTable`, `admin:GetTableMetadata` et `admin:CommitTable`.
 
-La lecture et l’écriture des fichiers de tables nécessitent aussi les autorisations S3 ordinaires. RustFS vérifie les autorisations de table sur les chemins des objets de l’entrepôt : les lectures nécessitent l’autorisation `admin:GetTableMetadata` correspondante, et les écritures `admin:SetTableMetadata`. Une autorisation de commit de catalogue ne suffit pas à autoriser les écritures de fichiers S3 qui le précèdent. Configurez les [politiques IAM](/security-compliance/iam/policies) pour les deux interfaces.
+La lecture et l’écriture des fichiers de tables nécessitent aussi les autorisations S3 ordinaires. RustFS vérifie les autorisations de table sur les chemins des objets de l’entrepôt : les lectures nécessitent l’autorisation `admin:GetTableMetadata` correspondante, et les écritures `admin:SetTableMetadata`. Une autorisation de commit de catalogue ne suffit pas à autoriser les écritures de fichiers S3 qui le précèdent. Configurez les [politiques IAM](/fr/security-compliance/iam/policies) pour les deux interfaces.
 
 La délégation d’identifiants (vended credentials) par le catalogue est désactivée par défaut. Lorsqu’elle est activée, un client compatible doit négocier `X-Iceberg-Access-Delegation: vended-credentials`, et l’appelant doit être autorisé à demander des identifiants de table. L’accès initial au catalogue nécessite toujours une identité autorisée. Le tutoriel PyIceberg associé utilise des identifiants configurés explicitement.
 
@@ -151,6 +151,6 @@ RustFS S3 Tables ne fournit ni moteur d’exécution SQL, ni transactions atomiq
 
 ## Étapes suivantes
 
-- Exécutez le [tutoriel PyIceberg](/developer/integration/big-data/pyiceberg).
-- Consultez les [politiques IAM](/security-compliance/iam/policies) avant d’autoriser les applications.
+- Exécutez le [tutoriel PyIceberg](/fr/developer/integration/big-data/pyiceberg).
+- Consultez les [politiques IAM](/fr/security-compliance/iam/policies) avant d’autoriser les applications.
 - Validez d’autres versions de clients avec les [vérifications de conformité des clients](https://github.com/rustfs/rustfs/blob/7e0c67111b97703d47e23719b0264a739c8acea8/scripts/table-catalog/README.md) du dépôt.

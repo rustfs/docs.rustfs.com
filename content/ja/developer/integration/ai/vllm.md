@@ -152,3 +152,4 @@ KV キャッシュの既定の予約は、システム RAM の 90% です。`--g
 - 追加のサービング構成を採用する前に、[S3 互換性に関する注意](/ja/administration/protocols/s3)を確認します。
 - [アクセスキー管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
 - [vLLM ドキュメント](https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html)に従い、同じバケットをバックエンドにしたモデルストアの上で、チャットテンプレート、テンソル並列、量子化ウェイトを確認します。
+

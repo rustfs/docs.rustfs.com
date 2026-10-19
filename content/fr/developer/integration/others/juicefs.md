@@ -1,13 +1,13 @@
 ---
 title: "JuiceFS"
-description: "Build a POSIX filesystem on RustFS with JuiceFS S3 object storage."
+description: "Construisez un système de fichiers POSIX sur RustFS avec le stockage objet S3 de JuiceFS."
 ---
 
-This guide connects [JuiceFS](https://github.com/juicedata/juicefs) — the cloud-native distributed POSIX filesystem — to **RustFS** as its object storage backend. You will format a volume whose data chunks live in a RustFS bucket, mount it locally, and read and write files through the mount. The workflow was verified with `juicefs v1.3.1` (community edition, SQLite metadata engine) against `rustfs/rustfs-x86-musl:v2.3.1`.
+Ce guide connecte [JuiceFS](https://github.com/juicedata/juicefs) — le système de fichiers POSIX distribué cloud native — à **RustFS** comme backend de stockage objet. Vous allez formater un volume dont les chunks de données résident dans un compartiment (bucket) RustFS, le monter localement, puis lire et écrire des fichiers via le point de montage. Le flux a été validé avec `juicefs v1.3.1` (édition communautaire, moteur de métadonnées SQLite) et `rustfs/rustfs-x86-musl:v2.3.1`.
 
-You need the JuiceFS binary, a metadata engine, and FUSE (`fuse3` on Linux). This deployment is intended for local integration testing, not production.
+Vous avez besoin du binaire JuiceFS, d’un moteur de métadonnées et de FUSE (`fuse3` sous Linux). Ce déploiement est destiné aux tests d’intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -16,11 +16,11 @@ flowchart LR
 	JuiceFS -->|"data chunks"| RustFS["RustFS :9000"]
 ```
 
-JuiceFS splits every file into chunks and stores them as objects under `chunks/` in the bucket, while the metadata engine tracks names, inodes, and layout. The filesystem behaves like a local disk but holds no data locally.
+JuiceFS découpe chaque fichier en chunks et les stocke comme objets sous `chunks/` dans le compartiment, tandis que le moteur de métadonnées suit les noms, les inodes et la disposition. Le système de fichiers se comporte comme un disque local, mais ne conserve aucune donnée localement.
 
-## 1. Format the volume
+## 1. Formater le volume
 
-Create the bucket and format a JuiceFS volume backed by RustFS, replacing all connection placeholders. The bucket URL carries the endpoint, which selects path-style addressing:
+Créez le compartiment et formatez un volume JuiceFS adossé à RustFS, en remplaçant toutes les valeurs indicatives de connexion. L’URL du compartiment porte le point de terminaison, ce qui sélectionne l’adressage de type chemin (path-style) :
 
 ```bash
 rc mb rustfs/jfs-demo
@@ -39,11 +39,11 @@ Data use s3://<your-rustfs-endpoint>:9000/jfs-demo/rustfs-jfs/
 <STATUS> OK, rustfs-jfs is ready
 ```
 
-`sqlite3:///opt/juicefs/jfs.db` is the metadata engine for this test. In production, use Redis, MySQL, or PostgreSQL instead so multiple clients can mount the same volume.
+`sqlite3:///opt/juicefs/jfs.db` est le moteur de métadonnées de ce test. En production, utilisez plutôt Redis, MySQL ou PostgreSQL, afin que plusieurs clients puissent monter le même volume.
 
-## 2. Mount the volume
+## 2. Monter le volume
 
-Mount the filesystem with the same metadata URL:
+Montez le système de fichiers avec la même URL de métadonnées :
 
 ```bash
 mkdir -p /mnt/jfs
@@ -54,11 +54,11 @@ juicefs mount -d sqlite3:///opt/juicefs/jfs.db /mnt/jfs
 OK, rustfs-jfs is ready at /mnt/jfs
 ```
 
-The `-d` flag runs the mount in the background. The volume is now a POSIX filesystem.
+L’option `-d` exécute le montage en arrière-plan. Le volume est désormais un système de fichiers POSIX.
 
-## 3. Read and write files
+## 3. Lire et écrire des fichiers
 
-Use the mount like any other directory:
+Utilisez le point de montage comme n’importe quel autre répertoire :
 
 ```bash
 echo "hello rustfs jfs" > /mnt/jfs/hello.txt
@@ -71,7 +71,7 @@ cat /mnt/jfs/hello.txt
 hello rustfs jfs
 ```
 
-Inspect the volume with `juicefs info`:
+Inspectez le volume avec `juicefs info` :
 
 ```text
 /mnt/jfs :
@@ -81,15 +81,15 @@ Inspect the volume with `juicefs info`:
  length: 3.00 MiB
 ```
 
-## 4. Verify chunks in RustFS
+## 4. Vérifier les chunks dans RustFS
 
-List the bucket prefixes:
+Listez les préfixes du compartiment :
 
 ```bash
 rc ls rustfs/jfs-demo/ -r
 ```
 
-Every file was split into content-addressed chunk objects:
+Chaque fichier a été découpé en objets chunk adressés par leur contenu :
 
 ```text
 rustfs-jfs/chunks/0/0/1_0_17
@@ -97,13 +97,13 @@ rustfs-jfs/chunks/0/0/3_0_3145728
 rustfs-jfs/chunks/0/0/4_0_7
 ```
 
-The chunk name encodes the inode, chunk index, and size — for example `3_0_3145728` is the 3 MiB file written in step 3.
+Le nom du chunk encode l’inode, l’index du chunk et la taille — par exemple, `3_0_3145728` est le fichier de 3 MiB écrit à l’étape 3.
 
-![JuiceFS data chunks stored in the RustFS Console](./images/rustfs-juicefs-chunks.png)
+![Chunks de données JuiceFS stockés dans la Console RustFS](./images/rustfs-juicefs-chunks.png)
 
-## 5. Stop or reset
+## 5. Arrêter ou réinitialiser
 
-Unmount the volume, then optionally wipe the volume metadata and bucket data:
+Démontez le volume, puis effacez si besoin les métadonnées du volume et les données du compartiment :
 
 ```bash
 juicefs umount /mnt/jfs
@@ -111,22 +111,22 @@ juicefs destroy --force sqlite3:///opt/juicefs/jfs.db rustfs-jfs
 rc rm rustfs/jfs-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## Dépannage
 
 ### `unknown option: --daemon`
 
-The background flag is a single dash: `juicefs mount -d`. Running without it keeps the mount in the foreground (useful for debugging).
+L’option d’arrière-plan prend un seul tiret : `juicefs mount -d`. Sans elle, le montage reste au premier plan (utile pour le débogage).
 
 ### `fusermount3: mount failed: Permission denied`
 
-Mounting requires the FUSE device. Inside a container, add `--device /dev/fuse --cap-add SYS_ADMIN` (or `--privileged`); on a host, install `fuse3` and confirm `/dev/fuse` exists.
+Le montage exige le périphérique FUSE. Dans un conteneur, ajoutez `--device /dev/fuse --cap-add SYS_ADMIN` (ou `--privileged`) ; sur un hôte, installez `fuse3` et vérifiez que `/dev/fuse` existe.
 
-### Mount hangs or fails to reach storage
+### Le montage reste bloqué ou n’atteint pas le stockage
 
-The client must reach both the metadata engine and the bucket endpoint. Because the bucket URL embeds the endpoint, verify it from the mounting host with `curl` before formatting.
+Le client doit joindre à la fois le moteur de métadonnées et le point de terminaison du compartiment. Comme l’URL du compartiment contient le point de terminaison, vérifiez-la depuis l’hôte de montage avec `curl` avant le formatage.
 
-## Next steps
+## Étapes suivantes
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional JuiceFS storage backends.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [JuiceFS documentation](https://juicefs.com/docs/community/quick_start_guide/) to switch the metadata engine to Redis and mount the volume from multiple clients.
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres backends de stockage JuiceFS.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
+- Suivez la [documentation JuiceFS](https://juicefs.com/docs/community/quick_start_guide/) pour passer le moteur de métadonnées à Redis et monter le volume depuis plusieurs clients.

@@ -7,7 +7,7 @@ Cette page couvre l’administration IAM au quotidien : création d’utilisat
 
 ## Prérequis
 
-- Installez [`rc`](/operations/rc) avant d’utiliser les commandes d’administration RustFS.
+- Installez [`rc`](/fr/operations/rc) avant d’utiliser les commandes d’administration RustFS.
 - Configurez un alias avec des identifiants autorisés à effectuer les actions `admin:*` correspondantes.
 
 ## Gérer les utilisateurs
@@ -28,7 +28,7 @@ Les utilisateurs se gèrent depuis la Console (section **Identity** de la naviga
 
 Un nom d’utilisateur (clé d’accès) ne doit pas contenir d’espace et ne peut pas être identique à la clé d’accès racine. La clé secrète est obligatoire lors de la création d’un utilisateur.
 
-:: :
+:::
 
 ## Gérer les groupes
 
@@ -161,9 +161,9 @@ Les opérateurs de condition pris en charge sont : `StringEquals`, `StringNotE
 
 :::note
 
-Un `Deny` explicite l’emporte toujours sur `Allow` : la seconde instruction s’applique donc aux opérations de suppression, même si `s3:*` les inclut. Voir la [sémantique d’évaluation](./index.md#policy-evaluation-semantics).
+Un `Deny` explicite l’emporte toujours sur `Allow` : la seconde instruction s’applique donc aux opérations de suppression, même si `s3:*` les inclut. Voir la [sémantique d’évaluation](./index.md#sémantique-dévaluation-des-politiques).
 
-:: :
+:::
 
 ## Politiques intégrées
 
@@ -181,4 +181,4 @@ RustFS définit cinq politiques intégrées, associables sans les créer au pré
 
 La politique intégrée `readonly` ne comprend ni `s3:ListBucket` ni `s3:ListAllMyBuckets`. L’autorisation `s3:GetBucketLocation` vous permet de voir les noms des compartiments dans RustFS, et `s3:GetObject` vous permet de récupérer des objets dont vous connaissez la clé. Pour lister les objets d’un compartiment, ajoutez une politique personnalisée accordant `s3:ListBucket` sur ce compartiment.
 
-:: :
+:::

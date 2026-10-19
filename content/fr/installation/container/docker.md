@@ -1,33 +1,33 @@
 ---
 title: "Docker"
-description: "Run RustFS with Docker: single-node setup, host-directory permissions, Docker Compose, TLS, and multi-node deployment."
+description: "Exécutez RustFS avec Docker : instance à nœud unique, droits des répertoires de l’hôte, Docker Compose, TLS et déploiement multi-nœuds."
 ---
 
-This page covers running the official RustFS image with Docker: a single-node instance with persistent storage, host-directory permissions for the non-root container user, Docker Compose with optional observability services, TLS, and a multi-node deployment. You need a working Docker Engine and permission to run containers.
+Cette page décrit l’exécution de l’image officielle de RustFS avec Docker : une instance à nœud unique avec stockage persistant, les droits des répertoires de l’hôte pour l’utilisateur non root du conteneur, Docker Compose avec des services d’observabilité facultatifs, TLS et un déploiement multi-nœuds. Vous avez besoin d’un moteur Docker opérationnel et du droit d’exécuter des conteneurs.
 
-## 1. Prerequisites
+## 1. Prérequis
 
-* Docker Engine (≥ 20.10) installed and able to pull images and run containers normally
-* Host ports 9000 (S3 API) and 9001 (Console) available, or consistent with your custom ports
-* If you bind-mount a host directory, the directory owner must match the container user — see [Bind-mount a host directory](#bind-mount-a-host-directory)
+* Moteur Docker (≥ 20.10) installé, avec la possibilité de tirer des images et d’exécuter des conteneurs
+* Ports de l’hôte 9000 (API S3) et 9001 (Console) disponibles, ou les ports personnalisés que vous prévoyez d’utiliser
+* Si vous montez un répertoire de l’hôte en bind mount, son propriétaire doit correspondre à l’utilisateur du conteneur — voir [Monter un répertoire de l’hôte](#5-monter-un-répertoire-de-lhôte)
 
-## 2. Pull the image
+## 2. Récupérer l’image
 
 ```bash
 docker pull rustfs/rustfs:latest
 ```
 
-## 3. Create persistent storage
+## 3. Créer un stockage persistant
 
-Create a named volume so object data remains available when you replace the container:
+Créez un volume nommé pour que les données d’objets restent disponibles lorsque vous remplacez le conteneur :
 
 ```bash
 docker volume create rustfs-data
 ```
 
-## 4. Start RustFS
+## 4. Démarrer RustFS
 
-Replace the credential placeholders before running the container:
+Remplacez les identifiants indicatifs avant d’exécuter le conteneur :
 
 ```bash
 docker run -d \
@@ -47,15 +47,15 @@ docker run -d \
   /data
 ```
 
-:::warning[Set credentials when creating the container]
+:::warning[Définir les identifiants à la création du conteneur]
 
-Set unique `RUSTFS_ACCESS_KEY` and `RUSTFS_SECRET_KEY` environment variables before exposing RustFS to a network. Do not use the well-known `rustfsadmin` value for either credential. If the container was started without custom credentials, stop and recreate it with both `-e` options shown above; the `rustfs-data` volume remains intact.
+Définissez des variables d’environnement `RUSTFS_ACCESS_KEY` et `RUSTFS_SECRET_KEY` uniques avant d’exposer RustFS sur un réseau. N’utilisez pas la valeur bien connue `rustfsadmin` pour l’un ou l’autre des identifiants. Si le conteneur a été démarré sans identifiants personnalisés, arrêtez-le et recréez-le avec les deux options `-e` indiquées ci-dessus. Le volume `rustfs-data` reste intact.
 
 :::
 
-### Environment variables or command-line flags
+### Variables d’environnement ou indicateurs de ligne de commande
 
-The example above configures RustFS with environment variables. You can pass the same settings as command-line flags instead; when both are present, command-line flags win:
+L’exemple ci-dessus configure RustFS avec des variables d’environnement. Vous pouvez transmettre les mêmes réglages sous forme d’indicateurs de ligne de commande. Lorsque les deux sont présents, les indicateurs de ligne de commande l’emportent :
 
 ```bash
 docker run -d \
@@ -71,40 +71,40 @@ docker run -d \
   /data
 ```
 
-## 5. Bind-mount a host directory
+## 5. Monter un répertoire de l’hôte
 
-The named volume above needs no extra setup. If you mount a host directory instead (`-v /path/on/host:/data`), keep in mind that the container runs as non-root user `rustfs` with id `10001`. Make the host directory owned by `10001`, otherwise you will encounter permission denied errors:
+Le volume nommé ci-dessus ne demande aucune préparation supplémentaire. Si vous montez plutôt un répertoire de l’hôte (`-v /path/on/host:/data`), gardez à l’esprit que le conteneur s’exécute sous l’utilisateur non root `rustfs`, d’identifiant `10001`. Le répertoire de l’hôte doit appartenir à `10001`, sinon vous rencontrerez des erreurs « permission denied » :
 
 ```bash
 chown -R 10001:10001 /path/to/host_directory
 ```
 
-## 6. Verify the deployment
+## 6. Vérifier le déploiement
 
-Check the container and the S3 API health endpoint:
+Vérifiez le conteneur et le point de terminaison de contrôle d’intégrité de l’API S3 :
 
 ```bash
 docker ps --filter name=rustfs
 curl --fail http://localhost:9000/health
 ```
 
-The S3 API is available at `http://localhost:9000`, and the Console is available at `http://localhost:9001`.
+L’API S3 est disponible à l’adresse `http://localhost:9000`, et la Console à l’adresse `http://localhost:9001`.
 
 ## Docker Compose
 
-The RustFS repository ships a [`docker-compose.yml`](https://github.com/rustfs/rustfs/blob/main/docker-compose.yml) that includes `grafana`, `prometheus`, `otel-collector`, and `jaeger` services, mainly for observability. To deploy RustFS together with these services, clone the [RustFS code repository](https://github.com/rustfs/rustfs) locally:
+Le dépôt RustFS fournit un fichier [`docker-compose.yml`](https://github.com/rustfs/rustfs/blob/main/docker-compose.yml) qui inclut les services `grafana`, `prometheus`, `otel-collector` et `jaeger`, principalement pour l’observabilité. Pour déployer RustFS avec ces services, clonez le [dépôt de code RustFS](https://github.com/rustfs/rustfs) en local :
 
 ```bash
 git clone https://github.com/rustfs/rustfs.git
 ```
 
-Run the command from the repository root:
+Exécutez la commande depuis la racine du dépôt :
 
 ```bash
 docker compose --profile observability up -d
 ```
 
-The compose file uses an initialization container to grant the correct access rights to `rustfs`: the `rustfs_perms` service below changes the ownership of the mounted volumes to `10001` before `rustfs` starts, using `depends_on` to wait for it to complete. To keep logs persistent and accessible, the host log directory is mapped to the container's `/var/log/rustfs/` path:
+Le fichier Compose utilise un conteneur d’initialisation pour accorder les droits d’accès corrects à `rustfs` : le service `rustfs_perms` ci-dessous attribue la propriété des volumes montés à `10001` avant le démarrage de `rustfs`, et `depends_on` attend la fin de cette opération. Pour conserver des journaux persistants et accessibles, le répertoire de journaux de l’hôte est mappé sur le chemin `/var/log/rustfs/` du conteneur :
 
 ```yaml title="docker-compose.yml"
   services:
@@ -134,21 +134,21 @@ The compose file uses an initialization container to grant the correct access ri
       # ... other configurations
 ```
 
-If you only want RustFS without Grafana, Prometheus, and the other observability services, start just the `rustfs` service (the compose file marks the collector dependency as optional):
+Si vous ne voulez que RustFS, sans Grafana, Prometheus ni les autres services d’observabilité, démarrez uniquement le service `rustfs` (le fichier Compose marque la dépendance au collecteur comme facultative) :
 
 ```bash
 docker compose -f docker-compose.yml up -d rustfs
 ```
 
-This starts only the `rustfs-server` container. Whether you start only `rustfs-server` or the full stack, the S3 API is served at `http://localhost:9000`, and the RustFS Console is at `http://localhost:9001`. Open the Console in a browser and log in with the access key and secret key you configured above. Generate a strong secret with, for example, `openssl rand -base64 24`, and never ship the placeholder values to production.
+Cela ne démarre que le conteneur `rustfs-server`. Que vous démarriez uniquement `rustfs-server` ou la pile complète, l’API S3 est servie à l’adresse `http://localhost:9000` et la Console RustFS à l’adresse `http://localhost:9001`. Ouvrez la Console dans un navigateur et connectez-vous avec la clé d’accès et la clé secrète configurées ci-dessus. Générez une clé secrète robuste, par exemple avec `openssl rand -base64 24`, et n’utilisez jamais les valeurs indicatives en production.
 
-For Docker Compose, define unique `RUSTFS_ACCESS_KEY` and `RUSTFS_SECRET_KEY` values in the `rustfs` service environment or in the environment file used for variable substitution, then recreate the service with `docker compose up -d rustfs`.
+Pour Docker Compose, définissez des valeurs uniques de `RUSTFS_ACCESS_KEY` et `RUSTFS_SECRET_KEY` dans l’environnement du service `rustfs`, ou dans le fichier d’environnement utilisé pour la substitution de variables, puis recréez le service avec `docker compose up -d rustfs`.
 
-## Multi-node deployment
+## Déploiement multi-nœuds
 
-Docker's default bridge networking does not support multi-node deployments. Use `--network host` so each container can communicate directly with other nodes.
+Le réseau bridge par défaut de Docker ne prend pas en charge les déploiements multi-nœuds. Utilisez `--network host` pour que chaque conteneur puisse communiquer directement avec les autres nœuds.
 
-Run the following on **each node**:
+Exécutez ce qui suit sur **chaque nœud** :
 
 ```bash
 docker run -d \
@@ -166,7 +166,7 @@ docker run -d \
   rustfs/rustfs:latest
 ```
 
-Add the entries to `/etc/hosts` on **every** node:
+Ajoutez les entrées à `/etc/hosts` sur **chaque** nœud :
 
 ```ini title="/etc/hosts"
 192.168.1.1 node1
@@ -175,21 +175,21 @@ Add the entries to `/etc/hosts` on **every** node:
 192.168.1.4 node4
 ```
 
-## TLS configuration
+## Configuration TLS
 
-If [using TLS](../../integration/tls-configured.md), mount the certificate directory and point RustFS at it:
+Si vous [utilisez TLS](../../integration/tls-configured.md), montez le répertoire des certificats et indiquez-le à RustFS :
 
 ```bash
 -v /path/to/certs:/certs \
 -e RUSTFS_TLS_PATH=/certs \
 ```
 
-## Before production
+## Avant la production
 
-Work through the [Pre-Installation Checklists](../requirement/checklists/index.md) — hardware, network, software, and security — before deploying to production. Use a multi-node deployment architecture, [enable TLS encrypted communication](../../integration/tls-configured.md), configure a log rotation strategy, and set up a regular backup strategy.
+Parcourez les [listes de contrôle préalables à l’installation](../requirement/checklists/index.md) — matériel, réseau, logiciels et sécurité — avant de déployer en production. Utilisez un déploiement multi-nœuds, [activez TLS](../../integration/tls-configured.md), configurez la rotation des journaux et planifiez des sauvegardes régulières.
 
-## Next steps
+## Étapes suivantes
 
-- [RustFS Console](/administration/console)
-- [Configure an S3 client](../../developer/examples/aws-cli.md)
-- [TLS configuration](../../integration/tls-configured.md)
+- [Console RustFS](/fr/administration/console)
+- [Configurer un client S3](../../developer/examples/aws-cli.md)
+- [Configuration TLS](../../integration/tls-configured.md)

@@ -1,43 +1,41 @@
 ---
-title: "RustFS SDK Overview"
-description: "Overview of supported S3 SDKs for RustFS."
+title: "SDK"
+description: "Cette page présente les SDK S3 pris en charge pour RustFS."
 ---
 
-RustFS is a distributed object storage system fully compatible with the S3 protocol. Users can:
+RustFS est un système de stockage objet distribué doté d’une API compatible avec S3. Vous pouvez :
 
-- Manage RustFS through the Console management interface.
-- Manage RustFS through S3 clients.
-- Implement object storage operations and management on the business side through SDKs.
+- Gérer RustFS dans la Console.
+- Gérer RustFS par l’intermédiaire de clients S3.
+- Utiliser un SDK S3 pour gérer les compartiments (bucket) et les objets depuis votre application.
 
-Currently, the SDKs provided by RustFS include:
+Les guides suivants expliquent comment utiliser les SDK S3 avec RustFS :
 
 - [Java SDK](./java.md)
 - [JavaScript SDK](./javascript.md)
 - [Python SDK](./python.md)
 - [Rust SDK](./rust.md)
 - [TypeScript SDK](./typescript.md)
-- [Golang SDK](./go.md)
+- [Go SDK](./go.md)
 
-## Terminology
+## Terminologie
 
-Amazon S3 (Simple Storage Service) was the first widely adopted object storage service. Its API has become the de facto standard for object storage. In this documentation, "S3" refers to the protocol.
+Amazon Simple Storage Service (Amazon S3) a été le premier service de stockage objet largement adopté. Son API est devenue la norme de fait du stockage objet. Dans cette documentation, « S3 » désigne le protocole.
 
-## SDK Recommendations
+## Recommandations relatives aux SDK
 
-We recommend using the official AWS S3 SDKs. These SDKs are mature, well-maintained, and highly optimized.
+Nous recommandons d’utiliser les SDK S3 officiels d’AWS. Ces SDK sont matures, bien maintenus et fortement optimisés.
 
-If you have a familiar and trusted SDK from a vendor, you can use it.
+Vous pouvez aussi utiliser un SDK d’éditeur que vous connaissez et auquel vous faites confiance, à condition qu’il prenne en charge les opérations S3 dont vous avez besoin.
 
-Some third-party SDKs may have non-standard implementations. We recommend avoiding SDKs that are not strictly S3-compliant.
+Certains SDK tiers peuvent avoir des implémentations non standard. Nous recommandons d’éviter les SDK qui ne sont pas strictement conformes à S3.
 
-## Compatibility with MinIO SDKs
+## Compatibilité avec les SDK MinIO
 
-Yes, RustFS is fully compatible with MinIO SDKs.
+RustFS fonctionne avec les SDK MinIO.
 
-If you are using MinIO SDKs, you can modify the Endpoint, AK, and SK to be directly compatible with RustFS.
+Pour connecter un SDK MinIO à RustFS, définissez le point de terminaison, la clé d’accès et la clé secrète avec vos valeurs RustFS.
 
-## Handling Incompatible SDKs
+## Traitement des SDK incompatibles
 
-If you encounter an SDK that does not support standard S3, MinIO, or RustFS:
-
-We recommend switching to a standard AWS S3 SDK.
+Si un SDK ne fonctionne ni avec S3 standard, ni avec MinIO, ni avec RustFS, nous recommandons de passer à un SDK AWS officiel pour S3.

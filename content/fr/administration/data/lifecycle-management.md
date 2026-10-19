@@ -1,21 +1,21 @@
 ---
-title: "Lifecycle Management"
-description: "Configure, inspect, and maintain RustFS object lifecycle rules with the rc command-line client."
+title: "Gestion du cycle de vie"
+description: "Configurez, inspectez et maintenez les règles de cycle de vie des objets RustFS avec le client en ligne de commande rc."
 ---
 
-RustFS lifecycle management applies expiration and transition rules to objects in a bucket. This page shows how to manage those rules with `rc`, verify a transition, and restore a temporary local copy of transitioned data.
+La gestion du cycle de vie RustFS applique des règles d’expiration et de transition aux objets d’un compartiment (bucket). Cette page montre comment gérer ces règles avec `rc`, vérifier une transition et restaurer une copie locale temporaire des données transférées.
 
-Before you begin, [install `rc`](/operations/rc), configure an alias named `local`, and create `my-bucket`. To transition objects, first register the target in [Tiered Storage](/administration/data/tiered-storage) and note its uppercase tier name.
+Avant de commencer, [installez `rc`](/fr/operations/rc), configurez un alias nommé `local` et créez `my-bucket`. Pour faire transiter des objets, enregistrez d’abord la cible dans [Stockage hiérarchisé](/fr/administration/data/tiered-storage) et notez son nom de niveau en majuscules.
 
-:::note[Asynchronous evaluation]
+:::note[Évaluation asynchrone]
 
-Lifecycle rules do not process every eligible object immediately. The [Object Scanner](/administration/data/object/scanner) evaluates lifecycle work in the background.
+Les règles de cycle de vie ne traitent pas immédiatement chaque objet éligible. Le [scanner d’objets](/fr/administration/data/object/scanner) évalue le travail de cycle de vie en arrière-plan.
 
 :::
 
-## Add an expiration rule
+## Ajouter une règle d’expiration
 
-Expire objects under the `logs/` prefix 30 days after creation:
+Faites expirer les objets du préfixe `logs/` 30 jours après leur création :
 
 ```bash
 rc bucket lifecycle rule add local/my-bucket \
@@ -23,11 +23,11 @@ rc bucket lifecycle rule add local/my-bucket \
 	--expiry-days 30
 ```
 
-The command creates an enabled rule and returns its generated rule ID. Record that ID when you need to edit or remove this specific rule.
+La commande crée une règle activée et renvoie l’ID de règle généré. Notez cet ID si vous devez modifier ou supprimer cette règle précise.
 
-## Add a transition rule
+## Ajouter une règle de transition
 
-Move object data to the registered `COLDTIER` tier after 90 days:
+Déplacez les données d’objet vers le niveau enregistré `COLDTIER` au bout de 90 jours :
 
 ```bash
 rc bucket lifecycle rule add local/my-bucket \
@@ -35,9 +35,9 @@ rc bucket lifecycle rule add local/my-bucket \
 	--storage-class COLDTIER
 ```
 
-`--storage-class` must match a registered tier name. Adding the rule does not create the tier or validate an AWS storage-class label as a RustFS tier.
+`--storage-class` doit correspondre au nom d’un niveau enregistré. L’ajout de la règle ne crée pas le niveau et ne valide pas un libellé de classe de stockage AWS en tant que niveau RustFS.
 
-You can combine expiration and transition options in one rule. Use the noncurrent-version options only for a versioned bucket:
+Vous pouvez combiner des options d’expiration et de transition dans une même règle. N’utilisez les options de versions non actuelles que pour un compartiment dont la gestion des versions est activée :
 
 ```bash
 rc bucket lifecycle rule add local/my-bucket \
@@ -46,15 +46,15 @@ rc bucket lifecycle rule add local/my-bucket \
 	--noncurrent-expiry-days 365
 ```
 
-## Inspect and update rules
+## Inspecter et mettre à jour les règles
 
-List the current rules and note the ID of the rule you want to change:
+Listez les règles actuelles et notez l’ID de la règle à modifier :
 
 ```bash
 rc bucket lifecycle rule list local/my-bucket
 ```
 
-Change a rule's expiration period or disable it without deleting it:
+Modifiez la durée d’expiration d’une règle, ou désactivez-la sans la supprimer :
 
 ```bash
 rc bucket lifecycle rule edit local/my-bucket \
@@ -65,30 +65,30 @@ rc bucket lifecycle rule edit local/my-bucket \
 	--disable true
 ```
 
-Remove one rule by ID. Use `--all` only when you intend to remove the bucket's complete lifecycle configuration:
+Supprimez une règle par son ID. N’utilisez `--all` que si vous avez l’intention de supprimer toute la configuration de cycle de vie du compartiment :
 
 ```bash
 rc bucket lifecycle rule remove local/my-bucket --id <rule-id>
 rc bucket lifecycle rule remove local/my-bucket --all
 ```
 
-## Export and import rules
+## Exporter et importer les règles
 
-Export the bucket's lifecycle configuration before a bulk change:
+Exportez la configuration de cycle de vie du compartiment avant une modification groupée :
 
 ```bash
 rc bucket lifecycle rule export local/my-bucket > lifecycle.json
 ```
 
-Importing a file replaces the lifecycle configuration sent to the bucket. Review the JSON before applying it:
+L’importation d’un fichier remplace la configuration de cycle de vie envoyée au compartiment. Examinez le JSON avant de l’appliquer :
 
 ```bash
 rc bucket lifecycle rule import local/my-bucket lifecycle.json
 ```
 
-## Confirm a lifecycle transition
+## Confirmer une transition de cycle de vie
 
-After an object becomes eligible under its lifecycle rule, inspect it on the source cluster:
+Lorsqu’un objet devient éligible au regard de sa règle de cycle de vie, inspectez-le sur le cluster source :
 
 ```bash
 aws s3api head-object \
@@ -97,7 +97,7 @@ aws s3api head-object \
 	--endpoint-url http://localhost:9000
 ```
 
-After the transition completes, the response reports the registered tier name as the storage class:
+Une fois la transition terminée, la réponse indique le nom du niveau enregistré comme classe de stockage :
 
 ```json
 {
@@ -105,9 +105,9 @@ After the transition completes, the response reports the registered tier name as
 }
 ```
 
-The response can contain additional object metadata. Before the transition completes, `StorageClass` may be absent or may not yet report `COLDTIER`.
+La réponse peut contenir d’autres métadonnées d’objet. Avant la fin de la transition, `StorageClass` peut être absent ou ne pas encore indiquer `COLDTIER`.
 
-Read the object through the source RustFS endpoint as usual:
+Lisez l’objet via le point de terminaison RustFS source, comme d’habitude :
 
 ```bash
 aws s3 cp \
@@ -116,23 +116,23 @@ aws s3 cp \
 	--endpoint-url http://localhost:9000
 ```
 
-RustFS reads transitioned data through the source bucket and object key. Applications do not need to address the target bucket directly.
+RustFS lit les données transférées via le compartiment source et la clé d’objet. Les applications n’ont pas besoin de s’adresser directement au compartiment cible.
 
-## Restore a local copy
+## Restaurer une copie locale
 
-Request a temporary local copy of a transitioned object and retain it for seven days:
+Demandez une copie locale temporaire d’un objet transféré et conservez-la pendant sept jours :
 
 ```bash
 rc bucket lifecycle restore local/my-bucket/hello.txt --days 7
 ```
 
-While the copy-back is running, `HEAD` reports `x-amz-restore: ongoing-request="true"`. After completion, it reports `ongoing-request="false"` with an expiry date. A second restore submitted while one is running returns `RestoreAlreadyInProgress`.
+Pendant le rapatriement, `HEAD` indique `x-amz-restore: ongoing-request="true"`. Une fois l’opération terminée, il indique `ongoing-request="false"` avec une date d’expiration. Une seconde restauration soumise alors qu’une restauration est en cours renvoie `RestoreAlreadyInProgress`.
 
-When the restore period expires, RustFS removes the local restored copy and its restore metadata. The transitioned object remains available from the remote tier.
+À l’expiration de la période de restauration, RustFS supprime la copie locale restaurée et ses métadonnées de restauration. L’objet transféré reste disponible depuis le niveau distant.
 
-## Command compatibility
+## Compatibilité des commandes
 
-The latest `rc` also accepts `rc ilm` as a compatibility alias. We recommend the noun-first `rc bucket lifecycle` form for new commands and scripts:
+La dernière version de `rc` accepte aussi `rc ilm` comme alias de compatibilité. Nous recommandons la forme `rc bucket lifecycle`, qui place le nom en premier, pour les nouvelles commandes et les scripts :
 
 ```bash
 rc bucket lifecycle --help
@@ -140,6 +140,6 @@ rc bucket lifecycle rule --help
 rc bucket lifecycle tier --help
 ```
 
-## Next steps
+## Étapes suivantes
 
-Review [Tiered Storage](/administration/data/tiered-storage) to monitor or maintain remote tiers, and use [object creation](/administration/data/object/creation) to create test objects for a lifecycle rule.
+Consultez [Stockage hiérarchisé](/fr/administration/data/tiered-storage) pour surveiller ou maintenir les niveaux distants, et utilisez la [création d’objets](/fr/administration/data/object/creation) pour créer des objets de test d’une règle de cycle de vie.

@@ -1,26 +1,26 @@
 ---
 title: "SSE-C"
-description: "Use customer-provided AES-256 keys for RustFS object encryption and decryption."
+description: "Utilisez des clés AES-256 fournies par le client pour le chiffrement et le déchiffrement des objets RustFS."
 ---
 
-SSE-C encrypts an object with a 256-bit key supplied by the client on every write and read request. RustFS validates and uses the key for the request but does not persist the plaintext customer key. SSE-C does not use the RustFS KMS backend.
+SSE-C chiffre un objet avec une clé de 256 bits fournie par le client à chaque requête d’écriture et de lecture. RustFS valide et utilise la clé pour la requête, mais ne persiste pas la clé client en clair. SSE-C n’utilise pas le backend KMS de RustFS.
 
-## Requirements
+## Prérequis
 
-- Install and configure [`rc`](/operations/rc).
-- Install OpenSSL for the key-generation example.
-- Use HTTPS so customer keys are encrypted in transit.
-- Store the customer key in a secret manager and maintain a mapping between each object and its key.
+- Installez et configurez [`rc`](/fr/operations/rc).
+- Installez OpenSSL pour l’exemple de génération de clé.
+- Utilisez HTTPS afin que les clés client soient chiffrées en transit.
+- Stockez la clé client dans un gestionnaire de secrets et conservez une correspondance entre chaque objet et sa clé.
 
-:::warning[The same key is required for every read]
+:::warning[La même clé est exigée pour chaque lecture]
 
-If you lose an SSE-C key, RustFS cannot recover it and the object becomes unreadable. Never log, commit, or send the key over an unencrypted connection.
+Si vous perdez une clé SSE-C, RustFS ne peut pas la retrouver et l’objet devient illisible. Ne journalisez jamais la clé, ne l’ajoutez jamais au dépôt et ne l’envoyez jamais sur une connexion non chiffrée.
 
 :::
 
-## Prepare a customer key
+## Préparer une clé client
 
-Generate 32 random bytes through a hexadecimal intermediate, then derive the Base64 key and its Base64-encoded MD5 checksum:
+Générez 32 octets aléatoires via un intermédiaire hexadécimal, puis dérivez la clé Base64 et sa somme MD5 encodée en Base64 :
 
 ```bash
 SSE_C_KEY_HEX=$(openssl rand -hex 32)
@@ -29,11 +29,11 @@ SSE_C_KEY_MD5=$(printf '%s' "$SSE_C_KEY_HEX" | xxd -r -p \
 	| openssl dgst -md5 -binary | openssl base64 -A)
 ```
 
-Move these values into your approved secret-management workflow. Do not print them to the terminal or shell history.
+Placez ces valeurs dans votre processus approuvé de gestion des secrets. Ne les affichez pas dans le terminal ni dans l’historique du shell.
 
-## Upload an encrypted object
+## Charger un objet chiffré
 
-`rc 0.1.29` has no dedicated SSE-C option. Its signed custom-header option can send the three S3 SSE-C headers:
+`rc 0.1.29` ne dispose pas d’option SSE-C dédiée. Son option d’en-tête personnalisé signé peut envoyer les trois en-têtes SSE-C de S3 :
 
 ```bash
 rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt \
@@ -42,17 +42,17 @@ rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt \
 	-H "x-amz-server-side-encryption-customer-key-md5:$SSE_C_KEY_MD5"
 ```
 
-The required request headers are:
+Les en-têtes de requête exigés sont les suivants :
 
-| Header | Value |
+| En-tête | Valeur |
 | --- | --- |
 | `x-amz-server-side-encryption-customer-algorithm` | `AES256` |
-| `x-amz-server-side-encryption-customer-key` | Base64-encoded 32-byte key |
-| `x-amz-server-side-encryption-customer-key-md5` | Base64-encoded MD5 digest of the raw key |
+| `x-amz-server-side-encryption-customer-key` | Clé de 32 octets encodée en Base64 |
+| `x-amz-server-side-encryption-customer-key-md5` | Empreinte MD5 de la clé brute, encodée en Base64 |
 
-## Read the encrypted object
+## Lire l’objet chiffré
 
-Supply the same three headers on reads and metadata requests:
+Fournissez les trois mêmes en-têtes pour les lectures et les requêtes de métadonnées :
 
 ```bash
 rc object show rustfs/my-bucket/hello.txt \
@@ -61,24 +61,24 @@ rc object show rustfs/my-bucket/hello.txt \
 	-H "x-amz-server-side-encryption-customer-key-md5:$SSE_C_KEY_MD5"
 ```
 
-The same workflow was validated with `rc 0.1.29` against RustFS by uploading an object, reading it with the original key, and comparing the returned bytes with the source.
+Le même flux a été validé avec `rc 0.1.29` sur RustFS en chargeant (upload) un objet, en le lisant avec la clé d’origine et en comparant les octets renvoyés à la source.
 
-:::warning[Protect command arguments]
+:::warning[Protégez les arguments de commande]
 
-The generic `-H` method places expanded header values in the `rc` process arguments, which may be visible to other processes on the host. For production automation, prefer an S3 SDK that accepts SSE-C key material through protected memory or a credential provider instead of command-line arguments.
+La méthode générique `-H` place les valeurs d’en-tête développées dans les arguments du processus `rc`, qui peuvent être visibles par d’autres processus de l’hôte. Pour l’automatisation en production, préférez un SDK S3 qui accepte le matériel de clé SSE-C via une mémoire protégée ou un fournisseur d’identifiants, plutôt que des arguments de ligne de commande.
 
 :::
 
-## Clear shell variables
+## Effacer les variables du shell
 
-After the operation, remove key material from the shell environment:
+Après l’opération, retirez le matériel de clé de l’environnement du shell :
 
 ```bash
 unset SSE_C_KEY_HEX SSE_C_KEY_B64 SSE_C_KEY_MD5
 ```
 
-Changing a bucket's SSE-S3 or SSE-KMS default does not alter SSE-C objects. SSE-C is selected by the customer-key headers on each individual request and takes precedence for that request.
+Modifier la valeur par défaut SSE-S3 ou SSE-KMS d’un compartiment (bucket) ne modifie pas les objets SSE-C. SSE-C est sélectionné par les en-têtes de clé client de chaque requête individuelle et a priorité pour cette requête.
 
-## Next steps
+## Étapes suivantes
 
-Compare [SSE-S3](./sse-s.md) for server-managed encryption and [KMS](./kms.md) for explicit KMS-backed key management.
+Comparez [SSE-S3](./sse-s.md) pour le chiffrement géré par le serveur et [KMS](./kms.md) pour une gestion des clés explicite reposant sur le KMS.

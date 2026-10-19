@@ -262,4 +262,4 @@ docker compose logs create-bucket
 
 - Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
 - Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
-- Folgen Sie der [Elasticsearch-Snapshot-Dokumentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshot-restore.html) zur Snapshot-Lebenszyklusverwaltung (SLM).
+- Folgen Sie der [Elasticsearch-Snapshot-Dokumentation](https://www.elastic.co/docs/deploy-manage/tools/snapshot-and-restore) zur Snapshot-Lebenszyklusverwaltung (SLM).

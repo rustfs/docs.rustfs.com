@@ -155,4 +155,4 @@ Die Standardreservierung für den KV-Cache beträgt 90 Prozent des Arbeitsspeich
 
 - Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere Inferenz-Bereitstellungen verwenden.
 - Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
-- Folgen Sie der [vLLM-Dokumentation](https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html) für Chat-Templates, Tensor-Parallelität und quantisierte Gewichte auf demselben Bucket als Modellspeicher.
+- Folgen Sie der [vLLM-Dokumentation](https://docs.vllm.ai/serving/openai_compatible_server.html) für Chat-Templates, Tensor-Parallelität und quantisierte Gewichte auf demselben Bucket als Modellspeicher.

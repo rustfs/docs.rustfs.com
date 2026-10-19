@@ -1,46 +1,46 @@
 ---
-title: "Object Lock"
-description: "Protect versioned objects from deletion with retention periods and legal holds."
+title: "Verrouillage d’objet"
+description: "Protégez les objets versionnés contre la suppression à l’aide de périodes de rétention et de conservations légales."
 ---
 
-RustFS Object Lock applies write-once, read-many protection to individual object versions. Use retention periods for time-bound protection and Legal Hold for protection without a predefined expiration date.
+Le verrouillage d’objet de RustFS applique une protection en écriture unique et lecture multiple à chaque version d’objet. Utilisez les périodes de rétention pour une protection limitée dans le temps, et la conservation légale (Legal Hold) pour une protection sans date d’expiration prédéfinie.
 
-## Overview
+## Vue d’ensemble
 
-Object Lock requires bucket versioning. You can enable it when creating a bucket or use the S3 `PutObjectLockConfiguration` API on an existing bucket whose versioning is enabled. Each overwrite creates a new version; retention and Legal Hold protect a specific version rather than the object key as a whole.
+Le verrouillage d’objet exige la gestion des versions du compartiment (bucket). Vous pouvez l’activer à la création d’un compartiment, ou utiliser l’API S3 `PutObjectLockConfiguration` sur un compartiment existant dont la gestion des versions est activée. Chaque écrasement crée une nouvelle version ; la rétention et la conservation légale protègent une version précise, et non la clé d’objet dans son ensemble.
 
-| Protection | Behavior |
+| Protection | Comportement |
 | --- | --- |
-| `GOVERNANCE` retention | Blocks deletion and retention shortening unless the caller has bypass permission and explicitly requests a bypass. Retention can be extended without bypass. |
-| `COMPLIANCE` retention | Blocks deletion even with governance bypass. The date can be extended but not shortened. |
-| Legal Hold | Blocks deletion until the hold is set to `OFF`. It has no expiration date and governance bypass does not override it. |
+| Rétention `GOVERNANCE` | Bloque la suppression et le raccourcissement de la rétention, sauf si l’appelant possède l’autorisation de contournement et demande explicitement un contournement. La rétention peut être prolongée sans contournement. |
+| Rétention `COMPLIANCE` | Bloque la suppression, même avec le contournement de gouvernance. La date peut être prolongée, mais pas raccourcie. |
+| Conservation légale | Bloque la suppression jusqu’à ce que la conservation soit définie sur `OFF`. Elle n’a pas de date d’expiration, et le contournement de gouvernance ne la lève pas. |
 
-Deleting a key without a version ID creates a delete marker. The protected version remains stored and can still be retrieved by version ID.
+La suppression d’une clé sans ID de version crée un marqueur de suppression. La version protégée reste stockée et peut toujours être récupérée par son ID de version.
 
-:::danger[Plan retention before enabling it]
+:::danger[Planifiez la rétention avant de l’activer]
 
-COMPLIANCE retention cannot be bypassed or shortened before its retain-until date. Test policies in a non-production bucket and verify time synchronization, permissions, lifecycle rules, replication, and backup procedures before protecting production data.
+La rétention COMPLIANCE ne peut être ni contournée ni raccourcie avant sa date de fin de conservation (retain-until). Testez les politiques dans un compartiment hors production et vérifiez la synchronisation horaire, les autorisations, les règles de cycle de vie, la réplication et les procédures de sauvegarde avant de protéger des données de production.
 
 :::
 
-## Configure in the Console
+## Configurer dans la Console
 
-1. Sign in to the RustFS Console and open **Buckets**.
-2. Select **Create Bucket** and enter the bucket name.
-3. Enable **Object Lock**. The Console also enables **Version** because Object Lock requires versioning.
-4. To apply retention automatically to new object versions, enable **Retention**.
-5. Select **COMPLIANCE** or **GOVERNANCE**, enter the validity, and select **Day** or **Year**.
-6. Select **Create**.
+1. Connectez-vous à la Console RustFS et ouvrez **Buckets**.
+2. Sélectionnez **Create Bucket** et saisissez le nom du compartiment.
+3. Activez **Object Lock**. La Console active aussi **Version**, car le verrouillage d’objet exige la gestion des versions.
+4. Pour appliquer automatiquement la rétention aux nouvelles versions d’objet, activez **Retention**.
+5. Sélectionnez **COMPLIANCE** ou **GOVERNANCE**, saisissez la période de rétention, puis sélectionnez **Day** ou **Year**.
+6. Sélectionnez **Create**.
 
-![Create Bucket dialog with versioning, Object Lock, and default retention enabled](./images/object-lock-create-bucket.png)
+![boîte de dialogue Create Bucket avec la gestion des versions, le verrouillage d’objet et la rétention par défaut activés](./images/object-lock-create-bucket.png)
 
-The Console initially displays `180` days when default retention is enabled. Replace it with the period required by your retention policy; it is a UI initial value, not a general recommendation.
+La Console affiche d’abord `180` jours lorsque la rétention par défaut est activée. Remplacez cette valeur par la période exigée par votre politique de rétention ; il s’agit d’une valeur initiale de l’interface, et non d’une recommandation générale.
 
-To inspect a protected object, open the bucket, select the object name, and use the **Versions** and **Info** tabs. The Info tab exposes **Legal Hold** and **RetentionPolicy** fields.
+Pour inspecter un objet protégé, ouvrez le compartiment, sélectionnez le nom de l’objet et utilisez les onglets **Versions** et **Info**. L’onglet Info expose les champs **Legal Hold** et **RetentionPolicy**.
 
-## Use rc
+## Utiliser rc
 
-Configure an alias before running these examples:
+Configurez un alias avant d’exécuter ces exemples :
 
 ```bash
 rc alias set rustfs http://localhost:9000 \
@@ -48,13 +48,13 @@ rc alias set rustfs http://localhost:9000 \
 	--region us-east-1 --bucket-lookup path
 ```
 
-:::note[rc 0.1.29 bucket creation boundary]
+:::note[Limite de création de compartiment dans rc 0.1.29]
 
-`rc bucket create --with-lock` and `--with-versioning` appear in the `rc 0.1.29` help output but return `not implemented` when executed. Create the Object Lock bucket in the Console. The upload headers shown below are supported and were validated against RustFS.
+`rc bucket create --with-lock` et `--with-versioning` apparaissent dans l’aide de `rc 0.1.29`, mais renvoient `not implemented` à l’exécution. Créez le compartiment avec verrouillage d’objet dans la Console. Les en-têtes de chargement ci-dessous sont pris en charge et ont été validés avec RustFS.
 
 :::
 
-Upload an object version with GOVERNANCE retention. Supply both retention headers together and use an RFC 3339 UTC timestamp in the future:
+Chargez une version d’objet avec une rétention GOVERNANCE. Fournissez les deux en-têtes de rétention ensemble et utilisez un horodatage UTC au format RFC 3339 situé dans le futur :
 
 ```bash
 rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt \
@@ -62,14 +62,14 @@ rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt \
 	-H "x-amz-object-lock-retain-until-date:2027-01-01T00:00:00Z"
 ```
 
-Upload an object version with Legal Hold enabled:
+Chargez une version d’objet avec la conservation légale activée :
 
 ```bash
 rc object copy /path/to/hello.txt rustfs/my-bucket/legal-hold.txt \
 	-H "x-amz-object-lock-legal-hold:ON"
 ```
 
-List the protected versions and inspect a specific version:
+Répertoriez les versions protégées et inspectez une version précise :
 
 ```bash
 rc bucket version list rustfs/my-bucket --json
@@ -77,27 +77,27 @@ rc object stat rustfs/my-bucket/hello.txt \
 	--version-id <version-id> --json
 ```
 
-`rc 0.1.29` does not provide commands to change retention or switch an existing Legal Hold between `ON` and `OFF`. Use the Console or an S3 SDK for those operations.
+`rc 0.1.29` ne fournit pas de commandes pour modifier la rétention ni pour faire passer une conservation légale existante entre `ON` et `OFF`. Utilisez la Console ou un SDK S3 pour ces opérations.
 
-## Verify protection
+## Vérifier la protection
 
-1. Upload a test object with GOVERNANCE retention or Legal Hold.
-2. Record its version ID with `rc bucket version list`.
-3. Attempt to delete that exact version through an S3 client without bypass. RustFS must return `AccessDenied` while protection is active.
-4. Confirm the version remains visible in the Console and through `rc object stat --version-id`.
+1. Chargez un objet de test avec une rétention GOVERNANCE ou une conservation légale.
+2. Notez son ID de version avec `rc bucket version list`.
+3. Tentez de supprimer cette version exacte via un client S3, sans contournement. RustFS doit renvoyer `AccessDenied` tant que la protection est active.
+4. Confirmez que la version reste visible dans la Console et via `rc object stat --version-id`.
 
-For GOVERNANCE retention, test bypass only with a dedicated administrative identity that has `s3:BypassGovernanceRetention`. COMPLIANCE retention and Legal Hold remain protected from governance bypass.
+Pour la rétention GOVERNANCE, ne testez le contournement qu’avec une identité d’administration dédiée disposant de `s3:BypassGovernanceRetention`. La rétention COMPLIANCE et la conservation légale restent protégées contre le contournement de gouvernance.
 
-## Operational considerations
+## Considérations d’exploitation
 
-- Default bucket retention is calculated when a new object version or multipart upload is initiated.
-- Copying an object creates a new destination version; destination retention policy applies independently.
-- Suspending versioning is not appropriate for an Object Lock bucket.
-- Lifecycle expiration cannot remove a version while retention or Legal Hold blocks deletion.
-- Replication targets for locked objects must support compatible Object Lock behavior.
+- La rétention par défaut du compartiment est calculée lorsqu’une nouvelle version d’objet ou un chargement partitionné est initié.
+- La copie d’un objet crée une nouvelle version de destination ; la politique de rétention de la destination s’applique de façon indépendante.
+- Suspendre la gestion des versions n’est pas approprié pour un compartiment avec verrouillage d’objet.
+- L’expiration du cycle de vie ne peut pas retirer une version tant que la rétention ou la conservation légale bloque la suppression.
+- Les cibles de réplication des objets verrouillés doivent prendre en charge un comportement compatible de verrouillage d’objet.
 
-## Next steps
+## Étapes suivantes
 
-- [Manage object versions](./versioning.md)
-- [Configure bucket replication](../bucket/replication.md)
-- [Review the security checklist](/installation/requirement/checklists/security-checklists)
+- [Gérer les versions d’objet](./versioning.md)
+- [Configurer la réplication de compartiment](../bucket/replication.md)
+- [Consulter la liste de contrôle de sécurité](/fr/installation/requirement/checklists/security-checklists)

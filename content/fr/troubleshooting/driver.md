@@ -1,34 +1,25 @@
 ---
-title: "Hard Drive Failures"
-description: "RustFS ensures read/write access can still be provided when some disks fail through mechanisms similar to erasure coding, and automatically heals data after replacing disks."
+title: "Pannes de disque"
+description: "Remplacez un disque défaillant dans un déploiement RustFS et laissez RustFS réparer les données automatiquement."
 ---
 
-RustFS ensures read/write access can still be provided when some disks fail through mechanisms similar to erasure coding, and automatically heals data after replacing disks.
-
-## Table of Contents
-
-1. [Unmount Failed Disk](#unmount-failed-disk)
-2. [Replace Failed Disk](#replace-failed-disk)
-3. [Update `/etc/fstab` or RustFS Configuration](#update-etcfstab-or-rustfs-configuration)
-4. [Remount New Disk](#remount-new-disk)
-5. [Trigger and Monitor Data Healing](#trigger-and-monitor-data-healing)
-6. [Follow-up Checks and Notes](#follow-up-checks-and-notes)
+RustFS utilise le codage d’effacement pour que les données restent lisibles et inscriptibles lorsque certains disques tombent en panne. Après le remplacement d’un disque défaillant, RustFS y répare automatiquement les données manquantes.
 
 <a id="unmount-failed-disk"></a>
 
-### Unmount Failed Disk
+### Démontez le disque défaillant
 
-Before replacing the physical hard drive, you need to safely unmount the failed disk from the operating system level to avoid I/O errors in the file system or RustFS during the replacement process.
+Avant de remplacer le disque dur physique, démontez le disque défaillant au niveau du système d’exploitation afin d’éviter des erreurs d’E/S dans le système de fichiers ou dans RustFS pendant le remplacement.
 
 ```bash
 # Assume the failed disk is /dev/sdb
 umount /dev/sdb
 ```
 
-:::note[Notes]
+:::note[Remarques]
 
-* If there are multiple mount points, execute `umount` separately.
-* If encountering "device is busy", you can first stop the RustFS service:
+* Si le disque possède plusieurs points de montage, exécutez `umount` sur chacun d’eux.
+* Si l’erreur « device is busy » apparaît, arrêtez d’abord le service RustFS :
 
 ```bash
 systemctl stop rustfs
@@ -38,26 +29,28 @@ systemctl stop rustfs
 
 <a id="replace-failed-disk"></a>
 
-### Replace Failed Disk
+### Remplacez le disque défaillant
 
-After physically replacing the failed disk, you need to partition and format the new disk, and apply the same label as the original disk.
+Après avoir physiquement remplacé le disque défaillant, vous devez partitionner et formater le nouveau disque, puis lui appliquer la même étiquette que le disque d’origine.
 
 ```bash
 # Format as XFS and apply the same label as the original disk (RustFS requires XFS, like the other disks in the deployment)
 mkfs.xfs -L DISK1 /dev/sdb
 ```
 
-> **Requirements**
->
-> * New disk capacity ≥ original disk capacity;
-> * File system type consistent with other disks (XFS, per the [installation guide](../installation/linux/index.md));
-> * Recommend using labels (LABEL) or UUID for mounting to ensure disk order is not affected by system restarts.
+:::note[Exigences]
+
+* Le nouveau disque est au moins aussi grand que le disque d’origine.
+* Utilisez le même système de fichiers que les autres disques (XFS ; voir le [guide d’installation](../installation/linux/index.md)).
+* Nous recommandons de monter les systèmes de fichiers par étiquette (LABEL) ou par UUID, afin que les montages restent corrects si les noms de périphériques changent après un redémarrage.
+
+:::
 
 <a id="update-etcfstab-or-rustfs-configuration"></a>
 
-### Update `/etc/fstab` or RustFS Configuration
+### Mettez à jour `/etc/fstab` ou la configuration RustFS
 
-Confirm that the mount item labels or UUIDs in `/etc/fstab` point to the new disk. The mount point must stay identical to the one listed in `RUSTFS_VOLUMES` (in `/etc/default/rustfs`), so the healed disk rejoins the cluster at the same path.
+Vérifiez que les étiquettes ou les UUID des entrées de `/etc/fstab` pointent vers le nouveau disque. Le point de montage doit rester identique à celui indiqué dans `RUSTFS_VOLUMES` (dans `/etc/default/rustfs`), afin que le disque réparé rejoigne le cluster au même chemin.
 
 ```bash
 # View current fstab
@@ -67,16 +60,16 @@ cat /etc/fstab
 LABEL=DISK1 /data/rustfs0 xfs defaults,noatime 0 2
 ```
 
-:::tip[Tips]
+:::tip[Conseils]
 
-* If using UUID:
+* Si vous utilisez un UUID :
 
 ```bash
 blkid /dev/sdb
 # Get the new partition's UUID, then replace the corresponding field in fstab
 ```
 
-* After modifying fstab, be sure to validate syntax:
+* Après avoir modifié `/etc/fstab`, validez la syntaxe :
 
 ```bash
 mount -a # If no errors, configuration is correct
@@ -86,32 +79,32 @@ mount -a # If no errors, configuration is correct
 
 <a id="remount-new-disk"></a>
 
-### Remount New Disk
+### Remontez le nouveau disque
 
-Execute the following commands to batch mount all disks and start the RustFS service:
+Exécutez les commandes suivantes pour monter tous les systèmes de fichiers configurés et démarrer RustFS :
 
 ```bash
 mount -a
 systemctl start rustfs
 ```
 
-Confirm all disks are mounted normally:
+Vérifiez que tous les systèmes de fichiers attendus sont montés :
 
 ```bash
 df -h | grep /data/rustfs
 ```
 
-:::note
+:::note[Échecs de montage]
 
-If some mounts fail, please check if fstab entries are consistent with disk labels/UUIDs.
+Si un montage échoue, vérifiez que les étiquettes ou les UUID de `/etc/fstab` correspondent à ceux du système de fichiers cible.
 
 :::
 
 <a id="trigger-and-monitor-data-healing"></a>
 
-### Trigger and Monitor Data Healing
+### Déclenchez et suivez la réparation des données
 
-Once RustFS detects a freshly formatted disk at a known mount point, its background scanner heals the missing data onto it automatically — no manual command is required. Confirm that recovery has started and track its progress through the service logs:
+Dès que RustFS détecte un disque fraîchement formaté sur un point de montage connu, son scanner en arrière-plan y répare automatiquement les données manquantes. Aucune commande manuelle n’est requise. Confirmez que la récupération a commencé et suivez sa progression dans les journaux du service :
 
 ```bash
 # For systemd-managed installations
@@ -121,28 +114,28 @@ journalctl -u rustfs -f
 tail -f /var/log/rustfs/rustfs.log
 ```
 
-You can also open the RustFS Console and check the disk status of the affected node.
+Vous pouvez aussi ouvrir la Console RustFS et vérifier l’état des disques du nœud concerné.
 
-:::note[Notes]
+:::note[Remarques]
 
-* The healing process will complete in the background, usually with minimal impact on online access;
-* After healing is complete, the tool will report success or list failed objects.
+* La réparation s’exécute en arrière-plan et a généralement peu d’impact sur les requêtes des clients.
+* Une fois la réparation terminée, les journaux signalent le succès ou listent les objets dont la réparation a échoué.
 
 :::
 
 <a id="follow-up-checks-and-notes"></a>
 
-### Follow-up Checks and Notes
+### Vérifications et remarques de suivi
 
-1. **Performance Monitoring**
+1. **Surveillance des performances**
 
- * I/O may fluctuate slightly during healing, recommend monitoring disk and network load.
-2. **Batch Failures**
+ * La charge d’E/S peut fluctuer pendant la réparation. Nous recommandons de surveiller l’utilisation des disques et du réseau.
+2. **Pannes par lot**
 
- * If multiple failures occur in the same batch of disks, consider more frequent hardware inspections.
-3. **Regular Drills**
+ * Si plusieurs disques du même lot de fabrication tombent en panne, inspectez plus souvent les disques restants de ce lot.
+3. **Tests de panne réguliers**
 
- * Regularly simulate disk failure drills to ensure team familiarity with recovery processes.
-4. **Maintenance Windows**
+ * Organisez régulièrement des exercices de panne de disque afin que votre équipe puisse s’exercer à la procédure de reprise.
+4. **Fenêtres de maintenance**
 
- * When failure rates are high, arrange dedicated maintenance windows to speed up replacement and healing.
+ * Lorsque le taux de panne est élevé, planifiez des fenêtres de maintenance dédiées pour accélérer le remplacement et la réparation.

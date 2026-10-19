@@ -1,19 +1,19 @@
 ---
 title: "Milvus"
-description: "Run Milvus with RustFS as its S3-compatible object storage backend using Docker Compose."
+description: "Exécutez Milvus avec RustFS comme backend de stockage objet compatible avec S3, à l’aide de Docker Compose."
 ---
 
-This guide runs **Milvus Standalone** with **RustFS** as its S3-compatible object storage backend. You will start Milvus, etcd, RustFS, and Attu; insert sample vectors; and verify that Milvus persists objects in RustFS.
+Ce guide exécute **Milvus Standalone** avec **RustFS** comme backend de stockage objet compatible avec S3. Vous allez démarrer Milvus, etcd, RustFS et Attu, insérer des vecteurs d’exemple et vérifier que Milvus persiste des objets dans RustFS.
 
-You need Docker with the Compose plugin and Python 3.9 or later. This deployment is intended for local integration testing, not production.
+Vous avez besoin de Docker avec le plugin Compose et de Python 3.9 ou d’une version plus récente. Ce déploiement est destiné aux tests d’intégration locaux, pas à la production.
 
-:::note[Milvus configuration names]
+:::note[Noms de configuration Milvus]
 
-Milvus groups S3-compatible storage settings under the `minio` configuration key. The name does not require a MinIO server. In this guide, `minio.address` points to the RustFS service, and Milvus uses the S3 API exposed by RustFS.
+Milvus regroupe les paramètres de stockage compatible avec S3 sous la clé de configuration `minio`. Ce nom n’exige pas un serveur MinIO. Dans ce guide, `minio.address` pointe vers le service RustFS, et Milvus utilise l’API S3 exposée par RustFS.
 
 :::
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -24,27 +24,27 @@ flowchart LR
 	Init["Bucket initializer"] -->|Create my-bucket| RustFS
 ```
 
-Milvus stores service metadata in etcd and persists vector data, indexes, and related objects under `s3://my-bucket/milvus` in RustFS. The local Milvus volume remains necessary for runtime data and caches.
+Milvus stocke les métadonnées de service dans etcd et persiste les données vectorielles, les index et les objets associés sous `s3://my-bucket/milvus` dans RustFS. Le volume local de Milvus reste nécessaire pour les données d’exécution et les caches.
 
-## 1. Create the project files
+## 1. Créer les fichiers du projet
 
-Create a working directory:
+Créez un répertoire de travail :
 
 ```bash
 mkdir rustfs-milvus
 cd rustfs-milvus
 ```
 
-Create an environment file and replace both credential placeholders:
+Créez un fichier d’environnement et remplacez les deux valeurs d’identifiants indicatives :
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Use dedicated credentials for the Milvus bucket. Do not commit `.env` to source control.
+Utilisez des identifiants dédiés pour le compartiment (bucket) Milvus. N’ajoutez pas le fichier `.env` au dépôt.
 
-Create the Milvus storage override:
+Créez le fichier de surcharge du stockage Milvus :
 
 ```yaml title="user.yaml"
 common:
@@ -62,9 +62,9 @@ minio:
   useVirtualHost: false
 ```
 
-`useVirtualHost: false` selects path-style S3 requests. The hostname `rustfs` resolves inside the Compose network; clients on the host use `http://localhost:9000`.
+`useVirtualHost: false` sélectionne les requêtes S3 en adressage de type chemin (path-style). Le nom d’hôte `rustfs` se résout à l’intérieur du réseau Compose ; les clients sur l’hôte utilisent `http://localhost:9000`.
 
-Create the Compose file:
+Créez le fichier Compose :
 
 ```yaml title="compose.yaml"
 services:
@@ -186,46 +186,46 @@ volumes:
   milvus-data:
 ```
 
-The `create-bucket` service uses the official [`rc`](https://github.com/rustfs/cli) image and exits after ensuring that `my-bucket` exists. Named volumes preserve etcd metadata, RustFS objects, and Milvus local data when containers are recreated.
+Le service `create-bucket` utilise l’image officielle [`rc`](https://github.com/rustfs/cli) et se termine après avoir vérifié que `my-bucket` existe. Les volumes nommés conservent les métadonnées etcd, les objets RustFS et les données locales de Milvus lorsque les conteneurs sont recréés.
 
-:::warning[Protect local service ports]
+:::warning[Protégez les ports des services locaux]
 
-The Compose file publishes the RustFS API and Console, Milvus gRPC and health ports, and Attu on the host for local testing. Do not expose these ports to an untrusted network. Production deployments require scoped credentials, TLS, authentication, resource planning, backups, and independently operated dependencies.
+Le fichier Compose publie l’API et la Console RustFS, les ports gRPC et de contrôle d’intégrité de Milvus, ainsi qu’Attu, sur l’hôte pour les tests locaux. N’exposez pas ces ports à un réseau non fiable. Les déploiements de production exigent des identifiants limités, TLS, une authentification, une planification des ressources, des sauvegardes et des dépendances exploitées séparément.
 
 :::
 
-## 2. Validate and start the deployment
+## 2. Valider et démarrer le déploiement
 
-Resolve the Compose file before starting containers:
+Résolvez le fichier Compose avant de démarrer les conteneurs :
 
 ```bash
 docker compose config
 ```
 
-Start the services:
+Démarrez les services :
 
 ```bash
 docker compose up -d
 docker compose ps -a
 ```
 
-The `create-bucket` service should exit with code `0`, and `etcd`, `rustfs`, and `standalone` should become healthy. Inspect logs if a service does not reach its expected state:
+Le service `create-bucket` devrait se terminer avec le code `0`, et `etcd`, `rustfs` ainsi que `standalone` devraient passer à l’état sain (healthy). Consultez les journaux si un service n’atteint pas l’état attendu :
 
 ```bash
 docker compose logs create-bucket rustfs standalone
 ```
 
-Open these local interfaces:
+Ouvrez ces interfaces locales :
 
-- RustFS Console: `http://localhost:9001`
-- Attu: `http://localhost:8000`
-- Milvus health endpoint: `http://localhost:9091/healthz`
+- Console RustFS : `http://localhost:9001`
+- Attu : `http://localhost:8000`
+- Point de terminaison de contrôle d’intégrité Milvus : `http://localhost:9091/healthz`
 
-Attu connects to `standalone:19530` through the Compose network. If Attu asks for a connection address, use that service name instead of `localhost:19530`.
+Attu se connecte à `standalone:19530` via le réseau Compose. Si Attu demande une adresse de connexion, utilisez ce nom de service à la place de `localhost:19530`.
 
-## 3. Insert and query sample vectors
+## 3. Insérer et interroger des vecteurs d’exemple
 
-Create a Python virtual environment and install the Milvus client version that matches the server release:
+Créez un environnement virtuel Python et installez la version du client Milvus qui correspond à la version du serveur :
 
 ```bash
 python3 -m venv .venv
@@ -233,7 +233,7 @@ source .venv/bin/activate
 python -m pip install "pymilvus==2.6.0"
 ```
 
-Create a test script:
+Créez un script de test :
 
 ```python title="verify_milvus.py"
 from pymilvus import MilvusClient
@@ -270,85 +270,85 @@ print(results)
 client.close()
 ```
 
-Run the script:
+Exécutez le script :
 
 ```bash
 python verify_milvus.py
 ```
 
-The result should rank the row with ID `1` first. Open Attu and confirm that the `rustfs_demo` collection contains three entities.
+Le résultat devrait classer en premier la ligne d’ID `1`. Ouvrez Attu et confirmez que la collection `rustfs_demo` contient trois entités.
 
-## 4. Verify Milvus objects in RustFS
+## 4. Vérifier les objets Milvus dans RustFS
 
-Use the bucket-initializer image to list objects below the configured `milvus` root path:
+Utilisez l’image d’initialisation du compartiment pour lister les objets sous le chemin racine `milvus` configuré :
 
 ```bash
 docker compose run --rm --entrypoint /bin/sh create-bucket -c \
   '/usr/bin/rc alias set rustfs http://rustfs:9000 "$RUSTFS_ACCESS_KEY" "$RUSTFS_SECRET_KEY" --region us-east-1 --bucket-lookup path >/dev/null && /usr/bin/rc find rustfs/my-bucket/milvus'
 ```
 
-The output should contain objects created by Milvus below the `milvus/` prefix. You can also open `my-bucket` in the RustFS Console.
+La sortie devrait contenir des objets créés par Milvus sous le préfixe `milvus/`. Vous pouvez aussi ouvrir `my-bucket` dans la Console RustFS.
 
-Milvus may buffer or compact data before every expected object appears. The successful insert, flush, query, and RustFS object listing together validate the integration path.
+Milvus peut mettre les données en tampon ou les compacter avant que chaque objet attendu n’apparaisse. L’insertion, le flush, la requête et le listage d’objets RustFS, lorsqu’ils réussissent ensemble, valident le chemin d’intégration.
 
-## 5. Stop or reset the stack
+## 5. Arrêter ou réinitialiser la pile
 
-Stop the containers while retaining all named volumes:
+Arrêtez les conteneurs tout en conservant tous les volumes nommés :
 
 ```bash
 docker compose down
 ```
 
-To delete the local test data, including the Milvus bucket contents and etcd metadata, explicitly remove the volumes:
+Pour supprimer les données de test locales, y compris le contenu du compartiment Milvus et les métadonnées etcd, supprimez explicitement les volumes :
 
 ```bash
 docker compose down --volumes
 ```
 
-:::warning[Reset removes the test data]
+:::warning[La réinitialisation supprime les données de test]
 
-The `--volumes` option permanently deletes the named volumes used by this Compose project. Do not run it against data you need to retain.
+L’option `--volumes` supprime définitivement les volumes nommés utilisés par ce projet Compose. Ne l’exécutez pas sur des données que vous devez conserver.
 
 :::
 
-## Troubleshooting
+## Dépannage
 
-### Milvus cannot reach RustFS
+### Milvus n’atteint pas RustFS
 
-Use `rustfs:9000` as the S3 endpoint inside Compose. `localhost:9000` inside the Milvus container refers to that container, not RustFS.
+Utilisez `rustfs:9000` comme point de terminaison S3 à l’intérieur de Compose. `localhost:9000` à l’intérieur du conteneur Milvus désigne ce conteneur, et non RustFS.
 
-Confirm that `useVirtualHost` remains `false` and that the credential values passed to Milvus match the RustFS credentials:
+Vérifiez que `useVirtualHost` reste à `false` et que les identifiants transmis à Milvus correspondent aux identifiants RustFS :
 
 ```bash
 docker compose logs standalone rustfs
 ```
 
-### The bucket initializer fails
+### L’initialiseur de compartiment échoue
 
-Check RustFS readiness and the initializer logs:
+Vérifiez l’état de préparation de RustFS et les journaux de l’initialiseur :
 
 ```bash
 curl -fsS http://localhost:9000/health/ready
 docker compose logs create-bucket
 ```
 
-Verify that `.env` contains non-empty credentials and that `docker compose config` resolves both variables.
+Vérifiez que `.env` contient des identifiants non vides et que `docker compose config` résout les deux variables.
 
-### Milvus starts without existing data
+### Milvus démarre sans les données existantes
 
-Do not change `minio.bucketName`, `minio.rootPath`, or the etcd root for an existing deployment. Confirm that the `rustfs-data`, `etcd-data`, and `milvus-data` volumes still exist and that the same Compose project name is in use.
+Ne modifiez pas `minio.bucketName`, `minio.rootPath` ni la racine etcd d’un déploiement existant. Vérifiez que les volumes `rustfs-data`, `etcd-data` et `milvus-data` existent encore et que le même nom de projet Compose est utilisé.
 
-### Attu cannot connect
+### Attu ne peut pas se connecter
 
-The Attu container must use `standalone:19530`. A browser or host-side client uses `localhost:19530`. Check Milvus health and Attu logs:
+Le conteneur Attu doit utiliser `standalone:19530`. Un navigateur ou un client côté hôte utilise `localhost:19530`. Vérifiez le contrôle d’intégrité de Milvus et les journaux d’Attu :
 
 ```bash
 curl -fsS http://localhost:9091/healthz
 docker compose logs attu standalone
 ```
 
-## Next steps
+## Étapes suivantes
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before enabling additional Milvus storage features.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Milvus documentation](https://milvus.io/docs) when adapting this local pattern to a managed or distributed deployment.
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’activer d’autres fonctionnalités de stockage Milvus.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
+- Suivez la [documentation Milvus](https://milvus.io/docs) pour adapter ce schéma local à un déploiement géré ou distribué.

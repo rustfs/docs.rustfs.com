@@ -203,7 +203,7 @@ Vous pouvez également parcourir le préfixe dans la Console RustFS :
 
 ## 6. Utiliser RustFS S3 Tables
 
-RustFS S3 Tables fournit un catalogue REST Apache Iceberg intégré, permettant à Trino de traiter un compartiment de tables (table bucket) comme un entrepôt Iceberg géré tandis que les données restent dans RustFS. Activez un compartiment de tables et connectez le connecteur Iceberg de Trino au catalogue REST comme décrit dans [S3 Tables](/administration/data/s3-tables) : l’URI du catalogue REST est `http://<rustfs-host>:9000/iceberg`, le warehouse est le nom du compartiment, et les requêtes de catalogue (AWS Signature Version 4, nom de signature `s3`) comme l’accès aux fichiers S3 utilisent l’adressage de type chemin (path-style).
+RustFS S3 Tables fournit un catalogue REST Apache Iceberg intégré, permettant à Trino de traiter un compartiment de tables (table bucket) comme un entrepôt Iceberg géré tandis que les données restent dans RustFS. Activez un compartiment de tables et connectez le connecteur Iceberg de Trino au catalogue REST comme décrit dans [S3 Tables](/fr/administration/data/s3-tables) : l’URI du catalogue REST est `http://<rustfs-host>:9000/iceberg`, le warehouse est le nom du compartiment, et les requêtes de catalogue (AWS Signature Version 4, nom de signature `s3`) comme l’accès aux fichiers S3 utilisent l’adressage de type chemin (path-style).
 
 Selon la matrice de prise en charge S3 Tables, Trino a fait l’objet d’une vérification en lecture seule face au catalogue ; validez la compatibilité en écriture et la version exacte de Trino que vous déployez avant d’adopter ce chemin en production.
 
@@ -245,6 +245,6 @@ docker compose logs create-bucket
 
 ## Étapes suivantes
 
-- Consultez les [notes de compatibilité S3](/administration/protocols/s3) avant d’adopter d’autres opérations S3.
-- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/security-compliance/iam/access-token).
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres opérations S3.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
 - Suivez la [documentation Trino](https://trino.io/docs/current/) pour connecter des outils BI et ajouter des catalogues de stockage objet.

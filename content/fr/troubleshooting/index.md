@@ -1,11 +1,10 @@
 ---
-title: "Troubleshooting"
-description: "Diagnose and resolve RustFS issues."
+title: "Dépannage"
+description: "Diagnostiquez et résolvez les problèmes de RustFS."
 ---
 
-Contents:
+Cette section traite :
 
-- [Node Failures](./node.md)
-- [Driver Failures](./driver.md)
-- [Node Healing](../operations/high-availability/node-healing.md)
-
+- [Pannes de nœud](./node.md)
+- [Pannes de disque](./driver.md)
+- [Réparation des données d’un nœud](../operations/high-availability/node-healing.md)

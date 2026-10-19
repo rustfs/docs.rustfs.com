@@ -1,13 +1,13 @@
 ---
 title: "Docker Registry"
-description: "Store container images from Docker Registry in RustFS."
+description: "Stockez dans RustFS les images de conteneurs issues de Docker Registry."
 ---
 
-This guide connects the open-source [Docker Registry](https://github.com/distribution/distribution) (distribution) to **RustFS** as its S3 storage backend. You will run a registry that stores all layers and manifests in a RustFS bucket, then push and pull an image. The workflow was verified with `registry:2` against `rustfs/rustfs-x86-musl:v2.3.1`.
+Ce guide connecte la [Docker Registry](https://github.com/distribution/distribution) open source (distribution) à **RustFS** comme backend de stockage S3. Vous allez exécuter un registre qui stocke toutes les couches et tous les manifestes dans un compartiment (bucket) RustFS, puis pousser une image et la tirer (pull). Le flux a été validé avec `registry:2` et `rustfs/rustfs-x86-musl:v2.3.1`.
 
-You need Docker on the registry host.
+Vous avez besoin de Docker sur l’hôte du registre.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -15,11 +15,11 @@ flowchart LR
 	Reg -->|"blobs + manifests"| RustFS["RustFS :9000"]
 ```
 
-The registry stores every blob (layers and configs) and manifest as objects under `docker/registry/v2/` in the bucket. The container itself is stateless, so registry nodes can be scaled horizontally against the same bucket.
+Le registre stocke chaque blob (couches et configurations) et chaque manifeste comme objets sous `docker/registry/v2/` dans le compartiment. Le conteneur lui-même est sans état, de sorte que les nœuds du registre peuvent être mis à l’échelle horizontalement face au même compartiment.
 
-## 1. Run the registry
+## 1. Exécuter le registre
 
-Configure the S3 driver entirely through environment variables. `REGISTRY_STORAGE_S3_REGIONENDPOINT` points the AWS SDK at RustFS:
+Configurez entièrement le pilote S3 au moyen de variables d’environnement. `REGISTRY_STORAGE_S3_REGIONENDPOINT` oriente le SDK AWS vers RustFS :
 
 ```bash
 docker run -d --name registry --network oo-rustfs_default -p 5000:5000 \
@@ -32,7 +32,7 @@ docker run -d --name registry --network oo-rustfs_default -p 5000:5000 \
   registry:2
 ```
 
-Check that the v2 API is up:
+Vérifiez que l’API v2 répond :
 
 ```bash
 curl -s -o /dev/null -w "%{http_code}\n" http://localhost:5000/v2/
@@ -42,9 +42,9 @@ curl -s -o /dev/null -w "%{http_code}\n" http://localhost:5000/v2/
 200
 ```
 
-## 2. Push an image
+## 2. Pousser une image
 
-Tag any local image for the registry and push it:
+Étiquetez n’importe quelle image locale pour le registre, puis poussez-la :
 
 ```bash
 docker pull alpine:3.20
@@ -56,7 +56,7 @@ docker push localhost:5000/rustfs-demo/alpine:3.20
 3.20: digest: sha256:c64c687cbea9300178b30c95835354e34c4e4febc4badfe27102879de0483b5e
 ```
 
-## 3. Verify objects in RustFS
+## 3. Vérifier les objets dans RustFS
 
 ```bash
 rc ls rustfs/registry-demo/docker/registry/v2/repositories/rustfs-demo/alpine/ -r | head -4
@@ -68,13 +68,13 @@ _repositories/rustfs-demo/alpine/_manifests/revisions/sha256/c64c687c.../link
 _repositories/rustfs-demo/alpine/_manifests/tags/3.20/current/link
 ```
 
-Every `_layers` link points at a blob object stored in the same bucket — the image data itself lives in RustFS, not on the registry host.
+Chaque lien `_layers` pointe vers un objet blob stocké dans le même compartiment — les données de l’image elles-mêmes se trouvent dans RustFS, et non sur l’hôte du registre.
 
-![Registry layers stored in the RustFS Console](./images/rustfs-registry-layers.png)
+![Couches du registre stockées dans la Console RustFS](./images/rustfs-registry-layers.png)
 
-## 4. Pull the image back
+## 4. Tirer l’image
 
-Remove the local copy and pull from the registry — the layers come back from RustFS:
+Supprimez la copie locale et tirez l’image depuis le registre — les couches reviennent depuis RustFS :
 
 ```bash
 docker rmi localhost:5000/rustfs-demo/alpine:3.20
@@ -87,29 +87,29 @@ Digest: sha256:c64c687cbea9300178b30c95835354e34c4e4febc4badfe27102879de0483b5e
 Status: Downloaded newer image for localhost:5000/rustfs-demo/alpine:3.20
 ```
 
-## 5. Stop or reset
+## 5. Arrêter ou réinitialiser
 
 ```bash
 docker rm -f registry
 rc rm rustfs/registry-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## Dépannage
 
-### Push fails with `unknown` or empty digest
+### Le push échoue avec `unknown` ou un digest vide
 
-Confirm `REGISTRY_STORAGE_S3_REGIONENDPOINT` is set — without it the registry sends requests to real AWS. Also check the bucket exists.
+Vérifiez que `REGISTRY_STORAGE_S3_REGIONENDPOINT` est défini — sans cela, le registre envoie les requêtes vers le véritable AWS. Vérifiez aussi que le compartiment existe.
 
-### `InvalidAccessKeyId` at push time
+### `InvalidAccessKeyId` au moment du push
 
-The access key and secret key must be passed with `REGISTRY_STORAGE_S3_ACCESSKEY` / `SECRETKEY`; the registry does not read the AWS credential environment chain in this driver.
+La clé d’accès et la clé secrète doivent être transmises avec `REGISTRY_STORAGE_S3_ACCESSKEY` / `SECRETKEY` ; le registre ne lit pas la chaîne d’identifiants de l’environnement AWS dans ce pilote.
 
-### Pull returns `manifest unknown` after the registry restarted
+### La récupération renvoie `manifest unknown` après le redémarrage du registre
 
-Manifests and blobs live in the bucket, so a restart cannot lose them — check that both registry instances point at the same `REGISTRY_STORAGE_S3_BUCKET` and `REGIONENDPOINT`.
+Les manifestes et les blobs résident dans le compartiment, un redémarrage ne peut donc pas les perdre. Vérifiez que les deux instances du registre pointent vers le même `REGISTRY_STORAGE_S3_BUCKET` et le même `REGIONENDPOINT`.
 
-## Next steps
+## Étapes suivantes
 
-- Compare with the [Harbor](/developer/integration/registry/harbor) guide when you need a UI, RBAC, or replication on top of the same bucket.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [distribution documentation](https://distribution.github.io/distribution/) for storage driver tuning and proxy-caching setups.
+- Comparez avec le guide [Harbor](/fr/developer/integration/registry/harbor) lorsque vous avez besoin d’une interface, du RBAC ou de la réplication sur le même compartiment.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
+- Suivez la [documentation distribution](https://distribution.github.io/distribution/) pour le réglage du pilote de stockage et les configurations de cache proxy.

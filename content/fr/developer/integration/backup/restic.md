@@ -11,7 +11,7 @@ Vous avez besoin d’une instance RustFS en cours d’exécution, d’un compart
 
 Le backend S3 de Restic doit utiliser l’adressage de type chemin avec RustFS. Cette page définit `-o s3.bucket-lookup=path` et utilise le nom du compartiment dans l’URL du dépôt.
 
-:: :
+:::
 
 ## Schéma d’architecture
 
@@ -87,5 +87,5 @@ restic -o s3.bucket-lookup=path check
 
 ## Étapes suivantes
 
-- [CLI Client (rc)](/operations/rc) pour créer des compartiments et inspecter les objets depuis la ligne de commande.
-- [Configuration TLS](/integration/tls-configured) si vous exposez RustFS hors d’un réseau de confiance.
+- [CLI Client (rc)](/fr/operations/rc) pour créer des compartiments et inspecter les objets depuis la ligne de commande.
+- [Configuration TLS](/fr/integration/tls-configured) si vous exposez RustFS hors d’un réseau de confiance.
