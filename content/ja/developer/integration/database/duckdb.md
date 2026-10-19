@@ -16,7 +16,7 @@ flowchart LR
 	Init["init-bucket job"] -->|"create my-bucket"| RustFS
 ```
 
-DuckDB は S3 API を実装する [`httpfs` 拡張機能](https://duckdb.org/docs/stable/extensions/httpfs/overview)を通じてオブジェクトの読み書きを行います。S3 シークレットに RustFS エンドポイント、認証情報、パススタイルのアドレス指定、平文 HTTP の設定を保持させると、Parquet ファイルを `s3://my-bucket/...` のパスでローカルファイルと同じようにロード・書き込みできます。
+DuckDB は S3 API を実装する [`httpfs` 拡張機能](https://duckdb.org/docs/stable/extensions/httpfs/overview)を通じてオブジェクトの読み書きを行います。S3 シークレットに RustFS エンドポイント、認証情報、パススタイルアクセス、平文 HTTP の設定を保持させると、Parquet ファイルを `s3://my-bucket/...` のパスでローカルファイルと同じようにロード・書き込みできます。
 
 ## 1. プロジェクトファイルを作成する
 
@@ -142,7 +142,7 @@ CREATE SECRET rustfs (
 );
 ```
 
-エンドポイントはスキーマなしの `host:port` 形式で指定します。`USE_SSL FALSE` は Compose ネットワーク内での平文 HTTP を選択し、`URL_STYLE 'path'` は RustFS が期待するパススタイルのアドレス指定を選択します。シークレットは現在のセッションでのみ有効です。新しいセッションを開始するたびに再作成してください。
+エンドポイントはスキーマなしの `host:port` 形式で指定します。`USE_SSL FALSE` は Compose ネットワーク内での平文 HTTP を選択し、`URL_STYLE 'path'` は RustFS が期待するパススタイルアクセスを選択します。シークレットは現在のセッションでのみ有効です。新しいセッションを開始するたびに再作成してください。
 
 ## 4. クエリ結果を RustFS に書き込む
 
