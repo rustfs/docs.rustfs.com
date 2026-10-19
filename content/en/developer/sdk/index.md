@@ -3,7 +3,7 @@ title: "SDKs"
 description: "Overview of supported S3 SDKs for RustFS."
 ---
 
-RustFS is a distributed object storage system fully compatible with the S3 protocol. You can:
+RustFS is a distributed object storage system with an S3-compatible API. You can:
 
 - Manage RustFS in the Console.
 - Manage RustFS through S3 clients.
@@ -32,10 +32,10 @@ Some third-party SDKs may have non-standard implementations. We recommend avoidi
 
 ## Compatibility with MinIO SDKs
 
-RustFS is fully compatible with the MinIO SDKs.
+RustFS works with the MinIO SDKs.
 
 To connect a MinIO SDK to RustFS, set the endpoint, access key, and secret key to your RustFS values.
 
 ## Handling Incompatible SDKs
 
-If an SDK does not work with standard S3, MinIO, or RustFS, we recommend switching to a standard AWS S3 SDK.
+If an SDK does not work with standard S3, MinIO, or RustFS, we recommend switching to an official AWS SDK for S3.

@@ -3,7 +3,7 @@ title: "TypeScript SDK Guide"
 description: "Operate RustFS from TypeScript with the AWS SDK for JavaScript v3, including creation and deletion of buckets and objects."
 ---
 
-RustFS ships no first-party TypeScript SDK — it is fully S3-compatible, so you use the official AWS SDK for JavaScript v3 (which includes TypeScript type definitions) configured to point at your RustFS server. With the SDK, you can create and delete buckets, and upload and download objects.
+RustFS ships no first-party TypeScript SDK — it is S3-compatible, so you use the official AWS SDK for JavaScript v3 (which includes TypeScript type definitions) configured to point at your RustFS server. With the SDK, you can create and delete buckets and upload, download, and delete objects.
 
 ## Prerequisites
 
@@ -201,4 +201,4 @@ async function getObject() {
 Object content: hello rustfs
 ```
 
-For other operations (presigned URLs, multipart uploads, and more), see the [AWS SDK for JavaScript v3 documentation](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/) — every S3-compatible call works against RustFS the same way.
+For other operations (presigned URLs, multipart uploads, and more), see the [AWS SDK for JavaScript v3 documentation](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/) — most S3 operations work the same way against RustFS; see [S3 compatibility](/reference/s3-compatibility) for exceptions.

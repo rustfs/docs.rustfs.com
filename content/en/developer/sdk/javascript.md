@@ -69,7 +69,7 @@ All snippets below reuse this `s3` client.
 
 ## Basic operations
 
-### 4.1 Create Bucket
+### 4.1 Create a bucket
 
 ```js
 import { CreateBucketCommand } from "@aws-sdk/client-s3";
@@ -84,7 +84,7 @@ Bucket created
 
 ---
 
-### 4.2 Upload Object
+### 4.2 Upload an object
 
 ```js
 import { PutObjectCommand } from "@aws-sdk/client-s3";
@@ -109,7 +109,7 @@ File uploaded
 
 ---
 
-### 4.3 Download Object
+### 4.3 Download an object
 
 ```js
 import { GetObjectCommand } from "@aws-sdk/client-s3";
@@ -137,7 +137,7 @@ File downloaded
 
 ---
 
-### 4.4 List Objects
+### 4.4 List objects
 
 ```js
 import { ListObjectsV2Command } from "@aws-sdk/client-s3";
@@ -152,7 +152,7 @@ hello.txt (12 bytes)
 
 ---
 
-### 4.5 Delete Object
+### 4.5 Delete an object
 
 ```js
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
@@ -169,7 +169,7 @@ File deleted
 
 ## Advanced features
 
-### 5.1 Generate Presigned URLs
+### 5.1 Generate presigned URLs
 
 Presigned URLs let browser clients or third parties upload or download objects through temporary links.
 
@@ -209,7 +209,7 @@ console.log("Presigned PUT URL:", url);
 
 ---
 
-### 5.2 Multipart Upload
+### 5.2 Multipart upload
 
 ```js
 import {
@@ -279,7 +279,7 @@ Multipart upload completed
 
 | Problem | Cause | Solution |
 | --------------------------- | -------------------- | --------------------------------------- |
-| SignatureDoesNotMatch | Signature version mismatch | AWS SDK for JavaScript v3 uses Signature Version 4 by default. Confirm that RustFS accepts SigV4. |
+| SignatureDoesNotMatch | Signature mismatch | SDK v3 signs with SigV4 by default; check credentials, region, and endpoint |
 | EndpointConnectionError | Endpoint address misconfigured or not started | Check if RustFS address is accessible |
 | NoSuchKey | File does not exist | Check if `Key` is spelled correctly |
 | InvalidAccessKeyId / Secret | Credentials misconfigured | Check `accessKeyId` / `secretAccessKey` configuration |
@@ -312,4 +312,4 @@ Frontend (HTML+JS) upload example:
 </script>
 ```
 
-For other operations (object tagging, bucket policies, and more), see the [AWS SDK for JavaScript v3 documentation](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/) — every S3-compatible call works against RustFS the same way.
+For other operations (object tagging, bucket policies, and more), see the [AWS SDK for JavaScript v3 documentation](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/) — most S3 operations work the same way against RustFS; see [S3 compatibility](/reference/s3-compatibility) for exceptions.

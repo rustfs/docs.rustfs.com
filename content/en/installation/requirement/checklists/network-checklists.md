@@ -93,7 +93,7 @@ net.ipv4.tcp_slow_start_after_idle = 0
 | Metric | Requirements |
 |------|------|
 | Node latency | ≤ 1 ms (same data center) / ≤ 5 ms (cross-AZ) |
-| Bandwidth Utilization | Peak ≤70% of design capacity |
+| Bandwidth utilization | Peak ≤ 70% of design capacity |
 | Failover | < 500ms BPDU convergence |
 
 ---

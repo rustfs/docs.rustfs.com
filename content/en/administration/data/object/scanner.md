@@ -19,7 +19,7 @@ The scanner works with the erasure coding layer: when it detects a missing or co
 
 ## Data Verification and Recovery
 
-The RustFS data verification mechanism checks metadata consistency and reads and verifies data bit by bit to detect latent bad sectors. The object scanner detects issues like bit rot and triggers repair processes when necessary.
+The RustFS data verification mechanism checks metadata consistency and reads and verifies data to detect latent bad sectors. The object scanner detects issues like bit rot and triggers repair processes when necessary.
 
 ## Scanning Modes and Scheduling
 

@@ -54,4 +54,8 @@ TLS now applies to both listeners: the S3 API at `https://rustfs.example.com:900
 
 2. Restart the RustFS instance container, then access the S3 API at `https://rustfs.example.com:9000` and the Console at `https://rustfs.example.com:9001`.
 
-**Note**: The RustFS container runs as the `rustfs` user (UID `10001`). Make sure that `rustfs` owns `rustfs_key.pem` and `rustfs_cert.pem`; otherwise, RustFS cannot read the certificates and TLS fails to start.
+:::note[Certificate file ownership]
+
+The RustFS container runs as the `rustfs` user (UID `10001`) by default. Make sure that user owns `rustfs_key.pem` and `rustfs_cert.pem`. Otherwise, RustFS cannot read the certificates and TLS fails to start.
+
+:::

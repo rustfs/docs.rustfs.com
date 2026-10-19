@@ -342,4 +342,4 @@ s3.abortMultipartUpload(abortRequest);
 
 ---
 
-For other operations (object tagging, bucket policies, and more), see the [AWS SDK for Java v2 documentation](https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/) — every S3-compatible call works against RustFS the same way.
+For other operations (object tagging, bucket policies, and more), see the [AWS SDK for Java v2 documentation](https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/) — most S3 operations work the same way against RustFS; see [S3 compatibility](/reference/s3-compatibility) for exceptions.

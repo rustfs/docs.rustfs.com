@@ -60,7 +60,7 @@ A distributed RustFS cluster uses erasure coding to stay readable and writable w
  ```
 
 * **Community observations**
-  When a node goes offline and rejoins, RustFS heals only that node instead of rebalancing the entire cluster, which avoids unnecessary network and I/O spikes.
+  In community testing, when a node goes offline and rejoins, RustFS heals only that node instead of rebalancing the entire cluster. This avoids unnecessary network and I/O spikes.
 
 ## 5. Follow-up checks and best practices
 

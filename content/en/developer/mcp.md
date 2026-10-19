@@ -18,7 +18,7 @@ The Model Context Protocol is an open standard that enables AI applications to e
 - **Upload Files**: Uploads local files with automatic MIME type detection and cache control.
 - **Get Objects**: Retrieves objects from S3 storage, supporting read or download modes.
 
-## 🔧 Installation
+## Installation
 
 :::warning[Build instructions may be outdated]
 
@@ -46,7 +46,7 @@ cargo build --release -p rustfs-mcp
 ./target/release/rustfs-mcp
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -77,7 +77,7 @@ The server supports various command line options to customize behavior:
 - `--endpoint-url`: Custom S3 endpoint URL (for MinIO, LocalStack, etc.)
 - `--log-level`: Log level configuration (default: rustfs_mcp_server=info)
 
-## 🚀 Usage
+## Usage
 
 ### Starting the Server
 
@@ -176,7 +176,7 @@ Many AI IDEs, such as Cursor, Windsurf, and Trae, support MCP. For example, in T
 
 > `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are RustFS access keys. To create them, see [Access Key Management](../security-compliance/iam/access-token.md).
 
-If the server is added successfully, the MCP configuration page lists its [available tools](#️-available-tools).
+If the server is added successfully, the MCP configuration page lists its [available tools](#available-tools).
 
 ![RustFS MCP server added to the MCP configuration in Trae](images/add-rustfs-mcp-succ.png)
 
@@ -192,7 +192,7 @@ Trae returns the following response:
 
 Trae uses **Builder with MCP** mode, calling the `list_buckets` tool to list all buckets in the configured RustFS instance. Other tools work the same way.
 
-## 🛠️ Available Tools
+## Available tools
 
 The MCP server exposes the following tools that AI assistants can use:
 

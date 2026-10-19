@@ -1,6 +1,6 @@
 ---
 title: "Virtual-Hosted–Style Requests"
-description: "RustFS S3 Virtual Host Style and Path Style configuration."
+description: "Configure path-style and virtual-hosted–style S3 URLs for RustFS."
 ---
 
 RustFS supports both S3 URL addressing styles:
