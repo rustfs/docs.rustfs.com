@@ -1,11 +1,11 @@
 ---
-title: "Tiered Storage"
-description: "Configure lifecycle-driven object transitions from RustFS to a remote storage tier."
+title: "Gestufte Speicherung"
+description: "Konfigurieren Sie lebenszyklusgesteuerte Objektübergänge von RustFS zu einer entfernten Speicherstufe."
 ---
 
-RustFS tiered storage moves objects from local storage to a configured remote backend. This page explains the supported targets and shows how to add and maintain a RustFS tier in the Console.
+Die gestufte Speicherung von RustFS verschiebt Objekte aus dem lokalen Speicher in ein konfiguriertes entferntes Backend. Diese Seite erklärt die unterstützten Ziele und zeigt, wie Sie eine RustFS-Stufe in der Console hinzufügen und pflegen.
 
-Tiering is asynchronous. RustFS keeps the object metadata locally, transfers the object data to the remote tier, and continues to serve S3 reads through the original bucket and object key.
+Die Übertragung in die entfernte Stufe erfolgt asynchron. RustFS behält die Objektmetadaten lokal, überträgt die Objektdaten in die entfernte Stufe und bedient S3-Lesevorgänge weiterhin über den ursprünglichen Bucket und Objektschlüssel.
 
 ```mermaid
 flowchart LR
@@ -14,22 +14,22 @@ flowchart LR
     H -->|Read transitioned object| T
 ```
 
-:::note[Tier names are not AWS storage classes]
+:::note[Stufennamen sind keine AWS-Speicherklassen]
 
-Lifecycle rules refer to a registered tier by its uppercase name, such as `COLDTIER`. Do not substitute AWS class labels such as `INTELLIGENT_TIERING`, `GLACIER`, or `DEEP_ARCHIVE` unless you have registered a RustFS tier with that exact valid name and verified the target behavior.
+Lebenszyklusregeln verweisen auf eine registrierte Stufe über ihren Namen in Großbuchstaben, etwa `COLDTIER`. Ersetzen Sie ihn nicht durch AWS-Klassenbezeichnungen wie `INTELLIGENT_TIERING`, `GLACIER` oder `DEEP_ARCHIVE`, es sei denn, Sie haben eine RustFS-Stufe mit genau diesem gültigen Namen registriert und das Zielverhalten geprüft.
 
 :::
 
-## Supported backends
+## Unterstützte Backends
 
-The RustFS source defines warm-backend implementations for these target types:
+Der RustFS-Quellcode definiert Warm-Backend-Implementierungen für diese Zieltypen:
 
-| Type | Configuration key | Typical target |
+| Typ | Konfigurationsschlüssel | Typisches Ziel |
 | --- | --- | --- |
-| RustFS | `rustfs` | Another RustFS deployment |
-| S3 | `s3` | Amazon S3 or an S3 endpoint supported by this backend |
-| Wasabi | `wasabi` | Wasabi object storage |
-| MinIO | `minio` | A MinIO deployment |
+| RustFS | `rustfs` | Eine andere RustFS-Bereitstellung |
+| S3 | `s3` | Amazon S3 oder ein von diesem Backend unterstützter S3-Endpunkt |
+| Wasabi | `wasabi` | Wasabi-Objektspeicher |
+| MinIO | `minio` | Eine MinIO-Bereitstellung |
 | Aliyun | `aliyun` | Alibaba Cloud Object Storage Service (OSS) |
 | Tencent | `tencent` | Tencent Cloud Object Storage (COS) |
 | Huaweicloud | `huaweicloud` | Huawei Cloud Object Storage Service (OBS) |
@@ -37,64 +37,64 @@ The RustFS source defines warm-backend implementations for these target types:
 | GCS | `gcs` | Google Cloud Storage |
 | R2 | `r2` | Cloudflare R2 |
 
-Provider payloads and credential requirements differ. The complete workflow below uses the RustFS backend because the RustFS source includes an end-to-end hot-cluster-to-cold-cluster test for this path.
+Die Konfigurationsdaten der Anbieter und die Anforderungen an die Zugangsdaten unterscheiden sich. Der vollständige Ablauf unten verwendet das RustFS-Backend, weil der RustFS-Quellcode für diesen Pfad einen Ende-zu-Ende-Test vom heißen Cluster zum kalten Cluster enthält.
 
-## Before you begin
+## Bevor Sie beginnen
 
-Prepare the following:
+Bereiten Sie Folgendes vor:
 
-- A source RustFS deployment that stores the hot data.
-- A separate target RustFS deployment and an existing target bucket. This example uses `my-bucket` on the target.
-- Target credentials with permission to put, get, list, and delete objects in that bucket.
-- Access to the source deployment's RustFS Console.
+- Eine RustFS-Quellbereitstellung, die die heißen Daten speichert.
+- Eine separate RustFS-Zielbereitstellung und einen vorhandenen Ziel-Bucket. Dieses Beispiel verwendet `my-bucket` auf dem Ziel.
+- Ziel-Zugangsdaten mit der Berechtigung, Objekte in diesem Bucket zu schreiben, zu lesen, aufzulisten und zu löschen.
+- Zugriff auf die RustFS-Console der Quellbereitstellung.
 
-Use TLS for both deployments in production. Restrict the target credentials to the dedicated tier bucket and prefix.
+Verwenden Sie in der Produktion TLS für beide Bereitstellungen. Beschränken Sie die Ziel-Zugangsdaten auf den dedizierten Stufen-Bucket und das Präfix.
 
-## 1. Open Tiered Storage
+## 1. Gestufte Speicherung öffnen
 
-Sign in to the source deployment's RustFS Console. In the left navigation, select **Tiered Storage**, then select **Add Tier** in the upper-right corner.
+Melden Sie sich an der RustFS-Console der Quellbereitstellung an. Wählen Sie in der linken Navigation **Tiered Storage** (gestufte Speicherung) und anschließend oben rechts **Add Tier** (Stufe hinzufügen).
 
-## 2. Select the target
+## 2. Ziel auswählen
 
-Select the target provider. This example uses **RustFS** to connect the source deployment to another RustFS deployment.
+Wählen Sie den Zielanbieter. Dieses Beispiel verwendet **RustFS**, um die Quellbereitstellung mit einer anderen RustFS-Bereitstellung zu verbinden.
 
-## 3. Enter the target details
+## 3. Zieldetails eingeben
 
-Complete the form:
+Füllen Sie das Formular aus:
 
-| Field | Value |
+| Feld | Wert |
 | --- | --- |
-| **Name (A-Z,0-9,_)** | Enter a unique uppercase tier name, such as `COLDTIER`. |
-| **Endpoint** | Enter the target RustFS S3 endpoint. |
-| **Access Key** | Enter the access key for the target deployment. |
-| **Secret Key** | Enter the secret key for the target deployment. |
-| **Bucket** | Enter the existing target bucket name, such as `my-bucket`. |
-| **Prefix (Optional)** | Optionally enter a prefix dedicated to tiered objects. |
-| **Region** | Optionally enter the target region, such as `us-east-1`. |
+| **Name (A-Z,0-9,_)** | Geben Sie einen eindeutigen Stufennamen in Großbuchstaben ein, etwa `COLDTIER`. |
+| **Endpoint** | Geben Sie den S3-Endpunkt der Ziel-RustFS ein. |
+| **Access Key** | Geben Sie den Zugriffsschlüssel der Zielbereitstellung ein. |
+| **Secret Key** | Geben Sie den geheimen Zugriffsschlüssel der Zielbereitstellung ein. |
+| **Bucket** | Geben Sie den Namen des vorhandenen Ziel-Buckets ein, etwa `my-bucket`. |
+| **Prefix (Optional)** | Geben Sie optional ein Präfix ein, das den gestuften Objekten vorbehalten ist. |
+| **Region** | Geben Sie optional die Zielregion ein, etwa `us-east-1`. |
 
-Leave **Storage Class** at its default unless the target backend requires a different supported storage class.
+Belassen Sie **Storage Class** beim Standardwert, es sei denn, das Ziel-Backend erfordert eine andere unterstützte Speicherklasse.
 
-:::warning[Protect tier credentials]
+:::warning[Stufen-Zugangsdaten schützen]
 
-The form contains a secret key. Use credentials restricted to the target bucket and prefix. Do not expose the key in screenshots, tickets, or logs.
+Das Formular enthält einen geheimen Zugriffsschlüssel. Verwenden Sie Zugangsdaten, die auf den Ziel-Bucket und das Präfix beschränkt sind. Legen Sie den Schlüssel nicht in Screenshots, Tickets oder Protokollen offen.
 
 :::
 
-## 4. Save the tier
+## 4. Stufe speichern
 
-Select **Save**. RustFS validates the backend and probes it by writing, reading, and removing a small object. Saving fails when the endpoint, credentials, bucket permissions, or backend configuration cannot complete that probe.
+Wählen Sie **Save** (Speichern). RustFS prüft das Backend, indem es ein kleines Objekt schreibt, liest und entfernt. Das Speichern schlägt fehl, wenn Endpunkt, Zugangsdaten, Bucket-Berechtigungen oder Backend-Konfiguration diese Prüfung nicht abschließen können.
 
-After the tier appears in the **Tiers** list, configure a transition rule in [Lifecycle Management](/administration/data/lifecycle-management). A registered tier does not move objects until a lifecycle rule references its name.
+Nachdem die Stufe in der Liste **Tiers** (Stufen) erscheint, konfigurieren Sie eine Übergangsregel unter [Lebenszyklusverwaltung](/de/administration/data/lifecycle-management). Eine registrierte Stufe verschiebt keine Objekte, bis eine Lebenszyklusregel ihren Namen referenziert.
 
-## Manage tiers with `rc`
+## Stufen mit `rc` verwalten
 
-Install and configure [`rc`](/operations/rc), then list the tiers registered on the source deployment:
+Installieren und konfigurieren Sie [`rc`](/de/operations/rc) und listen Sie anschließend die auf der Quellbereitstellung registrierten Stufen auf:
 
 ```bash
 rc bucket lifecycle tier list local
 ```
 
-Add a RustFS tier with the same settings described in the Console workflow:
+Fügen Sie eine RustFS-Stufe mit denselben Einstellungen hinzu, die der Ablauf in der Console beschreibt:
 
 ```bash
 rc bucket lifecycle tier add rustfs COLDTIER local \
@@ -105,13 +105,13 @@ rc bucket lifecycle tier add rustfs COLDTIER local \
   --region us-east-1
 ```
 
-Inspect the tier configuration and available statistics:
+Zeigen Sie die Stufenkonfiguration und die verfügbaren Statistiken an:
 
 ```bash
 rc bucket lifecycle tier info COLDTIER local
 ```
 
-The remaining tier commands update credentials or remove a tier:
+Die übrigen Stufenbefehle aktualisieren Zugangsdaten oder entfernen eine Stufe:
 
 ```bash
 rc bucket lifecycle tier edit COLDTIER local \
@@ -120,60 +120,60 @@ rc bucket lifecycle tier edit COLDTIER local \
 rc bucket lifecycle tier remove COLDTIER local
 ```
 
-See [Lifecycle Management](/administration/data/lifecycle-management) to create transition rules, confirm transitions, and restore local copies. Run `rc bucket lifecycle tier <command> --help` to inspect provider-specific options before changing a tier.
+Unter [Lebenszyklusverwaltung](/de/administration/data/lifecycle-management) erstellen Sie Übergangsregeln, bestätigen Übergänge und stellen lokale Kopien wieder her. Führen Sie `rc bucket lifecycle tier <command> --help` aus, um anbieterspezifische Optionen anzuzeigen, bevor Sie eine Stufe ändern.
 
-## Monitor tier activity
+## Stufenaktivität überwachen
 
-Use the tier statistics endpoint with a SigV4-signed request and `admin:ListTier` permission:
+Verwenden Sie den Statistikendpunkt der Stufe mit einer SigV4-signierten Anfrage und der Berechtigung `admin:ListTier`:
 
 ```http
 GET /rustfs/admin/v3/tier-stats?tier=COLDTIER HTTP/1.1
 Host: <hot-rustfs-endpoint>
 ```
 
-Monitor transition failures together with source-cluster capacity and target-side availability. A configured tier adds the target service and network path to the read path for objects that do not have a restored local copy.
+Überwachen Sie Übergangsfehler zusammen mit der Kapazität des Quellclusters und der Verfügbarkeit auf der Zielseite. Eine konfigurierte Stufe fügt den Zieldienst und den Netzwerkpfad dem Lesepfad für Objekte hinzu, die keine wiederhergestellte lokale Kopie haben.
 
-## Change or remove a tier
+## Stufe ändern oder entfernen
 
-The Admin API exposes these mutation routes, all requiring `admin:SetTier`:
+Die Admin-API stellt diese ändernden Routen bereit. Alle erfordern `admin:SetTier`:
 
 | Operation | Route |
 | --- | --- |
-| Edit a tier | `POST /rustfs/admin/v3/tier/{tiername}` |
-| Remove a tier | `DELETE /rustfs/admin/v3/tier/{tiername}` |
-| Clear all tiers | `POST /rustfs/admin/v3/tier/clear` |
+| Stufe bearbeiten | `POST /rustfs/admin/v3/tier/{tiername}` |
+| Stufe entfernen | `DELETE /rustfs/admin/v3/tier/{tiername}` |
+| Alle Stufen löschen | `POST /rustfs/admin/v3/tier/clear` |
 
-Before editing or removing a tier:
+Bevor Sie eine Stufe bearbeiten oder entfernen:
 
-1. Disable lifecycle rules that reference the tier.
-2. Confirm that no transition jobs are still using it.
-3. Confirm that no source objects depend on data stored in its target bucket or prefix.
-4. Back up the tier configuration and record the target location.
+1. Deaktivieren Sie Lebenszyklusregeln, die die Stufe referenzieren.
+2. Prüfen Sie, dass keine Übergangsaufträge sie noch verwenden.
+3. Prüfen Sie, dass keine Quellobjekte von Daten abhängen, die in ihrem Ziel-Bucket oder Präfix gespeichert sind.
+4. Sichern Sie die Stufenkonfiguration und notieren Sie den Zielort.
 
-Normal tier mutations check backend usage and protect non-empty targets. Do not use a `force` option to bypass those checks unless you have independently proved that every transitioned object remains recoverable. Removing configuration for an active tier can make transitioned objects unreadable from the source cluster.
+Normale Stufenänderungen prüfen die Backend-Nutzung und schützen nicht leere Ziele. Verwenden Sie eine `force`-Option nicht, um diese Prüfungen zu umgehen, es sei denn, Sie haben unabhängig nachgewiesen, dass jedes übertragene Objekt wiederherstellbar bleibt. Wenn Sie die Konfiguration einer aktiven Stufe entfernen, können übertragene Objekte vom Quellcluster aus unlesbar werden.
 
-:::warning[Do not modify tier objects directly]
+:::warning[Stufenobjekte nicht direkt ändern]
 
-Do not rename, overwrite, or delete generated objects in the target bucket. Manage source objects through the hot RustFS cluster so RustFS can keep local transition metadata and remote data consistent.
+Benennen Sie erzeugte Objekte im Ziel-Bucket nicht um, überschreiben Sie sie nicht und löschen Sie sie nicht. Verwalten Sie Quellobjekte über den heißen RustFS-Cluster, damit RustFS lokale Übergangsmetadaten und entfernte Daten konsistent halten kann.
 
 :::
 
-## Admin API reference
+## Referenz der Admin-API
 
-The current RustFS source registers these tier routes:
+Der aktuelle RustFS-Quellcode registriert diese Stufenrouten:
 
-| Method | Route | Permission |
+| Methode | Route | Berechtigung |
 | --- | --- | --- |
 | `PUT` | `/rustfs/admin/v3/tier` | `admin:SetTier` |
 | `POST` | `/rustfs/admin/v3/tier/{tiername}` | `admin:SetTier` |
 | `DELETE` | `/rustfs/admin/v3/tier/{tiername}` | `admin:SetTier` |
 | `POST` | `/rustfs/admin/v3/tier/clear` | `admin:SetTier` |
-| `GET` | `/rustfs/admin/v3/tier` (list configurations) | `admin:ListTier` |
-| `GET` | `/rustfs/admin/v3/tier/{tier}` (verify connectivity) | `admin:ListTier` |
-| `GET` | `/rustfs/admin/v3/tier-stats` (read statistics) | `admin:ListTier` |
+| `GET` | `/rustfs/admin/v3/tier` (Konfigurationen auflisten) | `admin:ListTier` |
+| `GET` | `/rustfs/admin/v3/tier/{tier}` (Konnektivität prüfen) | `admin:ListTier` |
+| `GET` | `/rustfs/admin/v3/tier-stats` (Statistiken lesen) | `admin:ListTier` |
 
-All Admin API requests require SigV4 authentication. These routes are an administrative interface, not ordinary S3 bucket operations.
+Alle Anfragen an die Admin-API erfordern SigV4-Authentifizierung. Diese Routen sind eine administrative Schnittstelle und keine gewöhnlichen S3-Bucket-Operationen.
 
-## Next steps
+## Nächste Schritte
 
-Review [lifecycle management](/administration/data/lifecycle-management) and configure [access policies](/security-compliance/iam/policies) for the administrators and service credentials used by tiered storage.
+Lesen Sie die [Lebenszyklusverwaltung](/de/administration/data/lifecycle-management) und konfigurieren Sie [Zugriffsrichtlinien](/de/security-compliance/iam/policies) für die Administratoren und Dienst-Zugangsdaten der gestuften Speicherung.

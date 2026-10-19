@@ -1,17 +1,17 @@
 ---
-title: "RustFS Single Node Multiple Disk Installation"
-description: "Install RustFS on a single server with multiple disks, data will be stored on multiple disks."
+title: "RustFS-Installation mit einem einzelnen Knoten und mehreren Datenträgern"
+description: "Installieren Sie RustFS auf einem einzelnen Server und verteilen Sie die Daten auf mehrere Datenträger."
 ---
 
-In Single Node Multiple Disk (SNMD) mode, one server stores data in sharded form across multiple data disks. Each object is split into K data shards and M parity shards (erasure coding), so the loss of up to M disks does not cause data loss.
+Im Modus mit einem einzelnen Knoten und mehreren Datenträgern (SNMD) verteilt ein Server die Daten auf mehrere Datenträger. Jedes Objekt wird in K Datenshards und M Paritätsshards aufgeteilt (Erasure Coding). Der Ausfall von bis zu M Datenträgern führt daher nicht zu Datenverlust.
 
 :::warning
 
-SNMD is suitable for medium, non-critical business. Damage to at most M disks does not pose a data risk, but if the entire server fails or more than M disks are damaged, data will be lost. Keep backups of important data. For node-level fault tolerance, use [MNMD](./multiple-node-multiple-disk.md).
+SNMD eignet sich für mittlere, nicht kritische Arbeitslasten. Die Bereitstellung kann bis zu M Datenträger verlieren, ohne dass Daten verloren gehen. Fällt jedoch der gesamte Server aus oder sind mehr als M Datenträger beschädigt, gehen die Daten verloren. Sichern Sie wichtige Daten. Für Fehlertoleranz auf Knotenebene verwenden Sie [MNMD](./multiple-node-multiple-disk.md).
 
 :::
 
-## Topology and Planning
+## Topologie und Planung
 
 ```mermaid
 flowchart TD
@@ -23,18 +23,18 @@ flowchart TD
     class D1,D2,D3,D4 disk
 ```
 
-- 1 server with multiple data disks (this example uses 4 disks mounted at `/data/rustfs0` through `/data/rustfs3`).
-- Erasure coding spreads data and parity shards across the disks; fault tolerance is limited to disk failures within the single node.
-- Format each disk with XFS and mount it separately (e.g., labels `RUSTFS0` – `RUSTFS3`), as described in the prerequisites page.
-- For production deployments, also review the [Pre-Installation Checklists](../requirement/checklists/index.md).
+- 1 Server mit mehreren Datenträgern (dieses Beispiel verwendet 4 Datenträger, eingehängt unter `/data/rustfs0` bis `/data/rustfs3`).
+- Erasure Coding verteilt Daten- und Paritätsshards auf die Datenträger. Die Fehlertoleranz beschränkt sich auf Datenträgerausfälle innerhalb des einzelnen Knotens.
+- Formatieren Sie jeden Datenträger mit XFS und hängen Sie ihn getrennt ein (zum Beispiel mit den Labels `RUSTFS0` – `RUSTFS3`), wie auf der Seite zu den Voraussetzungen beschrieben.
+- Prüfen Sie für Produktionsbereitstellungen zusätzlich die [Checklisten vor der Installation](../requirement/checklists/index.md).
 
-## Prerequisites and Service Setup
+## Voraussetzungen und Diensteinrichtung
 
-Complete the [common prerequisites and service setup](./prerequisites-and-service.md) — operating system, firewall, time synchronization, disk formatting, service user, binary download, and systemd unit — then continue below.
+Schließen Sie die [gemeinsamen Voraussetzungen und die Diensteinrichtung](./prerequisites-and-service.md) ab — Betriebssystem, Firewall, Zeitsynchronisation, Formatierung der Datenträger, Dienstbenutzer, Herunterladen der Binärdatei und systemd-Unit — und fahren Sie anschließend unten fort.
 
-## Configure Environment Variables
+## Umgebungsvariablen konfigurieren
 
-1. Create the configuration file. `RUSTFS_VOLUMES` uses brace expansion to enumerate the four disk mount points:
+1. Legen Sie die Konfigurationsdatei an. `RUSTFS_VOLUMES` zählt die vier Einhängepunkte der Datenträger mit einer Brace-Expansion (geschweifte Klammern) auf:
 
 ```ini title="/etc/default/rustfs"
 # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
@@ -48,44 +48,44 @@ RUSTFS_OBS_LOGGER_LEVEL=error
 RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
 ```
 
-2. Create the storage and log directories:
+2. Legen Sie die Verzeichnisse für Speicher und Logs an:
 
 ```bash
 sudo mkdir -p /data/rustfs{0..3} /var/log/rustfs /opt/tls
 sudo chmod -R 750 /data/rustfs* /var/log/rustfs
 ```
 
-## Start Service and Verification
+## Dienst starten und prüfen
 
-1. Start the service and enable auto-start on boot:
+1. Starten Sie den Dienst und aktivieren Sie den Start beim Systemstart:
 
 ```bash
 sudo systemctl enable --now rustfs
 ```
 
-2. Verify the service status:
+2. Prüfen Sie den Status des Dienstes:
 
 ```bash
 systemctl status rustfs
 ```
 
-3. Check the service port:
+3. Prüfen Sie den Port des Dienstes:
 
 ```bash
 netstat -ntpl
 ```
 
-4. View log files:
+4. Sehen Sie sich die Logdateien an:
 
 ```bash
 tail -f /var/log/rustfs/rustfs*.log
 ```
 
-5. Access the console: enter the server's IP address and the console port (default 9001) in a browser. You should see:
+5. Öffnen Sie die Console (Weboberfläche): Geben Sie im Browser die IP-Adresse des Servers und den Console-Port (Standard 9001) ein. Sie sollten Folgendes sehen:
 
 ![Console](./images/console.jpg)
 
-## Next Steps
+## Nächste Schritte
 
-- Need node-level fault tolerance and horizontal scalability? See [Multiple Node Multiple Disk Mode (MNMD)](./multiple-node-multiple-disk.md).
-- Just experimenting? [Single Node Single Disk Mode (SNSD)](./single-node-single-disk.md) is simpler to set up.
+- Benötigen Sie Fehlertoleranz auf Knotenebene und horizontale Skalierbarkeit? Siehe [Modus mit mehreren Knoten und mehreren Datenträgern (MNMD)](./multiple-node-multiple-disk.md).
+- Sie probieren RustFS nur aus? [Der Modus mit einem einzelnen Knoten und einem Datenträger (SNSD)](./single-node-single-disk.md) lässt sich einfacher einrichten.

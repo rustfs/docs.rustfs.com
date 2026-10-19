@@ -1,17 +1,17 @@
 ---
 title: "Administration"
-description: "Administer RustFS data, access protocols, and browser-based management."
+description: "Verwalten Sie RustFS-Daten, Zugriffsprotokolle und die browserbasierte Administration."
 ---
 
-Use this section to manage RustFS through the Console, administer buckets and objects, and configure access protocols.
+In diesem Abschnitt verwalten Sie RustFS über die Console (Weboberfläche), administrieren Buckets und Objekte und konfigurieren Zugriffsprotokolle.
 
-## Administration areas
+## Administrationsbereiche
 
-- [Console](./console/index.md) covers browser-based administration and sign-in methods.
-- [Data Management](./data/object/object-lock.md) covers buckets, objects, lifecycle behavior, and data protection features.
-- [S3 Tables](/administration/data/s3-tables) behandelt Tabellen-Buckets und den integrierten Iceberg-REST-Katalog.
-- [Protocol Support](./protocols/s3.md) covers S3, WebDAV, FTPS, and SFTP access.
-- [CORS Configuration](./cors/index.md) covers cross-origin access to RustFS services.
-- [Virtual-Host Access](/integration/virtual) covers domain-based S3 addressing.
+- [Console](./console/index.md) beschreibt die browserbasierte Administration und die Anmeldeverfahren.
+- [Datenverwaltung](./data/object/object-lock.md) beschreibt Buckets, Objekte, das Lebenszyklusverhalten und Funktionen zum Schutz von Daten.
+- [S3 Tables](/de/administration/data/s3-tables) behandelt Tabellen-Buckets und den integrierten Iceberg-REST-Katalog.
+- [Protokollunterstützung](./protocols/s3.md) beschreibt den Zugriff über S3, WebDAV, FTPS und SFTP.
+- [CORS-Konfiguration](./cors/index.md) beschreibt den ursprungsübergreifenden Zugriff auf RustFS-Dienste.
+- [Anfragen im Virtual-Hosted-Stil](/de/integration/virtual) beschreiben die domänenbasierte S3-Adressierung.
 
-For identity, encryption, transport security, and auditing, continue with [Security & Compliance](/security-compliance).
+Für Identität, Verschlüsselung, Transportsicherheit und Audit-Protokollierung lesen Sie [Sicherheit und Compliance](/de/security-compliance).

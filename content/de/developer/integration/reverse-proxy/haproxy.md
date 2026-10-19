@@ -1,55 +1,55 @@
 ---
 title: "HAProxy"
-description: "Deploy RustFS behind HAProxy with separate HTTPS routes for the S3 API and Console."
+description: "Stellen Sie RustFS hinter HAProxy mit getrennten HTTPS-Routen für die S3-API und die Console bereit."
 ---
 
-Use **HAProxy** to terminate TLS and route separate hostnames to the RustFS S3 API and Console. This deployment runs HAProxy and a single-node RustFS instance with Docker Compose. You need Docker Engine, Docker Compose, two DNS records, and a TLS certificate that covers both hostnames.
+Verwenden Sie **HAProxy**, um TLS zu terminieren und getrennte Hostnamen zur RustFS-S3-API und zur Console (Weboberfläche) zu leiten. In dieser Bereitstellung betreiben Sie HAProxy und eine RustFS-Instanz mit einem Knoten unter Docker Compose. Sie benötigen Docker Engine, Docker Compose, zwei DNS-Einträge und ein TLS-Zertifikat, das beide Hostnamen abdeckt.
 
-This guide uses these example hostnames:
+Diese Anleitung verwendet diese Beispiel-Hostnamen:
 
-- `s3.example.com` for the S3 API
-- `console.example.com` for the Console
+- `s3.example.com` für die S3-API
+- `console.example.com` für die Console
 
-Replace them with hostnames that resolve to the Docker host.
+Ersetzen Sie sie durch Hostnamen, die auf den Docker-Host zeigen.
 
-:::warning[Serve S3 from the root path]
+:::warning[S3 vom Wurzelpfad bereitstellen]
 
-Do not publish the S3 API under a path such as `/s3/`. AWS Signature Version 4 includes the request path and host, so rewriting either value can invalidate signed requests.
+Veröffentlichen Sie die S3-API nicht unter einem Pfad wie `/s3/`. AWS Signature Version 4 enthält den Anfragepfad und den Host, daher kann das Umschreiben eines der beiden Werte signierte Anfragen ungültig machen.
 
 :::
 
-## 1. Create the deployment directories
+## 1. Die Bereitstellungsverzeichnisse anlegen
 
-Create directories for the HAProxy configuration and TLS certificate:
+Legen Sie Verzeichnisse für die HAProxy-Konfiguration und das TLS-Zertifikat an:
 
 ```bash
 mkdir -p rustfs-haproxy/config rustfs-haproxy/certs
 cd rustfs-haproxy
 ```
 
-HAProxy expects the certificate chain and private key in one PEM file. Combine them in this order:
+HAProxy erwartet die Zertifikatskette und den privaten Schlüssel in einer PEM-Datei. Verbinden Sie sie in dieser Reihenfolge:
 
 ```bash
 cat fullchain.pem privkey.pem > certs/rustfs.pem
 chmod 600 certs/rustfs.pem
 ```
 
-The certificate must cover both public hostnames.
+Das Zertifikat muss beide öffentlichen Hostnamen abdecken.
 
-## 2. Set RustFS credentials
+## 2. RustFS-Zugangsdaten setzen
 
-Create an environment file and replace both credential placeholders:
+Legen Sie eine Umgebungsdatei an und ersetzen Sie beide Platzhalter für die Zugangsdaten:
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Do not commit this file or the certificate private key to source control.
+Nehmen Sie diese Datei und den privaten Schlüssel des Zertifikats nicht in die Versionsverwaltung auf.
 
-## 3. Configure HAProxy
+## 3. HAProxy konfigurieren
 
-Create the HAProxy configuration:
+Legen Sie die HAProxy-Konfiguration an:
 
 ```text title="config/haproxy.cfg"
 global
@@ -96,13 +96,13 @@ backend rustfs_console
     server rustfs rustfs:9001 check inter 10s fall 3 rise 2 cookie rustfs
 ```
 
-HAProxy preserves the incoming host and request path unless you explicitly rewrite them. The long client, server, and tunnel timeouts accommodate streaming S3 operations and Console WebSocket connections.
+HAProxy behält den eingehenden Host und den Anfragepfad bei, solange Sie sie nicht ausdrücklich umschreiben. Die langen Timeouts für Client, Server und Tunnel nehmen Streaming-S3-Operationen und Console-WebSocket-Verbindungen auf.
 
-The Console backend sets an affinity cookie. With one RustFS server it has no routing effect, but keeping it in the base configuration makes the behavior consistent when you add nodes.
+Das Console-Backend setzt ein Affinitäts-Cookie. Bei einem RustFS-Server hat es keine Routing-Wirkung, aber wenn Sie es in der Grundkonfiguration belassen, bleibt das Verhalten gleich, sobald Sie Knoten hinzufügen.
 
-## 4. Create the Compose file
+## 4. Die Compose-Datei anlegen
 
-Create the HAProxy and RustFS services:
+Legen Sie die Dienste HAProxy und RustFS an:
 
 ```yaml title="compose.yaml"
 services:
@@ -153,58 +153,58 @@ networks:
   rustfs:
 ```
 
-Only HAProxy publishes host ports. RustFS ports `9000` and `9001` remain reachable inside the Compose network.
+Nur HAProxy veröffentlicht Host-Ports. Die RustFS-Ports `9000` und `9001` bleiben innerhalb des Compose-Netzwerks erreichbar.
 
-## 5. Validate and start the deployment
+## 5. Die Bereitstellung prüfen und starten
 
-Render the Compose configuration and start RustFS:
+Rendern Sie die Compose-Konfiguration und starten Sie RustFS:
 
 ```bash
 docker compose config
 docker compose up -d rustfs
 ```
 
-Validate the HAProxy configuration with the same image used by the deployment:
+Prüfen Sie die HAProxy-Konfiguration mit demselben Image, das die Bereitstellung verwendet:
 
 ```bash
 docker compose run --rm --no-deps haproxy haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg
 ```
 
-Start HAProxy and check both services:
+Starten Sie HAProxy und prüfen Sie beide Dienste:
 
 ```bash
 docker compose up -d haproxy
 docker compose ps
 ```
 
-If a service does not become healthy, inspect its logs:
+Wenn ein Dienst nicht gesund wird, prüfen Sie seine Logs:
 
 ```bash
 docker compose logs haproxy
 docker compose logs rustfs
 ```
 
-## 6. Verify both endpoints
+## 6. Beide Endpunkte prüfen
 
-Verify the API and Console through their public HTTPS hostnames:
+Prüfen Sie die API und die Console über ihre öffentlichen HTTPS-Hostnamen:
 
 ```bash
 curl --fail https://s3.example.com/health/ready
 curl --fail https://console.example.com/rustfs/console/health
 ```
 
-Configure S3 clients with `https://s3.example.com` as the endpoint and enable path-style addressing. Open `https://console.example.com/rustfs/console/` to sign in to the Console.
+Konfigurieren Sie S3-Clients mit `https://s3.example.com` als Endpunkt und aktivieren Sie pfadbasierte Adressierung (Path-Style). Öffnen Sie `https://console.example.com/rustfs/console/`, um sich an der Console anzumelden.
 
-When you replace a renewed `certs/rustfs.pem`, validate the configuration and recreate the HAProxy container to load it:
+Wenn Sie eine erneuerte Datei `certs/rustfs.pem` ersetzen, prüfen Sie die Konfiguration und erstellen Sie den HAProxy-Container neu, um sie zu laden:
 
 ```bash
 docker compose run --rm --no-deps haproxy haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg
 docker compose up -d --force-recreate haproxy
 ```
 
-## Multi-node backends
+## Backends mit mehreren Knoten
 
-For a distributed RustFS deployment, add every RustFS node to both backends:
+Fügen Sie für eine verteilte RustFS-Bereitstellung jeden RustFS-Knoten zu beiden Backends hinzu:
 
 ```text title="config/haproxy.cfg"
 backend rustfs_s3
@@ -227,10 +227,10 @@ backend rustfs_console
 		server node4 node4.example.net:9001 check inter 10s fall 3 rise 2 cookie node4
 ```
 
-The Console cookie keeps an in-progress OpenID Connect login on the RustFS node that created its `state`. Keep port `9000` open directly between RustFS nodes because internal node RPC uses the same listener.
+Das Console-Cookie hält eine laufende OpenID-Connect-Anmeldung auf dem RustFS-Knoten, der ihren `state` erzeugt hat. Halten Sie Port `9000` direkt zwischen den RustFS-Knoten offen, weil der interne Knoten-RPC denselben Listener verwendet.
 
-## Next steps
+## Nächste Schritte
 
-- [Configure an S3 client](/developer/examples/aws-cli)
-- [Enable virtual-hosted-style bucket URLs](/integration/virtual)
-- [Review health and readiness endpoints](/operations/status-check)
+- [Einen S3-Client konfigurieren](/de/developer/examples/aws-cli)
+- [Bucket-URLs mit Adressierung im Virtual-Hosted-Stil aktivieren](/de/integration/virtual)
+- [Endpunkte für Integritätsprüfung und Bereitschaft prüfen](/de/operations/status-check)

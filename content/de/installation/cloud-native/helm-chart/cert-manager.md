@@ -1,26 +1,26 @@
 ---
 title: cert-manager
-description: Use cert-manager to issue and renew TLS certificates for a RustFS Helm deployment.
+description: Verwenden Sie cert-manager, um TLS-Zertifikate für eine RustFS-Helm-Bereitstellung auszustellen und zu erneuern.
 ---
 
-Use **cert-manager** to issue the certificate referenced by the RustFS Ingress. This provides HTTPS for the public S3 API and Console endpoint and allows cert-manager to renew the certificate.
+Verwenden Sie **cert-manager**, um das Zertifikat auszustellen, auf das der RustFS-Ingress verweist. Damit stellen Sie HTTPS für den öffentlichen Endpunkt der S3-API und der Console (Weboberfläche) bereit und ermöglichen cert-manager die Erneuerung des Zertifikats.
 
-## Requirements
+## Anforderungen
 
-- cert-manager is installed and its controller Pods are ready.
-- An `Issuer` or `ClusterIssuer` is ready.
-- The RustFS hostname resolves to the Ingress controller.
+- cert-manager ist installiert und die Controller-Pods sind bereit.
+- Ein `Issuer` oder `ClusterIssuer` ist bereit.
+- Der RustFS-Hostname wird auf den Ingress-Controller aufgelöst.
 
-Verify the issuer before installing RustFS:
+Prüfen Sie den Issuer, bevor Sie RustFS installieren:
 
 ```bash
 kubectl get clusterissuer letsencrypt-prod
 kubectl -n cert-manager get pods
 ```
 
-## 1. Configure Ingress TLS
+## 1. Ingress-TLS konfigurieren
 
-Add the Ingress and certificate settings to your standalone or distributed values file:
+Ergänzen Sie die Ingress- und Zertifikatseinstellungen in Ihrer Standalone- oder verteilten Values-Datei:
 
 ```yaml title="values.yaml"
 ingress:
@@ -42,9 +42,9 @@ ingress:
       name: ""
 ```
 
-Replace the Ingress class, issuer, and hostname for your cluster. For a namespace-scoped Issuer, use the `cert-manager.io/issuer` annotation instead.
+Ersetzen Sie Ingress-Klasse, Issuer und Hostname für Ihren Cluster. Verwenden Sie für einen auf den Namespace begrenzten Issuer stattdessen die Annotation `cert-manager.io/issuer`.
 
-## 2. Apply the configuration
+## 2. Konfiguration anwenden
 
 ```bash
 helm upgrade rustfs ./helm/rustfs \
@@ -52,9 +52,9 @@ helm upgrade rustfs ./helm/rustfs \
   -f values.yaml
 ```
 
-The Ingress references the `rustfs-tls` Secret for a release named `rustfs`. cert-manager ingress-shim reads the issuer annotation and creates a Certificate that writes to this Secret.
+Der Ingress verweist für ein Release namens `rustfs` auf das Secret `rustfs-tls`. cert-manager ingress-shim liest die Issuer-Annotation und erzeugt ein Certificate, das in dieses Secret schreibt.
 
-## 3. Verify the certificate
+## 3. Zertifikat prüfen
 
 ```bash
 kubectl -n rustfs get ingress,certificate,certificaterequest
@@ -62,8 +62,8 @@ kubectl -n rustfs describe certificate rustfs-tls
 kubectl -n rustfs get secret rustfs-tls
 ```
 
-Wait for the Certificate to report `Ready=True`, then open `https://s3.example.com`.
+Warten Sie, bis das Certificate `Ready=True` meldet, und öffnen Sie anschließend `https://s3.example.com`.
 
-## Use cert-manager with mTLS
+## cert-manager mit mTLS verwenden
 
-The chart also uses cert-manager to issue server and client certificates when `mtls.enabled=true`. See [mTLS](./mtls.md) to use the chart-managed CA or reference an existing issuer.
+Das Chart verwendet cert-manager auch, um Server- und Client-Zertifikate auszustellen, wenn `mtls.enabled=true`. Unter [mTLS](./mtls.md) erfahren Sie, wie Sie die vom Chart verwaltete CA verwenden oder einen vorhandenen Issuer referenzieren.

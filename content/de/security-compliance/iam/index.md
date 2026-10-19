@@ -1,54 +1,56 @@
 ---
-title: "RustFS IAM Management"
-description: "Overview of RustFS Identity and Access Management (IAM): identity types, policy attachment, and policy evaluation semantics."
+title: "Identitäts- und Zugriffsverwaltung"
+description: "Überblick über die Identitäts- und Zugriffsverwaltung (IAM) in RustFS: Identitätstypen, Richtlinienzuordnung und Auswertungssemantik."
 ---
 
-RustFS ships a built-in Identity and Access Management (IAM) system modeled on the AWS IAM policy language. Every request — S3 data access, Console operation, or admin API call — is authenticated against a credential and then authorized against the policies attached to that identity.
+RustFS bringt eine eingebaute Identitäts- und Zugriffsverwaltung (IAM) mit, die sich an der Richtliniensprache von AWS IAM orientiert. Jede Anfrage — S3-Datenzugriff, Console-Operation oder Admin-API-Aufruf — wird mit Zugangsdaten authentifiziert und anschließend anhand der Richtlinien autorisiert, die dieser Identität zugeordnet sind.
 
-## Identity Types
+## Identitätstypen
 
-RustFS distinguishes the following identity types:
+RustFS unterscheidet die folgenden Identitätstypen:
 
-| Identity | Created by | Typical use |
+| Identität | Angelegt durch | Typische Verwendung |
 | --- | --- | --- |
-| Root credentials | `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables at server start | Initial setup and break-glass administration. The root account bypasses IAM identity-policy evaluation (owner semantics). |
-| IAM users | Console or admin API (`add-user`) | Long-term named accounts for people or applications. |
-| Groups | Console or admin API (`update-group-members`) | Attach one policy set to many users at once. Users inherit the policies of every group they belong to. |
-| Service accounts (access keys) | Console or admin API (`add-service-account`) | Derived credentials that belong to a parent user. They inherit the parent's permissions, optionally restricted further by an embedded session policy, and can carry an expiration time. |
-| STS temporary credentials | `AssumeRole` / `AssumeRoleWithWebIdentity` STS calls | Short-lived credentials (15 minutes to 12 hours) with an access key, secret key, and session token. |
-| External OIDC identities | OpenID Connect providers (Keycloak, Authing, and other standard OIDC IdPs) | Console SSO. ID token claims are mapped to RustFS policy names, and RustFS issues STS credentials. |
+| Root-Anmeldedaten | Umgebungsvariablen `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` beim Serverstart | Erstkonfiguration und Administration im Notfall (Break-Glass). Das Root-Konto umgeht die Auswertung der IAM-Identitätsrichtlinien (Eigentümer-Semantik). |
+| IAM-Benutzer | Console oder Admin-API (`add-user`) | Langfristige benannte Konten für Personen oder Anwendungen. |
+| Gruppen | Console oder Admin-API (`update-group-members`) | Ordnen Sie einen Richtliniensatz vielen Benutzern gleichzeitig zu. Benutzer erben die Richtlinien jeder Gruppe, der sie angehören. |
+| Dienstkonten (Zugriffsschlüssel) | Console oder Admin-API (`add-service-account`) | Abgeleitete Zugangsdaten, die einem übergeordneten Benutzer gehören. Sie erben die Berechtigungen des übergeordneten Kontos, optional weiter eingeschränkt durch eine eingebettete Sitzungsrichtlinie, und können eine Ablaufzeit tragen. |
+| Temporäre STS-Zugangsdaten | STS-Aufrufe `AssumeRole` / `AssumeRoleWithWebIdentity` | Kurzlebige Zugangsdaten (15 Minuten bis 12 Stunden) mit Zugriffsschlüssel, geheimem Zugriffsschlüssel und Sitzungstoken. |
+| Externe OIDC-Identitäten | OpenID-Connect-Anbieter (Keycloak, Authing und andere standardkonforme OIDC-Identitätsanbieter) | SSO für die Console. Claims des ID-Tokens werden auf Namen von RustFS-Richtlinien abgebildet, und RustFS stellt STS-Zugangsdaten aus. |
 
 :::warning
 
-Root credentials bypass IAM identity policies, but bucket policies can still deny root S3 requests. Only `GetBucketPolicy`, `PutBucketPolicy`, and `DeleteBucketPolicy` bypass a bucket-policy deny so the owner can recover access. Use root credentials only to bootstrap the deployment, then create IAM users and service accounts for day-to-day work.
+Root-Anmeldedaten umgehen IAM-Identitätsrichtlinien, aber Bucket-Richtlinien können S3-Anfragen des Root-Kontos weiterhin ablehnen. Nur `GetBucketPolicy`, `PutBucketPolicy` und `DeleteBucketPolicy` umgehen ein Deny der Bucket-Richtlinie, damit der Eigentümer den Zugriff wiederherstellen kann. Verwenden Sie Root-Anmeldedaten nur, um die Bereitstellung einzurichten, und legen Sie anschließend IAM-Benutzer und Dienstkonten für die tägliche Arbeit an.
 
 :::
 
-## How Policies Attach to Identities
+## Wie Richtlinien Identitäten zugeordnet werden
 
-Policies are named JSON documents stored in RustFS. Attachment works as follows:
+Richtlinien sind benannte JSON-Dokumente, die in RustFS gespeichert sind. Die Zuordnung funktioniert so:
 
-- **User binding** — one or more policy names are attached to an IAM user (`set-user-or-group-policy`, or the `idp/builtin/policy/attach` endpoint which accepts a list of policies).
-- **Group binding** — the same mechanism with `isGroup=true`; every member of the group receives the group's policies in addition to their own.
-- **Service accounts** — do not get their own policy bindings. They evaluate under the parent user's combined policies. If the service account was created with an explicit policy document, that session policy is applied as an additional restriction (both must allow).
-- **STS sessions** — inherit the parent identity's policies. The `Policy` request parameter of `AssumeRole` can embed an additional session policy that further restricts the temporary credentials.
-- **OIDC identities** — the ID token's `groups`/`roles` claim values are matched against RustFS policy names; the matched policies govern the issued STS credentials.
+- **Benutzerzuordnung** — einem IAM-Benutzer werden ein oder mehrere Richtliniennamen zugeordnet (`set-user-or-group-policy` oder der Endpunkt `idp/builtin/policy/attach`, der eine Liste von Richtlinien akzeptiert).
+- **Gruppenzuordnung** — derselbe Mechanismus mit `isGroup=true`; jedes Mitglied der Gruppe erhält die Richtlinien der Gruppe zusätzlich zu den eigenen.
+- **Dienstkonten** — erhalten keine eigenen Richtlinienzuordnungen. Sie werden unter den zusammengefassten Richtlinien des übergeordneten Benutzers ausgewertet. Wurde das Dienstkonto mit einem ausdrücklichen Richtliniendokument angelegt, gilt diese Sitzungsrichtlinie als zusätzliche Einschränkung (beide müssen erlauben).
+- **STS-Sitzungen** — erben die Richtlinien der übergeordneten Identität. Der Anfrageparameter `Policy` von `AssumeRole` kann eine zusätzliche Sitzungsrichtlinie einbetten, die die temporären Zugangsdaten weiter einschränkt.
+- **OIDC-Identitäten** — die Claim-Werte `groups` und `roles` des ID-Tokens werden mit Namen von RustFS-Richtlinien abgeglichen; die passenden Richtlinien gelten für die ausgestellten STS-Zugangsdaten.
 
-RustFS ships these built-in (canned) policies: `readwrite`, `readonly`, `writeonly`, `diagnostics`, and `consoleAdmin`. See [Users, Groups, and Policies](./policies.md) for their contents and for writing custom policies.
+RustFS liefert diese integrierten Richtlinien (Canned Policies): `readwrite`, `readonly`, `writeonly`, `diagnostics` und `consoleAdmin`. Siehe [Benutzer, Gruppen und Richtlinien](./policies.md) zu ihrem Inhalt und zum Schreiben eigener Richtlinien.
 
-## Policy Evaluation Semantics
+<a id="policy-evaluation-semantics"></a>
 
-When an identity has multiple attached policies, RustFS merges their statements (dropping duplicates) and evaluates the merged document:
+## Auswertungssemantik von Richtlinien
 
-1. **Explicit deny wins.** All `Deny` statements are checked first; if any matching `Deny` statement applies to the request, the request is rejected regardless of any `Allow`.
-2. **Owner shortcut.** The root account bypasses IAM identity-policy evaluation; the bucket-policy checks and exceptions described above still apply.
-3. **Explicit allow required.** Otherwise, at least one `Allow` statement must match the requested action and resource.
-4. **Default deny.** If no statement matches, the request is denied.
+Wenn einer Identität mehrere Richtlinien zugeordnet sind, führt RustFS ihre Statements zusammen (Duplikate entfallen) und wertet das zusammengeführte Dokument aus:
 
-For service accounts and STS sessions carrying a session policy, the effective permission is the intersection: the parent's policies and the session policy must both allow the request.
+1. **Ein ausdrückliches Deny hat Vorrang.** Alle `Deny`-Statements werden zuerst geprüft. Trifft ein passendes `Deny` auf die Anfrage zu, wird sie unabhängig von jedem `Allow` abgelehnt.
+2. **Sonderfall Eigentümer.** Das Root-Konto umgeht die Auswertung der IAM-Identitätsrichtlinien; die oben beschriebenen Prüfungen und Ausnahmen der Bucket-Richtlinie gelten weiterhin.
+3. **Ausdrückliches Allow erforderlich.** Andernfalls muss mindestens ein `Allow`-Statement zur angeforderten Aktion und Ressource passen.
+4. **Standard-Deny.** Wenn kein Statement passt, wird die Anfrage abgelehnt.
 
-## In This Section
+Bei Dienstkonten und STS-Sitzungen mit einer Sitzungsrichtlinie ist die wirksame Berechtigung die Schnittmenge: Die Richtlinien des übergeordneten Kontos und die Sitzungsrichtlinie müssen die Anfrage beide erlauben.
 
-- [Users, Groups, and Policies](./policies.md) — managing users and groups, the policy document format, and built-in policies.
-- [Service Accounts and STS](./sts.md) — derived access keys and temporary credentials via `AssumeRole`.
-- [Access Keys](./access-token.md) — creating and deleting access keys from the Console.
+## In diesem Abschnitt
+
+- [Benutzer, Gruppen und Richtlinien](./policies.md) — Benutzer und Gruppen verwalten, das Format des Richtliniendokuments und integrierte Richtlinien.
+- [Dienstkonten und STS](./sts.md) — abgeleitete Zugriffsschlüssel und temporäre Zugangsdaten über `AssumeRole`.
+- [Zugriffsschlüssel](./access-token.md) — Zugriffsschlüssel in der Console anlegen und löschen.

@@ -233,13 +233,13 @@ docker compose run --rm --entrypoint /bin/sh create-bucket -c \
 [2026-09-21 01:34:52]       41 B flink-out/part-f759f9e8-3d1b-46a1-a92e-53e9b727e831-task-0-file-0
 ```
 
-Sie können das Präfix auch in der RustFS-Konsole anzeigen:
+Sie können das Präfix auch in der RustFS Console anzeigen:
 
-![Die in der RustFS-Konsole gespeicherte Flink-Ausgabedatei](./images/rustfs-flink-objects.png)
+![Die in der RustFS Console gespeicherte Flink-Ausgabedatei](./images/rustfs-flink-objects.png)
 
 ## 6. RustFS S3 Tables verwenden
 
-RustFS S3 Tables bietet einen integrierten Apache-Iceberg-REST-Katalog, sodass Flink einen Tabellen-Bucket als verwaltetes Iceberg-Warehouse nutzen kann, während die Daten in RustFS bleiben. Aktivieren Sie einen Tabellen-Bucket und richten Sie den REST-Katalog des Flink-Iceberg-Connectors auf RustFS, wie in [S3 Tables](/administration/data/s3-tables) beschrieben: Die REST-Katalog-URI ist `http://<rustfs-host>:9000/iceberg`, das Warehouse ist der Bucket-Name, und sowohl Kataloganfragen (AWS Signature Version 4, Signing-Name `s3`) als auch der S3-Dateizugriff verwenden pfadbasierte Adressierung (Path-Style).
+RustFS S3 Tables bietet einen integrierten Apache-Iceberg-REST-Katalog, sodass Flink einen Tabellen-Bucket als verwaltetes Iceberg-Warehouse nutzen kann, während die Daten in RustFS bleiben. Aktivieren Sie einen Tabellen-Bucket und richten Sie den REST-Katalog des Flink-Iceberg-Connectors auf RustFS, wie in [S3 Tables](/de/administration/data/s3-tables) beschrieben: Die REST-Katalog-URI ist `http://<rustfs-host>:9000/iceberg`, das Warehouse ist der Bucket-Name, und sowohl Kataloganfragen (AWS Signature Version 4, Signing-Name `s3`) als auch der S3-Dateizugriff verwenden pfadbasierte Adressierung (Path-Style).
 
 Laut der S3-Tables-Support-Matrix validieren Sie die exakten Flink- und Iceberg-Versionen Ihrer Bereitstellung gegen den Katalog, bevor Sie diesen Pfad in Produktion übernehmen.
 
@@ -273,6 +273,6 @@ Die Wiederherstellung eines laufenden S3-Uploads nach einem Fehler kann den Writ
 
 ## Nächste Schritte
 
-- Lesen Sie die [S3-Kompatibilitätshinweise](/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
 - Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
 - Folgen Sie der [Apache-Flink-Dokumentation](https://nightlies.apache.org/flink/flink-docs-stable/) für Filesystem-Connector-Optionen wie Partitionierung und Kompaktierung.

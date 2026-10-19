@@ -1,16 +1,16 @@
 ---
-title: "RustFS Multiple Node Multiple Disk Installation"
-description: "Install RustFS on multiple servers with multiple disks, data will be stored on multiple disks across multiple servers."
+title: "RustFS-Installation mit mehreren Knoten und mehreren Datenträgern"
+description: "Installieren Sie einen verteilten RustFS-Cluster auf mehreren Servern mit jeweils mehreren Datenträgern."
 ---
 
-Multiple Node Multiple Disk (MNMD) mode is the deployment mode for production workloads, providing enterprise-grade performance, security, and scalability. A minimum of **4 servers** is required, each with at least 1 disk, to safely start a distributed object storage cluster.
+Der Modus mit mehreren Knoten und mehreren Datenträgern (MNMD) ist die Produktionsbereitstellung für Cluster, die sich über mehrere Server erstrecken. Mindestens **4 Server** mit jeweils mindestens einem Datenträger sind erforderlich, um einen verteilten Objektspeicher-Cluster sicher zu starten.
 
-## Topology and Planning
+## Topologie und Planung
 
-In the following architecture, requests are distributed to the servers through load balancing. With the default 12 + 4 erasure coding layout, each object is split into 12 data shards and 4 parity shards stored on different disks across different servers:
+In der folgenden Architektur werden Anfragen über Lastverteilung auf die Server verteilt. Beim standardmäßigen Layout 12 + 4 für Erasure Coding wird jedes Objekt in 12 Datenshards und 4 Paritätsshards aufgeteilt, die auf verschiedenen Datenträgern verschiedener Server gespeichert werden:
 
-- Any single server failure or maintenance does not affect data security.
-- Corruption of up to 4 disks does not affect data security.
+- Der Cluster bleibt verfügbar und verliert keine Daten, wenn ein einzelner Server ausfällt oder zur Wartung heruntergefahren wird.
+- Der Cluster toleriert den Verlust von bis zu 4 Datenträgern ohne Datenverlust.
 
 ```mermaid
 flowchart TD
@@ -29,19 +29,19 @@ flowchart TD
     class N1D1,N1D2,N1D3,N1D4,N2D1,N2D2,N2D3,N2D4,N3D1,N3D2,N3D3,N3D4,N4D1,N4D2,N4D3,N4D4 disk
 ```
 
-Before installation, review the [Pre-Installation Checklists](../requirement/checklists/index.md) and ensure all items meet production guidance.
+Prüfen Sie vor der Installation die [Checklisten vor der Installation](../requirement/checklists/index.md) und stellen Sie sicher, dass jeder Punkt die Produktionsanforderungen erfüllt.
 
-## Hostnames
+## Hostnamen
 
-Creating a RustFS cluster requires **identical, sequential** hostnames. There are two ways to achieve sequential hostnames:
+Ein RustFS-Cluster erfordert Hostnamen nach einem einheitlichen, fortlaufend nummerierten Muster (zum Beispiel `node1` bis `node4`). Fortlaufende Hostnamen richten Sie auf zwei Wegen ein:
 
-**1. DNS Configuration:**
+**1. DNS-Konfiguration:**
 
-Configure your DNS resolution server to ensure name continuity.
+Legen Sie DNS-Einträge an, sodass jeder fortlaufende Hostname auf den richtigen Knoten auflöst.
 
-**2. HOSTS Configuration:**
+**2. Konfiguration von `/etc/hosts`:**
 
-Modify the local alias settings in `/etc/hosts` as follows:
+Tragen Sie auf jedem Knoten die folgenden Einträge in `/etc/hosts` ein:
 
 ```bash title="/etc/hosts"
 vim /etc/hosts
@@ -53,13 +53,13 @@ vim /etc/hosts
 192.168.1.4 node4
 ```
 
-## Prerequisites and Service Setup
+## Voraussetzungen und Diensteinrichtung
 
-On **every node**, complete the [common prerequisites and service setup](./prerequisites-and-service.md) — operating system, firewall, time synchronization, disk formatting, service user, binary download, and systemd unit — then continue below. Remember that all nodes must use the same listening port and must have synchronized clocks.
+Schließen Sie auf **jedem Knoten** die [gemeinsamen Voraussetzungen und die Diensteinrichtung](./prerequisites-and-service.md) ab — Betriebssystem, Firewall, Zeitsynchronisation, Formatierung der Datenträger, Dienstbenutzer, Herunterladen der Binärdatei und systemd-Unit — und fahren Sie anschließend unten fort. Alle Knoten müssen auf demselben Port lauschen und synchronisierte Uhren haben.
 
-## Configure Environment Variables
+## Umgebungsvariablen konfigurieren
 
-1. Create the same configuration file on every node. `RUSTFS_VOLUMES` uses brace expansion to enumerate all nodes and all disk mount points (this example: 4 nodes × 4 disks):
+1. Legen Sie auf jedem Knoten dieselbe Konfigurationsdatei an. `RUSTFS_VOLUMES` zählt mit einer Brace-Expansion (geschweifte Klammern) alle Knoten und alle Einhängepunkte auf (in diesem Beispiel 4 Knoten × 4 Datenträger):
 
 ```ini title="/etc/default/rustfs"
 # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
@@ -75,49 +75,49 @@ RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
 
 :::note
 
-The access key, secret key, and `RUSTFS_VOLUMES` value must be identical on all nodes. The hostnames (`node1` – `node4`) must match the DNS or `/etc/hosts` configuration above.
+Zugriffsschlüssel, geheimer Zugriffsschlüssel und der Wert von `RUSTFS_VOLUMES` müssen auf allen Knoten identisch sein. Die Hostnamen (`node1` – `node4`) müssen zur DNS- oder `/etc/hosts`-Konfiguration oben passen.
 
 :::
 
-2. Create the storage and log directories on every node:
+2. Legen Sie auf jedem Knoten die Verzeichnisse für Speicher und Logs an:
 
 ```bash
 sudo mkdir -p /data/rustfs{0..3} /var/log/rustfs /opt/tls
 sudo chmod -R 750 /data/rustfs* /var/log/rustfs
 ```
 
-## Start Service and Verification
+## Dienst starten und prüfen
 
-1. Start the service on every node and enable auto-start on boot:
+1. Starten Sie den Dienst auf jedem Knoten und aktivieren Sie den automatischen Start beim Systemstart:
 
 ```bash
 sudo systemctl enable --now rustfs
 ```
 
-2. Verify the service status:
+2. Prüfen Sie den Status des Dienstes:
 
 ```bash
 systemctl status rustfs
 ```
 
-3. Check the service port:
+3. Prüfen Sie den Port des Dienstes:
 
 ```bash
 netstat -ntpl
 ```
 
-4. View log files:
+4. Sehen Sie sich die Logdateien an:
 
 ```bash
 tail -f /var/log/rustfs/rustfs*.log
 ```
 
-5. Access the console: enter any node's IP address (or the load balancer address) and the console port (default 9001) in a browser. You should see:
+5. Öffnen Sie die Console (Weboberfläche): Geben Sie im Browser die IP-Adresse eines beliebigen Knotens (oder die Adresse des Load Balancers) und den Console-Port (Standard 9001) ein. Sie sollten Folgendes sehen:
 
 ![Console](./images/console.jpg)
 
-## Next Steps
+## Nächste Schritte
 
-- Put a load balancer in front of the cluster — see the [Nginx integration guide](/developer/integration/reverse-proxy/nginx).
-- Enable TLS for production traffic — see [TLS configuration](../../integration/tls-configured.md).
-- Review [Pool Expansion](../../operations/scaling/storage-pool-expansion.md) before scaling.
+- Setzen Sie einen Load Balancer vor den Cluster — siehe die [Nginx-Integrationsanleitung](/de/developer/integration/reverse-proxy/nginx).
+- Aktivieren Sie TLS für den Produktivverkehr — siehe [TLS-Konfiguration](../../integration/tls-configured.md).
+- Lesen Sie die [Erweiterung des Speicherpools](../../operations/scaling/storage-pool-expansion.md), bevor Sie skalieren.

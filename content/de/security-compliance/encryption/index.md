@@ -1,14 +1,14 @@
 ---
-title: "Data Encryption"
-description: "Find the verified RustFS server-side encryption and key management references."
+title: "Datenverschlüsselung"
+description: "Hier finden Sie die geprüften Referenzen zu serverseitiger Verschlüsselung und Schlüsselverwaltung in RustFS."
 ---
 
-RustFS provides server-side encryption options for data stored in the object storage service. Use this section to choose the key-management model that matches your security requirements.
+RustFS bietet Optionen für serverseitige Verschlüsselung von Daten im Objektspeicher. In diesem Abschnitt wählen Sie das Schlüsselverwaltungsmodell, das zu Ihren Sicherheitsanforderungen passt.
 
-## Encryption options
+## Verschlüsselungsoptionen
 
-- [SSE-S3](./sse-s.md) covers server-managed server-side encryption with the S3 `AES256` mode.
-- [SSE-C](./sse-c.md) covers server-side encryption with customer-provided keys.
-- [SSE-KMS](./kms.md) covers Local, Vault KV2, and Vault Transit key-management backends.
+- [SSE-S3](./sse-s.md) beschreibt die vom Server verwaltete serverseitige Verschlüsselung im S3-Modus `AES256`.
+- [SSE-C](./sse-c.md) beschreibt die serverseitige Verschlüsselung mit vom Kunden bereitgestellten Schlüsseln.
+- [SSE-KMS](./kms.md) beschreibt die Schlüsselverwaltungs-Backends Local, Vault KV2 und Vault Transit.
 
-For the currently verified KMS configuration surface, see the [CLI reference](/reference/cli) and [environment variable reference](/reference/environment-variables).
+Die derzeit geprüfte KMS-Konfiguration finden Sie in der [CLI-Referenz](/de/reference/cli) und in der [Referenz der Umgebungsvariablen](/de/reference/environment-variables).

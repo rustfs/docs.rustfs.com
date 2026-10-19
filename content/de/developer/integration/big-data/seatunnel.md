@@ -1,13 +1,13 @@
 ---
 title: "SeaTunnel"
-description: "Move data between SeaTunnel and RustFS with the S3File connector."
+description: "Verschieben Sie Daten zwischen SeaTunnel und RustFS mit dem Connector S3File."
 ---
 
-This guide connects [Apache SeaTunnel](https://github.com/apache/seatunnel) — the data integration engine — to **RustFS** through the S3File connector. You will run a batch job that generates rows with FakeSource and writes them as JSON files into a RustFS bucket. The workflow was verified with SeaTunnel 2.3.12 against `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [Apache SeaTunnel](https://github.com/apache/seatunnel) — die Datenintegrations-Engine — über den Connector S3File mit **RustFS**. Sie führen einen Batch-Job aus, der mit FakeSource Zeilen erzeugt und sie als JSON-Dateien in einen RustFS-Bucket schreibt. Der Ablauf wurde mit SeaTunnel 2.3.12 gegen `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker and the `rc` client.
+Sie benötigen Docker und den Client `rc`.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -15,11 +15,11 @@ flowchart LR
 	Job -->|"S3File sink"| RustFS["RustFS :9000"]
 ```
 
-The S3File sink writes through the Hadoop S3A filesystem, so the connector accepts both its own credential options and the standard `fs.s3a.*` Hadoop keys.
+Der Sink S3File schreibt über das Hadoop-Dateisystem S3A, daher akzeptiert der Connector sowohl eigene Zugangsdatenoptionen als auch die üblichen Hadoop-Schlüssel `fs.s3a.*`.
 
-## 1. Run the engine
+## 1. Die Engine starten
 
-The connector and the Hadoop AWS jars ship inside the image:
+Der Connector und die Hadoop-AWS-JARs liegen im Image:
 
 ```bash
 docker run --rm apache/seatunnel:2.3.12 \
@@ -31,9 +31,9 @@ connector-file-s3-2.3.12.jar
 seatunnel-hadoop-aws.jar
 ```
 
-## 2. Write the job config
+## 2. Die Job-Konfiguration schreiben
 
-The tricky part: the sink validates `access_key`/`secret_key` at compile time, while the actual S3A client reads the `fs.s3a.*` keys. Provide both, and keep the endpoint without a scheme — the bundled Hadoop version rejects `http://` endpoints:
+Der heikle Punkt: der Sink prüft `access_key` und `secret_key` zur Kompilierzeit, während der eigentliche S3A-Client die Schlüssel `fs.s3a.*` liest. Geben Sie beide an und lassen Sie das Schema im Endpunkt weg. Die gebündelte Hadoop-Version lehnt Endpunkte mit `http://` ab:
 
 ```text title="seatunnel-rustfs.conf"
 env {
@@ -71,7 +71,7 @@ sink {
 }
 ```
 
-## 3. Run the job
+## 3. Den Job ausführen
 
 ```bash
 docker run --rm --network oo-rustfs_default \
@@ -84,7 +84,7 @@ docker run --rm --network oo-rustfs_default \
 2026-10-07 ... INFO  ... Submit job finished, job id: 1159846059493556225
 ```
 
-## 4. Verify objects in RustFS
+## 4. Objekte in RustFS prüfen
 
 ```bash
 rc ls rustfs/seatunnel-demo/out/
@@ -96,38 +96,38 @@ out/T_1159846059493556225_2de3d99235_0_1_0.json
 {"id":168282592,"name":"ELyqD","value":1.594479327987022E308}
 ```
 
-Five FakeSource rows landed as one JSON file in the bucket.
+Fünf Zeilen von FakeSource sind als eine JSON-Datei im Bucket gelandet.
 
-![SeaTunnel output files stored in the RustFS Console](./images/rustfs-seatunnel-out.png)
+![In der RustFS-Console gespeicherte SeaTunnel-Ausgabedateien](./images/rustfs-seatunnel-out.png)
 
-## 5. Stop or reset
+## 5. Stoppen oder zurücksetzen
 
-SeaTunnel in `-e local` mode is stateless. To delete the output:
+SeaTunnel im Modus `-e local` ist zustandslos. So löschen Sie die Ausgabe:
 
 ```bash
 rc rm rustfs/seatunnel-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
 ### `Plugin PluginIdentifier{... pluginName='S3'} not found`
 
-The sink class is registered as `S3File`, not `S3`.
+Die Sink-Klasse ist als `S3File` registriert, nicht als `S3`.
 
 ### `There are unconfigured options, the options('access_key', 'secret_key') are required`
 
-The S3File sink requires its own `access_key`/`secret_key` options even when `fs.s3a.*` keys are present. Provide both sets as in step 2.
+Der Sink S3File verlangt eigene Optionen `access_key` und `secret_key`, auch wenn Schlüssel `fs.s3a.*` vorhanden sind. Geben Sie beide Sätze wie in Schritt 2 an.
 
 ### `No AWS Credentials provided by InstanceProfileCredentialsProvider`
 
-The S3A client on the coordinator side fell back to the instance-profile provider because `fs.s3a.aws.credentials.provider` and the `fs.s3a.access.key`/`fs.s3a.secret.key` pair were missing. Add all three as in step 2.
+Der S3A-Client auf der Coordinator-Seite ist auf den Instance-Profile-Provider zurückgefallen, weil `fs.s3a.aws.credentials.provider` und das Paar `fs.s3a.access.key`/`fs.s3a.secret.key` fehlten. Fügen Sie alle drei wie in Schritt 2 hinzu.
 
-### Job hangs on `doesBucketExist`
+### Der Job hängt bei `doesBucketExist`
 
-The bundled Hadoop version rejects `http://` scheme endpoints. Use the bare `host:port` form for `fs.s3a.endpoint` and add `fs.s3a.connection.ssl.enabled = "false"`.
+Die gebündelte Hadoop-Version lehnt Endpunkte mit dem Schema `http://` ab. Verwenden Sie für `fs.s3a.endpoint` die reine Form `host:port` und fügen Sie `fs.s3a.connection.ssl.enabled = "false"` hinzu.
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional SeaTunnel connectors.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [SeaTunnel S3File documentation](https://seatunnel.apache.org/docs/connector-v2/sink/S3File) for parquet/orc formats, partitioned writes, and the matching S3File source.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere SeaTunnel-Connectoren einsetzen.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [SeaTunnel-Dokumentation zu S3File](https://seatunnel.apache.org/docs/connector-v2/sink/S3File) für die Formate Parquet und ORC, partitionierte Schreibvorgänge und die passende Quelle S3File.

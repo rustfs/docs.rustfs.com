@@ -1,7 +1,7 @@
 ---
-title: "High Availability"
-description: "Review RustFS site replication and node recovery guidance."
+title: "Hochverfügbarkeit"
+description: "Lesen Sie die Hinweise zur Site-Replikation und zur Datenwiederherstellung von Knoten in RustFS."
 ---
 
-- [Site Replication](./site-replication.md)
-- [Node Healing](./node-healing.md)
+- [Site-Replikation](./site-replication.md)
+- [Datenwiederherstellung von Knoten](./node-healing.md)

@@ -1,49 +1,49 @@
 ---
-title: "Network Checklist"
-description: "Network checklist for enterprise deployments."
+title: "Netzwerk-Checkliste"
+description: "Diese Checkliste fasst die Netzwerkanforderungen für Unternehmensbereitstellungen zusammen."
 ---
 
-## Network Architecture
+## Netzwerkarchitektur
 
-### Planning
+### Planung
 
-- **Topology**
- Verify the architecture (star/ring/mesh) meets high availability requirements.
-- **Redundancy**
- Ensure at least two independent physical links between nodes.
-- **Bandwidth**
- Calculate estimated traffic: object storage read/write bandwidth × node count × replica count + 20% redundancy.
+- **Topologie**
+  Prüfen Sie, ob die Architektur (Stern, Ring oder vermascht) die Anforderungen an die Hochverfügbarkeit erfüllt.
+- **Redundanz**
+  Stellen Sie mindestens zwei unabhängige physische Verbindungen zwischen den Knoten sicher.
+- **Bandbreite**
+  Schätzen Sie den Datenverkehr als Lese- und Schreibbandbreite × Knotenanzahl × Replikatanzahl und rechnen Sie 20 % Spielraum hinzu.
 
-### IP Allocation
+### IP-Zuweisung
 
-- [ ] Separate management network from data network.
-- [ ] Allocate continuous IP segments for storage nodes (recommend /24 subnet).
-- [ ] Reserve at least 15% of IP addresses for expansion.
+- [ ] Trennen Sie das Verwaltungsnetz vom Datennetz.
+- [ ] Weisen Sie den Speicherknoten einen zusammenhängenden IP-Adressbereich zu. Wir empfehlen ein /24-Subnetz.
+- [ ] Reservieren Sie mindestens 15 % der IP-Adressen für die Erweiterung.
 
 ---
 
-## Hardware Requirements
+## Hardwareanforderungen
 
 ### Switches
 
-| Check Item | Requirements |
-|--------|---------|
-| Backplane Bandwidth | ≥ Full port line rate forwarding capability × 1.2 |
-| Port Type | 10G/25G/100G SFP+/QSFP+ fiber ports |
-| Flow Table Capacity | ≥ Node count × 5 |
-| Spanning Tree | Enable RSTP/MSTP fast convergence |
+| Punkt | Anforderung |
+| --- | --- |
+| Backplane-Bandbreite | ≥ 1,2 × aggregierte Leitungsrate aller Ports |
+| Porttyp | Glasfaserports 10G/25G/100G SFP+/QSFP+ |
+| Kapazität der Flow-Tabelle | ≥ Knotenanzahl × 5 |
+| Spanning Tree | Aktivieren Sie RSTP oder MSTP für schnelle Konvergenz |
 
-### Cabling
+### Verkabelung
 
-- [ ] Fiber attenuation test (single mode ≤0.35dB/km).
-- [ ] Port misalignment check (Node A eth0 ↔ Node B eth0).
-- [ ] Cable labeling (including source/destination IP + port number).
+- [ ] Dämpfungstest der Glasfaser (Singlemode ≤ 0,35 dB/km).
+- [ ] Prüfen Sie die Portzuordnung (Knoten A eth0 ↔ Knoten B eth0).
+- [ ] Kabelbeschriftung (einschließlich Quell- und Ziel-IP sowie Portnummer).
 
 ---
 
-## OS Configuration
+## Konfiguration des Betriebssystems
 
-### Kernel Tuning
+### Kernel-Abstimmung
 
 ```bash
 # Check the following parameter settings
@@ -53,15 +53,15 @@ net.ipv4.tcp_keepalive_time = 600
 net.ipv4.tcp_slow_start_after_idle = 0
 ```
 
-### NIC Configuration
+### NIC-Konfiguration
 
-- [ ] Enable jumbo frames (MTU=9000, requires full path support).
-- [ ] Verify bonding mode (recommend LACP mode4).
-- [ ] Disable IPv6 (if not needed).
+- [ ] Aktivieren Sie Jumbo-Frames (MTU=9000, Unterstützung auf dem gesamten Pfad erforderlich).
+- [ ] Prüfen Sie den Bonding-Modus. Wir empfehlen LACP mode4.
+- [ ] Deaktivieren Sie IPv6 (falls nicht benötigt).
 
 ---
 
-## Security
+## Sicherheit
 
 ### Firewall
 
@@ -72,43 +72,43 @@ net.ipv4.tcp_slow_start_after_idle = 0
 - TCP 443 (only if you terminate HTTPS on a reverse proxy / load balancer)
 ```
 
-### Access Control
+### Zugriffskontrolle
 
-- Switch port security MAC restrictions.
-- IPSec tunnel encryption between storage nodes.
-- Enable TLS 1.3 for management interfaces.
-
----
-
-## Performance Testing
-
-### Benchmarks
-
-1. Inter-node latency: `ping -c 20 <target IP>` (run `iperf3 -s` on the target first for throughput tests)
-2. Cross-rack bandwidth: `iperf3 -c <target IP> -P 8 -t 30`
-3. Failover: Randomly disconnect core links to observe recovery time.
-
-### Criteria
-
-| Metric | Requirements |
-|------|------|
-| Node Latency | ≤1ms (same room) / ≤5ms (cross AZ) |
-| Bandwidth Utilization | Peak ≤70% of design capacity |
-| Failover | < 500ms BPDU convergence |
+- Aktivieren Sie auf den Switches die Portsicherheit (Begrenzung der MAC-Adressen).
+- Verschlüsseln Sie den Datenverkehr zwischen den Speicherknoten mit IPsec.
+- Aktivieren Sie TLS 1.3 für die Verwaltungsschnittstellen.
 
 ---
 
-## Documentation Requirements
+## Leistungstests
 
-1. Network topology diagram (including physical connections and logical IPs)
-2. Switch configuration backup files (with timestamps)
-3. Baseline test reports (including raw data)
-4. Change record table (including maintenance window information)
+### Referenzmessungen
+
+1. Latenz zwischen Knoten: `ping -c 20 <target IP>` (führen Sie für Durchsatztests zuerst `iperf3 -s` auf dem Ziel aus)
+2. Bandbreite zwischen Racks: `iperf3 -c <target IP> -P 8 -t 30`
+3. Ausfallübernahme: Trennen Sie Kernverbindungen nach dem Zufallsprinzip und beobachten Sie die Wiederherstellungszeit.
+
+### Kriterien
+
+| Metrik | Anforderungen |
+| --- | --- |
+| Knotenlatenz | ≤ 1 ms (dasselbe Rechenzentrum) / ≤ 5 ms (über Verfügbarkeitszonen hinweg) |
+| Bandbreitenauslastung | Spitze ≤ 70 % der Auslegungskapazität |
+| Ausfallübernahme | < 500 ms BPDU-Konvergenz |
+
+---
+
+## Dokumentationsanforderungen
+
+1. Netzwerktopologiediagramm (einschließlich physischer Verbindungen und logischer IP-Adressen)
+2. Sicherungsdateien der Switch-Konfiguration (mit Zeitstempeln)
+3. Berichte der Basismessung (einschließlich Rohdaten)
+4. Änderungsprotokoll (einschließlich Wartungsfenster)
 
 :::tip
 
-Recommend conducting 72-hour stress testing before formal deployment, simulating 110% peak traffic load scenarios
+Wir empfehlen, vor der Bereitstellung in der Produktion einen 72-Stunden-Stresstest mit 110 % des erwarteten Spitzenverkehrs durchzuführen.
 
 :::
 
-This checklist covers key checkpoints for enterprise storage system network deployment, specifically optimized parameter requirements for distributed object storage characteristics. You can contact RustFS for official technical support.
+Diese Checkliste deckt die wesentlichen Netzwerkanforderungen für die Bereitstellung von verteiltem Objektspeicher in einer Unternehmensumgebung ab. Wenden Sie sich für technischen Support an RustFS.

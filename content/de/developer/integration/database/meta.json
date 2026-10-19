@@ -1,5 +1,5 @@
 {
-  "title": "Database",
+  "title": "Datenbank",
   "pages": [
     "clickhouse",
     "doris",

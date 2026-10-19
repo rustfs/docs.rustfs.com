@@ -248,9 +248,9 @@ docker compose run --rm --entrypoint /bin/sh create-bucket -c \
 [2026-09-20 14:49:33]      670 B fake/cd916b27d004a688/1a0bf4a03ca:1a0bf4a4e03:1376b308
 ```
 
-Sie können das Präfix auch in der RustFS-Konsole anzeigen:
+Sie können das Präfix auch in der RustFS Console anzeigen:
 
-![In der RustFS-Konsole gespeicherte Loki-Log-Chunks](./images/rustfs-loki-chunks.png)
+![In der RustFS Console gespeicherte Loki-Log-Chunks](./images/rustfs-loki-chunks.png)
 
 ## 6. Stack stoppen oder zurücksetzen
 
@@ -290,6 +290,6 @@ docker compose logs create-bucket
 
 ## Nächste Schritte
 
-- Lesen Sie die [S3-Kompatibilitätshinweise](/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
 - Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
 - Folgen Sie der [Grafana-Loki-Dokumentation](https://grafana.com/docs/loki/latest/), um Promtail, Alloy oder den OpenTelemetry Collector als Log-Producer anzubinden.

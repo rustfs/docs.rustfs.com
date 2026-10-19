@@ -164,7 +164,7 @@ Der Dienst `init-bucket` sollte nach dem Anlegen des Buckets mit dem Exit-Code `
 ✓ Bucket 'rustfs/my-bucket' created successfully.
 ```
 
-Öffnen Sie die OpenObserve-Oberfläche unter `http://localhost:5080` und melden Sie sich mit den Werten `ZO_ROOT_USER_EMAIL` und `ZO_ROOT_USER_PASSWORD` aus `.env` an. Die RustFS-Konsole erreichen Sie unter `http://localhost:9001/rustfs/console/`.
+Öffnen Sie die OpenObserve-Oberfläche unter `http://localhost:5080` und melden Sie sich mit den Werten `ZO_ROOT_USER_EMAIL` und `ZO_ROOT_USER_PASSWORD` aus `.env` an. Die RustFS Console erreichen Sie unter `http://localhost:9001/rustfs/console/`.
 
 ### 3. Verbindung zwischen OpenObserve und RustFS bestätigen
 
@@ -229,13 +229,13 @@ Die Ausgabe sollte die Prüfdatei und die Ingester-Ausgabe unterhalb von `files/
    6.5 KiB files/default/index/rustfs_test_logs/2026/09/20/02/75072592621841940484907.ttv
 ```
 
-Sie können den Bucket auch in der RustFS-Konsole unter `http://localhost:9001/rustfs/console/` anzeigen:
+Sie können den Bucket auch in der RustFS Console unter `http://localhost:9001/rustfs/console/` anzeigen:
 
-![Der Bucket my-bucket in der RustFS-Konsole](./images/rustfs-bucket-list.png)
+![Der Bucket my-bucket in der RustFS Console](./images/rustfs-bucket-list.png)
 
 OpenObserve speichert Parquet-Datendateien unterhalb von `files/<organization>/<stream type>/<stream>/<date partitions>` und Volltextindex-Dateien unterhalb von `files/<organization>/index/`:
 
-![Von OpenObserve geschriebene Parquet-Datei in der RustFS-Konsole](./images/rustfs-parquet-objects.png)
+![Von OpenObserve geschriebene Parquet-Datei in der RustFS Console](./images/rustfs-parquet-objects.png)
 
 ### Logs in OpenObserve abfragen
 
@@ -296,9 +296,9 @@ docker compose logs openobserve | grep "INGESTER:JOB"
 
 OpenObserve v1.0.x lehnt `ZO_ROOT_USER_PASSWORD`-Werte ab, die nicht mindestens einen Großbuchstaben, einen Kleinbuchstaben, eine Ziffer und ein Sonderzeichen enthalten.
 
-### Die RustFS-Konsole öffnet sich nicht
+### Die RustFS Console öffnet sich nicht
 
-In RustFS v2.x wird die Konsole unter dem Pfadpräfix `/rustfs/console/` bereitgestellt. Eine Anfrage an den Root-Pfad von Port `9001` liefert eine S3-ähnliche XML-Antwort mit Zugriffsverweigerung — das ist erwartetes Verhalten.
+In RustFS v2.x wird die Console unter dem Pfadpräfix `/rustfs/console/` bereitgestellt. Eine Anfrage an den Root-Pfad von Port `9001` liefert eine S3-ähnliche XML-Antwort mit Zugriffsverweigerung — das ist erwartetes Verhalten.
 
 ### RustFS startet mit einem Berechtigungsfehler nicht
 
@@ -306,6 +306,6 @@ Das RustFS-Image läuft mit Benutzer und Gruppe `10001`. Wenn Sie statt des Name
 
 ## Nächste Schritte
 
-- Lesen Sie die [S3-Kompatibilitätshinweise](/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
 - Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
 - Folgen Sie der [OpenObserve-Dokumentation](https://openobserve.ai/docs/), um echte Log-Producer wie Fluent Bit oder den OpenTelemetry Collector anzubinden.

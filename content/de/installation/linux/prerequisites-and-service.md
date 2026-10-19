@@ -227,6 +227,8 @@ XFS passt aus drei Gründen zur Arbeitslast von RustFS:
 
 Zur besseren Datenträgererkennung empfehlen wir, XFS-Dateisysteme mit **Label**-Kennzeichnungen zu formatieren.
 
+Damit Sie Datenträger leichter erkennen und einhängen können, empfehlen wir, beim Formatieren jedes Datenträgers eine Dateisystemkennung (`-L`) zu vergeben.
+
 Prüfen Sie zuerst das Datenträgerlayout:
 
 ```bash

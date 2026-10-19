@@ -1,13 +1,13 @@
 ---
 title: "vLLM"
-description: "Serve LLM inference with vLLM loading model weights stored in RustFS."
+description: "Stellen Sie LLM-Inferenz mit vLLM bereit, das die in RustFS gespeicherten Modellgewichte lädt."
 ---
 
-This guide connects [vLLM](https://github.com/vllm-project/vllm) — the high-throughput LLM inference engine — to **RustFS** as its model-weight store. You will upload a model into a RustFS bucket, expose the bucket to the vLLM host through an rclone mount, and serve the model with the OpenAI-compatible API. The workflow was verified with `vllm/vllm-openai-cpu` (vLLM 0.30.0) serving `facebook/opt-125m` from a RustFS bucket backed by `rustfs/rustfs-x86-musl:v2.3.1`, on a CPU-only host.
+In dieser Anleitung verbinden Sie [vLLM](https://github.com/vllm-project/vllm) — die LLM-Inferenz-Engine mit hohem Durchsatz — mit **RustFS** als Speicher für die Modellgewichte. Sie laden ein Modell in einen RustFS-Bucket hoch, binden den Bucket auf dem vLLM-Host über ein rclone-Mount ein und stellen das Modell über die OpenAI-kompatible API bereit. Der Ablauf wurde auf einem Nur-CPU-Host mit `vllm/vllm-openai-cpu` (vLLM 0.30.0) verifiziert, das `facebook/opt-125m` aus einem von `rustfs/rustfs-x86-musl:v2.3.1` bereitgestellten RustFS-Bucket ausliefert.
 
-You need Docker and an rclone binary on the host that runs vLLM. This deployment is intended for local integration testing, not production.
+Sie benötigen Docker und rclone auf dem Host, auf dem vLLM läuft. Dieses Setup ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -17,17 +17,17 @@ flowchart LR
 	Client["OpenAI SDK / curl"] -->|"completions"| vLLM
 ```
 
-The bucket is the single copy of the model. Hosts that serve the model mount the bucket read-only, so every node pulls weights from RustFS and no local model store exists to drift.
+Der Bucket ist die einzige Kopie des Modells. Hosts, die das Modell bereitstellen, binden den Bucket nur lesend ein. Jeder Knoten bezieht die Gewichte aus RustFS, und es gibt keinen lokalen Modellspeicher, der auseinanderlaufen kann.
 
-:::note[Why an rclone mount]
+:::note[Warum ein rclone-Mount]
 
-vLLM 0.30 loads `s3://` model paths through the RunAI model streamer, whose ranged reads currently fail against custom S3 endpoints such as RustFS (the loader errors with `File access error` on any non-zero offset). Mounting the bucket as a filesystem is the verified way to keep the weights in RustFS while vLLM reads them as local files.
+vLLM 0.30 lädt Modellpfade mit `s3://` über den RunAI Model Streamer. Dessen Lesezugriffe mit Byte-Ranges schlagen derzeit gegen eigene S3-Endpunkte wie RustFS fehl (der Loader meldet `File access error` bei jedem Offset ungleich null). Den Bucket als Dateisystem einzubinden ist der hier geprüfte Weg, die Gewichte in RustFS zu belassen, während vLLM sie als lokale Dateien liest.
 
 :::
 
-## 1. Upload the model to RustFS
+## 1. Modell nach RustFS hochladen
 
-Create the bucket and copy model weights into it, replacing all connection placeholders:
+Legen Sie den Bucket an und kopieren Sie die Modellgewichte hinein. Ersetzen Sie alle Verbindungsplatzhalter:
 
 ```ini title="rclone.conf"
 [rustfs]
@@ -39,16 +39,17 @@ endpoint = http://<your-rustfs-endpoint>:9000
 region = us-east-1
 ```
 
+
 ```bash
 rc mb rustfs/vllm-models
 rclone copy ./opt-125m rustfs:vllm-models/opt-125m --transfers 4
 ```
 
-Any Hugging Face layout works — `config.json`, the tokenizer files, and the weight files (`model.safetensors` or `pytorch_model.bin`). Keep one model per prefix so several models can share the bucket.
+Jedes Hugging-Face-Layout ist geeignet: `config.json`, die Tokenizer-Dateien und die Gewichtsdateien (`model.safetensors` oder `pytorch_model.bin`). Legen Sie ein Modell pro Präfix ab, damit mehrere Modelle denselben Bucket nutzen können.
 
-## 2. Mount the bucket on the vLLM host
+## 2. Bucket auf dem vLLM-Host einbinden
 
-On the machine that runs vLLM, mount the bucket read-only for clients with `--allow-other`:
+Binden Sie den Bucket auf dem Rechner, auf dem vLLM läuft, nur lesend ein und erlauben Sie anderen Clients den Zugriff mit `--allow-other`:
 
 ```bash
 mkdir -p /mnt/vllm-models
@@ -57,13 +58,14 @@ rclone mount rustfs:vllm-models /mnt/vllm-models \
 ls /mnt/vllm-models/opt-125m/
 ```
 
+
 ```text
 config.json  merges.txt  model.safetensors  tokenizer.json  vocab.json
 ```
 
-## 3. Run vLLM
+## 3. vLLM ausführen
 
-Start the CPU image against the mounted weights:
+Starten Sie das CPU-Image gegen die eingehängten Gewichte:
 
 ```bash
 docker run -d --name vllm -p 8000:8000 --shm-size=2g \
@@ -73,21 +75,22 @@ docker run -d --name vllm -p 8000:8000 --shm-size=2g \
   --dtype float32 --max-model-len 256 --gpu-memory-utilization 0.15
 ```
 
-vLLM reads the weights through the mount — the container stays stateless and the model lives in RustFS. Wait for the server to come up:
+vLLM liest die Gewichte über das Mount. Der Container bleibt zustandslos, und das Modell liegt in RustFS. Warten Sie, bis der Server bereit ist:
 
 ```bash
 curl -s http://localhost:8000/v1/models | head -c 200
 ```
 
+
 ```text
 {"object":"list","data":[{"id":"opt-125m","object":"model","created":...,"root":"/models/opt-125m",...}]}
 ```
 
-`--gpu-memory-utilization` controls the fraction of RAM reserved for the KV cache on the CPU backend; lower it on small hosts. `--dtype float32` matches what the CPU attention kernels support for this model.
+`--gpu-memory-utilization` steuert den Anteil des Arbeitsspeichers, der auf dem CPU-Backend für den KV-Cache reserviert wird. Setzen Sie den Wert auf kleinen Hosts herunter. `--dtype float32` entspricht dem, was die CPU-Attention-Kernel für dieses Modell unterstützen.
 
-## 4. Run inference
+## 4. Inferenz ausführen
 
-Send an OpenAI-compatible completion request:
+Senden Sie eine OpenAI-kompatible Completion-Anfrage:
 
 ```bash
 curl -s http://localhost:8000/v1/completions \
@@ -95,13 +98,14 @@ curl -s http://localhost:8000/v1/completions \
   -d '{"model": "opt-125m", "prompt": "RustFS is", "max_tokens": 12, "temperature": 0}'
 ```
 
+
 ```json
 {"id":"cmpl-...","object":"text_completion","model":"opt-125m",
  "choices":[{"index":0,"text":" a great tool for building your own server. It's a",
  "finish_reason":"length",...}]}
 ```
 
-The request is standard OpenAI schema, so the Python client works unchanged:
+Die Anfrage entspricht dem OpenAI-Schema, daher funktioniert der Python-Client unverändert:
 
 ```python
 from openai import OpenAI
@@ -112,43 +116,43 @@ print(client.completions.create(
 ).choices[0].text)
 ```
 
-![vLLM model weights stored in the RustFS Console](./images/rustfs-vllm-models.png)
+![In der RustFS Console gespeicherte vLLM-Modellgewichte](./images/rustfs-vllm-models.png)
 
-## 5. Stop or reset
+## 5. Anhalten oder zurücksetzen
 
-To tear down the demo while keeping the bucket objects:
+So bauen Sie die Demo ab und behalten die Objekte im Bucket:
 
 ```bash
 docker rm -f vllm
 fusermount -u /mnt/vllm-models
 ```
 
-To delete the stored model:
+So löschen Sie das gespeicherte Modell:
 
 ```bash
 rclone purge rustfs:vllm-models
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
 ### `Cannot find any model weights with /models/...`
 
-The mount had a stale directory cache or the weight files never made it to the bucket. Re-run `rclone copy` and confirm the files through the mount with `ls` before starting vLLM. A short `--dir-cache-time` (for example `10s`) helps while you iterate.
+Der Mount hatte einen veralteten Verzeichnis-Cache, oder die Gewichtsdateien sind nie im Bucket angekommen. Führen Sie `rclone copy` erneut aus und prüfen Sie die Dateien über das Mount mit `ls`, bevor Sie vLLM starten. Ein kurzes `--dir-cache-time` (zum Beispiel `10s`) hilft, solange Sie die Einrichtung anpassen.
 
 ### `Unsupported CPU attention configuration: head_dim=...`
 
-vLLM's CPU kernels support a fixed set of head dimensions. Tiny test models such as `hf-internal-testing/tiny-random-*` use exotic shapes that fail at request time — use a real small model such as `facebook/opt-125m`.
+Die CPU-Kernel von vLLM unterstützen nur eine feste Auswahl an Head-Dimensionen. Sehr kleine Testmodelle wie `hf-internal-testing/tiny-random-*` verwenden ungewöhnliche Formen, die erst zur Anfragezeit fehlschlagen. Verwenden Sie ein echtes kleines Modell wie `facebook/opt-125m`.
 
 ### `Insufficient space in /dev/shm`
 
-vLLM's CPU engine exchanges tensors through shared memory. Run the container with `--shm-size=2g` (or `--ipc=host`).
+Die CPU-Engine von vLLM tauscht Tensoren über Shared Memory aus. Starten Sie den Container mit `--shm-size=2g` (oder `--ipc=host`).
 
-### Server exits with `Available memory on node 0 ... is less than desired CPU memory utilization`
+### Der Server bricht mit `Available memory on node 0 ... is less than desired CPU memory utilization` ab
 
-The default KV-cache reservation is 90% of system RAM. Lower it with `--gpu-memory-utilization 0.15` (the flag applies to the CPU backend as a memory fraction despite its name).
+Die Standardreservierung für den KV-Cache beträgt 90 Prozent des Arbeitsspeichers. Senken Sie sie mit `--gpu-memory-utilization 0.15`. Das Flag gilt auf dem CPU-Backend trotz seines Namens als Anteil am Arbeitsspeicher.
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional serving setups.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [vLLM documentation](https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html) for chat templates, tensor parallelism, and quantized weights on top of the same bucket-backed model store.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere Inferenz-Bereitstellungen verwenden.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [vLLM-Dokumentation](https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html) für Chat-Templates, Tensor-Parallelität und quantisierte Gewichte auf demselben Bucket als Modellspeicher.
