@@ -1,6 +1,6 @@
 ---
-title: "Object Deletion"
-description: "Delete objects using the RustFS UI, rc, or the S3 API."
+title: "Delete an object"
+description: "Delete an object on the Console, with rc, or with the S3 API."
 ---
 
 This guide covers object deletion.
@@ -10,9 +10,9 @@ This guide covers object deletion.
 - Install and configure [`rc`](/operations/rc) before using the command-line workflow.
 - Confirm the alias, bucket, and object key before deleting an object.
 
-## Using the RustFS UI
+## Use the RustFS Console
 
-1. Log in to the RustFS Console.
+1. Sign in to the RustFS Console.
 2. Select the bucket that contains the object you want to delete.
 3. On the bucket page, select the file to be deleted.
 4. Select **Delete Selected Items** in the upper-right corner, and then select **Confirm**.

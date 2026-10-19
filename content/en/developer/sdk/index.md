@@ -24,7 +24,7 @@ Amazon Simple Storage Service (Amazon S3) was the first widely adopted object st
 
 ## SDK Recommendations
 
-We recommend using the official AWS S3 SDKs. These SDKs are mature, well-maintained, and highly optimized.
+We recommend using the official AWS S3 SDKs. These SDKs are mature and well maintained.
 
 You can also use a vendor SDK you know and trust, provided it supports the S3 operations you need.
 

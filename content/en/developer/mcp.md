@@ -11,7 +11,7 @@ The Model Context Protocol is an open standard that enables AI applications to e
 
 ## Features
 
-### Supported S3 Operations
+### Supported S3 operations
 
 - **List Buckets**: Lists all accessible S3 buckets.
 - **List Objects**: Browses bucket contents with optional prefix filtering.
@@ -32,7 +32,7 @@ The `rustfs-mcp` crate is no longer part of the current `rustfs/rustfs` main bra
 - Configured AWS credentials (via environment variables, AWS CLI, or IAM roles)
 - Access to S3-compatible storage services
 
-### Building from Source
+### Build from source
 
 ```bash
 # Clone the repository
@@ -48,7 +48,7 @@ cargo build --release -p rustfs-mcp
 
 ## Configuration
 
-### Environment Variables
+### Environment variables
 
 ```bash
 # AWS credentials (required)
@@ -63,7 +63,7 @@ export AWS_ENDPOINT_URL=http://localhost:9000
 export RUST_LOG=info
 ```
 
-### Command Line Options
+### Command-line options
 
 ```bash
 rustfs-mcp --help
@@ -79,19 +79,19 @@ The server supports various command line options to customize behavior:
 
 ## Usage
 
-### Starting the Server
+### Start the server
 
 ```bash
 # Start the MCP server
 rustfs-mcp
 
 # Or with custom options
-rustfs-mcp --log-level debug --region us-west-2
+rustfs-mcp --log-level debug --region us-east-1
 ```
 
-### Integration with Chat Clients
+### Connect a chat client
 
-#### Option 1: Using Command Line Arguments
+#### Pass command-line arguments
 
 ```json
 {
@@ -101,7 +101,7 @@ rustfs-mcp --log-level debug --region us-west-2
       "args": [
         "--access-key-id", "your_access_key",
         "--secret-access-key", "your_secret_key",
-        "--region", "us-west-2",
+        "--region", "us-east-1",
         "--log-level", "info"
       ]
     }
@@ -109,7 +109,7 @@ rustfs-mcp --log-level debug --region us-west-2
 }
 ```
 
-#### Option 2: Using Environment Variables
+#### Pass environment variables
 
 ```json
 {
@@ -126,7 +126,7 @@ rustfs-mcp --log-level debug --region us-west-2
 }
 ```
 
-### Using with Docker
+### Run with Docker
 
 RustFS MCP provides an [official Dockerfile](https://github.com/rustfs/rustfs/tree/main/crates/mcp) that you can use to build a container image.
 
@@ -140,7 +140,7 @@ docker build -f crates/mcp/Dockerfile -t rustfs/rustfs-mcp .
 
 After the build succeeds, add the server to your IDE's MCP configuration.
 
-#### Configuring MCP in AI IDEs
+#### Configure MCP in an AI IDE
 
 Many AI IDEs, such as Cursor, Windsurf, and Trae, support MCP. For example, in Trae, add the following content to the MCP configuration (**MCP --> Add**):
 
@@ -174,7 +174,11 @@ Many AI IDEs, such as Cursor, Windsurf, and Trae, support MCP. For example, in T
 }
 ```
 
-> `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are RustFS access keys. To create them, see [Access Key Management](../security-compliance/iam/access-token.md).
+:::note[Access keys]
+
+`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are RustFS access keys. To create them, see [Access keys](../security-compliance/iam/access-token.md).
+
+:::
 
 If the server is added successfully, the MCP configuration page lists its [available tools](#available-tools).
 
@@ -183,12 +187,12 @@ If the server is added successfully, the MCP configuration page lists its [avail
 To invoke an MCP tool in Trae, enter a prompt in the chat. For example:
 
 ```text
-Please help me list the buckets in the current rustfs instance, thank you!
+List the buckets in this RustFS instance.
 ```
 
 Trae returns the following response:
 
-![list rustfs bucket with rustfs mcp](images/list-rustfs-bucket-with-mcp.png)
+![Trae listing RustFS buckets with the RustFS MCP server](images/list-rustfs-bucket-with-mcp.png)
 
 Trae uses **Builder with MCP** mode, calling the `list_buckets` tool to list all buckets in the configured RustFS instance. Other tools work the same way.
 

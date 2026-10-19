@@ -86,7 +86,7 @@ Der Server unterstützt mehrere Befehlszeilenoptionen, mit denen Sie das Verhalt
 rustfs-mcp
 
 # Or with custom options
-rustfs-mcp --log-level debug --region us-west-2
+rustfs-mcp --log-level debug --region us-east-1
 ```
 
 ### Integration mit Chat-Clients
@@ -101,7 +101,7 @@ rustfs-mcp --log-level debug --region us-west-2
       "args": [
         "--access-key-id", "your_access_key",
         "--secret-access-key", "your_secret_key",
-        "--region", "us-west-2",
+        "--region", "us-east-1",
         "--log-level", "info"
       ]
     }
@@ -183,7 +183,7 @@ Wenn der Server erfolgreich hinzugefügt wurde, listet die MCP-Konfigurationssei
 Um in Trae ein MCP-Tool aufzurufen, geben Sie im Chat eine Eingabeaufforderung ein. Zum Beispiel:
 
 ```text
-Please help me list the buckets in the current rustfs instance, thank you!
+List the buckets in this RustFS instance.
 ```
 
 Trae gibt die folgende Antwort zurück:

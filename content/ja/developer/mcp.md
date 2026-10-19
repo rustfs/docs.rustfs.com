@@ -86,7 +86,7 @@ rustfs-mcp --help
 rustfs-mcp
 
 # Or with custom options
-rustfs-mcp --log-level debug --region us-west-2
+rustfs-mcp --log-level debug --region us-east-1
 ```
 
 ### チャットクライアントとの連携
@@ -101,7 +101,7 @@ rustfs-mcp --log-level debug --region us-west-2
       "args": [
         "--access-key-id", "your_access_key",
         "--secret-access-key", "your_secret_key",
-        "--region", "us-west-2",
+        "--region", "us-east-1",
         "--log-level", "info"
       ]
     }
@@ -183,7 +183,7 @@ Cursor、Windsurf、Trae など、多くの AI IDE が MCP に対応していま
 Trae で MCP ツールを呼び出すには、チャットにプロンプトを入力します。例:
 
 ```text
-Please help me list the buckets in the current rustfs instance, thank you!
+List the buckets in this RustFS instance.
 ```
 
 Trae は次の応答を返します。

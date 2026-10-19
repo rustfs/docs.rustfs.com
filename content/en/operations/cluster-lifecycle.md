@@ -3,7 +3,7 @@ title: "Cluster Lifecycle Operations"
 description: "Plan, start, expand, rebalance, decommission, heal, and restart erasure-coded RustFS clusters with verified quorum and storage-class behavior."
 ---
 
-This runbook is the operator entry point for erasure-coded RustFS deployments: layout boundaries, storage classes and quorum, zero-parity mode, expansion, rebalancing, decommissioning, healing, drive replacement, and restarts. Every behavior described here was verified against the RustFS source; the upstream runbook in [rustfs/rustfs#7998](https://github.com/rustfs/rustfs/pull/7998) is the change that introduced it.
+This runbook is the operator entry point for erasure-coded RustFS deployments: layout constraints, storage classes and quorum, zero-parity mode, expansion, rebalancing, decommissioning, healing, drive replacement, and restarts. Every behavior described here was verified against the RustFS source; the upstream runbook in [rustfs/rustfs#7998](https://github.com/rustfs/rustfs/pull/7998) is the change that introduced it.
 
 Related task pages: [Storage Pool Expansion](./scaling/storage-pool-expansion.md), [Data Rebalancing](./scaling/data-rebalancing.md), [Storage Pool Decommission](./scaling/storage-pool-decommission.md), and [Node Healing](./high-availability/node-healing.md).
 

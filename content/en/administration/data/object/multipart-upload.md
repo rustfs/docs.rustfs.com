@@ -17,7 +17,7 @@ Abort an unfinished upload with **AbortMultipartUpload** so temporary parts do n
 
 RustFS accepts part numbers from `1` through `10000`. `ListParts` and `ListMultipartUploads` return at most 1,000 entries per response and use markers for pagination. The completed object appears only after the completion request succeeds.
 
-## Upload in the Console
+## Upload on the Console
 
 1. Sign in to the RustFS Console and open the destination bucket.
 2. Select **Upload File/Folder**.

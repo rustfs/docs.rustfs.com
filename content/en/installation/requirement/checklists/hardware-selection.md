@@ -1,11 +1,9 @@
 ---
 title: Hardware Selection
-description: This page lists minimum and recommended hardware for RustFS test and production environments.
+description: Compare minimum and recommended hardware for RustFS test and production environments.
 ---
 
-> RustFS is designed for efficiency with a low memory footprint.
-
-## Test Environment
+## Test environment
 
 Minimum requirements for testing:
 
@@ -21,7 +19,7 @@ Minimum requirements for testing:
 | Load Balancing | None |
 | Nodes | 1 |
 
-## Production Environment
+## Production environment
 
 The Windows version of RustFS is intended for development and debugging only and is **not recommended for production deployments**. We recommend [Linux](/en/installation/linux) for production workloads.
 

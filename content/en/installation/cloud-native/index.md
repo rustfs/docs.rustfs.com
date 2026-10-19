@@ -143,7 +143,7 @@ kubectl -n rustfs port-forward svc/rustfs 9000:9000 9001:9001
 - S3 API: `http://localhost:9000`
 - Console: `http://localhost:9001`
 
-Log in to the Console with the access key and secret key you set at install time. With ingress enabled, use your configured host instead (check `kubectl -n rustfs get ing`). The Service defaults to `ClusterIP`; `service.type` can be switched to `NodePort` (S3 on `service.endpoint.nodePort: 32000`, Console on `service.console.nodePort: 32001`) or `LoadBalancer`.
+Sign in to the Console with the access key and secret key you set at install time. With ingress enabled, use your configured host instead (check `kubectl -n rustfs get ing`). The Service defaults to `ClusterIP`; `service.type` can be switched to `NodePort` (S3 on `service.endpoint.nodePort: 32000`, Console on `service.console.nodePort: 32001`) or `LoadBalancer`.
 
 ## 7. Scaling out with server pools
 

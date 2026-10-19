@@ -12,8 +12,7 @@ RustFS はイレイジャーコーディングにより、一部のドライブ�
 物理ハードディスクを交換する前に、OS 上で障害ディスクをアンマウントします。交換中にファイルシステムや RustFS で I/O エラーが起きるのを防ぎます。
 
 ```bash
-# Assume the failed disk is /dev/sdb
-umount /dev/sdb
+sudo umount /data/rustfs0
 ```
 
 :::note[注意]
@@ -22,7 +21,7 @@ umount /dev/sdb
 * 「device is busy」エラーが表示された場合は、先に RustFS サービスを停止します。
 
 ```bash
-systemctl stop rustfs
+sudo systemctl stop rustfs
 ```
 
 :::
@@ -34,8 +33,7 @@ systemctl stop rustfs
 障害ディスクを物理的に交換したあと、新しいディスクをパーティション分割してフォーマットし、元のディスクと同じラベルを付けます。
 
 ```bash
-# Format as XFS and apply the same label as the original disk (RustFS requires XFS, like the other disks in the deployment)
-mkfs.xfs -L DISK1 /dev/sdb
+sudo mkfs.xfs -f -i size=512 -n ftype=1 -L RUSTFS0 /dev/sdb
 ```
 
 :::note[要件]
@@ -52,12 +50,8 @@ mkfs.xfs -L DISK1 /dev/sdb
 
 `/etc/fstab` のエントリに書かれたラベルまたは UUID が、新しいディスクを指していることを確認します。マウントポイントは `/etc/default/rustfs` の `RUSTFS_VOLUMES` に記載されたパスと同一である必要があります。これにより、修復対象のディスクが同じパスでクラスターに再参加します。
 
-```bash
-# View current fstab
-cat /etc/fstab
-
-# Example fstab entry (no modification needed if labels are the same)
-LABEL=DISK1 /data/rustfs0 xfs defaults,noatime 0 2
+```ini title="/etc/fstab"
+UUID=<filesystem-uuid> /data/rustfs0 xfs defaults,noatime,nodiratime 0 0
 ```
 
 :::tip[ヒント]
@@ -65,14 +59,14 @@ LABEL=DISK1 /data/rustfs0 xfs defaults,noatime 0 2
 * UUID を使う場合:
 
 ```bash
-blkid /dev/sdb
-# Get the new partition's UUID, then replace the corresponding field in fstab
+sudo blkid -s UUID -o value /dev/sdb
 ```
 
 * `/etc/fstab` の編集後に、構文を検証します。
 
 ```bash
-mount -a # If no errors, configuration is correct
+sudo mount -a
+findmnt /data/rustfs0
 ```
 
 :::
@@ -84,14 +78,13 @@ mount -a # If no errors, configuration is correct
 次のコマンドで、設定済みのファイルシステムをすべてマウントし、RustFS を起動します。
 
 ```bash
-mount -a
-systemctl start rustfs
+sudo systemctl start rustfs
 ```
 
 想定しているファイルシステムがすべてマウントされていることを確認します。
 
 ```bash
-df -h | grep /data/rustfs
+df -hT /data/rustfs0
 ```
 
 :::note[マウントの失敗]
@@ -107,10 +100,7 @@ df -h | grep /data/rustfs
 RustFS が既知のマウントポイントでフォーマット直後のディスクを検出すると、バックグラウンドスキャナーが欠落データをそのディスクへ自動的に修復します。手動のコマンドは不要です。サービスログで、復旧の開始と進捗を確認します。
 
 ```bash
-# For systemd-managed installations
 journalctl -u rustfs -f
-
-# Or view the log files under the directory set by RUSTFS_OBS_LOG_DIRECTORY
 tail -f /var/log/rustfs/rustfs.log
 ```
 

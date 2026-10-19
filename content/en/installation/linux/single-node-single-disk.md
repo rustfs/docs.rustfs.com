@@ -5,13 +5,13 @@ description: Install RustFS on a single server that stores all data on one disk.
 
 In Single Node Single Disk (SNSD) mode, one server stores all data on a single data disk. It is the simplest deployment mode and the same topology that the [Linux Quick Start](./quick-start.md) script sets up.
 
-:::warning
+:::warning[No redundancy]
 
-A single disk offers no redundancy: if the disk fails, data is lost. SNSD is suitable for development, testing, and small non-critical workloads. For production use, maintain regular data backups or choose [SNMD](./single-node-multiple-disk.md) / [MNMD](./multiple-node-multiple-disk.md).
+A single drive offers no redundancy. If the drive fails, data is lost. SNSD is suitable for development, testing, and small non-critical workloads. For production use, keep backups or choose [SNMD](./single-node-multiple-disk.md) or [MNMD](./multiple-node-multiple-disk.md).
 
 :::
 
-## Topology and Planning
+## Topology and planning
 
 ```mermaid
 flowchart TD
@@ -27,11 +27,11 @@ flowchart TD
 - No erasure coding across disks — fault tolerance depends entirely on backups.
 - For production deployments, also review the [Pre-Installation Checklists](../requirement/checklists/index.md).
 
-## Prerequisites and Service Setup
+## Prerequisites and service setup
 
 Complete the [common prerequisites and service setup](./prerequisites-and-service.md) — operating system, firewall, time synchronization, disk formatting, service user, binary download, and systemd unit — then continue below.
 
-## Configure Environment Variables
+## Configure environment variables
 
 1. Create the configuration file with the single-disk volume path:
 
@@ -84,7 +84,7 @@ tail -f /var/log/rustfs/rustfs*.log
 
 ![Console](./images/console.jpg)
 
-## Next Steps
+## Next steps
 
 - Need disk-level redundancy on one server? See [Single Node Multiple Disk Mode (SNMD)](./single-node-multiple-disk.md).
 - Need a production cluster? See [Multiple Node Multiple Disk Mode (MNMD)](./multiple-node-multiple-disk.md).

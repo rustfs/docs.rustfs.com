@@ -21,8 +21,7 @@ RustFS ensures read/write access can still be provided when some disks fail thro
 Before replacing the physical hard drive, you need to safely unmount the failed disk from the operating system level to avoid I/O errors in the file system or RustFS during the replacement process.
 
 ```bash
-# Assume the failed disk is /dev/sdb
-umount /dev/sdb
+sudo umount /data/rustfs0
 ```
 
 :::note[Notes]
@@ -31,7 +30,7 @@ umount /dev/sdb
 * If encountering "device is busy", you can first stop the RustFS service:
 
 ```bash
-systemctl stop rustfs
+sudo systemctl stop rustfs
 ```
 
 :::
@@ -43,8 +42,7 @@ systemctl stop rustfs
 After physically replacing the failed disk, you need to partition and format the new disk, and apply the same label as the original disk.
 
 ```bash
-# Format as XFS and apply the same label as the original disk (RustFS requires XFS, like the other disks in the deployment)
-mkfs.xfs -L DISK1 /dev/sdb
+sudo mkfs.xfs -f -i size=512 -n ftype=1 -L RUSTFS0 /dev/sdb
 ```
 
 > **Requirements**
@@ -59,12 +57,8 @@ mkfs.xfs -L DISK1 /dev/sdb
 
 Confirm that the mount item labels or UUIDs in `/etc/fstab` point to the new disk. The mount point must stay identical to the one listed in `RUSTFS_VOLUMES` (in `/etc/default/rustfs`), so the healed disk rejoins the cluster at the same path.
 
-```bash
-# View current fstab
-cat /etc/fstab
-
-# Example fstab entry (no modification needed if labels are the same)
-LABEL=DISK1 /data/rustfs0 xfs defaults,noatime 0 2
+```ini title="/etc/fstab"
+UUID=<filesystem-uuid> /data/rustfs0 xfs defaults,noatime,nodiratime 0 0
 ```
 
 :::tip[Tips]
@@ -72,14 +66,14 @@ LABEL=DISK1 /data/rustfs0 xfs defaults,noatime 0 2
 * If using UUID:
 
 ```bash
-blkid /dev/sdb
-# Get the new partition's UUID, then replace the corresponding field in fstab
+sudo blkid -s UUID -o value /dev/sdb
 ```
 
 * After modifying fstab, be sure to validate syntax:
 
 ```bash
-mount -a # If no errors, configuration is correct
+sudo mount -a
+findmnt /data/rustfs0
 ```
 
 :::
@@ -91,14 +85,13 @@ mount -a # If no errors, configuration is correct
 Execute the following commands to batch mount all disks and start the RustFS service:
 
 ```bash
-mount -a
-systemctl start rustfs
+sudo systemctl start rustfs
 ```
 
 Confirm all disks are mounted normally:
 
 ```bash
-df -h | grep /data/rustfs
+df -hT /data/rustfs0
 ```
 
 :::note
@@ -114,10 +107,7 @@ If some mounts fail, please check if fstab entries are consistent with disk labe
 Once RustFS detects a freshly formatted disk at a known mount point, its background scanner heals the missing data onto it automatically — no manual command is required. Confirm that recovery has started and track its progress through the service logs:
 
 ```bash
-# For systemd-managed installations
 journalctl -u rustfs -f
-
-# Or view the log files under the directory set by RUSTFS_OBS_LOG_DIRECTORY
 tail -f /var/log/rustfs/rustfs.log
 ```
 

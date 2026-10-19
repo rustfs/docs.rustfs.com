@@ -5,7 +5,7 @@ description: "Learn how to connect to RustFS from languages without an official 
 
 If AWS does not provide an official SDK for your language, you can use one of the following approaches to integrate with RustFS:
 
-## 1. Send HTTP requests directly to the S3 API
+## Call the S3 REST API directly
 
 The S3 protocol is a standard RESTful API. You can implement the client logic yourself in any language that can send HTTP requests (such as C, Rust, Lua, or Erlang).
 
@@ -21,23 +21,23 @@ We recommend consulting existing open-source implementations of request signing,
 
 ---
 
-## 2. Use the AWS CLI or a service built on an existing SDK
+## Use the AWS CLI or a service built on an existing SDK
 
 If you don't want to implement signatures yourself, you can:
 
-### 2.1. Call the AWS CLI
+### Call the AWS CLI
 
 For example, run the following command from your application using a shell:
 
 ```bash
-aws s3 cp local.txt s3://mybucket/myfile.txt --endpoint-url http://rustfs.local:9000
+aws s3 cp /path/to/hello.txt s3://my-bucket/hello.txt --endpoint-url http://localhost:9000
 ```
 
 Alternatively, build a small relay service with an SDK for Node.js or Python, then call it from your application to upload or download objects.
 
-### 2.2. Run a proxy service (for example, Flask, FastAPI, or Express)
+### Run a proxy service
 
-Expose an HTTP API that clients without S3 support can call:
+Run a small HTTP service (for example, Flask, FastAPI, or Express) and expose an API that clients without S3 support can call:
 
 ```http
 POST /upload -> Service internally calls SDK to upload objects to RustFS
@@ -46,7 +46,7 @@ GET /presigned-url -> Generate presigned URL for frontend/client use
 
 ---
 
-## 3. Find Third-Party Community SDKs
+## Find a community SDK
 
 For languages without an official AWS SDK, look for community-maintained S3 clients. For example:
 
@@ -59,7 +59,7 @@ Community SDKs vary greatly in stability, so you should evaluate activity, docum
 
 ---
 
-## 4. Upload directly from clients with presigned URLs
+## Upload directly with presigned URLs
 
 For example:
 

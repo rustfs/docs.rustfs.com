@@ -140,7 +140,7 @@ If you only want RustFS without Grafana, Prometheus, and the other observability
 docker compose -f docker-compose.yml up -d rustfs
 ```
 
-This starts only the `rustfs-server` container. Whether you start only `rustfs-server` or the full stack, the S3 API is served at `http://localhost:9000`, and the RustFS Console is at `http://localhost:9001`. Open the Console in a browser and log in with the access key and secret key you configured above. Generate a strong secret with, for example, `openssl rand -base64 24`, and never ship the placeholder values to production.
+This starts only the `rustfs-server` container. Whether you start only `rustfs-server` or the full stack, the S3 API is served at `http://localhost:9000`, and the RustFS Console is at `http://localhost:9001`. Open the Console in a browser and sign in with the access key and secret key you configured above. Generate a strong secret with, for example, `openssl rand -base64 24`, and never ship the placeholder values to production.
 
 For Docker Compose, define unique `RUSTFS_ACCESS_KEY` and `RUSTFS_SECRET_KEY` values in the `rustfs` service environment or in the environment file used for variable substitution, then recreate the service with `docker compose up -d rustfs`.
 

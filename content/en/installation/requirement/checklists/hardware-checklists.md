@@ -1,6 +1,6 @@
 ---
 title: "Production Hardware Guide"
-description: "This page provides hardware sizing and configuration guidance for production RustFS deployments."
+description: "Size nodes, drives, memory, and the network for a production RustFS deployment."
 ---
 
 ## Planning considerations
@@ -10,7 +10,7 @@ Before deploying RustFS in production, assess your workload and capacity require
 1. **Data volume**
 
    - **Initial data volume**: Estimate the usable data volume at go-live (in TiB), including the ratio of hot to cold data.
-   - **Growth forecast**: Estimate data growth for the next 24 months based on business plans. We recommend modeling growth quarterly.
+   - **Growth forecast**: Estimate data growth for the next 24 months from your capacity plan. We recommend modeling growth quarterly.
    - **Object count**: Estimate the total number of objects from the average object size (ideally 128 KB to 1 MB). Deployments with more than 100 million objects need additional tuning.
 
 2. **Workload characteristics**
@@ -21,10 +21,10 @@ Before deploying RustFS in production, assess your workload and capacity require
 
 3. **Storage architecture**
 
-   - **Bucket planning**: Organize buckets by business unit. We recommend no more than 500 active buckets per cluster.
+   - **Bucket planning**: Organize buckets by workload or team. We recommend no more than 500 active buckets per cluster.
    - **Disaster recovery**: Choose active-active replication (recommended) or asynchronous replication based on how critical the data is.
 
-## Hardware Configuration Matrix
+## Hardware configuration
 
 Baseline configurations based on load-test results:
 
@@ -45,31 +45,31 @@ Baseline configurations based on load-test results:
 
 ## Performance tuning
 
-### Network Topology Optimization (Highest Priority)
+### Network topology
 
 - **Bandwidth sizing**: Provision 0.5 Gbps of bandwidth per TB of usable data (for example, 100 TB of data needs 50 Gbps of dedicated bandwidth).
-- **Latency Requirements**:
+- **Latency**:
   - Inter-node P99 latency ≤ 2ms
   - Cross-rack latency ≤ 5ms
 
-### Storage Subsystem Tuning
+### Storage subsystem
 
-- **Controller Configuration**:
+- **Controller**:
   - Enable read-ahead cache (recommended 256 MB+)
   - Disable all RAID features and use pass-through (HBA/JBOD) mode.
   - Check BBU health regularly.
-- **SSD Parameters**:
+- **SSD settings**:
   - Reserve 20% over-provisioning (OP) space to improve endurance.
   - Enable atomic writes (requires hardware support).
 
 ### Memory allocation
 
-- **Allocation Ratios**:
+- **Allocation**:
   - Metadata cache: 60% of total memory
   - Read/write buffers: 30%
   - System reserve: 10%
 
-## Network Design Reference Model
+## Network design
 
 ### Network bandwidth vs. disk count
 
@@ -119,37 +119,35 @@ def calc_memory(data_tb, access_pattern):
 | Throughput Requirements | < 500 MB/s | 500 MB-3 GB/s | > 3 GB/s |
 | Typical use cases | Archival storage | Hot-data cache | Real-time analytics |
 
-### File System Configuration
+### File system
+
+Format each data drive as its own XFS file system and mount it by UUID. Use the procedure in [Disk preparation](/installation/requirement/disk-preparation). Do not place RustFS data on NFS or on a hardware RAID volume.
 
 ```bash
-# XFS formatting example
-mkfs.xfs -f -L rustfs_disk1 -d su=256k,sw=10 /dev/sdb
-
-# Recommended mount parameters
-UUID=xxxx /mnt/disk1 xfs defaults,noatime,nodiratime,logbsize=256k 0 0
+sudo mkfs.xfs -f -i size=512 -n ftype=1 -L RUSTFS0 /dev/sdb
 ```
 
 ## High availability
 
-1. **Power Supply**:
+1. **Power**:
 
    - Use dual (redundant) power supplies.
    - Connect each PDU to a separate power feed.
    - Provide a UPS with at least 30 minutes of runtime.
 
-2. **Cooling Requirements**:
+2. **Cooling**:
 
    - Rack power density ≤ 15 kW per rack.
    - Keep the inlet-to-outlet temperature difference (ΔT) within 8 °C.
 
-3. **Firmware Management**:
+3. **Firmware**:
 
    - Maintain a hardware compatibility matrix.
    - Standardize on the same firmware versions across nodes.
 
 :::tip[Before go-live]
 
-We recommend running a 72-hour stress test before production go-live that covers the following scenarios:
+We recommend running a 72-hour stress test before production go-live that covers the following cases:
 
 1. Node failover testing
 2. Network partition tests

@@ -86,7 +86,7 @@ The server supports various command line options to customize behavior:
 rustfs-mcp
 
 # Or with custom options
-rustfs-mcp --log-level debug --region us-west-2
+rustfs-mcp --log-level debug --region us-east-1
 ```
 
 ### Integration with Chat Clients
@@ -101,7 +101,7 @@ rustfs-mcp --log-level debug --region us-west-2
       "args": [
         "--access-key-id", "your_access_key",
         "--secret-access-key", "your_secret_key",
-        "--region", "us-west-2",
+        "--region", "us-east-1",
         "--log-level", "info"
       ]
     }
@@ -183,7 +183,7 @@ If added successfully, you can list the [available tools](#️-available-tools) 
 In Trae, you can use the corresponding tools by entering the corresponding prompts. For example, in Trae's chat dialog, enter:
 
 ```text
-Please help me list the buckets in the current rustfs instance, thank you!
+List the buckets in this RustFS instance.
 ```
 
 Returns the following response:

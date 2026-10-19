@@ -17,7 +17,7 @@ Die pfadbasierte Adressierung ist der Standard. In einer pfadbasierten URL folgt
 Beispiel (Bucket: `test`, Host: `rustfs.yourdomain.com`):
 
 ```text
-http://rustfs.yourdomain.com/test
+http://rustfs.example.com/my-bucket
 ```
 
 **Hinweis**: Für die pfadbasierte Adressierung ist keine Konfiguration erforderlich.
@@ -29,7 +29,7 @@ Bei der Adressierung im Virtual-Hosted-Stil ist der Bucket-Name Teil der Domain.
 Beispiel (Bucket: `test`, Host: `rustfs.yourdomain.com`):
 
 ```text
-http://test.rustfs.yourdomain.com/
+http://my-bucket.rustfs.example.com/
 ```
 
 ### Konfiguration
@@ -45,14 +45,14 @@ Das Routing im Virtual-Hosted-Stil gilt für den Listener der S3-API (standardm�
 
 Beispiel (`rustfs.yourdomain.com:8000`):
 
-```ini
-RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com:8000"
+```ini title="/etc/default/rustfs"
+RUSTFS_SERVER_DOMAINS=rustfs.example.com:8000
 ```
 
 Damit werden Anfragen wie diese korrekt weitergeleitet:
 
 ```text
-http://my-bucket.rustfs.yourdomain.com:8000/
+http://my-bucket.rustfs.example.com:8000/
 ```
 
 Die Weiterleitung verwendet die Adressierung im Virtual-Hosted-Stil.

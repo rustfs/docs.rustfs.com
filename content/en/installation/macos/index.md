@@ -23,12 +23,12 @@ Use the result to choose the correct package:
 
 | Result | Mac type | Current standalone binary availability |
 | --- | --- | --- |
-| `arm64` | Apple Silicon | Download the macOS AArch64 package from current RustFS releases. |
+| `arm64` | Apple silicon | Download the macOS AArch64 package from current RustFS releases. |
 | `x86_64` | Intel | RustFS releases after `v1.0.0-beta.9` do not provide a prebuilt Intel macOS package. Build the current version from source. |
 
-:::warning[Intel Mac release boundary]
+:::warning[Intel Mac packages]
 
-Do not run the Apple Silicon binary on an Intel Mac. If you need a RustFS version newer than `v1.0.0-beta.9` on Intel macOS, follow the source-build procedure in this guide. An older beta.9 binary does not contain fixes and features from later releases.
+Do not run the Apple silicon binary on an Intel Mac. If you need a RustFS version newer than `v1.0.0-beta.9` on Intel macOS, follow the source-build procedure in this guide. An older beta.9 binary does not contain fixes and features from later releases.
 
 :::
 
@@ -52,8 +52,8 @@ Use an empty directory on a disk with enough free space. Do not store unrelated 
 
 | Method | Use it when | Architecture note |
 | --- | --- | --- |
-| RustFS Launcher | You want a graphical setup and built-in log viewer. | Download a Launcher package that matches Apple Silicon or Intel. |
-| Standalone binary | You want explicit Terminal commands or scripting. | Current releases provide Apple Silicon binaries; Intel users build releases after beta.9 from source. |
+| RustFS Launcher | You want a graphical setup and built-in log viewer. | Download a Launcher package that matches Apple silicon or Intel. |
+| Standalone binary | You want explicit Terminal commands or scripting. | Current releases provide Apple silicon binaries; Intel users build releases after beta.9 from source. |
 
 ## Install with RustFS Launcher
 
@@ -61,7 +61,7 @@ Use an empty directory on a disk with enough free space. Do not store unrelated 
 
 1. Open the [RustFS Launcher Releases page](https://github.com/rustfs/launcher/releases).
 2. Select the latest release and expand **Assets**.
-3. Download the macOS installer that matches your architecture: AArch64 for Apple Silicon or x86-64 for Intel. Do not download **Source code** unless you intend to build Launcher yourself.
+3. Download the macOS installer that matches your architecture: AArch64 for Apple silicon or x86-64 for Intel. Do not download **Source code** unless you intend to build Launcher yourself.
 4. Open the downloaded disk image and move **RustFS Launcher** to **Applications**.
 5. Open **RustFS Launcher** from **Applications**.
 
@@ -112,7 +112,7 @@ Closing the Launcher window hides it in the menu bar; it does not stop RustFS. T
 
 ## Install the standalone binary
 
-### 7. Download the Apple Silicon binary
+### 7. Download the Apple silicon binary
 
 Use this procedure when `uname -m` returns `arm64`:
 
@@ -158,7 +158,7 @@ The build script includes Console assets by default and verifies the resulting b
 
 :::note[Source-build dependencies]
 
-Building from source requires the tools used by the selected RustFS release in addition to Rust and the Xcode command-line tools. If the build reports a missing dependency, follow the requirements in that release's repository README rather than substituting a binary built for Apple Silicon.
+Building from source requires the tools used by the selected RustFS release in addition to Rust and the Xcode command-line tools. If the build reports a missing dependency, follow the requirements in that release's repository README rather than substituting a binary built for Apple silicon.
 
 :::
 
@@ -194,7 +194,7 @@ To perform an end-to-end check, create a bucket named `my-bucket`, upload `hello
 
 ## Confirm a successful installation
 
-Whether you used Launcher, an Apple Silicon binary, or an Intel source build, a successful Console sign-in opens the **Buckets** page.
+Whether you used Launcher, an Apple silicon binary, or an Intel source build, a successful Console sign-in opens the **Buckets** page.
 
 ![RustFS Console Buckets page after a successful sign-in](../windows/images/rustfs-console-login.png)
 
@@ -213,7 +213,7 @@ uname -m
 file "$RUSTFS_BIN"
 ```
 
-Use an AArch64 binary on Apple Silicon. On an Intel Mac, build releases after `v1.0.0-beta.9` from source for `x86_64-apple-darwin`.
+Use an AArch64 binary on Apple silicon. On an Intel Mac, build releases after `v1.0.0-beta.9` from source for `x86_64-apple-darwin`.
 
 ### The data path is rejected
 

@@ -43,8 +43,7 @@ Configure your DNS resolution server to ensure name continuity.
 
 Modify the local alias settings in `/etc/hosts` as follows:
 
-```bash title="/etc/hosts"
-vim /etc/hosts
+```text title="/etc/hosts"
 127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1 localhost localhost.localdomain localhost6 localhost6.localdomain6
 192.168.1.1 node1

@@ -1,61 +1,58 @@
 ---
-title: "Virtual-Hosted–Style Requests"
+title: "Virtual-hosted–style requests"
 description: "Configure path-style and virtual-hosted–style S3 URLs for RustFS."
 ---
 
 RustFS supports both S3 URL addressing styles:
 
-1. Virtual Host Style
-2. Path Style
+1. Virtual-hosted–style
+2. Path-style
 
-The two styles differ in where the bucket name appears in the URL.
+The difference is where the bucket name appears in the URL.
 
-## Path Style
+## Path-style addressing
 
 Path-style addressing is the default. In a path-style URL, the bucket name follows the endpoint.
 
-Example (Bucket: `test`, Host: `rustfs.yourdomain.com`):
+Example (bucket: `my-bucket`, host: `rustfs.example.com`):
 
 ```text
-http://rustfs.yourdomain.com/test
+http://rustfs.example.com/my-bucket
 ```
 
-**Note**: No configuration is required for Path Style.
+:::note[No extra configuration]
 
-## Virtual Host Style
+Path-style addressing works without `RUSTFS_SERVER_DOMAINS`.
 
-In Virtual Host Style, the bucket name is part of the domain.
+:::
 
-Example (Bucket: `test`, Host: `rustfs.yourdomain.com`):
+## Virtual-hosted–style addressing
+
+In a virtual-hosted–style URL, the bucket name is part of the hostname.
+
+Example (bucket: `my-bucket`, host: `rustfs.example.com`):
 
 ```text
-http://test.rustfs.yourdomain.com/
+http://my-bucket.rustfs.example.com/
 ```
 
-### Configuration
+### Configure the domain
 
-1. **DNS**: Create a wildcard DNS record (for example, `*.rustfs.yourdomain.com` → your server's IP address).
-2. **Configuration**: Modify the configuration file (Linux: `/etc/default/rustfs`, Docker/K8s: env vars).
-3. **Set Domain**: Set `RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com"`.
-4. **Restart**: Restart the service (`systemctl restart rustfs`).
+1. Create a wildcard DNS record (for example, `*.rustfs.example.com` → your server's IP address).
+2. Set `RUSTFS_SERVER_DOMAINS=rustfs.example.com` in the server configuration (Linux: `/etc/default/rustfs`; Docker or Kubernetes: the same environment variable). Do not include a port when clients use the S3 API listener's own port.
+3. Restart RustFS (`sudo systemctl restart rustfs` on a systemd install).
 
-### Port in Domain (Optional)
+Virtual-hosted routing applies to the S3 API listener (port `9000` by default). RustFS matches `Host` headers that use that listener's port. Include a port in `RUSTFS_SERVER_DOMAINS` only when clients reach RustFS through a different port, for example a proxy on port `8000`.
 
-Virtual-host routing applies to the S3 API listener (port 9000 by default); RustFS automatically matches `Host` headers that carry the S3 listener's own port. Only when clients reach RustFS through a **different** port (for example via a proxy) do you need to include that port in `RUSTFS_SERVER_DOMAINS`.
-
-Example (`rustfs.yourdomain.com:8000`):
-
-```ini
-RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com:8000"
+```ini title="/etc/default/rustfs"
+RUSTFS_SERVER_DOMAINS=rustfs.example.com:8000
 ```
 
-This ensures that requests like:
+Requests such as the following are then routed with virtual-hosted–style addressing:
 
 ```text
-http://my-bucket.rustfs.yourdomain.com:8000/
+http://my-bucket.rustfs.example.com:8000/
 ```
-
-are routed correctly with virtual-hosted–style addressing.
 
 :::warning[Match the Host header]
 
@@ -63,3 +60,7 @@ The value of `RUSTFS_SERVER_DOMAINS` must exactly match the `Host` header (inclu
 
 :::
 
+## Next steps
+
+- [S3 API overview](/administration/protocols/s3)
+- [Environment variables](/reference/environment-variables)

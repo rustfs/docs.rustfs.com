@@ -11,24 +11,24 @@ After installation, set unique `RUSTFS_ACCESS_KEY` and `RUSTFS_SECRET_KEY` value
 
 :::
 
-## Single Node Single Disk (SNSD)
+## Single-node single-disk (SNSD)
 
 One server, one data disk. The simplest mode, with no redundancy — a disk failure means data loss, so rely on backups. Suitable for development, testing, and small non-critical workloads.
 
 → [Single Node Single Disk installation](./single-node-single-disk.md)
 
-## Single Node Multiple Disk (SNMD)
+## Single-node multiple-disk (SNMD)
 
 One server, multiple data disks. Erasure coding shards data across the disks, so the node tolerates a limited number of disk failures, but a whole-server failure still means data loss. Suitable for mid-sized, non-critical workloads on a single machine.
 
 → [Single Node Multiple Disk installation](./single-node-multiple-disk.md)
 
-## Multiple Node Multiple Disk (MNMD)
+## Multiple-node multiple-disk (MNMD)
 
 Four or more servers, each with one or more disks. Erasure coding spans servers, providing disk- and node-level fault tolerance plus horizontal scalability. This is the mode for production workloads.
 
 → [Multiple Node Multiple Disk installation](./multiple-node-multiple-disk.md)
 
-## Before Production
+## Before production
 
 Work through the [Pre-Installation Checklists](../requirement/checklists/index.md) — hardware, network, software, and security — before deploying to production. You can skip them for non-production deployments.

@@ -17,7 +17,7 @@ Path Style is the default. In Path Style, the bucket name follows the endpoint.
 Example (Bucket: `test`, Host: `rustfs.yourdomain.com`):
 
 ```text
-http://rustfs.yourdomain.com/test
+http://rustfs.example.com/my-bucket
 ```
 
 **Note**: No configuration is required for Path Style.
@@ -29,7 +29,7 @@ In Virtual Host Style, the bucket name is part of the domain.
 Example (Bucket: `test`, Host: `rustfs.yourdomain.com`):
 
 ```text
-http://test.rustfs.yourdomain.com/
+http://my-bucket.rustfs.example.com/
 ```
 
 ### Configuration
@@ -45,14 +45,14 @@ Virtual-host routing applies to the S3 API listener (port 9000 by default); Rust
 
 Example (`rustfs.yourdomain.com:8000`):
 
-```ini
-RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com:8000"
+```ini title="/etc/default/rustfs"
+RUSTFS_SERVER_DOMAINS=rustfs.example.com:8000
 ```
 
 This ensures that requests like:
 
 ```text
-http://my-bucket.rustfs.yourdomain.com:8000/
+http://my-bucket.rustfs.example.com:8000/
 ```
 
 can be correctly resolved in Virtual Host Style mode.
