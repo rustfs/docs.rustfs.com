@@ -1,9 +1,9 @@
 ---
 title: "OpenStack-Swift-API"
-description: "Erstellen Sie RustFS mit der optionalen Swift-API und binden Sie die OpenStack-Keystone-Authentifizierung an."
+description: "Bauen Sie RustFS mit der optionalen Swift-API und binden Sie die OpenStack-Keystone-Authentifizierung an."
 ---
 
-RustFS kann auf demselben HTTP-Endpunkt wie die S3-API eine mit OpenStack Swift kompatible API bereitstellen. Diese Anleitung zeigt, wie Sie das optionale Feature `swift` erstellen, die Keystone-Tokenvalidierung konfigurieren und grundlegende Konto-, Container- und Objektoperationen prüfen.
+RustFS kann auf demselben HTTP-Endpunkt wie die S3-API eine mit OpenStack Swift kompatible API bereitstellen. Diese Anleitung zeigt, wie Sie das optionale Feature `swift` bauen, die Keystone-Tokenvalidierung konfigurieren und grundlegende Konto-, Container- und Objektoperationen prüfen.
 
 :::warning[Kompatibilitätsumfang]
 
@@ -28,12 +28,12 @@ Die bestätigten Kernoperationen sind:
 | Bereich | Operationen |
 | --- | --- |
 | Konto | Container auflisten, Kontometadaten aktualisieren |
-| Container | Erstellen, auflisten, untersuchen, Metadaten aktualisieren, löschen |
-| Objekt | Hochladen, herunterladen, Bereich herunterladen, untersuchen, Metadaten aktualisieren, kopieren, löschen |
+| Container | Erstellen, auflisten, Metadaten abrufen (Head), Metadaten aktualisieren, löschen |
+| Objekt | Hochladen, herunterladen, Teilbereich herunterladen, Metadaten abrufen, Metadaten aktualisieren, kopieren, löschen |
 
-## Mit Swift-Unterstützung erstellen
+## Mit Swift-Unterstützung bauen
 
-Swift gehört nicht zum standardmäßigen RustFS-Featuresatz. Erstellen Sie das Feature ausdrücklich aus dem Repository `rustfs/rustfs`:
+Swift gehört nicht zum standardmäßigen RustFS-Featuresatz. Bauen Sie das Feature ausdrücklich aus dem Repository `rustfs/rustfs`:
 
 ```bash
 cargo build --release --features swift
