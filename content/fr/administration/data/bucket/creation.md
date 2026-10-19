@@ -1,28 +1,28 @@
 ---
-title: "RustFS Bucket Creation"
-description: "Create buckets using the RustFS UI, rc, or the S3 API."
+title: "Créer un compartiment"
+description: "Créez des compartiments avec l’interface RustFS, rc ou l’API S3."
 ---
 
-This guide explains how to create buckets using the RustFS UI, `rc`, or the S3 API.
+Ce guide explique comment créer des compartiments (buckets) avec l’interface RustFS, `rc` ou l’API S3.
 
-## Requirements
+## Prérequis
 
-- A running RustFS instance (see [Installation Guide](../../../installation/index.md)).
-- [`rc`](/operations/rc) installed and configured with an alias for the command-line workflow.
+- Une instance RustFS en cours d’exécution (voir le [guide d’installation](../../../installation/index.md)).
+- [`rc`](/fr/operations/rc) installé et configuré avec un alias pour le flux en ligne de commande.
 
-## Using the RustFS UI
+## Utiliser la Console RustFS
 
-1. Log in to the RustFS Console.
-2. On the Buckets page, in the top right corner, select **Create Bucket**.
-3. Enter the bucket name and click **Create** to complete bucket creation.
+1. Connectez-vous à la Console RustFS.
+2. Sur la page **Buckets** (compartiments), dans le coin supérieur droit, sélectionnez **Create Bucket** (créer un compartiment).
+3. Saisissez un nom de compartiment et sélectionnez **Create** (créer).
 
-![bucket creation](images/bucket-creation-by-ui.png)
+![création d’un compartiment](images/bucket-creation-by-ui.png)
 
-## Using `rc`
+## Avec `rc`
 
-See the [`rc` guide](/operations/rc) for installation and alias configuration.
+Consultez le [guide `rc`](/fr/operations/rc) pour l’installation et la configuration de l’alias.
 
-Create a bucket:
+Créez un compartiment :
 
 ```bash
 rc bucket create rustfs/my-bucket
@@ -33,15 +33,15 @@ rc bucket list rustfs/
 ✓ Bucket 'rustfs/my-bucket' created successfully.
 ```
 
-## Using the API
+## Avec l’API
 
-Create a bucket via API:
+Créez un compartiment via l’API :
 
 ```http
 PUT /{bucketName} HTTP/1.1
 ```
 
-S3 requests must be signed with AWS Signature V4, so use an S3 client rather than hand-crafting headers. With the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) configured for your access keys:
+Les requêtes S3 doivent être signées avec AWS Signature V4 ; utilisez donc un client S3 plutôt que de composer les en-têtes à la main. Avec l’[AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) configurée pour vos clés d’accès :
 
 ```bash
 aws s3api create-bucket \
@@ -49,4 +49,4 @@ aws s3api create-bucket \
   --endpoint-url http://localhost:9000
 ```
 
-Verify the bucket creation in the RustFS Console.
+Confirmez que le compartiment apparaît dans la Console RustFS.

@@ -1,66 +1,66 @@
 ---
 title: "WebDAV"
-description: "Configure the RustFS WebDAV gateway and access buckets and objects with WebDAV clients."
+description: "Configurez la passerelle WebDAV de RustFS et accédez aux compartiments et aux objets avec des clients WebDAV."
 ---
 
-RustFS includes a Web Distributed Authoring and Versioning (WebDAV) gateway that exposes buckets and objects to WebDAV clients over HTTP or HTTPS. You can browse buckets, create collections, and upload, download, rename, or delete objects while RustFS enforces the permissions of the authenticated Identity and Access Management (IAM) user.
+RustFS inclut une passerelle Web Distributed Authoring and Versioning (WebDAV) qui expose les compartiments (buckets) et les objets aux clients WebDAV sur HTTP ou HTTPS. Vous pouvez parcourir les compartiments, créer des collections, puis charger, télécharger, renommer ou supprimer des objets, tandis que RustFS applique les autorisations de l’utilisateur authentifié de la gestion des identités et des accès (IAM).
 
-WebDAV support is compiled into the standard RustFS binary, but the gateway is disabled at runtime by default. You must enable and configure it before connecting a client.
+La prise en charge de WebDAV est compilée dans le binaire RustFS standard, mais la passerelle est désactivée par défaut à l’exécution. Vous devez l’activer et la configurer avant de connecter un client.
 
-## Overview
+## Vue d’ensemble
 
-The gateway maps WebDAV paths to RustFS resources:
+La passerelle associe les chemins WebDAV aux ressources RustFS :
 
-| WebDAV path | RustFS resource |
+| Chemin WebDAV | Ressource RustFS |
 | --- | --- |
-| `/` | All buckets visible to the authenticated user |
-| `/my-bucket/` | The `my-bucket` bucket |
-| `/my-bucket/hello.txt` | The `hello.txt` object in `my-bucket` |
-| `/my-bucket/docs/hello.txt` | The `docs/hello.txt` object in `my-bucket` |
+| `/` | Tous les compartiments visibles par l’utilisateur authentifié |
+| `/my-bucket/` | Le compartiment `my-bucket` |
+| `/my-bucket/hello.txt` | L’objet `hello.txt` dans `my-bucket` |
+| `/my-bucket/docs/hello.txt` | L’objet `docs/hello.txt` dans `my-bucket` |
 
-RustFS supports the following operations through the gateway:
+RustFS prend en charge les opérations suivantes via la passerelle :
 
-| Method | Operation |
+| Méthode | Opération |
 | --- | --- |
-| `PROPFIND` | List buckets or objects and read metadata |
-| `MKCOL` | Create a bucket or a directory prefix |
-| `PUT` | Upload an object |
-| `GET` | Download an object |
-| `HEAD` | Read object metadata |
-| `MOVE` | Rename or move an object or directory |
-| `DELETE` | Delete an object, directory, or bucket |
+| `PROPFIND` | Répertorier les compartiments ou les objets, et lire les métadonnées |
+| `MKCOL` | Créer un compartiment ou un préfixe de répertoire |
+| `PUT` | Charger un objet |
+| `GET` | Télécharger un objet |
+| `HEAD` | Lire les métadonnées d’un objet |
+| `MOVE` | Renommer ou déplacer un objet ou un répertoire |
+| `DELETE` | Supprimer un objet, un répertoire ou un compartiment |
 
-Use `PROPFIND`, not `GET`, to list a collection. The current gateway returns `405 Method Not Allowed` for `GET` requests to directories.
+Utilisez `PROPFIND`, et non `GET`, pour répertorier une collection. La passerelle actuelle renvoie `405 Method Not Allowed` pour les requêtes `GET` vers des répertoires.
 
-WebDAV uses HTTP Basic authentication. Enter a RustFS access key as the username and its secret key as the password. The gateway authenticates the credentials against RustFS IAM and applies the user's S3 policies to each operation.
+WebDAV utilise l’authentification HTTP Basic. Saisissez une clé d’accès RustFS comme nom d’utilisateur et la clé secrète correspondante comme mot de passe. La passerelle authentifie les identifiants auprès de l’IAM RustFS et applique les politiques S3 de l’utilisateur à chaque opération.
 
-:::warning[Protect credentials]
+:::warning[Protégez les identifiants]
 
-Basic authentication does not encrypt credentials. Disable TLS only for isolated local testing. Use HTTPS for every remote or production connection.
+L’authentification Basic ne chiffre pas les identifiants. Ne désactivez TLS que pour des tests locaux isolés. Utilisez HTTPS pour toute connexion distante ou de production.
 
 :::
 
 ## Configuration
 
-Configure the gateway with environment variables before starting RustFS:
+Configurez la passerelle avec des variables d’environnement avant de démarrer RustFS :
 
-| Variable | Description | Default |
+| Variable | Description | Valeur par défaut |
 | --- | --- | --- |
-| `RUSTFS_WEBDAV_ENABLE` | Enables the WebDAV gateway. | `false` |
-| `RUSTFS_WEBDAV_ADDRESS` | Bind address for WebDAV connections. | `0.0.0.0:8080` |
-| `RUSTFS_WEBDAV_TLS_ENABLED` | Enables TLS for the WebDAV listener. | `true` |
-| `RUSTFS_WEBDAV_CERTS_DIR` | Certificate directory used by the RustFS TLS runtime. Required when TLS is enabled. | Not set |
-| `RUSTFS_WEBDAV_MAX_BODY_SIZE` | Maximum request body size in bytes. Must be greater than zero. | `5368709120` (5 GiB) |
+| `RUSTFS_WEBDAV_ENABLE` | Active la passerelle WebDAV. | `false` |
+| `RUSTFS_WEBDAV_ADDRESS` | Adresse d’écoute des connexions WebDAV. | `0.0.0.0:8080` |
+| `RUSTFS_WEBDAV_TLS_ENABLED` | Active TLS pour l’écouteur WebDAV. | `true` |
+| `RUSTFS_WEBDAV_CERTS_DIR` | Répertoire de certificats utilisé par le moteur TLS de RustFS. Obligatoire lorsque TLS est activé. | Non définie |
+| `RUSTFS_WEBDAV_MAX_BODY_SIZE` | Taille maximale du corps de requête, en octets. Doit être supérieure à zéro. | `5368709120` (5 GiB) |
 
-The standard RustFS build enables the WebDAV compile-time feature. If you build RustFS with `--no-default-features`, include the feature explicitly:
+La compilation RustFS standard active la fonctionnalité de compilation WebDAV. Si vous compilez RustFS avec `--no-default-features`, incluez la fonctionnalité explicitement :
 
 ```bash
 cargo build --release --features webdav
 ```
 
-### Local testing without TLS
+### Tests locaux sans TLS
 
-The following example starts RustFS with an HTTP WebDAV listener on port `8080`:
+L’exemple suivant démarre RustFS avec un écouteur WebDAV en HTTP sur le port `8080` :
 
 ```bash
 export RUSTFS_WEBDAV_ENABLE=true
@@ -72,11 +72,11 @@ export RUSTFS_SECRET_KEY=<your-secret-key>
 rustfs /path/to/data
 ```
 
-Binding to `127.0.0.1` prevents other hosts from connecting to the unencrypted test endpoint.
+La liaison à `127.0.0.1` empêche les autres hôtes de se connecter au point de terminaison de test non chiffré.
 
 ### HTTPS
 
-For a remote or production connection, enable TLS and provide a certificate directory:
+Pour une connexion distante ou de production, activez TLS et indiquez un répertoire de certificats :
 
 ```bash
 export RUSTFS_WEBDAV_ENABLE=true
@@ -87,15 +87,15 @@ export RUSTFS_WEBDAV_CERTS_DIR=/path/to/certs
 rustfs /path/to/data
 ```
 
-If TLS is enabled without `RUSTFS_WEBDAV_CERTS_DIR`, or the directory does not exist, WebDAV initialization fails. See [Configure TLS](/integration/tls-configured) for certificate preparation guidance.
+Si TLS est activé sans `RUSTFS_WEBDAV_CERTS_DIR`, ou si le répertoire n’existe pas, l’initialisation de WebDAV échoue. Consultez [Configurer TLS](/fr/integration/tls-configured) pour préparer les certificats.
 
-Allow inbound TCP traffic to the configured WebDAV port. This listener is separate from the S3 API and Console listeners.
+Autorisez le trafic TCP entrant vers le port WebDAV configuré. Cet écouteur est distinct de ceux de l’API S3 et de la Console.
 
-## Usage
+## Utilisation
 
-The following commands use an HTTP endpoint for local testing. Replace the endpoint and credentials with your HTTPS WebDAV endpoint and an IAM user that has the required bucket and object permissions.
+Les commandes suivantes utilisent un point de terminaison HTTP pour les tests locaux. Remplacez le point de terminaison et les identifiants par votre point de terminaison WebDAV HTTPS et par un utilisateur IAM disposant des autorisations requises sur les compartiments et les objets.
 
-Set reusable shell variables without placing the secret directly in each command:
+Définissez des variables shell réutilisables sans placer le secret directement dans chaque commande :
 
 ```bash
 export WEBDAV_URL=http://127.0.0.1:8080
@@ -104,9 +104,9 @@ read -s WEBDAV_PASSWORD
 export WEBDAV_PASSWORD
 ```
 
-### List buckets
+### Répertorier les compartiments
 
-Send `PROPFIND` with `Depth: 1` to list the buckets visible to the user:
+Envoyez `PROPFIND` avec `Depth: 1` pour répertorier les compartiments visibles par l’utilisateur :
 
 ```bash
 curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
@@ -115,7 +115,7 @@ curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
 	"$WEBDAV_URL/"
 ```
 
-### Create a bucket
+### Créer un compartiment
 
 ```bash
 curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
@@ -123,11 +123,11 @@ curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
 	"$WEBDAV_URL/my-bucket/"
 ```
 
-Bucket names must follow the same naming rules as buckets created through the S3 API.
+Les noms de compartiment doivent suivre les mêmes règles de nommage que les compartiments créés via l’API S3.
 
-### Upload and download an object
+### Charger et télécharger un objet
 
-Upload `/path/to/hello.txt`:
+Chargez `/path/to/hello.txt` :
 
 ```bash
 curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
@@ -135,7 +135,7 @@ curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
 	"$WEBDAV_URL/my-bucket/hello.txt"
 ```
 
-Download the object:
+Téléchargez l’objet :
 
 ```bash
 curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
@@ -143,9 +143,9 @@ curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
 	"$WEBDAV_URL/my-bucket/hello.txt"
 ```
 
-### Create and list a directory
+### Créer et répertorier un répertoire
 
-WebDAV directories below a bucket map to object key prefixes:
+Les répertoires WebDAV situés sous un compartiment correspondent à des préfixes de clé d’objet :
 
 ```bash
 curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
@@ -158,9 +158,9 @@ curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
 	"$WEBDAV_URL/my-bucket/docs/"
 ```
 
-### Rename an object
+### Renommer un objet
 
-Use `MOVE` with a destination path on the same WebDAV endpoint:
+Utilisez `MOVE` avec un chemin de destination sur le même point de terminaison WebDAV :
 
 ```bash
 curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
@@ -169,11 +169,11 @@ curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
 	"$WEBDAV_URL/my-bucket/hello.txt"
 ```
 
-The IAM user needs permission to read and delete the source and to write the destination. If authorization fails, RustFS leaves the source unchanged.
+L’utilisateur IAM doit être autorisé à lire et à supprimer la source, ainsi qu’à écrire la destination. Si l’autorisation échoue, RustFS laisse la source inchangée.
 
-### Delete an object or bucket
+### Supprimer un objet ou un compartiment
 
-Delete an object:
+Supprimez un objet :
 
 ```bash
 curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
@@ -181,7 +181,7 @@ curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
 	"$WEBDAV_URL/my-bucket/greeting.txt"
 ```
 
-Delete the bucket after removing its contents:
+Supprimez le compartiment après en avoir retiré le contenu :
 
 ```bash
 curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
@@ -189,20 +189,20 @@ curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
 	"$WEBDAV_URL/my-bucket/"
 ```
 
-### Connect a desktop client
+### Connecter un client de bureau
 
-Use the WebDAV endpoint in a client that supports Basic authentication:
+Utilisez le point de terminaison WebDAV dans un client qui prend en charge l’authentification Basic :
 
-| Client | Connection address |
+| Client | Adresse de connexion |
 | --- | --- |
-| GNOME Files | `dav://<host>:8080/` for HTTP or `davs://<host>:8080/` for HTTPS |
-| macOS Finder | `http://<host>:8080/` or `https://<host>:8080/` |
+| GNOME Files | `dav://<host>:8080/` pour HTTP ou `davs://<host>:8080/` pour HTTPS |
+| macOS Finder | `http://<host>:8080/` ou `https://<host>:8080/` |
 | Windows File Explorer | `https://<host>:8080/` |
 
-Enter the RustFS access key and secret key when the client prompts for credentials. Client behavior and supported WebDAV methods vary; use `curl` to isolate server-side errors when troubleshooting.
+Saisissez la clé d’accès et la clé secrète RustFS lorsque le client demande les identifiants. Le comportement du client et les méthodes WebDAV prises en charge varient ; utilisez `curl` pour isoler les erreurs côté serveur lors du dépannage.
 
-## Next steps
+## Étapes suivantes
 
-- [Manage credentials](/operations/credentials)
-- [Configure TLS](/integration/tls-configured)
-- [Check service status](/operations/status-check)
+- [Gérer les identifiants](/fr/operations/credentials)
+- [Configurer TLS](/fr/integration/tls-configured)
+- [Vérifier l’état du service](/fr/operations/status-check)

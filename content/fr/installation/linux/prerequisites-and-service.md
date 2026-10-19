@@ -51,7 +51,7 @@ Tous les nœuds d’un déploiement distribué RustFS **doivent** maintenir des 
 
 La dérive d’horloge entre deux nœuds ne doit pas dépasser **15 minutes**. Pour les environnements de production, nous recommandons de maintenir la dérive en dessous d'**1 seconde**.
 
-:: :
+:::
 
 ### Outils NTP recommandés
 
@@ -225,7 +225,7 @@ XFS convient à la charge de RustFS pour trois raisons :
 - **Fichiers très nombreux et très volumineux.** XFS est un système de fichiers 64 bits qui prend en charge des fichiers extrêmement volumineux (jusqu’à 8 Eo). Sa gestion des métadonnées reste efficace même avec des millions de fichiers dans un seul répertoire, ce qui compte parce que RustFS stocke chaque objet (ou version d’objet) comme un fichier indépendant sur le disque.
 - **Réservation d’espace.** XFS fournit une API `fallocate` efficace. RustFS l’utilise pour réserver un espace disque contigu avant d’écrire les objets, ce qui évite le coût de l’extension dynamique et des mises à jour de métadonnées pendant l’écriture, et limite la fragmentation.
 
-Pour faciliter la découverte des disques, nous recommandons d’utiliser des étiquettes **Label** lors du formatage des systèmes de fichiers XFS.
+Pour faciliter l’identification et le montage des disques, nous recommandons d’attribuer une étiquette de système de fichiers (`-L`) lors du formatage de chaque disque.
 
 Vérifiez d’abord la disposition des disques :
 
@@ -283,10 +283,10 @@ chown rustfs-user:rustfs-user  /data/rustfs*
 
 :::note
 
-- Si vous avez créé l’utilisateur et le groupe `rustfs-user`, remplacez `User` et `Group` dans `/etc/systemd/system/rustfs.service` par `rustfs-user`.
+- Si vous avez créé l’utilisateur et le groupe rustfs-user, remplacez `User` et `Group` dans `/etc/systemd/system/rustfs.service` par `rustfs-user`.
 - Adaptez `/data/rustfs*` à vos répertoires de montage réels.
 
-:: :
+:::
 
 ## Télécharger le paquet d’installation
 

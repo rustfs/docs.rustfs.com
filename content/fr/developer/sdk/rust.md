@@ -1,23 +1,23 @@
 ---
-title: "Rust SDK Guide"
-description: "Operate RustFS instances through the AWS SDK for Rust, including creation and deletion of buckets and objects."
+title: "Guide du SDK Rust"
+description: "Utilisez le SDK AWS pour Rust afin de créer et de supprimer des compartiments et des objets dans RustFS."
 ---
 
-RustFS ships no first-party Rust client crate — it is fully S3-compatible, so you use the official AWS SDK for Rust (`aws-sdk-s3`) configured to point at your RustFS server. Through the SDK, you can operate RustFS, including creation and deletion of buckets/objects, file upload and download, etc.
+RustFS ne fournit pas de crate client Rust propre. Il est compatible avec S3 : vous utilisez donc le SDK AWS officiel pour Rust (`aws-sdk-s3`), configuré pour pointer vers votre serveur RustFS. Avec ce SDK, vous pouvez créer et supprimer des compartiments (buckets), charger (upload) et télécharger des objets, ainsi que les supprimer.
 
-## Prerequisites
+## Prérequis
 
-- Rust 1.78 or later (install via [rustup](https://rustup.rs/))
-- An available RustFS instance (refer to [Installation Guide](../../installation/index.md)) — the S3 API listens on port `9000`, the Console on port `9001`
-- Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (refer to [Access Key Management](../../security-compliance/iam/access-token.md))
+- Rust 1.78 ou ultérieur (installation via [rustup](https://rustup.rs/))
+- Une instance RustFS disponible (reportez-vous au [guide d’installation](../../installation/index.md)) : l’API S3 écoute sur le port `9000`, la Console sur le port `9001`
+- Des clés d’accès, définies à l’installation par les variables d’environnement `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` (reportez-vous à la [gestion des clés d’accès](../../security-compliance/iam/access-token.md))
 
-:::tip[Local test]
+:::tip[Essai local]
 
-If you did not set credentials at install time, the server defaults to `rustfsadmin` / `rustfsadmin` — fine for a throwaway local trial, never for anything reachable by others.
+Si vous n’avez pas défini d’identifiants à l’installation, le serveur utilise par défaut `rustfsadmin` / `rustfsadmin`. Cela convient à un essai local jetable, jamais à une instance accessible à d’autres personnes.
 
 :::
 
-Create a project and add the dependencies:
+Créez un projet et ajoutez les dépendances :
 
 ```bash
 cargo new rustfs-rust-demo && cd rustfs-rust-demo
@@ -25,7 +25,7 @@ cargo add aws-config aws-sdk-s3 anyhow
 cargo add tokio --features full
 ```
 
-Your `Cargo.toml` should contain:
+Votre `Cargo.toml` devrait contenir :
 
 ```toml title="Cargo.toml"
 [dependencies]
@@ -35,9 +35,9 @@ aws-sdk-s3 = "1"
 tokio = { version = "1", features = ["full"] }
 ```
 
-## Initializing the Client
+## Initialisation du client
 
-The following is a complete, runnable program. It loads the connection settings from environment variables, initializes the S3 client, and lists your buckets:
+Le programme suivant est complet et exécutable. Il charge les paramètres de connexion depuis les variables d’environnement, initialise le client S3 et liste vos compartiments :
 
 ```rust title="src/main.rs"
 use anyhow::Result;
@@ -108,11 +108,11 @@ async fn main() -> Result<()> {
 
 :::note
 
-These environment variable names (`RUSTFS_ENDPOINT_URL`, `RUSTFS_REGION`, `RUSTFS_ACCESS_KEY_ID`, `RUSTFS_SECRET_ACCESS_KEY`) are just this example's client-side conventions — they are read by your program, not by RustFS. They are distinct from the server-side `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` variables used when installing RustFS.
+Ces noms de variables d’environnement (`RUSTFS_ENDPOINT_URL`, `RUSTFS_REGION`, `RUSTFS_ACCESS_KEY_ID`, `RUSTFS_SECRET_ACCESS_KEY`) ne sont que des conventions côté client propres à cet exemple : c’est votre programme qui les lit, et non RustFS. Ces noms sont distincts des variables côté serveur `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY`, utilisées lors de l’installation de RustFS.
 
 :::
 
-Run it (replace `localhost` with your server's IP address if RustFS runs on another machine):
+Exécutez-le (remplacez `localhost` par l’adresse IP de votre serveur si RustFS s’exécute sur une autre machine) :
 
 ```bash
 export RUSTFS_ENDPOINT_URL="http://localhost:9000"
@@ -126,9 +126,9 @@ cargo run
 Bucket: Some("my-bucket")
 ```
 
-You can now use the client for the operations below. Each snippet runs inside `main`, reusing `rustfs_client`.
+Vous pouvez maintenant utiliser le client pour les opérations ci-dessous. Chaque extrait s’exécute dans `main` et réutilise `rustfs_client`.
 
-## Create Bucket
+## Créer un compartiment
 
 ```rust
 match rustfs_client
@@ -151,7 +151,7 @@ match rustfs_client
 Bucket created successfully
 ```
 
-## Delete Bucket
+## Supprimer un compartiment
 
 ```rust
 match rustfs_client
@@ -174,7 +174,7 @@ match rustfs_client
 Bucket deleted successfully
 ```
 
-## List Buckets
+## Lister les compartiments
 
 ```rust
 match rustfs_client.list_buckets().send().await {
@@ -196,7 +196,7 @@ Total buckets number is 1
 Bucket: Some("my-bucket")
 ```
 
-## List Objects
+## Lister les objets
 
 ```rust
 match rustfs_client
@@ -223,16 +223,16 @@ Total objects number is 1
 Object: Some("hello.txt")
 ```
 
-## Upload File
+## Charger un fichier
 
-Add these imports at the top of `src/main.rs`:
+Ajoutez ces importations en tête de `src/main.rs` :
 
 ```rust
 use aws_sdk_s3::primitives::ByteStream;
 use tokio::fs;
 ```
 
-Then upload a local file:
+Chargez ensuite un fichier local :
 
 ```rust
 let data = fs::read("/path/to/hello.txt").await.expect("can not open the file");
@@ -259,7 +259,7 @@ match rustfs_client
 Object uploaded successfully, res: PutObjectOutput { e_tag: Some("\"...\""), ... }
 ```
 
-## Download Object
+## Télécharger un objet
 
 ```rust
 match rustfs_client
@@ -284,4 +284,4 @@ match rustfs_client
 Object content: hello rustfs
 ```
 
-For other operations (presigned URLs, multipart uploads, and more), see the [AWS SDK for Rust documentation](https://docs.aws.amazon.com/sdk-for-rust/latest/dg/) — every S3-compatible call works against RustFS the same way.
+Pour les autres opérations (URL présignées, chargements partitionnés, etc.), consultez la [documentation de l’AWS SDK pour Rust](https://docs.aws.amazon.com/sdk-for-rust/latest/dg/). La plupart des opérations S3 fonctionnent de la même manière avec RustFS ; les exceptions sont décrites dans la [compatibilité S3](/fr/reference/s3-compatibility).

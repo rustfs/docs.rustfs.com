@@ -1,32 +1,32 @@
 ---
-title: "EC Configuration"
-description: "Plan and configure RustFS erasure-set size and parity before deploying storage pools."
+title: "Configuration du codage d’effacement"
+description: "Planifiez et configurez la taille des ensembles d’effacement et la parité de RustFS avant de déployer des pools de stockage."
 ---
 
-RustFS uses Reed-Solomon erasure coding (EC) to distribute each object across the drives in an erasure set. Use this page to estimate usable capacity, understand the automatic defaults, and decide whether your deployment needs an explicit parity setting.
+RustFS utilise le codage d’effacement (EC) de Reed-Solomon pour répartir chaque objet sur les disques d’un ensemble d’effacement. Utilisez cette page pour estimer la capacité utile, comprendre les valeurs par défaut automatiques et décider si votre déploiement exige un réglage de parité explicite.
 
-## Understand the layout
+## Comprendre la disposition
 
-Each storage pool is divided into one or more erasure sets. For a set with `N` drives and `M` parity shards:
+Chaque pool de stockage est divisé en un ou plusieurs ensembles d’effacement. Pour un ensemble comportant `N` disques et `M` shards de parité :
 
-- data shards: `N - M`
-- parity shards: `M`
-- maximum unavailable shards that can be reconstructed: `M`
-- approximate capacity efficiency: `(N - M) / N`
+- shards de données : `N - M`
+- shards de parité : `M`
+- nombre maximal de shards indisponibles pouvant être reconstruits : `M`
+- efficacité de capacité approximative : `(N - M) / N`
 
-For example, a 16-drive set with `EC:4` stores 12 data shards and 4 parity shards. Its approximate capacity efficiency is 75% before file-system, metadata, and operational overhead.
+Par exemple, un ensemble de 16 disques avec `EC:4` stocke 12 shards de données et 4 shards de parité. Son efficacité de capacité approximative est de 75 % avant la surcharge du système de fichiers, des métadonnées et de l’exploitation.
 
-:::note[Failure domains]
+:::note[Domaines de défaillance]
 
-Parity describes unavailable shards within one erasure set. Node-level fault tolerance depends on how the set's drives are distributed across nodes. Do not assume that `EC:4` always tolerates four complete node failures; a node can host multiple drives from the same set.
+La parité décrit les shards indisponibles au sein d’un seul ensemble d’effacement. La tolérance aux pannes au niveau du nœud dépend de la façon dont les disques de l’ensemble sont répartis entre les nœuds. Ne supposez pas que `EC:4` tolère toujours quatre pannes complètes de nœuds ; un nœud peut héberger plusieurs disques du même ensemble.
 
 :::
 
-## Automatic parity
+## Parité automatique
 
-We recommend leaving `RUSTFS_STORAGE_CLASS_STANDARD` unset unless you have a specific, validated durability or capacity requirement. RustFS derives STANDARD parity independently for each pool from its drives per erasure set:
+Nous recommandons de ne pas définir `RUSTFS_STORAGE_CLASS_STANDARD`, sauf si vous avez une exigence de durabilité ou de capacité précise et validée. RustFS déduit la parité STANDARD de chaque pool indépendamment, à partir de son nombre de disques par ensemble d’effacement :
 
-| Drives per erasure set (`N`) | Automatic STANDARD parity | Data shards | Approximate efficiency |
+| Disques par ensemble d’effacement (`N`) | Parité STANDARD automatique | Shards de données | Efficacité approximative |
 | --- | --- | --- | --- |
 | 1 | `EC:0` | 1 | 100% |
 | 2–3 | `EC:1` | `N - 1` | 50%–67% |
@@ -34,82 +34,82 @@ We recommend leaving `RUSTFS_STORAGE_CLASS_STANDARD` unset unless you have a spe
 | 6–7 | `EC:3` | `N - 3` | 50%–57% |
 | 8–16 | `EC:4` | `N - 4` | 50%–75% |
 
-Multi-drive erasure sets contain between 2 and 16 drives. A single-drive deployment is a separate layout with zero parity.
+Les ensembles d’effacement à plusieurs disques contiennent entre 2 et 16 disques. Un déploiement à un seul disque est une disposition distincte, avec une parité nulle.
 
-:::warning[Use the set width, not the cluster total]
+:::warning[Utilisez la largeur de l’ensemble, pas le total du cluster]
 
-Validate parity against the number of drives in each erasure set, not the total number of drives in the cluster. A cluster can contain multiple sets or pools with different widths.
+Validez la parité d’après le nombre de disques de chaque ensemble d’effacement, et non d’après le nombre total de disques du cluster. Un cluster peut contenir plusieurs ensembles ou plusieurs pools de largeurs différentes.
 
 :::
 
-## Estimate usable capacity
+## Estimer la capacité utile
 
-For a pool whose sets all use the same width and parity, estimate EC capacity with:
+Pour un pool dont tous les ensembles utilisent la même largeur et la même parité, estimez la capacité du codage d’effacement avec :
 
 $$
-\text{usable capacity} \approx \text{raw capacity} \times \frac{N-M}{N}
+\text{capacité utile} \approx \text{capacité brute} \times \frac{N-M}{N}
 $$
 
-For example, 16 equal 10 TiB drives arranged as one 16-drive set with `EC:4` provide approximately:
+Par exemple, 16 disques identiques de 10 TiB, disposés en un seul ensemble de 16 disques avec `EC:4`, fournissent environ :
 
 $$
 160\ \text{TiB} \times \frac{16-4}{16} = 120\ \text{TiB}
 $$
 
-Reserve additional capacity for XFS, object metadata, versioning, incomplete uploads, healing, and normal operational headroom. Treat the result as a planning estimate, not guaranteed available space.
+Réservez une capacité supplémentaire pour XFS, les métadonnées d’objets, la gestion des versions, les chargements incomplets, la réparation des données et une marge d’exploitation normale. Considérez le résultat comme une estimation de planification, et non comme un espace disponible garanti.
 
-## Configure parity
+## Configurer la parité
 
-Set EC variables in the same environment file used by the RustFS service, such as `/etc/default/rustfs`.
+Définissez les variables de codage d’effacement dans le même fichier d’environnement que celui du service RustFS, par exemple `/etc/default/rustfs`.
 
-To use the recommended automatic STANDARD parity, omit `RUSTFS_STORAGE_CLASS_STANDARD` or leave it empty:
+Pour utiliser la parité STANDARD automatique recommandée, omettez `RUSTFS_STORAGE_CLASS_STANDARD` ou laissez-la vide :
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_STORAGE_CLASS_STANDARD=
 ```
 
-To pin parity explicitly, use the `EC:<parity>` format:
+Pour fixer la parité de façon explicite, utilisez le format `EC:<parity>` :
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_STORAGE_CLASS_STANDARD=EC:4
 RUSTFS_STORAGE_CLASS_RRS=EC:1
 ```
 
-`RUSTFS_STORAGE_CLASS_STANDARD` controls writes using the `STANDARD` storage class. `RUSTFS_STORAGE_CLASS_RRS` controls `REDUCED_REDUNDANCY` writes and defaults to one parity shard on multi-drive sets. RustFS accepts these two storage classes for local writes.
+`RUSTFS_STORAGE_CLASS_STANDARD` contrôle les écritures qui utilisent la classe de stockage `STANDARD`. `RUSTFS_STORAGE_CLASS_RRS` contrôle les écritures `REDUCED_REDUNDANCY` et vaut par défaut un shard de parité sur les ensembles à plusieurs disques. RustFS accepte ces deux classes de stockage pour les écritures locales.
 
-Explicit settings must satisfy all of these rules:
+Les réglages explicites doivent respecter toutes les règles suivantes :
 
-- parity must be no greater than half of the drives in every target set: `M <= N / 2`
-- STANDARD parity must be greater than or equal to REDUCED_REDUNDANCY parity when both are non-zero
-- the configured parity must be valid for every pool, including the narrowest pool
+- la parité ne doit pas dépasser la moitié des disques de chaque ensemble cible : `M <= N / 2`
+- la parité STANDARD doit être supérieure ou égale à la parité REDUCED_REDUNDANCY lorsque les deux sont différentes de zéro
+- la parité configurée doit être valide pour chaque pool, y compris le pool le plus étroit
 
-RustFS validates explicit storage classes against each pool during startup. An invalid value causes startup to fail instead of silently reducing parity. Remove the explicit STANDARD value to return to per-pool automatic parity, or choose a value every pool can satisfy.
+Au démarrage, RustFS valide les classes de stockage explicites pour chaque pool. Une valeur non valide fait échouer le démarrage, au lieu de réduire la parité silencieusement. Retirez la valeur STANDARD explicite pour revenir à la parité automatique par pool, ou choisissez une valeur que chaque pool peut satisfaire.
 
-## Control erasure-set width
+## Contrôler la largeur des ensembles d’effacement
 
-RustFS normally selects a valid set width automatically from the volume topology. Multi-drive set widths range from 2 through 16.
+RustFS sélectionne normalement, de façon automatique, une largeur d’ensemble valide à partir de la topologie des volumes. Les largeurs des ensembles à plusieurs disques vont de 2 à 16.
 
-`RUSTFS_ERASURE_SET_DRIVE_COUNT` can pin the width when you need a specific symmetric layout:
+`RUSTFS_ERASURE_SET_DRIVE_COUNT` peut fixer la largeur lorsque vous avez besoin d’une disposition symétrique précise :
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_ERASURE_SET_DRIVE_COUNT=16
 ```
 
-The value must divide the pool topology symmetrically and be valid for every volume expansion pattern. RustFS rejects a width that cannot evenly partition the configured endpoints. Leave this variable unset unless you have verified the complete pool layout.
+La valeur doit diviser la topologie du pool de façon symétrique et rester valide pour chaque schéma d’extension des volumes. RustFS rejette une largeur qui ne peut pas partitionner uniformément les points de terminaison configurés. Laissez cette variable non définie, sauf si vous avez vérifié la disposition complète du pool.
 
-## Validate the configuration
+## Valider la configuration
 
-Before starting or restarting RustFS:
+Avant de démarrer ou de redémarrer RustFS :
 
-1. Determine the drives per erasure set for every pool.
-2. Confirm that explicit parity does not exceed half of the narrowest set width.
-3. Estimate usable capacity and reserve operational headroom.
-4. Keep the same service environment configuration on every node.
+1. Déterminez le nombre de disques par ensemble d’effacement pour chaque pool.
+2. Confirmez que la parité explicite ne dépasse pas la moitié de la largeur de l’ensemble le plus étroit.
+3. Estimez la capacité utile et réservez une marge d’exploitation.
+4. Conservez la même configuration d’environnement du service sur chaque nœud.
 
-After startup, use the Console **Status** page or `rc admin info cluster` to confirm the backend layout, erasure-coding parity, drive availability, and pool membership. See [Status Check](/operations/status-check) for the complete workflow.
+Après le démarrage, utilisez la page **Status** de la Console ou `rc admin info cluster` pour confirmer la disposition du backend, la parité du codage d’effacement, la disponibilité des disques et l’appartenance aux pools. Consultez [Vérification de l’état](/fr/operations/status-check) pour la procédure complète.
 
-## Next steps
+## Étapes suivantes
 
-- [Prepare data disks](./disk-preparation.md)
-- [Choose a deployment topology](/installation#deployment-mode-comparison)
-- [Review all storage environment variables](/reference/environment-variables#storage--erasure)
+- [Préparer les disques de données](./disk-preparation.md)
+- [Choisir une topologie de déploiement](/fr/installation#comparaison-des-modes-de-déploiement)
+- [Consulter toutes les variables d’environnement de stockage](/fr/reference/environment-variables#stockage-et-codage-deffacement)

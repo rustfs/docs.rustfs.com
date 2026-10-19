@@ -1,13 +1,13 @@
 ---
 title: "Elasticsearch"
-description: "Use RustFS as the S3 snapshot repository for Elasticsearch indices, deployed with Docker Compose."
+description: "Utilisez RustFS comme dépôt d’instantanés S3 pour les index Elasticsearch, déployé avec Docker Compose."
 ---
 
-This guide connects [Elasticsearch](https://github.com/elastic/elasticsearch) — the distributed search and analytics engine — to **RustFS** as the S3 snapshot repository for its indices. You will start Elasticsearch with the `repository-s3` plugin, register a snapshot repository backed by RustFS, index documents, take a snapshot, and prove the full cycle by deleting the index and restoring it from RustFS. The workflow was verified with `docker.elastic.co/elasticsearch/elasticsearch:8.18.0` and `rustfs/rustfs-x86-musl:v2.3.1`.
+Ce guide connecte [Elasticsearch](https://github.com/elastic/elasticsearch) — le moteur distribué de recherche et d’analyse — à **RustFS** comme dépôt d’instantanés S3 pour ses index. Vous allez démarrer Elasticsearch avec le plugin `repository-s3`, enregistrer un dépôt d’instantanés adossé à RustFS, indexer des documents, prendre un instantané, puis démontrer le cycle complet en supprimant l’index et en le restaurant depuis RustFS. Le flux a été validé avec `docker.elastic.co/elasticsearch/elasticsearch:8.18.0` et `rustfs/rustfs-x86-musl:v2.3.1`.
 
-You need Docker with the Compose plugin. This deployment is intended for local integration testing, not production.
+Vous avez besoin de Docker avec le plugin Compose. Ce déploiement est destiné aux tests d’intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -16,27 +16,27 @@ flowchart LR
 	Init["init-bucket job"] -->|"create my-bucket"| RustFS
 ```
 
-Elasticsearch stores its primary data on local disks and offloads index backups to a snapshot repository. The `repository-s3` plugin writes snapshot metadata and shard data blobs to RustFS through the S3 API with path-style addressing over plain HTTP.
+Elasticsearch conserve ses données primaires sur des disques locaux et externalise les sauvegardes d’index vers un dépôt d’instantanés. Le plugin `repository-s3` écrit les métadonnées d’instantané et les blobs de données des shards vers RustFS via l’API S3, avec un adressage de type chemin (path-style) en HTTP non chiffré.
 
-## 1. Create the project files
+## 1. Créer les fichiers du projet
 
-Create a working directory:
+Créez un répertoire de travail :
 
 ```bash
 mkdir rustfs-elasticsearch
 cd rustfs-elasticsearch
 ```
 
-Create an environment file and replace both credential placeholders:
+Créez un fichier d’environnement et remplacez les deux valeurs d’identifiants indicatives :
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Use dedicated credentials for the bucket. Do not commit `.env` to source control.
+Utilisez des identifiants dédiés pour le compartiment (bucket). N’ajoutez pas le fichier `.env` au dépôt (ne le versionnez pas).
 
-Elasticsearch splits its S3 settings between `elasticsearch.yml` (non-secret values) and the keystore (credentials). Create the configuration file:
+Elasticsearch répartit ses réglages S3 entre `elasticsearch.yml` (valeurs non secrètes) et le keystore (identifiants). Créez le fichier de configuration :
 
 ```yaml title="elasticsearch.yml"
 discovery.type: single-node
@@ -47,7 +47,7 @@ s3.client.default.path_style_access: "true"
 s3.client.default.region: "us-east-1"
 ```
 
-Create the Compose file:
+Créez le fichier Compose :
 
 ```yaml title="compose.yaml"
 services:
@@ -121,26 +121,26 @@ volumes:
   rustfs-data:
 ```
 
-`repository-s3` is a bundled plugin and installs without network access. Only the access key and secret key belong in the keystore — non-secure settings such as the endpoint must live in `elasticsearch.yml`, otherwise the node refuses to start.
+`repository-s3` est un plugin fourni avec la distribution et s’installe sans accès réseau. Seules la clé d’accès et la clé secrète appartiennent au keystore — les réglages non sécurisés, comme le point de terminaison, doivent figurer dans `elasticsearch.yml`, sinon le nœud refuse de démarrer.
 
-## 2. Start the deployment
+## 2. Démarrer le déploiement
 
-Resolve the Compose file before starting containers:
+Vérifiez le fichier Compose avant de démarrer les conteneurs :
 
 ```bash
 docker compose config
 ```
 
-Start the services and wait for Elasticsearch to finish booting (the first start installs the plugin and creates the keystore entries, which takes a minute or two):
+Démarrez les services et attendez la fin du démarrage d’Elasticsearch (le premier démarrage installe le plugin et crée les entrées du keystore, ce qui prend une à deux minutes) :
 
 ```bash
 docker compose up -d
 curl -s http://localhost:9200
 ```
 
-## 3. Register the snapshot repository and index documents
+## 3. Enregistrer le dépôt d’instantanés et indexer des documents
 
-Register RustFS as the snapshot repository, create an index, and index five documents:
+Enregistrez RustFS comme dépôt d’instantanés, créez un index et indexez cinq documents :
 
 ```bash
 curl -s -X PUT "http://localhost:9200/_snapshot/rustfs_repo" \
@@ -164,9 +164,9 @@ curl -s "http://localhost:9200/rustfs_index/_count"
 {"count":5,...}
 ```
 
-## 4. Take a snapshot
+## 4. Prendre un instantané
 
-Create a snapshot with `wait_for_completion` so the result is known immediately:
+Créez un instantané avec `wait_for_completion` afin que le résultat soit connu immédiatement :
 
 ```bash
 curl -s -X PUT "http://localhost:9200/_snapshot/rustfs_repo/snap1?wait_for_completion=true"
@@ -176,16 +176,16 @@ curl -s -X PUT "http://localhost:9200/_snapshot/rustfs_repo/snap1?wait_for_compl
 {"snapshot":{"snapshot":"snap1",...,"indices":["rustfs_index"],"shards":{"total":1,"failed":0,"successful":1}}}
 ```
 
-## 5. Verify objects in RustFS
+## 5. Vérifier les objets dans RustFS
 
-List the snapshot objects through the bucket-initializer image:
+Listez les objets d’instantané via l’image d’initialisation du compartiment :
 
 ```bash
 docker compose run --rm --entrypoint /bin/sh create-bucket -c \
   '/usr/bin/rc alias set rustfs http://rustfs:9000 "$RUSTFS_ACCESS_KEY" "$RUSTFS_SECRET_KEY" >/dev/null && /usr/bin/rc ls rustfs/my-bucket/indices --recursive'
 ```
 
-Snapshot metadata and shard data blobs live under `indices/` in the bucket:
+Les métadonnées d’instantané et les blobs de données des shards se trouvent sous `indices/` dans le compartiment :
 
 ```text
 [2026-09-21 02:58:01]   3.56 KiB indices/mvyat2-dSEOG3uiCCiFzRA/0/__LbLsSgUUTpqji_EXvqHYCg
@@ -193,13 +193,13 @@ Snapshot metadata and shard data blobs live under `indices/` in the bucket:
 [2026-09-21 02:58:01]   1.00 KiB indices/mvyat2-dSEOG3uiCCiFzRA/0/index-e9P8q6E9QhitpkiOdgjVDQ
 ```
 
-You can also browse the prefix in the RustFS Console:
+Vous pouvez également parcourir le préfixe dans la Console RustFS :
 
-![Elasticsearch snapshot blobs stored in the RustFS Console](./images/rustfs-es-snapshots.png)
+![Blobs d’instantané Elasticsearch stockés dans la Console RustFS](./images/rustfs-es-snapshots.png)
 
-## 6. Restore the index from RustFS
+## 6. Restaurer l’index depuis RustFS
 
-Delete the index, then restore it from the snapshot:
+Supprimez l’index, puis restaurez-le depuis l’instantané :
 
 ```bash
 curl -s -X DELETE "http://localhost:9200/rustfs_index" > /dev/null
@@ -211,31 +211,31 @@ curl -s "http://localhost:9200/rustfs_index/_count"
 {"count":5,...}
 ```
 
-The documents come back because the snapshot blobs were read from RustFS.
+Les documents réapparaissent, car les blobs d’instantané ont été lus depuis RustFS.
 
-## 7. Stop or reset the stack
+## 7. Arrêter ou réinitialiser la pile
 
-Stop the containers while keeping the RustFS data volume:
+Arrêtez les conteneurs en conservant le volume de données RustFS :
 
 ```bash
 docker compose down
 ```
 
-To delete the snapshots and start from an empty RustFS volume, explicitly include `--volumes`:
+Pour supprimer les instantanés et repartir d’un volume RustFS vide, ajoutez explicitement `--volumes` :
 
 ```bash
 docker compose down --volumes
 ```
 
-## Troubleshooting
+## Dépannage
 
-### The node refuses to start with "non-secure setting ... must be stored inside elasticsearch.yml"
+### Le nœud refuse de démarrer avec « non-secure setting ... must be stored inside elasticsearch.yml »
 
-Only `s3.client.default.access_key` and `s3.client.default.secret_key` belong in the keystore. Endpoint, protocol, path-style access, and region are non-secure settings and must be defined in `elasticsearch.yml`.
+Seuls `s3.client.default.access_key` et `s3.client.default.secret_key` appartiennent au keystore. Le point de terminaison, le protocole, l’accès en adressage de type chemin et la région sont des réglages non sécurisés et doivent être définis dans `elasticsearch.yml`.
 
-### Restored or new shards stay unassigned
+### Les shards restaurés ou nouveaux restent non assignés
 
-Elasticsearch stops allocating shards when disk usage passes the low watermark (85 percent by default). Free disk space, or disable the check for a local test:
+Elasticsearch cesse d’allouer des shards lorsque l’utilisation du disque dépasse le seuil bas (low watermark, 85 pour cent par défaut). Libérez de l’espace disque, ou désactivez le contrôle pour un test local :
 
 ```bash
 curl -s -X PUT "http://localhost:9200/_cluster/settings" \
@@ -243,20 +243,20 @@ curl -s -X PUT "http://localhost:9200/_cluster/settings" \
   -d '{"transient":{"cluster.routing.allocation.disk.threshold_enabled":false}}'
 ```
 
-### Restore fails because the index already exists
+### La restauration échoue parce que l’index existe déjà
 
-A previous failed restore leaves the index behind. Delete it with `DELETE /rustfs_index` and run the restore again.
+Une restauration précédente en échec laisse l’index en place. Supprimez-le avec `DELETE /rustfs_index` et relancez la restauration.
 
-### AccessDenied or 403 responses
+### Réponses AccessDenied ou 403
 
-Confirm that the credentials in the keystore match the RustFS credentials and that the `create-bucket` service completed successfully:
+Vérifiez que les identifiants du keystore correspondent aux identifiants RustFS et que le service `create-bucket` s’est terminé avec succès :
 
 ```bash
 docker compose logs create-bucket
 ```
 
-## Next steps
+## Étapes suivantes
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional S3 operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Elasticsearch snapshot documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshot-restore.html) for snapshot lifecycle management (SLM).
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres opérations S3.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
+- Suivez la [documentation des instantanés Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshot-restore.html) pour la gestion du cycle de vie des instantanés (SLM).

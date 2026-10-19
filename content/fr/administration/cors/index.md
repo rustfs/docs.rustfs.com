@@ -1,41 +1,41 @@
 ---
-title: "CORS Configuration"
-description: "Configure allowed browser origins for the RustFS S3 API and Console."
+title: "Configuration CORS"
+description: "Configurez les origines de navigateur autorisées pour l’API S3 et la Console RustFS."
 ---
 
-Cross-Origin Resource Sharing (CORS) controls which browser origins can access the RustFS S3 API and Console. Configure each listener separately, then restart RustFS to apply the environment changes.
+Le partage de ressources entre origines (Cross-Origin Resource Sharing, CORS) détermine quelles origines de navigateur peuvent accéder à l’API S3 et à la Console de RustFS. Configurez chaque écouteur séparément, puis redémarrez RustFS pour appliquer les changements d’environnement.
 
-## S3 API origins
+## Origines de l’API S3
 
-Set `RUSTFS_CORS_ALLOWED_ORIGINS` to a comma-separated list of trusted origins:
+Définissez `RUSTFS_CORS_ALLOWED_ORIGINS` avec une liste d’origines de confiance séparées par des virgules :
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_CORS_ALLOWED_ORIGINS="https://app.example.com,https://admin.example.com"
 ```
 
-When this variable is unset or empty, the S3 endpoint does not add generic CORS response headers. A list of explicit origins allows credentialed browser requests from matching origins.
+Lorsque cette variable n’est pas définie ou qu’elle est vide, le point de terminaison S3 n’ajoute pas d’en-têtes de réponse CORS génériques. Une liste d’origines explicites autorise les requêtes de navigateur avec identifiants en provenance des origines correspondantes.
 
-You can set the value to `*` to allow requests from any origin. Wildcard mode does not allow browser credentials.
+Vous pouvez définir la valeur sur `*` pour autoriser les requêtes depuis n’importe quelle origine. Le mode caractère générique n’autorise pas les identifiants de navigateur.
 
-:::warning[Use explicit origins in production]
+:::warning[Utilisez des origines explicites en production]
 
-Use a comma-separated allowlist for applications that send credentials. Reserve `*` for public resources that do not require credentialed browser requests.
+Utilisez une liste d’autorisation séparée par des virgules pour les applications qui envoient des identifiants. Réservez `*` aux ressources publiques qui n’exigent pas de requêtes de navigateur avec identifiants.
 
 :::
 
-## Console origins
+## Origines de la Console
 
-The Console uses a separate variable:
+La Console utilise une variable distincte :
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_CONSOLE_CORS_ALLOWED_ORIGINS="https://admin.example.com"
 ```
 
-Use a comma-separated list when more than one browser origin must access the Console. Set `*` only when any origin must be allowed.
+Utilisez une liste séparée par des virgules lorsque plusieurs origines de navigateur doivent accéder à la Console. Ne définissez `*` que lorsque toute origine doit être autorisée.
 
-## Verify the response
+## Vérifier la réponse
 
-Send a request with an `Origin` header and inspect the CORS response headers:
+Envoyez une requête avec un en-tête `Origin` et inspectez les en-têtes de réponse CORS :
 
 ```bash
 curl -i \
@@ -43,8 +43,8 @@ curl -i \
   http://localhost:9000/
 ```
 
-Confirm that `Access-Control-Allow-Origin` contains the expected origin. Repeat the check with an unlisted origin and confirm that it is not allowed.
+Confirmez que `Access-Control-Allow-Origin` contient l’origine attendue. Répétez la vérification avec une origine absente de la liste et confirmez qu’elle n’est pas autorisée.
 
-## Next steps
+## Étapes suivantes
 
-See the [environment variable reference](/reference/environment-variables#cors) for the verified defaults and configuration formats.
+Consultez la [référence des variables d’environnement](/fr/reference/environment-variables#cors) pour les valeurs par défaut vérifiées et les formats de configuration.

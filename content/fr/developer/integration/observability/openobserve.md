@@ -58,7 +58,7 @@ ZO_ROOT_USER_PASSWORD=Complexpass#123
 
 `root@example.com` et `Complexpass#123` sont les valeurs d’exemple de la documentation OpenObserve. OpenObserve v1.0.x applique une politique de mot de passe de 8 à 128 caractères avec majuscules, minuscules, chiffres et caractères spéciaux. Modifiez ces deux valeurs pour tout déploiement réel et ne commettez pas `.env` dans le contrôle de version.
 
-:: :
+:::
 
 Créez le fichier Compose :
 
@@ -306,6 +306,6 @@ L’image RustFS s’exécute avec l’utilisateur et le groupe `10001`. Si vous
 
 ## Étapes suivantes
 
-- Consultez les [notes de compatibilité S3](/administration/protocols/s3) avant d’adopter d’autres opérations S3.
-- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/security-compliance/iam/access-token).
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres opérations S3.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
 - Suivez la [documentation OpenObserve](https://openobserve.ai/docs/) pour connecter de vrais producteurs de journaux tels que Fluent Bit ou l’OpenTelemetry Collector.

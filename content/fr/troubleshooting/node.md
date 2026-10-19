@@ -1,83 +1,83 @@
 ---
-title: "Node Failures"
-description: "Complete steps for handling node failures in RustFS clusters. Mainly includes: replacement node hardware preparation, configuration updates, service deployment, rejoining the cluster, data healing, and subsequent checks and best practices."
+title: "Pannes de nœud"
+description: "Préparez un nœud de remplacement, mettez à jour sa configuration, rétablissez son appartenance au cluster et vérifiez la réparation des données."
 ---
 
-In distributed RustFS clusters, erasure coding mechanisms are adopted to ensure read/write access can still be provided when some nodes fail, and automatic data healing occurs after nodes rejoin. This document will guide you through the following process:
+Un cluster RustFS distribué utilise le codage d’effacement pour rester lisible et inscriptible lorsque certains nœuds tombent en panne, et il répare les données automatiquement lorsqu’un nœud rejoint de nouveau le cluster. Ce guide détaille les étapes suivantes :
 
-1. Start replacement node and synchronize environment
-2. Update DNS/hostname to point old node identifiers to new nodes
-3. Download and deploy RustFS services consistent with the cluster
-4. Rejoin new nodes to the cluster and trigger data healing
-5. Monitor healing progress and perform subsequent checks and optimization
+1. Démarrez le nœud de remplacement et alignez son environnement logiciel sur celui du cluster.
+2. Mettez à jour le DNS ou `/etc/hosts` afin que l’ancien nom d’hôte soit résolu vers le nouveau nœud.
+3. Installez la même version de RustFS que sur les autres nœuds.
+4. Démarrez les nœuds de remplacement afin qu’ils rejoignent le cluster et commencent la réparation des données.
+5. Surveillez la progression de la réparation, puis effectuez les vérifications de suivi.
 
-## 1) Start Replacement Node
+## 1. Préparez le nœud de remplacement
 
-* **Hardware and System Preparation**
-  Ensure the replacement node server hardware is roughly consistent with the failed node, including CPU, memory, network configuration, and disk type; even using higher configurations won't affect cluster performance.
-  Software environment needs to maintain version consistency with other nodes (operating system, kernel, dependency libraries, etc.) to avoid cluster abnormal behavior caused by environment differences.
+* **Préparation du matériel et du système**
+  Assurez-vous que le matériel du nœud de remplacement (processeur, mémoire, réseau et type de disque) correspond à peu près à celui du nœud défaillant. Un matériel de gamme supérieure n’affecte pas les performances du cluster.
+  Utilisez des versions logicielles identiques à celles des autres nœuds, y compris le système d’exploitation, le noyau et les dépendances, afin d’éviter les problèmes causés par des environnements incohérents.
 
-* **Drive Exclusive Access**
-  As with physical drive operations, RustFS requires exclusive access to storage volumes, prohibiting any other processes or scripts from directly modifying data within storage volumes, otherwise data corruption or redundancy loss can easily occur.
+* **Accès exclusif aux disques**
+  Comme pour les opérations sur les disques physiques, RustFS exige un accès exclusif à ses volumes de stockage. Ne laissez pas d’autres processus ou scripts modifier directement les données de ces volumes, car cela peut corrompre les données ou réduire la redondance.
 
-## 2) Update Hostname and Network Resolution
+## 2. Mettez à jour le nom d’hôte et la résolution réseau
 
-* **DNS/Hosts Configuration**
-  If the replacement node's IP address differs from the failed node, you need to re-resolve the old node's hostname (such as `rustfs-node-2.example.net`) to the new node to ensure nodes within the cluster discover each other through the same address.
+* **Configuration du DNS et du fichier hosts**
+  Si l’adresse IP du nœud de remplacement diffère de celle du nœud défaillant, faites pointer le nom d’hôte de l’ancien nœud (par exemple, `rustfs-node-2.example.net`) vers l’adresse IP du nouveau nœud, afin que les nœuds du cluster puissent toujours se joindre sous le même nom.
 
  ```bash
  # Example: Add or modify line in /etc/hosts
  192.168.1.12 rustfs-node-2.example.net
  ```
 
-  After correct resolution, you can verify the hostname points to the new node through `ping` or `nslookup`.
+  Utilisez `ping` ou `nslookup` pour vérifier que le nom d’hôte est résolu vers le nouveau nœud.
 
-## 3) Deploy and Configure RustFS Services
+## 3. Déployez et configurez les services RustFS
 
-* **Download and Installation**
-  Follow the same version deployment process as RustFS official, download binaries or installation packages consistent with existing nodes, and extract to a unified directory. Ensure startup scripts, environment variables, and configuration files (such as `/etc/default/rustfs`) are completely consistent with other nodes in the cluster.
+* **Téléchargement et installation**
+  Installez la même version de RustFS que sur les nœuds existants, avec la même méthode d’installation et le même répertoire. Assurez-vous que les scripts de démarrage, les variables d’environnement et les fichiers de configuration (comme `/etc/default/rustfs`) sont identiques à ceux des autres nœuds.
 
-* **Configuration Verification**
+* **Vérification de la configuration**
 
- * Check that `RUSTFS_VOLUMES` in `/etc/default/rustfs` is byte-for-byte identical to the other nodes, and that it covers the replacement node's hostname and port.
- * Ensure all nodes have the same access keys and permission configurations to avoid new nodes being unable to join due to authentication failures.
+ * Vérifiez que `RUSTFS_VOLUMES` dans `/etc/default/rustfs` est identique, octet pour octet, à la valeur des autres nœuds, et qu’il couvre le nom d’hôte et le port du nœud de remplacement.
+ * Assurez-vous que tous les nœuds utilisent les mêmes clés d’accès et les mêmes réglages de permissions ; sinon, le nouveau nœud échoue à l’authentification et ne peut pas rejoindre le cluster.
 
-## 4) Rejoin Cluster and Trigger Data Healing
+## 4. Réintégrez le cluster et déclenchez la réparation des données
 
-* **Start Service**
+* **Démarrage du service**
 
  ```bash
  systemctl start rustfs
  ```
 
-  Or use your custom startup script to start RustFS services, and view startup logs through `journalctl -u rustfs -f` to confirm the new node has detected other online nodes and started the data healing process.
+  Vous pouvez aussi démarrer RustFS avec votre propre script de démarrage. Exécutez ensuite `journalctl -u rustfs -f` pour confirmer que le nouveau nœud a détecté les autres nœuds et a démarré la réparation.
 
-* **Monitor Healing Status**
-  Healing runs in the background once the node rejoins; no manual command is required. Watch its progress through the service logs on the replacement node, and check node and disk status in the RustFS Console:
+* **Surveillance de l’état de la réparation**
+  La réparation s’exécute en arrière-plan dès que le nœud rejoint le cluster ; aucune commande manuelle n’est requise. Suivez sa progression dans les journaux du service sur le nœud de remplacement, et vérifiez l’état des nœuds et des disques dans la Console RustFS :
 
  ```bash
  journalctl -u rustfs -f
  ```
 
-* **Community Experience Reference**
-  Community testing shows that when nodes go offline and rejoin, RustFS will only perform healing operations on new nodes, not fully rebalance the cluster, thus avoiding unnecessary network and I/O peaks.
+* **Observations de la communauté**
+  Lors des tests menés par la communauté, lorsqu’un nœud se déconnecte puis rejoint le cluster, RustFS ne répare que ce nœud, au lieu de rééquilibrer l’ensemble du cluster. Cela évite des pics inutiles de réseau et d’E/S.
 
-## 5) Subsequent Checks and Best Practices
+## 5. Vérifications de suivi et bonnes pratiques
 
-* **Monitoring and Alerts**
+* **Surveillance et alertes**
 
- * During healing, monitor disk and network load to ensure the cluster meets read/write and network bandwidth requirements.
- * Set up alerts to notify operations teams when node healing fails or progress stalls beyond thresholds.
+ * Pendant la réparation, surveillez la charge des disques et du réseau afin de vous assurer que le cluster respecte encore ses exigences de lecture, d’écriture et de bande passante.
+ * Configurez des alertes pour prévenir les équipes d’exploitation lorsque la réparation d’un nœud échoue ou lorsque la progression reste bloquée au-delà des seuils.
 
-* **Repeated Failure Drills**
-  Regularly simulate node failures and drill the entire recovery process to ensure team familiarity with operation commands and emergency procedures.
+* **Tests de panne réguliers**
+  Organisez régulièrement des exercices de panne de nœud et exercez-vous à l’ensemble de la procédure de reprise, afin que votre équipe connaisse les commandes et le processus de réponse aux incidents.
 
-* **Root Cause Analysis**
-  Conduct in-depth hardware health diagnostics (SMART, BIOS logs, etc.) on frequently failing nodes or disks, and implement preventive maintenance plans.
+* **Analyse des causes racines**
+  Exécutez des diagnostics matériels détaillés (par exemple, les données SMART et les journaux du BIOS) sur les nœuds ou les disques qui tombent en panne de façon répétée, et mettez en place un plan de maintenance préventive.
 
-* **Professional Support**
-  If deeper-level fault location and recovery guidance is needed, contact the RustFS development team or community for help.
+* **Assistance professionnelle**
+  Pour obtenir de l’aide afin de diagnostiquer la cause d’une panne ou de rétablir le cluster, contactez l’équipe de développement ou la communauté RustFS.
 
 ---
 
-**Summary**: Through the above process, RustFS can quickly and safely replace nodes and complete data healing after node hardware completely fails, minimizing cluster availability interruptions. Be sure to cross-reference with your own environment and specific command-line tools to ensure configuration consistency and correct operation sequence.
+Ces étapes remplacent un nœud défaillant et réparent ses données. Adaptez les commandes à votre environnement, et conservez une configuration identique sur tous les nœuds.

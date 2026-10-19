@@ -1,14 +1,14 @@
 ---
-title: "Cloud Native"
-description: "Connect cloud native platforms to RustFS through S3-compatible object storage interfaces."
+title: "Cloud natif"
+description: "Connectez des plateformes cloud natives à RustFS par des interfaces de stockage objet compatibles avec S3."
 ---
 
-Use **RustFS** as the object storage layer for cloud native platforms that support an S3-compatible endpoint.
+Utilisez **RustFS** comme couche de stockage objet pour les plateformes cloud natives qui prennent en charge un point de terminaison compatible avec S3.
 
-## Platforms
+## Plateformes
 
 - [Cortex](./cortex.md)
 - [Flux](./flux.md)
 - [celld](./celld.md)
 
-Keep platform state in a dedicated bucket, and use credentials scoped to the required bucket operations.
+Conservez l’état de la plateforme dans un compartiment (bucket) dédié, et utilisez des identifiants limités aux opérations requises sur ce compartiment.

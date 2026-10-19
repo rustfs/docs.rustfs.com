@@ -148,7 +148,7 @@ Token: <your-admin-token>
 
 La valeur du token n’est affichée qu’une seule fois et ne peut pas être récupérée ultérieurement. Si le nom du token existe déjà (HTTP 409), le nœud possède des métadonnées — repartez d’un préfixe de compartiment neuf ou supprimez le préfixe du nœud dans le compartiment avant de réessayer.
 
-:: :
+:::
 
 ## 4. Écrire du line protocol
 
@@ -274,6 +274,6 @@ docker compose logs create-bucket
 
 ## Étapes suivantes
 
-- Consultez les [notes de compatibilité S3](/administration/protocols/s3) avant d’adopter d’autres opérations S3.
-- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/security-compliance/iam/access-token).
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres opérations S3.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
 - Suivez la [documentation InfluxDB 3 Core](https://docs.influxdata.com/influxdb3/core/) pour connecter telegraf ou les API d’écriture comme producteurs de données.

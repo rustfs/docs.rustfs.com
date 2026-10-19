@@ -1,28 +1,28 @@
 ---
-title: "Kubernetes Installation (Helm)"
-description: "Deploy RustFS on Kubernetes with the official Helm chart: standalone or distributed mode, storage sizing, probes, production hardening, and server-pool expansion."
+title: "Installation Kubernetes (Helm)"
+description: "Déployez RustFS sur Kubernetes avec le chart Helm officiel : mode autonome ou distribué, dimensionnement du stockage, sondes, durcissement pour la production et extension des pools de serveurs."
 ---
 
-RustFS ships an official Helm chart that deploys either a single-node instance (a `Deployment` with one PVC) or a distributed cluster (a `StatefulSet` with multiple pods and PVCs). This guide walks through installing the chart, choosing a deployment mode, sizing storage correctly, and the production options the chart provides.
+RustFS est livré avec un chart Helm officiel qui déploie soit une instance à un seul nœud (un `Deployment` avec un PVC), soit un cluster distribué (un `StatefulSet` avec plusieurs pods et plusieurs PVC). Ce guide décrit l’installation du chart, le choix du mode de déploiement, le dimensionnement correct du stockage et les options de production fournies par le chart.
 
-**Prerequisites**
+**Prérequis**
 
-- A Kubernetes cluster and `kubectl` access
+- Un cluster Kubernetes et un accès à `kubectl`
 - Helm 3
-- RustFS image version `>= 1.0.0-alpha.69` (the chart requirement)
-- A StorageClass with a working provisioner — the chart defaults to [`local-path`](https://github.com/rancher/local-path-provisioner); set `storageclass.name` to use your own
-- [`rc`](/operations/rc) installed on the administration host before using the server-pool commands in this guide
+- Une image RustFS en version `>= 1.0.0-alpha.69` (exigence du chart)
+- Une StorageClass dotée d’un provisionneur opérationnel — le chart utilise par défaut [`local-path`](https://github.com/rancher/local-path-provisioner) ; définissez `storageclass.name` pour utiliser la vôtre
+- [`rc`](/fr/operations/rc), installé sur l’hôte d’administration, avant d’utiliser les commandes de pools de serveurs de ce guide
 
-The chart lives in the RustFS source repository under `helm/rustfs`:
+Le chart se trouve dans le dépôt source de RustFS, sous `helm/rustfs` :
 
 ```bash
 git clone https://github.com/rustfs/rustfs.git
 cd rustfs/helm/rustfs
 ```
 
-## 1. Quick install
+## 1. Installation rapide
 
-Install into a dedicated namespace, setting your own credentials and a realistic data size:
+Installez le chart dans un espace de noms dédié, en définissant vos propres identifiants et une taille de données réaliste :
 
 ```bash
 helm install rustfs . \
@@ -33,19 +33,19 @@ helm install rustfs . \
   --set storageclass.logStorageSize=1Gi
 ```
 
-:::note[The chart refuses default credentials]
+:::note[Le chart refuse les identifiants par défaut]
 
-Rendering fails by default unless one of the following is true:
+Le rendu échoue par défaut, sauf si l’une des conditions suivantes est vraie :
 
-1. `secret.existingSecret` names a Kubernetes Secret you control, or
-2. `secret.rustfs.access_key` and `secret.rustfs.secret_key` are **both** set to non-empty, non-default values, or
-3. `secret.allowInsecureDefaults: true` is set (only for local development).
+1. `secret.existingSecret` désigne un Secret Kubernetes que vous contrôlez, ou
+2. `secret.rustfs.access_key` et `secret.rustfs.secret_key` sont **tous les deux** définis avec des valeurs non vides et différentes des valeurs par défaut, ou
+3. `secret.allowInsecureDefaults: true` est défini (uniquement pour le développement local).
 
-This prevents accidental deployment with the well-known default `rustfsadmin`/`rustfsadmin` credentials. Setting only one of the two keys is also rejected, so the chart never silently falls back to a default for the missing key.
+Cela empêche un déploiement accidentel avec les identifiants par défaut bien connus `rustfsadmin`/`rustfsadmin`. La définition d’une seule des deux clés est également rejetée : le chart ne retombe donc jamais silencieusement sur une valeur par défaut pour la clé manquante.
 
 :::
 
-Watch the pods come up:
+Observez le démarrage des pods :
 
 ```bash
 kubectl -n rustfs get pods -w
@@ -59,17 +59,17 @@ rustfs-2   1/1     Running   0          2m27s
 rustfs-3   1/1     Running   0          2m27s
 ```
 
-## 2. Choose a deployment mode
+## 2. Choisir un mode de déploiement
 
-The chart supports two modes, selected via the `mode` values:
+Le chart prend en charge deux modes, sélectionnés par les valeurs `mode` :
 
-| Mode | Values | Workload | Layout |
+| Mode | Valeurs | Charge de travail | Disposition |
 | --- | --- | --- | --- |
-| Distributed (**default**) | `mode.distributed.enabled=true` | StatefulSet | `replicaCount` pods (`>= 2`, default `4`) × `drivesPerNode` data PVCs per pod (`>= 1`, inferred as `4` when `replicaCount: 4` or `1` otherwise; 16 drives by default) |
-| Standalone | `mode.standalone.enabled=true`, `mode.distributed.enabled=false` | Deployment | 1 pod, 1 data PVC (single node single disk) |
+| Distribué (**par défaut**) | `mode.distributed.enabled=true` | StatefulSet | `replicaCount` pods (`>= 2`, `4` par défaut) × `drivesPerNode` PVC de données par pod (`>= 1`, interprété comme `4` lorsque `replicaCount: 4`, ou comme `1` sinon ; 16 disques par défaut) |
+| Autonome | `mode.standalone.enabled=true`, `mode.distributed.enabled=false` | Deployment | 1 pod, 1 PVC de données (un nœud, un seul disque) |
 
-- **Standalone** matches single-node single-disk: no erasure-coding redundancy across nodes. Use it for development, testing, or small setups where the underlying storage provides its own durability. It can reuse existing PVCs via `mode.standalone.existingClaim.dataClaim` / `mode.standalone.existingClaim.logsClaim`.
-- **Distributed** behaves like [multiple node multiple disk](../linux/multiple-node-multiple-disk.md): objects are erasure-coded across pods and PVCs. `replicaCount` sets the number of pods (`>= 2`) and `drivesPerNode` sets the number of data PVCs per pod (`>= 1`), giving `replicaCount * drivesPerNode` total drives. When `drivesPerNode` is left unset (`null`), the chart infers `4` data PVCs per pod when `replicaCount` is `4` (16 drives total) and `1` data PVC per pod for any other `replicaCount` (such as `replicaCount: 16` for 16 pods with 1 PVC each). Set both `replicaCount` and `drivesPerNode` explicitly (for example, `replicaCount: 4` and `drivesPerNode: 2` for 8 drives) to choose another layout.
+- **Autonome** correspond au mode un nœud, un seul disque : aucune redondance par codage d’effacement entre les nœuds. Utilisez-le pour le développement, les tests ou les petits déploiements dans lesquels le stockage sous-jacent assure sa propre durabilité. Il peut réutiliser des PVC existants via `mode.standalone.existingClaim.dataClaim` / `mode.standalone.existingClaim.logsClaim`.
+- **Distribué** se comporte comme [plusieurs nœuds, plusieurs disques](../linux/multiple-node-multiple-disk.md) : les objets sont répartis par codage d’effacement entre les pods et les PVC. `replicaCount` définit le nombre de pods (`>= 2`) et `drivesPerNode` définit le nombre de PVC de données par pod (`>= 1`), soit `replicaCount * drivesPerNode` disques au total. Lorsque `drivesPerNode` n’est pas défini (`null`), le chart déduit `4` PVC de données par pod lorsque `replicaCount` vaut `4` (16 disques au total) et `1` PVC de données par pod pour toute autre valeur de `replicaCount` (par exemple, `replicaCount: 16` pour 16 pods avec 1 PVC chacun). Définissez explicitement à la fois `replicaCount` et `drivesPerNode` (par exemple, `replicaCount: 4` et `drivesPerNode: 2` pour 8 disques) afin de choisir une autre disposition.
 
 ```bash
 # Standalone mode
@@ -80,9 +80,9 @@ helm install rustfs . -n rustfs --create-namespace \
   --set secret.rustfs.secret_key=<your-secret-key>
 ```
 
-## 3. Storage sizing
+## 3. Dimensionnement du stockage
 
-PVC sizes come from the `storageclass` block:
+Les tailles de PVC proviennent du bloc `storageclass` :
 
 ```yaml title="values-prod.yaml"
 storageclass:
@@ -91,65 +91,65 @@ storageclass:
   logStorageSize: 256Mi   # per logs PVC
 ```
 
-:::warning[The default PVC size is 256Mi — change it]
+:::warning[La taille de PVC par défaut est 256Mi — modifiez-la]
 
-The chart's default size for the data and logs volumes is **256Mi**, which is only enough to verify the chart works. For any real workload set `storageclass.dataStorageSize` (for example `1Ti`) and `storageclass.logStorageSize` (for example `1Gi`) at install time. In distributed mode the data size applies to **each** data PVC (`replicaCount * drivesPerNode`, 16 PVCs by default).
+La taille par défaut du chart pour les volumes de données et de journaux est de **256Mi**, ce qui suffit uniquement à vérifier que le chart fonctionne. Pour toute charge de travail réelle, définissez `storageclass.dataStorageSize` (par exemple `1Ti`) et `storageclass.logStorageSize` (par exemple `1Gi`) au moment de l’installation. En mode distribué, la taille des données s’applique à **chaque** PVC de données (`replicaCount * drivesPerNode`, 16 PVC par défaut).
 
 :::
 
-Setting `config.rustfs.obs_log_directory` to `""` disables the log PVCs and mounts entirely. Custom PVC annotations go under `storageclass.pvcAnnotations.data` / `storageclass.pvcAnnotations.logs`.
+Définir `config.rustfs.obs_log_directory` sur `""` désactive entièrement les PVC de journaux et leurs montages. Les annotations de PVC personnalisées se placent sous `storageclass.pvcAnnotations.data` / `storageclass.pvcAnnotations.logs`.
 
-## 4. Health probes
+## 4. Sondes d’intégrité
 
-The chart templates HTTP probes on the S3 port (9000) out of the box, matching the server's health endpoints:
+Le chart génère par défaut des sondes HTTP sur le port S3 (9000), alignées sur les points de terminaison d’intégrité du serveur :
 
-- **Liveness**: `GET /health` (`livenessProbe.httpGet.path`), initial delay 30s, period 5s
-- **Readiness**: `GET /health/ready` (`readinessProbe.httpGet.path`), initial delay 10s, period 5s
+- **Vivacité** : `GET /health` (`livenessProbe.httpGet.path`), délai initial de 30 s, période de 5 s
+- **État de préparation** : `GET /health/ready` (`readinessProbe.httpGet.path`), délai initial de 10 s, période de 5 s
 
-A pod is only added to the Service endpoints once `/health/ready` returns `200`, which in distributed mode requires the storage quorum to be met. Thresholds and timings are tunable via the `livenessProbe.*` and `readinessProbe.*` values.
+Un pod n’est ajouté aux points de terminaison du Service qu’une fois que `/health/ready` renvoie `200`, ce qui, en mode distribué, exige que le quorum de stockage soit atteint. Les seuils et les temporisations se règlent au moyen des valeurs `livenessProbe.*` et `readinessProbe.*`.
 
-## 5. Production hardening
+## 5. Durcissement pour la production
 
-### Pod Disruption Budget
+### Budget de perturbation des pods
 
-Disabled by default. Enable it so voluntary evictions (node drains, cluster upgrades) never take more than one pod down at a time:
+Désactivé par défaut. Activez-le afin que les évictions volontaires (drainage de nœuds, mises à niveau du cluster) ne mettent jamais hors service plus d’un pod à la fois :
 
 ```bash
 --set pdb.create=true    # pdb.maxUnavailable defaults to 1
 ```
 
-### Anti-affinity and topology spread
+### Anti-affinité et répartition topologique
 
-`affinity.podAntiAffinity.enabled` defaults to `true` with `topologyKey: kubernetes.io/hostname`, spreading pods across distinct nodes. For zone-level spreading, enable `topologySpreadConstraints.enabled` and supply raw constraint entries under `topologySpreadConstraints.constraints` (applied to the distributed StatefulSet).
+`affinity.podAntiAffinity.enabled` vaut `true` par défaut, avec `topologyKey: kubernetes.io/hostname`, ce qui répartit les pods sur des nœuds distincts. Pour une répartition au niveau des zones, activez `topologySpreadConstraints.enabled` et fournissez des entrées de contrainte brutes sous `topologySpreadConstraints.constraints` (appliquées au StatefulSet distribué).
 
-### Inter-pod mTLS (cert-manager)
+### mTLS entre pods (cert-manager)
 
-Set `mtls.enabled=true` to encrypt traffic between pods; the chart renders cert-manager `Issuer`/`Certificate` resources for a CA, server, and client certificates. To use an issuer you already operate, set `mtls.existingIssuerRef.enabled=true` with its `name`, `kind` (`Issuer` or `ClusterIssuer`), and `group`.
+Définissez `mtls.enabled=true` pour chiffrer le trafic entre les pods ; le chart génère des ressources cert-manager `Issuer`/`Certificate` pour une autorité de certification, ainsi que des certificats serveur et client. Pour utiliser un émetteur que vous exploitez déjà, définissez `mtls.existingIssuerRef.enabled=true` avec son `name`, son `kind` (`Issuer` ou `ClusterIssuer`) et son `group`.
 
-### Ingress and Gateway API
+### Ingress et Gateway API
 
-Ingress is enabled by default (`ingress.enabled=true`) with `ingress.className: nginx`; set it to `traefik` if that is your controller — the chart applies the matching session-stickiness annotations for each. Set your domain via `ingress.hosts[0].host` (default `example.rustfs.com`). For HTTPS, enable `ingress.tls.enabled` and either pass the certificate with `--set-file ingress.tls.crt=./tls.crt --set-file ingress.tls.key=./tls.key`, point at an existing secret (`ingress.tls.existingSecret`), or let cert-manager issue one (`ingress.tls.certManager.enabled=true`).
+L’Ingress est activé par défaut (`ingress.enabled=true`) avec `ingress.className: nginx` ; définissez cette valeur sur `traefik` si c’est votre contrôleur — le chart applique, pour chacun, les annotations d’affinité de session correspondantes. Définissez votre domaine via `ingress.hosts[0].host` (par défaut `example.rustfs.com`). Pour HTTPS, activez `ingress.tls.enabled`, puis transmettez le certificat avec `--set-file ingress.tls.crt=./tls.crt --set-file ingress.tls.key=./tls.key`, pointez vers un secret existant (`ingress.tls.existingSecret`), ou laissez cert-manager en émettre un (`ingress.tls.certManager.enabled=true`).
 
-The chart also has alpha [Gateway API](https://gateway-api.sigs.k8s.io/) support (`gatewayApi.enabled=true` together with `ingress.enabled=false`, Traefik gateway class), rendering `Gateway` and `HTTPRoute` resources.
+Le chart prend également en charge, en version alpha, la [Gateway API](https://gateway-api.sigs.k8s.io/) (`gatewayApi.enabled=true` conjointement avec `ingress.enabled=false`, classe de passerelle Traefik) et génère des ressources `Gateway` et `HTTPRoute`.
 
-## 6. Access RustFS
+## 6. Accéder à RustFS
 
-Without an ingress, port-forward the Service:
+Sans Ingress, redirigez les ports du Service :
 
 ```bash
 kubectl -n rustfs port-forward svc/rustfs 9000:9000 9001:9001
 ```
 
-- S3 API: `http://localhost:9000`
-- Console: `http://localhost:9001`
+- API S3 : `http://localhost:9000`
+- Console : `http://localhost:9001`
 
-Log in to the Console with the access key and secret key you set at install time. With ingress enabled, use your configured host instead (check `kubectl -n rustfs get ing`). The Service defaults to `ClusterIP`; `service.type` can be switched to `NodePort` (S3 on `service.endpoint.nodePort: 32000`, Console on `service.console.nodePort: 32001`) or `LoadBalancer`.
+Connectez-vous à la Console avec la clé d’accès et la clé secrète définies lors de l’installation. Lorsque l’Ingress est activé, utilisez plutôt l’hôte que vous avez configuré (vérifiez avec `kubectl -n rustfs get ing`). Le Service utilise `ClusterIP` par défaut ; `service.type` peut être basculé vers `NodePort` (S3 sur `service.endpoint.nodePort: 32000`, Console sur `service.console.nodePort: 32001`) ou `LoadBalancer`.
 
-## 7. Scaling out with server pools
+## 7. Monter en charge avec des pools de serveurs
 
-In distributed mode the chart can run multiple **server pools** — independent StatefulSets whose drives together form one cluster. This is the chart-level equivalent of adding a Server Pool as described in [Pool Expansion](../../operations/scaling/storage-pool-expansion.md).
+En mode distribué, le chart peut exécuter plusieurs **pools de serveurs** — des StatefulSets indépendants dont les disques forment ensemble un seul cluster. Cela correspond, au niveau du chart, à l’ajout d’un pool de serveurs décrit dans [Extension de pool](../../operations/scaling/storage-pool-expansion.md).
 
-To expand an existing deployment, enable pools and describe the current layout as pool 0 plus your new capacity:
+Pour étendre un déploiement existant, activez les pools et décrivez la disposition actuelle comme le pool 0, plus la nouvelle capacité :
 
 ```yaml title="values-prod.yaml (pools)"
 pools:
@@ -162,27 +162,27 @@ pools:
         dataStorageSize: 10Gi
 ```
 
-Then apply with `helm upgrade`. Each entry may set `replicaCount` (`>= 2`) and/or a `storageclass` block; omitted fields inherit the top-level values. When top-level `drivesPerNode` is set explicitly, that drive count applies to every pool; when `drivesPerNode` is left unset (`null`), the chart infers the drive count per pool from that pool's `replicaCount` (`4` drives per pod when `replicaCount` is `4`, or `1` drive per pod otherwise). Additional pools render as `<fullname>-pool<N>` StatefulSets; all pools share the headless service, the main service, the configuration, and the credentials.
+Appliquez ensuite la configuration avec `helm upgrade`. Chaque entrée peut définir `replicaCount` (`>= 2`) et/ou un bloc `storageclass` ; les champs omis héritent des valeurs de premier niveau. Lorsque le `drivesPerNode` de premier niveau est défini explicitement, ce nombre de disques s’applique à chaque pool ; lorsque `drivesPerNode` n’est pas défini (`null`), le chart déduit le nombre de disques de chaque pool à partir du `replicaCount` de ce pool (`4` disques par pod lorsque `replicaCount` vaut `4`, ou `1` disque par pod sinon). Les pools supplémentaires sont générés comme des StatefulSets `<fullname>-pool<N>` ; tous les pools partagent le service headless, le service principal, la configuration et les identifiants.
 
-:::warning[Pools are append-only]
+:::warning[Les pools ne s’ajoutent qu’en fin de liste]
 
-The list index determines the StatefulSet name — never remove or reorder entries. Retire a pool with `rc admin decommission` before removing it from the list.
+L’index de la liste détermine le nom du StatefulSet — ne supprimez ni ne réordonnez jamais les entrées. Mettez un pool hors service avec `rc admin decommission` avant de le retirer de la liste.
 
 :::
 
-What to expect during the rollout, per the chart's documentation:
+À quoi vous attendre pendant le déploiement, d’après la documentation du chart :
 
-- **Crash/restart cycles are normal.** Pods restart until every pod of every pool is resolvable — the server refuses to start with unresolvable peers, so expect a few crash loops before the cluster converges. This is harmless.
-- **Rebalance afterwards.** After the cluster converges, run `rc admin rebalance start <alias>` to spread existing objects across the new pool.
-- The PodDisruptionBudget spans all pools: with the default `pdb.maxUnavailable: 1`, at most one pod of the whole cluster may be evicted at a time.
+- **Prévoyez des redémarrages.** Les pods redémarrent jusqu’à ce que chaque pod de chaque pool soit résolvable — le serveur refuse de démarrer tant que des pairs ne sont pas résolvables. Attendez-vous donc à quelques boucles de plantage avant la convergence du cluster. Ce comportement est sans gravité.
+- **Rééquilibrez ensuite.** Une fois le cluster convergé, exécutez `rc admin rebalance start <alias>` pour répartir les objets existants sur le nouveau pool.
+- Le PodDisruptionBudget couvre tous les pools : avec la valeur par défaut `pdb.maxUnavailable: 1`, au plus un pod de l’ensemble du cluster peut être évincé à la fois.
 
 :::note
 
-`rc` is the RustFS command-line client. Use `rc admin pool list`, `expand`, `rebalance`, and `decommission` for the server-pool workflows described by the chart.
+`rc` est le client en ligne de commande de RustFS. Utilisez `rc admin pool list`, `expand`, `rebalance` et `decommission` pour les procédures de pools de serveurs décrites par le chart.
 
 :::
 
-## 8. Uninstall
+## 8. Désinstaller
 
 ```bash
 helm uninstall rustfs -n rustfs
@@ -190,12 +190,12 @@ helm uninstall rustfs -n rustfs
 
 :::note
 
-Helm does not delete PVCs created by StatefulSet volume claim templates. If you intend to discard the data, remove the PVCs explicitly (`kubectl -n rustfs delete pvc -l app.kubernetes.io/name=rustfs`) — otherwise a later reinstall with the same release name reattaches them.
+Helm ne supprime pas les PVC créés par les modèles de revendication de volume d’un StatefulSet. Si vous souhaitez supprimer les données, retirez explicitement les PVC (`kubectl -n rustfs delete pvc -l app.kubernetes.io/name=rustfs`) — sinon, une réinstallation ultérieure avec le même nom de release les rattache de nouveau.
 
 :::
 
-## Next steps
+## Étapes suivantes
 
-- [Pool Expansion](../../operations/scaling/storage-pool-expansion.md) — how Server Pool expansion works at the cluster level
-- [Kubernetes Upgrade](../../operations/upgrade/kubernetes/index.md) — upgrade Helm- and Operator-managed deployments
-- [TLS configuration](../../integration/tls-configured.md) — end-to-end TLS options
+- [Extension de pool](../../operations/scaling/storage-pool-expansion.md) — fonctionnement de l’extension d’un pool de serveurs au niveau du cluster
+- [Mise à niveau Kubernetes](../../operations/upgrade/kubernetes/index.md) — mettre à niveau les déploiements gérés par Helm et par l’Operator
+- [Configuration TLS](../../integration/tls-configured.md) — options TLS de bout en bout

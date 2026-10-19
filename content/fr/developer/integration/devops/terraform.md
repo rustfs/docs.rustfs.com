@@ -1,31 +1,31 @@
 ---
 title: "Terraform"
-description: "Store Terraform state in RustFS object storage with the S3 backend, including state locking."
+description: "Stockez l’état Terraform dans le stockage objet RustFS avec le backend S3, y compris le verrouillage de l’état."
 ---
 
-This guide connects [Terraform](https://github.com/hashicorp/terraform) — the infrastructure as code tool from HashiCorp — to **RustFS** through the S3 backend: the state file, and the lock file that prevents concurrent runs, are stored as objects in RustFS. You will initialize the backend, apply a small configuration, and verify the state object in RustFS. The workflow was verified with `terraform 1.12.2` and `rustfs/rustfs-x86-musl:v2.3.1`.
+Ce guide connecte [Terraform](https://github.com/hashicorp/terraform) — l’outil d’infrastructure en tant que code de HashiCorp — à **RustFS** via le backend S3 : le fichier d’état, et le fichier de verrou qui empêche les exécutions concurrentes, sont stockés comme objets dans RustFS. Vous allez initialiser le backend, appliquer une petite configuration, puis vérifier l’objet d’état dans RustFS. Le flux a été validé avec `terraform 1.12.2` et `rustfs/rustfs-x86-musl:v2.3.1`.
 
-You need a RustFS deployment reachable from your workstation (see the guides under [Installation](/installation)) and Terraform 1.10 or later, which supports S3-native locking via `use_lockfile`.
+Vous avez besoin d’un déploiement RustFS joignable depuis votre poste de travail (voir les guides sous [Installation](/fr/installation)) et de Terraform 1.10 ou ultérieur, qui prend en charge le verrouillage natif S3 via `use_lockfile`.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
 	Client["terraform init / apply"] -->|"state + lock objects"| RustFS["RustFS :9000"]
 ```
 
-The S3 backend stores the state file under the `key` prefix in the bucket. With `use_lockfile = true`, Terraform writes a `<key>.tflock` object while a run holds the lock, replacing the former DynamoDB-based locking for this setup.
+Le backend S3 stocke le fichier d’état sous le préfixe `key` dans le compartiment (bucket). Avec `use_lockfile = true`, Terraform écrit un objet `<key>.tflock` tant qu’une exécution détient le verrou, ce qui remplace, pour cette configuration, l’ancien verrouillage fondé sur DynamoDB.
 
-## 1. Create the project files
+## 1. Créer les fichiers du projet
 
-Create a working directory:
+Créez un répertoire de travail :
 
 ```bash
 mkdir rustfs-terraform
 cd rustfs-terraform
 ```
 
-Create the configuration. Replace the credential placeholders and point the endpoint at your RustFS server — `localhost:9000` when Terraform runs on the same host:
+Créez la configuration. Remplacez les valeurs d’identifiants indicatives et faites pointer le point de terminaison vers votre serveur RustFS — `localhost:9000` lorsque Terraform s’exécute sur le même hôte :
 
 ```hcl title="main.tf"
 terraform {
@@ -54,11 +54,11 @@ resource "local_file" "demo" {
 }
 ```
 
-`force_path_style` and `insecure` select path-style addressing over plain HTTP, which is what RustFS expects for the local endpoint. `use_lockfile` enables S3-native state locking so concurrent runs cannot corrupt the state.
+`force_path_style` et `insecure` sélectionnent l’adressage de type chemin (path-style) en HTTP non chiffré, ce qu’attend RustFS pour le point de terminaison local. `use_lockfile` active le verrouillage d’état natif S3, afin que des exécutions concurrentes ne puissent pas corrompre l’état.
 
-## 2. Initialize the backend
+## 2. Initialiser le backend
 
-Download the provider and configure the S3 backend:
+Téléchargez le fournisseur et configurez le backend S3 :
 
 ```bash
 terraform init -input=false
@@ -69,9 +69,9 @@ Successfully configured the backend "s3"! Terraform will automatically
 use this backend unless the backend configuration changes.
 ```
 
-## 3. Apply the configuration
+## 3. Appliquer la configuration
 
-Create the resource and write the state to RustFS:
+Créez la ressource et écrivez l’état dans RustFS :
 
 ```bash
 terraform apply -auto-approve -input=false
@@ -81,9 +81,9 @@ terraform apply -auto-approve -input=false
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 ```
 
-## 4. Verify the state in RustFS
+## 4. Vérifier l’état dans RustFS
 
-List the state objects through the `rc` CLI:
+Listez les objets d’état via la CLI `rc` :
 
 ```bash
 docker run --rm --network <rustfs-network> -v "$PWD:/m" \
@@ -95,13 +95,13 @@ docker run --rm --network <rustfs-network> -v "$PWD:/m" \
 [2026-09-21 03:05:03]   1.62 KiB rustfs-demo/terraform.tfstate
 ```
 
-You can also browse the prefix in the RustFS Console:
+Vous pouvez également parcourir le préfixe dans la Console RustFS :
 
-![The Terraform state file stored in the RustFS Console](./images/rustfs-terraform-state.png)
+![Le fichier d’état Terraform stocké dans la Console RustFS](./images/rustfs-terraform-state.png)
 
-## 5. Confirm the state is reloaded from RustFS
+## 5. Confirmer que l’état est rechargé depuis RustFS
 
-Run a plan — Terraform reads the state from RustFS and compares it against the configuration:
+Exécutez un plan — Terraform lit l’état depuis RustFS et le compare à la configuration :
 
 ```bash
 terraform plan -input=false
@@ -111,34 +111,34 @@ terraform plan -input=false
 No changes. Your infrastructure matches the configuration.
 ```
 
-The plan is clean because the state was read back from RustFS, not from any local file.
+Le plan ne contient aucune modification, car l’état a été relu depuis RustFS, et non depuis un fichier local.
 
-## 6. Destroy and reset
+## 6. Détruire et réinitialiser
 
-Tear the resource down; the state update is written to RustFS the same way:
+Détruisez la ressource ; la mise à jour de l’état est écrite dans RustFS de la même manière :
 
 ```bash
 terraform destroy -auto-approve -input=false
 ```
 
-Delete the state objects in the RustFS Console (or with `rc rm`) to start from scratch.
+Supprimez les objets d’état dans la Console RustFS (ou avec `rc rm`) pour repartir de zéro.
 
-## Troubleshooting
+## Dépannage
 
-### "dial tcp: lookup rustfs ... server misbehaving" or connection failures
+### « dial tcp: lookup rustfs ... server misbehaving » ou échecs de connexion
 
-The `endpoint` must be reachable from the machine where Terraform runs. Inside a Compose network use `http://rustfs:9000`; from the host use `http://localhost:9000`.
+`endpoint` doit être joignable depuis la machine où s’exécute Terraform. À l’intérieur d’un réseau Compose, utilisez `http://rustfs:9000` ; depuis l’hôte, `http://localhost:9000`.
 
-### "Bucket cannot have ACLs set" or signature errors
+### « Bucket cannot have ACLs set » ou erreurs de signature
 
-`skip_credentials_validation`, `skip_region_validation`, `skip_metadata_api_check`, `skip_requesting_account_id`, `force_path_style`, and `insecure` are all required for a non-AWS endpoint; missing any of them makes the backend talk to AWS defaults instead of RustFS.
+`skip_credentials_validation`, `skip_region_validation`, `skip_metadata_api_check`, `skip_requesting_account_id`, `force_path_style` et `insecure` sont tous requis pour un point de terminaison non AWS ; s’il en manque un, le backend s’adresse aux valeurs par défaut d’AWS au lieu de RustFS.
 
-### The state does not appear in the bucket
+### L’état n’apparaît pas dans le compartiment
 
-Confirm that the bucket exists and that the credentials match the RustFS credentials. The state object appears under the `key` path (`rustfs-demo/terraform.tfstate` in this guide) after the first `init` or `apply`.
+Vérifiez que le compartiment existe et que les identifiants correspondent aux identifiants RustFS. L’objet d’état apparaît sous le chemin `key` (`rustfs-demo/terraform.tfstate` dans ce guide) après le premier `init` ou `apply`.
 
-## Next steps
+## Étapes suivantes
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional S3 operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Terraform S3 backend documentation](https://developer.hashicorp.com/terraform/language/backend/s3) for options such as workspace prefixes and role assumption.
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres opérations S3.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
+- Suivez la [documentation du backend S3 de Terraform](https://developer.hashicorp.com/terraform/language/backend/s3) pour des options telles que les préfixes d’espace de travail et l’emprunt d’un rôle (assume role).

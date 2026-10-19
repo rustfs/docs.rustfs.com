@@ -1,13 +1,13 @@
 ---
 title: "tusd"
-description: "Receive resumable uploads into RustFS with the tusd server's S3 backend."
+description: "Recevez des chargements reprisables dans RustFS avec le backend S3 du serveur tusd."
 ---
 
-This guide connects [tusd](https://github.com/tus/tusd) — the official reference implementation of the tus resumable-upload protocol — to **RustFS** as its S3 storage backend. You will run tusd against a RustFS bucket, create an upload with the tus protocol, send the file in two chunks with an interruption in between, resume from the reported offset, and verify the assembled object in the bucket. The workflow was verified with `tusproject/tusd:v2.10.1` against `rustfs/rustfs-x86-musl:v2.3.1`.
+Ce guide connecte [tusd](https://github.com/tus/tusd) — l’implémentation de référence officielle du protocole de chargement reprisable tus — à **RustFS** comme backend de stockage S3. Vous allez exécuter tusd face à un compartiment (bucket) RustFS, créer un chargement (upload) avec le protocole tus, envoyer le fichier en deux fragments avec une interruption entre les deux, reprendre à partir de l’offset indiqué, puis vérifier l’objet assemblé dans le compartiment. Le flux a été validé avec `tusproject/tusd:v2.10.1` et `rustfs/rustfs-x86-musl:v2.3.1`.
 
-You need Docker, or a local tusd binary. This deployment is intended for local integration testing, not production.
+Vous avez besoin de Docker, ou d’un binaire tusd local. Ce déploiement est destiné aux tests d’intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -15,11 +15,11 @@ flowchart LR
 	tusd -->|"multipart upload"| RustFS["RustFS :9000"]
 ```
 
-tusd stores each in-progress upload as S3 multipart parts in the bucket. A client that loses its connection asks the server for the last committed offset with `HEAD` and continues from there — the data already received is never sent twice.
+tusd stocke chaque chargement en cours sous forme de parties de chargement partitionné S3 dans le compartiment. Un client qui perd sa connexion demande au serveur le dernier offset confirmé avec `HEAD`, puis reprend à partir de là — les données déjà reçues ne sont jamais envoyées deux fois.
 
-## 1. Run tusd
+## 1. Exécuter tusd
 
-Create the bucket and start tusd with the S3 backend, replacing all connection placeholders. The AWS region must be set even though RustFS ignores it:
+Créez le compartiment et démarrez tusd avec le backend S3, en remplaçant toutes les valeurs indicatives de connexion. La région AWS doit être définie, même si RustFS l’ignore :
 
 ```bash
 rc mb rustfs/tus-uploads
@@ -33,7 +33,7 @@ docker run -d --name tusd --network oo-rustfs_default -p 8080:8080 \
   -s3-endpoint http://<your-rustfs-endpoint>:9000
 ```
 
-Check that the server is healthy:
+Vérifiez que le serveur répond correctement :
 
 ```bash
 curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8080/health
@@ -43,9 +43,9 @@ curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8080/health
 200
 ```
 
-## 2. Create the upload
+## 2. Créer le chargement
 
-Create a 6 MiB upload and read the `Location` header:
+Créez un chargement de 6 MiB et lisez l’en-tête `Location` :
 
 ```bash
 curl -s -D - -o /dev/null -X POST http://localhost:8080/files/ \
@@ -57,11 +57,11 @@ curl -s -D - -o /dev/null -X POST http://localhost:8080/files/ \
 Location: http://localhost:8080/files/b7338250daa9...+NGVmNDRhZjEt...
 ```
 
-The upload URL contains the file ID and a message-authentication tag. Strip the scheme and host before re-sending it (the server echoes whatever `Host` it received, which may not be reachable from your next client).
+L’URL de chargement contient l’identifiant de fichier et une étiquette d’authentification de message. Supprimez le schéma et l’hôte avant de la renvoyer (le serveur renvoie tel quel l’en-tête `Host` qu’il a reçu, qui peut ne pas être joignable depuis le client suivant).
 
-## 3. Upload in chunks with an interruption
+## 3. Charger par fragments, avec une interruption
 
-Send the first 2.5 MB, then stop — this is the point where a mobile client would lose its connection:
+Envoyez les premiers 2,5 MB, puis arrêtez — c’est à ce moment qu’un client mobile perdrait sa connexion :
 
 ```bash
 head -c 2500000 demo.bin > part1.bin
@@ -76,7 +76,7 @@ curl -s -o /dev/null -w "%{http_code}\n" -X PATCH "http://localhost:8080${LOC}" 
 204
 ```
 
-Ask the server how much it actually has — this is the resumable-upload core:
+Demandez au serveur la quantité réellement reçue — c’est le cœur du chargement reprisable :
 
 ```bash
 curl -s -X HEAD "http://localhost:8080${LOC}" \
@@ -87,9 +87,9 @@ curl -s -X HEAD "http://localhost:8080${LOC}" \
 Upload-Offset: 2500000
 ```
 
-## 4. Resume and finish
+## 4. Reprendre et terminer
 
-Continue from offset 2500000 with the remaining bytes:
+Reprenez à partir de l’offset 2500000 avec les octets restants :
 
 ```bash
 tail -c 3791456 demo.bin > part2.bin
@@ -104,7 +104,7 @@ curl -s -o /dev/null -w "%{http_code}\n" -X PATCH "http://localhost:8080${LOC}" 
 204
 ```
 
-Download the finished upload through tusd and compare checksums with the source:
+Téléchargez le chargement terminé via tusd et comparez les sommes de contrôle avec la source :
 
 ```bash
 curl -s -o download.bin "http://localhost:8080${LOC}"
@@ -116,55 +116,55 @@ d9016032ced6c7515b67a0c556e006c4b25a5858  demo.bin
 d9016032ced6c7515b67a0c556e006c4b25a5858  download.bin
 ```
 
-## 5. Verify objects in RustFS
+## 5. Vérifier les objets dans RustFS
 
-List the bucket:
+Listez le compartiment :
 
 ```bash
 rc ls rustfs/tus-uploads/ -r
 ```
 
-The bucket holds the assembled object plus one `.info` metadata file per upload — both live and finished:
+Le compartiment contient l’objet assemblé et un fichier de métadonnées `.info` par chargement — qu’il soit en cours ou terminé :
 
 ```text
 b7338250daa9a1a79c1343502b57b28f       6 MiB
 b7338250daa9a1a79c1343502b57b28f.info  378 B
 ```
 
-The object key is the upload ID, and the object body is the uploaded file byte-for-byte — so any S3 client can read completed uploads directly from the bucket.
+La clé d’objet est l’identifiant de chargement, et le corps de l’objet est le fichier chargé octet pour octet. N’importe quel client S3 peut donc lire les chargements terminés directement depuis le compartiment.
 
-![tus uploads stored in the RustFS Console](./images/rustfs-tus-uploads.png)
+![Chargements tus stockés dans la Console RustFS](./images/rustfs-tus-uploads.png)
 
-## 6. Stop or reset
+## 6. Arrêter ou réinitialiser
 
-To tear down the server while keeping the bucket objects:
+Pour arrêter le serveur tout en conservant les objets du compartiment :
 
 ```bash
 docker rm -f tusd
 ```
 
-To delete the stored uploads:
+Pour supprimer les chargements stockés :
 
 ```bash
 rc rm rustfs/tus-uploads/ --recursive --force
 ```
 
-## Troubleshooting
+## Dépannage
 
 ### `CreateMultipartUpload ... A region must be set when sending requests to S3`
 
-tusd builds its S3 client from the AWS environment, and the region is mandatory for endpoint resolution. Export `AWS_REGION=us-east-1` next to the credentials, as in step 1.
+tusd construit son client S3 à partir de l’environnement AWS, et la région est obligatoire pour la résolution du point de terminaison. Exportez `AWS_REGION=us-east-1` à côté des identifiants, comme à l’étape 1.
 
-### `PATCH` returns `404` or connects to the wrong host
+### `PATCH` renvoie `404` ou se connecte au mauvais hôte
 
-The `Location` URL echoes the `Host` header of the creation request. When your client and the server use different hostnames (container name versus published port), strip the scheme and host from the URL and send the path to the address the client can reach.
+L’URL `Location` renvoie l’en-tête `Host` de la requête de création. Lorsque votre client et le serveur utilisent des noms d’hôte différents (nom du conteneur et port publié), supprimez le schéma et l’hôte de l’URL et envoyez le chemin vers l’adresse que le client peut joindre.
 
-### Upload disappears after server restart
+### Le chargement disparaît après un redémarrage du serveur
 
-The S3 backend keeps `.info` files in the bucket, so uploads survive restarts. If you run tusd against an empty bucket that another process prunes, the metadata is lost — protect the `tus-uploads` prefix from cleanup jobs.
+Le backend S3 conserve les fichiers `.info` dans le compartiment, les chargements survivent donc aux redémarrages. Si vous exécutez tusd sur un compartiment vide qu’un autre processus purge, les métadonnées sont perdues — protégez le préfixe `tus-uploads` des tâches de nettoyage.
 
-## Next steps
+## Étapes suivantes
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional tusd backends.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [tus protocol documentation](https://tus.io/protocols/resumable-upload) for creation-with-upload, termination, and checksum extensions that tusd supports on top of the core protocol.
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres backends tusd.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
+- Suivez la [documentation du protocole tus](https://tus.io/protocols/resumable-upload) pour la création avec chargement, la terminaison et les extensions de somme de contrôle que tusd prend en charge en plus du protocole de base.

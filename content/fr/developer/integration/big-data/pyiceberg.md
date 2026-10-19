@@ -7,7 +7,7 @@ Utilisez **PyIceberg** pour créer un espace de noms et une table dans le catalo
 
 ## Prérequis
 
-- Terminez la [configuration de S3 Tables](/administration/data/s3-tables) : créez et activez `my-bucket` et respectez les exigences relatives au compte et à TLS.
+- Terminez la [configuration de S3 Tables](/fr/administration/data/s3-tables) : créez et activez `my-bucket` et respectez les exigences relatives au compte et à TLS.
 - Conservez les variables `RUSTFS_ENDPOINT`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` et `AWS_DEFAULT_REGION` définies dans ce guide.
 
 ## 1. Installer le client
@@ -90,7 +90,7 @@ catalog = RustFSRestCatalog(
 
 L’adaptateur redéfinit le hook `_init_sigv4` de PyIceberg afin que la découverte soit signée avant la fin du constructeur du catalogue. Conservez la version PyIceberg fixée pour ce module et réexécutez tout le tutoriel avant d’en changer.
 
-:: :
+:::
 
 ## 3. Créer et lire une table
 
@@ -159,9 +159,9 @@ Le résultat devrait contenir `("analytics", "events")`.
 
 :::note[Suppression des entrées du catalogue uniquement]
 
-Les commandes suivantes retirent l’entrée de table de ce tutoriel et son espace de noms devenu vide. Le compartiment et les objets sous-jacents sont conservés. Planifiez tout nettoyage de données avant de continuer : après `drop_table`, la maintenance ne peut plus trouver la table. Consultez la [maintenance et la protection des données](/administration/data/s3-tables).
+Les commandes suivantes retirent l’entrée de table de ce tutoriel et son espace de noms devenu vide. Le compartiment et les objets sous-jacents sont conservés. Planifiez tout nettoyage de données avant de continuer : après `drop_table`, la maintenance ne peut plus trouver la table. Consultez la [maintenance et la protection des données](/fr/administration/data/s3-tables).
 
-:: :
+:::
 
 ```bash
 python - <<'PY'
@@ -175,4 +175,4 @@ PY
 ## Étapes suivantes
 
 - Suivez la [documentation de l’API PyIceberg](https://py.iceberg.apache.org/api/) pour les opérations client, en vérifiant chacune par rapport au périmètre pris en charge par RustFS.
-- Utilisez l’[intégration avec un catalogue Iceberg externe](/developer/integration/big-data/iceberg) si vous gérez un service de catalogue séparé.
+- Utilisez l’[intégration avec un catalogue Iceberg externe](/fr/developer/integration/big-data/iceberg) si vous gérez un service de catalogue séparé.

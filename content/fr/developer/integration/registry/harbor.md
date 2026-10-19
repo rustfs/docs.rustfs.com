@@ -274,6 +274,6 @@ Le pilote écrit sous `docker/registry/v2/` dans le compartiment. Listez tout le
 
 ## Étapes suivantes
 
-- Consultez les [notes de compatibilité S3](/administration/protocols/s3) avant d’adopter d’autres opérations S3.
-- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/security-compliance/iam/access-token).
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres opérations S3.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
 - Suivez la [documentation Harbor](https://goharbor.io/docs/) pour configurer un déploiement Harbor complet avec réplication, scan de vulnérabilités et RBAC.

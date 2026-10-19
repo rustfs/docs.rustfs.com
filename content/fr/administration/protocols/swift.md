@@ -9,7 +9,7 @@ RustFS peut exposer une API compatible avec OpenStack Swift sur le même point d
 
 La prise en charge de Swift est facultative et ne couvre pas tous les comportements d’OpenStack Swift. Les requêtes `HEAD` au niveau du compte et les formats de liste autres que JSON ne sont pas implémentés. Validez le fonctionnement de votre client avant d’utiliser cette API en production.
 
-:: :
+:::
 
 ## Correspondance entre Swift et RustFS
 

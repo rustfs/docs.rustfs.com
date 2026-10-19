@@ -1,43 +1,43 @@
 ---
-title: "Other SDKs"
-description: "This article mainly explains the usage of various other language SDKs in RustFS."
+title: "Autres SDK"
+description: "Découvrez comment vous connecter à RustFS depuis un langage sans SDK AWS officiel."
 ---
 
-If AWS S3 doesn't officially support your language, you can adopt the following strategies to integrate with RustFS:
+Si AWS ne fournit pas de SDK officiel pour votre langage, vous pouvez utiliser l’une des approches suivantes pour intégrer RustFS :
 
-## 1. Use HTTP Interface Direct Requests (Based on S3 API Protocol)
+## 1. Envoyez des requêtes HTTP directement à l’API S3
 
-The S3 protocol is a standard RESTful API. You can encapsulate access logic yourself using any language that supports HTTP requests (such as C, Rust, Lua, Erlang).
+Le protocole S3 est une API REST standard. Vous pouvez implémenter vous-même la logique du client dans tout langage capable d’envoyer des requêtes HTTP (comme C, Rust, Lua ou Erlang).
 
-### Key points include:
+### Étapes clés
 
-* **Signature Algorithm**: Implement AWS Signature Version 4 signature (more complex)
-* **Construct correct Headers and Canonical Request**
-* **Use HTTPS/HTTP client to send requests**
+* **Signature des requêtes** : implémentez AWS Signature Version 4 (la partie la plus complexe).
+* **En-têtes et requête canonique** : construisez la requête canonique et les en-têtes requis.
+* **Client HTTP** : envoyez la requête signée avec un client HTTP ou HTTPS.
 
-👉 Recommended to reference open-source project signature implementations, for example:
+Nous recommandons de consulter les implémentations open source existantes de la signature des requêtes, par exemple :
 
 * [https://docs.aws.amazon.com/general/latest/gr/sigv4-signed-request-examples.html](https://docs.aws.amazon.com/general/latest/gr/sigv4-signed-request-examples.html)
 
 ---
 
-## 2. Call CLI Tools or Middleware Services of Existing SDKs
+## 2. Utilisez l’AWS CLI ou un service construit sur un SDK existant
 
-If you don't want to implement signatures yourself, you can:
+Si vous ne souhaitez pas implémenter les signatures vous-même, vous pouvez :
 
-### 2.1. Use AWS CLI tools with existing language support:
+### 2.1. Appelez l’AWS CLI
 
-For example, call through Shell:
+Par exemple, exécutez la commande suivante depuis votre application, à l’aide d’un shell :
 
 ```bash
 aws s3 cp local.txt s3://mybucket/myfile.txt --endpoint-url http://rustfs.local:9000
 ```
 
-Or write a simple relay service using Node.js/Python SDK, and your language uploads/downloads by calling this service.
+Vous pouvez aussi construire un petit service relais avec un SDK Node.js ou Python, puis l’appeler depuis votre application pour charger (upload) ou télécharger des objets.
 
-### 2.2. Set up a Proxy (such as Flask, FastAPI, Express)
+### 2.2. Exécutez un service proxy (par exemple Flask, FastAPI ou Express)
 
-Let clients that don't support S3 call your encapsulated HTTP API:
+Exposez une API HTTP que les clients sans prise en charge de S3 peuvent appeler :
 
 ```http
 POST /upload -> Service internally calls SDK to upload objects to RustFS
@@ -46,33 +46,33 @@ GET /presigned-url -> Generate presigned URL for frontend/client use
 
 ---
 
-## 3. Find Third-Party Community SDKs
+## 3. Recherchez des SDK communautaires tiers
 
-Although AWS doesn't have official SDKs, some language communities have developed unofficial S3 clients. For example:
+Pour les langages sans SDK AWS officiel, recherchez des clients S3 maintenus par la communauté. Par exemple :
 
-* Haskell: `amazonka-s3`
-* Rust: `rusoto` (deprecated) or `aws-sdk-rust`
-* OCaml: May implement through `cohttp` yourself
-* Delphi: Has commercial libraries supporting S3 protocol
+* Haskell : `amazonka-s3`
+* Rust : `rusoto` (obsolète) ou `aws-sdk-rust`
+* OCaml : construisez votre propre client au-dessus de `cohttp`
+* Delphi : des bibliothèques commerciales avec prise en charge de S3 sont disponibles
 
-Community SDKs vary greatly in stability, so you should evaluate activity, documentation, and compatibility before use.
-
----
-
-## 4. Delegate Core Upload Logic to Platform Hosting
-
-For example:
-
-* Delegate frontend (Web/Mobile) upload tasks to browser or App side execution (using presigned URLs)
-* Backend uses Node.js/Python/Go and other proxies to implement upload logic
+Les SDK communautaires varient fortement en stabilité. Vous devriez donc évaluer l’activité, la documentation et la compatibilité avant de les utiliser.
 
 ---
 
-## Summary Recommendations
+## 4. Chargez directement depuis les clients avec des URL présignées
 
-| Scenario | Recommended Solution |
+Par exemple :
+
+* Utilisez des URL présignées pour charger directement depuis un navigateur ou une application mobile.
+* Implémentez la logique de chargement dans un service côté serveur (par exemple Node.js, Python ou Go)
+
+---
+
+## Choisissez une approche
+
+| Situation | Approche recommandée |
 | ------------- | ---------------------------------- |
-| Need complete control/embedded environment | Implement Signature V4 self-signing |
-| Weak language support but has Shell | Call upload through AWS CLI |
-| Can deploy relay service | Use Python/Node to build S3 API gateway |
-| Frontend upload | Use presigned URLs |
+| Vous avez besoin d’un contrôle total, ou vous visez un environnement embarqué | Implémentez vous-même la signature SigV4 |
+| Prise en charge limitée des SDK, mais un shell est disponible | Chargez avec l’AWS CLI |
+| Vous pouvez déployer un service relais | Construisez une petite passerelle S3 avec Python ou Node.js |
+| Chargement côté client | Utilisez des URL présignées |

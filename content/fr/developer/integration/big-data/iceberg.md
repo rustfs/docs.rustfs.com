@@ -5,7 +5,7 @@ description: "Exécutez Apache Iceberg avec Spark, un catalogue REST et le stock
 
 Ce guide exécute **Apache Iceberg** avec Spark, un catalogue REST Iceberg et **RustFS** comme entrepôt compatible avec S3. Vous allez créer une table Iceberg, écrire des lignes, les interroger et vérifier que les fichiers de la table sont stockés dans RustFS.
 
-Pour utiliser le catalogue REST intégré à RustFS, suivez la [configuration de S3 Tables](/administration/data/s3-tables) et le [guide PyIceberg](/developer/integration/big-data/pyiceberg). Le déploiement ci-dessous exécute un service de catalogue distinct.
+Pour utiliser le catalogue REST intégré à RustFS, suivez la [configuration de S3 Tables](/fr/administration/data/s3-tables) et le [guide PyIceberg](/fr/developer/integration/big-data/pyiceberg). Le déploiement ci-dessous exécute un service de catalogue distinct.
 
 Vous avez besoin de Docker avec le plugin Compose et de ressources locales suffisantes pour quatre conteneurs. Ce déploiement est destiné à un test d’intégration local, pas à la production.
 
@@ -13,7 +13,7 @@ Vous avez besoin de Docker avec le plugin Compose et de ressources locales suffi
 
 La [demande d’intégration n° 14928](https://github.com/apache/iceberg/pull/14928) d’Apache Iceberg a démontré le même flux Spark, catalogue REST, `S3FileIO` et RustFS, y compris la création de table et les écritures. Cette demande a été fermée sans être fusionnée, et le [guide de démarrage Spark](https://iceberg.apache.org/spark-quickstart/#docker-compose) actuel utilise encore un autre stockage compatible avec S3. La configuration ci-dessous documente donc une intégration RustFS, et non un réglage par défaut d’Apache Iceberg.
 
-:: :
+:::
 
 ## Schéma d’architecture
 
@@ -154,7 +154,7 @@ L’[image `rc`](https://github.com/rustfs/cli) fournit le client en ligne de co
 
 Les images du guide de démarrage Apache Iceberg sont publiées sans étiquettes de version stables dans l’exemple en amont. Avant d’utiliser ce modèle au-delà d’un test local, épinglez chaque image sur une étiquette ou une empreinte testée, et validez ensemble les versions de Spark, du moteur Iceberg et du catalogue REST.
 
-:: :
+:::
 
 ## 2. Valider et démarrer le déploiement
 
@@ -270,6 +270,6 @@ La propriété du catalogue REST utilise des doubles traits de soulignement dans
 
 ## Étapes suivantes
 
-- Consultez les [notes de compatibilité S3](/administration/protocols/s3) avant d’adopter d’autres opérations Iceberg.
-- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/security-compliance/iam/access-token).
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres opérations Iceberg.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
 - Suivez la [documentation Spark d’Apache Iceberg](https://iceberg.apache.org/docs/latest/spark-getting-started/) pour configurer votre environnement Spark existant.

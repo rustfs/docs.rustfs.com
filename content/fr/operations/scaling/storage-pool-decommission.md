@@ -1,119 +1,119 @@
 ---
-title: "Pool Decommission"
-description: "Drain and retire a RustFS storage pool through the Console or rc, then verify that its data was relocated."
+title: "Mise hors service d’un pool"
+description: "Videz un pool de stockage RustFS et mettez-le hors service depuis la Console ou avec rc, puis vérifiez que ses données ont été déplacées."
 ---
 
-## Overview
+## Vue d’ensemble
 
-### Requirements
+### Prérequis
 
-- Install [`rc`](/operations/rc) on the administration host before using the `rc` workflow in this guide.
-- Configure credentials with decommission administration permission.
+- Installez [`rc`](/fr/operations/rc) sur l’hôte d’administration avant d’utiliser le flux `rc` de ce guide.
+- Configurez des identifiants disposant de l’autorisation d’administration de la mise hors service.
 
-**Pool decommission** moves objects from a selected pool to the remaining active pools so the target pool can be removed from the deployment. Use it when retiring hardware, replacing a pool, or consolidating capacity.
+La **mise hors service d’un pool** déplace les objets d’un pool sélectionné vers les pools actifs restants, afin de pouvoir retirer le pool cible du déploiement. Utilisez-la pour mettre du matériel hors service, remplacer un pool ou consolider la capacité.
 
-Decommission is different from [Rebalancing](./data-rebalancing.md): rebalance keeps every pool active, while decommission drains and retires the selected pool. The two operations cannot run at the same time.
+La mise hors service diffère du [rééquilibrage](./data-rebalancing.md) : le rééquilibrage conserve chaque pool actif, tandis que la mise hors service vide le pool sélectionné, puis le retire du déploiement. Les deux opérations ne peuvent pas s’exécuter en même temps.
 
-Before starting:
+Avant de commencer :
 
-- Keep at least one active pool after the operation.
-- Verify that the remaining pools have enough free capacity. RustFS requires their free space to cover the used bytes being drained plus a 30% overhead.
-- Confirm that every node and disk is healthy and no rebalance is running.
-- Back up critical data and schedule the operation during a lower-traffic period.
-- Record the exact pool ID and volume expression before selecting the target.
+- Conservez au moins un pool actif après l’opération.
+- Vérifiez que les pools restants disposent d’assez de capacité libre. RustFS exige que leur espace libre couvre les octets utilisés en cours de vidage, plus une marge de 30 %.
+- Confirmez que chaque nœud et chaque disque est sain, et qu’aucun rééquilibrage n’est en cours.
+- Sauvegardez les données critiques et planifiez l’opération pendant une période de plus faible trafic.
+- Notez l’ID exact du pool et l’expression de volumes avant de sélectionner la cible.
 
-Canceling a decommission does not roll back completed moves. Objects already relocated remain in the destination pools.
+L’annulation d’une mise hors service n’annule pas les déplacements déjà effectués. Les objets déjà relocalisés restent dans les pools de destination.
 
-## Operation
+## Opération
 
-### Start decommissioning in the Console
+### Démarrer la mise hors service dans la Console
 
-1. Sign in to the RustFS Console with an account that has decommission administration permission.
-2. Open **Pool Decommission**.
-3. Locate the pool to retire and verify its ID, volume expression, used capacity, and status.
+1. Connectez-vous à la Console RustFS avec un compte disposant de l’autorisation d’administration de la mise hors service.
+2. Ouvrez **Pool Decommission** (mise hors service du pool).
+3. Repérez le pool à mettre hors service et vérifiez son ID, son expression de volumes, sa capacité utilisée et son statut.
 
-   ![RustFS Console showing the selected storage pool before decommissioning](./images/pool-decommission-selection-console.png)
+   ![Console RustFS affichant le pool de stockage sélectionné avant la mise hors service](./images/pool-decommission-selection-console.png)
 
-4. Select **Start Decommission** for that pool.
-5. Review the confirmation dialog carefully, then select **Start Decommission**.
+4. Sélectionnez **Start Decommission** (démarrer la mise hors service) pour ce pool.
+5. Examinez attentivement la boîte de dialogue de confirmation, puis sélectionnez **Start Decommission**.
 
-   ![RustFS Console showing the pool decommission confirmation dialog](./images/pool-decommission-confirmation-console.png)
+   ![Console RustFS affichant la boîte de dialogue de confirmation de la mise hors service du pool](./images/pool-decommission-confirmation-console.png)
 
-6. Use **Sync** to refresh the pool state and movement counters until the operation completes.
+6. Utilisez **Sync** (synchroniser) pour actualiser l’état du pool et les compteurs de déplacement jusqu’à la fin de l’opération.
 
-   ![RustFS Console showing pool decommission progress and movement counters](./images/pool-decommission-running-console.png)
+   ![Console RustFS affichant la progression de la mise hors service du pool et les compteurs de déplacement](./images/pool-decommission-running-console.png)
 
-After completion, remove the drained pool expression from `RUSTFS_VOLUMES` on every remaining node and restart RustFS with the same ordered topology. For Helm, decommission the pool before removing its entry from `pools.list`; never remove or reorder a live pool entry.
+Une fois l’opération terminée, retirez l’expression du pool vidé de `RUSTFS_VOLUMES` sur chaque nœud restant et redémarrez RustFS avec la même topologie ordonnée. Avec Helm, mettez le pool hors service avant de retirer son entrée de `pools.list` ; ne retirez ni ne réordonnez jamais une entrée de pool encore en service.
 
-![RustFS Console showing the selected pool with a completed decommission status](./images/pool-decommission-completed-console.png)
+![Console RustFS affichant le pool sélectionné avec un statut de mise hors service terminée](./images/pool-decommission-completed-console.png)
 
-### Start decommissioning with rc
+### Démarrer la mise hors service avec rc
 
-Configure the cluster alias if needed, then list the pools:
+Configurez l’alias du cluster si nécessaire, puis listez les pools :
 
 ```bash
 rc alias set rustfs http://<server-ip>:9000 <your-access-key> <your-secret-key>
 rc admin pool list rustfs
 ```
 
-Start decommissioning pool `0` by its zero-based ID:
+Démarrez la mise hors service du pool `0` à l’aide de son ID à base zéro :
 
 ```bash
 rc admin decommission start rustfs 0 --by-id
 ```
 
-You can instead pass the exact pool volume expression without `--by-id`:
+Vous pouvez aussi transmettre l’expression de volumes exacte du pool, sans `--by-id` :
 
 ```bash
 rc admin decommission start rustfs 'http://rustfs-node1:9000/data/rustfs{1...4}/mnmd'
 ```
 
-Monitor all pools or only the target pool:
+Surveillez tous les pools, ou seulement le pool cible :
 
 ```bash
 rc admin decommission status rustfs
 rc admin decommission status rustfs 0 --by-id
 ```
 
-To cancel a running operation, use:
+Pour annuler une opération en cours, utilisez :
 
 ```bash
 rc admin decommission cancel rustfs 0 --by-id
 ```
 
-If a decommission is failed or canceled, clear its metadata before retrying:
+Si une mise hors service a échoué ou a été annulée, effacez ses métadonnées avant de réessayer :
 
 ```bash
 rc admin decommission clear rustfs 0 --by-id
 ```
 
-After the target reports `complete`, remove its expression from `RUSTFS_VOLUMES` on every remaining node and restart RustFS with the reduced topology.
+Lorsque la cible indique `complete`, retirez son expression de `RUSTFS_VOLUMES` sur chaque nœud restant et redémarrez RustFS avec la topologie réduite.
 
-## Verification
+## Vérification
 
-### Verify decommissioning in the Console
+### Vérifier la mise hors service dans la Console
 
-Confirm that the target pool reports `Completed`, with zero failed objects and zero failed bytes. After removing the pool from the startup topology and restarting RustFS, verify that:
+Confirmez que le pool cible indique `Completed`, avec zéro objet en échec et zéro octet en échec. Après avoir retiré le pool de la topologie de démarrage et redémarré RustFS, vérifiez que :
 
-![RustFS Console showing only the remaining pool after the retired pool was removed](./images/pool-decommission-final-topology-console.png)
+![Console RustFS n’affichant que le pool restant après le retrait du pool mis hors service](./images/pool-decommission-final-topology-console.png)
 
-- The retired pool no longer appears as an active pool.
-- Every remaining node and disk is online.
-- Remaining pools show the relocated data and have adequate free capacity.
-- Existing objects can still be listed, read, and downloaded.
+- Le pool mis hors service n’apparaît plus comme pool actif.
+- Chaque nœud et chaque disque restant est en ligne.
+- Les pools restants affichent les données déplacées et disposent d’une capacité libre suffisante.
+- Les objets existants peuvent toujours être listés, lus et téléchargés.
 
-### Verify decommissioning with rc
+### Vérifier la mise hors service avec rc
 
-Before removing the pool from the topology, run:
+Avant de retirer le pool de la topologie, exécutez :
 
 ```bash
 rc admin decommission status rustfs 0 --by-id
 ```
 
-Confirm that the status is `complete` and the failed object and byte counters are zero. After updating `RUSTFS_VOLUMES` and restarting RustFS, run:
+Confirmez que le statut est `complete` et que les compteurs d’objets et d’octets en échec sont à zéro. Après avoir mis à jour `RUSTFS_VOLUMES` et redémarré RustFS, exécutez :
 
 ```bash
 rc admin pool list rustfs
 ```
 
-Verify that only the intended active pools remain. Read objects that previously resided on the retired pool and write a new test object through the S3 endpoint.
+Vérifiez que seuls les pools actifs prévus subsistent. Lisez des objets qui résidaient auparavant sur le pool mis hors service, puis écrivez un nouvel objet de test par le point de terminaison S3.

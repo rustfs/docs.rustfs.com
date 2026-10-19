@@ -1,19 +1,19 @@
 ---
 title: "boto3 (Python)"
-description: "Connect boto3 to RustFS and perform basic object operations from Python."
+description: "Connectez boto3 à RustFS et effectuez des opérations objet de base depuis Python."
 ---
 
-[boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) is the AWS SDK for Python and connects to RustFS through a custom endpoint.
+[boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) est le SDK AWS pour Python. Il se connecte à RustFS par un point de terminaison personnalisé.
 
-## Install
+## Installation
 
 ```bash
 pip install boto3
 ```
 
-## Configure
+## Configuration
 
-Point the client at your RustFS endpoint. Replace `http://localhost:9000` with your server address, and use your own [access keys](../../security-compliance/iam/access-token.md). RustFS requires path-style addressing, set via botocore `Config`:
+Pointez le client vers votre point de terminaison RustFS. Remplacez `http://localhost:9000` par l’adresse de votre serveur et utilisez vos propres [clés d’accès](../../security-compliance/iam/access-token.md). RustFS exige l’adressage de type chemin (path-style), défini via le `Config` de botocore :
 
 ```python
 import boto3
@@ -29,9 +29,9 @@ s3 = boto3.client(
 )
 ```
 
-## Verify
+## Vérification
 
-Create a bucket, upload a file, and list the bucket:
+Créez un compartiment (bucket), chargez (upload) un fichier et listez le compartiment :
 
 ```python
 s3.create_bucket(Bucket="my-bucket")
@@ -42,12 +42,12 @@ for obj in s3.list_objects_v2(Bucket="my-bucket").get("Contents", []):
     print(obj["Key"], obj["Size"])
 ```
 
-Expected output:
+Sortie attendue :
 
 ```text
 hello.txt 12
 ```
 
-## Next steps
+## Étapes suivantes
 
-See the [S3 SDK overview](../sdk/index.md) for more languages, or manage objects with [`rc`](/operations/rc). If you prefer a community-driven SDK with native async support and full typing, see [capo (Python)](../integration/others/capo.md).
+Consultez la [présentation des SDK S3](../sdk/index.md) pour d’autres langages, ou gérez les objets avec [`rc`](/fr/operations/rc). Si vous préférez un SDK communautaire avec une prise en charge asynchrone native et un typage complet, consultez [capo (Python)](../integration/others/capo.md).

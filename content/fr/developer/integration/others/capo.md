@@ -68,7 +68,7 @@ print(url)
 
 ## Client asynchrone
 
-Le client asynchrone accepte les mêmes arguments et propose les mêmes opérations. Utilisez `await` pour chaque appel ainsi que des gestionnaires de contexte asynchrones pour le client et pour les réponses en flux :
+Le client asynchrone accepte les mêmes arguments et propose les mêmes opérations. Utilisez await pour chaque appel ainsi que des gestionnaires de contexte asynchrones pour le client et pour les réponses en flux :
 
 ```python
 import asyncio

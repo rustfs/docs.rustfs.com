@@ -1,40 +1,40 @@
 ---
-title: "Cluster Lifecycle Operations"
-description: "Plan, start, expand, rebalance, decommission, heal, and restart erasure-coded RustFS clusters with verified quorum and storage-class behavior."
+title: "Opérations du cycle de vie du cluster"
+description: "Planifiez, démarrez, étendez, rééquilibrez, mettez hors service, réparez les données et redémarrez les clusters RustFS à codage d’effacement, avec un quorum et un comportement de classe de stockage vérifiés."
 ---
 
-This runbook is the operator entry point for erasure-coded RustFS deployments: layout boundaries, storage classes and quorum, zero-parity mode, expansion, rebalancing, decommissioning, healing, drive replacement, and restarts. Every behavior described here was verified against the RustFS source; the upstream runbook in [rustfs/rustfs#7998](https://github.com/rustfs/rustfs/pull/7998) is the change that introduced it.
+Ce runbook est le point d’entrée des opérateurs pour les déploiements RustFS avec codage d’effacement : limites de disposition, classes de stockage et quorum, mode à parité nulle, extension, rééquilibrage, mise hors service, réparation des données, remplacement de disque et redémarrages. Chaque comportement décrit ici a été vérifié par rapport au code source de RustFS ; le runbook en amont de [rustfs/rustfs#7998](https://github.com/rustfs/rustfs/pull/7998) est le changement qui l’a introduit.
 
-Related task pages: [Storage Pool Expansion](./scaling/storage-pool-expansion.md), [Data Rebalancing](./scaling/data-rebalancing.md), [Storage Pool Decommission](./scaling/storage-pool-decommission.md), and [Node Healing](./high-availability/node-healing.md).
+Pages de tâches associées : [Extension d’un pool de stockage](./scaling/storage-pool-expansion.md), [Rééquilibrage des données](./scaling/data-rebalancing.md), [Mise hors service d’un pool de stockage](./scaling/storage-pool-decommission.md) et [Réparation des données des nœuds](./high-availability/node-healing.md).
 
-## Layout boundaries
+## Contraintes de disposition
 
-A pool's endpoint count, set count, drives per set, and position in the pool list are persisted layout. On startup RustFS compares the stored format with the configured drive count and set width and fails permanently with `PoolTopologyMismatch` (or `UnsupportedSnsdExpansion` for a single-drive deployment) instead of migrating. Restore the original endpoints and set width; do not delete `format.json` to get past the error.
+Le nombre de points de terminaison d’un pool de stockage (pool), le nombre d’ensembles, le nombre de disques par ensemble et la position dans la liste des pools constituent une disposition persistée. Au démarrage, RustFS compare le format stocké au nombre de disques configuré et à la largeur d’ensemble, puis échoue de façon permanente avec `PoolTopologyMismatch` (ou `UnsupportedSnsdExpansion` pour un déploiement mono-disque) au lieu de migrer. Restaurez les points de terminaison d’origine et la largeur d’ensemble ; ne supprimez pas `format.json` pour passer outre l’erreur.
 
-:::warning[Never do these]
+:::warning[Ne faites jamais ceci]
 
-- Overwrite an existing pool with more or fewer endpoints, or change `RUSTFS_ERASURE_SET_DRIVE_COUNT` for an initialized pool.
-- Reorder volume arguments or move a drive directory to another slot.
-- Delete, copy, or rename object shards, `xl.meta`, or anything under `.rustfs.sys` by hand.
-- Treat a manual file copy as data movement. Only rebalance and decommission move objects, under object locks with version re-checks and source cleanup.
+- N’écrasez pas un pool existant avec plus ou moins de points de terminaison, et ne modifiez pas `RUSTFS_ERASURE_SET_DRIVE_COUNT` pour un pool initialisé.
+- Ne réordonnez pas les arguments de volume et ne déplacez pas un répertoire de disque vers un autre slot.
+- Ne supprimez pas, ne copiez pas et ne renommez pas à la main les shards d’objet, `xl.meta`, ni quoi que ce soit sous `.rustfs.sys`.
+- Ne considérez pas une copie manuelle de fichiers comme un déplacement de données. Seuls le rééquilibrage et la mise hors service déplacent les objets, sous verrous d’objet, avec revérification des versions et nettoyage de la source.
 
 :::
 
-Runtime roles:
+Rôles à l’exécution :
 
-- **Pool** — one endpoint list with persisted layout. Multi-drive sets contain 2 to 16 drives; a single local path is the only single-drive layout.
-- **Pool leader** — the first endpoint of a pool. Decommission start, cancel, and clear may be sent to any node; requests are forwarded to the pool leader over authenticated internode RPC.
-- **Cluster-wide state** — rebalance and root heal propagate to peers and recover from persisted metadata on restart.
+- **Pool** — une liste de points de terminaison avec une disposition persistée. Les ensembles d’effacement multi-disques contiennent de 2 à 16 disques ; un chemin local unique est la seule disposition mono-disque.
+- **Leader de pool** — le premier point de terminaison d’un pool. Le démarrage, l’annulation et l’effacement d’une mise hors service peuvent être envoyés à n’importe quel nœud ; les requêtes sont transmises au leader du pool par un RPC authentifié entre nœuds.
+- **État à l’échelle du cluster** — le rééquilibrage et la réparation racine des données se propagent aux pairs et se rétablissent depuis les métadonnées persistées au redémarrage.
 
-## Plan and first start
+## Planification et premier démarrage
 
-1. Plan endpoints by node, rack, power, and network failure domain. Topology admission is not a high-availability guarantee: a single-node pool loses every shard with its host, and startup logs a `host_failure_data_unavailable` warning for every multi-drive pool.
-2. Pick each pool's set width. Pools may differ in width, but each pool must split evenly into sets of one width from 2 to 16 drives; `RUSTFS_ERASURE_SET_DRIVE_COUNT` may pin a width that is already a valid divisor, nothing else.
-3. Pick STANDARD and RRS parity per the rules in [Storage classes](#storage-classes-parity-and-quorum), then validate against the narrowest pool, because an explicit parity must fit every pool.
-4. Record the full launch command, endpoint order, pool order, set width, and storage-class variables. They must be identical on every node and on every restart.
-5. Give RustFS exclusive ownership of every endpoint path.
+1. Planifiez les points de terminaison selon les domaines de défaillance de nœud, de baie, d’alimentation et de réseau. L’admission de la topologie n’est pas une garantie de haute disponibilité : un pool mono-nœud perd tous ses shards en même temps que son hôte, et le démarrage journalise un avertissement `host_failure_data_unavailable` pour chaque pool multi-disques.
+2. Choisissez la largeur d’ensemble de chaque pool. Les pools peuvent avoir des largeurs différentes, mais chaque pool doit se répartir exactement en ensembles d’une seule largeur, de 2 à 16 disques ; `RUSTFS_ERASURE_SET_DRIVE_COUNT` peut figer une largeur qui est déjà un diviseur valide, et rien d’autre.
+3. Choisissez la parité STANDARD et RRS selon les règles de [Classes de stockage, parité et quorum](#classes-de-stockage-parité-et-quorum), puis validez-les sur le pool le plus étroit, car une parité explicite doit tenir dans chaque pool.
+4. Notez la commande de lancement complète, l’ordre des points de terminaison, l’ordre des pools, la largeur d’ensemble et les variables de classe de stockage. Elles doivent être identiques sur chaque nœud et à chaque redémarrage.
+5. Donnez à RustFS la propriété exclusive de chaque chemin de point de terminaison.
 
-Volumes come from positional arguments or `RUSTFS_VOLUMES`; `rustfs` with no arguments behaves as `rustfs server` with volumes from the environment. Ellipsis expansion follows the MinIO pattern:
+Les volumes proviennent des arguments positionnels ou de `RUSTFS_VOLUMES` ; `rustfs` sans argument se comporte comme `rustfs server` avec les volumes issus de l’environnement. L’expansion des ellipses suit le modèle MinIO :
 
 ```bash
 # one pool, four nodes, four drives each: sixteen endpoints
@@ -44,35 +44,35 @@ rustfs server http://node{1...4}:9000/data{1...4}
 rustfs server http://node{1...4}:9000/data{1...4} http://node{5...8}:9000/data{1...4}
 ```
 
-With more than one argument, every argument needs an ellipsis; each pool must expand to at least two distinct drive endpoints; a single-drive pool cannot join a multi-pool deployment; a singleton range such as `{3...3}` does not bypass the minimum.
+Avec plusieurs arguments, chaque argument doit contenir une ellipse ; chaque pool doit s’étendre en au moins deux points de terminaison de disque distincts ; un pool mono-disque ne peut pas rejoindre un déploiement multi-pool ; une plage singleton telle que `{3...3}` ne contourne pas le minimum.
 
-A storage-class error stops startup before any disk is touched. Startup then initializes local disks, the lock clients, and the format quorum in that order.
+Une erreur de classe de stockage interrompt le démarrage avant qu’aucun disque ne soit touché. Le démarrage initialise ensuite les disques locaux, les clients de verrouillage et le quorum de format, dans cet ordre.
 
-## Startup configuration
+## Configuration au démarrage
 
-| Variable | Effect | Boundary |
+| Variable | Effet | Contraintes |
 |---|---|---|
-| `RUSTFS_ERASURE_SET_DRIVE_COUNT` | Pin the set width | Must be a valid symmetric divisor of the pool, at most 16; cannot change an initialized pool |
-| `RUSTFS_STORAGE_CLASS_STANDARD` | STANDARD parity as `EC:<n>` | Validated per pool; affects new writes only |
-| `RUSTFS_STORAGE_CLASS_RRS` | RRS parity as `EC:<n>` | Validated per pool; an explicit value fails on a single drive, the persisted default `EC:1` resolves to `0` there |
-| `RUSTFS_STORAGE_CLASS_OPTIMIZE` | Accepted for MinIO compatibility | Stored but currently unused: it changes nothing at runtime |
-| `RUSTFS_STORAGE_CLASS_INLINE_BLOCK` | Fixed per-shard inline limit (bytesize syntax such as `128KiB`) | Replaces the scaled default in [Inline objects](#inline-objects); values above 128 KiB log a warning |
+| `RUSTFS_ERASURE_SET_DRIVE_COUNT` | Fige la largeur d’ensemble | Doit être un diviseur symétrique valide du pool, au plus 16 ; ne peut pas modifier un pool déjà initialisé |
+| `RUSTFS_STORAGE_CLASS_STANDARD` | Parité STANDARD sous la forme `EC:<n>` | Validée pour chaque pool ; n’affecte que les nouvelles écritures |
+| `RUSTFS_STORAGE_CLASS_RRS` | Parité RRS sous la forme `EC:<n>` | Validée pour chaque pool ; une valeur explicite échoue sur un seul disque, et la valeur persistée par défaut `EC:1` y est résolue en `0` |
+| `RUSTFS_STORAGE_CLASS_OPTIMIZE` | Acceptée pour la compatibilité avec MinIO | Stockée mais actuellement inutilisée : elle ne change rien à l’exécution |
+| `RUSTFS_STORAGE_CLASS_INLINE_BLOCK` | Limite inline fixe par shard (syntaxe de taille en octets telle que `128KiB`) | Remplace la valeur par défaut proportionnelle des [Objets inline](#objets-inline) ; les valeurs supérieures à 128 KiB produisent un avertissement dans le journal |
 
-An empty `RUSTFS_STORAGE_CLASS_STANDARD` or `RUSTFS_STORAGE_CLASS_RRS` restores the automatic policy and overrides a persisted value. `MINIO_`-prefixed spellings of these keys, of `ERASURE_SET_DRIVE_COUNT`, and of `VOLUMES` are mapped onto the `RUSTFS_` names when the `RUSTFS_` name is unset; when both are set the `RUSTFS_` value wins and the conflict is reported at startup.
+Une valeur vide de `RUSTFS_STORAGE_CLASS_STANDARD` ou de `RUSTFS_STORAGE_CLASS_RRS` rétablit la politique automatique et remplace une valeur persistée. Les graphies préfixées par `MINIO_` de ces clés, de `ERASURE_SET_DRIVE_COUNT` et de `VOLUMES` sont reportées sur les noms `RUSTFS_` lorsque le nom `RUSTFS_` n’est pas défini ; lorsque les deux sont définis, la valeur `RUSTFS_` l’emporte et le conflit est signalé au démarrage.
 
-Other data-movement and listing knobs: `RUSTFS_REBALANCE_MAX_ATTEMPTS` (default 3), `RUSTFS_DECOMMISSION_BUCKET_CONCURRENCY` (default cap 4), `RUSTFS_DECOMMISSION_ENTRY_CONCURRENCY` (default cap 8, hard cap 64), and `RUSTFS_LIST_OBJECTS_QUORUM` (default `optimal`; accepts `disk`, `reduced`, `optimal`, `auto`, anything else means `strict`). None of them relaxes object quorum, object locks, or version checks.
+Autres réglages de déplacement de données et de listage : `RUSTFS_REBALANCE_MAX_ATTEMPTS` (par défaut 3), `RUSTFS_DECOMMISSION_BUCKET_CONCURRENCY` (plafond par défaut 4), `RUSTFS_DECOMMISSION_ENTRY_CONCURRENCY` (plafond par défaut 8, plafond strict 64) et `RUSTFS_LIST_OBJECTS_QUORUM` (par défaut `optimal` ; accepte `disk`, `reduced`, `optimal`, `auto`, toute autre valeur signifie `strict`). Aucun d’eux n’assouplit le quorum d’objet, les verrous d’objet ni les contrôles de version.
 
-## Storage classes, parity, and quorum
+## Classes de stockage, parité et quorum
 
-### Geometry
+### Géométrie
 
-Each object is Reed-Solomon coded across the `N` drives of one set into `K` data and `M` parity shards, `N = K + M`; any `K` shards rebuild it. The geometry is stored per object in `xl.meta`, so changing the default later rewrites nothing. Objects hash to a set and shards rotate within it; sets never share a failure budget.
+Chaque objet est codé en Reed-Solomon sur les `N` disques d’un ensemble, en `K` shards de données et `M` shards de parité, `N = K + M` ; n’importe quels `K` shards le reconstruisent. La géométrie est stockée par objet dans `xl.meta`, si bien qu’un changement ultérieur de la valeur par défaut ne réécrit rien. Les objets sont répartis par hachage sur un ensemble et les shards tournent à l’intérieur de celui-ci ; les ensembles ne partagent jamais un budget de défaillance.
 
-Default STANDARD parity by set width: 0 for one drive, 1 for 2 to 3, 2 for 4 to 5, 3 for 6 to 7, 4 for 8 to 16. Default RRS parity is 1 (0 on a single drive).
+Parité STANDARD par défaut selon la largeur d’ensemble : 0 pour un disque, 1 pour 2 à 3, 2 pour 4 à 5, 3 pour 6 à 7, 4 pour 8 à 16. La parité RRS par défaut est 1 (0 sur un seul disque).
 
-Validation rules: each parity is at most `N/2` for every pool, and STANDARD parity is at least RRS parity only when both are non-zero. There is no minimum, so `EC:0` passes on any width. Only `STANDARD` and `REDUCED_REDUNDANCY` are accepted on PUT, CopyObject, and CreateMultipartUpload; other AWS storage classes return `InvalidStorageClass`.
+Règles de validation : chaque parité vaut au plus `N/2` pour chaque pool, et la parité STANDARD est au moins égale à la parité RRS seulement lorsque les deux sont non nulles. Il n’y a pas de minimum, donc `EC:0` est accepté pour toute largeur. Seuls `STANDARD` et `REDUCED_REDUNDANCY` sont acceptés sur PUT, CopyObject et CreateMultipartUpload ; les autres classes de stockage AWS renvoient `InvalidStorageClass`.
 
-### Quorum and capacity
+### Quorum et capacité
 
 ```text
 usable capacity  ≈ raw × K / N
@@ -81,38 +81,38 @@ write quorum     = K, or K + 1 when K == M
 delete markers   = N/2 + 1      (majority, both write and vote)
 ```
 
-Sixteen drives at `EC:4`: `K = 12`, about 75 percent usable, four failures tolerated, twelve valid shards needed to read. Two drives at `EC:1`: `K = M = 1`, so one drive down still reads but no longer writes. Internal metadata under `.rustfs.sys` is always written with parity `N/2`, regardless of the configured class.
+Seize disques avec `EC:4` : `K = 12`, environ 75 pour cent de capacité utile, quatre défaillances tolérées, douze shards valides nécessaires pour lire. Deux disques avec `EC:1` : `K = M = 1`, donc un disque hors service permet encore la lecture, mais plus l’écriture. Les métadonnées internes sous `.rustfs.sys` sont toujours écrites avec la parité `N/2`, quelle que soit la classe configurée.
 
-### Inline objects
+### Objets inline
 
-An object is stored inline in `xl.meta` when every shard is at most the per-shard budget. The default budget is `256 KiB / K` capped at 128 KiB per shard, so a wider set does not raise the maximum inline object size; on a versioned bucket the budget is divided by 8. `RUSTFS_STORAGE_CLASS_INLINE_BLOCK` replaces the scaled default with a fixed per-shard limit. Each drive keeps only its own shard inline, so inline data has the same loss semantics as external shards. Compressed or encrypted streams inline only when the stored size is known and within budget.
+Un objet est stocké inline dans `xl.meta` lorsque chaque shard est au plus égal au budget par shard. Le budget par défaut est `256 KiB / K`, plafonné à 128 KiB par shard, si bien qu’un ensemble plus large n’augmente pas la taille maximale d’un objet inline ; sur un compartiment (bucket) avec gestion des versions, le budget est divisé par 8. `RUSTFS_STORAGE_CLASS_INLINE_BLOCK` remplace la valeur par défaut proportionnelle par une limite fixe par shard. Chaque disque ne conserve inline que son propre shard, si bien que les données inline ont la même sémantique de perte que les shards externes. Les flux compressés ou chiffrés ne sont mis inline que lorsque la taille stockée est connue et reste dans le budget.
 
-### Write and read paths
+### Chemins d’écriture et de lecture
 
-Writes resolve the layout per pool, encode with Reed-Solomon in 1 MiB blocks, write bitrot-protected shards, and commit only after write quorum. A write below quorum is never reported as success. Reads pick the authoritative metadata at read quorum, verify bitrot, decode from at least `K` shards, and fail closed below that; a read that succeeds with missing shards enqueues read-repair. Multipart parts use the object's geometry and write quorum; `CompleteMultipartUpload` re-checks metadata and commit quorum, so an uploaded part is not a committed object.
+Les écritures résolvent la disposition par pool, encodent en Reed-Solomon par blocs de 1 MiB, écrivent des shards protégés contre le bitrot et ne valident qu’après le quorum d’écriture. Une écriture sous le quorum n’est jamais signalée comme un succès. Les lectures sélectionnent les métadonnées faisant autorité au quorum de lecture, vérifient le bitrot, décodent à partir d’au moins `K` shards et échouent en mode fermé en deçà ; une lecture qui réussit avec des shards manquants met en file une réparation à la lecture. Les parties d’un chargement partitionné utilisent la géométrie de l’objet et le quorum d’écriture ; `CompleteMultipartUpload` revérifie les métadonnées et le quorum de validation, si bien qu’une partie chargée n’est pas un objet validé.
 
-## Zero parity (EC:0)
+## Parité nulle (EC:0)
 
-`EC:0` is accepted for STANDARD, for RRS, or for both, on any set width. It gives raw capacity and no redundancy.
+`EC:0` est accepté pour STANDARD, pour RRS, ou pour les deux, quelle que soit la largeur d’ensemble. Il offre la capacité brute et aucune redondance.
 
-:::danger[EC:0 means one drive loss equals set loss]
+:::danger[Avec EC:0, la perte d’un disque fait perdre des données sur l’ensemble]
 
-A replaced or wiped drive permanently loses every zero-parity object that had a shard on it, unless a copy exists outside the set. Healing cannot rebuild zero-parity objects: heal reports `no-parity object is unrecoverable` for them. Production deployments should use `EC:1` or higher; `EC:2` or more per set is the usual floor once a set spans more than one node. Use `EC:0` only where an external layer (RAID, replication, backup, or a re-creatable source) owns durability and availability, and only with explicit sign-off.
+Un disque remplacé ou effacé perd définitivement chaque objet à parité nulle qui y avait un shard, sauf si une copie existe en dehors de l’ensemble. La réparation des données ne peut pas reconstruire les objets à parité nulle : la réparation signale `no-parity object is unrecoverable` pour ceux-ci. Les déploiements de production devraient utiliser `EC:1` ou plus ; `EC:2` ou davantage par ensemble est le plancher habituel dès qu’un ensemble s’étend sur plus d’un nœud. N’utilisez `EC:0` que là où une couche externe (RAID, réplication, sauvegarde ou source recréable) assure la durabilité et la disponibilité, et seulement avec une validation explicite.
 
 :::
 
-Behavior details:
+Détail du comportement :
 
-- **Configuration.** Explicit `EC:0` produces no startup warning — the zero-redundancy warning fires only for automatic zero parity, meaning a single-drive pool. `STANDARD=EC:2` with `RRS=EC:0` is valid because the ordering rule is skipped when either side is zero; only objects written with `x-amz-storage-class: REDUCED_REDUNDANCY` then carry zero-parity semantics.
-- **Writes.** Write quorum is `N`: if any drive of the set is unwritable, the write fails with `ErasureWriteQuorum` and nothing is committed. Because a zero-parity shard cannot be rebuilt later, the write path verifies every shard it just wrote against its bitrot hash before commit and refuses to commit a shard that already fails.
-- **Reads.** Read quorum is `N`. With any drive of the set offline, HEAD and GET of every zero-parity object in that set fail with `ErasureReadQuorum`. There is no degraded read.
-- **Deletes.** Delete markers and version deletes use majority quorum (`N/2 + 1`), so a delete can succeed on a set whose reads and writes are failing. A successful delete is not evidence that the set is healthy.
-- **What still works with one drive down.** Bucket operations, `.rustfs.sys` metadata, delete markers, and listings that satisfy the list quorum. Everything else in the set is unavailable, including rebalance and decommission of its objects, which must read all `N` shards.
-- **Raising parity later rewrites nothing.** Re-upload or server-side copy each object after the change to re-protect it.
+- **Configuration.** Un `EC:0` explicite ne produit aucun avertissement au démarrage — l’avertissement d’absence de redondance ne se déclenche que pour une parité nulle automatique, c’est-à-dire un pool mono-disque. `STANDARD=EC:2` avec `RRS=EC:0` est valide, car la règle d’ordre est ignorée lorsque l’un des deux côtés est nul ; seuls les objets écrits avec `x-amz-storage-class: REDUCED_REDUNDANCY` portent alors la sémantique de parité nulle.
+- **Écritures.** Le quorum d’écriture est `N` : si un disque quelconque de l’ensemble n’est pas accessible en écriture, l’écriture échoue avec `ErasureWriteQuorum` et rien n’est validé. Comme un shard à parité nulle ne peut pas être reconstruit plus tard, le chemin d’écriture vérifie chaque shard qu’il vient d’écrire par rapport à son empreinte de bitrot avant la validation, et refuse de valider un shard qui échoue déjà.
+- **Lectures.** Le quorum de lecture est `N`. Si un disque quelconque de l’ensemble est hors ligne, les HEAD et GET de chaque objet à parité nulle de cet ensemble échouent avec `ErasureReadQuorum`. Il n’existe pas de lecture dégradée.
+- **Suppressions.** Les marqueurs de suppression et les suppressions de versions utilisent le quorum majoritaire (`N/2 + 1`), si bien qu’une suppression peut réussir sur un ensemble dont les lectures et les écritures échouent. Une suppression réussie ne prouve pas que l’ensemble est sain.
+- **Ce qui fonctionne encore avec un disque hors service.** Les opérations sur les compartiments, les métadonnées `.rustfs.sys`, les marqueurs de suppression et les listages qui satisfont le quorum de listage. Tout le reste dans l’ensemble est indisponible, y compris le rééquilibrage et la mise hors service de ses objets, qui doivent lire l’ensemble des `N` shards.
+- **Augmenter la parité plus tard ne réécrit rien.** Rechargez chaque objet, ou copiez-le côté serveur, après le changement afin de le protéger à nouveau.
 
-## Post-start verification
+## Vérification après démarrage
 
-Read-only admin checks:
+Contrôles d’administration en lecture seule :
 
 ```text
 GET /rustfs/admin/v3/pools/list
@@ -122,27 +122,27 @@ GET /rustfs/admin/v4/cluster/snapshot
 GET /rustfs/admin/v4/runtime/capabilities
 ```
 
-`pool` is a pool command line, or a zero-based index with `by-id=true`. Status queries ignore unknown parameters; mutation queries reject unknown or duplicate parameters and a `by-id` value other than `true` or `false`.
+`pool` est une ligne de commande de pool, ou un index commençant à zéro avec `by-id=true`. Les requêtes d’état ignorent les paramètres inconnus ; les requêtes de mutation rejettent les paramètres inconnus ou en double, ainsi qu’une valeur de `by-id` autre que `true` ou `false`.
 
-Confirm: pool count, endpoints per pool, set count and width per pool, local versus remote endpoints, and no topology mismatch.
+Vérifiez : le nombre de pools, les points de terminaison par pool, le nombre et la largeur d’ensembles par pool, les points de terminaison locaux et distants, et l’absence d’écart de topologie.
 
-Data-plane checks: write one STANDARD and one RRS object; GET, HEAD, range GET, CopyObject, and a multipart upload; take one drive or node offline within parity and confirm reads continue and writes behave per the quorum table; bring it back and confirm the heal queue drains and bitrot errors stop; confirm every node reports the same pool metadata and cluster snapshot.
+Contrôles du plan de données : écrivez un objet STANDARD et un objet RRS ; GET, HEAD, GET par plage, CopyObject et un chargement partitionné ; mettez un disque ou un nœud hors ligne dans la limite de la parité et vérifiez que les lectures continuent et que les écritures se comportent selon le tableau de quorum ; ramenez-le en ligne et vérifiez que la file de réparation des données se vide et que les erreurs de bitrot cessent ; vérifiez que chaque nœud signale les mêmes métadonnées de pool et le même instantané de cluster.
 
-## Expansion
+## Extension
 
-An existing pool cannot grow in place. Add a pool:
+Un pool existant ne peut pas grandir sur place. Ajoutez un pool :
 
-1. Plan its nodes, drives, and failure domain; each new pool needs at least two drive endpoints and its own valid set layout.
-2. Prepare empty, RustFS-exclusive paths on every node.
-3. Append the pool to the launch arguments on **every** node, keeping existing pools, their order, endpoints, and set width unchanged. A single-node single-drive deployment cannot expand; migrate through S3 instead.
-4. Restart and verify per the checks above.
-5. New writes are placed across available pools; old objects stay where they are. To move them, start a rebalance. A restart never rebalances.
+1. Planifiez ses nœuds, ses disques et son domaine de défaillance ; chaque nouveau pool a besoin d’au moins deux points de terminaison de disque et de sa propre disposition d’ensembles valide.
+2. Préparez, sur chaque nœud, des chemins vides dont RustFS est l’unique propriétaire.
+3. Ajoutez le pool aux arguments de lancement sur **chaque** nœud, en conservant les pools existants, leur ordre, leurs points de terminaison et leur largeur d’ensemble inchangés. Un déploiement mono-nœud et mono-disque ne peut pas être étendu ; migrez par S3.
+4. Redémarrez et vérifiez selon les contrôles ci-dessus.
+5. Les nouvelles écritures sont placées sur les pools disponibles ; les objets existants restent là où ils sont. Pour les déplacer, lancez un rééquilibrage. Un redémarrage ne rééquilibre jamais.
 
-Adding a pool does not add parity to existing objects and does not copy anything. Cross-pool movement is rebalance or decommission only. See [Storage Pool Expansion](./scaling/storage-pool-expansion.md) for a worked example.
+L’ajout d’un pool n’ajoute pas de parité aux objets existants et ne copie rien. Le déplacement entre pools ne passe que par le rééquilibrage ou la mise hors service. Voir [Extension d’un pool de stockage](./scaling/storage-pool-expansion.md) pour un exemple concret.
 
-## Rebalance
+## Rééquilibrage
 
-Rebalance redistributes objects across pools by usage. Preconditions: more than one pool (a single pool returns `NotImplemented`), no decommission running or conflicting, and no query string on `start` or `stop`.
+Le rééquilibrage redistribue les objets entre les pools selon l’utilisation. Conditions préalables : plus d’un pool (un pool unique renvoie `NotImplemented`), aucune mise hors service en cours ou en conflit, et aucune chaîne de requête sur `start` ou `stop`.
 
 ```text
 POST /rustfs/admin/v3/rebalance/start     → {"id": "<uuid>"}
@@ -150,13 +150,13 @@ GET  /rustfs/admin/v3/rebalance/status
 POST /rustfs/admin/v3/rebalance/stop
 ```
 
-Status reports per-pool `id`, `status`, `stopping`, `used`, `lastError`, `cleanupWarnings`, and `progress` (objects, versions, bytes, remaining buckets, current bucket and object, elapsed, ETA), plus `stoppedAt` and stop-propagation fields.
+L’état indique, pour chaque pool, `id`, `status`, `stopping`, `used`, `lastError`, `cleanupWarnings` et `progress` (objets, versions, octets, compartiments restants, compartiment et objet courants, temps écoulé, ETA), ainsi que `stoppedAt` et les champs de propagation de l’arrêt.
 
-Start propagates an admission fence and worker state to peers; a propagation failure rolls back to a terminal state and reports any peer that did not roll back. Stop closes admission, stops local and remote workers, and persists the stopped state. Treat a rebalance as finished only when no pool is active or stopping, `lastError` is empty or explained, `cleanupWarnings` are understood, stop propagation has completed, and migrated objects read from their new pool. Per-pool state lives in `rebalance.bin`; never delete it to unblock a run. See [Data Rebalancing](./scaling/data-rebalancing.md) for the walkthrough.
+Le démarrage propage une barrière d’admission et l’état des workers vers les pairs ; un échec de propagation revient à un état terminal et signale tout pair qui n’est pas revenu en arrière. L’arrêt ferme l’admission, arrête les workers locaux et distants et persiste l’état arrêté. Ne considérez un rééquilibrage comme terminé que lorsqu’aucun pool n’est actif ou en cours d’arrêt, que `lastError` est vide ou expliqué, que les `cleanupWarnings` sont comprises, que la propagation de l’arrêt est terminée et que les objets migrés se lisent depuis leur nouveau pool. L’état par pool réside dans `rebalance.bin` ; ne le supprimez jamais pour débloquer une exécution. Voir [Rééquilibrage des données](./scaling/data-rebalancing.md) pour la procédure pas à pas.
 
-## Decommission
+## Mise hors service
 
-Operator summary — supported only on multi-pool, non-legacy (ellipsis) deployments; anything else returns `NotImplemented`. A rebalance in progress blocks start.
+Résumé pour l’opérateur — prise en charge seulement sur les déploiements multi-pool non historiques (avec ellipse) ; tout autre cas renvoie `NotImplemented`. Un rééquilibrage en cours bloque le démarrage.
 
 ```text
 POST /rustfs/admin/v3/pools/decommission?pool=<a>[,<b>]      # by command line
@@ -166,17 +166,17 @@ POST /rustfs/admin/v3/pools/cancel?pool=1&by-id=true
 POST /rustfs/admin/v3/pools/clear?pool=1&by-id=true
 ```
 
-- Targets are validated as a batch before anything is persisted: unknown, duplicate, active, queued, or completed targets are rejected; failed or canceled targets must be cleared first unless they hold unresolved listing entries, in which case a new start is the retry path.
-- Entry states: `queued` → `active` → `completed`, `failed`, or `canceled`, persisted in `pool.bin`. Startup resumes non-terminal entries and skips terminal predecessors.
-- A source pool in any decommission state rejects new ordinary PUTs and new multipart uploads (a staged PUT gets `SlowDown`); existing multipart uploads may drain while the source is non-terminal.
-- `clear` removes failed or canceled metadata only and never moves data back.
-- Remove a pool from the launch arguments only after its entry is `completed`, free versions and tier ownership have converged, and every node shows the same status. Never detach source drives before that, and never substitute a directory delete for the configuration change.
+- Les cibles sont validées en lot avant toute persistance : les cibles inconnues, en double, actives, en file d’attente ou terminées sont rejetées ; les cibles en échec ou annulées doivent d’abord être effacées, sauf si elles contiennent des entrées de listage non résolues, auquel cas un nouveau démarrage est le chemin de nouvelle tentative.
+- États d’entrée : `queued` → `active` → `completed`, `failed` ou `canceled`, persistés dans `pool.bin`. Le démarrage reprend les entrées non terminales et ignore les prédécesseurs terminaux.
+- Un pool source dans n’importe quel état de mise hors service rejette les nouveaux PUT ordinaires et les nouveaux chargements partitionnés (un PUT préparé reçoit `SlowDown`) ; les chargements partitionnés existants peuvent se vider tant que la source n’est pas terminale.
+- `clear` ne retire que les métadonnées en échec ou annulées et ne rapatrie jamais les données.
+- Ne retirez un pool des arguments de lancement qu’une fois son entrée à l’état `completed`, une fois que les versions libres et la propriété de niveau ont convergé, et une fois que chaque nœud affiche le même état. Ne détachez jamais les disques sources avant cela, et ne substituez jamais la suppression d’un répertoire au changement de configuration.
 
-See [Storage Pool Decommission](./scaling/storage-pool-decommission.md) for the walkthrough.
+Voir [Mise hors service d’un pool de stockage](./scaling/storage-pool-decommission.md) pour la procédure pas à pas.
 
-## Heal and drive replacement
+## Réparation des données et remplacement de disque
 
-### Admin heal
+### Réparation administrative des données
 
 ```text
 POST /rustfs/admin/v3/heal/                    # root: cluster, or one erasure set with pool+set
@@ -186,59 +186,59 @@ POST /rustfs/admin/v3/background-heal/status
 GET  /rustfs/admin/v4/heal/replacement-recovery
 ```
 
-The JSON body carries `recursive`, `dryRun`, `remove`, `recreate`, `scanMode`, `updateParity`, `nolock`, `readRepair`, `pool`, and `set`. Handler rules:
+Le corps JSON porte `recursive`, `dryRun`, `remove`, `recreate`, `scanMode`, `updateParity`, `nolock`, `readRepair`, `pool` et `set`. Règles du gestionnaire :
 
-- a root heal must set `recursive=true` or name both `pool` and `set`; a bucket heal without a prefix is always recursive, and a prefix heal honors `recursive`;
-- `readRepair=true` is rejected with `InvalidArgument`;
-- `nolock` is accepted on the wire but always forced to `false` — admin heals always take the object namespace lock, so there is no lock bypass;
-- `clientToken` correlates start, status, and stop; `forceStart` and `forceStop` are validated against it, and unknown or duplicate query keys are rejected.
+- une réparation racine des données doit définir `recursive=true` ou nommer à la fois `pool` et `set` ; une réparation de compartiment sans préfixe est toujours récursive, et une réparation de préfixe respecte `recursive` ;
+- `readRepair=true` est rejeté avec `InvalidArgument` ;
+- `nolock` est accepté tel qu’il est transmis, mais toujours forcé à `false` — les réparations administratives des données prennent toujours le verrou d’espace de noms d’objet, il n’existe donc pas de contournement du verrou ;
+- `clientToken` corrèle le démarrage, l’état et l’arrêt ; `forceStart` et `forceStop` sont validés par rapport à lui, et les clés de requête inconnues ou en double sont rejetées.
 
-Heal selects the authoritative version from quorum metadata and refuses when more shards are missing than parity can rebuild or when the stored geometry does not match the set. It shares the `(bucket, object)` lock with PUT, delete, multipart complete, and data movement.
+La réparation des données sélectionne la version faisant autorité à partir des métadonnées de quorum et refuse lorsque plus de shards manquent que la parité ne peut en reconstruire, ou lorsque la géométrie stockée ne correspond pas à l’ensemble. Elle partage le verrou `(bucket, object)` avec PUT, la suppression, la finalisation du chargement partitionné et le déplacement de données.
 
-### Drive replacement
+### Remplacement de disque
 
-1. Confirm the affected set still meets read quorum for its objects (impossible at `EC:0`) and record pool index, set index, slot, and the failed disk's UUID from the pool status.
-2. Replace the drive at the **same** endpoint and mount path with an empty filesystem owned by RustFS. Do not copy the old drive's directories; a copied `format.json` claims an identity the set already tracks.
-3. Bring the node back. The empty drive is not a format-quorum member, so its slot stays offline until the erasure-set heal task writes the format into the original slot and rebuilds the shards — through the recorded automatic replacement intent when startup or the disk scanner observes a changed mount identity, or through an admin erasure-set heal (`POST /rustfs/admin/v3/heal/` with `pool` and `set`).
-4. Watch `GET /rustfs/admin/v4/heal/replacement-recovery`, background heal status, disk health, and bitrot counters. An `idle` queue or a readable object is not proof of completion.
-5. The replacement is done when recovery reports `completed` for that instance and sampled objects have `xl.meta` and parts on the new drive.
+1. Vérifiez que l’ensemble concerné satisfait encore le quorum de lecture pour ses objets (impossible avec `EC:0`) et notez l’index de pool, l’index d’ensemble, le slot et l’UUID du disque en panne à partir de l’état du pool.
+2. Remplacez le disque au **même** point de terminaison et au même chemin de montage par un système de fichiers vide dont RustFS est propriétaire. Ne copiez pas les répertoires de l’ancien disque ; un `format.json` copié revendique une identité que l’ensemble suit déjà.
+3. Ramenez le nœud en ligne. Le disque vide n’est pas membre du quorum de format, si bien que son slot reste hors ligne jusqu’à ce que la tâche de réparation des données de l’ensemble d’effacement écrive le format dans le slot d’origine et reconstruise les shards — par l’intention de remplacement automatique enregistrée lorsque le démarrage ou l’analyseur de disques observe une identité de montage modifiée, ou par une réparation administrative de l’ensemble d’effacement (`POST /rustfs/admin/v3/heal/` avec `pool` et `set`).
+4. Surveillez `GET /rustfs/admin/v4/heal/replacement-recovery`, l’état de la réparation des données en arrière-plan, l’intégrité des disques et les compteurs de bitrot. Une file `idle` ou un objet lisible ne prouve pas que l’opération est terminée.
+5. Le remplacement est terminé lorsque la reprise signale `completed` pour cette instance et que les objets échantillonnés ont `xl.meta` et leurs parties sur le nouveau disque.
 
-If a set has lost more drives than its parity, heal cannot rebuild; recover from replication, a remote tier, or backup. See [Node Healing](./high-availability/node-healing.md) for the broader healing model.
+Si un ensemble a perdu plus de disques que sa parité, la réparation des données ne peut pas reconstruire ; récupérez les données depuis la réplication, un niveau distant ou une sauvegarde. Voir [Réparation des données des nœuds](./high-availability/node-healing.md) pour le modèle plus large de réparation des données.
 
-## Restart and recovery
+## Redémarrage et reprise
 
-- **Ordinary restart.** No topology change in flight, identical arguments on every node, one node at a time. Startup reloads pool metadata, `rebalance.bin`, the decommission queue, and heal recovery records, and resumes workers by leader and owner rules.
-- **Rebalance.** Read `/rebalance/status` first. Handle active or stopping pools, `lastError`, cleanup warnings, and stop propagation before deciding to stop or restart. Do not delete `rebalance.bin`.
-- **Decommission.** Non-terminal entries resume; failed and canceled entries survive restarts until cleared or retried through the allowed path.
-- **Root heal.** A graceful shutdown persists an unfinished cluster heal as `root-heal-<task-id>.json` under `.rustfs.sys` and replays it with the same task id. Invalid, oversized, or unsupported records move to quarantine prefixes and are skipped with a log line until an operator repairs them. Do not delete quarantine markers or reuse a task id.
-- **Unclean shutdown.** When the previous run left its marker behind, the heal manager enqueues a full erasure-set heal for every local set; graceful shutdown clears the marker.
+- **Redémarrage ordinaire.** Aucun changement de topologie en cours, arguments identiques sur chaque nœud, un nœud à la fois. Le démarrage recharge les métadonnées de pool, `rebalance.bin`, la file de mise hors service et les enregistrements de reprise de réparation des données, puis reprend les workers selon les règles de leader et de propriétaire.
+- **Rééquilibrage.** Lisez d’abord `/rebalance/status`. Traitez les pools actifs ou en cours d’arrêt, `lastError`, les avertissements de nettoyage et la propagation de l’arrêt avant de décider d’arrêter ou de redémarrer. Ne supprimez pas `rebalance.bin`.
+- **Mise hors service.** Les entrées non terminales reprennent ; les entrées en échec et annulées survivent aux redémarrages jusqu’à ce qu’elles soient effacées ou retentées par le chemin autorisé.
+- **Réparation racine des données.** Un arrêt propre persiste une réparation de cluster inachevée sous le nom `root-heal-<task-id>.json` dans `.rustfs.sys` et la rejoue avec le même identifiant de tâche. Les enregistrements invalides, trop volumineux ou non pris en charge sont déplacés vers des préfixes de quarantaine et ignorés, avec une ligne de journal, jusqu’à ce qu’un opérateur les répare. Ne supprimez pas les marqueurs de quarantaine et ne réutilisez pas un identifiant de tâche.
+- **Arrêt non propre.** Lorsque l’exécution précédente a laissé son marqueur, le gestionnaire de réparation des données met en file une réparation complète de chaque ensemble d’effacement local ; un arrêt propre efface le marqueur.
 
-## Mutual exclusion and prohibited actions
+## Exclusion mutuelle et actions interdites
 
-| Operation | With rebalance | With decommission | Notes |
+| Opération | Avec un rééquilibrage | Avec une mise hors service | Notes |
 |---|---|---|---|
-| PUT, DELETE, multipart complete | Object lock | Source pool rejects new publication | Never bypass the pool fence |
-| Decommission | Rejected while rebalance runs | Serial queue | Leader-only mutation |
-| Rebalance | Multi-pool only | Rejected while decommission runs or conflicts | No query parameters |
-| Admin heal | Object lock | Repairs data, never changes decommission state | `nolock` is ignored |
-| Drive replacement | Cannot change the layout | Avoid on a source pool mid-decommission | Same slot, empty drive |
+| PUT, DELETE, finalisation de chargement partitionné | Verrou d’objet | Le pool source refuse les nouvelles publications | Ne contournez jamais la barrière du pool |
+| Mise hors service | Rejetée pendant qu’un rééquilibrage s’exécute | File sérielle | Mutation réservée au leader |
+| Rééquilibrage | Multi-pool seulement | Rejeté pendant qu’une mise hors service s’exécute ou entre en conflit | Aucun paramètre de requête |
+| Réparation administrative des données | Verrou d’objet | Répare les données, ne change jamais l’état de mise hors service | `nolock` est ignoré |
+| Remplacement de disque | Ne peut pas modifier la disposition | À éviter sur un pool source en cours de mise hors service | Même slot, disque vide |
 
-:::warning[Prohibited]
+:::warning[Interdit]
 
-Do not change launch endpoints while rebalance or decommission runs; do not delete `.rustfs.sys`, `rebalance.bin`, `pool.bin`, or root-heal records; do not run manual heal, file copies, and drive replacement on one pool at the same time; do not treat an HTTP 200 on a start call as completion.
+Ne modifiez pas les points de terminaison de lancement pendant qu’un rééquilibrage ou une mise hors service s’exécute ; ne supprimez pas `.rustfs.sys`, `rebalance.bin`, `pool.bin` ni les enregistrements de réparation racine des données ; n’exécutez pas en même temps, sur un même pool, une réparation manuelle des données, des copies de fichiers et un remplacement de disque ; ne considérez pas un HTTP 200 sur un appel de démarrage comme une fin d’opération.
 
 :::
 
-## Checklists
+## Listes de contrôle
 
-- **After start or expansion**: identical endpoints and pool order on every node; topology equals the stored format; peers ready; new endpoints unique and RustFS-exclusive; GET, HEAD, range GET, and multipart verified.
-- **After rebalance**: no pool active or stopping; `lastError` empty or explained; `cleanupWarnings` handled; stop propagation complete; migrated objects readable.
-- **After decommission**: status `completed`; other entries handled by policy; source pool rejects new writes; free versions, tier ownership, and listing entries converged; launch arguments updated on every node before drives are detached.
-- **After heal or replacement**: replacement recovery `completed`; slot and UUID correct; heal queue drained; no growing bitrot count; sampled current and historical versions readable; no leftover temporary directories.
+- **Après le démarrage ou l’extension** : points de terminaison et ordre des pools identiques sur chaque nœud ; topologie égale au format stocké ; pairs prêts ; nouveaux points de terminaison uniques et exclusifs à RustFS ; GET, HEAD, GET par plage et chargement partitionné vérifiés.
+- **Après un rééquilibrage** : aucun pool actif ou en cours d’arrêt ; `lastError` vide ou expliqué ; `cleanupWarnings` traités ; propagation de l’arrêt terminée ; objets migrés lisibles.
+- **Après une mise hors service** : état `completed` ; autres entrées traitées selon la politique ; le pool source refuse les nouvelles écritures ; les versions libres, la propriété de niveau et les entrées de listage ont convergé ; arguments de lancement mis à jour sur chaque nœud avant le détachement des disques.
+- **Après une réparation des données ou un remplacement** : reprise de remplacement `completed` ; slot et UUID corrects ; file de réparation des données vidée ; pas de compteur de bitrot en croissance ; versions courantes et historiques échantillonnées lisibles ; aucun répertoire temporaire résiduel.
 
-## rc command mapping
+## Correspondance des commandes rc
 
-`rc` is the RustFS CLI (see [CLI Client (rc)](./rc.mdx)); its `expand` group is an alias of `rebalance` — there is no server-side expand API. Flags below are the commonly used ones; check `rc admin <group> --help` for the installed version.
+`rc` est la CLI RustFS (voir [Client CLI (rc)](./rc.mdx)) ; son groupe `expand` est un alias de `rebalance` — il n’existe pas d’API d’extension côté serveur. Les indicateurs ci-dessous sont d’usage courant ; consultez `rc admin <group> --help` pour la version installée.
 
 ```bash
 rc alias set local http://localhost:9000 <your-access-key> <your-secret-key>
@@ -261,7 +261,7 @@ rc admin heal status local --client-token <TOKEN_FROM_START>
 rc admin heal stop local --client-token <TOKEN_FROM_START>
 ```
 
-| `rc` command | Server route |
+| Commande `rc` | Route du serveur |
 |---|---|
 | `rc ping` / `rc ready` | `GET /health` / `GET /health/ready` |
 | `rc admin pool list` / `status` | `GET /rustfs/admin/v3/pools/list` / `GET /rustfs/admin/v3/pools/status` |
@@ -270,9 +270,9 @@ rc admin heal stop local --client-token <TOKEN_FROM_START>
 | `rc admin decommission status` | `GET /rustfs/admin/v3/decommission/status` |
 | `rc admin heal start` / `status` / `stop` | `/rustfs/admin/v3/heal/*`, `POST /rustfs/admin/v3/background-heal/status` |
 
-`rc admin heal start` exposes `--bucket`, `--prefix`, `--scan-mode`, `--remove`, `--recreate`, and `--dry-run`; it does not expose `nolock`, `forceStart`, `forceStop`, `pool`, or `set`. There is no `rc` command for replacement recovery; call `GET /rustfs/admin/v4/heal/replacement-recovery` directly.
+`rc admin heal start` expose `--bucket`, `--prefix`, `--scan-mode`, `--remove`, `--recreate` et `--dry-run` ; il n’expose pas `nolock`, `forceStart`, `forceStop`, `pool` ni `set`. Il n’existe pas de commande `rc` pour la reprise après remplacement ; appelez directement `GET /rustfs/admin/v4/heal/replacement-recovery`.
 
-## References
+## Références
 
-- Upstream runbook: `docs/operations/cluster-lifecycle-operations.md` in [rustfs/rustfs#7998](https://github.com/rustfs/rustfs/pull/7998) — the source this page is adapted from, verified claim by claim against the RustFS source code.
-- [Storage Pool Expansion](./scaling/storage-pool-expansion.md) · [Data Rebalancing](./scaling/data-rebalancing.md) · [Storage Pool Decommission](./scaling/storage-pool-decommission.md) · [Node Healing](./high-availability/node-healing.md) · [CLI Client (rc)](./rc.mdx)
+- Runbook en amont : `docs/operations/cluster-lifecycle-operations.md` dans [rustfs/rustfs#7998](https://github.com/rustfs/rustfs/pull/7998) — source dont cette page est adaptée, vérifiée affirmation par affirmation par rapport au code source de RustFS.
+- [Extension d’un pool de stockage](./scaling/storage-pool-expansion.md) · [Rééquilibrage des données](./scaling/data-rebalancing.md) · [Mise hors service d’un pool de stockage](./scaling/storage-pool-decommission.md) · [Réparation des données des nœuds](./high-availability/node-healing.md) · [Client CLI (rc)](./rc.mdx)
