@@ -1,83 +1,83 @@
 ---
 title: "FTP(S)"
-description: "Configure the RustFS FTP or FTPS gateway and manage buckets and objects with FTP clients."
+description: "Konfigurieren Sie das FTP- oder FTPS-Gateway von RustFS und verwalten Sie Buckets und Objekte mit FTP-Clients."
 ---
 
-RustFS includes an FTP gateway that exposes buckets and objects to standard FTP clients. You can run it as unencrypted FTP for isolated local testing or as explicit FTP over TLS (FTPS) for encrypted connections. RustFS authenticates each session against Identity and Access Management (IAM) and applies the user's S3 policies to storage operations.
+RustFS enthält ein FTP-Gateway, das Buckets und Objekte für Standard-FTP-Clients bereitstellt. Sie können es als unverschlüsseltes FTP für isolierte lokale Tests oder als explizites FTP über TLS (FTPS) für verschlüsselte Verbindungen betreiben. RustFS authentifiziert jede Sitzung gegen Identity and Access Management (IAM) und wendet die S3-Richtlinien des Benutzers auf Speicheroperationen an.
 
-FTP and FTPS support is compiled into the standard RustFS binary, but both listeners are disabled at runtime by default. Enable only the listener you intend to use.
+Die Unterstützung für FTP und FTPS ist im Standard-Binary von RustFS enthalten, beide Listener sind zur Laufzeit jedoch standardmäßig deaktiviert. Aktivieren Sie nur den Listener, den Sie verwenden möchten.
 
-## Overview
+## Überblick
 
-The gateway maps FTP paths to RustFS resources:
+Das Gateway bildet FTP-Pfade auf RustFS-Ressourcen ab:
 
-| FTP path | RustFS resource |
+| FTP-Pfad | RustFS-Ressource |
 | --- | --- |
-| `/` | All buckets visible to the authenticated user |
-| `/my-bucket/` | The `my-bucket` bucket |
-| `/my-bucket/hello.txt` | The `hello.txt` object in `my-bucket` |
+| `/` | Alle Buckets, die für den authentifizierten Benutzer sichtbar sind |
+| `/my-bucket/` | Der Bucket `my-bucket` |
+| `/my-bucket/hello.txt` | Das Objekt `hello.txt` in `my-bucket` |
 
-The following FTP operations are supported:
+Die folgenden FTP-Operationen werden unterstützt:
 
-| FTP command | Operation |
+| FTP-Befehl | Operation |
 | --- | --- |
-| `LIST` | List buckets at the root or objects and prefixes in a bucket |
-| `MKD` | Create a bucket |
-| `CWD` | Enter a bucket |
-| `STOR` | Upload an object |
-| `RETR` | Download an object |
-| `DELE` | Delete an object |
-| `RMD` | Recursively delete a bucket and its objects |
+| `LIST` | Buckets am Wurzelverzeichnis oder Objekte und Präfixe in einem Bucket auflisten |
+| `MKD` | Bucket erstellen |
+| `CWD` | Bucket betreten |
+| `STOR` | Objekt hochladen |
+| `RETR` | Objekt herunterladen |
+| `DELE` | Objekt löschen |
+| `RMD` | Bucket und seine Objekte rekursiv löschen |
 
-RustFS does not currently support FTP rename operations or uploads that append to an existing object. Because S3 storage has no native working-directory or POSIX directory model, some client-specific filesystem operations may not behave like a traditional FTP server.
+RustFS unterstützt derzeit keine FTP-Umbenennungen und keine Uploads, die an ein vorhandenes Objekt angefügt werden. Weil der S3-Speicher kein natives Arbeitsverzeichnis und kein POSIX-Verzeichnismodell hat, verhalten sich manche clientspezifischen Dateisystemoperationen anders als bei einem herkömmlichen FTP-Server.
 
-Enter a RustFS access key as the FTP username and its secret key as the password. Invalid usernames and passwords both return `530 Not logged in`. After login, RustFS checks the IAM user's S3 permissions for each operation.
+Geben Sie einen RustFS-Zugriffsschlüssel als FTP-Benutzernamen und den zugehörigen geheimen Zugriffsschlüssel als Passwort ein. Ungültige Benutzernamen und Passwörter geben beide `530 Not logged in` zurück. Nach der Anmeldung prüft RustFS die S3-Berechtigungen des IAM-Benutzers für jede Operation.
 
-:::danger[Plain FTP exposes credentials]
+:::danger[Unverschlüsseltes FTP legt Zugangsdaten offen]
 
-FTP sends credentials and data without encryption. Bind plain FTP to a loopback or isolated test network only. Use FTPS for every remote or production connection.
+FTP sendet Zugangsdaten und Daten ohne Verschlüsselung. Binden Sie unverschlüsseltes FTP nur an ein Loopback oder ein isoliertes Testnetz. Verwenden Sie FTPS für jede entfernte oder produktive Verbindung.
 
 :::
 
-:::warning[Bucket deletion is recursive]
+:::warning[Das Löschen eines Buckets ist rekursiv]
 
-The current `RMD` implementation deletes the objects in the target bucket before deleting the bucket. Confirm the path before running `rmdir` in an FTP client.
+Die aktuelle Implementierung von `RMD` löscht die Objekte im Ziel-Bucket, bevor sie den Bucket löscht. Prüfen Sie den Pfad, bevor Sie `rmdir` in einem FTP-Client ausführen.
 
 :::
 
-## Configuration
+## Konfiguration
 
-FTP and FTPS use separate listeners and environment variables.
+FTP und FTPS verwenden getrennte Listener und Umgebungsvariablen.
 
-### FTP variables
+### FTP-Variablen
 
-| Variable | Description | Default |
+| Variable | Beschreibung | Standard |
 | --- | --- | --- |
-| `RUSTFS_FTP_ENABLE` | Enables the unencrypted FTP listener. | `false` |
-| `RUSTFS_FTP_ADDRESS` | Bind address for FTP control connections. | `0.0.0.0:8021` |
-| `RUSTFS_FTP_PASSIVE_PORTS` | Inclusive passive data port range in `start-end` format. | `40000-50000` |
-| `RUSTFS_FTP_EXTERNAL_IP` | Public IP or hostname advertised to passive clients when RustFS is behind NAT. | Not set |
+| `RUSTFS_FTP_ENABLE` | Aktiviert den unverschlüsselten FTP-Listener. | `false` |
+| `RUSTFS_FTP_ADDRESS` | Bind-Adresse für FTP-Steuerverbindungen. | `0.0.0.0:8021` |
+| `RUSTFS_FTP_PASSIVE_PORTS` | Bereich passiver Datenports im Format `start-end`, einschließlich Anfang und Ende. | `40000-50000` |
+| `RUSTFS_FTP_EXTERNAL_IP` | Öffentliche IP oder öffentlicher Hostname, der passiven Clients mitgeteilt wird, wenn RustFS hinter NAT steht. | Nicht gesetzt |
 
-### FTPS variables
+### FTPS-Variablen
 
-| Variable | Description | Default |
+| Variable | Beschreibung | Standard |
 | --- | --- | --- |
-| `RUSTFS_FTPS_ENABLE` | Enables the explicit FTPS listener. | `false` |
-| `RUSTFS_FTPS_ADDRESS` | Bind address for FTPS control connections. | `0.0.0.0:8022` |
-| `RUSTFS_FTPS_TLS_ENABLED` | Enables TLS on the FTPS listener. Keep this enabled for FTPS. | `true` |
-| `RUSTFS_FTPS_CERTS_DIR` | Directory containing the FTPS certificate and private key. Required for FTPS. | Not set |
-| `RUSTFS_FTPS_PASSIVE_PORTS` | Inclusive passive data port range in `start-end` format. | `40000-50000` |
-| `RUSTFS_FTPS_EXTERNAL_IP` | Public IP or hostname advertised to passive clients when RustFS is behind NAT. | Not set |
+| `RUSTFS_FTPS_ENABLE` | Aktiviert den Listener für explizites FTPS. | `false` |
+| `RUSTFS_FTPS_ADDRESS` | Bind-Adresse für FTPS-Steuerverbindungen. | `0.0.0.0:8022` |
+| `RUSTFS_FTPS_TLS_ENABLED` | Aktiviert TLS auf dem FTPS-Listener. Lassen Sie dies für FTPS aktiviert. | `true` |
+| `RUSTFS_FTPS_CERTS_DIR` | Verzeichnis mit dem FTPS-Zertifikat und dem privaten Schlüssel. Für FTPS erforderlich. | Nicht gesetzt |
+| `RUSTFS_FTPS_PASSIVE_PORTS` | Bereich passiver Datenports im Format `start-end`, einschließlich Anfang und Ende. | `40000-50000` |
+| `RUSTFS_FTPS_EXTERNAL_IP` | Öffentliche IP oder öffentlicher Hostname, der passiven Clients mitgeteilt wird, wenn RustFS hinter NAT steht. | Nicht gesetzt |
 
-The standard RustFS build enables the `ftps` compile-time feature, which provides both FTP and FTPS. If you build RustFS with `--no-default-features`, include the feature explicitly:
+Der Standard-Build von RustFS aktiviert das Feature `ftps` zur Build-Zeit, das sowohl FTP als auch FTPS bereitstellt. Wenn Sie RustFS mit `--no-default-features` bauen, nehmen Sie das Feature ausdrücklich auf:
 
 ```bash
 cargo build --release --features ftps
 ```
 
-### Local testing with FTP
+### Lokale Tests mit FTP
 
-Start an unencrypted FTP listener on the loopback interface:
+Starten Sie einen unverschlüsselten FTP-Listener auf der Loopback-Schnittstelle:
 
 ```bash
 export RUSTFS_FTP_ENABLE=true
@@ -89,11 +89,11 @@ export RUSTFS_SECRET_KEY=<your-secret-key>
 rustfs /path/to/data
 ```
 
-Binding to `127.0.0.1` prevents remote hosts from connecting to the unencrypted listener.
+Die Bindung an `127.0.0.1` verhindert, dass entfernte Hosts eine Verbindung zum unverschlüsselten Listener aufbauen.
 
-### Prepare a test certificate
+### Testzertifikat vorbereiten
 
-FTPS expects `rustfs_cert.pem` and `rustfs_key.pem` in the certificate directory. For local testing, create a short-lived self-signed certificate:
+FTPS erwartet `rustfs_cert.pem` und `rustfs_key.pem` im Zertifikatsverzeichnis. Erstellen Sie für lokale Tests ein kurzlebiges selbstsigniertes Zertifikat:
 
 ```bash
 mkdir -p /path/to/ftps-certs
@@ -106,11 +106,11 @@ openssl req -x509 -newkey rsa:2048 -nodes \
 	-addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
 ```
 
-Use a certificate issued by a trusted certificate authority in production. Protect `rustfs_key.pem` from unauthorized access and ensure the certificate subject alternative names match the host clients use.
+Verwenden Sie in der Produktion ein Zertifikat einer vertrauenswürdigen Zertifizierungsstelle. Schützen Sie `rustfs_key.pem` vor unberechtigtem Zugriff und stellen Sie sicher, dass die Subject Alternative Names des Zertifikats zum Host passen, den Clients verwenden.
 
-### Start FTPS
+### FTPS starten
 
-Configure an explicit FTPS listener:
+Konfigurieren Sie einen Listener für explizites FTPS:
 
 ```bash
 export RUSTFS_FTPS_ENABLE=true
@@ -122,44 +122,44 @@ export RUSTFS_FTPS_PASSIVE_PORTS=40000-50000
 rustfs /path/to/data
 ```
 
-RustFS requires TLS on both the FTPS control and data channels. Configure clients for **explicit FTP over TLS**, sometimes labeled **FTPES** or **Require explicit FTP over TLS**. Implicit FTPS is not the mode implemented by this listener.
+RustFS verlangt TLS sowohl auf dem FTPS-Steuerkanal als auch auf dem Datenkanal. Konfigurieren Sie Clients für **explicit FTP over TLS** (explizites FTP über TLS), manchmal bezeichnet als **FTPES** oder **Require explicit FTP over TLS**. Implizites FTPS ist nicht der Modus, den dieser Listener implementiert.
 
-If the certificate directory is missing, does not exist, or does not contain a usable certificate and key, FTPS initialization fails. See [Configure TLS](/integration/tls-configured) for general certificate guidance.
+Wenn das Zertifikatsverzeichnis fehlt, nicht vorhanden ist oder kein verwendbares Zertifikat und keinen verwendbaren Schlüssel enthält, schlägt die FTPS-Initialisierung fehl. Allgemeine Hinweise zu Zertifikaten stehen unter [TLS konfigurieren](/de/integration/tls-configured).
 
-### Configure passive connections
+### Passive Verbindungen konfigurieren
 
-FTP uses the control port for commands and a separate data connection for listings and file transfers. For passive mode:
+FTP verwendet den Steuerport für Befehle und eine separate Datenverbindung für Auflistungen und Dateiübertragungen. Für den passiven Modus:
 
-1. Allow inbound TCP traffic to the configured control port.
-2. Allow inbound TCP traffic to every port in the configured passive range.
-3. Set `RUSTFS_FTP_EXTERNAL_IP` or `RUSTFS_FTPS_EXTERNAL_IP` when clients connect through NAT or a load balancer.
+1. Lassen Sie eingehenden TCP-Verkehr zum konfigurierten Steuerport zu.
+2. Lassen Sie eingehenden TCP-Verkehr zu jedem Port im konfigurierten passiven Bereich zu.
+3. Setzen Sie `RUSTFS_FTP_EXTERNAL_IP` oder `RUSTFS_FTPS_EXTERNAL_IP`, wenn Clients über NAT oder einen Load Balancer verbinden.
 
-For example, an FTPS server behind NAT can advertise its public hostname:
+Ein FTPS-Server hinter NAT kann beispielsweise seinen öffentlichen Hostnamen bekannt geben:
 
 ```bash
 export RUSTFS_FTPS_EXTERNAL_IP=storage.example.com
 export RUSTFS_FTPS_PASSIVE_PORTS=40000-40100
 ```
 
-Use the corresponding FTP-prefixed variables for the plain FTP listener. RustFS supports both active and passive transfer modes, but passive mode is generally easier to operate through client firewalls.
+Verwenden Sie die entsprechenden Variablen mit FTP-Präfix für den unverschlüsselten FTP-Listener. RustFS unterstützt den aktiven und den passiven Übertragungsmodus. Der passive Modus lässt sich durch Client-Firewalls in der Regel leichter betreiben.
 
-## Usage
+## Verwendung
 
-The examples use [`lftp`](https://lftp.yar.ru/) and the canonical `my-bucket` and `hello.txt` names. The IAM user must have the S3 permissions required for each operation.
+Die Beispiele verwenden [`lftp`](https://lftp.yar.ru/) sowie die kanonischen Namen `my-bucket` und `hello.txt`. Der IAM-Benutzer muss die S3-Berechtigungen besitzen, die jede Operation erfordert.
 
-### Connect with FTP
+### Mit FTP verbinden
 
-Use plain FTP only with the loopback test listener:
+Verwenden Sie unverschlüsseltes FTP nur mit dem Loopback-Testlistener:
 
 ```bash
 lftp -u <your-access-key> ftp://127.0.0.1:8021
 ```
 
-Enter the secret key when `lftp` prompts for a password.
+Geben Sie den geheimen Zugriffsschlüssel ein, wenn `lftp` nach einem Passwort fragt.
 
-### Connect with FTPS
+### Mit FTPS verbinden
 
-Connect to the explicit FTPS listener and require encryption for control and data connections:
+Verbinden Sie sich mit dem Listener für explizites FTPS und verlangen Sie Verschlüsselung für Steuer- und Datenverbindungen:
 
 ```bash
 lftp -u <your-access-key> -e '
@@ -169,9 +169,9 @@ lftp -u <your-access-key> -e '
 '
 ```
 
-Enter the secret key when prompted. Keep certificate verification enabled in production.
+Geben Sie den geheimen Zugriffsschlüssel ein, wenn Sie dazu aufgefordert werden. Lassen Sie die Zertifikatsprüfung in der Produktion aktiviert.
 
-For the self-signed local test certificate only, connect to `localhost` and disable certificate verification for that session:
+Nur für das selbstsignierte lokale Testzertifikat verbinden Sie sich mit `localhost` und deaktivieren Sie die Zertifikatsprüfung für diese Sitzung:
 
 ```bash
 lftp -u <your-access-key> -e '
@@ -184,13 +184,13 @@ lftp -u <your-access-key> -e '
 
 :::warning
 
-Do not disable certificate verification in production. Install the issuing CA in the client trust store instead.
+Deaktivieren Sie die Zertifikatsprüfung nicht in der Produktion. Installieren Sie stattdessen die ausstellende Zertifizierungsstelle im Vertrauensspeicher des Clients.
 
 :::
 
-### List buckets and create a bucket
+### Buckets auflisten und einen Bucket erstellen
 
-At the `lftp` prompt, list the visible buckets and create `my-bucket`:
+Listen Sie an der `lftp`-Eingabeaufforderung die sichtbaren Buckets auf und erstellen Sie `my-bucket`:
 
 ```text
 lftp> cls -1 /
@@ -198,11 +198,11 @@ lftp> mkdir my-bucket
 lftp> cd my-bucket
 ```
 
-Bucket names must follow the same naming rules as buckets created through the S3 API.
+Bucket-Namen müssen denselben Namensregeln folgen wie Buckets, die über die S3-API erstellt werden.
 
-### Upload and download an object
+### Objekt hochladen und herunterladen
 
-Upload `/path/to/hello.txt`, list the bucket, and download the object:
+Laden Sie `/path/to/hello.txt` hoch, listen Sie den Bucket auf und laden Sie das Objekt herunter:
 
 ```text
 lftp> put /path/to/hello.txt -o hello.txt
@@ -210,11 +210,11 @@ lftp> ls
 lftp> get hello.txt -o hello.txt
 ```
 
-The upload replaces an object with the same key. Appending to an existing object is not supported.
+Der Upload ersetzt ein Objekt mit demselben Objektschlüssel. Das Anfügen an ein vorhandenes Objekt wird nicht unterstützt.
 
-### Delete an object and bucket
+### Objekt und Bucket löschen
 
-Delete the object, return to the root, and delete the bucket:
+Löschen Sie das Objekt, kehren Sie zum Wurzelverzeichnis zurück und löschen Sie den Bucket:
 
 ```text
 lftp> rm hello.txt
@@ -222,25 +222,25 @@ lftp> cd /
 lftp> rmdir my-bucket
 ```
 
-Remember that `rmdir` recursively removes remaining objects from the bucket before deleting it.
+Denken Sie daran, dass `rmdir` verbleibende Objekte rekursiv aus dem Bucket entfernt, bevor es ihn löscht.
 
-### Connect other clients
+### Andere Clients verbinden
 
-Use these settings in graphical FTP clients such as FileZilla or Cyberduck:
+Verwenden Sie diese Einstellungen in grafischen FTP-Clients wie FileZilla oder Cyberduck:
 
-| Setting | FTP test listener | FTPS listener |
+| Einstellung | FTP-Testlistener | FTPS-Listener |
 | --- | --- | --- |
-| Protocol | FTP | FTP over TLS (explicit) |
-| Host | `127.0.0.1` | Your FTPS hostname |
+| Protokoll | FTP | FTP over TLS (explicit) |
+| Host | `127.0.0.1` | Ihr FTPS-Hostname |
 | Port | `8021` | `8022` |
-| Username | RustFS access key | RustFS access key |
-| Password | RustFS secret key | RustFS secret key |
-| Transfer mode | Passive | Passive |
+| Benutzername | RustFS-Zugriffsschlüssel | RustFS-Zugriffsschlüssel |
+| Passwort | Geheimer Zugriffsschlüssel von RustFS | Geheimer Zugriffsschlüssel von RustFS |
+| Übertragungsmodus | Passiv | Passiv |
 
-If login succeeds but directory listings or transfers time out, check the passive port firewall rules and external IP setting first.
+Wenn die Anmeldung gelingt, Verzeichnisauflistungen oder Übertragungen aber in ein Zeitlimit laufen, prüfen Sie zuerst die Firewall-Regeln der passiven Ports und die Einstellung der externen IP.
 
-## Next steps
+## Nächste Schritte
 
-- [Manage credentials](/operations/credentials)
-- [Configure TLS](/integration/tls-configured)
-- [Check service status](/operations/status-check)
+- [Zugangsdaten verwalten](/de/operations/credentials)
+- [TLS konfigurieren](/de/integration/tls-configured)
+- [Dienststatus prüfen](/de/operations/status-check)

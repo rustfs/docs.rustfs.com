@@ -1,24 +1,24 @@
 ---
 title: "RustFS MCP"
-description: "RustFS MCP Usage Guide"
+description: "Connect AI assistants to RustFS object storage with the RustFS MCP server."
 ---
 
-**RustFS MCP Server** is a high-performance [Model Context Protocol (MCP)](https://www.anthropic.com/news/model-context-protocol) server that provides AI/LLM tools with seamless access to S3-compatible object storage operations. Built with Rust for performance and security, it enables AI assistants like Claude Desktop to interact with cloud storage through standardized protocols.
+**RustFS MCP Server** is a [Model Context Protocol (MCP)](https://www.anthropic.com/news/model-context-protocol) server that gives AI assistants, such as Claude Desktop, access to S3-compatible object storage.
 
 ### What is MCP?
 
 The Model Context Protocol is an open standard that enables AI applications to establish secure, controlled connections with external systems. This server acts as a bridge between AI tools and S3-compatible storage services, providing structured access to file operations while maintaining security and observability.
 
-## ✨ Features
+## Features
 
-### Supported S3 Operations
+### Supported S3 operations
 
 - **List Buckets**: Lists all accessible S3 buckets.
 - **List Objects**: Browses bucket contents with optional prefix filtering.
 - **Upload Files**: Uploads local files with automatic MIME type detection and cache control.
 - **Get Objects**: Retrieves objects from S3 storage, supporting read or download modes.
 
-## 🔧 Installation
+## Installation
 
 :::warning[Build instructions may be outdated]
 
@@ -32,7 +32,7 @@ The `rustfs-mcp` crate is no longer part of the current `rustfs/rustfs` main bra
 - Configured AWS credentials (via environment variables, AWS CLI, or IAM roles)
 - Access to S3-compatible storage services
 
-### Building from Source
+### Build from source
 
 ```bash
 # Clone the repository
@@ -46,9 +46,9 @@ cargo build --release -p rustfs-mcp
 ./target/release/rustfs-mcp
 ```
 
-## ⚙️ Configuration
+## Configuration
 
-### Environment Variables
+### Environment variables
 
 ```bash
 # AWS credentials (required)
@@ -63,7 +63,7 @@ export AWS_ENDPOINT_URL=http://localhost:9000
 export RUST_LOG=info
 ```
 
-### Command Line Options
+### Command-line options
 
 ```bash
 rustfs-mcp --help
@@ -77,21 +77,21 @@ The server supports various command line options to customize behavior:
 - `--endpoint-url`: Custom S3 endpoint URL (for MinIO, LocalStack, etc.)
 - `--log-level`: Log level configuration (default: rustfs_mcp_server=info)
 
-## 🚀 Usage
+## Usage
 
-### Starting the Server
+### Start the server
 
 ```bash
 # Start the MCP server
 rustfs-mcp
 
 # Or with custom options
-rustfs-mcp --log-level debug --region us-west-2
+rustfs-mcp --log-level debug --region us-east-1
 ```
 
-### Integration with Chat Clients
+### Connect a chat client
 
-#### Option 1: Using Command Line Arguments
+#### Pass command-line arguments
 
 ```json
 {
@@ -101,7 +101,7 @@ rustfs-mcp --log-level debug --region us-west-2
       "args": [
         "--access-key-id", "your_access_key",
         "--secret-access-key", "your_secret_key",
-        "--region", "us-west-2",
+        "--region", "us-east-1",
         "--log-level", "info"
       ]
     }
@@ -109,7 +109,7 @@ rustfs-mcp --log-level debug --region us-west-2
 }
 ```
 
-#### Option 2: Using Environment Variables
+#### Pass environment variables
 
 ```json
 {
@@ -126,9 +126,9 @@ rustfs-mcp --log-level debug --region us-west-2
 }
 ```
 
-### Using with Docker
+### Run with Docker
 
-[RustFS MCP officially provides a Dockerfile](https://github.com/rustfs/rustfs/tree/main/crates/mcp) that can be used to build container images for using RustFS MCP.
+RustFS MCP provides an [official Dockerfile](https://github.com/rustfs/rustfs/tree/main/crates/mcp) that you can use to build a container image.
 
 ```bash
 # Clone RustFS repository code
@@ -138,11 +138,11 @@ git clone https://github.com/rustfs/rustfs.git
 docker build -f crates/mcp/Dockerfile -t rustfs/rustfs-mcp .
 ```
 
-After successful build, you can configure it in the MCP configuration of AI IDEs.
+After the build succeeds, add the server to your IDE's MCP configuration.
 
-#### Configuring MCP in AI IDEs
+#### Configure MCP in an AI IDE
 
-Currently, mainstream AI IDEs such as Cursor, Windsurf, Trae, etc. all support MCP. For example, in Trae, add the following content to the MCP configuration (**MCP --> Add**):
+Many AI IDEs, such as Cursor, Windsurf, and Trae, support MCP. For example, in Trae, add the following content to the MCP configuration (**MCP --> Add**):
 
 ```json
 {
@@ -174,25 +174,29 @@ Currently, mainstream AI IDEs such as Cursor, Windsurf, Trae, etc. all support M
 }
 ```
 
-> `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are RustFS access keys. You can refer to the [Access Key Management chapter](../security-compliance/iam/access-token.md) for creation.
+:::note[Access keys]
 
-If added successfully, you can list the [available tools](#️-available-tools) on the MCP configuration page.
+`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are RustFS access keys. To create them, see [Access keys](../security-compliance/iam/access-token.md).
 
-![add rustfs mcp in trae mcp configuration successfully](images/add-rustfs-mcp-succ.png)
+:::
 
-In Trae, you can use the corresponding tools by entering the corresponding prompts. For example, in Trae's chat dialog, enter:
+If the server is added successfully, the MCP configuration page lists its [available tools](#available-tools).
+
+![RustFS MCP server added to the MCP configuration in Trae](images/add-rustfs-mcp-succ.png)
+
+To invoke an MCP tool in Trae, enter a prompt in the chat. For example:
 
 ```text
-Please help me list the buckets in the current rustfs instance, thank you!
+List the buckets in this RustFS instance.
 ```
 
-Returns the following response:
+Trae returns the following response:
 
-![list rustfs bucket with rustfs mcp](images/list-rustfs-bucket-with-mcp.png)
+![Trae listing RustFS buckets with the RustFS MCP server](images/list-rustfs-bucket-with-mcp.png)
 
-Trae uses **Builder with MCP** mode, calling the `list_buckets` tool to list all buckets in the configured RustFS instance. The same applies to calls to other tools.
+Trae uses **Builder with MCP** mode, calling the `list_buckets` tool to list all buckets in the configured RustFS instance. Other tools work the same way.
 
-## 🛠️ Available Tools
+## Available tools
 
 The MCP server exposes the following tools that AI assistants can use:
 

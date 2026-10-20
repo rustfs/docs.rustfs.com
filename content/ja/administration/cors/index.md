@@ -1,41 +1,41 @@
 ---
-title: "CORS Configuration"
-description: "Configure allowed browser origins for the RustFS S3 API and Console."
+title: "CORS の設定"
+description: "RustFS の S3 API と Console について、ブラウザから許可するオリジンを設定します。"
 ---
 
-Cross-Origin Resource Sharing (CORS) controls which browser origins can access the RustFS S3 API and Console. Configure each listener separately, then restart RustFS to apply the environment changes.
+Cross-Origin Resource Sharing（CORS）は、どのブラウザオリジンが RustFS の S3 API と Console にアクセスできるかを制御します。リスナーごとに設定したあと、環境変数の変更を反映するために RustFS を再起動します。
 
-## S3 API origins
+## S3 API のオリジン
 
-Set `RUSTFS_CORS_ALLOWED_ORIGINS` to a comma-separated list of trusted origins:
+`RUSTFS_CORS_ALLOWED_ORIGINS` に、信頼できるオリジンをカンマ区切りで設定します。
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_CORS_ALLOWED_ORIGINS="https://app.example.com,https://admin.example.com"
 ```
 
-When this variable is unset or empty, the S3 endpoint does not add generic CORS response headers. A list of explicit origins allows credentialed browser requests from matching origins.
+この変数が未設定または空のとき、S3 エンドポイントは汎用の CORS 応答ヘッダーを付加しません。明示したオリジンの一覧を設定すると、一致するオリジンからの、認証情報を伴うブラウザリクエストが許可されます。
 
-You can set the value to `*` to allow requests from any origin. Wildcard mode does not allow browser credentials.
+任意のオリジンからのリクエストを許可するには、値を `*` にできます。ワイルドカードモードでは、ブラウザの認証情報は許可されません。
 
-:::warning[Use explicit origins in production]
+:::warning[本番では明示したオリジンを使う]
 
-Use a comma-separated allowlist for applications that send credentials. Reserve `*` for public resources that do not require credentialed browser requests.
+認証情報を送信するアプリケーションには、カンマ区切りの許可リストを使います。認証情報を伴うブラウザリクエストが不要な公開リソースに限り、`*` を使います。
 
 :::
 
-## Console origins
+## Console のオリジン
 
-The Console uses a separate variable:
+Console は、別の変数を使います。
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_CONSOLE_CORS_ALLOWED_ORIGINS="https://admin.example.com"
 ```
 
-Use a comma-separated list when more than one browser origin must access the Console. Set `*` only when any origin must be allowed.
+複数のブラウザオリジンが Console にアクセスする必要がある場合は、カンマ区切りの一覧を使います。任意のオリジンを許可する必要がある場合にだけ、`*` を設定します。
 
-## Verify the response
+## 応答を確認する
 
-Send a request with an `Origin` header and inspect the CORS response headers:
+`Origin` ヘッダーを付けてリクエストを送り、CORS の応答ヘッダーを確認します。
 
 ```bash
 curl -i \
@@ -43,8 +43,8 @@ curl -i \
   http://localhost:9000/
 ```
 
-Confirm that `Access-Control-Allow-Origin` contains the expected origin. Repeat the check with an unlisted origin and confirm that it is not allowed.
+`Access-Control-Allow-Origin` に、想定したオリジンが含まれていることを確認します。一覧にないオリジンでも確認を繰り返し、許可されていないことを確認します。
 
-## Next steps
+## 次のステップ
 
-See the [environment variable reference](/reference/environment-variables#cors) for the verified defaults and configuration formats.
+検証済みの既定値と設定形式は、[環境変数リファレンス](/ja/reference/environment-variables#cors) を参照します。

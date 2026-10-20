@@ -1,11 +1,11 @@
 ---
-title: "Database"
-description: "Connect databases to RustFS through S3-compatible object storage interfaces."
+title: "Bases de données"
+description: "Connectez des bases de données à RustFS par des interfaces de stockage objet compatibles avec S3."
 ---
 
-Use **RustFS** as the object storage layer for databases that support an S3-compatible endpoint.
+Utilisez **RustFS** comme couche de stockage objet pour les bases de données qui prennent en charge un point de terminaison compatible avec S3.
 
-## Databases
+## Bases de données
 
 - [ClickHouse](./clickhouse.md)
 - [Doris](./doris.md)
@@ -17,4 +17,4 @@ Use **RustFS** as the object storage layer for databases that support an S3-comp
 - [Databend](./databend.md)
 - [Vitess](./vitess.md)
 
-Keep database data and backups in a dedicated bucket and prefix, and use credentials scoped to the required bucket operations.
+Conservez les données et les sauvegardes de base de données dans un compartiment (bucket) et un préfixe dédiés, et utilisez des identifiants limités aux opérations requises sur ce compartiment.

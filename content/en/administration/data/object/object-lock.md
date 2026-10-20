@@ -23,13 +23,13 @@ COMPLIANCE retention cannot be bypassed or shortened before its retain-until dat
 
 :::
 
-## Configure in the Console
+## Configure on the Console
 
 1. Sign in to the RustFS Console and open **Buckets**.
 2. Select **Create Bucket** and enter the bucket name.
 3. Enable **Object Lock**. The Console also enables **Version** because Object Lock requires versioning.
 4. To apply retention automatically to new object versions, enable **Retention**.
-5. Select **COMPLIANCE** or **GOVERNANCE**, enter the validity, and select **Day** or **Year**.
+5. Select **COMPLIANCE** or **GOVERNANCE**, enter the retention period, and select **Day** or **Year**.
 6. Select **Create**.
 
 ![Create Bucket dialog with versioning, Object Lock, and default retention enabled](./images/object-lock-create-bucket.png)
@@ -48,9 +48,9 @@ rc alias set rustfs http://localhost:9000 \
 	--region us-east-1 --bucket-lookup path
 ```
 
-:::note[rc 0.1.29 bucket creation boundary]
+:::note[Bucket creation limitation in rc 0.1.29]
 
-`rc bucket create --with-lock` and `--with-versioning` appear in the `rc 0.1.29` help output but return `not implemented` when executed. Create the Object Lock bucket in the Console. The upload headers shown below are supported and were validated against RustFS.
+`rc bucket create --with-lock` and `--with-versioning` appear in the `rc 0.1.29` help output but return `not implemented` when executed. Create the Object Lock bucket on the Console. The upload headers shown below are supported and were validated against RustFS.
 
 :::
 
@@ -84,7 +84,7 @@ rc object stat rustfs/my-bucket/hello.txt \
 1. Upload a test object with GOVERNANCE retention or Legal Hold.
 2. Record its version ID with `rc bucket version list`.
 3. Attempt to delete that exact version through an S3 client without bypass. RustFS must return `AccessDenied` while protection is active.
-4. Confirm the version remains visible in the Console and through `rc object stat --version-id`.
+4. Confirm the version remains visible on the Console and through `rc object stat --version-id`.
 
 For GOVERNANCE retention, test bypass only with a dedicated administrative identity that has `s3:BypassGovernanceRetention`. COMPLIANCE retention and Legal Hold remain protected from governance bypass.
 

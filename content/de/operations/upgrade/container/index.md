@@ -1,45 +1,45 @@
 ---
-title: "Container Upgrade"
-description: "Upgrade RustFS containers started with Docker, Podman, or Docker Compose while preserving persistent data."
+title: "Container-Upgrade"
+description: "Aktualisieren Sie mit Docker, Podman oder Docker Compose gestartete RustFS-Container und behalten Sie persistente Daten bei."
 ---
 
-Upgrade a container deployment by recreating the RustFS container from a newer image. Choose the workflow that matches the original installation method: a container started directly with Docker or Podman, or a service managed by Docker Compose.
+Aktualisieren Sie eine Container-Bereitstellung, indem Sie den RustFS-Container aus einem neueren Image neu erzeugen. Wählen Sie den Ablauf, der zur ursprünglichen Installationsmethode passt: ein direkt mit Docker oder Podman gestarteter Container oder ein von Docker Compose verwalteter Dienst.
 
-## Before you upgrade
+## Vor dem Upgrade
 
-Read the target release notes and use an explicit image tag for the upgrade. Record the current image and retain the original `docker run`, `podman run`, or Compose configuration because recreating a container does not copy its runtime options automatically.
+Lesen Sie die Versionshinweise der Zielversion und verwenden Sie für das Upgrade ein explizites Image-Tag. Notieren Sie das aktuelle Image und bewahren Sie die ursprüngliche Konfiguration von `docker run`, `podman run` oder Compose auf, weil das Neuerzeugen eines Containers dessen Laufzeitoptionen nicht automatisch übernimmt.
 
-Confirm that RustFS is healthy before replacing it:
+Bestätigen Sie, dass RustFS betriebsbereit ist, bevor Sie es ersetzen:
 
 ```bash
 curl -fsS http://localhost:9000/health/ready
 ```
 
-:::warning[Preserve persistent storage]
+:::warning[Persistenten Speicher bewahren]
 
-Do not remove the named volume or host directory mounted at `/data`. Commands such as `docker compose down -v`, `docker volume rm`, and `podman volume rm` delete persistent storage and are not part of an upgrade.
+Entfernen Sie weder das benannte Volume noch das Hostverzeichnis, das unter `/data` eingehängt ist. Befehle wie `docker compose down -v`, `docker volume rm` und `podman volume rm` löschen persistenten Speicher und gehören nicht zu einem Upgrade.
 
 :::
 
-## Upgrade a Docker container
+## Einen Docker-Container aktualisieren
 
-The following workflow matches the container name and named volume used in the [Docker installation guide](/installation/container/docker). If your deployment uses different ports, environment variables, mounts, or startup arguments, keep those settings unchanged in the replacement command.
+Der folgende Ablauf entspricht dem Containernamen und dem benannten Volume aus der [Docker-Installationsanleitung](/de/installation/container/docker). Wenn Ihre Bereitstellung andere Ports, Umgebungsvariablen, Einhängungen oder Startargumente verwendet, lassen Sie diese Einstellungen im Ersatzbefehl unverändert.
 
-Record the current image, then pull the target version:
+Notieren Sie das aktuelle Image und ziehen Sie dann die Zielversion:
 
 ```bash
 docker inspect --format '{{.Config.Image}}' rustfs
 docker pull rustfs/rustfs:<target-version>
 ```
 
-Stop and remove only the container. The `rustfs-data` volume remains intact:
+Stoppen und entfernen Sie nur den Container. Das Volume `rustfs-data` bleibt erhalten:
 
 ```bash
 docker stop rustfs
 docker rm rustfs
 ```
 
-Recreate the container with the original configuration and the target image:
+Erzeugen Sie den Container mit der ursprünglichen Konfiguration und dem Ziel-Image neu:
 
 ```bash
 docker run -d \
@@ -59,7 +59,7 @@ docker run -d \
 	/data
 ```
 
-Wait for the replacement container to become healthy:
+Warten Sie, bis der Ersatzcontainer betriebsbereit ist:
 
 ```bash
 docker ps --filter name=rustfs
@@ -67,9 +67,9 @@ docker logs rustfs
 curl -fsS http://localhost:9000/health/ready
 ```
 
-## Upgrade a Podman container
+## Einen Podman-Container aktualisieren
 
-The Podman workflow is the same replacement operation, using the image name from the [Podman installation guide](/installation/container/podman).
+Der Podman-Ablauf ist derselbe Ersatzvorgang und verwendet den Image-Namen aus der [Podman-Installationsanleitung](/de/installation/container/podman).
 
 ```bash
 podman inspect --format '{{.Config.Image}}' rustfs
@@ -78,7 +78,7 @@ podman stop rustfs
 podman rm rustfs
 ```
 
-Recreate the container with the original configuration and persistent volume:
+Erzeugen Sie den Container mit der ursprünglichen Konfiguration und dem persistenten Volume neu:
 
 ```bash
 podman run -d \
@@ -97,7 +97,7 @@ podman run -d \
 	/data
 ```
 
-Verify the replacement before continuing:
+Prüfen Sie den Ersatz, bevor Sie fortfahren:
 
 ```bash
 podman ps --filter name=rustfs
@@ -105,16 +105,16 @@ podman logs rustfs
 curl -fsS http://localhost:9000/health/ready
 ```
 
-## Upgrade with Docker Compose
+## Mit Docker Compose aktualisieren
 
-Run Compose commands from the directory containing the deployment's `docker-compose.yml`. Before the upgrade, save the fully resolved configuration and confirm the current image:
+Führen Sie Compose-Befehle aus dem Verzeichnis aus, das die `docker-compose.yml` der Bereitstellung enthält. Speichern Sie vor dem Upgrade die vollständig aufgelöste Konfiguration und bestätigen Sie das aktuelle Image:
 
 ```bash
 docker compose config > docker-compose.resolved.yaml
 docker compose images rustfs
 ```
 
-Change the `rustfs` service to an explicit target image tag while leaving its volumes, environment, ports, and command unchanged:
+Setzen Sie den Dienst `rustfs` auf ein explizites Ziel-Image-Tag und lassen Sie Volumes, Umgebung, Ports und Befehl unverändert:
 
 ```yaml title="docker-compose.yml"
 services:
@@ -122,7 +122,7 @@ services:
 		image: rustfs/rustfs:<target-version>
 ```
 
-Validate the file, pull the target image, and recreate only the RustFS service. `--no-deps` leaves optional observability services running:
+Prüfen Sie die Datei, ziehen Sie das Ziel-Image und erzeugen Sie nur den RustFS-Dienst neu. `--no-deps` lässt optionale Observability-Dienste weiterlaufen:
 
 ```bash
 docker compose config --quiet
@@ -130,7 +130,7 @@ docker compose pull rustfs
 docker compose up -d --no-deps rustfs
 ```
 
-Check the service and the RustFS readiness endpoint:
+Prüfen Sie den Dienst und den Bereitschafts-Endpunkt von RustFS:
 
 ```bash
 docker compose ps rustfs
@@ -138,19 +138,19 @@ docker compose logs --tail=100 rustfs
 curl -fsS http://localhost:9000/health/ready
 ```
 
-If you started RustFS together with the `observability` profile, the RustFS service still upgrades with the same commands. Upgrade observability images separately according to each component's release notes.
+Wenn Sie RustFS zusammen mit dem Profil `observability` gestartet haben, wird der RustFS-Dienst mit denselben Befehlen aktualisiert. Aktualisieren Sie Observability-Images getrennt nach den Versionshinweisen der jeweiligen Komponente.
 
-## Upgrade a multi-node deployment
+## Eine Bereitstellung mit mehreren Knoten aktualisieren
 
-Replace one RustFS node at a time. Wait for the upgraded node's readiness endpoint to succeed and confirm cluster status before proceeding to the next node. Do not recreate all nodes simultaneously.
+Ersetzen Sie jeweils einen RustFS-Knoten. Warten Sie, bis der Bereitschafts-Endpunkt des aktualisierten Knotens erfolgreich antwortet, und bestätigen Sie den Clusterstatus, bevor Sie zum nächsten Knoten wechseln. Erzeugen Sie nicht alle Knoten gleichzeitig neu.
 
-Use the same Docker, Podman, or Compose workflow on each node, preserving that node's existing mounts and configuration.
+Verwenden Sie auf jedem Knoten denselben Ablauf für Docker, Podman oder Compose und behalten Sie die vorhandenen Einhängungen und die Konfiguration dieses Knotens bei.
 
-## Roll back
+## Zurücksetzen
 
-For Docker or Podman, stop and remove the failed replacement container, then repeat the corresponding `run` command with the previously recorded image tag. Keep the same persistent volume and runtime configuration.
+Stoppen und entfernen Sie bei Docker oder Podman den fehlgeschlagenen Ersatzcontainer und wiederholen Sie den zugehörigen `run`-Befehl mit dem zuvor notierten Image-Tag. Behalten Sie dasselbe persistente Volume und dieselbe Laufzeitkonfiguration bei.
 
-For Docker Compose, restore the previous `image` value in `docker-compose.yml`, then recreate the RustFS service:
+Setzen Sie bei Docker Compose den vorherigen Wert von `image` in `docker-compose.yml` wieder ein und erzeugen Sie dann den RustFS-Dienst neu:
 
 ```bash
 docker compose pull rustfs
@@ -158,8 +158,8 @@ docker compose up -d --no-deps rustfs
 curl -fsS http://localhost:9000/health/ready
 ```
 
-In a multi-node deployment, roll back one node at a time and wait for readiness before continuing.
+Setzen Sie in einer Bereitstellung mit mehreren Knoten jeweils einen Knoten zurück und warten Sie auf Bereitschaft, bevor Sie fortfahren.
 
-## Next steps
+## Nächste Schritte
 
-Review [Status Check](/operations/status-check) for additional post-upgrade validation.
+Weitere Prüfungen nach dem Upgrade finden Sie unter [Statusprüfung](/de/operations/status-check).

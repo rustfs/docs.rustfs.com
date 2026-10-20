@@ -1,9 +1,9 @@
 ---
 title: "DevOps"
-description: "Verbinden Sie DevOps-Plattformen und Infrastructure-Tooling über S3-kompatible Objektspeicher-Schnittstellen mit RustFS."
+description: "Verbinden Sie DevOps-Plattformen und Infrastruktur-Tools über S3-kompatible Objektspeicher-Schnittstellen mit RustFS."
 ---
 
-Nutzen Sie **RustFS** als Objektspeicher-Layer für DevOps-Plattformen und Infrastructure-Tooling, die einen S3-kompatiblen Endpunkt unterstützen.
+Nutzen Sie **RustFS** als Objektspeicher-Backend für DevOps-Plattformen und Infrastruktur-Tools mit S3-kompatiblem Endpunkt.
 
 ## Plattformen und Tools
 
@@ -13,4 +13,4 @@ Nutzen Sie **RustFS** als Objektspeicher-Layer für DevOps-Plattformen und Infra
 - [Jenkins](./jenkins.md)
 - [Terraform](./terraform.md)
 
-Speichern Sie Artefakte, State und Telemetriedaten in dedizierten Buckets und beschränken Sie die Anmeldeinformationen auf die erforderlichen Bucket-Operationen.
+Speichern Sie Artefakte, State und Telemetriedaten in dedizierten Buckets und beschränken Sie die Zugangsdaten auf die erforderlichen Bucket-Operationen.

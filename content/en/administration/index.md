@@ -12,6 +12,6 @@ Use this section to manage RustFS through the Console, administer buckets and ob
 - [S3 Tables](/administration/data/s3-tables) covers table buckets and the built-in Iceberg REST catalog.
 - [Protocol Support](./protocols/s3.md) covers S3, WebDAV, FTPS, and SFTP access.
 - [CORS Configuration](./cors/index.md) covers cross-origin access to RustFS services.
-- [Virtual-Host Access](/integration/virtual) covers domain-based S3 addressing.
+- [Virtual-hosted–style requests](/integration/virtual) cover domain-based S3 addressing.
 
 For identity, encryption, transport security, and auditing, continue with [Security & Compliance](/security-compliance).

@@ -1,58 +1,58 @@
 ---
-title: "Bucket Policy"
-description: "Create, apply, inspect, and verify RustFS bucket policies with the S3 API."
+title: "Bucket-Richtlinie"
+description: "Erstellen, anwenden, lesen und prüfen Sie Bucket-Richtlinien von RustFS über die S3-API."
 ---
 
-RustFS bucket policies are S3-compatible resource policies attached directly to a bucket. Use them to grant or deny access to the bucket and its objects, including controlled anonymous access for public downloads.
+Bucket-Richtlinien von RustFS sind S3-kompatible Ressourcenrichtlinien, die direkt an einen Bucket gebunden sind. Damit gewähren oder verweigern Sie den Zugriff auf den Bucket und seine Objekte, einschließlich eines kontrollierten anonymen Zugriffs für öffentliche Downloads.
 
-## Overview
+## Überblick
 
-A bucket policy contains one or more statements that match a principal, action, resource, and optional conditions. RustFS evaluates the policy for requests to the bucket before allowing the storage operation.
+Eine Bucket-Richtlinie enthält eine oder mehrere Anweisungen, die einen Principal, eine Aktion, eine Ressource und optionale Bedingungen abgleichen. RustFS wertet die Richtlinie für Anfragen an den Bucket aus, bevor es die Speicheroperation zulässt.
 
-Bucket policies and IAM policies serve different purposes:
+Bucket-Richtlinien und IAM-Richtlinien erfüllen unterschiedliche Zwecke:
 
-| Policy type | Attached to | Typical use |
+| Richtlinientyp | Gebunden an | Typische Verwendung |
 | --- | --- | --- |
-| Bucket policy | A bucket | Grant public access, add resource-level restrictions, or authorize access to one bucket. |
-| IAM policy | A user or group | Define what an authenticated identity can do across one or more resources. |
+| Bucket-Richtlinie | Einen Bucket | Öffentlichen Zugriff gewähren, Einschränkungen auf Ressourcenebene hinzufügen oder den Zugriff auf einen Bucket autorisieren. |
+| IAM-Richtlinie | Einen Benutzer oder eine Gruppe | Festlegen, was eine authentifizierte Identität über eine oder mehrere Ressourcen tun darf. |
 
-An explicit `Deny` takes precedence over an `Allow`. Bucket owners remain able to get, replace, or delete the bucket policy so that a deny statement cannot permanently lock policy administration.
+Ein ausdrückliches `Deny` hat Vorrang vor einem `Allow`. Bucket-Eigentümer können die Bucket-Richtlinie weiterhin abrufen, ersetzen oder löschen, damit eine Deny-Anweisung die Richtlinienverwaltung nicht dauerhaft sperrt.
 
-RustFS implements the standard S3 operations `PutBucketPolicy`, `GetBucketPolicy`, `GetBucketPolicyStatus`, and `DeleteBucketPolicy`.
+RustFS implementiert die Standard-S3-Operationen `PutBucketPolicy`, `GetBucketPolicy`, `GetBucketPolicyStatus` und `DeleteBucketPolicy`.
 
-:::warning[Public policies]
+:::warning[Öffentliche Richtlinien]
 
-A statement with `"Principal": "*"` can grant access without authentication. Keep the action and resource scope as narrow as possible, and verify the result anonymously before using the policy in production.
+Eine Anweisung mit `"Principal": "*"` kann Zugriff ohne Authentifizierung gewähren. Halten Sie den Umfang von Aktion und Ressource so eng wie möglich und prüfen Sie das Ergebnis anonym, bevor Sie die Richtlinie in der Produktion verwenden.
 
 :::
 
-## Configuration
+## Konfiguration
 
-### Requirements
+### Voraussetzungen
 
-- Create the target bucket before applying a policy.
-- Configure the AWS CLI with a RustFS credential and region `us-east-1`.
-- Use a credential allowed to perform the required policy-management action.
+- Erstellen Sie den Ziel-Bucket, bevor Sie eine Richtlinie anwenden.
+- Konfigurieren Sie die AWS CLI mit RustFS-Zugangsdaten und der Region `us-east-1`.
+- Verwenden Sie Zugangsdaten, die die erforderliche Aktion zur Richtlinienverwaltung ausführen dürfen.
 
-Set reusable variables:
+Setzen Sie wiederverwendbare Variablen:
 
 ```bash
 export RUSTFS_ENDPOINT=http://localhost:9000
 export BUCKET_NAME=my-bucket
 ```
 
-Policy management requires these actions:
+Die Richtlinienverwaltung erfordert diese Aktionen:
 
-| Operation | Required action |
+| Operation | Erforderliche Aktion |
 | --- | --- |
-| Apply or replace a policy | `s3:PutBucketPolicy` |
-| Read a policy | `s3:GetBucketPolicy` |
-| Read public status | `s3:GetBucketPolicyStatus` |
-| Remove a policy | `s3:DeleteBucketPolicy` |
+| Richtlinie anwenden oder ersetzen | `s3:PutBucketPolicy` |
+| Richtlinie lesen | `s3:GetBucketPolicy` |
+| Öffentlichen Status lesen | `s3:GetBucketPolicyStatus` |
+| Richtlinie entfernen | `s3:DeleteBucketPolicy` |
 
-### Policy document structure
+### Aufbau des Richtliniendokuments
 
-A bucket policy uses version `2012-10-17` and a `Statement` array:
+Eine Bucket-Richtlinie verwendet die Version `2012-10-17` und ein `Statement`-Array:
 
 ```json
 {
@@ -69,26 +69,26 @@ A bucket policy uses version `2012-10-17` and a `Statement` array:
 }
 ```
 
-The bucket ARN and object ARN are different:
+Die Bucket-ARN und die Objekt-ARN unterscheiden sich:
 
-| Resource | ARN format | Example actions |
+| Ressource | ARN-Format | Beispielaktionen |
 | --- | --- | --- |
 | Bucket | `arn:aws:s3:::my-bucket` | `s3:ListBucket`, `s3:GetBucketLocation` |
-| Objects | `arn:aws:s3:::my-bucket/*` | `s3:GetObject`, `s3:PutObject`, `s3:DeleteObject` |
+| Objekte | `arn:aws:s3:::my-bucket/*` | `s3:GetObject`, `s3:PutObject`, `s3:DeleteObject` |
 
-Use a prefix in the object ARN, such as `arn:aws:s3:::my-bucket/public/*`, to limit access to part of the bucket. For the complete statement format and supported condition operators, see [Users, Groups, and Policies](/security-compliance/iam/policies#policy-document-format).
+Verwenden Sie ein Präfix in der Objekt-ARN, etwa `arn:aws:s3:::my-bucket/public/*`, um den Zugriff auf einen Teil des Buckets zu beschränken. Das vollständige Anweisungsformat und die unterstützten Bedingungsoperatoren stehen unter [Benutzer, Gruppen und Richtlinien](/de/security-compliance/iam/policies#policy-document-format).
 
 ### Public Access Block
 
-If the bucket's Public Access Block configuration has `BlockPublicPolicy` enabled, RustFS rejects a new policy containing an `Allow` statement with a wildcard principal. Keep this protection enabled unless anonymous access is intentional.
+Wenn `BlockPublicPolicy` in der Konfiguration Public Access Block (Sperre für öffentlichen Zugriff) des Buckets aktiviert ist, lehnt RustFS eine neue Richtlinie ab, die eine `Allow`-Anweisung mit einem Wildcard-Principal enthält. Lassen Sie diesen Schutz aktiviert, solange anonymer Zugriff nicht beabsichtigt ist.
 
-Public Access Block does not replace careful policy review. An existing explicit `Deny` still overrides allows, and authenticated requests continue to be evaluated against IAM and bucket policies.
+Public Access Block ersetzt keine sorgfältige Prüfung der Richtlinie. Ein vorhandenes ausdrückliches `Deny` setzt Allows weiterhin außer Kraft, und authentifizierte Anfragen werden weiterhin gegen IAM- und Bucket-Richtlinien geprüft.
 
-## Usage
+## Verwendung
 
-### Create a public-read policy
+### Richtlinie für öffentliches Lesen erstellen
 
-Create a policy that allows anonymous downloads only from the `public/` prefix:
+Erstellen Sie eine Richtlinie, die anonyme Downloads nur aus dem Präfix `public/` erlaubt:
 
 ```bash
 cat > /tmp/my-bucket-policy.json <<'EOF'
@@ -107,9 +107,9 @@ cat > /tmp/my-bucket-policy.json <<'EOF'
 EOF
 ```
 
-This policy does not allow anonymous bucket listing, uploads, overwrites, or deletes.
+Diese Richtlinie erlaubt kein anonymes Auflisten des Buckets, keine Uploads, keine Überschreibungen und keine Löschungen.
 
-### Apply the policy
+### Richtlinie anwenden
 
 ```bash
 aws s3api put-bucket-policy \
@@ -118,9 +118,9 @@ aws s3api put-bucket-policy \
 	--endpoint-url "$RUSTFS_ENDPOINT"
 ```
 
-Applying another policy replaces the complete existing policy. Retrieve and review the current document before updating it; statements are not merged automatically.
+Eine weitere Richtlinie ersetzt die bestehende Richtlinie vollständig. Rufen Sie das aktuelle Dokument ab und prüfen Sie es, bevor Sie es aktualisieren. Anweisungen werden nicht automatisch zusammengeführt.
 
-### Read the policy
+### Richtlinie lesen
 
 ```bash
 aws s3api get-bucket-policy \
@@ -130,9 +130,9 @@ aws s3api get-bucket-policy \
 	--output text
 ```
 
-RustFS preserves the submitted policy JSON. If no policy exists, the API returns `NoSuchBucketPolicy`.
+RustFS behält das übermittelte Richtlinien-JSON bei. Wenn keine Richtlinie vorhanden ist, gibt die API `NoSuchBucketPolicy` zurück.
 
-### Check public status
+### Öffentlichen Status prüfen
 
 ```bash
 aws s3api get-bucket-policy-status \
@@ -140,7 +140,7 @@ aws s3api get-bucket-policy-status \
 	--endpoint-url "$RUSTFS_ENDPOINT"
 ```
 
-The response contains a high-level public-access status:
+Die Antwort enthält einen groben Status zum öffentlichen Zugriff:
 
 ```json
 {
@@ -150,9 +150,9 @@ The response contains a high-level public-access status:
 }
 ```
 
-The current status check detects anonymous bucket listing (`s3:ListBucket`) and uploads (`s3:PutObject`). A policy that exposes only object downloads, such as the `public/` example above, can still report `false`. Always test the exact anonymous action, object prefix, and conditions instead of treating this status as a complete access analysis.
+Die aktuelle Statusprüfung erkennt anonymes Auflisten des Buckets (`s3:ListBucket`) und Uploads (`s3:PutObject`). Eine Richtlinie, die nur Objekt-Downloads freigibt, wie das Beispiel `public/` oben, kann weiterhin `false` melden. Prüfen Sie immer die genaue anonyme Aktion, das Objektpräfix und die Bedingungen, anstatt diesen Status als vollständige Zugriffsanalyse zu behandeln.
 
-### Remove the policy
+### Richtlinie entfernen
 
 ```bash
 aws s3api delete-bucket-policy \
@@ -160,11 +160,11 @@ aws s3api delete-bucket-policy \
 	--endpoint-url "$RUSTFS_ENDPOINT"
 ```
 
-Deleting a bucket policy removes only that resource policy. IAM policies attached to users and groups remain unchanged.
+Das Löschen einer Bucket-Richtlinie entfernt nur diese Ressourcenrichtlinie. IAM-Richtlinien, die an Benutzer und Gruppen gebunden sind, bleiben unverändert.
 
-## Verification
+## Überprüfung
 
-Upload a test object with an authenticated credential:
+Laden Sie ein Testobjekt mit authentifizierten Zugangsdaten hoch:
 
 ```bash
 printf 'hello from RustFS\n' > /tmp/hello.txt
@@ -176,14 +176,14 @@ aws s3api put-object \
 	--endpoint-url "$RUSTFS_ENDPOINT"
 ```
 
-Verify that the allowed object can be downloaded without credentials:
+Prüfen Sie, dass das zugelassene Objekt ohne Zugangsdaten heruntergeladen werden kann:
 
 ```bash
 curl --fail-with-body \
 	"${RUSTFS_ENDPOINT}/${BUCKET_NAME}/public/hello.txt"
 ```
 
-Then verify that an object outside the allowed prefix is not public:
+Prüfen Sie anschließend, dass ein Objekt außerhalb des zugelassenen Präfixes nicht öffentlich ist:
 
 ```bash
 aws s3api put-object \
@@ -196,10 +196,10 @@ curl --fail-with-body \
 	"${RUSTFS_ENDPOINT}/${BUCKET_NAME}/private/hello.txt"
 ```
 
-The second `curl` request should fail with `AccessDenied`. Also test each authenticated user role that relies on the policy, especially when the document contains conditions or explicit deny statements.
+Die zweite `curl`-Anfrage sollte mit `AccessDenied` fehlschlagen. Prüfen Sie außerdem jede authentifizierte Benutzerrolle, die sich auf die Richtlinie stützt, besonders wenn das Dokument Bedingungen oder ausdrückliche Deny-Anweisungen enthält.
 
-## Next steps
+## Nächste Schritte
 
-- [Manage IAM policies](/security-compliance/iam/policies)
-- [Manage credentials](/operations/credentials)
-- [Configure audit logs](/security-compliance/audit-logs)
+- [IAM-Richtlinien verwalten](/de/security-compliance/iam/policies)
+- [Zugangsdaten verwalten](/de/operations/credentials)
+- [Audit-Protokolle konfigurieren](/de/security-compliance/audit-logs)

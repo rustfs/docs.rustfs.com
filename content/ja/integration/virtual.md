@@ -1,61 +1,64 @@
 ---
-title: "Virtual Host Style"
-description: "RustFS S3 Virtual Host Style and Path Style configuration."
+title: "仮想ホスト形式"
+description: "RustFS でパススタイルアクセスと仮想ホスト形式の S3 URL を設定します。"
 ---
 
-RustFS complies with S3 protocols. S3 supports two request modes:
+RustFS は、次の 2 つの S3 URL 形式に対応しています。
 
-1. Virtual Host Style
-2. Path Style
+1. 仮想ホスト形式
+2. パススタイルアクセス
 
-The difference lies in the bucket name placement.
+2 つの形式は、URL のどこにバケット名が現れるかが異なります。
 
-## Path Style
+## パススタイルアクセス
 
-Path Style is the default. In Path Style, the bucket name follows the endpoint.
+パススタイルアクセスが既定です。パススタイルの URL では、バケット名がエンドポイントの後ろに続きます。
 
-Example (Bucket: `test`, Host: `rustfs.yourdomain.com`):
-
-```text
-http://rustfs.yourdomain.com/test
-```
-
-**Note**: No configuration is required for Path Style.
-
-## Virtual Host Style
-
-In Virtual Host Style, the bucket name is part of the domain.
-
-Example (Bucket: `test`, Host: `rustfs.yourdomain.com`):
+例（バケット: `test`、ホスト: `rustfs.yourdomain.com`）:
 
 ```text
-http://test.rustfs.yourdomain.com/
+http://rustfs.example.com/my-bucket
 ```
 
-### Configuration
+**注意**: パススタイルアクセスに設定は不要です。
 
-1. **DNS**: Configure wildcard DNS resolution (e.g., `*.rustfs.yourdomain.com` -> Server IP).
-2. **Configuration**: Modify the configuration file (Linux: `/etc/default/rustfs`, Docker/K8s: env vars).
-3. **Set Domain**: Set `RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com"`.
-4. **Restart**: Restart the service (`systemctl restart rustfs`).
+## 仮想ホスト形式
 
-### Port in Domain (Optional)
+仮想ホスト形式では、バケット名がドメインの一部になります。
 
-Virtual-host routing applies to the S3 API listener (port 9000 by default); RustFS automatically matches `Host` headers that carry the S3 listener's own port. Only when clients reach RustFS through a **different** port (for example via a proxy) do you need to include that port in `RUSTFS_SERVER_DOMAINS`.
-
-Example (`rustfs.yourdomain.com:8000`):
-
-```ini
-RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com:8000"
-```
-
-This ensures that requests like:
+例（バケット: `test`、ホスト: `rustfs.yourdomain.com`）:
 
 ```text
-http://my-bucket.rustfs.yourdomain.com:8000/
+http://my-bucket.rustfs.example.com/
 ```
 
-can be correctly resolved in Virtual Host Style mode.
+### 設定
 
-> ⚠️ Note: The value of `RUSTFS_SERVER_DOMAINS` must exactly match the **Host header** (including the port, if present) used by the client request
+1. **DNS**: ワイルドカード DNS レコードを作成します（例: `*.rustfs.yourdomain.com` → サーバーの IP アドレス）。
+2. **設定**: 設定ファイルを変更します（Linux: `/etc/default/rustfs`、Docker / Kubernetes: 環境変数）。
+3. **ドメインの設定**: `RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com"` を設定します。
+4. **再起動**: サービスを再起動します（`systemctl restart rustfs`）。
 
+### ドメイン内のポート（任意）
+
+仮想ホストのルーティングは S3 API リスナー（既定のポートは 9000）に適用されます。RustFS は、S3 リスナー自身のポートを含む `Host` ヘッダーを自動的に照合します。クライアントが **別の** ポート経由で RustFS に到達する場合（プロキシ経由など）に限り、そのポートを `RUSTFS_SERVER_DOMAINS` に含める必要があります。
+
+例（`rustfs.yourdomain.com:8000`）:
+
+```ini title="/etc/default/rustfs"
+RUSTFS_SERVER_DOMAINS=rustfs.example.com:8000
+```
+
+これにより、次のようなリクエストが、
+
+```text
+http://my-bucket.rustfs.example.com:8000/
+```
+
+仮想ホスト形式で正しくルーティングされます。
+
+:::warning[Host ヘッダーとの一致]
+
+`RUSTFS_SERVER_DOMAINS` の値は、クライアントが送信する `Host` ヘッダー（ポートが含まれる場合はそのポートも含む）と完全に一致する必要があります。
+
+:::

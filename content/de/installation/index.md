@@ -1,38 +1,44 @@
 ---
 title: "Installation"
-description: "Choose the right RustFS deployment path: local trial, single-node or multi-node production, containers, and Kubernetes."
+description: "Wählen Sie den passenden Bereitstellungspfad für RustFS: lokaler Test, Produktion auf einem oder mehreren Knoten, Container und Kubernetes."
 ---
 
-RustFS is a distributed object storage system written in Rust and released under the Apache 2.0 license. It runs on Linux, Windows, macOS, FreeBSD, and containers, across x86, ARM, RISC-V, and other CPU architectures.
+RustFS ist ein verteiltes Objektspeichersystem. Es ist in Rust geschrieben und steht unter der Apache-2.0-Lizenz. Es läuft auf Linux, Windows, macOS und FreeBSD sowie in Containern, auf x86, ARM, RISC-V und weiteren CPU-Architekturen.
 
-:::warning[Change the default credentials immediately]
+:::warning[Nur für Entwicklung und Debugging]
 
-After installation, set unique values for `RUSTFS_ACCESS_KEY` and `RUSTFS_SECRET_KEY` before exposing RustFS to a network. Do not use the well-known `rustfsadmin` value for either credential.
-
-- For a Linux binary or systemd installation, set both values in `/etc/default/rustfs`, then restart the `rustfs` service.
-- For Docker, Podman, or Docker Compose, pass both values as container environment variables when creating the container. Recreate an existing container if it was started without them.
-- For Docker Swarm, create both values as Docker secrets before you install the chart.
+Die Windows-Version von RustFS ist ausschließlich für Entwicklung und Debugging vorgesehen und wird **nicht für Produktionsbereitstellungen empfohlen**. Für Produktionsarbeitslasten empfehlen wir [Linux](/de/installation/linux).
 
 :::
 
-## Choose Your Path
+:::warning[Standardzugangsdaten sofort ändern]
 
-| Your goal | Recommended path | Guide |
+Legen Sie nach der Installation eindeutige Werte für `RUSTFS_ACCESS_KEY` und `RUSTFS_SECRET_KEY` fest, bevor Sie RustFS in einem Netzwerk erreichbar machen. Verwenden Sie den allgemein bekannten Wert `rustfsadmin` weder als Zugriffsschlüssel noch als geheimen Zugriffsschlüssel.
+
+- Bei einer Installation als Linux-Binärdatei oder mit systemd tragen Sie beide Werte in `/etc/default/rustfs` ein und starten Sie anschließend den Dienst `rustfs` neu.
+- Bei Docker, Podman oder Docker Compose übergeben Sie beide Werte beim Erstellen des Containers als Umgebungsvariablen. Erstellen Sie einen bestehenden Container neu, wenn er ohne diese Werte gestartet wurde.
+- Bei Docker Swarm legen Sie beide Werte als Docker-Secrets an, bevor Sie das Chart installieren.
+
+:::
+
+## Pfad auswählen
+
+| Ihr Ziel | Empfohlener Pfad | Anleitung |
 | - | - | - |
-| Try RustFS on a local machine | One-command install script, or a container | [Linux Quick Start](./linux/quick-start.md) · [Container](./container/index.md) |
-| Single-server production | SNSD (one disk) or SNMD (multiple disks) | [Installing RustFS on Linux](./linux/index.md) |
-| Multi-server production cluster | MNMD, after completing the production checklists | [Multiple Node Multiple Disk](./linux/multiple-node-multiple-disk.md) · [Checklists](./requirement/checklists/index.md) |
-| Kubernetes / cloud-native | Container orchestration deployment | [Cloud Native](./cloud-native/index.md) |
-| Windows or macOS host | Native installation | [Windows](./windows/index.md) · [macOS](./macos/index.md) |
+| RustFS auf einem lokalen Rechner ausprobieren | Installationsskript mit einem Befehl oder ein Container | [Linux-Schnellstart](./linux/quick-start.md) · [Container](./container/index.md) |
+| Produktion auf einem Server | SNSD (ein Datenträger) oder SNMD (mehrere Datenträger) | [RustFS unter Linux installieren](./linux/index.md) |
+| Produktionscluster auf mehreren Servern | MNMD, nachdem Sie die Produktions-Checklisten abgeschlossen haben | [Mehrere Knoten mit mehreren Datenträgern](./linux/multiple-node-multiple-disk.md) · [Checklisten](./requirement/checklists/index.md) |
+| Kubernetes / Cloud-native | Bereitstellung mit dem Helm-Chart oder dem Operator | [Cloud-native](./cloud-native/index.md) |
+| Windows- oder macOS-Host | Installation des nativen Programms | [Windows](./windows/index.md) · [macOS](./macos/index.md) |
 
-## Deployment Mode Comparison
+## Vergleich der Bereitstellungsmodi
 
-| Mode | Nodes | Disks | Fault Tolerance | Typical Use |
+| Modus | Knoten | Datenträger | Fehlertoleranz | Typische Verwendung |
 | - | - | - | - | - |
-| [SNSD](./linux/single-node-single-disk.md) | 1 | 1 | None — rely on backups | Development, testing, low-density non-critical business |
-| [SNMD](./linux/single-node-multiple-disk.md) | 1 | Multiple | Up to M parity disks within the node | Medium, non-critical business on a single server |
-| [MNMD](./linux/multiple-node-multiple-disk.md) | 4+ | Multiple per node | Disk- and node-level via erasure coding across servers | Production workloads |
+| [SNSD](./linux/single-node-single-disk.md) | 1 | 1 | Keine — nur über Sicherungen | Entwicklung, Tests und kleine, nicht kritische Arbeitslasten |
+| [SNMD](./linux/single-node-multiple-disk.md) | 1 | Mehrere | Bis zu M Paritätsdatenträger innerhalb des Knotens | Mittlere, nicht kritische Arbeitslasten auf einem Server |
+| [MNMD](./linux/multiple-node-multiple-disk.md) | 4+ | Mehrere je Knoten | Datenträger- und Knotenebene durch Erasure Coding über mehrere Server | Produktionsarbeitslasten |
 
-## Checklist
+## Checkliste
 
-Before any production deployment, work through the [Pre-Installation Checklists](./requirement/checklists/index.md) — hardware, network, software, and security — to make sure your environment meets production guidance.
+Arbeiten Sie vor jeder Produktionsbereitstellung die [Checklisten vor der Installation](./requirement/checklists/index.md) durch — Hardware, Netzwerk, Software und Sicherheit —, damit Ihre Umgebung die Produktionsanforderungen erfüllt.

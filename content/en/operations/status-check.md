@@ -28,15 +28,15 @@ firewall-cmd --permanent --add-port=9001/tcp
 firewall-cmd --reload
 ```
 
-:::warning[Restrict console access]
+:::warning[Restrict Console access]
 
-Expose port 9001 only to trusted networks. If you do not need the console, set `RUSTFS_CONSOLE_ENABLE=false` and leave the port closed.
+Expose port 9001 only to trusted networks. If you do not need the Console, set `RUSTFS_CONSOLE_ENABLE=false` and leave the port closed.
 
 :::
 
 ## Health endpoints
 
-The S3 listener on port **9000** serves unauthenticated probe endpoints. Disable them with `RUSTFS_HEALTH_ENDPOINT_ENABLE=false`. The console on port **9001** has its own health path.
+The S3 listener on port **9000** serves unauthenticated probe endpoints. Disable them with `RUSTFS_HEALTH_ENDPOINT_ENABLE=false`. The Console on port **9001** has its own health path.
 
 | Endpoint | Port | Meaning |
 | --- | --- | --- |
@@ -58,7 +58,7 @@ The `details` object reports `storage` / `iam` / `lock` (and `kms` when configur
 
 ## Cluster status
 
-### Check cluster status in the Console
+### Check cluster status on the Console
 
 1. Sign in to the RustFS Console.
 2. Open **Status**.
@@ -83,7 +83,7 @@ rc admin info cluster rustfs --json
 
 ## Storage capacity
 
-### Check storage capacity in the Console
+### Check storage capacity on the Console
 
 1. Sign in to the RustFS Console and open **Status**.
 2. Review the cluster's used and total storage capacity.

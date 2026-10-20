@@ -1,24 +1,24 @@
 ---
-title: "Checklist"
-description: "Pre-installation checklists."
+title: "Listes de contrôle avant installation"
+description: "Cette page regroupe les listes de contrôle à parcourir avant l’installation."
 ---
 
-These checklists cover the necessary preparations for a production environment.
+Ces listes de contrôle couvrent les préparatifs nécessaires à un environnement de production.
 
 :::note
 
-These are general guidelines. Adjust them based on your specific architecture and requirements.
+Ce sont des indications générales. Adaptez-les à votre architecture et à vos exigences particulières.
 
 :::
 
-For professional support, contact us at hello@rustfs.com.
+Pour une assistance professionnelle, contactez-nous à hello@rustfs.com.
 
-For community support, submit an issue on GitHub.
+Pour une assistance communautaire, ouvrez un ticket sur GitHub.
 
-## Checklist
+## Liste de contrôle
 
-- [Hardware Checklist](./hardware-checklists.md)
-- [Hardware Selection](./hardware-selection.md)
-- [Security Checklist](./security-checklists.md)
-- [Software Checklist](./software-checklists.md)
-- [Network Checklist](./network-checklists.md)
+- [Liste de contrôle matérielle](./hardware-checklists.md)
+- [Choix du matériel](./hardware-selection.md)
+- [Liste de contrôle de sécurité](./security-checklists.md)
+- [Liste de contrôle logicielle](./software-checklists.md)
+- [Liste de contrôle réseau](./network-checklists.md)

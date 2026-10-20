@@ -1,9 +1,9 @@
 ---
 title: "Network Checklist"
-description: "Network checklist for enterprise deployments."
+description: "Check network layout, ports, and failover before a production RustFS deployment."
 ---
 
-## Network Architecture
+## Network architecture
 
 ### Planning
 
@@ -12,38 +12,38 @@ description: "Network checklist for enterprise deployments."
 - **Redundancy**
  Ensure at least two independent physical links between nodes.
 - **Bandwidth**
- Calculate estimated traffic: object storage read/write bandwidth × node count × replica count + 20% redundancy.
+ Estimate traffic as: read/write bandwidth × node count × replica count, plus 20% headroom.
 
-### IP Allocation
+### IP allocation
 
 - [ ] Separate management network from data network.
-- [ ] Allocate continuous IP segments for storage nodes (recommend /24 subnet).
+- [ ] Allocate a contiguous IP address range for storage nodes. We recommend a /24 subnet.
 - [ ] Reserve at least 15% of IP addresses for expansion.
 
 ---
 
-## Hardware Requirements
+## Switch and cabling requirements
 
 ### Switches
 
-| Check Item | Requirements |
+| Item | Requirement |
 |--------|---------|
-| Backplane Bandwidth | ≥ Full port line rate forwarding capability × 1.2 |
+| Backplane bandwidth | ≥ 1.2 × aggregate line rate of all ports |
 | Port Type | 10G/25G/100G SFP+/QSFP+ fiber ports |
 | Flow Table Capacity | ≥ Node count × 5 |
-| Spanning Tree | Enable RSTP/MSTP fast convergence |
+| Spanning Tree | Enable RSTP or MSTP for fast convergence |
 
 ### Cabling
 
 - [ ] Fiber attenuation test (single mode ≤0.35dB/km).
-- [ ] Port misalignment check (Node A eth0 ↔ Node B eth0).
+- [ ] Verify port mapping (Node A eth0 ↔ Node B eth0).
 - [ ] Cable labeling (including source/destination IP + port number).
 
 ---
 
-## OS Configuration
+## Operating system configuration
 
-### Kernel Tuning
+### Kernel tuning
 
 ```bash
 # Check the following parameter settings
@@ -53,10 +53,10 @@ net.ipv4.tcp_keepalive_time = 600
 net.ipv4.tcp_slow_start_after_idle = 0
 ```
 
-### NIC Configuration
+### NIC configuration
 
 - [ ] Enable jumbo frames (MTU=9000, requires full path support).
-- [ ] Verify bonding mode (recommend LACP mode4).
+- [ ] Verify the bond mode. We recommend LACP (mode 4).
 - [ ] Disable IPv6 (if not needed).
 
 ---
@@ -72,15 +72,15 @@ net.ipv4.tcp_slow_start_after_idle = 0
 - TCP 443 (only if you terminate HTTPS on a reverse proxy / load balancer)
 ```
 
-### Access Control
+### Access control
 
-- Switch port security MAC restrictions.
-- IPSec tunnel encryption between storage nodes.
+- Enable port security (MAC address limits) on switches.
+- Encrypt traffic between storage nodes with IPsec.
 - Enable TLS 1.3 for management interfaces.
 
 ---
 
-## Performance Testing
+## Performance testing
 
 ### Benchmarks
 
@@ -92,23 +92,23 @@ net.ipv4.tcp_slow_start_after_idle = 0
 
 | Metric | Requirements |
 |------|------|
-| Node Latency | ≤1ms (same room) / ≤5ms (cross AZ) |
-| Bandwidth Utilization | Peak ≤70% of design capacity |
+| Node latency | ≤ 1 ms (same data center) / ≤ 5 ms (cross-AZ) |
+| Bandwidth utilization | Peak ≤ 70% of design capacity |
 | Failover | < 500ms BPDU convergence |
 
 ---
 
-## Documentation Requirements
+## Records to keep
 
 1. Network topology diagram (including physical connections and logical IPs)
 2. Switch configuration backup files (with timestamps)
 3. Baseline test reports (including raw data)
-4. Change record table (including maintenance window information)
+4. Change log (including maintenance windows)
 
-:::tip
+:::tip[Before production]
 
-Recommend conducting 72-hour stress testing before formal deployment, simulating 110% peak traffic load scenarios
+We recommend running a 72-hour stress test at 110% of the expected peak traffic before deploying to production.
 
 :::
 
-This checklist covers key checkpoints for enterprise storage system network deployment, specifically optimized parameter requirements for distributed object storage characteristics. You can contact RustFS for official technical support.
+This checklist covers the key network requirements for deploying distributed object storage in an enterprise environment. For technical support, contact RustFS.

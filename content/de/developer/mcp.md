@@ -1,38 +1,38 @@
 ---
 title: "RustFS MCP"
-description: "RustFS MCP Usage Guide"
+description: "Verbinden Sie KI-Assistenten über den RustFS-MCP-Server mit dem RustFS-Objektspeicher."
 ---
 
-**RustFS MCP Server** is a high-performance [Model Context Protocol (MCP)](https://www.anthropic.com/news/model-context-protocol) server that provides AI/LLM tools with seamless access to S3-compatible object storage operations. Built with Rust for performance and security, it enables AI assistants like Claude Desktop to interact with cloud storage through standardized protocols.
+Der **RustFS MCP Server** ist ein [Model Context Protocol (MCP)](https://www.anthropic.com/news/model-context-protocol)-Server, der KI-Assistenten wie Claude Desktop Zugriff auf S3-kompatiblen Objektspeicher gibt.
 
-### What is MCP?
+### Was ist MCP?
 
-The Model Context Protocol is an open standard that enables AI applications to establish secure, controlled connections with external systems. This server acts as a bridge between AI tools and S3-compatible storage services, providing structured access to file operations while maintaining security and observability.
+Das Model Context Protocol ist ein offener Standard, mit dem KI-Anwendungen sichere, kontrollierte Verbindungen zu externen Systemen aufbauen. Dieser Server verbindet KI-Werkzeuge mit S3-kompatiblen Speicherdiensten. Er bietet strukturierten Zugriff auf Objektoperationen und wahrt dabei Sicherheit und Observability.
 
-## ✨ Features
+## Funktionen
 
-### Supported S3 Operations
+### Unterstützte S3-Operationen
 
-- **List Buckets**: Lists all accessible S3 buckets.
-- **List Objects**: Browses bucket contents with optional prefix filtering.
-- **Upload Files**: Uploads local files with automatic MIME type detection and cache control.
-- **Get Objects**: Retrieves objects from S3 storage, supporting read or download modes.
+- **Buckets auflisten**: Listet alle zugänglichen S3-Buckets auf.
+- **Objekte auflisten**: Durchsucht den Inhalt eines Buckets, optional mit Präfixfilter.
+- **Dateien hochladen**: Lädt lokale Dateien hoch, erkennt den MIME-Typ automatisch und setzt Cache-Control.
+- **Objekte abrufen**: Ruft Objekte aus dem S3-Speicher ab und unterstützt die Modi Lesen und Herunterladen.
 
-## 🔧 Installation
+## Installation
 
-:::warning[Build instructions may be outdated]
+:::warning[Anweisungen zum Bauen können veraltet sein]
 
-The `rustfs-mcp` crate is no longer part of the current `rustfs/rustfs` main branch, so the build commands below may fail against a fresh clone. Check the [RustFS GitHub organization](https://github.com/rustfs) for the MCP server's current location before building from source.
+Das Crate `rustfs-mcp` gehört nicht mehr zum aktuellen `main`-Branch von `rustfs/rustfs`. Die folgenden Build-Befehle können daher bei einem frisch geklonten Repository fehlschlagen. Prüfen Sie vor dem Bauen aus dem Quellcode in der [RustFS-Organisation auf GitHub](https://github.com/rustfs), wo der MCP-Server derzeit liegt.
 
 :::
 
-### Prerequisites
+### Voraussetzungen
 
-- Rust 1.75+ (for building from source)
-- Configured AWS credentials (via environment variables, AWS CLI, or IAM roles)
-- Access to S3-compatible storage services
+- Rust 1.75 oder höher (zum Bauen aus dem Quellcode)
+- Konfigurierte AWS-Zugangsdaten (über Umgebungsvariablen, die AWS CLI oder IAM-Rollen)
+- Zugriff auf S3-kompatible Speicherdienste
 
-### Building from Source
+### Aus dem Quellcode bauen
 
 ```bash
 # Clone the repository
@@ -46,9 +46,9 @@ cargo build --release -p rustfs-mcp
 ./target/release/rustfs-mcp
 ```
 
-## ⚙️ Configuration
+## Konfiguration
 
-### Environment Variables
+### Umgebungsvariablen
 
 ```bash
 # AWS credentials (required)
@@ -63,35 +63,35 @@ export AWS_ENDPOINT_URL=http://localhost:9000
 export RUST_LOG=info
 ```
 
-### Command Line Options
+### Befehlszeilenoptionen
 
 ```bash
 rustfs-mcp --help
 ```
 
-The server supports various command line options to customize behavior:
+Der Server unterstützt mehrere Befehlszeilenoptionen, mit denen Sie das Verhalten anpassen:
 
-- `--access-key-id`: AWS access key ID for S3 authentication
-- `--secret-access-key`: AWS secret key for S3 authentication
-- `--region`: AWS region for S3 operations (default: us-east-1)
-- `--endpoint-url`: Custom S3 endpoint URL (for MinIO, LocalStack, etc.)
-- `--log-level`: Log level configuration (default: rustfs_mcp_server=info)
+- `--access-key-id`: AWS-Zugriffsschlüssel-ID für die S3-Authentifizierung
+- `--secret-access-key`: geheimer AWS-Zugriffsschlüssel für die S3-Authentifizierung
+- `--region`: AWS-Region für S3-Operationen (Standard: us-east-1)
+- `--endpoint-url`: benutzerdefinierte S3-Endpunkt-URL (für MinIO, LocalStack und andere)
+- `--log-level`: Log-Level (Standard: rustfs_mcp_server=info)
 
-## 🚀 Usage
+## Verwendung
 
-### Starting the Server
+### Server starten
 
 ```bash
 # Start the MCP server
 rustfs-mcp
 
 # Or with custom options
-rustfs-mcp --log-level debug --region us-west-2
+rustfs-mcp --log-level debug --region us-east-1
 ```
 
-### Integration with Chat Clients
+### Integration mit Chat-Clients
 
-#### Option 1: Using Command Line Arguments
+#### Option 1: Befehlszeilenargumente
 
 ```json
 {
@@ -101,7 +101,7 @@ rustfs-mcp --log-level debug --region us-west-2
       "args": [
         "--access-key-id", "your_access_key",
         "--secret-access-key", "your_secret_key",
-        "--region", "us-west-2",
+        "--region", "us-east-1",
         "--log-level", "info"
       ]
     }
@@ -109,7 +109,7 @@ rustfs-mcp --log-level debug --region us-west-2
 }
 ```
 
-#### Option 2: Using Environment Variables
+#### Option 2: Umgebungsvariablen
 
 ```json
 {
@@ -126,9 +126,9 @@ rustfs-mcp --log-level debug --region us-west-2
 }
 ```
 
-### Using with Docker
+### Verwendung mit Docker
 
-[RustFS MCP officially provides a Dockerfile](https://github.com/rustfs/rustfs/tree/main/crates/mcp) that can be used to build container images for using RustFS MCP.
+RustFS MCP stellt ein [offizielles Dockerfile](https://github.com/rustfs/rustfs/tree/main/crates/mcp) bereit, mit dem Sie ein Container-Image bauen.
 
 ```bash
 # Clone RustFS repository code
@@ -138,11 +138,11 @@ git clone https://github.com/rustfs/rustfs.git
 docker build -f crates/mcp/Dockerfile -t rustfs/rustfs-mcp .
 ```
 
-After successful build, you can configure it in the MCP configuration of AI IDEs.
+Wenn das Image gebaut wurde, fügen Sie den Server der MCP-Konfiguration Ihrer IDE hinzu.
 
-#### Configuring MCP in AI IDEs
+#### MCP in KI-IDEs konfigurieren
 
-Currently, mainstream AI IDEs such as Cursor, Windsurf, Trae, etc. all support MCP. For example, in Trae, add the following content to the MCP configuration (**MCP --> Add**):
+Viele KI-IDEs, darunter Cursor, Windsurf und Trae, unterstützen MCP. Fügen Sie in Trae beispielsweise den folgenden Inhalt zur MCP-Konfiguration hinzu (**MCP --> Add**):
 
 ```json
 {
@@ -174,88 +174,88 @@ Currently, mainstream AI IDEs such as Cursor, Windsurf, Trae, etc. all support M
 }
 ```
 
-> `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are RustFS access keys. You can refer to the [Access Key Management chapter](../security-compliance/iam/access-token.md) for creation.
+> `AWS_ACCESS_KEY_ID` und `AWS_SECRET_ACCESS_KEY` sind RustFS-Zugriffsschlüssel. Zum Anlegen siehe [Zugriffsschlüssel-Verwaltung](../security-compliance/iam/access-token.md).
 
-If added successfully, you can list the [available tools](#️-available-tools) on the MCP configuration page.
+Wenn der Server erfolgreich hinzugefügt wurde, listet die MCP-Konfigurationsseite seine [verfügbaren Tools](#verfügbare-tools) auf.
 
-![add rustfs mcp in trae mcp configuration successfully](images/add-rustfs-mcp-succ.png)
+![RustFS-MCP-Server in der MCP-Konfiguration von Trae hinzugefügt](images/add-rustfs-mcp-succ.png)
 
-In Trae, you can use the corresponding tools by entering the corresponding prompts. For example, in Trae's chat dialog, enter:
+Um in Trae ein MCP-Tool aufzurufen, geben Sie im Chat eine Eingabeaufforderung ein. Zum Beispiel:
 
 ```text
-Please help me list the buckets in the current rustfs instance, thank you!
+List the buckets in this RustFS instance.
 ```
 
-Returns the following response:
+Trae gibt die folgende Antwort zurück:
 
-![list rustfs bucket with rustfs mcp](images/list-rustfs-bucket-with-mcp.png)
+![Buckets einer RustFS-Instanz, aufgelistet mit dem RustFS-MCP](images/list-rustfs-bucket-with-mcp.png)
 
-Trae uses **Builder with MCP** mode, calling the `list_buckets` tool to list all buckets in the configured RustFS instance. The same applies to calls to other tools.
+Trae verwendet den Modus **Builder with MCP** und ruft das Tool `list_buckets` auf, um alle Buckets in der konfigurierten RustFS-Instanz aufzulisten. Andere Tools funktionieren auf dieselbe Weise.
 
-## 🛠️ Available Tools
+## Verfügbare Tools
 
-The MCP server exposes the following tools that AI assistants can use:
+Der MCP-Server stellt die folgenden Tools bereit, die KI-Assistenten verwenden können:
 
 ### `list_buckets`
 
-Lists all S3 buckets accessible with the configured credentials.
+Listet alle S3-Buckets auf, die mit den konfigurierten Zugangsdaten erreichbar sind.
 
-**Parameters**: None
+**Parameter**: Keine
 
 ### `list_objects`
 
-Lists objects in an S3 bucket with optional prefix filtering.
+Listet Objekte in einem S3-Bucket auf, optional mit Präfixfilter.
 
-**Parameters**:
+**Parameter**:
 
-- `bucket_name` (string): Name of the S3 bucket
-- `prefix` (string, optional): Prefix for filtering objects
+- `bucket_name` (string): Name des S3-Buckets
+- `prefix` (string, optional): Präfix zum Filtern der Objekte
 
 ### `upload_file`
 
-Uploads a local file to S3 with automatic MIME type detection.
+Lädt eine lokale Datei nach S3 hoch und erkennt den MIME-Typ automatisch.
 
-**Parameters**:
+**Parameter**:
 
-- `local_file_path` (string): Local file path
-- `bucket_name` (string): Target S3 bucket
-- `object_key` (string): S3 object key (target path)
-- `content_type` (string, optional): Content type (auto-detected if not provided)
-- `storage_class` (string, optional): S3 storage class
-- `cache_control` (string, optional): Cache control header
+- `local_file_path` (string): lokaler Dateipfad
+- `bucket_name` (string): Ziel-S3-Bucket
+- `object_key` (string): S3-Objektschlüssel (Zielpfad)
+- `content_type` (string, optional): Inhaltstyp (wird automatisch erkannt, wenn er fehlt)
+- `storage_class` (string, optional): S3-Speicherklasse
+- `cache_control` (string, optional): Cache-Control-Header
 
 ### `get_object`
 
-Retrieves objects from S3 with two operation modes: direct content reading or download to file.
+Ruft Objekte aus S3 in zwei Betriebsmodi ab: Inhalt direkt lesen oder in eine Datei herunterladen.
 
-**Parameters**:
+**Parameter**:
 
-- `bucket_name` (string): Source S3 bucket
-- `object_key` (string): S3 object key
-- `version_id` (string, optional): Version ID for versioned objects
-- `mode` (string, optional): Operation mode - "read" (default) returns content directly, "download" saves to local file
-- `local_path` (string, optional): Local file path (required when mode is "download")
-- `max_content_size` (number, optional): Maximum content size for read mode in bytes (default: 1MB)
+- `bucket_name` (string): Quell-S3-Bucket
+- `object_key` (string): S3-Objektschlüssel
+- `version_id` (string, optional): Versions-ID für versionierte Objekte
+- `mode` (string, optional): Betriebsmodus. `read` (Standard) gibt den Inhalt direkt zurück, `download` speichert in eine lokale Datei
+- `local_path` (string, optional): lokaler Dateipfad (erforderlich, wenn `mode` den Wert `download` hat)
+- `max_content_size` (number, optional): maximale Inhaltsgröße im Lesemodus in Byte (Standard: 1 MB)
 
 ### `create_bucket`
 
-Creates a new RustFS bucket.
+Erstellt einen neuen RustFS-Bucket.
 
-**Parameters**:
+**Parameter**:
 
-- `bucket_name` (string): Name of the bucket to create.
+- `bucket_name` (string): Name des zu erstellenden Buckets.
 
 ### `delete_bucket`
 
-Deletes the specified RustFS bucket.
+Löscht den angegebenen RustFS-Bucket.
 
-**Parameters**:
+**Parameter**:
 
-- `bucket_name` (string): Name of the bucket to delete.
+- `bucket_name` (string): Name des zu löschenden Buckets.
 
-## Architecture
+## Architektur
 
-The MCP server is built with a modular architecture:
+Der MCP-Server ist modular aufgebaut:
 
 ```text
 rustfs-mcp/

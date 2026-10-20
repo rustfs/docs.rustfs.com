@@ -87,5 +87,5 @@ restic -o s3.bucket-lookup=path check
 
 ## Nächste Schritte
 
-- [CLI Client (rc)](/operations/rc) zum Erstellen von Buckets und Prüfen von Objekten über die Kommandozeile.
-- [TLS Configuration](/integration/tls-configured), wenn Sie RustFS außerhalb eines vertrauenswürdigen Netzwerks bereitstellen.
+- [CLI-Client (rc)](/de/operations/rc) zum Erstellen von Buckets und Prüfen von Objekten über die Kommandozeile.
+- [TLS-Konfiguration](/de/integration/tls-configured), wenn Sie RustFS außerhalb eines vertrauenswürdigen Netzwerks bereitstellen.

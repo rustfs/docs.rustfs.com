@@ -1,32 +1,44 @@
 ---
-title: "Object Scanning"
-description: "Guide to the RustFS object scanner, including design, implementation, and monitoring."
+title: "Object scanning"
+description: "Control the RustFS background scanner, its bit-rot cycle, and the metrics that show scans are still running."
 ---
 
-This guide covers the design and implementation of the RustFS object scanner, including its integration with Erasure Coding, Scrub & Repair mechanisms, scheduling strategies, monitoring metrics, and troubleshooting.
+The background scanner walks buckets and drives, records usage, and can queue objects for healing. A separate cycle runs deeper bit-rot checks. Use this page to see what the scanner does, how to slow it down, and which metrics show that it is still running.
 
-## Overview
+## What the scanner does
 
-The RustFS object scanner is built into the storage engine and is responsible for periodically checking object integrity and executing scheduled operations.
-Scanning tasks include disk usage statistics, lifecycle management rule evaluation, object replication execution, and triggering corrupted object self-healing.
+On each cycle the scanner visits objects and directories and updates usage data. When it finds storage that needs repair, it can queue that object for healing. Healing runs on its own schedule. See [Node healing](/operations/high-availability/node-healing) for how reconstructed data is written back.
 
-## Architecture and Design Principles
+Deep bit-rot scans use a separate interval. `RUSTFS_SCANNER_BITROT_CYCLE_SECS` defaults to `2592000` (30 days). Set it to `0`, `true`, or `on` to make every cycle a deep scan, or to `false` or `off` to turn deep scans off.
 
-### Scanner Architecture
+Reads can also discover damage and submit repair work. That path is separate from the background cycle.
 
-The RustFS scanner uses a hash sampling mechanism, selecting one out of every 1024 objects for inspection based on object name hashing to minimize performance impact.
-The scanner is deeply integrated with the Erasure Coding module, utilizing redundant shards for online reconstruction when detecting lost or corrupted shards, ensuring high data availability and consistency.
+## Control the scan rate
 
-## Data Verification and Recovery
+`RUSTFS_SCANNER_SPEED` selects a preset: `fastest`, `fast`, `default`, `slow`, or `slowest`. The preset sets how long the scanner sleeps between objects, the maximum sleep, and the cycle interval. Override one value at a time:
 
-The RustFS data verification mechanism checks metadata consistency and performs bit-by-bit reading and verification to discover hidden bad blocks. The object scanner detects issues like bit rot and triggers repair processes when necessary.
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `RUSTFS_SCANNER_DELAY` | preset | Sleep multiplier, for example `30.0` |
+| `RUSTFS_SCANNER_MAX_WAIT_SECS` | preset | Maximum sleep, in seconds |
+| `RUSTFS_SCANNER_CYCLE` | preset | Cycle interval, in seconds. An example override is `3600` |
+| `RUSTFS_SCANNER_IDLE_MODE` | `true` | When `true`, the scanner throttles itself |
 
-## Scanning Modes and Scheduling
+Cycle budgets, startup delay, and concurrency caps are listed in the [environment variable reference](/reference/environment-variables).
 
-RustFS supports three scanning modes: online scanning during reads, background periodic scanning, and manual full scanning, balancing performance and reliability.
-Similar to the `osd_scrub_begin_hour` configuration in Ceph, administrators can set scanning start times and frequency. For example, light verification is set to once daily by default.
+## Monitor scans
 
-## Monitoring and Metrics
+With OpenTelemetry export enabled, use the scanner series documented in [Observability](/operations/observability):
 
-Scanner statistics include total task count, failure count, and time distribution, exposing metrics through the Prometheus data model such as `rustfs_scanner_jobs_total`, `rustfs_scanner_failures_total`, and `rustfs_scanner_duration_seconds`.
-Combined with monitoring systems, alerts can be set based on scanning failure rates and duration to promptly discover and locate potential issues at the storage or network levels.
+- `rustfs_scanner_cycles_total` counts finished cycles and is labeled by result.
+- `rustfs_scanner_objects_scanned_total` counts objects visited.
+- `rustfs_scanner_inline_heal_total` counts objects the scanner queued for healing.
+- `rustfs_scanner_cycle_duration_seconds` is the duration of the last completed cycle.
+
+If `rustfs_scanner_cycles_total` does not increase, treat the scanner as stalled and follow the alert hint on that page. Per-drive online state is shown on the Console and through the admin API, not as a dedicated scanner metric.
+
+## Next steps
+
+- [Replace a failed drive](/troubleshooting/driver)
+- [Recover a failed node](/troubleshooting/node)
+- [Monitor healing](/operations/high-availability/node-healing)

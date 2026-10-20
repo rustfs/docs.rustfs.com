@@ -1,10 +1,10 @@
 ---
-title: "Scaling"
-description: "Expand, rebalance, and retire RustFS storage pools."
+title: "Montée en charge"
+description: "Étendez, rééquilibrez et mettez hors service les pools de stockage RustFS."
 ---
 
-Choose the workflow that matches the topology change:
+Choisissez le flux qui correspond au changement de topologie :
 
-- [Pool Expansion](./storage-pool-expansion.md)
-- [Rebalancing](./data-rebalancing.md)
-- [Pool Decommission](./storage-pool-decommission.md)
+- [Extension de pool](./storage-pool-expansion.md)
+- [Rééquilibrage](./data-rebalancing.md)
+- [Mise hors service d’un pool](./storage-pool-decommission.md)

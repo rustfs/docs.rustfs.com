@@ -1,11 +1,11 @@
 ---
-title: "AWS SDK for Go"
-description: "Connect the AWS SDK for Go v2 to RustFS and perform basic object operations."
+title: "AWS SDK pour Go"
+description: "Connectez l’AWS SDK pour Go v2 à RustFS et effectuez des opérations objet de base."
 ---
 
-The [AWS SDK for Go v2](https://aws.github.io/aws-sdk-go-v2/docs/) connects to RustFS through a custom base endpoint. This is the minimal connection recipe; see the [Go SDK guide](../sdk/go.md) for a full program.
+L’[AWS SDK pour Go v2](https://aws.github.io/aws-sdk-go-v2/docs/) se connecte à RustFS par un point de terminaison de base personnalisé. Voici la recette de connexion minimale ; le [guide du SDK Go](../sdk/go.md) présente un programme complet.
 
-## Install
+## Installation
 
 ```bash
 go get github.com/aws/aws-sdk-go-v2/aws
@@ -13,9 +13,9 @@ go get github.com/aws/aws-sdk-go-v2/credentials
 go get github.com/aws/aws-sdk-go-v2/service/s3
 ```
 
-## Configure
+## Configuration
 
-Replace `http://localhost:9000` with your server address and use your own [access keys](../../security-compliance/iam/access-token.md). RustFS requires path-style addressing (`UsePathStyle: true`):
+Remplacez `http://localhost:9000` par l’adresse de votre serveur et utilisez vos propres [clés d’accès](../../security-compliance/iam/access-token.md). RustFS exige l’adressage de type chemin (path-style) (`UsePathStyle: true`) :
 
 ```go {9,11}
 import (
@@ -34,7 +34,7 @@ client := s3.NewFromConfig(cfg, func(o *s3.Options) {
 })
 ```
 
-## Verify
+## Vérification
 
 ```go
 ctx := context.Background()
@@ -50,6 +50,6 @@ for _, b := range out.Buckets {
 my-bucket
 ```
 
-## Next steps
+## Étapes suivantes
 
-See the full [Go SDK guide](../sdk/go.md), or manage objects with [`rc`](/operations/rc).
+Consultez le [guide complet du SDK Go](../sdk/go.md), ou gérez les objets avec [`rc`](/fr/operations/rc).

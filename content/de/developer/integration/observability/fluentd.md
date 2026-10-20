@@ -1,13 +1,13 @@
 ---
 title: "Fluentd"
-description: "Ship Fluentd log events to RustFS with the S3 output plugin."
+description: "Senden Sie Fluentd-Log-Ereignisse mit dem S3-Output-Plugin an RustFS."
 ---
 
-This guide connects [Fluentd](https://github.com/fluent/fluentd) — the open-source data collector — to **RustFS** through the `out_s3` output plugin. You will run Fluentd with a tail source, buffer log events, and verify that the flushed objects are stored in RustFS. The workflow was verified with `fluent/fluentd:v1.17-1`, `fluent-plugin-s3` 1.8.6, and `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [Fluentd](https://github.com/fluent/fluentd) — den Open-Source-Datensammler — über das Output-Plugin `out_s3` mit **RustFS**. Sie betreiben Fluentd mit einer Tail-Quelle, puffern Log-Ereignisse und prüfen, dass die geschriebenen Objekte in RustFS liegen. Der Ablauf wurde mit `fluent/fluentd:v1.17-1`, `fluent-plugin-s3` 1.8.6 und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Sie benötigen Docker. Dieses Setup ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -16,18 +16,18 @@ flowchart LR
 	Fluentd -->|"gzip objects"| RustFS["RustFS :9000"]
 ```
 
-The tail source reads new lines from `app.log` and hands them to the S3 output, which buffers events on a time key and uploads a gzip object per flush window.
+Die Tail-Quelle liest neue Zeilen aus `app.log` und übergibt sie an die S3-Ausgabe. Diese puffert Ereignisse über einen Zeit-Schlüssel und lädt pro Flush-Fenster ein gzip-Objekt hoch.
 
-## 1. Create the project files
+## 1. Projektdateien anlegen
 
-Create the bucket first — Fluentd does not create buckets:
+Legen Sie zuerst den Bucket an. Fluentd legt keine Buckets an:
 
 ```bash
 rc alias set rustfs http://<your-rustfs-endpoint>:9000 <your-access-key> <your-secret-key>
 rc mb rustfs/fluentd-data
 ```
 
-The official Fluentd image runs as a non-root user and cannot install gems at startup, so build a small image with the S3 plugin:
+Das offizielle Fluentd-Image läuft als Benutzer ohne Root-Rechte und kann beim Start keine Gems installieren. Bauen Sie daher ein kleines Image mit dem S3-Plugin:
 
 ```dockerfile title="Dockerfile"
 FROM fluent/fluentd:v1.17-1
@@ -36,7 +36,7 @@ RUN gem install fluent-plugin-s3 --no-document
 USER fluent
 ```
 
-Create the Fluentd configuration, replacing both credential placeholders:
+Erstellen Sie die Fluentd-Konfiguration und ersetzen Sie beide Platzhalter für die Zugangsdaten:
 
 ```nginx title="fluent.conf"
 <source>
@@ -67,9 +67,9 @@ Create the Fluentd configuration, replacing both credential placeholders:
 </match>
 ```
 
-`force_path_style true` is required — without it the plugin constructs `fluentd-data.rustfs` as a hostname and every request fails with a DNS error. Inside the Compose network the hostname is `rustfs`; from the host use `http://localhost:9000/`.
+`force_path_style true` erzwingt pfadbasierte Adressierung (Path-Style) und ist erforderlich. Ohne diese Einstellung setzt das Plugin den Hostnamen `fluentd-data.rustfs` zusammen, und jede Anfrage scheitert mit einem DNS-Fehler. Im Compose-Netzwerk lautet der Hostname `rustfs`; vom Host aus verwenden Sie `http://localhost:9000/`.
 
-Build the image and start Fluentd on the same Docker network as RustFS:
+Bauen Sie das Image und starten Sie Fluentd im selben Docker-Netzwerk wie RustFS:
 
 ```bash
 docker build -t fluentd-rustfs .
@@ -79,74 +79,74 @@ docker run -d --name fluentd --network oo-rustfs_default \
   -v "$PWD/logs":/var/log fluentd-rustfs
 ```
 
-## 2. Produce log events
+## 2. Log-Ereignisse erzeugen
 
-Append lines to the watched file:
+Hängen Sie Zeilen an die überwachte Datei an:
 
 ```bash
 echo "rustfs fluentd demo line 1" >> logs/app.log
 echo "rustfs fluentd demo line 2" >> logs/app.log
 ```
 
-With a 30-second time key and immediate flush mode, each window uploads one gzip object shortly after it closes. Wait about a minute.
+Bei einem Zeit-Schlüssel von 30 Sekunden und sofortigem Flush lädt jedes Fenster kurz nach dem Schließen ein gzip-Objekt hoch. Warten Sie etwa eine Minute.
 
-## 3. Verify objects in RustFS
+## 3. Objekte in RustFS prüfen
 
-List the bucket:
+Listen Sie den Bucket auf:
 
 ```bash
 rc ls rustfs/fluentd-data/ -r
 ```
 
-Each flush window produces one gzipped object:
+Jedes Flush-Fenster erzeugt ein gzip-komprimiertes Objekt:
 
 ```text
 fluentd-logs20260921154400_0.gz
 fluentd-logs20260921154400_1.gz
 ```
 
-Read one object back to confirm the events are intact:
+Lesen Sie ein Objekt zurück, um zu prüfen, dass die Ereignisse unversehrt sind:
 
 ```bash
 rc cat rustfs/fluentd-data/fluentd-logs20260921154400_0.gz | gunzip
 ```
 
-![Fluentd log objects stored in the RustFS Console](./images/rustfs-fluentd-logs.png)
+![In der RustFS Console gespeicherte Fluentd-Log-Objekte](./images/rustfs-fluentd-logs.png)
 
-## 4. Stop or reset the deployment
+## 4. Bereitstellung anhalten oder zurücksetzen
 
-Stop Fluentd while keeping the data:
+Stoppen Sie Fluentd und behalten Sie die Daten:
 
 ```bash
 docker rm -f fluentd
 ```
 
-The objects stay in the `fluentd-data` bucket. To delete them, remove the bucket:
+Die Objekte bleiben im Bucket `fluentd-data`. Um sie zu löschen, entfernen Sie den Bucket:
 
 ```bash
 rc rb rustfs/fluentd-data --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
 ### `Unknown output plugin 's3'`
 
-The plugin is not installed. Confirm the Dockerfile installs `fluent-plugin-s3` as `root` before switching back to the `fluent` user — installing at container start as the default user fails with permission errors.
+Das Plugin ist nicht installiert. Stellen Sie sicher, dass das Dockerfile `fluent-plugin-s3` als `root` installiert, bevor es zum Benutzer `fluent` zurückwechselt. Eine Installation beim Containerstart als Standardbenutzer scheitert mit Berechtigungsfehlern.
 
 ### `Failed to open TCP connection to fluentd-data.rustfs`
 
-Virtual-hosted addressing is in use. Add `force_path_style true` to the `s3` output so the bucket stays in the URL path.
+Es wird Adressierung im Virtual-Hosted-Stil verwendet. Fügen Sie `force_path_style true` zur Ausgabe `s3` hinzu, damit der Bucket im URL-Pfad bleibt.
 
-### The worker crashes in a restart loop
+### Der Worker stürzt in einer Neustartschleife ab
 
-The output fails hard when the bucket does not exist. Create `fluentd-data` before starting Fluentd and check the startup log:
+Die Ausgabe schlägt fehl, sobald der Bucket nicht existiert. Legen Sie `fluentd-data` an, bevor Sie Fluentd starten, und prüfen Sie das Startprotokoll:
 
 ```bash
 docker logs fluentd | grep -iE "error|bucket" | tail
 ```
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Fluentd outputs.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [fluent-plugin-s3 documentation](https://github.com/fluent/fluent-plugin-s3) for object key formats and compression options.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere Fluentd-Ausgaben verwenden.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [Dokumentation zu fluent-plugin-s3](https://github.com/fluent/fluent-plugin-s3) für Objektschlüssel-Formate und Komprimierungsoptionen.

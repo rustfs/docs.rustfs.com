@@ -1,66 +1,66 @@
 ---
 title: "Keycloak"
-description: "Configure Keycloak as an OpenID Connect identity provider for RustFS Console single sign-on."
+description: "Keycloak を、RustFS Console のシングルサインオン用 OpenID Connect アイデンティティプロバイダーとして設定します。"
 ---
 
-RustFS integrates with **Keycloak** through the OpenID Connect (OIDC) Authorization Code Flow. The examples on this page use the default RustFS provider ID, `default`.
+RustFS は、OpenID Connect（OIDC）の Authorization Code Flow を通じて **Keycloak** と連携します。このページの例では、RustFS のデフォルトプロバイダー ID である `default` を使います。
 
-## Overview
+## 概要
 
-The browser login flow is:
+ブラウザのログインの流れは次のとおりです。
 
-1. RustFS sends an authorization-code request with a Proof Key for Code Exchange (PKCE) S256 challenge.
-2. Keycloak authenticates the user and redirects the browser to RustFS with `code` and `state`.
-3. RustFS exchanges the code at the Keycloak token endpoint.
-4. RustFS verifies the ID token signature, issuer, audience, expiry, and nonce.
-5. RustFS maps ID token claim values to local RustFS Identity and Access Management (IAM) policies and issues temporary credentials for the Console session.
+1. RustFS は、Proof Key for Code Exchange（PKCE）の S256 チャレンジ付きで認可コードリクエストを送ります。
+2. Keycloak がユーザーを認証し、`code` と `state` を付けてブラウザを RustFS へリダイレクトします。
+3. RustFS は、Keycloak のトークンエンドポイントでコードを交換します。
+4. RustFS は、ID トークンの署名、発行者、オーディエンス、有効期限、nonce を検証します。
+5. RustFS は、ID トークンのクレーム値をローカルの Identity and Access Management（IAM）ポリシーに対応付け、Console セッション用の一時認証情報を発行します。
 
-Keycloak authenticates the user, while RustFS policies authorize S3 and administration operations. RustFS does not use Keycloak Authorization Services for object or Console authorization.
+Keycloak がユーザーを認証し、RustFS のポリシーが S3 と管理操作を認可します。RustFS は、オブジェクトや Console の認可に Keycloak Authorization Services を使いません。
 
-The examples use the following values. Replace the hostnames and client secret for your environment:
+例では次の値を使います。ホスト名とクライアントシークレットは、環境に合わせて置き換えてください。
 
-| Setting | Example |
+| 設定 | 例 |
 | --- | --- |
-| Keycloak realm | `rustfs` |
-| Keycloak issuer | `https://keycloak.example.com/realms/rustfs` |
-| Keycloak client ID | `rustfs-console` |
-| Public RustFS origin | `https://rustfs.example.com` |
-| RustFS callback URL | `https://rustfs.example.com/rustfs/admin/v3/oidc/callback/default` |
+| Keycloak のレルム | `rustfs` |
+| Keycloak の発行者 | `https://keycloak.example.com/realms/rustfs` |
+| Keycloak のクライアント ID | `rustfs-console` |
+| 公開する RustFS のオリジン | `https://rustfs.example.com` |
+| RustFS のコールバック URL | `https://rustfs.example.com/rustfs/admin/v3/oidc/callback/default` |
 
-## Configuration
+## 設定
 
-### Keycloak configuration
+### Keycloak の設定
 
-#### Create the realm and client
+#### レルムとクライアントを作成する
 
-1. Open the Keycloak Admin Console and create or select the `rustfs` realm.
-2. Open **Clients** and create an OpenID Connect client with the client ID `rustfs-console`.
-3. Enable **Client authentication** and **Standard flow**.
-4. Disable unused flows, including **Implicit flow**, **Direct access grants**, and **Service accounts roles**.
-5. Set **Valid redirect URIs** to the exact RustFS callback URL:
+1. Keycloak の Admin Console を開き、`rustfs` レルムを作成または選択します。
+2. **Clients** を開き、クライアント ID `rustfs-console` の OpenID Connect クライアントを作成します。
+3. **Client authentication** と **Standard flow** を有効にします。
+4. **Implicit flow**、**Direct access grants**、**Service accounts roles** など、使わないフローを無効にします。
+5. **Valid redirect URIs** に、RustFS のコールバック URL を完全一致で設定します。
 
   ```text
   https://rustfs.example.com/rustfs/admin/v3/oidc/callback/default
   ```
 
-6. Set **Web origins** to the public RustFS origin:
+6. **Web origins** に、公開する RustFS のオリジンを設定します。
 
   ```text
   https://rustfs.example.com
   ```
 
-7. Set **Proof Key for Code Exchange Code Challenge Method** to `S256`.
-8. Save the client and copy its secret from **Credentials**.
+7. **Proof Key for Code Exchange Code Challenge Method** を `S256` に設定します。
+8. クライアントを保存し、**Credentials** からシークレットをコピーします。
 
-RustFS submits the client secret in the token request body. Do not apply a Keycloak client policy that disables `client_secret_post`.
+RustFS は、トークンリクエストの本文でクライアントシークレットを送ります。`client_secret_post` を無効にする Keycloak のクライアントポリシーは適用しないでください。
 
-#### Map Keycloak groups to RustFS policies
+#### Keycloak のグループを RustFS のポリシーに対応付ける
 
-RustFS maps values in the ID token `groups` claim to RustFS policy names. Create Keycloak groups that match the policies required by your users, such as `consoleAdmin`, `readwrite`, or `readonly`, then assign users to those groups.
+RustFS は、ID トークンの `groups` クレームの値を RustFS のポリシー名に対応付けます。ユーザーに必要なポリシーと一致する Keycloak グループ（`consoleAdmin`、`readwrite`、`readonly` など）を作成し、ユーザーをそれらのグループに割り当てます。
 
-Add a **Group Membership** mapper to a dedicated client scope and attach it to `rustfs-console`:
+専用のクライアントスコープに **Group Membership** マッパーを追加し、`rustfs-console` に割り当てます。
 
-| Mapper field | Value |
+| マッパーのフィールド | 値 |
 | --- | --- |
 | Name | `rustfs-groups` |
 | Token Claim Name | `groups` |
@@ -70,21 +70,21 @@ Add a **Group Membership** mapper to a dedicated client scope and attach it to `
 | Add to userinfo | On |
 | Multivalued | On |
 
-Keep **Full group path** disabled. A value such as `/consoleAdmin` does not match the RustFS policy named `consoleAdmin`.
+**Full group path** は無効のままにします。`/consoleAdmin` のような値は、RustFS のポリシー名 `consoleAdmin` と一致しません。
 
-:::note[Using Keycloak roles]
+:::note[Keycloak のロールを使う場合]
 
-If you use realm or client roles instead of groups, add a role mapper that emits a flat top-level `roles` array. RustFS does not parse Keycloak's nested `realm_access.roles` claim.
+グループの代わりにレルムロールまたはクライアントロールを使う場合は、フラットなトップレベルの `roles` 配列を出力するロールマッパーを追加します。RustFS は、Keycloak のネストした `realm_access.roles` クレームを解析しません。
 
 :::
 
-### RustFS configuration
+### RustFS の設定
 
-Configure the Keycloak provider through environment variables.
+環境変数で Keycloak プロバイダーを設定します。
 
-#### Configure with environment variables
+#### 環境変数で設定する
 
-Add the Keycloak provider and public browser origin to the RustFS service environment:
+Keycloak プロバイダーと、ブラウザ向けの公開オリジンを、RustFS サービスの環境に追加します。
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_BROWSER_REDIRECT_URL="https://rustfs.example.com"
@@ -103,7 +103,7 @@ RUSTFS_IDENTITY_OPENID_EMAIL_CLAIM="email"
 RUSTFS_IDENTITY_OPENID_USERNAME_CLAIM="preferred_username"
 ```
 
-Restart RustFS after applying the configuration.
+設定を適用したあと、RustFS を再起動します。
 
 :::note[プライベートネットワーク上の Keycloak]
 
@@ -119,21 +119,21 @@ RUSTFS_OUTBOUND_ALLOW_ORIGINS="http://kc:8080"
 
 :::
 
-`RUSTFS_BROWSER_REDIRECT_URL` must contain the public scheme and authority without a path. It controls the Console success redirect and logout fallback URL. The provider callback URL must exactly match the URL registered in Keycloak.
+`RUSTFS_BROWSER_REDIRECT_URL` には、パスを除いた公開スキームとオーソリティを指定します。Console の成功時リダイレクトと、ログアウト時のフォールバック URL を制御します。プロバイダーのコールバック URL は、Keycloak に登録した URL と完全に一致する必要があります。
 
-:::warning[Map claims in production]
+:::warning[本番ではクレームを対応付ける]
 
-Do not use `RUSTFS_IDENTITY_OPENID_ROLE_POLICY=consoleAdmin` as a permanent shortcut. Map Keycloak groups or roles to RustFS policies so each user receives only the required permissions.
+恒久的な省略手段として `RUSTFS_IDENTITY_OPENID_ROLE_POLICY=consoleAdmin` を使わないでください。Keycloak のグループまたはロールを RustFS のポリシーに対応付け、各ユーザーに必要な権限だけを付与します。
 
 :::
 
-For a reverse proxy or load balancer, preserve the callback query string and route the authorize and callback requests to the same RustFS node. The in-flight OIDC `state` is local to that node.
+リバースプロキシまたはロードバランサーを使う場合は、コールバックのクエリ文字列を保持し、認可リクエストとコールバックリクエストを同じ RustFS ノードへルーティングします。処理中の OIDC `state` は、そのノードのローカルにあります。
 
-## Verification
+## 確認
 
-### Verify Keycloak discovery
+### Keycloak のディスカバリーを確認する
 
-Query the realm discovery document:
+レルムのディスカバリードキュメントを問い合わせます。
 
 ```bash
 curl -fsS "https://keycloak.example.com/realms/rustfs/.well-known/openid-configuration" | jq '{
@@ -146,42 +146,42 @@ curl -fsS "https://keycloak.example.com/realms/rustfs/.well-known/openid-configu
 }'
 ```
 
-Confirm that:
+次を確認します。
 
-- `issuer` is `https://keycloak.example.com/realms/rustfs`.
-- `authorization_endpoint`, `token_endpoint`, and `jwks_uri` are present.
-- `code_challenge_methods_supported` includes `S256`.
-- The token endpoint supports client-secret authentication in the request body.
+- `issuer` が `https://keycloak.example.com/realms/rustfs` であること。
+- `authorization_endpoint`、`token_endpoint`、`jwks_uri` があること。
+- `code_challenge_methods_supported` に `S256` が含まれること。
+- トークンエンドポイントが、リクエスト本文でのクライアントシークレット認証に対応していること。
 
-### Verify the RustFS provider
+### RustFS のプロバイダーを確認する
 
-After restarting RustFS, check that the provider is available:
+RustFS を再起動したあと、プロバイダーが利用できることを確認します。
 
 ```bash
 curl -fsS "https://rustfs.example.com/rustfs/admin/v3/oidc/providers" | jq
 ```
 
-The response should include the `default` provider with the display name `Keycloak`.
+レスポンスには、表示名 `Keycloak` の `default` プロバイダーが含まれるはずです。
 
-### Test Console login
+### Console ログインを試す
 
-Open the RustFS Console and select **Keycloak**, or open the authorization endpoint directly:
+RustFS Console を開き **Keycloak** を選択するか、認可エンドポイントを直接開きます。
 
 ```text
 https://rustfs.example.com/rustfs/admin/v3/oidc/authorize/default
 ```
 
-Verify the complete flow:
+一連の流れを確認します。
 
-1. The browser redirects to Keycloak.
-2. The user signs in.
-3. Keycloak redirects to the RustFS callback URL with `code` and `state`.
-4. RustFS validates the ID token and creates the Console session.
-5. The Console opens with the permissions mapped from the user's `groups` or `roles` claim.
+1. ブラウザが Keycloak へリダイレクトされる。
+2. ユーザーがサインインする。
+3. Keycloak が `code` と `state` を付けて RustFS のコールバック URL へリダイレクトする。
+4. RustFS が ID トークンを検証し、Console セッションを作成する。
+5. ユーザーの `groups` または `roles` クレームから対応付けた権限で Console が開く。
 
-If authentication succeeds but access is denied, confirm that the ID token contains a flat `groups` or `roles` claim and that each value exactly matches an existing RustFS policy name.
+認証は成功するのにアクセスが拒否される場合は、ID トークンにフラットな `groups` または `roles` クレームがあり、各値が既存の RustFS ポリシー名と完全に一致することを確認します。
 
-## Next steps
+## 次のステップ
 
-- Review [users, groups, and policies](../iam/policies.md) before assigning Keycloak groups.
-- Review the [Console security notes](/administration/console) before exposing the login endpoint publicly.
+- Keycloak のグループを割り当てる前に、[ユーザー、グループ、ポリシー](../iam/policies.md)を確認します。
+- ログインエンドポイントを公開する前に、[Console のセキュリティに関する注意](/ja/administration/console)を確認します。

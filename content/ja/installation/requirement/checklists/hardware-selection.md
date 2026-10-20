@@ -1,39 +1,41 @@
 ---
-title: Hardware Selection
-description: Hardware requirements for RustFS.
+title: ハードウェアの選定
+description: RustFS のテスト環境と本番環境における、最小要件と推奨ハードウェアを示します。
 ---
 
-> RustFS is designed for efficiency with a low memory footprint.
+> RustFS は、メモリ使用量を抑えて効率的に動作するよう設計されています。
 
-## Test Environment
+## テスト環境
 
-> Minimal requirements for testing:
+テストに必要な最小要件は次のとおりです。
 
-| Component | Requirement |
+| コンポーネント | 要件 |
 | - | - |
-| CPU | 1 core+ |
-| Architecture | x86, ARM |
-| Memory | 1 GB+ |
-| Storage | HDD or SSD |
-| Docker | Supported |
-| Network | Local or Offline |
-| OS | Windows, Linux, macOS |
-| Load Balancing | None |
-| Nodes | 1 |
+| CPU | 1 コア以上 |
+| アーキテクチャ | x86、ARM |
+| メモリ | 1 GB 以上 |
+| ストレージ | HDD または SSD |
+| Docker | 対応 |
+| ネットワーク | ローカルまたはオフライン |
+| OS | Windows、Linux、macOS |
+| ロードバランサー | なし |
+| ノード | 1 |
 
-## Production Environment
+## 本番環境
 
-| Component | Requirement |
+Windows 版の RustFS は、開発とデバッグのみを目的としており、**本番デプロイには推奨しません**。本番ワークロードには [Linux](/ja/installation/linux) を推奨します。
+
+| コンポーネント | 要件 |
 | - | - |
-| CPU | 2 x 12 cores+ |
-| Architecture | x86, ARM, etc. |
-| Memory | 64 GB+ |
-| Storage | SSD recommended |
-| Network | 10 Gbps+ |
-| OS | Linux (Recommended) |
-| Load Balancing | Recommended |
-| Nodes | 4+ |
+| CPU | 2 × 12 コア以上 |
+| アーキテクチャ | x86、ARM など |
+| メモリ | 64 GB 以上 |
+| ストレージ | SSD を推奨 |
+| ネットワーク | 10 Gbps 以上 |
+| OS | Linux（推奨） |
+| ロードバランサー | 推奨 |
+| ノード | 4 以上 |
 
-## Expert Services
+## 専門サービス
 
-For complex deployments, contact support at hello@rustfs.com.
+複雑なデプロイについては、hello@rustfs.com のサポートに問い合わせてください。

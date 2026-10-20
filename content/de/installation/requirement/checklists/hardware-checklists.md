@@ -1,93 +1,94 @@
 ---
-title: "Production Environment Hardware Configuration Guide"
-description: "RustFS is a high-performance distributed object storage system developed in Rust, suitable for massive unstructured data storage scenarios. This document provides comprehensive hardware selection and configuration guidance for production environment deployment."
+title: "Hardwareleitfaden für die Produktion"
+description: "Diese Seite beschreibt die Bemessung und Konfiguration der Hardware für RustFS-Produktionsbereitstellungen."
 ---
 
-## Deployment Planning Factor Analysis
+## Planungsüberlegungen
 
-Before formally deploying RustFS, it's recommended to conduct 2-3 weeks of business research, focusing on evaluating the following dimensions:
+Bewerten Sie vor der Bereitstellung von RustFS in der Produktion über einen Zeitraum von zwei bis drei Wochen Ihre Arbeitslast und Ihren Kapazitätsbedarf. Konzentrieren Sie sich auf die folgenden Faktoren:
 
-1. **Data Scale Analysis**
+1. **Datenmenge**
 
-- **Initial Data Volume**: Accurately calculate effective data volume at production startup (recommended in TiB units), considering hot/cold data ratios
-- **Growth Trend Prediction**: Estimate data increments for the next 24 months based on business development plans (recommended quarterly growth rate model)
-- **Object Scale**: Calculate total object count based on average object size (recommended 128 KB-1 MB range), note special optimization needed when exceeding 100 million objects
+   - **Anfängliche Datenmenge**: Schätzen Sie die nutzbare Datenmenge zum Produktivstart (in TiB), einschließlich des Verhältnisses von heißen zu kalten Daten.
+   - **Wachstumsprognose**: Schätzen Sie das Datenwachstum der nächsten 24 Monate anhand der Geschäftspläne. Wir empfehlen, das Wachstum quartalsweise zu modellieren.
+   - **Objektanzahl**: Schätzen Sie die Gesamtzahl der Objekte aus der durchschnittlichen Objektgröße (idealerweise 128 KB bis 1 MB). Bereitstellungen mit mehr als 100 Millionen Objekten brauchen zusätzliche Abstimmung.
 
-2. **Business Characteristic Assessment**
+2. **Eigenschaften der Arbeitslast**
 
-- **Access Patterns**: Distinguish read-intensive (such as content distribution) from write-intensive (such as log collection) scenarios
-- **Compliance Requirements**: Data retention cycles must comply with industry regulatory requirements (e.g., financial industry must retain for at least 5 years)
-- **Multi-site Deployment**: Cross-regional deployment requires network latency assessment (recommended controlled within 50ms) and bandwidth cost evaluation
+   - **Zugriffsmuster**: Unterscheiden Sie leselastige Arbeitslasten (etwa Inhaltsverteilung) von schreiblastigen Arbeitslasten (etwa Protokollerfassung).
+   - **Einhaltung von Vorschriften**: Aufbewahrungsfristen müssen die Branchenvorschriften erfüllen (einige Finanzvorschriften verlangen beispielsweise eine Aufbewahrung von mindestens fünf Jahren).
+   - **Bereitstellung an mehreren Standorten**: Bewerten Sie bei regionsübergreifenden Bereitstellungen die Netzwerklatenz (idealerweise unter 50 ms) und die Bandbreitenkosten.
 
-3. **Storage Architecture Design**
+3. **Speicherarchitektur**
 
-- **Bucket Planning**: Divide storage buckets by business units, single cluster recommended not exceeding 500 active buckets
-- **Disaster Recovery Strategy**: Choose dual-active architecture (recommended) or asynchronous replication based on data importance
+   - **Bucket-Planung**: Organisieren Sie Buckets nach Geschäftseinheit. Wir empfehlen höchstens 500 aktive Buckets je Cluster.
+   - **Notfallwiederherstellung**: Wählen Sie Aktiv-Aktiv-Replikation (empfohlen) oder asynchrone Replikation, je nachdem, wie kritisch die Daten sind.
 
-## Hardware Configuration Matrix
+## Hardware-Konfigurationsmatrix
 
-Baseline configuration solutions based on stress test results:
+Basiskonfigurationen auf Grundlage von Lasttestergebnissen:
 
-| Component | Basic Environment | Production Standard Configuration | High-Performance Configuration |
-|--------------|---------------------------|--------------------------|--------------------------|
-| Node Count | 4 nodes | 8 nodes | 16+ nodes |
-| Storage Media | 4× NVMe SSD | 8×NVMe SSD | 12×NVMe SSD |
-| Network Architecture | Dual 25GbE (link aggregation) | Dual 100GbE | 200GbE |
-| CPU | 2×Intel Silver 4310 (16 cores) | 2×AMD EPYC 7313 (32 cores) | 2×Intel Platinum 8461Y (48 cores) |
-| Memory | 64 GB DDR4-3200 ECC | 256 GB DDR5-4800 ECC | 512 GB DDR5-5600 ECC |
-| Storage Controller | HBA 9500-8i | HBA 9600-16i | Dual controller redundant architecture |
+| Komponente | Einstieg | Produktionsstandard | Hohe Leistung |
+| --- | --- | --- | --- |
+| Knotenanzahl | 4 Knoten | 8 Knoten | 16 oder mehr Knoten |
+| Speichermedium | 4× NVMe-SSD | 8× NVMe-SSD | 12× NVMe-SSD |
+| Netzwerkarchitektur | 2× 25GbE (Link-Aggregation) | 2× 100GbE | 200GbE |
+| CPU | 2×Intel Silver 4310 (16 Kerne) | 2×AMD EPYC 7313 (32 Kerne) | 2×Intel Platinum 8461Y (48 Kerne) |
+| Arbeitsspeicher | 64 GB DDR4-3200 ECC | 256 GB DDR5-4800 ECC | 512 GB DDR5-5600 ECC |
+| Speichercontroller | HBA 9500-8i | HBA 9600-16i | Redundante Architektur mit zwei Controllern |
 
-**Important Deployment Principles:**
+**Bereitstellungsrichtlinien:**
 
-1. Adopt "server farm" mode, ensuring all nodes use identical hardware batches and firmware versions
-2. Network architecture must meet: leaf-spine topology + physically isolated storage network + dual uplink paths
-3. Recommend using 2U server models, single node recommended configuration of 12+ disk bays (based on actual hard disk count)
+1. Verwenden Sie homogene Knoten: Jeder Knoten sollte identische Hardware aus derselben Charge und dieselben Firmware-Versionen aufweisen.
+2. Das Netzwerk muss eine Leaf-Spine-Topologie, ein physisch getrenntes Speichernetz und zwei Uplink-Verbindungen verwenden.
+3. Wir empfehlen 2U-Server mit mindestens 12 Laufwerksschächten je Knoten, abhängig von der benötigten Anzahl der Datenträger.
 
-## Performance Critical Path Optimization
+## Leistungsoptimierung
 
-### Network Topology Optimization (Highest Priority)
+### Optimierung der Netzwerktopologie (höchste Priorität)
 
-- **Bandwidth Calculation**: Reserve 0.5 Gbps bandwidth per TB of effective data (e.g., 100 TB data needs 50 Gbps dedicated bandwidth)
-- **Latency Requirements**:
-- Inter-node P99 latency ≤ 2ms
-- Cross-rack latency ≤ 5ms
+- **Bandbreitenbemessung**: Planen Sie 0,5 Gbps Bandbreite je TB nutzbarer Daten ein (100 TB Daten benötigen beispielsweise 50 Gbps dedizierte Bandbreite).
+- **Latenzanforderungen**:
+  - P99-Latenz zwischen Knoten ≤ 2 ms
+  - Latenz zwischen Racks ≤ 5 ms
 
-### Storage Subsystem Tuning
+### Abstimmung des Speichersubsystems
 
-- **Controller Configuration**:
-- Enable read-ahead cache (recommended 256 MB+)
-- Disable all RAID functions, use pass-through mode
-- Regularly check BBU battery health status
-- **SSD Parameters**:
-- Reserve 20% OP space to improve durability
-- Enable atomic write features (requires hardware support)
+- **Controller-Konfiguration**:
+  - Aktivieren Sie den Vorauslese-Cache (mindestens 256 MB empfohlen).
+  - Deaktivieren Sie alle RAID-Funktionen und verwenden Sie den Durchleitungsmodus (HBA/JBOD).
+  - Prüfen Sie den Zustand der BBU regelmäßig.
+- **SSD-Parameter**:
+  - Reservieren Sie 20 % Überprovisionierung (OP), um die Lebensdauer zu verbessern.
+  - Aktivieren Sie atomare Schreibvorgänge (erfordert Hardwareunterstützung).
 
-### Memory Management Strategy
+### Arbeitsspeicherzuweisung
 
-- **Allocation Ratios**:
-- Metadata cache: 60% of total memory
-- Read/write buffers: 30%
-- System reserve: 10%
+- **Zuweisungsverhältnisse**:
+  - Metadaten-Cache: 60 % des gesamten Arbeitsspeichers
+  - Lese- und Schreibpuffer: 30 %
+  - Systemreserve: 10 %
 
-## Network Design Reference Model
+## Referenzmodell für das Netzwerkdesign
 
-### Bandwidth and Disk Ratio Relationship
+### Netzwerkbandbreite und Datenträgeranzahl
 
-| Network Type | Theoretical Throughput | Suitable Disk Types | Maximum Disk Support |
-|------------|------------|---------------------|----------------|
-| 10GbE | 1.25 GB/s | 7.2K HDD (180 MB/s) | 8 disks |
-| 25GbE | 3.125 GB/s | SATA SSD (550 MB/s) | 6 disks |
-| 100GbE | 12.5 GB/s | NVMe Gen4 (7 GB/s) | 2 disks full-speed read/write |
+| Netzwerk | Theoretischer Durchsatz | Datenträgertyp | Maximale Datenträger je Knoten |
+| --- | --- | --- | --- |
+| 10GbE | 1,25 GB/s | 7.2K HDD (180 MB/s) | 8 Datenträger |
+| 25GbE | 3,125 GB/s | SATA-SSD (550 MB/s) | 6 Datenträger |
+| 100GbE | 12,5 GB/s | NVMe Gen4 (7 GB/s) | 2 (bei voller Lese- und Schreibgeschwindigkeit) |
 
-**Best Practice Case**: A video platform uses 16-node cluster, each node configured with:
+**Beispiel**: Eine Videoplattform betreibt einen Cluster mit 16 Knoten. Jeder Knoten verfügt über:
 
-- 8×7.68 TB NVMe SSD
-- Dual 100GbE CX5 network cards
-- Achieves aggregate throughput of 38 GB/s
+- 8×7,68 TB NVMe-SSD
+- zwei NVIDIA ConnectX-5-NICs mit 100GbE
 
-## Memory Configuration Calculator
+Der Cluster erreicht einen aggregierten Durchsatz von 38 GB/s.
 
-Dynamic algorithm based on disk capacity and business characteristics:
+## Bemessung des Arbeitsspeichers
+
+Bemessen Sie den Arbeitsspeicher anhand der Datenträgerkapazität und des Lasttyps mit der folgenden Formel:
 
 ```python
 # Memory calculation formula (unit: GB)
@@ -101,58 +102,58 @@ def calc_memory(data_tb, access_pattern):
  return base + data_tb * 1.0
 ```
 
-**Reference Configuration Table**:
+**Referenzgrößen**:
 
-| Data Scale | Read-Intensive | Write-Intensive | Mixed |
-|-----------|----------|----------|---------|
+| Datenmenge | Leselastig | Schreiblastig | Gemischt |
+| --- | --- | --- | --- |
 | 10 TB | 40 GB | 44 GB | 42 GB |
 | 100 TB | 112 GB | 152 GB | 132 GB |
 | 500 TB | 432 GB | 632 GB | 532 GB |
 
-## Storage Deployment Standards
+## Speicherrichtlinien
 
-### Media Selection Criteria
+### Speichermedien auswählen
 
-| Metric | HDD Suitable Scenarios | SSD Suitable Scenarios | NVMe Mandatory Scenarios |
-|-------------|------------------|---------------------|----------------------|
-| Latency Requirements | >50ms | 1 to 10ms | < 1ms |
-| Throughput Requirements | < 500 MB/s | 500 MB-3 GB/s | > 3 GB/s |
-| Typical Use Cases | Archive storage | Hot data cache | Real-time analysis |
+| Metrik | HDD | SATA-SSD | NVMe (erforderlich) |
+| --- | --- | --- | --- |
+| Latenzanforderungen | > 50 ms | 1 bis 10 ms | < 1 ms |
+| Durchsatzanforderungen | < 500 MB/s | 500 MB/s bis 3 GB/s | > 3 GB/s |
+| Typische Anwendungsfälle | Archivspeicher | Cache für heiße Daten | Echtzeitanalysen |
 
-### File System Configuration
+### Dateisystemkonfiguration
 
 ```bash
-# XFS formatting example
-mkfs.xfs -f -L rustfs_disk1 -d su=256k,sw=10 /dev/sdb
-
-# Recommended mount parameters
-UUID=xxxx /mnt/disk1 xfs defaults,noatime,nodiratime,logbsize=256k 0 0
+sudo mkfs.xfs -f -i size=512 -n ftype=1 -L RUSTFS0 /dev/sdb
 ```
 
-## High Availability Assurance Measures
+## Hochverfügbarkeit
 
-1. **Power Supply**:
+1. **Stromversorgung**:
 
-- Adopt dual power supply architecture
-- Each PDU connects to different substations
-- Equip UPS (at least 30 minutes runtime)
+   - Verwenden Sie doppelte (redundante) Netzteile.
+   - Schließen Sie jede PDU an eine eigene Einspeisung an.
+   - Sehen Sie eine USV mit mindestens 30 Minuten Überbrückungszeit vor.
 
-2. **Cooling Requirements**:
+2. **Kühlungsanforderungen**:
 
-- Cabinet power density ≤ 15kW/cabinet
-- Inlet/outlet temperature difference controlled within 8℃
+   - Leistungsdichte im Rack ≤ 15 kW je Rack.
+   - Halten Sie die Temperaturdifferenz zwischen Einlass und Auslass (ΔT) bei höchstens 8 °C.
 
-3. **Firmware Management**:
+3. **Firmware-Verwaltung**:
 
-- Establish hardware compatibility matrix
-- Use unified firmware versions
+   - Pflegen Sie eine Hardware-Kompatibilitätsmatrix.
+   - Vereinheitlichen Sie die Firmware-Versionen auf allen Knoten.
 
-> **Implementation Recommendations**: Recommend conducting 72-hour stress testing before formal deployment, simulating the following scenarios:
->
-> 1. Node failover testing
-> 2. Network partition drills
-> 3. Burst write pressure testing (recommended reaching 120% of theoretical value)
+:::tip[Vor der Produktivsetzung]
+
+Wir empfehlen, vor der Produktivsetzung einen 72-Stunden-Stresstest durchzuführen, der die folgenden Szenarien abdeckt:
+
+1. Test beim Ausfall eines Knotens
+2. Tests zur Netzwerkpartition
+3. Lasttests mit Schreibspitzen (wir empfehlen einen Test mit 120 % des theoretischen Maximums)
+
+:::
 
 ---
 
-This guide is based on the latest RustFS development version. For actual deployment, please combine with specific hardware vendor white papers for parameter fine-tuning. Or contact RustFS official recommendations for quarterly hardware health assessments to ensure continuous stable operation of storage clusters.
+Diese Anleitung basiert auf der neuesten Entwicklungsversion von RustFS. Stimmen Sie diese Einstellungen für Produktionsbereitstellungen anhand der Dokumentation Ihres Hardwareherstellers ab. Wenden Sie sich für vierteljährliche Bewertungen des Hardwarezustands an RustFS.

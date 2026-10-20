@@ -1,13 +1,11 @@
 ---
 title: Hardware Selection
-description: Hardware requirements for RustFS.
+description: Compare minimum and recommended hardware for RustFS test and production environments.
 ---
 
-> RustFS is designed for efficiency with a low memory footprint.
+## Test environment
 
-## Test Environment
-
-> Minimal requirements for testing:
+Minimum requirements for testing:
 
 | Component | Requirement |
 | - | - |
@@ -16,12 +14,14 @@ description: Hardware requirements for RustFS.
 | Memory | 1 GB+ |
 | Storage | HDD or SSD |
 | Docker | Supported |
-| Network | Local or Offline |
+| Network | Local or offline |
 | OS | Windows, Linux, macOS |
 | Load Balancing | None |
 | Nodes | 1 |
 
-## Production Environment
+## Production environment
+
+The Windows version of RustFS is intended for development and debugging only and is **not recommended for production deployments**. We recommend [Linux](/en/installation/linux) for production workloads.
 
 | Component | Requirement |
 | - | - |
@@ -34,6 +34,6 @@ description: Hardware requirements for RustFS.
 | Load Balancing | Recommended |
 | Nodes | 4+ |
 
-## Expert Services
+## Professional services
 
 For complex deployments, contact support at hello@rustfs.com.

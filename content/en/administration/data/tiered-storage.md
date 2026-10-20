@@ -3,7 +3,7 @@ title: "Tiered Storage"
 description: "Configure lifecycle-driven object transitions from RustFS to a remote storage tier."
 ---
 
-RustFS tiered storage moves objects from local storage to a configured remote backend. This page explains the supported targets and shows how to add and maintain a RustFS tier in the Console.
+RustFS tiered storage moves objects from local storage to a configured remote backend. This page explains the supported targets and shows how to add and maintain a RustFS tier on the Console.
 
 Tiering is asynchronous. RustFS keeps the object metadata locally, transfers the object data to the remote tier, and continues to serve S3 reads through the original bucket and object key.
 
@@ -94,7 +94,7 @@ Install and configure [`rc`](/operations/rc), then list the tiers registered on 
 rc bucket lifecycle tier list local
 ```
 
-Add a RustFS tier with the same settings described in the Console workflow:
+Add a RustFS tier with the same settings as the Console steps above:
 
 ```bash
 rc bucket lifecycle tier add rustfs COLDTIER local \

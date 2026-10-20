@@ -1,13 +1,13 @@
 ---
 title: "Trino"
-description: "Interrogez des données CSV et Parquet stockées dans le stockage objet RustFS avec Trino et le file metastore du connecteur hive."
+description: "Interrogez des données CSV et Parquet stockées dans le stockage objet RustFS avec Trino et le metastore fichier du connecteur Hive."
 ---
 
-Ce guide connecte [Trino](https://github.com/trinodb/trino) — le moteur de requêtes SQL distribué — à **RustFS** via le connecteur hive avec son metastore basé sur les fichiers et le système de fichiers S3 natif. Vous allez créer un schéma et une table, insérer des lignes, les relire, puis vérifier les objets dans RustFS. Les métadonnées et les fichiers de données résident tous deux dans RustFS. Le flux a été validé avec `trinodb/trino:435` et `rustfs/rustfs-x86-musl:v2.3.1`.
+Ce guide connecte [Trino](https://github.com/trinodb/trino) — le moteur de requêtes SQL distribué — à **RustFS** via le connecteur Hive avec son metastore basé sur les fichiers et le système de fichiers S3 natif. Vous allez créer un schéma et une table, insérer des lignes, les relire, puis vérifier les objets dans RustFS. Les métadonnées et les fichiers de données résident tous deux dans RustFS. Le flux a été validé avec `trinodb/trino:435` et `rustfs/rustfs-x86-musl:v2.3.1`.
 
-Vous avez besoin de Docker avec le plugin Compose. Ce déploiement est destiné aux tests d'intégration locaux, pas à la production.
+Vous avez besoin de Docker avec le plugin Compose. Ce déploiement est destiné aux tests d’intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -17,27 +17,27 @@ flowchart LR
 	Init["init-bucket job"] -->|"create my-bucket"| RustFS
 ```
 
-Le connecteur hive avec `hive.metastore=file` conserve les métadonnées de schémas et de tables sous forme d'objets JSON sous le répertoire du catalogue, et le système de fichiers S3 natif (`fs.s3.enabled`) stocke les métadonnées et les données dans RustFS avec un adressage path-style en HTTP simple.
+Le connecteur Hive avec `hive.metastore=file` conserve les métadonnées de schémas et de tables sous forme d’objets JSON sous le répertoire du catalogue, et le système de fichiers S3 natif (`fs.s3.enabled`) stocke les métadonnées et les données dans RustFS avec un adressage de type chemin (path-style) en HTTP non chiffré.
 
 ## 1. Créer les fichiers du projet
 
-Créez un répertoire de travail :
+Créez un répertoire de travail :
 
 ```bash
 mkdir rustfs-trino
 cd rustfs-trino
 ```
 
-Créez un fichier d'environnement et remplacez les deux espaces réservés d'identifiants :
+Créez un fichier d’environnement et remplacez les deux valeurs d’identifiants indicatives :
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Utilisez des identifiants dédiés pour le bucket. Ne commettez pas `.env` dans le contrôle de version.
+Utilisez des identifiants dédiés pour le compartiment. N’ajoutez pas le fichier `.env` au dépôt (ne le versionnez pas).
 
-Créez la configuration du catalogue pour Trino :
+Créez la configuration du catalogue pour Trino :
 
 ```ini title="hive.properties"
 connector.name=hive
@@ -51,9 +51,9 @@ s3.aws-access-key=<your-access-key>
 s3.aws-secret-key=<your-secret-key>
 ```
 
-`hive.metastore.catalog.dir` pointe le file metastore dans le bucket : métadonnées et données résident donc dans RustFS. `fs.s3.enabled` active le système de fichiers S3 natif ; `s3.path-style-access` est requis pour le point de terminaison du réseau de conteneurs.
+`hive.metastore.catalog.dir` place le metastore fichier dans le compartiment : les métadonnées et les données résident donc dans RustFS. `fs.s3.enabled` active le système de fichiers S3 natif ; `s3.path-style-access` est requis pour le point de terminaison du réseau de conteneurs.
 
-Créez le fichier Compose :
+Créez le fichier Compose :
 
 ```yaml title="compose.yaml"
 services:
@@ -121,20 +121,20 @@ volumes:
 
 ## 2. Démarrer le déploiement
 
-Vérifiez le fichier Compose avant de démarrer les conteneurs :
+Vérifiez le fichier Compose avant de démarrer les conteneurs :
 
 ```bash
 docker compose config
 ```
 
-Démarrez les services et attendez la fin de l'initialisation du bucket :
+Démarrez les services et attendez la fin de l’initialisation du compartiment :
 
 ```bash
 docker compose up -d
 docker compose ps -a
 ```
 
-Trino est démarré quand le journal du serveur indique `SERVER STARTED`. Le conteneur s'exécute sous l'utilisateur `trino` (uid 1000) ; assurez-vous que le volume du metastore est inscriptible :
+Trino est démarré quand le journal du serveur indique `SERVER STARTED`. Le conteneur s’exécute sous l’utilisateur `trino` (uid 1000) ; assurez-vous que le volume du metastore est inscriptible :
 
 ```bash
 docker compose exec trino id
@@ -143,14 +143,14 @@ docker compose exec trino ls -la /data/metastore
 
 ## 3. Créer un schéma et une table
 
-Créez le schéma sans location explicite — Trino le place sous le répertoire du catalogue dans RustFS :
+Créez le schéma sans emplacement explicite — Trino le place sous le répertoire du catalogue dans RustFS :
 
 ```bash
 docker compose exec trino trino --execute \
   "CREATE SCHEMA hive.demo"
 ```
 
-Créez une table et insérez cinq lignes :
+Créez une table et insérez cinq lignes :
 
 ```bash
 docker compose exec trino trino --execute \
@@ -166,7 +166,7 @@ INSERT: 5 rows
 
 ## 4. Interroger les données
 
-Relisez les lignes :
+Relisez les lignes :
 
 ```bash
 docker compose exec trino trino --execute \
@@ -183,7 +183,7 @@ docker compose exec trino trino --execute \
 
 ## 5. Vérifier les objets dans RustFS
 
-Listez le préfixe du metastore via l'image d'initialisation du bucket :
+Listez le préfixe du metastore via l’image d’initialisation du compartiment :
 
 ```bash
 docker compose run --rm --entrypoint /bin/sh create-bucket -c \
@@ -197,25 +197,25 @@ docker compose run --rm --entrypoint /bin/sh create-bucket -c \
 [2026-09-21 01:55:25]      432 B trino-metastore/demo/events/20260921_..._cb761cec-...parquet
 ```
 
-Vous pouvez également parcourir le préfixe dans la console RustFS :
+Vous pouvez également parcourir le préfixe dans la Console RustFS :
 
-![Les objets de métadonnées et de données Trino stockés dans la console RustFS](./images/rustfs-trino-objects.png)
+![Les objets de métadonnées et de données Trino stockés dans la Console RustFS](./images/rustfs-trino-objects.png)
 
 ## 6. Utiliser RustFS S3 Tables
 
-RustFS S3 Tables fournit un catalogue REST Apache Iceberg intégré, permettant à Trino de traiter un table bucket comme un entrepôt Iceberg géré tandis que les données restent dans RustFS. Activez un table bucket et connectez le connecteur Iceberg de Trino au catalogue REST comme décrit dans [S3 Tables](/administration/data/s3-tables) : l'URI du catalogue REST est `http://<rustfs-host>:9000/iceberg`, le warehouse est le nom du bucket, et les requêtes de catalogue (AWS Signature Version 4, nom de signature `s3`) comme l'accès aux fichiers S3 utilisent l'adressage path-style.
+RustFS S3 Tables fournit un catalogue REST Apache Iceberg intégré, permettant à Trino de traiter un compartiment de tables (table bucket) comme un entrepôt Iceberg géré tandis que les données restent dans RustFS. Activez un compartiment de tables et connectez le connecteur Iceberg de Trino au catalogue REST comme décrit dans [S3 Tables](/fr/administration/data/s3-tables) : l’URI du catalogue REST est `http://<rustfs-host>:9000/iceberg`, le warehouse est le nom du compartiment, et les requêtes de catalogue (AWS Signature Version 4, nom de signature `s3`) comme l’accès aux fichiers S3 utilisent l’adressage de type chemin (path-style).
 
-Selon la matrice de support S3 Tables, Trino a fait l'objet d'une sonde en lecture seule contre le catalogue ; validez la compatibilité en écriture et la version exacte de Trino que vous déployez avant d'adopter ce chemin en production.
+Selon la matrice de prise en charge S3 Tables, Trino a fait l’objet d’une vérification en lecture seule face au catalogue ; validez la compatibilité en écriture et la version exacte de Trino que vous déployez avant d’adopter ce chemin en production.
 
 ## 7. Arrêter ou réinitialiser la pile
 
-Arrêtez les conteneurs en conservant le volume de données RustFS :
+Arrêtez les conteneurs en conservant le volume de données RustFS :
 
 ```bash
 docker compose down
 ```
 
-Pour supprimer les métadonnées et données stockées et repartir d'un volume RustFS vide, ajoutez explicitement `--volumes` :
+Pour supprimer les métadonnées et données stockées et repartir d’un volume RustFS vide, ajoutez explicitement `--volumes` :
 
 ```bash
 docker compose down --volumes
@@ -225,11 +225,11 @@ docker compose down --volumes
 
 ### Erreurs de configuration pour `fs.native-s3.enabled` ou `fs.s3.enabled`
 
-Le nom de la propriété du système de fichiers S3 natif a changé selon les versions de Trino : Trino 435 utilise `fs.native-s3.enabled`, les versions plus récentes `fs.s3.enabled`. Ce guide épingle `trinodb/trino:435`, utilisez donc `fs.native-s3.enabled`.
+Le nom de la propriété du système de fichiers S3 natif a changé selon les versions de Trino : Trino 435 utilise `fs.native-s3.enabled`, les versions plus récentes `fs.s3.enabled`. Ce guide épingle `trinodb/trino:435`, utilisez donc `fs.native-s3.enabled`.
 
-### "Table directory must be ..." lors de la création d'une table
+### « Table directory must be ... » lors de la création d’une table
 
-Avec le file metastore, les locations de tables doivent rester sous `hive.metastore.catalog.dir`. Créez le schéma sans location explicite, ou pointez la location du schéma vers un répertoire du même préfixe de bucket.
+Avec le metastore fichier, les emplacements des tables doivent rester sous `hive.metastore.catalog.dir`. Créez le schéma sans emplacement explicite, ou pointez l’emplacement du schéma vers un répertoire du même préfixe de compartiment.
 
 ### Hive CSV storage format only supports VARCHAR
 
@@ -237,14 +237,14 @@ Le format CSV rejette les colonnes non textuelles. Utilisez `format = 'parquet'`
 
 ### Réponses AccessDenied ou 403
 
-Vérifiez que les identifiants de `hive.properties` correspondent aux identifiants RustFS et que la tâche `create-bucket` s'est terminée avec succès :
+Vérifiez que les identifiants de `hive.properties` correspondent aux identifiants RustFS et que la tâche `create-bucket` s’est terminée avec succès :
 
 ```bash
 docker compose logs create-bucket
 ```
 
-## Prochaines étapes
+## Étapes suivantes
 
-- Consultez les [notes de compatibilité S3](/administration/protocols/s3) avant d'adopter d'autres opérations S3.
-- Créez des identifiants de production dédiés avec la [gestion des clés d'accès](/security-compliance/iam/access-token).
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres opérations S3.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
 - Suivez la [documentation Trino](https://trino.io/docs/current/) pour connecter des outils BI et ajouter des catalogues de stockage objet.

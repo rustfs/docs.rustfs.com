@@ -1,32 +1,32 @@
 ---
-title: "Object Scanning"
-description: "Guide to the RustFS object scanner, including design, implementation, and monitoring."
+title: "オブジェクトスキャン"
+description: "RustFS のオブジェクトスキャナーについて、設計、実装、監視を説明します。"
 ---
 
-This guide covers the design and implementation of the RustFS object scanner, including its integration with Erasure Coding, Scrub & Repair mechanisms, scheduling strategies, monitoring metrics, and troubleshooting.
+このガイドでは、RustFS オブジェクトスキャナーの設計と実装を扱います。イレイジャーコーディングとの連携、スクラブと修復、スケジュール、メトリクス、トラブルシューティングを含みます。
 
-## Overview
+## 概要
 
-The RustFS object scanner is built into the storage engine and is responsible for periodically checking object integrity and executing scheduled operations.
-Scanning tasks include disk usage statistics, lifecycle management rule evaluation, object replication execution, and triggering corrupted object self-healing.
+RustFS のオブジェクトスキャナーはストレージエンジンに組み込まれ、オブジェクトの整合性を定期的に確認し、スケジュールされた操作を実行します。
+スキャナーはディスク使用量の統計を収集し、ライフサイクルルールを評価し、オブジェクトのレプリケーションを実行し、破損したオブジェクトのデータ修復を開始します。
 
-## Architecture and Design Principles
+## アーキテクチャと設計原則
 
-### Scanner Architecture
+### スキャナーのアーキテクチャ
 
-The RustFS scanner uses a hash sampling mechanism, selecting one out of every 1024 objects for inspection based on object name hashing to minimize performance impact.
-The scanner is deeply integrated with the Erasure Coding module, utilizing redundant shards for online reconstruction when detecting lost or corrupted shards, ensuring high data availability and consistency.
+RustFS のスキャナーはハッシュサンプリングを使い、性能への影響を抑えるため、オブジェクト名のハッシュに基づいて 1024 個につき 1 個を検査対象に選びます。
+スキャナーはイレイジャーコーディング層と連携します。欠損または破損したシャードを検出すると、残りの冗長シャードからそのシャードをオンラインで再構築します。
 
-## Data Verification and Recovery
+## データの検証と復旧
 
-The RustFS data verification mechanism checks metadata consistency and performs bit-by-bit reading and verification to discover hidden bad blocks. The object scanner detects issues like bit rot and triggers repair processes when necessary.
+RustFS のデータ検証は、メタデータの整合性を確認し、データを読み取って検証することで、潜在的な不良セクタを検出します。オブジェクトスキャナーはビットロットなどの問題を検出し、必要に応じて修復処理を開始します。
 
-## Scanning Modes and Scheduling
+## スキャンモードとスケジュール
 
-RustFS supports three scanning modes: online scanning during reads, background periodic scanning, and manual full scanning, balancing performance and reliability.
-Similar to the `osd_scrub_begin_hour` configuration in Ceph, administrators can set scanning start times and frequency. For example, light verification is set to once daily by default.
+RustFS は、性能と信頼性のバランスを取る 3 つのスキャンモードに対応しています。読み取り時のインライン検査、定期的なバックグラウンドスキャン、手動のフルスキャンです。
+Ceph の `osd_scrub_begin_hour` 設定と同様に、管理者はスキャンの開始時刻と頻度を設定できます。たとえば、軽量チェックは既定で 1 日に 1 回実行されます。
 
-## Monitoring and Metrics
+## 監視とメトリクス
 
-Scanner statistics include total task count, failure count, and time distribution, exposing metrics through the Prometheus data model such as `rustfs_scanner_jobs_total`, `rustfs_scanner_failures_total`, and `rustfs_scanner_duration_seconds`.
-Combined with monitoring systems, alerts can be set based on scanning failure rates and duration to promptly discover and locate potential issues at the storage or network levels.
+スキャナーは、タスクの総数、失敗数、所要時間の分布を Prometheus メトリクスとして報告します。例として `rustfs_scanner_jobs_total`、`rustfs_scanner_failures_total`、`rustfs_scanner_duration_seconds` があります。
+スキャンの失敗率と所要時間にアラートを設定すると、ストレージやネットワークの問題を早期に検出して診断できます。

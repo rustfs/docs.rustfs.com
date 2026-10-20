@@ -1,31 +1,35 @@
 ---
-title: "RustFS Bucket Deletion"
-description: "Delete buckets using the RustFS UI, rc, or the S3 API."
+title: "Bucket löschen"
+description: "Löschen Sie Buckets über die RustFS-Oberfläche, mit rc oder über die S3-API."
 ---
 
-This guide explains how to delete buckets using the RustFS UI, `rc`, or the S3 API.
+In dieser Anleitung löschen Sie Buckets über die RustFS-Oberfläche, mit `rc` oder über die S3-API.
 
-## Requirements
+## Voraussetzungen
 
-- Install and configure [`rc`](/operations/rc) before using the command-line workflow.
-- Empty the target bucket before deleting it, or use `--force` only after reviewing the objects that will be removed.
+- Installieren und konfigurieren Sie [`rc`](/de/operations/rc), bevor Sie den Kommandozeilenablauf verwenden.
+- Leeren Sie den Ziel-Bucket, bevor Sie ihn löschen, oder verwenden Sie `--force` erst, nachdem Sie die Objekte geprüft haben, die entfernt werden.
 
-**Warning**: Deleting a bucket is irreversible and may break applications relying on it. Ensure you have backed up any necessary data before proceeding.
+:::warning[Das Löschen ist endgültig]
 
-## Using the RustFS UI
+Das Löschen eines Buckets lässt sich nicht rückgängig machen und kann Anwendungen beeinträchtigen, die davon abhängen. Sichern Sie alle Daten, die Sie behalten müssen, bevor Sie fortfahren.
 
-1. Log in to the RustFS Console.
-2. On the homepage, select the bucket you want to delete.
-3. On the far right, select the **Delete** button.
-4. In the popup dialog, click **Confirm** to complete bucket deletion.
+:::
 
-![bucket deletion](images/bucket-deletion-on-ui.png)
+## RustFS-Oberfläche verwenden
 
-## Using `rc`
+1. Melden Sie sich an der RustFS-Console an.
+2. Wählen Sie auf der Startseite den Bucket, den Sie löschen möchten.
+3. Wählen Sie ganz rechts die Schaltfläche **Delete** (Löschen).
+4. Wählen Sie im Bestätigungsdialog **Confirm** (Bestätigen).
 
-See the [`rc` guide](/operations/rc) for installation and alias configuration.
+![Bucket-Löschung](images/bucket-deletion-on-ui.png)
 
-Delete a bucket:
+## `rc` verwenden
+
+Installation und Alias-Konfiguration stehen in der [`rc`-Anleitung](/de/operations/rc).
+
+Löschen Sie einen Bucket:
 
 ```bash
 rc bucket remove rustfs/my-bucket
@@ -35,15 +39,15 @@ rc bucket remove rustfs/my-bucket
 ✓ Bucket 'rustfs/my-bucket' removed successfully.
 ```
 
-## Using the API
+## API verwenden
 
-Delete a bucket via API:
+Löschen Sie einen Bucket über die API:
 
 ```http
 DELETE /{bucketName} HTTP/1.1
 ```
 
-S3 requests must be signed with AWS Signature V4, so use an S3 client rather than hand-crafting headers. With the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) configured for your access keys:
+S3-Anfragen müssen mit AWS Signature V4 signiert sein. Verwenden Sie deshalb einen S3-Client, anstatt Header von Hand zu setzen. Mit der für Ihre Zugriffsschlüssel konfigurierten [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html):
 
 ```bash
 aws s3api delete-bucket \
@@ -51,4 +55,4 @@ aws s3api delete-bucket \
   --endpoint-url http://localhost:9000
 ```
 
-Verify the bucket deletion in the RustFS Console.
+Prüfen Sie die Löschung des Buckets in der RustFS-Console.

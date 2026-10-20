@@ -1,29 +1,29 @@
 ---
-title: "RustFS Access Key Management"
-description: "Creation, usage, and deletion of RustFS access keys."
+title: "Clés d’accès"
+description: "Créez et supprimez les clés d’accès RustFS dans la Console."
 ---
 
-RustFS access keys are the core credentials of the RustFS system, used for identity authentication and operation authorization, and are very useful in API and SDK scenarios. This chapter introduces the creation and deletion of RustFS access keys.
+Les clés d’accès sont les identifiants que les applications et les outils utilisent pour s’authentifier auprès de RustFS et pour autoriser leurs requêtes. Cette page montre comment créer et supprimer des clés d’accès dans la Console.
 
-Prerequisites:
+## Prérequis
 
-- An available RustFS instance. You can refer to the [Installation Guide](../../installation/index.md) for installation.
+- Une instance RustFS en cours d’exécution. Voir le [guide d’installation](../../installation/index.md).
 
-## Creating Access Keys
+## Création de clés d’accès
 
-1. Log in to the RustFS UI console.
-2. In the left navigation bar, select **Access Keys**.
-3. On the access keys page, in the upper right corner, click **Add Access Key**.
-4. Enter the key's **expiration time, name, and description**, then click **Submit**.
-5. (Optional but recommended). On the access key page that appears, select **Copy** or **Export** to save the access key for future use.
+1. Connectez-vous à la Console RustFS.
+2. Dans la barre de navigation de gauche, sélectionnez **Access Keys** (clés d’accès).
+3. Sur la page des clés d’accès, dans le coin supérieur droit, cliquez sur **Add Access Key** (ajouter une clé d’accès).
+4. Saisissez une **Expiration** (expiration), un **Name** (nom) et une **Description**, puis sélectionnez **Submit** (valider).
+5. (Recommandé) Sur la page qui s’affiche, sélectionnez **Copy** (copier) ou **Export** (exporter) pour enregistrer la clé.
 
-![access key list page](images/access_token_creation.png)
+![page de la liste des clés d’accès](images/access_token_creation.png)
 
-## Deleting Access Keys
+## Suppression de clés d’accès
 
-1. Log in to the RustFS UI console.
-2. In the left navigation bar, select **Access Keys**.
-3. On the access keys page, select the access key you want to delete.
-4. Select the **Delete** button on the right side of the access key or **Delete Selected Items** in the upper right corner to delete the access key.
+1. Connectez-vous à la Console RustFS.
+2. Dans la barre de navigation de gauche, sélectionnez **Access Keys**.
+3. Sur la page des clés d’accès, sélectionnez la clé d’accès à supprimer.
+4. Sélectionnez **Delete** (supprimer) à côté de la clé d’accès, ou **Delete Selected Items** (supprimer les éléments sélectionnés) dans le coin supérieur droit.
 
-![access key deletion](images/access_token_deletion.png)
+![suppression d’une clé d’accès](images/access_token_deletion.png)

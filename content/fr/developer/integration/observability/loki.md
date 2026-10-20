@@ -3,11 +3,11 @@ title: "Loki"
 description: "Exécutez Grafana Loki avec RustFS comme backend de stockage objet S3, déployé avec Docker Compose."
 ---
 
-Ce guide exécute [Grafana Loki](https://github.com/grafana/loki) — le système d'agrégation de journaux de Grafana Labs — avec **RustFS** comme backend de stockage objet. Vous allez démarrer un Loki single-binary avec Docker Compose, pousser des flux de journaux via l'API HTTP, les interroger, puis vérifier que les chunks de journaux sont stockés comme objets dans RustFS. Le flux a été validé avec `grafana/loki:latest` (v3.7.8) et `rustfs/rustfs-x86-musl:v2.3.1`.
+Ce guide exécute [Grafana Loki](https://github.com/grafana/loki) — le système d’agrégation de journaux de Grafana Labs — avec **RustFS** comme backend de stockage objet. Vous allez démarrer Loki en mode binaire unique (single-binary) avec Docker Compose, pousser des flux de journaux via l’API HTTP, les interroger, puis vérifier que les chunks de journaux sont stockés comme objets dans RustFS. Le flux a été validé avec `grafana/loki:latest` (v3.7.8) et `rustfs/rustfs-x86-musl:v2.3.1`.
 
-Vous avez besoin de Docker avec le plugin Compose. Ce déploiement est destiné aux tests d'intégration locaux, pas à la production.
+Vous avez besoin de Docker avec le plugin Compose. Ce déploiement est destiné aux tests d’intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -16,27 +16,27 @@ flowchart LR
 	Init["init-bucket job"] -->|"create my-bucket"| RustFS
 ```
 
-Loki ingère les flux de journaux dans un chunk en mémoire et un journal d'écriture anticipée, transfère les chunks compressés vers le stockage objet dès qu'un flux devient inactif, et envoie les fichiers d'index TSDB vers le même bucket. Les requêtes localisent les chunks via l'index et les lisent depuis le stockage objet.
+Loki ingère les flux de journaux dans un chunk en mémoire et un journal d’écriture anticipée, transfère les chunks compressés vers le stockage objet dès qu’un flux devient inactif, et envoie les fichiers d’index TSDB vers le même compartiment. Les requêtes localisent les chunks via l’index et les lisent depuis le stockage objet.
 
 ## 1. Créer les fichiers du projet
 
-Créez un répertoire de travail :
+Créez un répertoire de travail :
 
 ```bash
 mkdir rustfs-loki
 cd rustfs-loki
 ```
 
-Créez un fichier d'environnement et remplacez les deux espaces réservés d'identifiants :
+Créez un fichier d’environnement et remplacez les deux valeurs d’identifiants indicatives :
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Utilisez des identifiants dédiés pour le bucket. Ne commettez pas `.env` dans le contrôle de version.
+Utilisez des identifiants dédiés pour le compartiment. N’ajoutez pas le fichier `.env` au dépôt (ne le versionnez pas).
 
-Créez la configuration Loki — un déploiement single-binary avec le schéma TSDB et le backend S3 pointant vers RustFS :
+Créez la configuration Loki — un déploiement en binaire unique (single-binary) avec le schéma TSDB et le backend S3 pointant vers RustFS :
 
 ```yaml title="loki.yml"
 auth_enabled: false
@@ -78,9 +78,9 @@ ruler:
   alertmanager_url: http://localhost:9093
 ```
 
-`s3forcepathstyle: true` et `insecure: true` sélectionnent l'adressage path-style en HTTP simple, attendu par RustFS pour le point de terminaison du réseau de conteneurs. `chunk_idle_period` et `max_chunk_age` sont réduits pour qu'une exécution de vérification n'attende pas les 30 minutes par défaut avant le transfert des chunks.
+`s3forcepathstyle: true` et `insecure: true` sélectionnent l’adressage de type chemin (path-style) en HTTP non chiffré, attendu par RustFS pour le point de terminaison du réseau de conteneurs. `chunk_idle_period` et `max_chunk_age` sont réduits pour qu’une exécution de vérification n’attende pas les 30 minutes par défaut avant le transfert des chunks.
 
-Créez le fichier Compose :
+Créez le fichier Compose :
 
 ```yaml title="compose.yaml"
 services:
@@ -149,20 +149,20 @@ volumes:
 
 ## 2. Démarrer le déploiement
 
-Vérifiez le fichier Compose avant de démarrer les conteneurs :
+Vérifiez le fichier Compose avant de démarrer les conteneurs :
 
 ```bash
 docker compose config
 ```
 
-Démarrez les services et attendez la fin de l'initialisation du bucket :
+Démarrez les services et attendez la fin de l’initialisation du compartiment :
 
 ```bash
 docker compose up -d
 docker compose ps -a
 ```
 
-Loki est prêt quand le point de terminaison de readiness répond :
+Loki est prêt quand le point de terminaison de readiness répond :
 
 ```bash
 curl -s http://localhost:3100/ready
@@ -174,7 +174,7 @@ ready
 
 ## 3. Pousser des flux de journaux
 
-Envoyez un lot d'entrées de journaux via l'API de push :
+Envoyez un lot d’entrées de journaux via l’API de push :
 
 ```bash
 python3 - <<'PY'
@@ -212,7 +212,7 @@ push: 204
 
 ## 4. Interroger les journaux
 
-Interrogez le flux via l'API de requête par plage :
+Interrogez le flux via l’API de requête par plage :
 
 ```bash
 curl -sG "http://localhost:3100/loki/api/v1/query_range" \
@@ -222,7 +222,7 @@ curl -sG "http://localhost:3100/loki/api/v1/query_range" \
   | python3 -m json.tool | head -20
 ```
 
-La réponse contient les lignes poussées :
+La réponse contient les lignes poussées :
 
 ```text
 "values": [
@@ -234,33 +234,33 @@ La réponse contient les lignes poussées :
 
 ## 5. Vérifier les chunks dans RustFS
 
-Avec `chunk_idle_period: 30s`, l'ingester transfère le flux vers le stockage objet environ une minute après la dernière ligne. Listez le préfixe du tenant via l'image d'initialisation du bucket :
+Avec `chunk_idle_period: 30s`, l’ingester transfère le flux vers le stockage objet environ une minute après la dernière ligne. Listez le préfixe du tenant via l’image d’initialisation du compartiment :
 
 ```bash
 docker compose run --rm --entrypoint /bin/sh create-bucket -c \
   '/usr/bin/rc alias set rustfs http://rustfs:9000 "$RUSTFS_ACCESS_KEY" "$RUSTFS_SECRET_KEY" >/dev/null && /usr/bin/rc ls rustfs/my-bucket/fake --recursive'
 ```
 
-`fake` est le tenant utilisé par Loki quand `auth_enabled` vaut `false` ; chaque objet est un chunk de journal compressé :
+`fake` est le tenant utilisé par Loki quand `auth_enabled` vaut `false` ; chaque objet est un chunk de journal compressé :
 
 ```text
 [2026-09-20 14:48:57]      398 B fake/51610c9b43452db8/1a0bf49f028:1a0bf49f028:f0ed52f7
 [2026-09-20 14:49:33]      670 B fake/cd916b27d004a688/1a0bf4a03ca:1a0bf4a4e03:1376b308
 ```
 
-Vous pouvez également parcourir le préfixe dans la console RustFS :
+Vous pouvez également parcourir le préfixe dans la Console RustFS :
 
-![Chunks de journaux Loki stockés dans la console RustFS](./images/rustfs-loki-chunks.png)
+![Chunks de journaux Loki stockés dans la Console RustFS](./images/rustfs-loki-chunks.png)
 
 ## 6. Arrêter ou réinitialiser la pile
 
-Arrêtez les conteneurs en conservant le volume de données RustFS :
+Arrêtez les conteneurs en conservant le volume de données RustFS :
 
 ```bash
 docker compose down
 ```
 
-Pour supprimer les journaux stockés et repartir d'un volume RustFS vide, ajoutez explicitement `--volumes` :
+Pour supprimer les journaux stockés et repartir d’un volume RustFS vide, ajoutez explicitement `--volumes` :
 
 ```bash
 docker compose down --volumes
@@ -268,28 +268,28 @@ docker compose down --volumes
 
 ## Dépannage
 
-### Loki bride les écritures et signale "disk usage exceeded threshold"
+### Loki bride les écritures et signale « disk usage exceeded threshold »
 
-Loki surveille le disque qui héberge son journal d'écriture anticipée et bride l'ingester lorsque l'utilisation dépasse 90 pour cent. Assurez-vous que le volume derrière `path_prefix` dispose de suffisamment d'espace libre, ou exécutez le conteneur avec un tmpfs pour le WAL lorsque la machine est par ailleurs saine.
+Loki surveille le disque qui héberge son journal d’écriture anticipée et bride l’ingester lorsque l’utilisation dépasse 90 pour cent. Assurez-vous que le volume derrière `path_prefix` dispose de suffisamment d’espace libre, ou exécutez le conteneur avec un tmpfs pour le WAL lorsque la machine est par ailleurs saine.
 
-### L'anneau signale des erreurs de connexion au port 8500
+### L’anneau signale des erreurs de connexion au port 8500
 
-Le magasin clé-valeur par défaut de l'anneau est Consul. Pour un single-binary, définissez `common.ring.kvstore.store: inmemory`, comme montré dans la configuration ci-dessus.
+Le magasin clé-valeur par défaut de l’anneau est Consul. Pour un déploiement en binaire unique (single-binary), définissez `common.ring.kvstore.store: inmemory`, comme montré dans la configuration ci-dessus.
 
-### Les requêtes de push échouent avec "Ingester is shutting down"
+### Les requêtes de push échouent avec « Ingester is shutting down »
 
-L'ingester n'a jamais atteint un état en cours d'exécution — généralement un conteneur restant d'un démarrage antérieur en échec. Supprimez le conteneur avec `docker compose down` et redémarrez-le, ou consultez les journaux pour identifier l'erreur de stockage sous-jacente.
+L’ingester n’a jamais atteint un état en cours d’exécution — généralement un conteneur restant d’un démarrage antérieur en échec. Supprimez le conteneur avec `docker compose down` et redémarrez-le, ou consultez les journaux pour identifier l’erreur de stockage sous-jacente.
 
 ### Réponses AccessDenied ou 403
 
-Vérifiez que les identifiants de `loki.yml` correspondent aux identifiants RustFS et que la tâche `create-bucket` s'est terminée avec succès :
+Vérifiez que les identifiants de `loki.yml` correspondent aux identifiants RustFS et que la tâche `create-bucket` s’est terminée avec succès :
 
 ```bash
 docker compose logs create-bucket
 ```
 
-## Prochaines étapes
+## Étapes suivantes
 
-- Consultez les [notes de compatibilité S3](/administration/protocols/s3) avant d'adopter d'autres opérations S3.
-- Créez des identifiants de production dédiés avec la [gestion des clés d'accès](/security-compliance/iam/access-token).
-- Suivez la [documentation Grafana Loki](https://grafana.com/docs/loki/latest/) pour connecter Promtail, Alloy ou l'OpenTelemetry Collector comme producteurs de journaux.
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres opérations S3.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
+- Suivez la [documentation Grafana Loki](https://grafana.com/docs/loki/latest/) pour connecter Promtail, Alloy ou l’OpenTelemetry Collector comme producteurs de journaux.

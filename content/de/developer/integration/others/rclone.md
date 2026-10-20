@@ -1,13 +1,13 @@
 ---
 title: "rclone"
-description: "Sync, mount, and serve RustFS buckets with rclone over its S3-compatible API."
+description: "Synchronisieren Sie RustFS-Buckets mit rclone, hängen Sie sie ein und stellen Sie sie über die S3-kompatible API bereit."
 ---
 
-This guide connects [rclone](https://github.com/rclone/rclone) — the command-line tool for syncing files to and from cloud storage — to **RustFS** through its S3 backend. You will configure an S3 remote for RustFS, copy and sync files, read objects back, publish a bucket over HTTP with `rclone serve`, and mount the bucket as a local filesystem with `rclone mount`. The workflow was verified with `rclone v1.75.1` against `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [rclone](https://github.com/rclone/rclone) — das Kommandozeilenwerkzeug zum Synchronisieren von Dateien mit Cloud-Speicher — über sein S3-Backend mit **RustFS**. Sie konfigurieren ein S3-Remote für RustFS, kopieren und synchronisieren Dateien, lesen Objekte zurück, veröffentlichen einen Bucket über HTTP mit `rclone serve` und hängen den Bucket mit `rclone mount` als lokales Dateisystem ein. Der Ablauf wurde mit `rclone v1.75.1` gegen `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker, or a local rclone binary. This deployment is intended for local integration testing, not production.
+Sie benötigen Docker oder eine lokale rclone-Binärdatei. Diese Bereitstellung ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -16,11 +16,11 @@ flowchart LR
 	RustFS -->|"mount / serve"| Client["FUSE mount / HTTP clients"]
 ```
 
-One remote definition drives every rclone command: data transfer, mounting, and serving all use the same S3 connection.
+Eine Remote-Definition steuert jeden rclone-Befehl: Datentransfer, Mount und Bereitstellung verwenden dieselbe S3-Verbindung.
 
-## 1. Configure the remote
+## 1. Das Remote konfigurieren
 
-Create an rclone config file with an S3 remote for RustFS, replacing all connection placeholders. The `Other` provider disables AWS-specific behavior, and path-style addressing is used automatically for custom endpoints:
+Legen Sie eine rclone-Konfigurationsdatei mit einem S3-Remote für RustFS an und ersetzen Sie alle Verbindungsplatzhalter. Der Provider `Other` schaltet AWS-spezifisches Verhalten ab, und für eigene Endpunkte wird pfadbasierte Adressierung (Path-Style) automatisch verwendet:
 
 ```ini title="rclone.conf"
 [rustfs]
@@ -32,16 +32,16 @@ endpoint = http://<your-rustfs-endpoint>:9000
 region = us-east-1
 ```
 
-## 2. Copy and read objects
+## 2. Objekte kopieren und lesen
 
-Create the bucket and upload a directory with `rclone copy`:
+Legen Sie den Bucket an und laden Sie ein Verzeichnis mit `rclone copy` hoch:
 
 ```bash
 rc mb rustfs/rclone-demo
 rclone copy /data rustfs:rclone-demo/seed
 ```
 
-List and read back:
+Listen Sie auf und lesen Sie zurück:
 
 ```bash
 rclone ls rustfs:rclone-demo/seed
@@ -54,11 +54,11 @@ rclone cat rustfs:rclone-demo/seed/hello.txt
 hello from rclone
 ```
 
-`rclone lsd rustfs:` lists every bucket on the endpoint.
+`rclone lsd rustfs:` listet jeden Bucket am Endpunkt auf.
 
-## 3. Sync a directory
+## 3. Ein Verzeichnis synchronisieren
 
-`rclone sync` makes the destination identical to the source, including deletions. Remove a local file and sync:
+`rclone sync` macht das Ziel identisch mit der Quelle, einschließlich Löschungen. Entfernen Sie eine lokale Datei und synchronisieren Sie:
 
 ```bash
 rm /data/hello.txt
@@ -70,17 +70,17 @@ rclone lsf rustfs:rclone-demo/seed
 blob.bin
 ```
 
-`hello.txt` disappears from the bucket. Add `--dry-run` first to preview the changes without touching the bucket.
+`hello.txt` verschwindet aus dem Bucket. Fügen Sie zuerst `--dry-run` hinzu, um die Änderungen vorzuschauen, ohne den Bucket zu verändern.
 
-## 4. Serve a bucket over HTTP
+## 4. Einen Bucket über HTTP bereitstellen
 
-Publish the bucket contents as an HTTP file server:
+Veröffentlichen Sie den Bucket-Inhalt als HTTP-Dateiserver:
 
 ```bash
 rclone serve http --addr 0.0.0.0:8080 rustfs:rclone-demo/seed
 ```
 
-Any HTTP client can now download objects:
+Jeder HTTP-Client kann die Objekte jetzt herunterladen:
 
 ```bash
 curl -s http://localhost:8080/blob.bin -o /dev/null -w "%{http_code} %{size_download} bytes\n"
@@ -90,11 +90,11 @@ curl -s http://localhost:8080/blob.bin -o /dev/null -w "%{http_code} %{size_down
 200 3145728 bytes
 ```
 
-`rclone serve` also supports WebDAV, SFTP, and S3 endpoints over the same remote.
+`rclone serve` unterstützt außerdem WebDAV-, SFTP- und S3-Endpunkte über dasselbe Remote.
 
-## 5. Mount the bucket as a filesystem
+## 5. Den Bucket als Dateisystem einhängen
 
-With FUSE available, mount the bucket locally and use it like a directory:
+Wenn FUSE verfügbar ist, hängen Sie den Bucket lokal ein und verwenden Sie ihn wie ein Verzeichnis:
 
 ```bash
 rclone mount rustfs:rclone-demo /mnt/rclone --daemon
@@ -103,7 +103,7 @@ echo test > /mnt/rclone/write-test.txt
 cat /mnt/rclone/write-test.txt
 ```
 
-Files written through the mount appear in RustFS as regular objects:
+Dateien, die über den Mount geschrieben werden, erscheinen in RustFS als gewöhnliche Objekte:
 
 ```bash
 rc ls rustfs/rclone-demo/ -r
@@ -113,32 +113,32 @@ rc ls rustfs/rclone-demo/ -r
 [2026-09-29 11:12:41]        5 B write-test.txt
 ```
 
-Unmount with `fusermount -u /mnt/rclone` when finished.
+Hängen Sie mit `fusermount -u /mnt/rclone` aus, wenn Sie fertig sind.
 
-## 6. Stop or reset
+## 6. Stoppen oder zurücksetzen
 
-rclone holds no server-side state. To delete the demo data:
+rclone hält keinen serverseitigen Zustand. So löschen Sie die Demo-Daten:
 
 ```bash
 rclone purge rustfs:rclone-demo
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
-### `Access Denied` or empty listings
+### `Access Denied` oder leere Auflistungen
 
-Confirm `endpoint` includes the scheme and that the key pair matches a RustFS access key. The `region` value is required by the S3 signer even though RustFS ignores it; keep `us-east-1`.
+Prüfen Sie, dass `endpoint` das Schema enthält und dass das Schlüsselpaar zu einem RustFS-Zugriffsschlüssel passt. Der Wert `region` ist für den S3-Signer erforderlich, auch wenn RustFS ihn ignoriert. Belassen Sie `us-east-1`.
 
-### Mount fails with `fusermount3: mount failed: Permission denied`
+### Der Mount scheitert mit `fusermount3: mount failed: Permission denied`
 
-Mounting needs the FUSE device and elevated privileges. Inside a container, run with `--device /dev/fuse --cap-add SYS_ADMIN` — and use `--privileged` if the mount helper still fails. On a host, verify that `fuse3` is installed and `/dev/fuse` exists.
+Das Einhängen braucht das FUSE-Gerät und erhöhte Rechte. Starten Sie in einem Container mit `--device /dev/fuse --cap-add SYS_ADMIN` und verwenden Sie `--privileged`, wenn der Mount-Helfer weiterhin scheitert. Prüfen Sie auf einem Host, dass `fuse3` installiert ist und `/dev/fuse` existiert.
 
-### Sync deleted nothing on the destination
+### Die Synchronisierung hat am Ziel nichts gelöscht
 
-`rclone copy` never deletes. Only `rclone sync` (or `rclone delete`) removes destination objects, and `--dry-run` is the safe way to preview either.
+`rclone copy` löscht nie. Nur `rclone sync` (oder `rclone delete`) entfernt Zielobjekte, und `--dry-run` ist der sichere Weg, beides vorzuschauen.
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional rclone backends.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [rclone S3 documentation](https://rclone.org/s3/) for flags such as `--transfers`, bandwidth limits, and crypt overlays.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere rclone-Backends einsetzen.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [rclone-S3-Dokumentation](https://rclone.org/s3/) für Flags wie `--transfers`, Bandbreitengrenzen und Crypt-Overlays.

@@ -1,13 +1,13 @@
 ---
 title: "s3fs"
-description: "Mount a RustFS bucket as a local filesystem with s3fs-fuse."
+description: "Hängen Sie einen RustFS-Bucket mit s3fs-fuse als lokales Dateisystem ein."
 ---
 
-This guide connects [s3fs-fuse](https://github.com/s3fs-fuse/s3fs-fuse) — the FUSE-based S3 filesystem — to **RustFS**. You will mount a bucket as a local directory, write files through the mount, unmount, and confirm the objects persist in the bucket. The workflow was verified with s3fs v1.93 against `rustfs/rustfs-x86-musl:v2.3.1` on Ubuntu 24.04.
+In dieser Anleitung verbinden Sie [s3fs-fuse](https://github.com/s3fs-fuse/s3fs-fuse) — das FUSE-basierte S3-Dateisystem — mit **RustFS**. Sie hängen einen Bucket als lokales Verzeichnis ein, schreiben Dateien über den Mount, hängen ihn aus und bestätigen, dass die Objekte im Bucket erhalten bleiben. Der Ablauf wurde mit s3fs v1.93 gegen `rustfs/rustfs-x86-musl:v2.3.1` auf Ubuntu 24.04 verifiziert.
 
-You need a Linux host with FUSE (`fuse3` package) and the `s3fs` binary.
+Sie benötigen einen Linux-Host mit FUSE (Paket `fuse3`) und der Binärdatei `s3fs`.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -15,9 +15,9 @@ flowchart LR
 	Mount -->|"S3 API"| RustFS["RustFS :9000"]
 ```
 
-Every file created under the mount point becomes an object in the bucket, keyed by its relative path — a plain 1:1 mapping with no caching layer.
+Jede Datei, die unter dem Mount-Punkt entsteht, wird zu einem Objekt im Bucket, dessen Objektschlüssel der relative Pfad ist. Das ist eine einfache 1:1-Abbildung ohne Cache-Schicht.
 
-## 1. Install
+## 1. Installieren
 
 ```bash
 apt-get install -y s3fs
@@ -28,16 +28,16 @@ s3fs --version
 Amazon Simple Storage Service File System V1.93 ...
 ```
 
-## 2. Store the credentials
+## 2. Die Zugangsdaten speichern
 
-Write the access key and secret key to the password file s3fs expects:
+Schreiben Sie Zugriffsschlüssel und geheimen Zugriffsschlüssel in die Passwortdatei, die s3fs erwartet:
 
 ```bash
 echo "<your-access-key>:<your-secret-key>" > ~/.passwd-s3fs
 chmod 600 ~/.passwd-s3fs
 ```
 
-## 3. Mount the bucket
+## 3. Den Bucket einhängen
 
 ```bash
 mkdir -p /mnt/s3fs-demo
@@ -49,9 +49,9 @@ s3fs s3fs-demo /mnt/s3fs-demo \
   -o allow_other -o umask=000
 ```
 
-`use_path_request_style` selects path-style addressing, which is what RustFS serves. `allow_other` lets non-root users read the mount.
+`use_path_request_style` wählt pfadbasierte Adressierung (Path-Style), die RustFS bereitstellt. `allow_other` erlaubt Benutzern ohne Root-Rechte, den Mount zu lesen.
 
-## 4. Write and read files
+## 4. Dateien schreiben und lesen
 
 ```bash
 echo "hello from s3fs" > /mnt/s3fs-demo/s3fs-test.txt
@@ -63,9 +63,9 @@ cat /mnt/s3fs-demo/s3fs-test.txt
 hello from s3fs
 ```
 
-## 5. Verify objects and persistence
+## 5. Objekte und Persistenz prüfen
 
-Unmount and remount — the objects persist in the bucket:
+Hängen Sie aus und wieder ein. Die Objekte bleiben im Bucket:
 
 ```bash
 fusermount -u /mnt/s3fs-demo
@@ -79,7 +79,7 @@ ls /mnt/s3fs-demo/
 blob.bin  s3fs-test.txt
 ```
 
-List the bucket to see the same objects from the S3 side:
+Listen Sie den Bucket auf, um dieselben Objekte von der S3-Seite zu sehen:
 
 ```bash
 rc ls rustfs/s3fs-demo/
@@ -90,31 +90,31 @@ rc ls rustfs/s3fs-demo/
 [2026-10-06 12:09:26]       16 B s3fs-test.txt
 ```
 
-![s3fs files stored in the RustFS Console](./images/rustfs-s3fs-files.png)
+![In der RustFS-Console gespeicherte s3fs-Dateien](./images/rustfs-s3fs-files.png)
 
-## 6. Stop or reset
+## 6. Stoppen oder zurücksetzen
 
 ```bash
 fusermount -u /mnt/s3fs-demo
 rc rm rustfs/s3fs-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
-### `fuse: device not found` inside a container
+### `fuse: device not found` innerhalb eines Containers
 
-Pass `--device /dev/fuse --cap-add SYS_ADMIN` to `docker run`, or `--privileged` if the mount helper still fails.
+Übergeben Sie `--device /dev/fuse --cap-add SYS_ADMIN` an `docker run`, oder `--privileged`, wenn der Mount-Helfer weiterhin scheitert.
 
-### `Permission denied` reading the mount as another user
+### `Permission denied` beim Lesen des Mounts als anderer Benutzer
 
-s3fs mounts are private to the mounting user by default. Add `-o allow_other -o umask=000` (or a tighter umask) at mount time.
+s3fs-Mounts gehören standardmäßig nur dem Benutzer, der sie eingehängt hat. Fügen Sie beim Einhängen `-o allow_other -o umask=000` (oder eine engere umask) hinzu.
 
-### Mount succeeds but listing is empty on another client
+### Der Mount gelingt, die Auflistung ist auf einem anderen Client aber leer
 
-s3fs has no metadata cache shared across mounts, but clients and list operations are eventually consistent. Remount or re-list after a few seconds.
+s3fs hat keinen Metadaten-Cache, der über Mounts hinweg geteilt wird, Clients und List-Operationen sind aber letztendlich konsistent. Hängen Sie neu ein oder listen Sie nach einigen Sekunden erneut auf.
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional FUSE options.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [s3fs-fuse documentation](https://github.com/s3fs-fuse/s3fs-fuse/wiki/Fuse-Over-https) for performance tuning options such as `-o multipart` and `-o parallel_count`.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere FUSE-Optionen einsetzen.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [s3fs-fuse-Dokumentation](https://github.com/s3fs-fuse/s3fs-fuse/wiki/Fuse-Over-https) für Leistungsoptionen wie `-o multipart` und `-o parallel_count`.

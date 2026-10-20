@@ -1,25 +1,25 @@
 ---
-title: "Java SDK Guide"
-description: "Use the official AWS SDK for Java v2 with RustFS."
+title: "Guide du SDK Java"
+description: "Utilisez le SDK AWS officiel pour Java v2 avec RustFS."
 ---
 
-RustFS ships no first-party Java SDK — it is S3-compatible, so you use the official AWS SDK for Java v2 configured to point at your RustFS server.
+RustFS ne fournit pas de SDK Java propre. Il est compatible avec S3 : vous utilisez donc le SDK AWS officiel pour Java v2, configuré pour pointer vers votre serveur RustFS.
 
-## 1. Prerequisites
+## 1. Prérequis
 
-* Java 8 or later and Maven (or Gradle)
-* A running RustFS instance (see the [Installation Guide](../../installation/index.md)) — the S3 API listens on port `9000`, the Console on port `9001`
-* Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (see [Access Key Management](../../security-compliance/iam/access-token.md))
+* Java 8 ou ultérieur et Maven (ou Gradle)
+* Une instance RustFS en cours d’exécution (consultez le [guide d’installation](../../installation/index.md)) : l’API S3 écoute sur le port `9000`, la Console sur le port `9001`
+* Des clés d’accès, définies à l’installation par les variables d’environnement `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` (consultez la [gestion des clés d’accès](../../security-compliance/iam/access-token.md))
 
-:::tip[Local test]
+:::tip[Essai local]
 
-If you did not set credentials at install time, the server defaults to `rustfsadmin` / `rustfsadmin` — fine for a throwaway local trial, never for anything reachable by others.
+Si vous n’avez pas défini d’identifiants à l’installation, le serveur utilise par défaut `rustfsadmin` / `rustfsadmin`. Cela convient à un essai local jetable, jamais à une instance accessible à d’autres personnes.
 
 :::
 
-### 1.1 Maven Project Setup
+### 1.1 Mise en place du projet Maven
 
-Create a new Maven project:
+Créez un projet Maven :
 
 ```text
 rustfs-java-s3-demo/
@@ -32,9 +32,9 @@ rustfs-java-s3-demo/
                     └── RustfsS3Example.java
 ```
 
-### 1.2 Add Dependencies
+### 1.2 Ajouter les dépendances
 
-Add AWS SDK dependencies in `pom.xml`:
+Ajoutez les dépendances du SDK AWS dans `pom.xml` :
 
 ```xml title="pom.xml"
 <dependencies>
@@ -46,15 +46,15 @@ Add AWS SDK dependencies in `pom.xml`:
 </dependencies>
 ```
 
-> Recommend using AWS SDK v2, which has more complete features and supports async, reactive, and other patterns.
+Nous recommandons le SDK AWS pour Java v2, plus complet, qui prend en charge la programmation asynchrone et réactive.
 
 ---
 
-## 2. Connecting to RustFS
+## 2. Connexion à RustFS
 
-### 2.1 Complete Example
+### 2.1 Exemple complet
 
-The following class compiles and runs as-is. Replace `localhost` with your server's IP address if RustFS runs on another machine, and fill in your own access keys:
+La classe suivante se compile et s’exécute telle quelle. Remplacez `localhost` par l’adresse IP de votre serveur si RustFS s’exécute sur une autre machine, et renseignez vos propres clés d’accès :
 
 ```java title="RustfsS3Example.java"
 package com.example;
@@ -121,7 +121,7 @@ public class RustfsS3Example {
 }
 ```
 
-Expected output:
+Sortie attendue :
 
 ```text
 Bucket created: my-bucket
@@ -133,55 +133,55 @@ Deleted hello.txt
 
 ---
 
-## 3. Common Issues and Troubleshooting
+## 3. Dépannage
 
-| Issue | Cause | Solution |
+| Problème | Cause | Solution |
 | -------------------------------------- | ------------------------------------ | ----------------------------------------- |
-| `S3Exception: 301 Moved Permanently` | Path-style not enabled or region error | Set `.forcePathStyle(true)` and use region `us-east-1` |
-| `ConnectException: Connection refused` | RustFS not started or incorrect port | Check RustFS status and port |
-| `403 Forbidden` | AccessKey / SecretKey error | Check authentication configuration |
-| Upload fails with no response | SDK defaults to HTTPS, RustFS only supports HTTP (or needs certificates) | Use `http://` address and configure `endpointOverride` |
+| `S3Exception: 301 Moved Permanently` | Adressage de type chemin (path-style) non activé, ou erreur de région | Définissez `.forcePathStyle(true)` et utilisez la région `us-east-1` |
+| `ConnectException: Connection refused` | RustFS n’est pas démarré, ou le port est incorrect | Vérifiez l’état de RustFS et le port |
+| `403 Forbidden` | Clé d’accès ou clé secrète incorrecte | Vérifiez vos identifiants |
+| Le chargement (upload) échoue sans réponse | Le SDK utilise HTTPS par défaut, et RustFS ne prend en charge que HTTP (ou nécessite des certificats) | Utilisez une adresse `http://` et définissez `endpointOverride` |
 
 ---
 
-## 4. Appendix
+## 4. Annexe
 
-### 4.1 Maven Package and Run
+### 4.1 Empaqueter et exécuter avec Maven
 
-Package project:
+Empaquetez le projet :
 
 ```bash
 mvn clean package
 ```
 
-Execute:
+Exécutez-le :
 
 ```bash
 java -cp target/rustfs-java-s3-demo-1.0-SNAPSHOT.jar com.example.RustfsS3Example
 ```
 
-### 4.2 RustFS Configuration Recommendations
+### 4.2 Réglages RustFS recommandés
 
-* Ensure SSL validation is disabled when service uses HTTP protocol.
-* Enable CORS support (if used for web frontend).
-* Recommend setting limits like `max_object_size` and `max_part_size` to prevent large file transfer failures.
-
----
-
-The following advanced examples cover:
-
-* Presigned URL generation and usage
-* Multipart Upload complete process
+* Si RustFS sert du HTTP non chiffré, désactivez la validation des certificats TLS dans le SDK.
+* Activez la prise en charge CORS si vous l’utilisez pour un frontal web.
+* Nous recommandons de définir des limites telles que `max_object_size` et `max_part_size` afin d’éviter les échecs de transfert des fichiers volumineux.
 
 ---
 
-## 5. Java Advanced Features Examples
+Les exemples avancés suivants portent sur :
 
-### 5.1 Generate and Use Presigned URLs
+* La génération et l’utilisation d’URL présignées
+* Le flux complet de chargement partitionné
 
-> Presigned URLs allow clients to temporarily access private objects without exposing credentials, widely used for browser direct upload or download file scenarios.
+---
 
-#### 5.1.1 Generate Download Link (GET)
+## 5. Exemples avancés
+
+### 5.1 Générer et utiliser des URL présignées
+
+Les URL présignées donnent aux clients un accès temporaire à des objets privés sans exposer les identifiants. Elles servent couramment aux chargements et aux téléchargements directs depuis un navigateur.
+
+#### 5.1.1 Générer un lien de téléchargement (GET)
 
 ```java
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -217,7 +217,7 @@ GetObjectRequest getObjectRequest = GetObjectRequest.builder()
 
 GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
     .getObjectRequest(getObjectRequest)
-    .signatureDuration(Duration.ofMinutes(15)) // 15 minutes validity
+    .signatureDuration(Duration.ofMinutes(15)) // expires in 15 minutes
     .build();
 
 PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
@@ -229,11 +229,11 @@ System.out.println("Presigned URL: " + presignedRequest.url());
 Presigned URL: http://localhost:9000/my-bucket/hello.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&...
 ```
 
-> 🔗 Open the link in browser to access the object.
+Ouvrez l’URL dans un navigateur pour accéder à l’objet.
 
-#### 5.1.2 Upload Presigned URL (PUT)
+#### 5.1.2 URL présignée de chargement (PUT)
 
-Similarly, you can also generate upload URLs:
+Vous pouvez aussi générer des URL de chargement :
 
 ```java
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -257,11 +257,11 @@ System.out.println("Upload URL: " + presignedPut.url());
 
 ---
 
-### 5.2 Implement Multipart Upload
+### 5.2 Mettre en œuvre le chargement partitionné
 
-> Multipart Upload is the recommended way for large file uploads, enabling resume from breakpoint during network fluctuations.
+Le chargement partitionné est la méthode recommandée pour charger des fichiers volumineux. Si le réseau est interrompu, vous pouvez réessayer les parties en échec au lieu de recommencer tout le chargement.
 
-The examples below reuse the `s3` client from section 2 and need these additional imports:
+Les exemples ci-dessous réutilisent le client `s3` de la section 2 et nécessitent ces importations supplémentaires :
 
 ```java
 import software.amazon.awssdk.services.s3.model.*;
@@ -271,7 +271,7 @@ import java.util.ArrayList;
 import java.util.List;
 ```
 
-#### 5.2.1 Start Multipart Upload
+#### 5.2.1 Démarrer le chargement partitionné
 
 ```java
 CreateMultipartUploadRequest createRequest = CreateMultipartUploadRequest.builder()
@@ -283,7 +283,7 @@ CreateMultipartUploadResponse createResponse = s3.createMultipartUpload(createRe
 String uploadId = createResponse.uploadId();
 ```
 
-#### 5.2.2 Upload Each Part
+#### 5.2.2 Charger chaque partie
 
 ```java
 List<CompletedPart> completedParts = new ArrayList<>();
@@ -306,7 +306,7 @@ for (int i = 1; i <= 3; i++) {
 }
 ```
 
-#### 5.2.3 Complete Multipart Upload
+#### 5.2.3 Terminer le chargement partitionné
 
 ```java
 CompletedMultipartUpload completedUpload = CompletedMultipartUpload.builder()
@@ -328,7 +328,7 @@ System.out.println("Multipart upload completed.");
 Multipart upload completed.
 ```
 
-#### 5.2.4 Abort Upload on Exception (Optional)
+#### 5.2.4 Abandonner le chargement en cas d’exception (facultatif)
 
 ```java
 AbortMultipartUploadRequest abortRequest = AbortMultipartUploadRequest.builder()
@@ -342,4 +342,4 @@ s3.abortMultipartUpload(abortRequest);
 
 ---
 
-For other operations (object tagging, bucket policies, and more), see the [AWS SDK for Java v2 documentation](https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/) — every S3-compatible call works against RustFS the same way.
+Pour les autres opérations (étiquetage d’objets, politiques de compartiment, etc.), consultez la [documentation de l’AWS SDK pour Java v2](https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/). La plupart des opérations S3 fonctionnent de la même manière avec RustFS ; les exceptions sont décrites dans la [compatibilité S3](/fr/reference/s3-compatibility).

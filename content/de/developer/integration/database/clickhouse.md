@@ -1,13 +1,13 @@
 ---
 title: "ClickHouse"
-description: "Run ClickHouse with an S3 disk backed by RustFS for MergeTree table data."
+description: "Betreiben Sie ClickHouse mit einer S3-Disk auf RustFS für MergeTree-Tabellendaten."
 ---
 
-This guide connects [ClickHouse](https://github.com/ClickHouse/ClickHouse) — the real-time OLAP database — to **RustFS** through ClickHouse's S3 disk storage policy. You will start a ClickHouse server with Docker, create a MergeTree table that stores its parts on RustFS, insert rows, and verify that the table data lives in the bucket. The workflow was verified with `clickhouse/clickhouse-server:25.8` and `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [ClickHouse](https://github.com/ClickHouse/ClickHouse) — die OLAP-Datenbank für Echtzeitanalysen — über die Speicher-Policy der S3-Disk von ClickHouse mit **RustFS**. Sie starten einen ClickHouse-Server mit Docker, legen eine MergeTree-Tabelle an, die ihre Parts auf RustFS speichert, fügen Zeilen ein und prüfen, dass die Tabellendaten im Bucket liegen. Der Ablauf wurde mit `clickhouse/clickhouse-server:25.8` und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Sie benötigen Docker. Diese Bereitstellung ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -15,18 +15,18 @@ flowchart LR
 	CH -->|"MergeTree parts"| RustFS["RustFS :9000"]
 ```
 
-The `rustfs` disk is a ClickHouse S3 disk pointed at the `clickhouse-data` bucket. Tables created with the matching storage policy write their parts — data, index, and checksum files — to the bucket instead of the local filesystem.
+Die Disk `rustfs` ist eine ClickHouse-S3-Disk, die auf den Bucket `clickhouse-data` zeigt. Tabellen mit der passenden Speicher-Policy schreiben ihre Parts — Daten-, Index- und Prüfsummendateien — in den Bucket statt auf das lokale Dateisystem.
 
-## 1. Create the project files
+## 1. Projektdateien anlegen
 
-Create the bucket first — ClickHouse does not create buckets:
+Legen Sie zuerst den Bucket an. ClickHouse legt keine Buckets an:
 
 ```bash
 rc alias set rustfs http://<your-rustfs-endpoint>:9000 <your-access-key> <your-secret-key>
 rc mb rustfs/clickhouse-data
 ```
 
-Create the storage configuration, replacing both credential placeholders:
+Legen Sie die Speicherkonfiguration an und ersetzen Sie beide Platzhalter für die Zugangsdaten:
 
 ```xml title="storage.xml"
 <clickhouse>
@@ -52,9 +52,9 @@ Create the storage configuration, replacing both credential placeholders:
 </clickhouse>
 ```
 
-The endpoint must end with `/` and includes the bucket name as the first path segment. Inside the Compose network the hostname is `rustfs`; from the host use `http://localhost:9000/clickhouse-data/`.
+Der Endpunkt muss mit `/` enden und enthält den Bucket-Namen als erstes Pfadsegment. Innerhalb des Compose-Netzwerks lautet der Hostname `rustfs`. Vom Host aus verwenden Sie `http://localhost:9000/clickhouse-data/`.
 
-Start ClickHouse with the configuration mounted:
+Starten Sie ClickHouse mit eingehängter Konfiguration:
 
 ```bash
 docker run -d --name clickhouse --network oo-rustfs_default \
@@ -64,9 +64,9 @@ docker run -d --name clickhouse --network oo-rustfs_default \
   clickhouse/clickhouse-server:25.8
 ```
 
-## 2. Create a table on the S3 disk
+## 2. Eine Tabelle auf der S3-Disk anlegen
 
-Wait for the HTTP interface, then create a database and a MergeTree table with the storage policy:
+Warten Sie auf die HTTP-Schnittstelle und legen Sie dann eine Datenbank und eine MergeTree-Tabelle mit der Speicher-Policy an:
 
 ```bash
 curl "http://localhost:8123/?password=<your-clickhouse-password>" \
@@ -83,7 +83,7 @@ curl "http://localhost:8123/?password=<your-clickhouse-password>" \
     VALUES (1, 'clickhouse-on-rustfs'), (2, 'second')"
 ```
 
-Read the rows back and confirm ClickHouse reports the part on the `rustfs` disk:
+Lesen Sie die Zeilen zurück und bestätigen Sie, dass ClickHouse den Part auf der Disk `rustfs` meldet:
 
 ```bash
 curl "http://localhost:8123/?password=<your-clickhouse-password>" \
@@ -99,15 +99,15 @@ curl "http://localhost:8123/?password=<your-clickhouse-password>" \
 all_1_1_0  rustfs
 ```
 
-## 3. Verify objects in RustFS
+## 3. Objekte in RustFS prüfen
 
-List the bucket:
+Listen Sie den Bucket auf:
 
 ```bash
 rc ls rustfs/clickhouse-data/ -r
 ```
 
-ClickHouse writes each part as content-addressed blobs. The output contains several small objects, and the count grows as more parts are written:
+ClickHouse schreibt jeden Part als inhaltsadressierte Blobs. Die Ausgabe enthält mehrere kleine Objekte, und die Anzahl wächst, wenn weitere Parts geschrieben werden:
 
 ```text
 dtg/hpsyncexixvdnsgorvseobogcgowg
@@ -115,9 +115,9 @@ dzp/zfblobhsatzdveqdrsfqcupkdehja
 izg/gvhchqobrizpkdftuvlmakkoutwps
 ```
 
-![ClickHouse parts stored in the RustFS Console](./images/rustfs-clickhouse-disk.png)
+![In der RustFS-Console gespeicherte ClickHouse-Parts](./images/rustfs-clickhouse-disk.png)
 
-The data survives a container restart because the parts live in RustFS:
+Die Daten überstehen einen Container-Neustart, weil die Parts in RustFS liegen:
 
 ```bash
 docker restart clickhouse
@@ -125,36 +125,36 @@ curl "http://localhost:8123/?password=<your-clickhouse-password>" \
   --data-binary "SELECT count() FROM rustfs_demo.events"
 ```
 
-## 4. Stop or reset the deployment
+## 4. Die Bereitstellung stoppen oder zurücksetzen
 
-Stop the server while keeping the data:
+Stoppen Sie den Server und behalten Sie die Daten:
 
 ```bash
 docker rm -f clickhouse
 ```
 
-The parts stay in the `clickhouse-data` bucket and the table can be queried again after the next start. To delete the data, remove the bucket:
+Die Parts bleiben im Bucket `clickhouse-data`, und die Tabelle lässt sich nach dem nächsten Start erneut abfragen. Um die Daten zu löschen, entfernen Sie den Bucket:
 
 ```bash
 rc rb rustfs/clickhouse-data --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
-### `REQUIRED_PASSWORD` on every query
+### `REQUIRED_PASSWORD` bei jeder Abfrage
 
-ClickHouse 25.8 images require a password for the `default` user. Set `CLICKHOUSE_PASSWORD` on the container and pass the same value as the `password` query parameter, as shown above.
+Images von ClickHouse 25.8 verlangen ein Passwort für den Benutzer `default`. Setzen Sie `CLICKHOUSE_PASSWORD` am Container und übergeben Sie denselben Wert als Abfrageparameter `password`, wie oben gezeigt.
 
-### Table creation fails with a disk or endpoint error
+### Das Anlegen der Tabelle schlägt mit einem Disk- oder Endpunktfehler fehl
 
-Confirm that the bucket exists before the table is created, that the endpoint ends with `/`, and that the credentials match the RustFS deployment. Check the server log for the underlying S3 error:
+Prüfen Sie, dass der Bucket existiert, bevor die Tabelle angelegt wird, dass der Endpunkt mit `/` endet und dass die Zugangsdaten zur RustFS-Bereitstellung passen. Prüfen Sie das Server-Log auf den zugrunde liegenden S3-Fehler:
 
 ```bash
 docker logs clickhouse | grep -i s3 | tail
 ```
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional ClickHouse operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [ClickHouse S3 disk documentation](https://clickhouse.com/docs/engines/table-engines/mergetree-family/mergetree#table_engine-mergetree-s3) to add a cache disk or a tiered hot/cold policy.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere ClickHouse-Operationen einsetzen.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [ClickHouse-Dokumentation zur S3-Disk](https://clickhouse.com/docs/engines/table-engines/mergetree-family/mergetree#table_engine-mergetree-s3), um eine Cache-Disk oder eine Policy für gestufte Speicherung mit heißer und kalter Stufe hinzuzufügen.

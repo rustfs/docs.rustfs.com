@@ -1,48 +1,48 @@
 ---
-title: "Users, Groups, and Policies"
-description: "Managing RustFS IAM users and groups, the policy document JSON format, condition operators, and built-in policies."
+title: "Utilisateurs, groupes et politiques"
+description: "Cette page décrit l’administration des utilisateurs et des groupes IAM RustFS, le format JSON des documents de politique, les opérateurs de condition et les politiques intégrées."
 ---
 
-This page covers day-to-day IAM administration: creating users and groups, attaching policies, and writing custom policy documents.
+Cette page couvre l’administration IAM au quotidien : création d’utilisateurs et de groupes, association de politiques et rédaction de documents de politique personnalisés.
 
-## Requirements
+## Prérequis
 
-- Install [`rc`](/operations/rc) before using RustFS administrative commands.
-- Configure an alias with credentials that permit the corresponding `admin:*` actions.
+- Installez [`rc`](/fr/operations/rc) avant d’utiliser les commandes d’administration RustFS.
+- Configurez un alias avec des identifiants autorisés à effectuer les actions `admin:*` correspondantes.
 
-## Managing Users
+## Gérer les utilisateurs
 
-Users can be managed from the Console (**Identity** section in the left navigation), with `rc admin`, or through the admin REST API. The native admin endpoints live under the `/rustfs/admin/v3` prefix. Requests must be signed (AWS Signature V4) by a credential whose policies allow the corresponding `admin:*` action.
+Les utilisateurs se gèrent depuis la Console (section **Identity** de la navigation de gauche), avec `rc admin` ou via l’API REST d’administration. Les points de terminaison d’administration natifs se trouvent sous le préfixe `/rustfs/admin/v3`. Les requêtes doivent être signées (AWS Signature V4) par un identifiant dont les politiques autorisent l’action `admin:*` correspondante.
 
-| Operation | Method and path | Notes |
+| Opération | Méthode et chemin | Remarques |
 | --- | --- | --- |
-| Create/update user | `PUT /rustfs/admin/v3/add-user?accessKey=<name>` | JSON body: `{"secretKey": "...", "status": "enabled"}`; `policy` is optional. Requires `admin:CreateUser`. |
-| List users | `GET /rustfs/admin/v3/list-users` | Requires `admin:ListUsers`. |
-| User details | `GET /rustfs/admin/v3/user-info?accessKey=<name>` | Requires `admin:GetUser`. |
-| Enable/disable user | `PUT /rustfs/admin/v3/set-user-status?accessKey=<name>&status=<enabled\|disabled>` | You cannot change the status of the credential making the call. |
-| Delete user | `DELETE /rustfs/admin/v3/remove-user?accessKey=<name>` | Requires `admin:DeleteUser`. |
-| Export IAM data | `GET /rustfs/admin/v3/export-iam` | Dumps users, groups, policies, and mappings. |
-| Import IAM data | `PUT /rustfs/admin/v3/import-iam` | Restores an exported dataset. |
+| Créer ou mettre à jour un utilisateur | `PUT /rustfs/admin/v3/add-user?accessKey=<name>` | Corps JSON : `{"secretKey": "...", "status": "enabled"}` ; `policy` est facultatif. Exige `admin:CreateUser`. |
+| Lister les utilisateurs | `GET /rustfs/admin/v3/list-users` | Exige `admin:ListUsers`. |
+| Détail d’un utilisateur | `GET /rustfs/admin/v3/user-info?accessKey=<name>` | Exige `admin:GetUser`. |
+| Activer ou désactiver un utilisateur | `PUT /rustfs/admin/v3/set-user-status?accessKey=<name>&status=<enabled\|disabled>` | Vous ne pouvez pas modifier l’état de l’identifiant qui effectue l’appel. |
+| Supprimer un utilisateur | `DELETE /rustfs/admin/v3/remove-user?accessKey=<name>` | Exige `admin:DeleteUser`. |
+| Exporter les données IAM | `GET /rustfs/admin/v3/export-iam` | Exporte les utilisateurs, les groupes, les politiques et les associations. |
+| Importer les données IAM | `PUT /rustfs/admin/v3/import-iam` | Restaure un jeu de données exporté. |
 
 :::note
 
-A user name (access key) must not contain spaces and cannot equal the root access key. The secret key is required when creating a user.
+Un nom d’utilisateur (clé d’accès) ne doit pas contenir d’espace et ne peut pas être identique à la clé d’accès racine. La clé secrète est obligatoire lors de la création d’un utilisateur.
 
 :::
 
-## Managing Groups
+## Gérer les groupes
 
-Groups collect users so a single policy binding covers all members. Group membership and status are managed with these endpoints (Console equivalents exist under **Identity**):
+Les groupes rassemblent des utilisateurs afin qu’une seule association de politique couvre tous les membres. L’appartenance et l’état d’un groupe se gèrent avec ces points de terminaison (la Console propose les équivalents sous **Identity**) :
 
-| Operation | Method and path | Notes |
+| Opération | Méthode et chemin | Remarques |
 | --- | --- | --- |
-| List groups | `GET /rustfs/admin/v3/groups` | Requires `admin:ListGroups`. |
-| Group details | `GET /rustfs/admin/v3/group?group=<name>` | Requires `admin:GetGroup`. |
-| Add/remove members | `PUT /rustfs/admin/v3/update-group-members` | JSON body below. Adding members to a nonexistent group creates it. Requires `admin:AddUserToGroup` / `admin:RemoveUserFromGroup`. |
-| Enable/disable group | `PUT /rustfs/admin/v3/set-group-status?group=<name>&status=<enabled\|disabled>` | Requires `admin:EnableGroup` / `admin:DisableGroup`. |
-| Delete group | `DELETE /rustfs/admin/v3/group/{group}` | Fails while the group still has members. |
+| Lister les groupes | `GET /rustfs/admin/v3/groups` | Exige `admin:ListGroups`. |
+| Détail d’un groupe | `GET /rustfs/admin/v3/group?group=<name>` | Exige `admin:GetGroup`. |
+| Ajouter ou retirer des membres | `PUT /rustfs/admin/v3/update-group-members` | Corps JSON ci-dessous. L’ajout de membres à un groupe inexistant crée ce groupe. Exige `admin:AddUserToGroup` / `admin:RemoveUserFromGroup`. |
+| Activer ou désactiver un groupe | `PUT /rustfs/admin/v3/set-group-status?group=<name>&status=<enabled\|disabled>` | Exige `admin:EnableGroup` / `admin:DisableGroup`. |
+| Supprimer un groupe | `DELETE /rustfs/admin/v3/group/{group}` | Échoue tant que le groupe contient encore des membres. |
 
-Membership update body:
+Corps de mise à jour de l’appartenance :
 
 ```json
 {
@@ -52,49 +52,49 @@ Membership update body:
 }
 ```
 
-Set `isRemove` to `true` to remove the listed members instead. Temporary (STS) users and the root credential cannot be added to groups.
+Réglez `isRemove` sur `true` pour retirer les membres indiqués au lieu de les ajouter. Les utilisateurs temporaires (STS) et l’identifiant racine ne peuvent pas être ajoutés à un groupe.
 
-## Attaching Policies
+## Associer des politiques
 
-Policy bindings connect a named policy to a user or a group:
+Une association relie une politique nommée à un utilisateur ou à un groupe :
 
-| Operation | Method and path | Notes |
+| Opération | Méthode et chemin | Remarques |
 | --- | --- | --- |
-| Set policy for user or group | `PUT /rustfs/admin/v3/set-user-or-group-policy?policyName=<policy>&userOrGroup=<name>&isGroup=<true\|false>` | Replaces the binding. Also served as `/rustfs/admin/v3/set-policy`. Requires `admin:AttachUserOrGroupPolicy`. |
-| Attach policies | `POST /rustfs/admin/v3/idp/builtin/policy/attach` | JSON body: `{"policies": ["readonly"], "user": "alice"}` (or `"group"`). Adds to the existing binding. |
-| Detach policies | `POST /rustfs/admin/v3/idp/builtin/policy/detach` | Same body shape; removes policies from the binding. |
-| List policy bindings | `GET /rustfs/admin/v3/idp/builtin/policy-entities` | Shows which users/groups have which policies. |
+| Définir la politique d’un utilisateur ou d’un groupe | `PUT /rustfs/admin/v3/set-user-or-group-policy?policyName=<policy>&userOrGroup=<name>&isGroup=<true\|false>` | Remplace l’association. Également exposé sur `/rustfs/admin/v3/set-policy`. Exige `admin:AttachUserOrGroupPolicy`. |
+| Associer des politiques | `POST /rustfs/admin/v3/idp/builtin/policy/attach` | Corps JSON : `{"policies": ["readonly"], "user": "alice"}` (ou `"group"`). S’ajoute à l’association existante. |
+| Dissocier des politiques | `POST /rustfs/admin/v3/idp/builtin/policy/detach` | Même forme de corps ; retire des politiques de l’association. |
+| Lister les associations de politiques | `GET /rustfs/admin/v3/idp/builtin/policy-entities` | Indique quels utilisateurs et groupes possèdent quelles politiques. |
 
-## Managing Policy Documents
+## Gérer les documents de politique
 
-| Operation | Method and path | Notes |
+| Opération | Méthode et chemin | Remarques |
 | --- | --- | --- |
-| List policies | `GET /rustfs/admin/v3/list-canned-policies` | Requires `admin:GetPolicy` scope for details. |
-| Policy details | `GET /rustfs/admin/v3/info-canned-policy?name=<policy>` | Returns the JSON document. |
-| Create/replace policy | `PUT /rustfs/admin/v3/add-canned-policy?name=<policy>` | Request body is the policy JSON document. Requires `admin:CreatePolicy`. |
-| Delete policy | `DELETE /rustfs/admin/v3/remove-canned-policy?name=<policy>` | Requires `admin:DeletePolicy`. |
+| Lister les politiques | `GET /rustfs/admin/v3/list-canned-policies` | Le détail exige le périmètre `admin:GetPolicy`. |
+| Détail d’une politique | `GET /rustfs/admin/v3/info-canned-policy?name=<policy>` | Renvoie le document JSON. |
+| Créer ou remplacer une politique | `PUT /rustfs/admin/v3/add-canned-policy?name=<policy>` | Le corps de la requête est le document JSON de la politique. Exige `admin:CreatePolicy`. |
+| Supprimer une politique | `DELETE /rustfs/admin/v3/remove-canned-policy?name=<policy>` | Exige `admin:DeletePolicy`. |
 
-## Policy Document Format
+## Format du document de politique
 
-A policy document is a JSON object with `Version` and `Statement` fields. The only accepted `Version` value is `2012-10-17`.
+Un document de politique est un objet JSON comportant les champs `Version` et `Statement`. La seule valeur acceptée pour `Version` est `2012-10-17`.
 
-Each statement supports:
+Chaque instruction prend en charge :
 
-| Field | Required | Description |
+| Champ | Obligatoire | Description |
 | --- | --- | --- |
-| `Sid` | No | Statement identifier. |
-| `Effect` | Yes | `Allow` or `Deny`. |
-| `Action` | Yes (or `NotAction`) | Action names, wildcards allowed (e.g. `s3:Get*`). |
-| `NotAction` | No | Matches every action except the listed ones. |
-| `Resource` | Yes for S3 actions (or `NotResource`) | ARNs in the form `arn:aws:s3:::bucket` or `arn:aws:s3:::bucket/prefix/*`. |
-| `NotResource` | No | Matches every resource except the listed ones. |
-| `Condition` | No | Condition operators keyed by context values. |
+| `Sid` | Non | Identifiant de l’instruction. |
+| `Effect` | Oui | `Allow` ou `Deny`. |
+| `Action` | Oui (ou `NotAction`) | Noms d’actions ; les caractères génériques sont autorisés (par exemple `s3:Get*`). |
+| `NotAction` | Non | Correspond à toutes les actions sauf celles de la liste. |
+| `Resource` | Oui pour les actions S3 (ou `NotResource`) | ARN de la forme `arn:aws:s3:::bucket` ou `arn:aws:s3:::bucket/prefix/*`. |
+| `NotResource` | Non | Correspond à toutes les ressources sauf celles de la liste. |
+| `Condition` | Non | Opérateurs de condition indexés par des clés de contexte. |
 
-Action names are namespaced: `s3:*` for object/bucket operations (e.g. `s3:GetObject`, `s3:PutObject`, `s3:DeleteObject`, `s3:ListBucket`, `s3:GetBucketLocation`, `s3:ListAllMyBuckets`), `admin:*` for management operations, `sts:AssumeRole` for STS, and `kms:*` for key management.
+Les noms d’actions portent un préfixe d’espace de noms : `s3:*` pour les opérations sur les objets et les compartiments (par exemple `s3:GetObject`, `s3:PutObject`, `s3:DeleteObject`, `s3:ListBucket`, `s3:GetBucketLocation`, `s3:ListAllMyBuckets`), `admin:*` pour les opérations de gestion, `sts:AssumeRole` pour STS et `kms:*` pour la gestion des clés.
 
-Supported condition operators include: `StringEquals`, `StringNotEquals`, `StringEqualsIgnoreCase`, `StringNotEqualsIgnoreCase`, `StringLike`, `StringNotLike`, `ArnEquals`, `ArnNotEquals`, `ArnLike`, `ArnNotLike`, `BinaryEquals`, `IpAddress`, `NotIpAddress`, `Null`, `Bool`, `NumericEquals`, `NumericNotEquals`, `NumericLessThan`, `NumericLessThanEquals`, `NumericGreaterThan`, `NumericGreaterThanEquals`, `DateEquals`, `DateNotEquals`, `DateLessThan`, `DateLessThanEquals`, `DateGreaterThan`, and `DateGreaterThanEquals`. Any operator can be suffixed with `IfExists` (the condition passes when the referenced context key is absent).
+Les opérateurs de condition pris en charge sont : `StringEquals`, `StringNotEquals`, `StringEqualsIgnoreCase`, `StringNotEqualsIgnoreCase`, `StringLike`, `StringNotLike`, `ArnEquals`, `ArnNotEquals`, `ArnLike`, `ArnNotLike`, `BinaryEquals`, `IpAddress`, `NotIpAddress`, `Null`, `Bool`, `NumericEquals`, `NumericNotEquals`, `NumericLessThan`, `NumericLessThanEquals`, `NumericGreaterThan`, `NumericGreaterThanEquals`, `DateEquals`, `DateNotEquals`, `DateLessThan`, `DateLessThanEquals`, `DateGreaterThan` et `DateGreaterThanEquals`. Tout opérateur peut recevoir le suffixe `IfExists` (la condition est satisfaite lorsque la clé de contexte référencée est absente).
 
-### Example: Read-Only Access to One Bucket
+### Exemple : accès en lecture seule à un compartiment
 
 ```json
 {
@@ -114,7 +114,7 @@ Supported condition operators include: `StringEquals`, `StringNotEquals`, `Strin
 }
 ```
 
-### Example: Read/Write Restricted to a Prefix
+### Exemple : lecture et écriture limitées à un préfixe
 
 ```json
 {
@@ -139,7 +139,7 @@ Supported condition operators include: `StringEquals`, `StringNotEquals`, `Strin
 }
 ```
 
-### Example: Full Access but Deletion Denied
+### Exemple : accès complet, suppression refusée
 
 ```json
 {
@@ -161,21 +161,21 @@ Supported condition operators include: `StringEquals`, `StringNotEquals`, `Strin
 
 :::note
 
-An explicit `Deny` always overrides `Allow`, so the second statement wins for delete operations even though `s3:*` matches them. See the [evaluation semantics](./index.md#policy-evaluation-semantics).
+Un `Deny` explicite l’emporte toujours sur `Allow` : la seconde instruction s’applique donc aux opérations de suppression, même si `s3:*` les inclut. Voir la [sémantique d’évaluation](./index.md#sémantique-dévaluation-des-politiques).
 
 :::
 
-## Built-In Policies
+## Politiques intégrées
 
-RustFS defines five built-in policies that can be attached without creating them first:
+RustFS définit cinq politiques intégrées, associables sans les créer au préalable :
 
-| Policy | Grants |
+| Politique | Autorisations |
 | --- | --- |
-| `readwrite` | All S3 actions (`s3:*`) on all resources, plus `sts:AssumeRole`. |
-| `readonly` | `s3:GetBucketLocation`, `s3:GetObject`, and `s3:GetBucketQuota` on all resources, plus `sts:AssumeRole`. |
-| `writeonly` | `s3:PutObject` on all resources, plus `sts:AssumeRole`. |
-| `diagnostics` | Diagnostic admin actions (`admin:Profiling`, `admin:ServerTrace`, `admin:ConsoleLog`, `admin:ServerInfo`, `admin:TopLocksInfo`, `admin:OBDInfo`, `admin:Prometheus`, `admin:BandwidthMonitor`), plus `sts:AssumeRole`. |
-| `consoleAdmin` | All admin actions (`admin:*`), all KMS actions (`kms:*`), all S3 actions (`s3:*`), plus `sts:AssumeRole`. |
+| `readwrite` | Toutes les actions S3 (`s3:*`) sur toutes les ressources, plus `sts:AssumeRole`. |
+| `readonly` | `s3:GetBucketLocation`, `s3:GetObject` et `s3:GetBucketQuota` sur toutes les ressources, plus `sts:AssumeRole`. |
+| `writeonly` | `s3:PutObject` sur toutes les ressources, plus `sts:AssumeRole`. |
+| `diagnostics` | Actions d’administration de diagnostic (`admin:Profiling`, `admin:ServerTrace`, `admin:ConsoleLog`, `admin:ServerInfo`, `admin:TopLocksInfo`, `admin:OBDInfo`, `admin:Prometheus`, `admin:BandwidthMonitor`), plus `sts:AssumeRole`. |
+| `consoleAdmin` | Toutes les actions d’administration (`admin:*`), toutes les actions KMS (`kms:*`), toutes les actions S3 (`s3:*`), plus `sts:AssumeRole`. |
 
 :::warning
 

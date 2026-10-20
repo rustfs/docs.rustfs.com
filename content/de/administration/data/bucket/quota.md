@@ -1,47 +1,47 @@
 ---
-title: "Bucket Quota"
-description: "Configure, inspect, and verify hard storage quotas for individual RustFS buckets."
+title: "Bucket-Kontingent"
+description: "Konfigurieren, lesen und prüfen Sie harte Speicherkontingente für einzelne RustFS-Buckets."
 ---
 
-RustFS bucket quotas limit the total object data stored in an individual bucket. Use a quota to prevent one workload from consuming more than its assigned capacity while allowing other buckets to use the remaining storage.
+Bucket-Kontingente von RustFS begrenzen die gesamten Objektdaten, die in einem einzelnen Bucket gespeichert sind. Verwenden Sie ein Kontingent, damit ein Workload nicht mehr als die zugewiesene Kapazität verbraucht, während andere Buckets den übrigen Speicher nutzen können.
 
-## Overview
+## Überblick
 
-RustFS currently supports hard, byte-based quotas. Before accepting a write, RustFS compares the bucket's current usage plus the requested object size with the configured limit. A write that would exceed the limit is rejected with `InvalidRequest` and a `Bucket quota exceeded` message.
+RustFS unterstützt derzeit harte, bytebasierte Kontingente. Bevor RustFS einen Schreibvorgang annimmt, vergleicht es die aktuelle Nutzung des Buckets zuzüglich der angeforderten Objektgröße mit dem konfigurierten Limit. Ein Schreibvorgang, der das Limit überschreiten würde, wird mit `InvalidRequest` und der Meldung `Bucket quota exceeded` abgelehnt.
 
-Quota checks cover these operations:
+Kontingentprüfungen umfassen diese Operationen:
 
-| Operation | Quota behavior |
+| Operation | Kontingentverhalten |
 | --- | --- |
-| Upload an object | Rejects the upload when current usage plus the object size exceeds the limit. |
-| Complete a multipart upload | Checks the completed object size before committing the upload. |
-| Copy an object into the bucket | Checks the source object size against the destination bucket quota. |
-| Delete an object | Always allowed so that you can recover capacity. |
+| Objekt hochladen | Lehnt den Upload ab, wenn die aktuelle Nutzung zuzüglich der Objektgröße das Limit überschreitet. |
+| Mehrteiligen Upload abschließen | Prüft die Größe des abgeschlossenen Objekts, bevor der Upload festgeschrieben wird. |
+| Objekt in den Bucket kopieren | Prüft die Größe des Quellobjekts gegen das Kontingent des Ziel-Buckets. |
+| Objekt löschen | Immer zulässig, damit Sie Kapazität zurückgewinnen können. |
 
-The quota applies to object data, not the number of objects or request rate. A bucket without a configured limit is unlimited.
+Das Kontingent gilt für Objektdaten, nicht für die Anzahl der Objekte oder die Anfragerate. Ein Bucket ohne konfiguriertes Limit ist unbegrenzt.
 
-:::note[Replacement uploads]
+:::note[Ersetzende Uploads]
 
-The quota check reserves the full incoming object size against the bucket's current usage. Replacing an existing key can therefore require enough headroom for the complete replacement object.
+Die Kontingentprüfung reserviert die vollständige Größe des eingehenden Objekts gegen die aktuelle Nutzung des Buckets. Das Ersetzen eines vorhandenen Objektschlüssels kann deshalb genug freien Kontingentraum für das vollständige Ersatzobjekt erfordern.
 
 :::
 
-## Configure in the Console
+## In der Console konfigurieren
 
-1. Sign in to the RustFS Console and open **Browser**.
-2. Find the bucket and select **Settings**.
-3. Under **Capacity & Metadata**, find **Bucket Quota** and select **Edit**.
-4. Enable **Bucket Quota**.
-5. Enter the quota size and select **MiB**, **GiB**, **TiB**, or **PiB**.
-6. Select **Save Quota**.
+1. Melden Sie sich an der RustFS-Console an und öffnen Sie **Browser**.
+2. Suchen Sie den Bucket und wählen Sie **Settings** (Einstellungen).
+3. Suchen Sie unter **Capacity & Metadata** (Kapazität und Metadaten) den Eintrag **Bucket Quota** (Bucket-Kontingent) und wählen Sie **Edit** (Bearbeiten).
+4. Aktivieren Sie **Bucket Quota**.
+5. Geben Sie die Kontingentgröße ein und wählen Sie **MiB**, **GiB**, **TiB** oder **PiB**.
+6. Wählen Sie **Save Quota** (Kontingent speichern).
 
-![Set Bucket Quota dialog with quota size and unit controls](./images/bucket-quota-console.png)
+![Dialog zum Festlegen des Bucket-Kontingents mit Größe und Einheit](./images/bucket-quota-console.png)
 
-To remove the limit, open the dialog again, disable **Bucket Quota**, and save the change.
+Um das Limit zu entfernen, öffnen Sie den Dialog erneut, deaktivieren Sie **Bucket Quota** und speichern Sie die Änderung.
 
-## Use rc
+## `rc` verwenden
 
-Configure an alias for your RustFS deployment:
+Konfigurieren Sie einen Alias für Ihre RustFS-Bereitstellung:
 
 ```bash
 rc alias set rustfs http://localhost:9000 \
@@ -49,29 +49,29 @@ rc alias set rustfs http://localhost:9000 \
 	--region us-east-1 --bucket-lookup path
 ```
 
-Replace `localhost` with the RustFS server address when `rc` runs on another host.
+Ersetzen Sie `localhost` durch die Adresse des RustFS-Servers, wenn `rc` auf einem anderen Host läuft.
 
-### Permissions
+### Berechtigungen
 
-Quota operations require these policy actions:
+Kontingentoperationen erfordern diese Richtlinienaktionen:
 
-| Operation | Required action |
+| Operation | Erforderliche Aktion |
 | --- | --- |
-| Set or clear a quota | `admin:SetBucketQuota` |
-| Read quota configuration or statistics | `s3:GetBucketQuota` |
-| Check whether a proposed operation fits | `s3:GetBucketQuota` |
+| Kontingent setzen oder löschen | `admin:SetBucketQuota` |
+| Kontingentkonfiguration oder Statistik lesen | `s3:GetBucketQuota` |
+| Prüfen, ob eine geplante Operation passt | `s3:GetBucketQuota` |
 
-The root credential has these permissions. For delegated administration, attach only the actions needed for the workflow.
+Die Root-Anmeldedaten besitzen diese Berechtigungen. Hängen Sie für die delegierte Administration nur die Aktionen an, die der Ablauf benötigt.
 
-### Set a quota
+### Kontingent setzen
 
-Set a 1 GiB hard quota. `rc` accepts byte values or units such as `1G`, `500M`, and `10KB`:
+Setzen Sie ein hartes Kontingent von 1 GiB. `rc` akzeptiert Bytewerte oder Einheiten wie `1G`, `500M` und `10KB`:
 
 ```bash
 rc bucket quota set rustfs/my-bucket 1G
 ```
 
-The response includes the configured limit and current usage:
+Die Antwort enthält das konfigurierte Limit und die aktuelle Nutzung:
 
 ```text
 Bucket: my-bucket
@@ -80,42 +80,42 @@ Usage: 0 B
 Type:  HARD
 ```
 
-### Read the quota
+### Kontingent lesen
 
 ```bash
 rc bucket quota info rustfs/my-bucket
 ```
 
-Use `--json` when another tool needs to process the result:
+Verwenden Sie `--json`, wenn ein anderes Werkzeug das Ergebnis verarbeiten muss:
 
 ```bash
 rc bucket quota info rustfs/my-bucket --json
 ```
 
-When no limit is configured, the human-readable output reports `Quota: unlimited`.
+Wenn kein Limit konfiguriert ist, meldet die lesbare Ausgabe `Quota: unlimited`.
 
-:::note[Configuration propagation]
+:::note[Weitergabe der Konfiguration]
 
-A query issued immediately after setting or clearing a quota can briefly return the previous state. Query the quota again and confirm the expected value before starting the verification workflow.
+Eine Abfrage unmittelbar nach dem Setzen oder Löschen eines Kontingents kann kurz den vorherigen Zustand zurückgeben. Fragen Sie das Kontingent erneut ab und bestätigen Sie den erwarteten Wert, bevor Sie die Überprüfung starten.
 
 :::
 
-### Clear a quota
+### Kontingent löschen
 
-Remove the limit without deleting objects:
+Entfernen Sie das Limit, ohne Objekte zu löschen:
 
 ```bash
 rc bucket quota clear rustfs/my-bucket
 rc bucket quota info rustfs/my-bucket
 ```
 
-The bucket becomes unlimited after the configuration change is applied.
+Der Bucket wird unbegrenzt, nachdem die Konfigurationsänderung angewendet wurde.
 
-## Advanced quota checks
+## Erweiterte Kontingentprüfungen
 
-`rc 0.1.29` does not expose commands for detailed usage statistics or advisory checks for proposed writes. Use the RustFS Admin API for these operations. Requests must use AWS Signature Version 4 with an active RustFS credential.
+`rc 0.1.29` stellt keine Befehle für detaillierte Nutzungsstatistiken oder unverbindliche Prüfungen geplanter Schreibvorgänge bereit. Verwenden Sie für diese Operationen die RustFS-Admin-API. Anfragen müssen AWS Signature Version 4 mit aktiven RustFS-Zugangsdaten verwenden.
 
-The examples use these shell variables:
+Die Beispiele verwenden diese Shell-Variablen:
 
 ```bash
 export RUSTFS_ENDPOINT=http://localhost:9000
@@ -124,15 +124,15 @@ export RUSTFS_SECRET_KEY=<your-secret-key>
 export BUCKET_NAME=my-bucket
 ```
 
-:::warning[Protect credentials]
+:::warning[Zugangsdaten schützen]
 
-Environment variables are convenient for local testing but may be visible to processes running as the same operating-system user. Use your platform's secret manager or a restricted credentials file in production.
+Umgebungsvariablen sind für lokale Tests praktisch, können aber für Prozesse sichtbar sein, die als derselbe Betriebssystembenutzer laufen. Verwenden Sie in der Produktion die Geheimnisverwaltung Ihrer Plattform oder eine eingeschränkte Zugangsdatendatei.
 
 :::
 
-### Read detailed usage statistics
+### Detaillierte Nutzungsstatistik lesen
 
-Use the statistics endpoint to retrieve the limit, current usage, remaining bytes, and percentage used:
+Verwenden Sie den Statistikendpunkt, um das Limit, die aktuelle Nutzung, die verbleibenden Bytes und den genutzten Prozentsatz abzurufen:
 
 ```bash
 curl --fail-with-body \
@@ -151,11 +151,11 @@ curl --fail-with-body \
 }
 ```
 
-Usage values come from RustFS data-usage accounting. Allow time for that view to reflect very recent changes before using the statistics response for external billing or orchestration.
+Die Nutzungswerte stammen aus der Datennutzungsabrechnung von RustFS. Warten Sie, bis diese Sicht sehr aktuelle Änderungen widerspiegelt, bevor Sie die Statistikantwort für externe Abrechnung oder Orchestrierung verwenden.
 
-### Check a proposed upload
+### Geplanten Upload prüfen
 
-Check whether a 64 MiB upload would fit without writing an object:
+Prüfen Sie, ob ein Upload von 64 MiB passen würde, ohne ein Objekt zu schreiben:
 
 ```bash
 curl --fail-with-body \
@@ -167,11 +167,11 @@ curl --fail-with-body \
 	"${RUSTFS_ENDPOINT}/rustfs/admin/v3/quota-check/${BUCKET_NAME}"
 ```
 
-The `allowed` field reports the decision. This check is advisory: another write can consume capacity before the planned upload starts, so the actual upload remains authoritative.
+Das Feld `allowed` meldet die Entscheidung. Diese Prüfung ist unverbindlich: Ein anderer Schreibvorgang kann Kapazität verbrauchen, bevor der geplante Upload beginnt. Deshalb bleibt der tatsächliche Upload maßgeblich.
 
-## Verification
+## Überprüfung
 
-Set a small test quota, upload an object that fits, and then attempt to upload an object that exceeds the remaining capacity:
+Setzen Sie ein kleines Testkontingent, laden Sie ein Objekt hoch, das hineinpasst, und versuchen Sie anschließend, ein Objekt hochzuladen, das die verbleibende Kapazität überschreitet:
 
 ```bash
 rc bucket quota set rustfs/my-bucket 1M
@@ -183,9 +183,9 @@ rc object copy /tmp/quota-small.bin rustfs/my-bucket/hello.bin
 rc object copy /tmp/quota-large.bin rustfs/my-bucket/too-large.bin
 ```
 
-The 256 KiB object succeeds. The 2 MiB object exceeds the 1 MiB bucket quota, so `rc` exits with an error and RustFS does not create `too-large.bin`.
+Das Objekt von 256 KiB gelingt. Das Objekt von 2 MiB überschreitet das Bucket-Kontingent von 1 MiB. Deshalb endet `rc` mit einem Fehler, und RustFS erstellt `too-large.bin` nicht.
 
-Delete the first object and clear the test quota:
+Löschen Sie das erste Objekt und entfernen Sie das Testkontingent:
 
 ```bash
 rc object remove rustfs/my-bucket/hello.bin --force
@@ -193,12 +193,12 @@ rc bucket quota clear rustfs/my-bucket
 rc bucket quota info rustfs/my-bucket
 ```
 
-Confirm that the final query reports `Quota: unlimited`.
+Prüfen Sie, dass die letzte Abfrage `Quota: unlimited` meldet.
 
-If quota enforcement cannot read or parse its internal configuration, RustFS logs `Bucket quota check degraded to allow` and permits the write. Monitor for this warning because it means quota enforcement is temporarily unavailable.
+Wenn die Kontingentdurchsetzung ihre interne Konfiguration nicht lesen oder auswerten kann, protokolliert RustFS `Bucket quota check degraded to allow` und lässt den Schreibvorgang zu. Überwachen Sie diese Warnung, weil sie bedeutet, dass die Kontingentdurchsetzung vorübergehend nicht verfügbar ist.
 
-## Next steps
+## Nächste Schritte
 
-- [Create a bucket](./creation.md)
-- [Manage lifecycle rules](../lifecycle-management.md)
-- [Configure observability](/operations/observability)
+- [Bucket erstellen](./creation.md)
+- [Lebenszyklusregeln verwalten](../lifecycle-management.md)
+- [Observability konfigurieren](/de/operations/observability)

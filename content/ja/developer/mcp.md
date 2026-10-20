@@ -1,38 +1,38 @@
 ---
-title: "RustFS MCP"
-description: "RustFS MCP Usage Guide"
+title: "RustFS MCP サーバー"
+description: "RustFS MCP サーバーで、AI アシスタントを RustFS のオブジェクトストレージに接続します。"
 ---
 
-**RustFS MCP Server** is a high-performance [Model Context Protocol (MCP)](https://www.anthropic.com/news/model-context-protocol) server that provides AI/LLM tools with seamless access to S3-compatible object storage operations. Built with Rust for performance and security, it enables AI assistants like Claude Desktop to interact with cloud storage through standardized protocols.
+**RustFS MCP Server** は、[Model Context Protocol (MCP)](https://www.anthropic.com/news/model-context-protocol) のサーバーです。Claude Desktop などの AI アシスタントに、S3 互換のオブジェクトストレージへのアクセスを提供します。
 
-### What is MCP?
+### MCP とは
 
-The Model Context Protocol is an open standard that enables AI applications to establish secure, controlled connections with external systems. This server acts as a bridge between AI tools and S3-compatible storage services, providing structured access to file operations while maintaining security and observability.
+Model Context Protocol は、AI アプリケーションが外部システムとの間に、安全で制御された接続を確立するためのオープン標準です。このサーバーは AI ツールと S3 互換ストレージサービスをつなぎ、セキュリティとオブザーバビリティを保ったまま、ファイル操作を構造化された形で提供します。
 
-## ✨ Features
+## 機能
 
-### Supported S3 Operations
+### 対応する S3 操作
 
-- **List Buckets**: Lists all accessible S3 buckets.
-- **List Objects**: Browses bucket contents with optional prefix filtering.
-- **Upload Files**: Uploads local files with automatic MIME type detection and cache control.
-- **Get Objects**: Retrieves objects from S3 storage, supporting read or download modes.
+- **バケットの一覧**: アクセスできる S3 バケットをすべて列挙します。
+- **オブジェクトの一覧**: 任意のプレフィックスで絞り込みながら、バケットの内容を参照します。
+- **ファイルのアップロード**: MIME タイプの自動判定とキャッシュ制御を使って、ローカルファイルをアップロードします。
+- **オブジェクトの取得**: S3 ストレージからオブジェクトを取得します。読み取りとダウンロードの両モードに対応します。
 
-## 🔧 Installation
+## インストール
 
-:::warning[Build instructions may be outdated]
+:::warning[ビルド手順が古い可能性があります]
 
-The `rustfs-mcp` crate is no longer part of the current `rustfs/rustfs` main branch, so the build commands below may fail against a fresh clone. Check the [RustFS GitHub organization](https://github.com/rustfs) for the MCP server's current location before building from source.
+`rustfs-mcp` クレートは、現在の `rustfs/rustfs` の main ブランチには含まれていません。そのため、新しいクローンに対して以下のビルドコマンドは失敗することがあります。ソースからビルドする前に、[RustFS の GitHub 組織](https://github.com/rustfs) で MCP サーバーの現在の場所を確認します。
 
 :::
 
-### Prerequisites
+### 前提条件
 
-- Rust 1.75+ (for building from source)
-- Configured AWS credentials (via environment variables, AWS CLI, or IAM roles)
-- Access to S3-compatible storage services
+- Rust 1.75 以降（ソースからビルドする場合）
+- 設定済みの AWS 認証情報（環境変数、AWS CLI、または IAM ロール）
+- S3 互換のストレージサービスへのアクセス
 
-### Building from Source
+### ソースからのビルド
 
 ```bash
 # Clone the repository
@@ -46,9 +46,9 @@ cargo build --release -p rustfs-mcp
 ./target/release/rustfs-mcp
 ```
 
-## ⚙️ Configuration
+## 設定
 
-### Environment Variables
+### 環境変数
 
 ```bash
 # AWS credentials (required)
@@ -63,35 +63,35 @@ export AWS_ENDPOINT_URL=http://localhost:9000
 export RUST_LOG=info
 ```
 
-### Command Line Options
+### コマンドラインオプション
 
 ```bash
 rustfs-mcp --help
 ```
 
-The server supports various command line options to customize behavior:
+サーバーは、動作をカスタマイズする複数のコマンドラインオプションに対応しています。
 
-- `--access-key-id`: AWS access key ID for S3 authentication
-- `--secret-access-key`: AWS secret key for S3 authentication
-- `--region`: AWS region for S3 operations (default: us-east-1)
-- `--endpoint-url`: Custom S3 endpoint URL (for MinIO, LocalStack, etc.)
-- `--log-level`: Log level configuration (default: rustfs_mcp_server=info)
+- `--access-key-id`: S3 認証に使う AWS のアクセスキー ID
+- `--secret-access-key`: S3 認証に使う AWS のシークレットキー
+- `--region`: S3 操作に使う AWS リージョン（既定: us-east-1）
+- `--endpoint-url`: カスタムの S3 エンドポイント URL（MinIO や LocalStack など）
+- `--log-level`: ログレベルの設定（既定: rustfs_mcp_server=info）
 
-## 🚀 Usage
+## 使い方
 
-### Starting the Server
+### サーバーの起動
 
 ```bash
 # Start the MCP server
 rustfs-mcp
 
 # Or with custom options
-rustfs-mcp --log-level debug --region us-west-2
+rustfs-mcp --log-level debug --region us-east-1
 ```
 
-### Integration with Chat Clients
+### チャットクライアントとの連携
 
-#### Option 1: Using Command Line Arguments
+#### 方法 1: コマンドライン引数を使う
 
 ```json
 {
@@ -101,7 +101,7 @@ rustfs-mcp --log-level debug --region us-west-2
       "args": [
         "--access-key-id", "your_access_key",
         "--secret-access-key", "your_secret_key",
-        "--region", "us-west-2",
+        "--region", "us-east-1",
         "--log-level", "info"
       ]
     }
@@ -109,7 +109,7 @@ rustfs-mcp --log-level debug --region us-west-2
 }
 ```
 
-#### Option 2: Using Environment Variables
+#### 方法 2: 環境変数を使う
 
 ```json
 {
@@ -126,9 +126,9 @@ rustfs-mcp --log-level debug --region us-west-2
 }
 ```
 
-### Using with Docker
+### Docker で使う
 
-[RustFS MCP officially provides a Dockerfile](https://github.com/rustfs/rustfs/tree/main/crates/mcp) that can be used to build container images for using RustFS MCP.
+コンテナイメージのビルドには、RustFS MCP の[公式 Dockerfile](https://github.com/rustfs/rustfs/tree/main/crates/mcp) を使えます。
 
 ```bash
 # Clone RustFS repository code
@@ -138,11 +138,11 @@ git clone https://github.com/rustfs/rustfs.git
 docker build -f crates/mcp/Dockerfile -t rustfs/rustfs-mcp .
 ```
 
-After successful build, you can configure it in the MCP configuration of AI IDEs.
+ビルドが成功したら、IDE の MCP 設定にサーバーを追加します。
 
-#### Configuring MCP in AI IDEs
+#### AI IDE での MCP 設定
 
-Currently, mainstream AI IDEs such as Cursor, Windsurf, Trae, etc. all support MCP. For example, in Trae, add the following content to the MCP configuration (**MCP --> Add**):
+Cursor、Windsurf、Trae など、多くの AI IDE が MCP に対応しています。たとえば Trae では、MCP 設定の **MCP --> Add**（追加）に次の内容を追加します。
 
 ```json
 {
@@ -174,88 +174,88 @@ Currently, mainstream AI IDEs such as Cursor, Windsurf, Trae, etc. all support M
 }
 ```
 
-> `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are RustFS access keys. You can refer to the [Access Key Management chapter](../security-compliance/iam/access-token.md) for creation.
+> `AWS_ACCESS_KEY_ID` と `AWS_SECRET_ACCESS_KEY` は、RustFS のアクセスキーです。作成方法は[アクセスキーの管理](../security-compliance/iam/access-token.md)を参照します。
 
-If added successfully, you can list the [available tools](#️-available-tools) on the MCP configuration page.
+サーバーの追加に成功すると、MCP の設定ページに[利用できるツール](#available-tools)が一覧表示されます。
 
-![add rustfs mcp in trae mcp configuration successfully](images/add-rustfs-mcp-succ.png)
+![Trae の MCP 設定に追加された RustFS MCP サーバー](images/add-rustfs-mcp-succ.png)
 
-In Trae, you can use the corresponding tools by entering the corresponding prompts. For example, in Trae's chat dialog, enter:
+Trae で MCP ツールを呼び出すには、チャットにプロンプトを入力します。例:
 
 ```text
-Please help me list the buckets in the current rustfs instance, thank you!
+List the buckets in this RustFS instance.
 ```
 
-Returns the following response:
+Trae は次の応答を返します。
 
-![list rustfs bucket with rustfs mcp](images/list-rustfs-bucket-with-mcp.png)
+![RustFS MCP でバケットを一覧した画面](images/list-rustfs-bucket-with-mcp.png)
 
-Trae uses **Builder with MCP** mode, calling the `list_buckets` tool to list all buckets in the configured RustFS instance. The same applies to calls to other tools.
+Trae は **Builder with MCP**（MCP を使うビルダー）モードで `list_buckets` ツールを呼び出し、設定済みの RustFS インスタンスにあるバケットをすべて列挙します。他のツールも同じように動作します。
 
-## 🛠️ Available Tools
+## 利用できるツール [#available-tools]
 
-The MCP server exposes the following tools that AI assistants can use:
+MCP サーバーは、AI アシスタントが使える次のツールを公開します。
 
 ### `list_buckets`
 
-Lists all S3 buckets accessible with the configured credentials.
+設定済みの認証情報でアクセスできる S3 バケットをすべて列挙します。
 
-**Parameters**: None
+**パラメータ**: なし
 
 ### `list_objects`
 
-Lists objects in an S3 bucket with optional prefix filtering.
+任意のプレフィックスで絞り込みながら、S3 バケット内のオブジェクトを列挙します。
 
-**Parameters**:
+**パラメータ**:
 
-- `bucket_name` (string): Name of the S3 bucket
-- `prefix` (string, optional): Prefix for filtering objects
+- `bucket_name` (string): S3 バケットの名前
+- `prefix` (string, optional): オブジェクトを絞り込むプレフィックス
 
 ### `upload_file`
 
-Uploads a local file to S3 with automatic MIME type detection.
+MIME タイプを自動判定して、ローカルファイルを S3 にアップロードします。
 
-**Parameters**:
+**パラメータ**:
 
-- `local_file_path` (string): Local file path
-- `bucket_name` (string): Target S3 bucket
-- `object_key` (string): S3 object key (target path)
-- `content_type` (string, optional): Content type (auto-detected if not provided)
-- `storage_class` (string, optional): S3 storage class
-- `cache_control` (string, optional): Cache control header
+- `local_file_path` (string): ローカルファイルのパス
+- `bucket_name` (string): アップロード先の S3 バケット
+- `object_key` (string): S3 オブジェクトキー（保存先のパス）
+- `content_type` (string, optional): コンテンツタイプ（未指定の場合は自動判定）
+- `storage_class` (string, optional): S3 ストレージクラス
+- `cache_control` (string, optional): Cache-Control ヘッダー
 
 ### `get_object`
 
-Retrieves objects from S3 with two operation modes: direct content reading or download to file.
+S3 からオブジェクトを取得します。内容を直接読むモードと、ファイルへダウンロードするモードがあります。
 
-**Parameters**:
+**パラメータ**:
 
-- `bucket_name` (string): Source S3 bucket
-- `object_key` (string): S3 object key
-- `version_id` (string, optional): Version ID for versioned objects
-- `mode` (string, optional): Operation mode - "read" (default) returns content directly, "download" saves to local file
-- `local_path` (string, optional): Local file path (required when mode is "download")
-- `max_content_size` (number, optional): Maximum content size for read mode in bytes (default: 1MB)
+- `bucket_name` (string): 取得元の S3 バケット
+- `object_key` (string): S3 オブジェクトキー
+- `version_id` (string, optional): バージョニングされたオブジェクトのバージョン ID
+- `mode` (string, optional): 操作モード。"read"（既定）は内容を直接返し、"download" はローカルファイルへ保存します
+- `local_path` (string, optional): ローカルファイルのパス（mode が "download" の場合は必須です）
+- `max_content_size` (number, optional): read モードで返す内容の最大サイズ。単位はバイト（既定: 1MB）
 
 ### `create_bucket`
 
-Creates a new RustFS bucket.
+新しい RustFS バケットを作成します。
 
-**Parameters**:
+**パラメータ**:
 
-- `bucket_name` (string): Name of the bucket to create.
+- `bucket_name` (string): 作成するバケットの名前。
 
 ### `delete_bucket`
 
-Deletes the specified RustFS bucket.
+指定した RustFS バケットを削除します。
 
-**Parameters**:
+**パラメータ**:
 
-- `bucket_name` (string): Name of the bucket to delete.
+- `bucket_name` (string): 削除するバケットの名前。
 
-## Architecture
+## アーキテクチャ
 
-The MCP server is built with a modular architecture:
+MCP サーバーは、モジュール構成で構築されています。
 
 ```text
 rustfs-mcp/

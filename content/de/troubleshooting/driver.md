@@ -1,148 +1,131 @@
 ---
-title: "Hard Drive Failures"
-description: "RustFS ensures read/write access can still be provided when some disks fail through mechanisms similar to erasure coding, and automatically heals data after replacing disks."
+title: "Laufwerksausfälle"
+description: "Ersetzen Sie ein ausgefallenes Laufwerk in einer RustFS-Bereitstellung und lassen Sie RustFS die Daten automatisch wiederherstellen."
 ---
 
-RustFS ensures read/write access can still be provided when some disks fail through mechanisms similar to erasure coding, and automatically heals data after replacing disks.
-
-## Table of Contents
-
-1. [Unmount Failed Disk](#unmount-failed-disk)
-2. [Replace Failed Disk](#replace-failed-disk)
-3. [Update `/etc/fstab` or RustFS Configuration](#update-etcfstab-or-rustfs-configuration)
-4. [Remount New Disk](#remount-new-disk)
-5. [Trigger and Monitor Data Healing](#trigger-and-monitor-data-healing)
-6. [Follow-up Checks and Notes](#follow-up-checks-and-notes)
+RustFS verwendet Erasure Coding, damit Daten lesbar und schreibbar bleiben, wenn einzelne Laufwerke ausfallen. Nachdem Sie ein ausgefallenes Laufwerk ersetzt haben, stellt RustFS die fehlenden Daten automatisch darauf wieder her (Healing).
 
 <a id="unmount-failed-disk"></a>
 
-### Unmount Failed Disk
+### Ausgefallenes Laufwerk aushängen
 
-Before replacing the physical hard drive, you need to safely unmount the failed disk from the operating system level to avoid I/O errors in the file system or RustFS during the replacement process.
+Hängen Sie das ausgefallene Laufwerk auf Betriebssystemebene aus, bevor Sie die physische Festplatte ersetzen. So vermeiden Sie I/O-Fehler im Dateisystem oder in RustFS während des Austauschs.
 
 ```bash
-# Assume the failed disk is /dev/sdb
-umount /dev/sdb
+sudo umount /data/rustfs0
 ```
 
-:::note[Notes]
+:::note[Hinweise]
 
-* If there are multiple mount points, execute `umount` separately.
-* If encountering "device is busy", you can first stop the RustFS service:
+* Wenn das Laufwerk mehrere Einhängepunkte hat, führen Sie `umount` für jeden aus.
+* Wenn Sie den Fehler „device is busy“ sehen, stoppen Sie zuerst den RustFS-Dienst:
 
 ```bash
-systemctl stop rustfs
+sudo systemctl stop rustfs
 ```
 
 :::
 
 <a id="replace-failed-disk"></a>
 
-### Replace Failed Disk
+### Ausgefallenes Laufwerk ersetzen
 
-After physically replacing the failed disk, you need to partition and format the new disk, and apply the same label as the original disk.
+Nachdem Sie das ausgefallene Laufwerk physisch ersetzt haben, partitionieren und formatieren Sie das neue Laufwerk und vergeben Sie dieselbe Bezeichnung wie beim ursprünglichen Laufwerk.
 
 ```bash
-# Format as XFS and apply the same label as the original disk (RustFS requires XFS, like the other disks in the deployment)
-mkfs.xfs -L DISK1 /dev/sdb
+sudo mkfs.xfs -f -i size=512 -n ftype=1 -L RUSTFS0 /dev/sdb
 ```
 
-> **Requirements**
->
-> * New disk capacity ≥ original disk capacity;
-> * File system type consistent with other disks (XFS, per the [installation guide](../installation/linux/index.md));
-> * Recommend using labels (LABEL) or UUID for mounting to ensure disk order is not affected by system restarts.
+:::note[Anforderungen]
+
+* Das neue Laufwerk ist mindestens so groß wie das ursprüngliche Laufwerk.
+* Verwenden Sie dasselbe Dateisystem wie bei den anderen Laufwerken (XFS; siehe die [Installationsanleitung](../installation/linux/index.md)).
+* Wir empfehlen, Dateisysteme über die Bezeichnung (LABEL) oder die UUID einzuhängen, damit Einhängungen korrekt bleiben, wenn sich Gerätenamen nach einem Neustart ändern.
+
+:::
 
 <a id="update-etcfstab-or-rustfs-configuration"></a>
 
-### Update `/etc/fstab` or RustFS Configuration
+### `/etc/fstab` oder die RustFS-Konfiguration aktualisieren
 
-Confirm that the mount item labels or UUIDs in `/etc/fstab` point to the new disk. The mount point must stay identical to the one listed in `RUSTFS_VOLUMES` (in `/etc/default/rustfs`), so the healed disk rejoins the cluster at the same path.
+Prüfen Sie, dass Bezeichnungen oder UUIDs in den Einträgen von `/etc/fstab` auf das neue Laufwerk zeigen. Der Einhängepunkt muss mit dem in `RUSTFS_VOLUMES` (in `/etc/default/rustfs`) genannten identisch bleiben, damit das wiederhergestellte Laufwerk dem Cluster unter demselben Pfad beitritt.
 
-```bash
-# View current fstab
-cat /etc/fstab
-
-# Example fstab entry (no modification needed if labels are the same)
-LABEL=DISK1 /data/rustfs0 xfs defaults,noatime 0 2
+```ini title="/etc/fstab"
+UUID=<filesystem-uuid> /data/rustfs0 xfs defaults,noatime,nodiratime 0 0
 ```
 
-:::tip[Tips]
+:::tip[Tipps]
 
-* If using UUID:
+* Bei Verwendung einer UUID:
 
 ```bash
-blkid /dev/sdb
-# Get the new partition's UUID, then replace the corresponding field in fstab
+sudo blkid -s UUID -o value /dev/sdb
 ```
 
-* After modifying fstab, be sure to validate syntax:
+* Nachdem Sie `/etc/fstab` bearbeitet haben, prüfen Sie die Syntax:
 
 ```bash
-mount -a # If no errors, configuration is correct
+sudo mount -a
+findmnt /data/rustfs0
 ```
 
 :::
 
 <a id="remount-new-disk"></a>
 
-### Remount New Disk
+### Neues Laufwerk wieder einhängen
 
-Execute the following commands to batch mount all disks and start the RustFS service:
-
-```bash
-mount -a
-systemctl start rustfs
-```
-
-Confirm all disks are mounted normally:
+Führen Sie die folgenden Befehle aus, um alle konfigurierten Dateisysteme einzuhängen und RustFS zu starten:
 
 ```bash
-df -h | grep /data/rustfs
+sudo systemctl start rustfs
 ```
 
-:::note
+Prüfen Sie, dass alle erwarteten Dateisysteme eingehängt sind:
 
-If some mounts fail, please check if fstab entries are consistent with disk labels/UUIDs.
+```bash
+df -hT /data/rustfs0
+```
+
+:::note[Fehler beim Einhängen]
+
+Wenn ein Einhängen fehlschlägt, prüfen Sie, dass Bezeichnungen oder UUIDs in `/etc/fstab` denen des Zieldateisystems entsprechen.
 
 :::
 
 <a id="trigger-and-monitor-data-healing"></a>
 
-### Trigger and Monitor Data Healing
+### Datenwiederherstellung auslösen und beobachten
 
-Once RustFS detects a freshly formatted disk at a known mount point, its background scanner heals the missing data onto it automatically — no manual command is required. Confirm that recovery has started and track its progress through the service logs:
+Sobald RustFS an einem bekannten Einhängepunkt ein frisch formatiertes Laufwerk erkennt, stellt der Hintergrund-Scanner die fehlenden Daten automatisch darauf wieder her. Ein manueller Befehl ist nicht erforderlich. Bestätigen Sie, dass die Wiederherstellung begonnen hat, und verfolgen Sie den Fortschritt in den Dienstprotokollen:
 
 ```bash
-# For systemd-managed installations
 journalctl -u rustfs -f
-
-# Or view the log files under the directory set by RUSTFS_OBS_LOG_DIRECTORY
 tail -f /var/log/rustfs/rustfs.log
 ```
 
-You can also open the RustFS Console and check the disk status of the affected node.
+Sie können auch die RustFS Console öffnen und den Festplattenstatus des betroffenen Knotens prüfen.
 
-:::note[Notes]
+:::note[Hinweise]
 
-* The healing process will complete in the background, usually with minimal impact on online access;
-* After healing is complete, the tool will report success or list failed objects.
+* Die Datenwiederherstellung läuft im Hintergrund und wirkt sich in der Regel wenig auf Client-Anfragen aus.
+* Wenn die Datenwiederherstellung endet, melden die Protokolle den Erfolg oder listen Objekte, deren Wiederherstellung fehlgeschlagen ist.
 
 :::
 
 <a id="follow-up-checks-and-notes"></a>
 
-### Follow-up Checks and Notes
+### Anschlussprüfungen und Hinweise
 
-1. **Performance Monitoring**
+1. **Leistungsüberwachung**
 
- * I/O may fluctuate slightly during healing, recommend monitoring disk and network load.
-2. **Batch Failures**
+ * Die I/O-Last kann während der Datenwiederherstellung schwanken. Wir empfehlen, die Auslastung von Festplatte und Netzwerk zu überwachen.
+2. **Ausfälle einer Charge**
 
- * If multiple failures occur in the same batch of disks, consider more frequent hardware inspections.
-3. **Regular Drills**
+ * Wenn mehrere Laufwerke derselben Fertigungscharge ausfallen, prüfen Sie die übrigen Laufwerke dieser Charge häufiger.
+3. **Regelmäßige Ausfalltests**
 
- * Regularly simulate disk failure drills to ensure team familiarity with recovery processes.
-4. **Maintenance Windows**
+ * Führen Sie regelmäßig Übungen zum Laufwerksausfall durch, damit Ihr Team das Wiederherstellungsverfahren proben kann.
+4. **Wartungsfenster**
 
- * When failure rates are high, arrange dedicated maintenance windows to speed up replacement and healing.
+ * Planen Sie bei hoher Ausfallrate eigene Wartungsfenster, um Austausch und Datenwiederherstellung zu beschleunigen.

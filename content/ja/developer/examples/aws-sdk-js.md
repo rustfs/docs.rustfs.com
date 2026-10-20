@@ -1,19 +1,19 @@
 ---
 title: "AWS SDK for JavaScript"
-description: "Connect the AWS SDK for JavaScript v3 to RustFS and perform basic object operations from Node.js."
+description: "AWS SDK for JavaScript v3 を RustFS に接続し、Node.js から基本的なオブジェクト操作を行います。"
 ---
 
-The [AWS SDK for JavaScript v3](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/) connects to RustFS through a custom endpoint. This is the minimal connection recipe; see the [JavaScript SDK guide](../sdk/javascript.md) for a full program.
+[AWS SDK for JavaScript v3](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/) は、カスタムエンドポイントを通じて RustFS に接続します。これは接続に必要な最小限の手順です。完全なプログラムについては、[JavaScript SDK ガイド](../sdk/javascript.md)を参照します。
 
-## Install
+## インストール
 
 ```bash
 npm install @aws-sdk/client-s3
 ```
 
-## Configure
+## 設定
 
-Replace `http://localhost:9000` with your server address and use your own [access keys](../../security-compliance/iam/access-token.md). RustFS requires path-style addressing (`forcePathStyle: true`):
+`http://localhost:9000` を実際のサーバーアドレスに置き換え、独自の[アクセスキー](../../security-compliance/iam/access-token.md)を使います。RustFS ではパススタイルアクセス（`forcePathStyle: true`）が必要です。
 
 ```javascript title="index.mjs" {8}
 import { S3Client, CreateBucketCommand, PutObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
@@ -27,7 +27,7 @@ const s3 = new S3Client({
 });
 ```
 
-## Verify
+## 検証
 
 ```javascript
 await s3.send(new CreateBucketCommand({ Bucket: "my-bucket" }));
@@ -41,6 +41,6 @@ for (const obj of out.Contents ?? []) console.log(obj.Key, obj.Size);
 hello.txt 12
 ```
 
-## Next steps
+## 次のステップ
 
-See the full [JavaScript SDK guide](../sdk/javascript.md), or manage objects with [`rc`](/operations/rc).
+完全な [JavaScript SDK ガイド](../sdk/javascript.md)を参照するか、[`rc`](/ja/operations/rc) でオブジェクトを管理します。

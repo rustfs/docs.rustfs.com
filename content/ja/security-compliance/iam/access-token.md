@@ -1,29 +1,29 @@
 ---
-title: "RustFS Access Key Management"
-description: "Creation, usage, and deletion of RustFS access keys."
+title: "アクセスキー"
+description: "Console で RustFS のアクセスキーを作成および削除します。"
 ---
 
-RustFS access keys are the core credentials of the RustFS system, used for identity authentication and operation authorization, and are very useful in API and SDK scenarios. This chapter introduces the creation and deletion of RustFS access keys.
+アクセスキーは、アプリケーションやツールが RustFS への認証とリクエストの認可に使う認証情報です。このページでは、Console でアクセスキーを作成および削除する方法を説明します。
 
-Prerequisites:
+## 前提条件
 
-- An available RustFS instance. You can refer to the [Installation Guide](../../installation/index.md) for installation.
+- 稼働中の RustFS インスタンス。手順は[インストールガイド](../../installation/index.md)を参照します。
 
-## Creating Access Keys
+## アクセスキーの作成
 
-1. Log in to the RustFS UI console.
-2. In the left navigation bar, select **Access Keys**.
-3. On the access keys page, in the upper right corner, click **Add Access Key**.
-4. Enter the key's **expiration time, name, and description**, then click **Submit**.
-5. (Optional but recommended). On the access key page that appears, select **Copy** or **Export** to save the access key for future use.
+1. RustFS Console にサインインします。
+2. 左のナビゲーションバーで **Access Keys**（アクセスキー）を選択します。
+3. アクセスキーのページで、右上の **Add Access Key**（アクセスキーの追加）をクリックします。
+4. キーの **Expiration**（有効期限）、**Name**（名前）、**Description**（説明）を入力し、**Submit**（送信）を選択します。
+5. （推奨）表示されたページで **Copy**（コピー）または **Export**（エクスポート）を選択し、キーを保存します。
 
-![access key list page](images/access_token_creation.png)
+![アクセスキーの一覧ページ](images/access_token_creation.png)
 
-## Deleting Access Keys
+## アクセスキーの削除
 
-1. Log in to the RustFS UI console.
-2. In the left navigation bar, select **Access Keys**.
-3. On the access keys page, select the access key you want to delete.
-4. Select the **Delete** button on the right side of the access key or **Delete Selected Items** in the upper right corner to delete the access key.
+1. RustFS Console にサインインします。
+2. 左のナビゲーションバーで **Access Keys** を選択します。
+3. アクセスキーのページで、削除するアクセスキーを選択します。
+4. アクセスキーの横にある **Delete**（削除）を選択するか、右上の **Delete Selected Items**（選択項目の削除）を選択します。
 
-![access key deletion](images/access_token_deletion.png)
+![アクセスキーの削除](images/access_token_deletion.png)

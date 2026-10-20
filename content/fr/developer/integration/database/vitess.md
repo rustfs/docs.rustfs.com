@@ -1,13 +1,13 @@
 ---
 title: "Vitess"
-description: "Back up Vitess to RustFS through the S3 backup storage implementation."
+description: "Sauvegardez Vitess vers RustFS via l’implémentation de stockage de sauvegarde S3."
 ---
 
-This guide connects [Vitess](https://github.com/vitessio/vitess) — the database clustering system for horizontal scaling of MySQL — to **RustFS** through Vitess's S3 backup storage implementation. You will bring up a minimal Vitess topology on a single host, run `Backup` on a tablet, and confirm the backup chunks and `MANIFEST` in the bucket, then read the backup list back from RustFS. The workflow was verified with `vitess/lite` (Vitess v25.0.0-SNAPSHOT, built 2026-09-22), MySQL 8.4, and `rustfs/rustfs-x86-musl:v2.3.1`; stable Vitess 20+ releases use the same flags.
+Ce guide connecte [Vitess](https://github.com/vitessio/vitess) — le système de clustering de bases de données pour la mise à l’échelle horizontale de MySQL — à **RustFS** via l’implémentation de stockage de sauvegarde S3 de Vitess. Vous allez mettre en place une topologie Vitess minimale sur un seul hôte, exécuter `Backup` sur un tablet, confirmer les fragments de sauvegarde et le `MANIFEST` dans le compartiment (bucket), puis relire la liste des sauvegardes depuis RustFS. Le flux a été validé avec `vitess/lite` (Vitess v25.0.0-SNAPSHOT, construit le 2026-09-22), MySQL 8.4 et `rustfs/rustfs-x86-musl:v2.3.1` ; les versions stables de Vitess 20 et suivantes utilisent les mêmes options.
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Vous avez besoin de Docker. Ce déploiement est destiné aux tests d’intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -16,11 +16,11 @@ flowchart LR
 	Tablet -->|"S3 API"| RustFS["RustFS :9000"]
 ```
 
-`vtctld` triggers the backup, but the `vttablet` owning the tablet performs it: it snapshots MySQL, compresses the data into numbered chunks, and uploads them together with a `MANIFEST` through the S3-compatible endpoint.
+`vtctld` déclenche la sauvegarde, mais le `vttablet` qui possède le tablet l’exécute : il prend un instantané de MySQL, compresse les données en fragments numérotés et les charge avec un `MANIFEST` via le point de terminaison compatible avec S3.
 
-## 1. Run etcd and the Vitess image
+## 1. Exécuter etcd et l’image Vitess
 
-Vitess stores its topology in etcd, and the `vitess/lite` image ships all Vitess binaries plus MySQL:
+Vitess stocke sa topologie dans etcd, et l’image `vitess/lite` fournit tous les binaires Vitess ainsi que MySQL :
 
 ```bash
 docker run -d --name etcd --hostname etcd --network oo-rustfs_default \
@@ -34,26 +34,26 @@ docker run -d --name vtess --hostname vtess --network oo-rustfs_default \
   vitess/lite:latest sleep infinity
 ```
 
-The AWS environment variables supply the credentials for the S3 backup storage in both `vtctld` and `vttablet`.
+Les variables d’environnement AWS fournissent les identifiants du stockage de sauvegarde S3, à la fois pour `vtctld` et pour `vttablet`.
 
-## 2. Initialize MySQL
+## 2. Initialiser MySQL
 
-Initialize a MySQL instance in the standard Vitess tablet directory so `vttablet` can load its `my.cnf` later:
+Initialisez une instance MySQL dans le répertoire de tablet Vitess standard, afin que `vttablet` puisse charger son `my.cnf` ensuite :
 
 ```bash
 docker exec vtess sh -c \
   "/vt/bin/mysqlctl --log_dir /tmp/vtlogs init --tablet-dir vt_0000000100"
 ```
 
-The instance is ready when the socket file exists:
+L’instance est prête lorsque le fichier de socket existe :
 
 ```text
 /vt/vtdataroot/vt_0000000100/mysql.sock
 ```
 
-## 3. Start vtctld and vttablet
+## 3. Démarrer vtctld et vttablet
 
-Start `vtctld` with the S3 backup flags, register the cell, and start the tablet. Replace all connection placeholders:
+Démarrez `vtctld` avec les options de sauvegarde S3, enregistrez la cell et démarrez le tablet. Remplacez toutes les valeurs de connexion indicatives :
 
 ```bash
 docker exec vtess sh -c "nohup /vt/bin/vtctld \
@@ -95,7 +95,7 @@ docker exec vtess sh -c "nohup /vt/bin/vttablet \
   --log_dir /tmp/vtlogs > /tmp/vtlogs/vttablet.out 2>&1 &"
 ```
 
-Both processes carry the S3 flags because `vttablet` performs the backup while `vtctld` lists and removes backups. `--s3-backup-force-path-style` is mandatory for non-AWS endpoints. Check that the tablet registered:
+Les deux processus incluent les options S3, car `vttablet` exécute la sauvegarde tandis que `vtctld` répertorie et supprime les sauvegardes. `--s3-backup-force-path-style`, qui impose l’adressage de type chemin (path-style), est obligatoire pour les points de terminaison autres qu’AWS. Vérifiez que le tablet est enregistré :
 
 ```bash
 docker exec vtess /vt/bin/vtctldclient --server localhost:15998 GetTablets
@@ -105,9 +105,9 @@ docker exec vtess /vt/bin/vtctldclient --server localhost:15998 GetTablets
 zone1-0000000100 commerce 0 replica vtess:15100 vtess:3306 [] <null>
 ```
 
-## 4. Run the backup
+## 4. Exécuter la sauvegarde
 
-Create the bucket and trigger the backup:
+Créez le compartiment et déclenchez la sauvegarde :
 
 ```bash
 rc mb rustfs/vitess-backups
@@ -116,21 +116,21 @@ docker exec vtess /vt/bin/vtctldclient --server localhost:15998 \
   Backup zone1-0000000100
 ```
 
-The stream ends with the engine writing the manifest:
+Le flux se termine lorsque le moteur écrit le manifeste :
 
 ```text
 commerce/0 (zone1-0000000100): ... value:"Completed backing up MANIFEST (attempt 1/2)"
 ```
 
-## 5. Verify objects in RustFS
+## 5. Vérifier les objets dans RustFS
 
-List the backup prefix:
+Listez le préfixe de sauvegarde :
 
 ```bash
 rc ls rustfs/vitess-backups/ -r | head -4
 ```
 
-The tablet uploaded compressed data chunks plus the metadata files:
+Le tablet a chargé des fragments de données compressés ainsi que les fichiers de métadonnées :
 
 ```text
 commerce/commerce/0/2026-09-23.011225.zone1-0000000100/0
@@ -138,9 +138,9 @@ commerce/commerce/0/2026-09-23.011225.zone1-0000000100/1
 commerce/commerce/0/2026-09-23.011225.zone1-0000000100/MANIFEST
 ```
 
-![Vitess backup files stored in the RustFS Console](./images/rustfs-vitess-backups.png)
+![Fichiers de sauvegarde Vitess stockés dans la Console RustFS](./images/rustfs-vitess-backups.png)
 
-Read the backup list back from RustFS through `vtctld`:
+Relisez la liste des sauvegardes depuis RustFS via `vtctld` :
 
 ```bash
 docker exec vtess /vt/bin/vtctldclient --server localhost:15998 GetBackups commerce/0
@@ -150,40 +150,40 @@ docker exec vtess /vt/bin/vtctldclient --server localhost:15998 GetBackups comme
 2026-09-23.011225.zone1-0000000100
 ```
 
-## 6. Stop or reset
+## 6. Arrêter ou réinitialiser
 
-To tear down the demo while keeping the bucket objects:
+Pour arrêter la démonstration tout en conservant les objets du compartiment :
 
 ```bash
 docker rm -f vtess etcd
 ```
 
-To delete the stored backups:
+Pour supprimer les sauvegardes stockées :
 
 ```bash
 rc rm rustfs/vitess-backups/ --recursive --force
 ```
 
-## Troubleshooting
+## Dépannage
 
 ### `cannot perform backup without my.cnf`
 
-Passing connection parameters such as `--db-socket` or `--db-host` makes `vttablet` skip loading `my.cnf`, and backups refuse to run. Start `vttablet` with `--mycnf-file` pointing at the instance config and let it discover the socket from there — this is why the MySQL instance lives in the `vt_0000000100` directory from step 2.
+Si vous transmettez des paramètres de connexion tels que `--db-socket` ou `--db-host`, `vttablet` n’charge pas `my.cnf` et les sauvegardes refusent de s’exécuter. Démarrez `vttablet` avec `--mycnf-file` pointant vers la configuration de l’instance et laissez-le découvrir le socket à partir de là — c’est pourquoi l’instance MySQL se trouve dans le répertoire `vt_0000000100` depuis l’étape 2.
 
 ### `unknown service vtctlservice.Vtctld`
 
-`vtctld` exposes the API used by `vtctldclient` only when the service map includes it: `--service-map grpc-vtctl,grpc-vtctld`. Also make sure `vtctldclient --server` points at the gRPC port (`15998` here), not the web UI port.
+`vtctld` n’expose l’API utilisée par `vtctldclient` que lorsque la carte des services l’inclut : `--service-map grpc-vtctl,grpc-vtctld`. Assurez-vous aussi que `vtctldclient --server` pointe vers le port gRPC (`15998` ici), et non vers le port de l’interface web.
 
 ### `node doesn't exist: /vitess/global/cells/zone1/CellInfo`
 
-The cell must exist before tablets register. Run `vtctldclient AddCellInfo` as shown in step 3 before starting `vttablet`.
+La cell doit exister avant l’enregistrement des tablets. Exécutez `vtctldclient AddCellInfo` comme indiqué à l’étape 3 avant de démarrer `vttablet`.
 
-### Flag parse errors such as `unknown shorthand flag`
+### Erreurs d’analyse d’options telles que `unknown shorthand flag`
 
-Vitess 20+ normalizes underscores to dashes, so write flags in dash style (`--tablet-path`). A single-dash long flag like `-tablet_dir` is parsed as shorthand options and fails.
+Vitess 20 et les versions suivantes normalisent les tirets bas en tirets, donc écrivez les options avec des tirets (`--tablet-path`). Une option longue à un seul tiret, comme `-tablet_dir`, est analysée comme des options abrégées et échoue.
 
-## Next steps
+## Étapes suivantes
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Vitess storage options.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Vitess backup and restore documentation](https://vitess.io/docs/user-guides/configuration-basic/#backups) to schedule backups and restore tablets from the bucket.
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres options de stockage Vitess.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
+- Suivez la [documentation de sauvegarde et de restauration Vitess](https://vitess.io/docs/user-guides/configuration-basic/#backups) pour planifier les sauvegardes et restaurer des tablets depuis le compartiment.

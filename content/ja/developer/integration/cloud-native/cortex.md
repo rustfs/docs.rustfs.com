@@ -1,13 +1,13 @@
 ---
 title: "Cortex"
-description: "Run Cortex with RustFS as the S3-compatible blocks, ruler, and alertmanager storage backend."
+description: "ブロック、Ruler、Alertmanager の S3 互換ストレージバックエンドとして RustFS を使って Cortex を実行します。"
 ---
 
-This guide connects [Cortex](https://github.com/cortexproject/cortex) — the horizontally scalable Prometheus-compatible metrics backend — to **RustFS** through Cortex's native S3 bucket storage. You will run Cortex in single-binary mode with blocks, ruler, and alertmanager storage pointed at a RustFS bucket, push metrics with remote write, store a rule group, and verify the objects. The workflow was verified with `cortexproject/cortex:v1.21.1` and `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、水平スケール可能な Prometheus 互換のメトリクスバックエンドである [Cortex](https://github.com/cortexproject/cortex) を、Cortex ネイティブの S3 バケットストレージ経由で **RustFS** に接続します。ブロック、Ruler、Alertmanager のストレージを RustFS のバケットに向けたシングルバイナリモードで Cortex を実行し、リモートライトでメトリクスを push し、ルールグループを保存してオブジェクトを確認します。この流れは `cortexproject/cortex:v1.21.1` と `rustfs/rustfs-x86-musl:v2.3.1` で検証済みです。
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Docker が必要です。このデプロイはローカルでの統合テストを目的としており、本番環境向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -15,11 +15,11 @@ flowchart LR
 	Cortex -->|"blocks, rules, configs"| RustFS["RustFS :9000"]
 ```
 
-Cortex stores every TSDB block, ruler rule group, and alertmanager configuration in object storage. Pointing the `s3` backend at RustFS makes the bucket the single source of truth for all tenant data.
+Cortex はすべての TSDB ブロック、Ruler のルールグループ、Alertmanager の設定をオブジェクトストレージに保存します。`s3` バックエンドを RustFS に向けると、バケットがすべてのテナントデータの単一の正本になります。
 
-## 1. Create the Cortex config
+## 1. Cortex の設定を作成する
 
-Create the config file, replacing all connection placeholders:
+接続情報のプレースホルダーをすべて置き換えて、設定ファイルを作成します。
 
 ```yaml title="cortex.yaml"
 target: all
@@ -88,11 +88,11 @@ alertmanager_storage:
     <<: *s3
 ```
 
-Cortex names the bucket field `bucket_name` and controls addressing with `bucket_lookup_type: path`. `insecure: true` allows the plain-HTTP endpoint. The `block_ranges_period` and `ship_interval` values shorten the block cycle so the test produces objects quickly; keep the defaults in production.
+Cortex のバケットフィールド名は `bucket_name` で、アドレス指定は `bucket_lookup_type: path` で制御します。`insecure: true` は平文 HTTP のエンドポイントを許可します。`block_ranges_period` と `ship_interval` はブロック周期を短くし、テストですぐにオブジェクトができるようにします。本番ではデフォルトを維持してください。
 
-## 2. Run Cortex
+## 2. Cortex を実行する
 
-Create the bucket and start Cortex on the same Docker network as RustFS:
+バケットを作成し、RustFS と同じ Docker ネットワーク上で Cortex を起動します。
 
 ```bash
 rc mb rustfs/cortex
@@ -107,9 +107,9 @@ docker run -d --name cortex --network oo-rustfs_default -p 9009:9009 \
 ts=... caller=cortex.go:469 level=info msg="Cortex started"
 ```
 
-## 3. Push metrics and rules
+## 3. メトリクスとルールを push する
 
-Start a Prometheus that scrapes itself and remote-writes into Cortex:
+自身をスクレイプし、Cortex へリモートライトする Prometheus を起動します。
 
 ```yaml title="prometheus.yml"
 global:
@@ -128,7 +128,7 @@ docker run -d --name prom-writer --network oo-rustfs_default \
   prom/prometheus:latest --config.file=/etc/prometheus/prometheus.yml
 ```
 
-Store a rule group through the ruler API:
+Ruler API でルールグループを保存します。
 
 ```bash
 cat > rules.yaml << "EOF"
@@ -151,7 +151,7 @@ curl -s -o /dev/null -w "%{http_code}\n" \
 202
 ```
 
-Query the ingested series back:
+取り込んだ系列をクエリして読み戻します。
 
 ```bash
 curl -s "http://localhost:9009/prometheus/api/v1/query?query=up"
@@ -161,15 +161,15 @@ curl -s "http://localhost:9009/prometheus/api/v1/query?query=up"
 {"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"up",...},"value":[...,"1"]}]}}
 ```
 
-## 4. Verify objects in RustFS
+## 4. RustFS 内のオブジェクトを確認する
 
-List the bucket prefixes:
+バケットのプレフィックスを一覧します。
 
 ```bash
 rc ls rustfs/cortex/ -r
 ```
 
-The ruler config landed immediately, and the ingester shipped two TSDB blocks (each with `chunks`, `index`, and `meta.json`):
+Ruler の設定はすぐに保存され、ingester は 2 つの TSDB ブロックを送出しました（それぞれ `chunks`、`index`、`meta.json` を持ちます）。
 
 ```text
 fake/01M35WE4B1G6RRKHRV0HSGADY1/chunks/000001
@@ -181,38 +181,38 @@ fake/01M35WWS2YCC7FBK1JSBKFQGRP/meta.json
 rules/fake/cnVzdGZzLWRlbW8=/cnVzdGZzLWRlbW8=
 ```
 
-![Cortex blocks and rules stored in the RustFS Console](./images/rustfs-cortex-blocks.png)
+![RustFS Console に保存された Cortex のブロックとルール](./images/rustfs-cortex-blocks.png)
 
-## 5. Stop or reset
+## 5. 停止またはリセットする
 
-To tear down the demo while keeping the bucket objects:
+バケット内のオブジェクトを残したままデモを破棄します。
 
 ```bash
 docker rm -f cortex prom-writer
 ```
 
-To delete the stored data:
+保存したデータを削除します。
 
 ```bash
 rc rm rustfs/cortex/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
 ### `field bucket not found in type s3.Config`
 
-Cortex uses `bucket_name`, not `bucket`. Path-style addressing is set with `bucket_lookup_type: path` — the `force_path_style` key used by Thanos does not exist in Cortex.
+Cortex が使うのは `bucket` ではなく `bucket_name` です。パススタイルアクセスは `bucket_lookup_type: path` で設定します。Thanos で使う `force_path_style` キーは Cortex にはありません。
 
-### Blocks never appear in the bucket
+### ブロックがバケットに現れない
 
-The ingester only ships a block after the head is compacted at a `block_ranges_period` boundary (default 2h). For tests, set a small range such as `[15m]` together with `ship_interval: 30s` and wait for one period.
+ingester は、ヘッドが `block_ranges_period` の境界（デフォルト 2 時間）でコンパクトされたあとでなければブロックを送出しません。テストでは `[15m]` のような短い範囲と `ship_interval: 30s` を設定し、1 周期待ちます。
 
-### `Unauthorized` or empty bucket listings
+### `Unauthorized` または空のバケット一覧
 
-Confirm `access_key_id` and `secret_access_key` are present in every `s3` block that uses the bucket, and that `insecure: true` matches the plain-HTTP endpoint.
+バケットを使うすべての `s3` ブロックに `access_key_id` と `secret_access_key` があること、および `insecure: true` が平文 HTTP のエンドポイントと一致することを確認します。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Cortex storage options.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Combine Cortex with [Thanos](/developer/integration/observability/thanos) when you need block storage for long-term Prometheus data as well.
+- 追加の Cortex ストレージオプションを採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認してください。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
+- 長期の Prometheus データ向けのブロックストレージも必要な場合は、Cortex を [Thanos](/ja/developer/integration/observability/thanos) と組み合わせてください。

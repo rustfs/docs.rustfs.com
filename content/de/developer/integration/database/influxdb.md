@@ -3,7 +3,7 @@ title: "InfluxDB"
 description: "Betreiben Sie InfluxDB 3 Core mit RustFS als S3-Objektspeicher, bereitgestellt mit Docker Compose."
 ---
 
-Diese Anleitung betreibt [InfluxDB](https://github.com/influxdata/influxdb) — konkret **InfluxDB 3 Core**, die Rust-basierte Zeitreihendatenbank mit einer Parquet-Speicher-Engine — mit **RustFS** als Objektspeicher. Sie starten InfluxDB mit Docker Compose, schreiben Line Protocol über die HTTP-API, fragen es per SQL zurück, prüfen die persistierten Objekte in RustFS und bestätigen, dass die Daten einen Neustart von InfluxDB überstehen. Der Ablauf wurde mit `influxdb:3-core` (v3.11.5) und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
+In dieser Anleitung betreiben Sie [InfluxDB](https://github.com/influxdata/influxdb) — konkret **InfluxDB 3 Core**, die Rust-basierte Zeitreihendatenbank mit einer Parquet-Speicher-Engine — mit **RustFS** als Objektspeicher. Sie starten InfluxDB mit Docker Compose, schreiben Line Protocol über die HTTP-API, fragen es per SQL zurück, prüfen die persistierten Objekte in RustFS und bestätigen, dass die Daten einen Neustart von InfluxDB überstehen. Der Ablauf wurde mit `influxdb:3-core` (v3.11.5) und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
 Sie benötigen Docker mit dem Compose-Plugin. Dieses Setup ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
@@ -16,7 +16,7 @@ flowchart LR
 	Init["init-bucket job"] -->|"create my-bucket"| RustFS
 ```
 
-InfluxDB 3 Core hält Katalog, Write-Ahead-Log und Parquet-Datendateien im konfigurierten Objektspeicher. Schreibvorgänge landen zuerst im WAL und werden nach RustFS persistiert, sodass jeder Schreibvorgang einen Neustart übersteht, noch bevor die Kompaktierung Parquet-Dateien erzeugt. Der Server verwendet standardmäßig Path-Style-Adressierung gegenüber dem konfigurierten Endpunkt.
+InfluxDB 3 Core hält Katalog, Write-Ahead-Log und Parquet-Datendateien im konfigurierten Objektspeicher. Schreibvorgänge landen zuerst im WAL und werden nach RustFS persistiert, sodass jeder Schreibvorgang einen Neustart übersteht, noch bevor die Kompaktierung Parquet-Dateien erzeugt. Der Server verwendet standardmäßig pfadbasierte Adressierung (Path-Style) gegenüber dem konfigurierten Endpunkt.
 
 ## 1. Projektdateien anlegen
 
@@ -27,14 +27,14 @@ mkdir rustfs-influxdb
 cd rustfs-influxdb
 ```
 
-Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Anmeldeinformationen:
+Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Zugangsdaten:
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Verwenden Sie dedizierte Anmeldeinformationen für den Bucket. Committen Sie `.env` nicht in die Versionsverwaltung.
+Verwenden Sie dedizierte Zugangsdaten für den Bucket. Nehmen Sie `.env` nicht in die Versionsverwaltung auf.
 
 Erstellen Sie die Compose-Datei:
 
@@ -115,7 +115,7 @@ volumes:
   rustfs-data:
 ```
 
-`--object-store s3` mit `--aws-endpoint` leitet alle Katalog-, WAL- und Parquet-Schreibvorgänge an RustFS. InfluxDB verwendet standardmäßig Path-Style-Adressierung gegenüber dem Endpunkt, und `--aws-allow-http` erlaubt Plain HTTP innerhalb des Compose-Netzwerks.
+`--object-store s3` mit `--aws-endpoint` leitet alle Katalog-, WAL- und Parquet-Schreibvorgänge an RustFS. InfluxDB verwendet standardmäßig pfadbasierte Adressierung (Path-Style) gegenüber dem Endpunkt, und `--aws-allow-http` erlaubt Plain HTTP innerhalb des Compose-Netzwerks.
 
 ## 2. Bereitstellung starten
 
@@ -213,9 +213,9 @@ Katalog, Write-Ahead-Log und später die Parquet-Datendateien liegen unter dem K
 [2026-09-20 23:20:19]       31 B influxdb-demo/table-index-conversion-completed
 ```
 
-Sie können das Präfix auch in der RustFS-Konsole anzeigen:
+Sie können das Präfix auch in der RustFS Console anzeigen:
 
-![Das InfluxDB-Knoten-Präfix in der RustFS-Konsole](./images/rustfs-influxdb-objects.png)
+![Das InfluxDB-Knoten-Präfix in der RustFS Console](./images/rustfs-influxdb-objects.png)
 
 ## 7. Persistenz über einen Neustart bestätigen
 
@@ -262,7 +262,7 @@ Der Knoten hat bereits einen Admin-Token, und der Wert kann nicht wiederhergeste
 
 ### AccessDenied- oder 403-Antworten
 
-Stellen Sie sicher, dass die Anmeldeinformationen in der Compose-Datei mit den RustFS-Anmeldeinformationen übereinstimmen und dass der Dienst `create-bucket` erfolgreich abgeschlossen wurde:
+Stellen Sie sicher, dass die Zugangsdaten in der Compose-Datei mit den RustFS-Zugangsdaten übereinstimmen und dass der Dienst `create-bucket` erfolgreich abgeschlossen wurde:
 
 ```bash
 docker compose logs create-bucket
@@ -274,6 +274,6 @@ docker compose logs create-bucket
 
 ## Nächste Schritte
 
-- Lesen Sie die [S3-Kompatibilitätshinweise](/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
-- Erstellen Sie dedizierte Produktions-Anmeldeinformationen mit dem [Access Key Management](/security-compliance/iam/access-token).
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
 - Folgen Sie der [InfluxDB-3-Core-Dokumentation](https://docs.influxdata.com/influxdb3/core/), um Telegraf oder die Write-APIs als Datenproduzenten anzubinden.

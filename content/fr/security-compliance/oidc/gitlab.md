@@ -1,76 +1,76 @@
 ---
 title: "GitLab"
-description: "Configure GitLab as an OpenID Connect identity provider for RustFS Console single sign-on."
+description: "Configurez GitLab comme fournisseur d’identité OpenID Connect pour l’authentification unique de la Console RustFS."
 ---
 
-RustFS integrates with **GitLab** through the OpenID Connect (OIDC) Authorization Code Flow. The examples on this page use the default RustFS provider ID, `default`.
+RustFS s’intègre à **GitLab** via le flux Authorization Code d’OpenID Connect (OIDC). Les exemples de cette page utilisent l’identifiant de fournisseur RustFS par défaut, `default`.
 
-## Requirements
+## Prérequis
 
-Before you begin, prepare:
+Avant de commencer, préparez :
 
-- An [installed GitLab instance](https://about.gitlab.com/install/) and access to its Admin area.
-- A RustFS deployment with a public HTTPS Console origin.
-- A RustFS policy to assign to GitLab users. The examples use `consoleAdmin`; use a policy with only the permissions your users require in production.
+- Une [instance GitLab installée](https://about.gitlab.com/install/) et un accès à sa zone d’administration.
+- Un déploiement RustFS avec une origine HTTPS publique pour la Console.
+- Une politique RustFS à affecter aux utilisateurs GitLab. Les exemples utilisent `consoleAdmin` ; en production, utilisez une politique qui n’accorde que les autorisations requises par vos utilisateurs.
 
-## Overview
+## Vue d’ensemble
 
-The browser login flow is:
+Le flux de connexion dans le navigateur est le suivant :
 
-1. RustFS sends an authorization-code request with a Proof Key for Code Exchange (PKCE) S256 challenge.
-2. GitLab authenticates the user and redirects the browser to RustFS with `code` and `state`.
-3. RustFS exchanges the code at the GitLab token endpoint.
-4. RustFS verifies the ID token signature, issuer, audience, expiry, and nonce.
-5. RustFS assigns the configured local Identity and Access Management (IAM) policy and issues temporary credentials for the Console session.
+1. RustFS envoie une demande de code d’autorisation avec un défi Proof Key for Code Exchange (PKCE) S256.
+2. GitLab authentifie l’utilisateur et redirige le navigateur vers RustFS avec `code` et `state`.
+3. RustFS échange le code auprès du point de terminaison de jeton de GitLab.
+4. RustFS vérifie la signature du jeton d’identité, l’émetteur, l’audience, l’expiration et le nonce.
+5. RustFS affecte la politique locale de gestion des identités et des accès (IAM) configurée et émet des identifiants temporaires pour la session Console.
 
-GitLab authenticates the user, while RustFS policies authorize S3 and administration operations.
+GitLab authentifie l’utilisateur, tandis que les politiques RustFS autorisent les opérations S3 et d’administration.
 
-The examples use the following values. Replace the hostnames and client secret for your environment:
+Les exemples utilisent les valeurs suivantes. Remplacez les noms d’hôte et le secret client pour votre environnement :
 
-| Setting | Example |
+| Réglage | Exemple |
 | --- | --- |
-| GitLab issuer | `https://gitlab.example.com` |
-| GitLab application ID | `<gitlab-application-id>` |
-| Public RustFS origin | `https://rustfs.example.com` |
-| RustFS callback URL | `https://rustfs.example.com/rustfs/admin/v3/oidc/callback/default` |
+| Émetteur GitLab (issuer) | `https://gitlab.example.com` |
+| ID d’application GitLab | `<gitlab-application-id>` |
+| Origine publique RustFS | `https://rustfs.example.com` |
+| URL de rappel RustFS | `https://rustfs.example.com/rustfs/admin/v3/oidc/callback/default` |
 
 ## Configuration
 
-### GitLab configuration
+### Configuration de GitLab
 
-#### Create the OAuth application
+#### Créer l’application OAuth
 
-1. Sign in to GitLab as an administrator.
-2. Open **Admin Area**, select **Applications**, and select **New application**.
-3. Enter `RustFS OIDC` as the application name.
-4. Set **Redirect URI** to the exact RustFS callback URL:
+1. Connectez-vous à GitLab en tant qu’administrateur.
+2. Ouvrez **Admin Area** (zone d’administration), sélectionnez **Applications**, puis **New application**.
+3. Saisissez `RustFS OIDC` comme nom d’application.
+4. Réglez **Redirect URI** sur l’URL de rappel RustFS exacte :
 
   ```text
   https://rustfs.example.com/rustfs/admin/v3/oidc/callback/default
   ```
 
-5. Enable **Confidential**.
-6. Enable **Trusted** to skip the user authorization prompt for this instance-wide application.
-7. Select the `openid`, `profile`, and `email` scopes.
-8. Save the application, then copy the generated application ID and secret.
+5. Activez **Confidential**.
+6. Activez **Trusted** pour ignorer l’invite d’autorisation de l’utilisateur pour cette application à l’échelle de l’instance.
+7. Sélectionnez les portées `openid`, `profile` et `email`.
+8. Enregistrez l’application, puis copiez l’ID et le secret d’application générés.
 
-See the [GitLab OAuth provider documentation](https://docs.gitlab.com/integration/oauth_provider/) for details about administering applications.
+Consultez la [documentation du fournisseur OAuth GitLab](https://docs.gitlab.com/integration/oauth_provider/) pour les détails d’administration des applications.
 
-![GitLab Admin area showing the RustFS OIDC instance OAuth application as trusted and confidential](./images/gitlab-oidc-configuration.png)
+![Zone d’administration GitLab montrant l’application OAuth d’instance RustFS OIDC comme approuvée et confidentielle](./images/gitlab-oidc-configuration.png)
 
-:::note[Test environment shown]
+:::note[Environnement de test illustré]
 
-The screenshot shows an HTTP callback URL from a test environment. Use the public HTTPS callback URL for your RustFS deployment.
+La capture montre une URL de rappel HTTP issue d’un environnement de test. Utilisez l’URL de rappel HTTPS publique de votre déploiement RustFS.
 
 :::
 
-### RustFS configuration
+### Configuration de RustFS
 
-Configure the GitLab provider through environment variables.
+Configurez le fournisseur GitLab au moyen de variables d’environnement.
 
-#### Configure with environment variables
+#### Configurer avec des variables d’environnement
 
-Add the GitLab provider and public browser origin to the RustFS service environment:
+Ajoutez le fournisseur GitLab et l’origine publique du navigateur à l’environnement du service RustFS :
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_BROWSER_REDIRECT_URL="https://rustfs.example.com"
@@ -88,23 +88,23 @@ RUSTFS_IDENTITY_OPENID_USERNAME_CLAIM="preferred_username"
 RUSTFS_IDENTITY_OPENID_ROLE_POLICY="consoleAdmin"
 ```
 
-Restart RustFS after applying the configuration.
+Redémarrez RustFS après avoir appliqué la configuration.
 
-`RUSTFS_BROWSER_REDIRECT_URL` must contain the public scheme and authority without a path. It controls the Console success redirect and logout fallback URL. The provider callback URL must exactly match the URL registered in GitLab.
+`RUSTFS_BROWSER_REDIRECT_URL` doit contenir le schéma et l’autorité publics, sans chemin. Cette variable contrôle la redirection de succès de la Console et l’URL de repli lors de la déconnexion. L’URL de rappel du fournisseur doit correspondre exactement à l’URL enregistrée dans GitLab.
 
-:::warning[Limit the assigned policy]
+:::warning[Limitez la politique affectée]
 
-`RUSTFS_IDENTITY_OPENID_ROLE_POLICY` assigns the same RustFS policy to every user who signs in through this provider. Replace `consoleAdmin` with a policy that grants only the permissions required by your GitLab users.
+`RUSTFS_IDENTITY_OPENID_ROLE_POLICY` affecte la même politique RustFS à chaque utilisateur qui se connecte via ce fournisseur. Remplacez `consoleAdmin` par une politique qui n’accorde que les autorisations requises par vos utilisateurs GitLab.
 
 :::
 
-For a reverse proxy or load balancer, preserve the callback query string and route the authorize and callback requests to the same RustFS node. The in-flight OIDC `state` is local to that node.
+Avec un reverse proxy ou un répartiteur de charge, conservez la chaîne de requête du rappel et acheminez les requêtes d’autorisation et de rappel vers le même nœud RustFS. L’état OIDC en cours (`state`) est local à ce nœud.
 
-## Verification
+## Vérification
 
-### Verify GitLab discovery
+### Vérifier la découverte GitLab
 
-Query the GitLab discovery document:
+Interrogez le document de découverte GitLab :
 
 ```bash
 curl -fsS "https://gitlab.example.com/.well-known/openid-configuration" | jq '{
@@ -117,44 +117,44 @@ curl -fsS "https://gitlab.example.com/.well-known/openid-configuration" | jq '{
 }'
 ```
 
-Confirm that:
+Vérifiez que :
 
-- `issuer` is `https://gitlab.example.com`.
-- `authorization_endpoint`, `token_endpoint`, and `jwks_uri` are present.
-- `scopes_supported` includes `openid`, `profile`, and `email`.
-- `code_challenge_methods_supported` includes `S256`.
+- `issuer` vaut `https://gitlab.example.com`.
+- `authorization_endpoint`, `token_endpoint` et `jwks_uri` sont présents.
+- `scopes_supported` contient `openid`, `profile` et `email`.
+- `code_challenge_methods_supported` contient `S256`.
 
-### Verify the RustFS provider
+### Vérifier le fournisseur RustFS
 
-After restarting RustFS, check that the provider is available:
+Après le redémarrage de RustFS, vérifiez que le fournisseur est disponible :
 
 ```bash
 curl -fsS "https://rustfs.example.com/rustfs/admin/v3/oidc/providers" | jq
 ```
 
-The response should include the `default` provider with the display name `GitLab`.
+La réponse devrait inclure le fournisseur `default` avec le nom d’affichage `GitLab`.
 
-### Test Console login
+### Tester la connexion à la Console
 
-Open the RustFS Console and select **GitLab**, or open the authorization endpoint directly:
+Ouvrez la Console RustFS et sélectionnez **GitLab**, ou ouvrez directement le point de terminaison d’autorisation :
 
 ```text
 https://rustfs.example.com/rustfs/admin/v3/oidc/authorize/default
 ```
 
-![RustFS Console login page showing the Login with GitLab option](./images/rustfs-console-gitlab-oidc.png)
+![Page de connexion de la Console RustFS montrant l’option Login with GitLab](./images/rustfs-console-gitlab-oidc.png)
 
-Verify the complete flow:
+Vérifiez le flux complet :
 
-1. The browser redirects to GitLab.
-2. The user signs in and authorizes the application when prompted.
-3. GitLab redirects to the RustFS callback URL with `code` and `state`.
-4. RustFS validates the ID token and creates the Console session.
-5. The Console opens with the configured RustFS policy.
+1. Le navigateur redirige vers GitLab.
+2. L’utilisateur se connecte et autorise l’application lorsque l’invite s’affiche.
+3. GitLab redirige vers l’URL de rappel RustFS avec `code` et `state`.
+4. RustFS valide le jeton d’identité et crée la session Console.
+5. La Console s’ouvre avec la politique RustFS configurée.
 
-If GitLab reports a redirect URI mismatch, confirm that the URI registered in the GitLab application exactly matches `RUSTFS_IDENTITY_OPENID_REDIRECT_URI`.
+Si GitLab signale une non-correspondance de l’URI de redirection, confirmez que l’URI enregistrée dans l’application GitLab correspond exactement à `RUSTFS_IDENTITY_OPENID_REDIRECT_URI`.
 
-## Next steps
+## Étapes suivantes
 
-- Review [users, groups, and policies](../iam/policies.md) before selecting the policy assigned to GitLab users.
-- Review the [Console security notes](/administration/console) before exposing the login endpoint publicly.
+- Consultez [Utilisateurs, groupes et politiques](../iam/policies.md) avant de choisir la politique affectée aux utilisateurs GitLab.
+- Consultez les [notes de sécurité de la Console](/fr/administration/console) avant d’exposer publiquement le point de terminaison de connexion.

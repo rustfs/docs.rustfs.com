@@ -78,7 +78,7 @@ ruler:
   alertmanager_url: http://localhost:9093
 ```
 
-`s3forcepathstyle: true` と `insecure: true` は、コンテナネットワークのエンドポイントに対して RustFS が期待する、平文 HTTP 上のパススタイルアドレス指定を選択します。`chunk_idle_period` と `max_chunk_age` は短縮しており、検証時にデフォルトの 30 分間チャンクのフラッシュを待つ必要がありません。
+`s3forcepathstyle: true` と `insecure: true` は、コンテナネットワークのエンドポイントに対して RustFS が期待する、平文 HTTP 上のパススタイルアクセスを選択します。`chunk_idle_period` と `max_chunk_age` は短縮しており、検証時にデフォルトの 30 分間チャンクのフラッシュを待つ必要がありません。
 
 Compose ファイルを作成します。
 
@@ -290,6 +290,6 @@ docker compose logs create-bucket
 
 ## 次のステップ
 
-- 追加の S3 オペレーションを採用する前に、[S3 互換性ノート](/administration/protocols/s3)を確認してください。
-- [アクセスキー管理](/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
+- 追加の S3 オペレーションを採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認してください。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
 - [Grafana Loki ドキュメント](https://grafana.com/docs/loki/latest/)に従って、Promtail、Alloy、OpenTelemetry Collector をログプロデューサーとして接続してください。

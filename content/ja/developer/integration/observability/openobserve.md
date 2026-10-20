@@ -7,7 +7,7 @@ description: "Docker Compose で OpenObserve を S3 互換オブジェクトス�
 
 Docker と Compose プラグイン、および 3 つのコンテナを実行できるマシンが必要です。このデプロイはローカルでの統合テストを目的としており、本番環境向けではありません。
 
-## 製品紹介
+## 概要
 
 ### OpenObserve
 
@@ -17,7 +17,7 @@ OpenObserve は Rust 製の `object_store` クライアントを通じてオブ�
 
 ### RustFS
 
-RustFS は Rust で構築された分散オブジェクトストレージシステムです。SigV4 署名、パススタイルおよびバーチャルホストスタイルのアドレス指定、マルチパートアップロードを含む Amazon S3 API を実装し、Web コンソールとマルチテナント IAM を備えています。単一ノードからマルチノードクラスタまで実行でき、OpenObserve がテレメトリデータの保存に必要とする S3 オペレーションをカバーします。
+RustFS は Rust で構築された分散オブジェクトストレージシステムです。SigV4 署名、パススタイルアクセス、バーチャルホストスタイルのアドレス指定、マルチパートアップロードを含む Amazon S3 API を実装し、Web コンソールとマルチテナント IAM を備えています。単一ノードからマルチノードクラスターまで実行でき、OpenObserve がテレメトリデータの保存に必要とする S3 オペレーションをカバーします。
 
 ### 統合の仕組み
 
@@ -306,6 +306,6 @@ RustFS イメージはユーザーとグループ `10001` で実行されます�
 
 ## 次のステップ
 
-- 追加の S3 オペレーションを採用する前に、[S3 互換性ノート](/administration/protocols/s3)を確認してください。
-- [アクセスキー管理](/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
+- 追加の S3 オペレーションを採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認してください。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
 - [OpenObserve ドキュメント](https://openobserve.ai/docs/)に従って、Fluent Bit や OpenTelemetry Collector などの実際のログプロデューサーを接続してください。

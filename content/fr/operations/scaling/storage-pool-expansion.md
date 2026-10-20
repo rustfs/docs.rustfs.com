@@ -1,104 +1,104 @@
 ---
-title: "Pool Expansion"
-description: "Add a storage pool to a RustFS cluster and verify the expanded topology through the Console or rc."
+title: "Extension de pool"
+description: "Ajoutez un pool de stockage à un cluster RustFS et vérifiez la topologie étendue depuis la Console ou avec rc."
 ---
 
-## Overview
+## Vue d’ensemble
 
-### Requirements
+### Prérequis
 
-- Install [`rc`](/operations/rc) on the administration host before using the `rc` workflow in this guide.
-- Configure credentials with permission to read RustFS cluster and pool status.
+- Installez [`rc`](/fr/operations/rc) sur l’hôte d’administration avant d’utiliser le flux `rc` de ce guide.
+- Configurez des identifiants autorisés à lire l’état du cluster et des pools RustFS.
 
-RustFS expands capacity by appending a **server pool** to the cluster topology. Each pool is one space-separated volume expression in `RUSTFS_VOLUMES`. After the expanded topology is applied, new writes can use the added capacity; existing objects remain in their current pools until you run [Rebalancing](./data-rebalancing.md).
+RustFS étend la capacité en ajoutant un **pool de serveurs** à la topologie du cluster. Chaque pool correspond à une expression de volumes, séparée par des espaces, dans `RUSTFS_VOLUMES`. Une fois la topologie étendue appliquée, les nouvelles écritures peuvent utiliser la capacité ajoutée ; les objets existants restent dans leurs pools actuels jusqu’à ce que vous lanciez un [rééquilibrage](./data-rebalancing.md).
 
-This guide uses the following two-pool example:
+Ce guide utilise l’exemple à deux pools suivant :
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_VOLUMES="http://rustfs-node1:9000/data/rustfs{1...4}/mnmd http://rustfs-node2:9000/data/rustfs{1...4}/mnmd"
 ```
 
-Before expanding:
+Avant d’étendre :
 
-- Back up critical data and run the workflow during a maintenance window.
-- Use the same RustFS version, credentials, and complete `RUSTFS_VOLUMES` value on every node.
-- Verify name resolution, time synchronization, and port `9000` connectivity between all old and new nodes.
-- Prepare the new pool with the intended disk count and storage specification.
+- Sauvegardez les données critiques et exécutez le flux pendant une fenêtre de maintenance.
+- Utilisez la même version de RustFS, les mêmes identifiants et la valeur complète de `RUSTFS_VOLUMES` sur chaque nœud.
+- Vérifiez la résolution de noms, la synchronisation de l’heure et la connectivité du port `9000` entre tous les anciens et les nouveaux nœuds.
+- Préparez le nouveau pool avec le nombre de disques et la spécification de stockage prévus.
 
-:::warning[Append the pool; do not replace the topology]
+:::warning[Ajoutez le pool ; ne remplacez pas la topologie]
 
-Every node must start with the complete ordered pool list. Omitting the existing pool or using a different expression on one node creates an inconsistent topology.
+Chaque nœud doit démarrer avec la liste ordonnée complète des pools. Omettre le pool existant, ou utiliser une expression différente sur un nœud, crée une topologie incohérente.
 
 :::
 
-## Operation
+## Opération
 
-### Expand with Console assistance
+### Étendre avec l’aide de la Console
 
-The Console displays storage pools but does not add a pool to the server startup topology. Use this Console-assisted workflow:
+La Console affiche les pools de stockage, mais elle n’ajoute pas de pool à la topologie de démarrage du serveur. Utilisez ce flux assisté par la Console :
 
-1. Record the existing pools and their usage from **Rebalance** or **Pool Decommission**.
-2. Install the same RustFS version and service configuration on the new pool node or nodes.
-3. Append the new pool expression to `RUSTFS_VOLUMES` on every existing and new node. Keep the existing expressions unchanged and in the same order.
-4. Restart RustFS across all nodes so every process starts with the same expanded topology.
-5. Wait for all nodes to become ready, then refresh the pool list in the Console.
+1. Relevez les pools existants et leur utilisation depuis **Rebalance** (rééquilibrage) ou **Pool Decommission** (mise hors service du pool).
+2. Installez la même version de RustFS et la même configuration de service sur le ou les nœuds du nouveau pool.
+3. Ajoutez l’expression du nouveau pool à `RUSTFS_VOLUMES` sur chaque nœud existant et nouveau. Conservez les expressions existantes inchangées et dans le même ordre.
+4. Redémarrez RustFS sur tous les nœuds, afin que chaque processus démarre avec la même topologie étendue.
+5. Attendez que tous les nœuds soient prêts, puis actualisez la liste des pools dans la Console.
 
-![RustFS Console showing the original and newly added storage pools](./images/pool-expansion-console.png)
+![Console RustFS affichant le pool de stockage d’origine et le pool nouvellement ajouté](./images/pool-expansion-console.png)
 
-For a Helm deployment, append the new entry to `pools.list` and apply `helm upgrade`. Do not remove or reorder existing entries.
+Pour un déploiement Helm, ajoutez la nouvelle entrée à `pools.list` et appliquez `helm upgrade`. Ne retirez ni ne réordonnez les entrées existantes.
 
-### Inspect the expansion with rc
+### Inspecter l’extension avec rc
 
-Configure an alias with credentials that can read cluster and pool status:
+Configurez un alias avec des identifiants capables de lire l’état du cluster et des pools :
 
 ```bash
 rc alias set rustfs http://<server-ip>:9000 <your-access-key> <your-secret-key>
 ```
 
-Record the current topology:
+Relevez la topologie actuelle :
 
 ```bash
 rc admin pool list rustfs
 ```
 
-Prepare the new nodes, append the new pool expression to the complete `RUSTFS_VOLUMES` value on every node, and restart RustFS across the cluster. `rc` does not mutate the server startup topology.
+Préparez les nouveaux nœuds, ajoutez l’expression du nouveau pool à la valeur complète de `RUSTFS_VOLUMES` sur chaque nœud, puis redémarrez RustFS sur l’ensemble du cluster. `rc` ne modifie pas la topologie de démarrage du serveur.
 
-After the cluster returns, list the pools again:
+Lorsque le cluster est de nouveau disponible, listez encore les pools :
 
 ```bash
 rc admin pool list rustfs
 ```
 
-Use a zero-based pool ID to inspect the new pool in detail:
+Utilisez un ID de pool à base zéro pour inspecter le nouveau pool en détail :
 
 ```bash
 rc admin pool status rustfs 1 --by-id
 ```
 
-:::note[Rebalance aliases]
+:::note[Alias de rééquilibrage]
 
-`rc admin expand start`, `status`, and `stop` are aliases for the post-expansion rebalance workflow. They redistribute existing data; they do not append a pool to `RUSTFS_VOLUMES`.
+`rc admin expand start`, `status` et `stop` sont des alias du flux de rééquilibrage qui suit une extension. Ils redistribuent les données existantes ; ils n’ajoutent pas de pool à `RUSTFS_VOLUMES`.
 
 :::
 
-## Verification
+## Vérification
 
-### Verify the expansion in the Console
+### Vérifier l’extension dans la Console
 
-Confirm that:
+Confirmez que :
 
-- The pool list shows the original pool and the new pool.
-- Every expected node and disk is online.
-- The new pool reports the expected total and available capacity.
-- The cluster reports no degraded nodes before you resume normal traffic.
+- La liste des pools affiche le pool d’origine et le nouveau pool.
+- Chaque nœud et chaque disque attendu est en ligne.
+- Le nouveau pool indique la capacité totale et la capacité disponible attendues.
+- Le cluster ne signale aucun nœud dégradé avant que vous repreniez le trafic normal.
 
-### Verify the expansion with rc
+### Vérifier l’extension avec rc
 
-Run:
+Exécutez :
 
 ```bash
 rc admin pool list rustfs
 rc admin pool status rustfs 1 --by-id
 ```
 
-Verify that the new pool has the expected command-line expression and an active state. Write and read a test object through the normal S3 endpoint before starting a rebalance.
+Vérifiez que le nouveau pool possède l’expression de ligne de commande attendue et un état actif. Écrivez puis lisez un objet de test par le point de terminaison S3 habituel avant de démarrer un rééquilibrage.

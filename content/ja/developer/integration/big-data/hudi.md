@@ -1,24 +1,24 @@
 ---
 title: "Apache Hudi"
-description: "Write Apache Hudi tables to RustFS through Spark and the s3a connector."
+description: "Spark と s3a コネクタを通じて、Apache Hudi テーブルを RustFS に書き込みます。"
 ---
 
-This guide connects [Apache Hudi](https://github.com/apache/hudi) — the transactional data lake platform — to **RustFS** as its copy-on-write table store. You will run Spark with the Hudi bundle, write a table to the `s3a://` location inside a RustFS bucket, read it back, and verify the table files. The workflow was verified with `apache/spark:3.5.6`, `hudi-spark3.5-bundle_2.12:0.15.0`, `hadoop-aws:3.3.4`, and `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、トランザクション型データレイク基盤である [Apache Hudi](https://github.com/apache/hudi) を、コピーオンライトのテーブルストアとして **RustFS** に接続します。Hudi バンドル付きの Spark を実行し、RustFS バケット内の `s3a://` ロケーションへテーブルを書き込み、読み戻してテーブルファイルを確認します。この流れは `apache/spark:3.5.6`、`hudi-spark3.5-bundle_2.12:0.15.0`、`hadoop-aws:3.3.4`、`rustfs/rustfs-x86-musl:v2.3.1` で検証済みです。
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Docker が必要です。このデプロイはローカルでの統合テストを目的としており、本番環境向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
 	Job["Spark + Hudi"] -->|"commit + parquet"| RustFS["RustFS :9000"]
 ```
 
-Hudi stores the `.hoodie/` timeline, commit files, and Parquet data blocks under the table path in the bucket. Reads resolve the latest table snapshot from the timeline, so every write and query goes through the S3 API.
+Hudi は、バケット内のテーブルパス配下に `.hoodie/` タイムライン、コミットファイル、Parquet データブロックを保存します。読み取りはタイムラインから最新のテーブルスナップショットを解決するため、すべての書き込みとクエリは S3 API を経由します。
 
-## 1. Run the Spark write
+## 1. Spark の書き込みを実行する
 
-Hudi requires the Kryo serializer and the s3a credentials as Hadoop properties. The following `spark-shell` session creates a non-partitioned table in `my-bucket` — replace all connection placeholders:
+Hudi では Kryo シリアライザーと s3a の認証情報を Hadoop プロパティとして指定する必要があります。次の `spark-shell` セッションは `my-bucket` に非パーティションテーブルを作成します。接続用のプレースホルダーはすべて置き換えます。
 
 ```scala
 import org.apache.spark.sql.SaveMode
@@ -52,7 +52,7 @@ docker run --rm --network oo-rustfs_default \
   -i /tmp/hudi_test.scala
 ```
 
-The `--packages` flags download the Hudi bundle and the s3a connector on first run. The `spark.jars.ivy` setting avoids Ivy cache permission errors in the container. The read-back `show()` prints the three rows:
+`--packages` フラグは、初回実行時に Hudi バンドルと s3a コネクタをダウンロードします。`spark.jars.ivy` は、コンテナ内の Ivy キャッシュ権限エラーを避けます。読み戻しの `show()` は次の 3 行を出力します。
 
 ```text
 +---+----+
@@ -62,15 +62,15 @@ The `--packages` flags download the Hudi bundle and the s3a connector on first r
 +---+----+
 ```
 
-## 2. Verify objects in RustFS
+## 2. RustFS 内のオブジェクトを確認する
 
-List the table prefix:
+テーブルのプレフィックスを一覧します。
 
 ```bash
 rc ls rustfs/my-bucket/hudi-demo/ -r
 ```
 
-The Hudi table layout appears under the table path — the `.hoodie/` timeline with the commit file, plus the Parquet data block:
+Hudi のテーブルレイアウトはテーブルパス配下に現れます。コミットファイルを含む `.hoodie/` タイムラインと、Parquet データブロックです。
 
 ```text
 hudi-demo/events/.hoodie/20260922015803291.commit
@@ -78,32 +78,32 @@ hudi-demo/events/.hoodie/20260922015803291.commit.requested
 hudi-demo/events/<partition>/<filegroup>/<parquet-block>
 ```
 
-![Hudi table files stored in the RustFS Console](./images/rustfs-hudi-table.png)
+![RustFS Console に保存された Hudi テーブルファイル](./images/rustfs-hudi-table.png)
 
-## 3. Stop or reset
+## 3. 停止またはリセットする
 
-Spark runs as a one-shot client and holds no state. To delete the demo table:
+Spark はワンショットのクライアントとして動作し、状態を保持しません。デモテーブルを削除します。
 
 ```bash
 rc rm rustfs/my-bucket/hudi-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
 ### `hoodie only support org.apache.spark.serializer.KryoSerializer as spark.serializer`
 
-Hudi rejects the default Spark serializer. Pass `--conf spark.serializer=org.apache.spark.serializer.KryoSerializer` as shown above.
+Hudi は Spark のデフォルトシリアライザーを拒否します。上記のとおり `--conf spark.serializer=org.apache.spark.serializer.KryoSerializer` を渡します。
 
-### `Partition-path field has to be non-empty` or keygenerator class errors
+### `Partition-path field has to be non-empty` または keygenerator クラスのエラー
 
-For a non-partitioned table, keep the default key generator (do not set `hoodie.datasource.write.keygenerator.class`) and set `hoodie.datasource.write.partitionpath.field` to the empty string.
+非パーティションテーブルでは、デフォルトのキージェネレーターを維持します（`hoodie.datasource.write.keygenerator.class` は設定しません）。`hoodie.datasource.write.partitionpath.field` は空文字列にします。
 
-### `NoSuchMethodError` or `ClassNotFoundException` in the Hudi write
+### Hudi の書き込みで `NoSuchMethodError` または `ClassNotFoundException` が出る
 
-The Spark and Hudi bundle versions must match: `hudi-spark3.5-bundle_2.12` goes with Spark 3.5.x, and the bundled Hadoop client must be compatible with `hadoop-aws:3.3.4`.
+Spark と Hudi バンドルのバージョンは一致している必要があります。`hudi-spark3.5-bundle_2.12` は Spark 3.5.x と組み合わせ、同梱の Hadoop クライアントは `hadoop-aws:3.3.4` と互換である必要があります。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Hudi operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Hudi Spark guide](https://hudi.apache.org/docs/quick-start-guide/) to add upserts, compaction, and query integrations on the same table.
+- 追加の Hudi 操作を採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認します。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- [Hudi Spark ガイド](https://hudi.apache.org/docs/quick-start-guide/)に従い、同じテーブルへ upsert、コンパクション、クエリ連携を追加します。

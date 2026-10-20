@@ -1,13 +1,13 @@
 ---
 title: "Airflow"
-description: "Move data between Airflow DAGs and RustFS with the Amazon S3 provider."
+description: "Verschieben Sie Daten zwischen Airflow-DAGs und RustFS mit dem Amazon-S3-Provider."
 ---
 
-This guide connects [Apache Airflow](https://github.com/apache/airflow) — the workflow orchestration platform — to **RustFS** through the Amazon S3 provider's hooks, operators, and sensors. You will register a custom-endpoint connection, run a DAG that writes an object to a RustFS bucket, waits for a key with `S3KeySensor`, and reads the object back with `S3Hook`. The workflow was verified with `apache/airflow:3.3.2` (standalone, SequentialExecutor) and the `apache-airflow-providers-amazon` provider against `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [Apache Airflow](https://github.com/apache/airflow) — die Plattform zur Workflow-Orchestrierung — über die Hooks, Operatoren und Sensoren des Amazon-S3-Providers mit **RustFS**. Sie registrieren eine Verbindung mit eigenem Endpunkt, führen einen DAG aus, der ein Objekt in einen RustFS-Bucket schreibt, mit `S3KeySensor` auf einen Objektschlüssel wartet und das Objekt mit `S3Hook` wieder liest. Der Ablauf wurde mit `apache/airflow:3.3.2` (Standalone, SequentialExecutor) und dem Provider `apache-airflow-providers-amazon` gegen `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker, or an existing Airflow installation. This deployment is intended for local integration testing, not production.
+Sie benötigen Docker oder eine vorhandene Airflow-Installation. Diese Bereitstellung ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -16,11 +16,11 @@ flowchart LR
 	Sensor["S3KeySensor"] -->|"poll key"| RustFS
 ```
 
-Every S3 interaction inside a DAG goes through the provider's S3 client, pointed at RustFS by the connection's `endpoint_url`. Operators, sensors, and hooks share the same connection object.
+Jede S3-Interaktion innerhalb eines DAG läuft über den S3-Client des Providers, den die `endpoint_url` der Verbindung auf RustFS ausrichtet. Operatoren, Sensoren und Hooks verwenden dasselbe Verbindungsobjekt.
 
-## 1. Run Airflow
+## 1. Airflow starten
 
-Start a standalone instance with examples disabled, and create the demo bucket:
+Starten Sie eine Standalone-Instanz mit deaktivierten Beispielen und legen Sie den Demo-Bucket an:
 
 ```bash
 docker run -d --name airflow --network oo-rustfs_default -p 8080:8080 \
@@ -31,11 +31,11 @@ docker run -d --name airflow --network oo-rustfs_default -p 8080:8080 \
 rc mb rustfs/airflow-demo
 ```
 
-The image ships with all providers preinstalled, including `apache-airflow-providers-amazon`.
+Das Image enthält alle Provider vorinstalliert, einschließlich `apache-airflow-providers-amazon`.
 
-## 2. Register the RustFS connection
+## 2. Die RustFS-Verbindung registrieren
 
-The S3 provider reads its endpoint from the connection's extra field. Replace all connection placeholders:
+Der S3-Provider liest seinen Endpunkt aus dem Extra-Feld der Verbindung. Ersetzen Sie alle Platzhalter der Verbindung:
 
 ```bash
 docker exec airflow airflow connections add rustfs \
@@ -43,11 +43,11 @@ docker exec airflow airflow connections add rustfs \
   --conn-extra '{"endpoint_url": "http://<your-rustfs-endpoint>:9000", "region_name": "us-east-1", "aws_access_key_id": "<your-access-key>", "aws_secret_access_key": "<your-secret-key>"}'
 ```
 
-The keys `aws_access_key_id` and `aws_secret_access_key` inside `--conn-extra` supply credentials; `endpoint_url` redirects the boto3 client from AWS to RustFS.
+Die Schlüssel `aws_access_key_id` und `aws_secret_access_key` in `--conn-extra` liefern die Zugangsdaten. `endpoint_url` lenkt den boto3-Client von AWS auf RustFS um.
 
-## 3. Write the DAG
+## 3. Den DAG schreiben
 
-The DAG writes an object with an operator, waits for the key with a sensor, and reads it back with the hook:
+Der DAG schreibt ein Objekt mit einem Operator, wartet mit einem Sensor auf den Objektschlüssel und liest es mit dem Hook zurück:
 
 ```python title="rustfs_demo.py"
 import datetime
@@ -95,18 +95,18 @@ def rustfs_demo():
 rustfs_demo()
 ```
 
-Note the import paths: `S3CreateObjectOperator` lives in the `operators` module while `S3KeySensor` lives in the `sensors` module — importing both from one place fails.
+Beachten Sie die Importpfade: `S3CreateObjectOperator` liegt im Modul `operators`, `S3KeySensor` im Modul `sensors`. Der Import beider Klassen aus derselben Stelle schlägt fehl.
 
-## 4. Unpause and trigger
+## 4. Fortsetzen und auslösen
 
-New DAGs start paused, and a trigger fired while paused stays queued forever. Unpause first, then trigger:
+Neue DAGs starten pausiert, und ein Auslöser, der im pausierten Zustand feuert, bleibt dauerhaft in der Warteschlange. Heben Sie die Pause zuerst auf und lösen Sie den DAG dann aus:
 
 ```bash
 docker exec airflow airflow dags unpause rustfs_demo
 docker exec airflow airflow dags trigger rustfs_demo
 ```
 
-Watch the run finish:
+Beobachten Sie, bis der Lauf abgeschlossen ist:
 
 ```bash
 docker exec airflow airflow dags list-runs rustfs_demo | head -3
@@ -117,11 +117,11 @@ dag_id       run_id                                    state
 rustfs_demo  manual__2026-09-29T13:15:57.332688+00:00  success
 ```
 
-All three tasks succeed: `write_object`, `wait_for_object`, and `read_object`.
+Alle drei Tasks sind erfolgreich: `write_object`, `wait_for_object` und `read_object`.
 
-## 5. Verify objects in RustFS
+## 5. Objekte in RustFS prüfen
 
-List the bucket prefix:
+Listen Sie das Bucket-Präfix auf:
 
 ```bash
 rc ls rustfs/airflow-demo/ -r
@@ -133,38 +133,38 @@ rc cat rustfs/airflow-demo/dags/airflow-put.txt
 written by airflow to rustfs
 ```
 
-![Airflow object stored in the RustFS Console](./images/rustfs-airflow-object.png)
+![In der RustFS-Console gespeichertes Airflow-Objekt](./images/rustfs-airflow-object.png)
 
-## 6. Stop or reset
+## 6. Stoppen oder zurücksetzen
 
-To tear down the demo while keeping the bucket objects:
+Um die Demo abzubauen und die Bucket-Objekte zu behalten:
 
 ```bash
 docker rm -f airflow
 ```
 
-To delete the stored data:
+Um die gespeicherten Daten zu löschen:
 
 ```bash
 rc rm rustfs/airflow-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
-### Dag runs stay `queued` after triggering
+### DAG-Läufe bleiben nach dem Auslösen im Status `queued`
 
-The DAG is paused. New DAGs are paused by default in Airflow 3, and runs triggered in that state never execute. Run `airflow dags unpause rustfs_demo`; queued runs then start on their own.
+Der DAG ist pausiert. Neue DAGs sind in Airflow 3 standardmäßig pausiert, und Läufe, die in diesem Zustand ausgelöst werden, werden nie ausgeführt. Führen Sie `airflow dags unpause rustfs_demo` aus. Läufe in der Warteschlange starten danach von selbst.
 
 ### `cannot import name 'S3KeySensor' from 'airflow.providers.amazon.aws.operators.s3'`
 
-The sensor lives in a separate module: `from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor`.
+Der Sensor liegt in einem eigenen Modul: `from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor`.
 
-### Tasks fail with connection errors
+### Tasks schlagen mit Verbindungsfehlern fehl
 
-The `endpoint_url` must be reachable from the Airflow container — use the Docker network hostname for RustFS, not `localhost`. Airflow 3 serves its health endpoint under `/api/v2/monitor/health` if you need to check component status.
+Die `endpoint_url` muss vom Airflow-Container aus erreichbar sein. Verwenden Sie den Docker-Netzwerk-Hostnamen von RustFS, nicht `localhost`. Airflow 3 stellt den Endpunkt für die Integritätsprüfung unter `/api/v2/monitor/health` bereit, wenn Sie den Komponentenstatus prüfen möchten.
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional provider hooks.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Amazon provider documentation](https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/index.html) for transfer operators such as `S3ToLocalFilesystemOperator` and `LocalFilesystemToS3Operator`.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere Provider-Hooks einsetzen.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [Dokumentation des Amazon-Providers](https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/index.html) für Transfer-Operatoren wie `S3ToLocalFilesystemOperator` und `LocalFilesystemToS3Operator`.

@@ -1,58 +1,58 @@
 ---
-title: "Bucket Policy"
-description: "Create, apply, inspect, and verify RustFS bucket policies with the S3 API."
+title: "バケットポリシー"
+description: "S3 API を使い、RustFS のバケットポリシーを作成、適用、確認、検証します。"
 ---
 
-RustFS bucket policies are S3-compatible resource policies attached directly to a bucket. Use them to grant or deny access to the bucket and its objects, including controlled anonymous access for public downloads.
+RustFS のバケットポリシーは、バケットに直接付与する S3 互換のリソースポリシーです。バケットとそのオブジェクトへのアクセスを許可または拒否するために使います。公開ダウンロード向けに、許可範囲を定めた匿名アクセスも含められます。
 
-## Overview
+## 概要
 
-A bucket policy contains one or more statements that match a principal, action, resource, and optional conditions. RustFS evaluates the policy for requests to the bucket before allowing the storage operation.
+バケットポリシーは、プリンシパル、アクション、リソース、任意の条件に一致する 1 つ以上のステートメントを含みます。RustFS は、ストレージ操作を許可する前に、そのバケットへのリクエストに対してポリシーを評価します。
 
-Bucket policies and IAM policies serve different purposes:
+バケットポリシーと IAM ポリシーは、目的が異なります。
 
-| Policy type | Attached to | Typical use |
+| ポリシーの種類 | 付与先 | 典型的な用途 |
 | --- | --- | --- |
-| Bucket policy | A bucket | Grant public access, add resource-level restrictions, or authorize access to one bucket. |
-| IAM policy | A user or group | Define what an authenticated identity can do across one or more resources. |
+| バケットポリシー | バケット | 公開アクセスの許可、リソース単位の制限の追加、または 1 つのバケットへのアクセス認可。 |
+| IAM ポリシー | ユーザーまたはグループ | 認証済みアイデンティティが、1 つ以上のリソースに対して実行できる操作の定義。 |
 
-An explicit `Deny` takes precedence over an `Allow`. Bucket owners remain able to get, replace, or delete the bucket policy so that a deny statement cannot permanently lock policy administration.
+明示的な `Deny` は `Allow` より優先されます。バケット所有者は、バケットポリシーの取得、置換、削除を引き続き実行できます。拒否ステートメントによって、ポリシー管理が恒久的にロックされることはありません。
 
-RustFS implements the standard S3 operations `PutBucketPolicy`, `GetBucketPolicy`, `GetBucketPolicyStatus`, and `DeleteBucketPolicy`.
+RustFS は、標準の S3 操作である `PutBucketPolicy`、`GetBucketPolicy`、`GetBucketPolicyStatus`、`DeleteBucketPolicy` を実装しています。
 
-:::warning[Public policies]
+:::warning[公開ポリシー]
 
-A statement with `"Principal": "*"` can grant access without authentication. Keep the action and resource scope as narrow as possible, and verify the result anonymously before using the policy in production.
+`"Principal": "*"` を含むステートメントは、認証なしのアクセスを許可できます。アクションとリソースの範囲はできる限り狭く保ち、本番で使う前に、認証しないリクエストで結果を確認します。
 
 :::
 
-## Configuration
+## 設定
 
-### Requirements
+### 要件
 
-- Create the target bucket before applying a policy.
-- Configure the AWS CLI with a RustFS credential and region `us-east-1`.
-- Use a credential allowed to perform the required policy-management action.
+- ポリシーを適用する前に、対象のバケットを作成します。
+- AWS CLI に、RustFS の認証情報とリージョン `us-east-1` を設定します。
+- 必要なポリシー管理アクションを許可された認証情報を使います。
 
-Set reusable variables:
+再利用する変数を設定します。
 
 ```bash
 export RUSTFS_ENDPOINT=http://localhost:9000
 export BUCKET_NAME=my-bucket
 ```
 
-Policy management requires these actions:
+ポリシー管理には、次のアクションが必要です。
 
-| Operation | Required action |
+| 操作 | 必要なアクション |
 | --- | --- |
-| Apply or replace a policy | `s3:PutBucketPolicy` |
-| Read a policy | `s3:GetBucketPolicy` |
-| Read public status | `s3:GetBucketPolicyStatus` |
-| Remove a policy | `s3:DeleteBucketPolicy` |
+| ポリシーの適用または置換 | `s3:PutBucketPolicy` |
+| ポリシーの読み取り | `s3:GetBucketPolicy` |
+| 公開状態の読み取り | `s3:GetBucketPolicyStatus` |
+| ポリシーの削除 | `s3:DeleteBucketPolicy` |
 
-### Policy document structure
+### ポリシードキュメントの構造
 
-A bucket policy uses version `2012-10-17` and a `Statement` array:
+バケットポリシーは、バージョン `2012-10-17` と `Statement` 配列を使います。
 
 ```json
 {
@@ -69,26 +69,26 @@ A bucket policy uses version `2012-10-17` and a `Statement` array:
 }
 ```
 
-The bucket ARN and object ARN are different:
+バケットの ARN とオブジェクトの ARN は異なります。
 
-| Resource | ARN format | Example actions |
+| リソース | ARN の形式 | アクションの例 |
 | --- | --- | --- |
-| Bucket | `arn:aws:s3:::my-bucket` | `s3:ListBucket`, `s3:GetBucketLocation` |
-| Objects | `arn:aws:s3:::my-bucket/*` | `s3:GetObject`, `s3:PutObject`, `s3:DeleteObject` |
+| バケット | `arn:aws:s3:::my-bucket` | `s3:ListBucket`、`s3:GetBucketLocation` |
+| オブジェクト | `arn:aws:s3:::my-bucket/*` | `s3:GetObject`、`s3:PutObject`、`s3:DeleteObject` |
 
-Use a prefix in the object ARN, such as `arn:aws:s3:::my-bucket/public/*`, to limit access to part of the bucket. For the complete statement format and supported condition operators, see [Users, Groups, and Policies](/security-compliance/iam/policies#policy-document-format).
+オブジェクト ARN に `arn:aws:s3:::my-bucket/public/*` のようなプレフィックスを使い、バケットの一部へアクセスを限定します。ステートメント形式の全体と、対応している条件演算子は、[ユーザー、グループ、ポリシー](/ja/security-compliance/iam/policies#policy-document-format) を参照します。
 
-### Public Access Block
+### パブリックアクセスブロック
 
-If the bucket's Public Access Block configuration has `BlockPublicPolicy` enabled, RustFS rejects a new policy containing an `Allow` statement with a wildcard principal. Keep this protection enabled unless anonymous access is intentional.
+バケットのパブリックアクセスブロック設定で `BlockPublicPolicy` が有効な場合、RustFS は、ワイルドカードのプリンシパルを持つ `Allow` ステートメントを含む新しいポリシーを拒否します。匿名アクセスが意図的である場合を除き、この保護は有効なままにします。
 
-Public Access Block does not replace careful policy review. An existing explicit `Deny` still overrides allows, and authenticated requests continue to be evaluated against IAM and bucket policies.
+パブリックアクセスブロックは、慎重なポリシー確認の代わりにはなりません。既存の明示的な `Deny` は引き続き許可より優先され、認証済みリクエストは引き続き IAM ポリシーとバケットポリシーに照らして評価されます。
 
-## Usage
+## 使い方
 
-### Create a public-read policy
+### 公開読み取りポリシーを作成する
 
-Create a policy that allows anonymous downloads only from the `public/` prefix:
+`public/` プレフィックスからの匿名ダウンロードだけを許可するポリシーを作成します。
 
 ```bash
 cat > /tmp/my-bucket-policy.json <<'EOF'
@@ -107,9 +107,9 @@ cat > /tmp/my-bucket-policy.json <<'EOF'
 EOF
 ```
 
-This policy does not allow anonymous bucket listing, uploads, overwrites, or deletes.
+このポリシーは、匿名でのバケット一覧、アップロード、上書き、削除を許可しません。
 
-### Apply the policy
+### ポリシーを適用する
 
 ```bash
 aws s3api put-bucket-policy \
@@ -118,9 +118,9 @@ aws s3api put-bucket-policy \
 	--endpoint-url "$RUSTFS_ENDPOINT"
 ```
 
-Applying another policy replaces the complete existing policy. Retrieve and review the current document before updating it; statements are not merged automatically.
+別のポリシーを適用すると、既存のポリシー全体が置き換わります。更新する前に、現在のドキュメントを取得して確認します。ステートメントは自動ではマージされません。
 
-### Read the policy
+### ポリシーを読み取る
 
 ```bash
 aws s3api get-bucket-policy \
@@ -130,9 +130,9 @@ aws s3api get-bucket-policy \
 	--output text
 ```
 
-RustFS preserves the submitted policy JSON. If no policy exists, the API returns `NoSuchBucketPolicy`.
+RustFS は、送信されたポリシー JSON をそのまま保持します。ポリシーが存在しない場合、API は `NoSuchBucketPolicy` を返します。
 
-### Check public status
+### 公開状態を確認する
 
 ```bash
 aws s3api get-bucket-policy-status \
@@ -140,7 +140,7 @@ aws s3api get-bucket-policy-status \
 	--endpoint-url "$RUSTFS_ENDPOINT"
 ```
 
-The response contains a high-level public-access status:
+応答には、概要レベルの公開アクセス状態が含まれます。
 
 ```json
 {
@@ -150,9 +150,9 @@ The response contains a high-level public-access status:
 }
 ```
 
-The current status check detects anonymous bucket listing (`s3:ListBucket`) and uploads (`s3:PutObject`). A policy that exposes only object downloads, such as the `public/` example above, can still report `false`. Always test the exact anonymous action, object prefix, and conditions instead of treating this status as a complete access analysis.
+現在の状態確認が検出するのは、匿名のバケット一覧（`s3:ListBucket`）とアップロード（`s3:PutObject`）です。上の `public/` の例のように、オブジェクトのダウンロードだけを公開するポリシーでも、`false` と報告されることがあります。この状態を網羅的なアクセス分析として扱わず、匿名で行う具体的なアクション、オブジェクトのプレフィックス、条件を必ずテストします。
 
-### Remove the policy
+### ポリシーを削除する
 
 ```bash
 aws s3api delete-bucket-policy \
@@ -160,11 +160,11 @@ aws s3api delete-bucket-policy \
 	--endpoint-url "$RUSTFS_ENDPOINT"
 ```
 
-Deleting a bucket policy removes only that resource policy. IAM policies attached to users and groups remain unchanged.
+バケットポリシーを削除しても、取り除かれるのはそのリソースポリシーだけです。ユーザーとグループにアタッチされた IAM ポリシーは変わりません。
 
-## Verification
+## 検証
 
-Upload a test object with an authenticated credential:
+認証済みの認証情報で、テスト用オブジェクトをアップロードします。
 
 ```bash
 printf 'hello from RustFS\n' > /tmp/hello.txt
@@ -176,14 +176,14 @@ aws s3api put-object \
 	--endpoint-url "$RUSTFS_ENDPOINT"
 ```
 
-Verify that the allowed object can be downloaded without credentials:
+許可されたオブジェクトを、認証情報なしでダウンロードできることを確認します。
 
 ```bash
 curl --fail-with-body \
 	"${RUSTFS_ENDPOINT}/${BUCKET_NAME}/public/hello.txt"
 ```
 
-Then verify that an object outside the allowed prefix is not public:
+次に、許可されたプレフィックスの外にあるオブジェクトが公開されていないことを確認します。
 
 ```bash
 aws s3api put-object \
@@ -196,10 +196,10 @@ curl --fail-with-body \
 	"${RUSTFS_ENDPOINT}/${BUCKET_NAME}/private/hello.txt"
 ```
 
-The second `curl` request should fail with `AccessDenied`. Also test each authenticated user role that relies on the policy, especially when the document contains conditions or explicit deny statements.
+2 回目の `curl` リクエストは、`AccessDenied` で失敗するはずです。ポリシーに依存する認証済みユーザーの役割も、それぞれテストします。ドキュメントに条件や明示的な拒否ステートメントが含まれる場合は、特に確認します。
 
-## Next steps
+## 次のステップ
 
-- [Manage IAM policies](/security-compliance/iam/policies)
-- [Manage credentials](/operations/credentials)
-- [Configure audit logs](/security-compliance/audit-logs)
+- [IAM ポリシーを管理する](/ja/security-compliance/iam/policies)
+- [認証情報を管理する](/ja/operations/credentials)
+- [監査ログを設定する](/ja/security-compliance/audit-logs)

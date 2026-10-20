@@ -1,46 +1,46 @@
 ---
 title: "Object Lock"
-description: "Protect versioned objects from deletion with retention periods and legal holds."
+description: "Schützen Sie versionierte Objekte mit Aufbewahrungszeiträumen und Legal Holds vor dem Löschen."
 ---
 
-RustFS Object Lock applies write-once, read-many protection to individual object versions. Use retention periods for time-bound protection and Legal Hold for protection without a predefined expiration date.
+Object Lock von RustFS schützt einzelne Objektversionen nach dem Prinzip Write once, read many. Verwenden Sie Aufbewahrungszeiträume für einen zeitlich begrenzten Schutz und Legal Hold für einen Schutz ohne vorgegebenes Ablaufdatum.
 
-## Overview
+## Überblick
 
-Object Lock requires bucket versioning. You can enable it when creating a bucket or use the S3 `PutObjectLockConfiguration` API on an existing bucket whose versioning is enabled. Each overwrite creates a new version; retention and Legal Hold protect a specific version rather than the object key as a whole.
+Object Lock erfordert die Bucket-Versionierung. Sie können es beim Erstellen eines Buckets aktivieren oder die S3-API `PutObjectLockConfiguration` für einen vorhandenen Bucket verwenden, dessen Versionierung aktiviert ist. Jede Überschreibung erzeugt eine neue Version. Aufbewahrung und Legal Hold schützen eine bestimmte Version und nicht den Objektschlüssel als Ganzes.
 
-| Protection | Behavior |
+| Schutz | Verhalten |
 | --- | --- |
-| `GOVERNANCE` retention | Blocks deletion and retention shortening unless the caller has bypass permission and explicitly requests a bypass. Retention can be extended without bypass. |
-| `COMPLIANCE` retention | Blocks deletion even with governance bypass. The date can be extended but not shortened. |
-| Legal Hold | Blocks deletion until the hold is set to `OFF`. It has no expiration date and governance bypass does not override it. |
+| `GOVERNANCE`-Aufbewahrung | Blockiert das Löschen und das Verkürzen der Aufbewahrung, es sei denn, der Aufrufer hat die Bypass-Berechtigung und fordert einen Bypass ausdrücklich an. Die Aufbewahrung kann ohne Bypass verlängert werden. |
+| `COMPLIANCE`-Aufbewahrung | Blockiert das Löschen auch mit Governance-Bypass. Das Datum kann verlängert, aber nicht verkürzt werden. |
+| Legal Hold | Blockiert das Löschen, bis der Hold auf `OFF` gesetzt wird. Er hat kein Ablaufdatum, und ein Governance-Bypass setzt ihn nicht außer Kraft. |
 
-Deleting a key without a version ID creates a delete marker. The protected version remains stored and can still be retrieved by version ID.
+Das Löschen eines Objektschlüssels ohne Versions-ID erzeugt einen Löschmarker. Die geschützte Version bleibt gespeichert und kann weiterhin über die Versions-ID abgerufen werden.
 
-:::danger[Plan retention before enabling it]
+:::danger[Planen Sie die Aufbewahrung, bevor Sie sie aktivieren]
 
-COMPLIANCE retention cannot be bypassed or shortened before its retain-until date. Test policies in a non-production bucket and verify time synchronization, permissions, lifecycle rules, replication, and backup procedures before protecting production data.
+Die COMPLIANCE-Aufbewahrung kann vor dem Retain-until-Datum weder umgangen noch verkürzt werden. Testen Sie Richtlinien in einem Bucket außerhalb der Produktion und prüfen Sie Zeitsynchronisation, Berechtigungen, Lebenszyklusregeln, Replikation und Sicherungsverfahren, bevor Sie Produktionsdaten schützen.
 
 :::
 
-## Configure in the Console
+## In der Console konfigurieren
 
-1. Sign in to the RustFS Console and open **Buckets**.
-2. Select **Create Bucket** and enter the bucket name.
-3. Enable **Object Lock**. The Console also enables **Version** because Object Lock requires versioning.
-4. To apply retention automatically to new object versions, enable **Retention**.
-5. Select **COMPLIANCE** or **GOVERNANCE**, enter the validity, and select **Day** or **Year**.
-6. Select **Create**.
+1. Melden Sie sich an der RustFS-Console an und öffnen Sie **Buckets**.
+2. Wählen Sie **Create Bucket** (Bucket erstellen) und geben Sie den Bucket-Namen ein.
+3. Aktivieren Sie **Object Lock**. Die Console aktiviert zusätzlich **Version** (Versionierung), weil Object Lock Versionierung erfordert.
+4. Aktivieren Sie **Retention** (Aufbewahrung), wenn die Aufbewahrung automatisch auf neue Objektversionen angewendet werden soll.
+5. Wählen Sie **COMPLIANCE** oder **GOVERNANCE**, geben Sie den Aufbewahrungszeitraum ein und wählen Sie **Day** (Tag) oder **Year** (Jahr).
+6. Wählen Sie **Create** (Erstellen).
 
-![Create Bucket dialog with versioning, Object Lock, and default retention enabled](./images/object-lock-create-bucket.png)
+![Dialog Bucket erstellen mit aktivierter Versionierung, Object Lock und Standardaufbewahrung](./images/object-lock-create-bucket.png)
 
-The Console initially displays `180` days when default retention is enabled. Replace it with the period required by your retention policy; it is a UI initial value, not a general recommendation.
+Die Console zeigt anfangs `180` Tage an, wenn die Standardaufbewahrung aktiviert ist. Ersetzen Sie den Wert durch den Zeitraum, den Ihre Aufbewahrungsrichtlinie verlangt. Es handelt sich um einen Anfangswert der Oberfläche und nicht um eine allgemeine Empfehlung.
 
-To inspect a protected object, open the bucket, select the object name, and use the **Versions** and **Info** tabs. The Info tab exposes **Legal Hold** and **RetentionPolicy** fields.
+Um ein geschütztes Objekt anzuzeigen, öffnen Sie den Bucket, wählen Sie den Objektnamen und verwenden Sie die Registerkarten **Versions** (Versionen) und **Info**. Die Registerkarte Info zeigt die Felder **Legal Hold** und **RetentionPolicy**.
 
-## Use rc
+## `rc` verwenden
 
-Configure an alias before running these examples:
+Konfigurieren Sie einen Alias, bevor Sie diese Beispiele ausführen:
 
 ```bash
 rc alias set rustfs http://localhost:9000 \
@@ -48,13 +48,13 @@ rc alias set rustfs http://localhost:9000 \
 	--region us-east-1 --bucket-lookup path
 ```
 
-:::note[rc 0.1.29 bucket creation boundary]
+:::note[Grenze beim Erstellen von Buckets in rc 0.1.29]
 
-`rc bucket create --with-lock` and `--with-versioning` appear in the `rc 0.1.29` help output but return `not implemented` when executed. Create the Object Lock bucket in the Console. The upload headers shown below are supported and were validated against RustFS.
+`rc bucket create --with-lock` und `--with-versioning` erscheinen in der Hilfe von `rc 0.1.29`, geben bei der Ausführung aber `not implemented` zurück. Erstellen Sie den Object-Lock-Bucket in der Console. Die unten gezeigten Upload-Header werden unterstützt und wurden gegen RustFS geprüft.
 
 :::
 
-Upload an object version with GOVERNANCE retention. Supply both retention headers together and use an RFC 3339 UTC timestamp in the future:
+Laden Sie eine Objektversion mit GOVERNANCE-Aufbewahrung hoch. Geben Sie beide Aufbewahrungsheader zusammen an und verwenden Sie einen RFC-3339-Zeitstempel in UTC in der Zukunft:
 
 ```bash
 rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt \
@@ -62,14 +62,14 @@ rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt \
 	-H "x-amz-object-lock-retain-until-date:2027-01-01T00:00:00Z"
 ```
 
-Upload an object version with Legal Hold enabled:
+Laden Sie eine Objektversion mit aktiviertem Legal Hold hoch:
 
 ```bash
 rc object copy /path/to/hello.txt rustfs/my-bucket/legal-hold.txt \
 	-H "x-amz-object-lock-legal-hold:ON"
 ```
 
-List the protected versions and inspect a specific version:
+Listen Sie die geschützten Versionen auf und rufen Sie die Metadaten einer bestimmten Version ab (Head):
 
 ```bash
 rc bucket version list rustfs/my-bucket --json
@@ -77,27 +77,27 @@ rc object stat rustfs/my-bucket/hello.txt \
 	--version-id <version-id> --json
 ```
 
-`rc 0.1.29` does not provide commands to change retention or switch an existing Legal Hold between `ON` and `OFF`. Use the Console or an S3 SDK for those operations.
+`rc 0.1.29` bietet keine Befehle, um die Aufbewahrung zu ändern oder einen vorhandenen Legal Hold zwischen `ON` und `OFF` umzuschalten. Verwenden Sie dafür die Console oder ein S3-SDK.
 
-## Verify protection
+## Schutz prüfen
 
-1. Upload a test object with GOVERNANCE retention or Legal Hold.
-2. Record its version ID with `rc bucket version list`.
-3. Attempt to delete that exact version through an S3 client without bypass. RustFS must return `AccessDenied` while protection is active.
-4. Confirm the version remains visible in the Console and through `rc object stat --version-id`.
+1. Laden Sie ein Testobjekt mit GOVERNANCE-Aufbewahrung oder Legal Hold hoch.
+2. Notieren Sie seine Versions-ID mit `rc bucket version list`.
+3. Versuchen Sie, genau diese Version über einen S3-Client ohne Bypass zu löschen. RustFS muss `AccessDenied` zurückgeben, solange der Schutz aktiv ist.
+4. Prüfen Sie, dass die Version in der Console und über `rc object stat --version-id` sichtbar bleibt.
 
-For GOVERNANCE retention, test bypass only with a dedicated administrative identity that has `s3:BypassGovernanceRetention`. COMPLIANCE retention and Legal Hold remain protected from governance bypass.
+Testen Sie den Bypass bei GOVERNANCE-Aufbewahrung nur mit einer eigenen administrativen Identität, die `s3:BypassGovernanceRetention` besitzt. COMPLIANCE-Aufbewahrung und Legal Hold bleiben vor einem Governance-Bypass geschützt.
 
-## Operational considerations
+## Betriebliche Hinweise
 
-- Default bucket retention is calculated when a new object version or multipart upload is initiated.
-- Copying an object creates a new destination version; destination retention policy applies independently.
-- Suspending versioning is not appropriate for an Object Lock bucket.
-- Lifecycle expiration cannot remove a version while retention or Legal Hold blocks deletion.
-- Replication targets for locked objects must support compatible Object Lock behavior.
+- Die Standardaufbewahrung des Buckets wird berechnet, wenn eine neue Objektversion oder ein mehrteiliger Upload begonnen wird.
+- Das Kopieren eines Objekts erzeugt eine neue Zielversion. Die Aufbewahrungsrichtlinie des Ziels gilt unabhängig.
+- Das Aussetzen der Versionierung ist für einen Object-Lock-Bucket nicht geeignet.
+- Der Lebenszyklusablauf kann eine Version nicht entfernen, solange Aufbewahrung oder Legal Hold das Löschen blockieren.
+- Replikationsziele für gesperrte Objekte müssen ein kompatibles Object-Lock-Verhalten unterstützen.
 
-## Next steps
+## Nächste Schritte
 
-- [Manage object versions](./versioning.md)
-- [Configure bucket replication](../bucket/replication.md)
-- [Review the security checklist](/installation/requirement/checklists/security-checklists)
+- [Objektversionen verwalten](./versioning.md)
+- [Bucket-Replikation konfigurieren](../bucket/replication.md)
+- [Sicherheitscheckliste prüfen](/de/installation/requirement/checklists/security-checklists)

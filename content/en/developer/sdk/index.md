@@ -1,43 +1,41 @@
 ---
-title: "RustFS SDK Overview"
+title: "SDKs"
 description: "Overview of supported S3 SDKs for RustFS."
 ---
 
-RustFS is a distributed object storage system fully compatible with the S3 protocol. Users can:
+RustFS is a distributed object storage system with an S3-compatible API. You can:
 
-- Manage RustFS through the Console management interface.
+- Manage RustFS in the Console.
 - Manage RustFS through S3 clients.
-- Implement object storage operations and management on the business side through SDKs.
+- Use an S3 SDK to manage buckets and objects from your application.
 
-Currently, the SDKs provided by RustFS include:
+The following guides explain how to use S3 SDKs with RustFS:
 
 - [Java SDK](./java.md)
 - [JavaScript SDK](./javascript.md)
 - [Python SDK](./python.md)
 - [Rust SDK](./rust.md)
 - [TypeScript SDK](./typescript.md)
-- [Golang SDK](./go.md)
+- [Go SDK](./go.md)
 
 ## Terminology
 
-Amazon S3 (Simple Storage Service) was the first widely adopted object storage service. Its API has become the de facto standard for object storage. In this documentation, "S3" refers to the protocol.
+Amazon Simple Storage Service (Amazon S3) was the first widely adopted object storage service. Its API has become the de facto standard for object storage. In this documentation, "S3" refers to the protocol.
 
 ## SDK Recommendations
 
-We recommend using the official AWS S3 SDKs. These SDKs are mature, well-maintained, and highly optimized.
+We recommend using the official AWS S3 SDKs. These SDKs are mature and well maintained.
 
-If you have a familiar and trusted SDK from a vendor, you can use it.
+You can also use a vendor SDK you know and trust, provided it supports the S3 operations you need.
 
 Some third-party SDKs may have non-standard implementations. We recommend avoiding SDKs that are not strictly S3-compliant.
 
 ## Compatibility with MinIO SDKs
 
-Yes, RustFS is fully compatible with MinIO SDKs.
+RustFS works with the MinIO SDKs.
 
-If you are using MinIO SDKs, you can modify the Endpoint, AK, and SK to be directly compatible with RustFS.
+To connect a MinIO SDK to RustFS, set the endpoint, access key, and secret key to your RustFS values.
 
 ## Handling Incompatible SDKs
 
-If you encounter an SDK that does not support standard S3, MinIO, or RustFS:
-
-We recommend switching to a standard AWS S3 SDK.
+If an SDK does not work with standard S3, MinIO, or RustFS, we recommend switching to an official AWS SDK for S3.

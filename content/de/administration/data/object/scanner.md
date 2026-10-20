@@ -1,32 +1,32 @@
 ---
-title: "Object Scanning"
-description: "Guide to the RustFS object scanner, including design, implementation, and monitoring."
+title: "Objekt-Scan"
+description: "Beschreibt den Objekt-Scanner von RustFS, einschließlich Entwurf, Implementierung und Überwachung."
 ---
 
-This guide covers the design and implementation of the RustFS object scanner, including its integration with Erasure Coding, Scrub & Repair mechanisms, scheduling strategies, monitoring metrics, and troubleshooting.
+Diese Anleitung beschreibt Entwurf und Implementierung des Objekt-Scanners von RustFS, einschließlich des Zusammenspiels mit Erasure Coding, der Prüfung und Reparatur, der Planung, der Metriken und der Fehlerbehebung.
 
-## Overview
+## Überblick
 
-The RustFS object scanner is built into the storage engine and is responsible for periodically checking object integrity and executing scheduled operations.
-Scanning tasks include disk usage statistics, lifecycle management rule evaluation, object replication execution, and triggering corrupted object self-healing.
+Der Objekt-Scanner von RustFS ist in die Speicher-Engine eingebaut. Er prüft regelmäßig die Integrität von Objekten und führt geplante Operationen aus.
+Der Scanner erfasst Statistiken zur Datenträgernutzung, wertet Lebenszyklusregeln aus, führt die Objektreplikation aus und löst die Datenwiederherstellung (Healing) für beschädigte Objekte aus.
 
-## Architecture and Design Principles
+## Architektur und Entwurfsprinzipien
 
-### Scanner Architecture
+### Scanner-Architektur
 
-The RustFS scanner uses a hash sampling mechanism, selecting one out of every 1024 objects for inspection based on object name hashing to minimize performance impact.
-The scanner is deeply integrated with the Erasure Coding module, utilizing redundant shards for online reconstruction when detecting lost or corrupted shards, ensuring high data availability and consistency.
+Der Scanner von RustFS verwendet eine Hash-Stichprobe. Anhand des Hashs des Objektnamens wählt er jedes 1024. Objekt für eine Prüfung aus, um die Auswirkung auf die Leistung gering zu halten.
+Der Scanner arbeitet mit dem Erasure Coding: Erkennt er ein fehlendes oder beschädigtes Shard, baut er das Shard online aus den verbleibenden redundanten Shards wieder auf.
 
-## Data Verification and Recovery
+## Datenprüfung und Wiederherstellung
 
-The RustFS data verification mechanism checks metadata consistency and performs bit-by-bit reading and verification to discover hidden bad blocks. The object scanner detects issues like bit rot and triggers repair processes when necessary.
+Die Datenprüfung von RustFS prüft die Konsistenz der Metadaten und liest Daten, um sie zu prüfen und latente defekte Sektoren zu erkennen. Der Objekt-Scanner erkennt Probleme wie Bit Rot und stößt bei Bedarf Reparaturvorgänge an.
 
-## Scanning Modes and Scheduling
+## Scan-Modi und Planung
 
-RustFS supports three scanning modes: online scanning during reads, background periodic scanning, and manual full scanning, balancing performance and reliability.
-Similar to the `osd_scrub_begin_hour` configuration in Ceph, administrators can set scanning start times and frequency. For example, light verification is set to once daily by default.
+RustFS unterstützt drei Scan-Modi, die Leistung und Zuverlässigkeit ausbalancieren: Prüfungen während des Lesens, regelmäßige Hintergrundscans und manuelle vollständige Scans.
+Ähnlich wie bei der Ceph-Einstellung `osd_scrub_begin_hour` können Sie Startzeitpunkt und Häufigkeit der Scans festlegen. Eine leichte Prüfung läuft beispielsweise standardmäßig einmal täglich.
 
-## Monitoring and Metrics
+## Überwachung und Metriken
 
-Scanner statistics include total task count, failure count, and time distribution, exposing metrics through the Prometheus data model such as `rustfs_scanner_jobs_total`, `rustfs_scanner_failures_total`, and `rustfs_scanner_duration_seconds`.
-Combined with monitoring systems, alerts can be set based on scanning failure rates and duration to promptly discover and locate potential issues at the storage or network levels.
+Der Scanner meldet die Gesamtzahl der Aufgaben, die Anzahl der Fehler und die Verteilung der Dauer als Prometheus-Metriken, etwa `rustfs_scanner_jobs_total`, `rustfs_scanner_failures_total` und `rustfs_scanner_duration_seconds`.
+Konfigurieren Sie Alarme für die Fehlerrate und die Dauer der Scans, damit Sie Speicher- oder Netzwerkprobleme früh erkennen und eingrenzen können.

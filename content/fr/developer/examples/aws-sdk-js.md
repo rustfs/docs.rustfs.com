@@ -1,19 +1,19 @@
 ---
-title: "AWS SDK for JavaScript"
-description: "Connect the AWS SDK for JavaScript v3 to RustFS and perform basic object operations from Node.js."
+title: "AWS SDK pour JavaScript"
+description: "Connectez l’AWS SDK pour JavaScript v3 à RustFS et effectuez des opérations objet de base depuis Node.js."
 ---
 
-The [AWS SDK for JavaScript v3](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/) connects to RustFS through a custom endpoint. This is the minimal connection recipe; see the [JavaScript SDK guide](../sdk/javascript.md) for a full program.
+L’[AWS SDK pour JavaScript v3](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/) se connecte à RustFS par un point de terminaison personnalisé. Voici la recette de connexion minimale ; le [guide du SDK JavaScript](../sdk/javascript.md) présente un programme complet.
 
-## Install
+## Installation
 
 ```bash
 npm install @aws-sdk/client-s3
 ```
 
-## Configure
+## Configuration
 
-Replace `http://localhost:9000` with your server address and use your own [access keys](../../security-compliance/iam/access-token.md). RustFS requires path-style addressing (`forcePathStyle: true`):
+Remplacez `http://localhost:9000` par l’adresse de votre serveur et utilisez vos propres [clés d’accès](../../security-compliance/iam/access-token.md). RustFS exige l’adressage de type chemin (path-style) (`forcePathStyle: true`) :
 
 ```javascript title="index.mjs" {8}
 import { S3Client, CreateBucketCommand, PutObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
@@ -27,7 +27,7 @@ const s3 = new S3Client({
 });
 ```
 
-## Verify
+## Vérification
 
 ```javascript
 await s3.send(new CreateBucketCommand({ Bucket: "my-bucket" }));
@@ -41,6 +41,6 @@ for (const obj of out.Contents ?? []) console.log(obj.Key, obj.Size);
 hello.txt 12
 ```
 
-## Next steps
+## Étapes suivantes
 
-See the full [JavaScript SDK guide](../sdk/javascript.md), or manage objects with [`rc`](/operations/rc).
+Consultez le [guide complet du SDK JavaScript](../sdk/javascript.md), ou gérez les objets avec [`rc`](/fr/operations/rc).

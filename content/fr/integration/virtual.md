@@ -1,61 +1,64 @@
 ---
-title: "Virtual Host Style"
-description: "RustFS S3 Virtual Host Style and Path Style configuration."
+title: "Requêtes en adressage de type hôte virtuel"
+description: "Configurez les URL S3 en adressage de type chemin (path-style) et en adressage de type hôte virtuel pour RustFS."
 ---
 
-RustFS complies with S3 protocols. S3 supports two request modes:
+RustFS prend en charge les deux modes d’adressage des URL S3 :
 
-1. Virtual Host Style
-2. Path Style
+1. Adressage de type hôte virtuel
+2. Adressage de type chemin (path-style)
 
-The difference lies in the bucket name placement.
+Les deux modes diffèrent selon l’emplacement du nom du compartiment (bucket) dans l’URL.
 
-## Path Style
+## Adressage de type chemin
 
-Path Style is the default. In Path Style, the bucket name follows the endpoint.
+L’adressage de type chemin est le mode par défaut. Dans une URL de ce type, le nom du compartiment suit le point de terminaison.
 
-Example (Bucket: `test`, Host: `rustfs.yourdomain.com`):
+Exemple (compartiment : `test`, hôte : `rustfs.yourdomain.com`) :
 
 ```text
-http://rustfs.yourdomain.com/test
+http://rustfs.example.com/my-bucket
 ```
 
-**Note**: No configuration is required for Path Style.
+**Remarque** : aucune configuration n’est requise pour l’adressage de type chemin.
 
-## Virtual Host Style
+## Adressage de type hôte virtuel
 
-In Virtual Host Style, the bucket name is part of the domain.
+En adressage de type hôte virtuel, le nom du compartiment fait partie du domaine.
 
-Example (Bucket: `test`, Host: `rustfs.yourdomain.com`):
+Exemple (compartiment : `test`, hôte : `rustfs.yourdomain.com`) :
 
 ```text
-http://test.rustfs.yourdomain.com/
+http://my-bucket.rustfs.example.com/
 ```
 
 ### Configuration
 
-1. **DNS**: Configure wildcard DNS resolution (e.g., `*.rustfs.yourdomain.com` -> Server IP).
-2. **Configuration**: Modify the configuration file (Linux: `/etc/default/rustfs`, Docker/K8s: env vars).
-3. **Set Domain**: Set `RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com"`.
-4. **Restart**: Restart the service (`systemctl restart rustfs`).
+1. **DNS** : créez un enregistrement DNS générique (par exemple, `*.rustfs.yourdomain.com` → l’adresse IP de votre serveur).
+2. **Configuration** : modifiez le fichier de configuration (Linux : `/etc/default/rustfs`, Docker/K8s : variables d’environnement).
+3. **Définir le domaine** : définissez `RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com"`.
+4. **Redémarrage** : redémarrez le service (`systemctl restart rustfs`).
 
-### Port in Domain (Optional)
+### Port dans le domaine (facultatif)
 
-Virtual-host routing applies to the S3 API listener (port 9000 by default); RustFS automatically matches `Host` headers that carry the S3 listener's own port. Only when clients reach RustFS through a **different** port (for example via a proxy) do you need to include that port in `RUSTFS_SERVER_DOMAINS`.
+Le routage en adressage de type hôte virtuel s’applique à l’écouteur de l’API S3 (port 9000 par défaut) ; RustFS fait automatiquement correspondre les en-têtes `Host` qui portent le port propre à cet écouteur. Vous ne devez inclure ce port dans `RUSTFS_SERVER_DOMAINS` que lorsque les clients joignent RustFS par un port **différent** (par exemple via un proxy).
 
-Example (`rustfs.yourdomain.com:8000`):
+Exemple (`rustfs.yourdomain.com:8000`) :
 
-```ini
-RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com:8000"
+```ini title="/etc/default/rustfs"
+RUSTFS_SERVER_DOMAINS=rustfs.example.com:8000
 ```
 
-This ensures that requests like:
+Cela garantit que des requêtes comme :
 
 ```text
-http://my-bucket.rustfs.yourdomain.com:8000/
+http://my-bucket.rustfs.example.com:8000/
 ```
 
-can be correctly resolved in Virtual Host Style mode.
+sont acheminées correctement en adressage de type hôte virtuel.
 
-> ⚠️ Note: The value of `RUSTFS_SERVER_DOMAINS` must exactly match the **Host header** (including the port, if present) used by the client request
+:::warning[Faites correspondre l’en-tête Host]
 
+La valeur de `RUSTFS_SERVER_DOMAINS` doit correspondre exactement à l’en-tête `Host` (y compris le port, s’il est présent) envoyé par les clients.
+
+:::

@@ -17,7 +17,7 @@ flowchart LR
 	Init["init-bucket job"] -->|"create my-bucket"| RustFS
 ```
 
-Der hive-Connector mit `hive.metastore=file` hält Schema- und Tabellenmetadaten als JSON-Objekte unter dem Katalogverzeichnis, und das native S3-Dateisystem (`fs.s3.enabled`) speichert Metadaten und Datendateien in RustFS mit Path-Style-Adressierung über Plain HTTP.
+Der hive-Connector mit `hive.metastore=file` hält Schema- und Tabellenmetadaten als JSON-Objekte unter dem Katalogverzeichnis, und das native S3-Dateisystem (`fs.s3.enabled`) speichert Metadaten und Datendateien in RustFS mit pfadbasierter Adressierung (Path-Style) über unverschlüsseltes HTTP (Plain HTTP).
 
 ## 1. Projektdateien anlegen
 
@@ -28,14 +28,14 @@ mkdir rustfs-trino
 cd rustfs-trino
 ```
 
-Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Anmeldeinformationen:
+Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Zugangsdaten:
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Verwenden Sie dedizierte Anmeldeinformationen für den Bucket. Committen Sie `.env` nicht in die Versionsverwaltung.
+Verwenden Sie dedizierte Zugangsdaten für den Bucket. Nehmen Sie `.env` nicht in die Versionsverwaltung auf.
 
 Erstellen Sie die Katalog-Konfiguration für Trino:
 
@@ -197,13 +197,13 @@ docker compose run --rm --entrypoint /bin/sh create-bucket -c \
 [2026-09-21 01:55:25]      432 B trino-metastore/demo/events/20260921_..._cb761cec-...parquet
 ```
 
-Sie können das Präfix auch in der RustFS-Konsole anzeigen:
+Sie können das Präfix auch in der RustFS Console anzeigen:
 
-![Die Trino-Metadaten- und Datenobjekte in der RustFS-Konsole](./images/rustfs-trino-objects.png)
+![Die Trino-Metadaten- und Datenobjekte in der RustFS Console](./images/rustfs-trino-objects.png)
 
 ## 6. RustFS S3 Tables verwenden
 
-RustFS S3 Tables bietet einen integrierten Apache-Iceberg-REST-Katalog, sodass Trino einen Table-Bucket als verwaltetes Iceberg-Warehouse nutzen kann, während die Daten in RustFS bleiben. Aktivieren Sie einen Table-Bucket und verbinden Sie den Iceberg-Connector von Trino mit dem REST-Katalog, wie in [S3 Tables](/administration/data/s3-tables) beschrieben: Die REST-Katalog-URI ist `http://<rustfs-host>:9000/iceberg`, das Warehouse ist der Bucket-Name, und sowohl Kataloganfragen (AWS Signature Version 4, Signing-Name `s3`) als auch der S3-Dateizugriff verwenden Path-Style-Adressierung.
+RustFS S3 Tables bietet einen integrierten Apache-Iceberg-REST-Katalog, sodass Trino einen Tabellen-Bucket als verwaltetes Iceberg-Warehouse nutzen kann, während die Daten in RustFS bleiben. Aktivieren Sie einen Tabellen-Bucket und verbinden Sie den Iceberg-Connector von Trino mit dem REST-Katalog, wie in [S3 Tables](/de/administration/data/s3-tables) beschrieben: Die REST-Katalog-URI ist `http://<rustfs-host>:9000/iceberg`, das Warehouse ist der Bucket-Name, und sowohl Kataloganfragen (AWS Signature Version 4, Signing-Name `s3`) als auch der S3-Dateizugriff verwenden pfadbasierte Adressierung (Path-Style).
 
 Laut der S3-Tables-Support-Matrix wurde Trino nur als Read-only-Probe gegen den Katalog geprüft; validieren Sie die Schreibkompatibilität und die exakte Trino-Version Ihrer Bereitstellung, bevor Sie diesen Pfad in Produktion übernehmen.
 
@@ -231,13 +231,13 @@ Der Property-Name des nativen S3-Dateisystems hat sich zwischen Trino-Versionen 
 
 Mit dem File-Metastore müssen Tabellen-Locations unter `hive.metastore.catalog.dir` bleiben. Erstellen Sie das Schema ohne explizite Location, oder zeigen Sie die Schema-Location auf ein Verzeichnis innerhalb desselben Bucket-Präfixes.
 
-### Hive CSV storage format only supports VARCHAR
+### Das CSV-Speicherformat von Hive unterstützt nur VARCHAR
 
 Das CSV-Format lehnt Nicht-String-Spalten ab. Verwenden Sie für typisierte Tabellen `format = 'parquet'` wie in dieser Anleitung.
 
 ### AccessDenied- oder 403-Antworten
 
-Stellen Sie sicher, dass die Anmeldeinformationen in `hive.properties` mit den RustFS-Anmeldeinformationen übereinstimmen und dass der Dienst `create-bucket` erfolgreich abgeschlossen wurde:
+Stellen Sie sicher, dass die Zugangsdaten in `hive.properties` mit den RustFS-Zugangsdaten übereinstimmen und dass der Dienst `create-bucket` erfolgreich abgeschlossen wurde:
 
 ```bash
 docker compose logs create-bucket
@@ -245,6 +245,6 @@ docker compose logs create-bucket
 
 ## Nächste Schritte
 
-- Lesen Sie die [S3-Kompatibilitätshinweise](/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
-- Erstellen Sie dedizierte Produktions-Anmeldeinformationen mit dem [Access Key Management](/security-compliance/iam/access-token).
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
 - Folgen Sie der [Trino-Dokumentation](https://trino.io/docs/current/), um BI-Tools anzubinden und weitere Objektspeicher-Kataloge hinzuzufügen.

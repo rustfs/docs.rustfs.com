@@ -1,46 +1,46 @@
 ---
-title: "Bucket Replication"
-description: "Configure, validate, and monitor asynchronous replication between versioned RustFS buckets."
+title: "バケットレプリケーション"
+description: "バージョニングを有効にした RustFS バケット間で、非同期レプリケーションを設定、検証、監視します。"
 ---
 
-RustFS bucket replication copies selected object versions from a source bucket to a target bucket. Use it to maintain a remote copy of bucket data, distribute objects between deployments, or prepare a secondary copy for recovery workflows.
+RustFS のバケットレプリケーションは、選択したオブジェクトバージョンを、ソースバケットからターゲットバケットへコピーします。バケットデータのリモートコピーの維持、デプロイ間でのオブジェクトの配布、復旧手順で使う二次コピーの準備に使います。
 
-## Overview
+## 概要
 
-Bucket replication has two configuration layers:
+バケットレプリケーションには、2 層の設定があります。
 
-1. A **remote target** stores the target endpoint, bucket, credentials, and generated target ARN.
-2. An S3 **replication configuration** attaches rules to the source bucket and references that target ARN.
+1. **リモートターゲット**は、ターゲットのエンドポイント、バケット、認証情報、生成されたターゲット ARN を保持します。
+2. S3 の **レプリケーション設定**は、ルールをソースバケットに付与し、そのターゲット ARN を参照します。
 
-Both the source and target buckets must have versioning enabled. RustFS verifies the target connection and target-bucket versioning when you register the remote target. It rejects a replication configuration whose enabled rules reference an unknown or stale target ARN.
+ソースバケットとターゲットバケットの両方で、バージョニングを有効にする必要があります。リモートターゲットを登録するとき、RustFS はターゲットへの接続と、ターゲットバケットのバージョニングを確認します。RustFS は、有効なルールが未知の、または古くなったターゲット ARN を参照するレプリケーション設定を拒否します。
 
-Replication is asynchronous by default. A successful source upload means RustFS accepted the source object; it does not mean the target copy is already complete.
+レプリケーションは、既定で非同期です。ソースへのアップロードが成功したことは、RustFS がソースオブジェクトを受け付けたことを意味します。ターゲット側のコピーがすでに完了していることにはなりません。
 
-Rules can select objects by prefix or object tags and control these behaviors:
+ルールでは、プレフィックスまたはオブジェクトタグでオブジェクトを選べます。制御できる動作は次のとおりです。
 
-| Rule setting | Behavior |
+| ルールの設定 | 動作 |
 | --- | --- |
-| `Status` | Enables or disables the rule. |
-| `Filter` | Restricts replication by key prefix, object tags, or both. |
-| `ExistingObjectReplication` | Includes objects that existed before the rule when set to `Enabled`. |
-| `DeleteMarkerReplication` | Replicates delete markers when set to `Enabled`. |
-| `DeleteReplication` | Replicates deletion of a specific object version when set to `Enabled`. |
-| `Destination` | Identifies the registered remote target by ARN. |
+| `Status` | ルールを有効または無効にします。 |
+| `Filter` | キーのプレフィックス、オブジェクトタグ、またはその両方によって、レプリケーション対象を制限します。 |
+| `ExistingObjectReplication` | `Enabled` のとき、ルールの作成より前からあったオブジェクトを含めます。 |
+| `DeleteMarkerReplication` | `Enabled` のとき、削除マーカーをレプリケートします。 |
+| `DeleteReplication` | `Enabled` のとき、特定のオブジェクトバージョンの削除をレプリケートします。 |
+| `Destination` | 登録済みのリモートターゲットを、ARN で指定します。 |
 
-Bucket replication is directional. Configure a separate target and rule in the opposite direction if both buckets must accept writes and replicate them to each other. Do not confuse bucket replication with [site replication](/operations/high-availability/site-replication), which synchronizes broader site configuration and identity data.
+バケットレプリケーションには方向があります。両方のバケットが書き込みを受け付け、互いの変更をレプリケートする必要がある場合は、逆方向にも別のターゲットとルールを設定します。より広いサイト設定とアイデンティティデータを同期する [サイトレプリケーション](/ja/operations/high-availability/site-replication) と、バケットレプリケーションを混同してはなりません。
 
-## Configuration
+## 設定
 
-### Requirements
+### 要件
 
-- A source RustFS deployment and a reachable target S3-compatible deployment.
-- A source bucket and target bucket with versioning enabled.
-- A dedicated target credential that can inspect the target bucket's versioning and write replicated object versions and delete markers.
-- A source administrator allowed to manage remote targets and replication configuration.
-- Network access from every source node that can run replication work to the target endpoint.
-- The RustFS [`rc`](/operations/rc) client installed on an administration host.
+- ソースの RustFS デプロイと、到達できるターゲットの S3 互換デプロイ。
+- バージョニングを有効にした、ソースバケットとターゲットバケット。
+- ターゲットバケットのバージョニングを検査でき、レプリケートされたオブジェクトバージョンと削除マーカーを書き込める、専用のターゲット認証情報。
+- リモートターゲットとレプリケーション設定を管理できる、ソース側の管理者。
+- レプリケーション処理を実行できるすべてのソースノードから、ターゲットエンドポイントへのネットワーク到達性。
+- 管理用ホストにインストールした、RustFS の [`rc`](/ja/operations/rc) クライアント。
 
-Configure one `rc` alias for each deployment. Use dedicated credentials and replace the example endpoints before running the commands:
+デプロイごとに、`rc` のエイリアスを 1 つ設定します。専用の認証情報を使い、コマンドを実行する前に、例のエンドポイントを置き換えます。
 
 ```bash
 rc alias set source https://source.example.com:9000 \
@@ -54,43 +54,43 @@ rc alias set target https://target.example.com:9000 \
 rc alias list
 ```
 
-The source deployment uses the target alias credentials when it registers the remote target. `rc alias list` displays endpoints but does not print secret keys.
+ソースデプロイは、リモートターゲットを登録するとき、ターゲットエイリアスの認証情報を使います。`rc alias list` はエンドポイントを表示しますが、シークレットキーは表示しません。
 
-:::warning[Protect target credentials]
+:::warning[ターゲットの認証情報を保護する]
 
-RustFS stores the target credential as part of the source bucket's remote-target configuration. Use a dedicated credential with access limited to the target bucket and do not reuse a root credential.
+RustFS は、ターゲットの認証情報を、ソースバケットのリモートターゲット設定の一部として保存します。ターゲットバケットへのアクセスに限定した専用の認証情報を使い、ルート認証情報は再利用してはなりません。
 
 :::
 
-### Permissions
+### 権限
 
-Source-side administration uses these policy actions:
+ソース側の管理では、次のポリシーアクションを使います。
 
-| Operation | Required action |
+| 操作 | 必要なアクション |
 | --- | --- |
-| Register, update, or remove a remote target | `admin:SetBucketTarget` |
-| List remote targets | `admin:GetBucketTarget` |
-| Read replication metrics | `admin:GetReplicationMetrics` |
-| Apply or delete replication configuration | `s3:PutReplicationConfiguration` |
-| Read replication configuration | `s3:GetReplicationConfiguration` |
+| リモートターゲットの登録、更新、削除 | `admin:SetBucketTarget` |
+| リモートターゲットの一覧 | `admin:GetBucketTarget` |
+| レプリケーションメトリクスの読み取り | `admin:GetReplicationMetrics` |
+| レプリケーション設定の適用または削除 | `s3:PutReplicationConfiguration` |
+| レプリケーション設定の読み取り | `s3:GetReplicationConfiguration` |
 
-The target credential must pass RustFS target validation, which checks bucket access, versioning, replicated-object writes, replicated delete markers, and object-version deletion. When Object Lock is enabled on the source bucket, the target must have compatible Object Lock support.
+ターゲットの認証情報は、RustFS のターゲット検証に合格する必要があります。検証では、バケットへのアクセス、バージョニング、レプリケートされたオブジェクトの書き込み、レプリケートされた削除マーカー、オブジェクトバージョンの削除を確認します。ソースバケットでオブジェクトロックが有効な場合、ターゲットは互換性のあるオブジェクトロックに対応している必要があります。
 
-### Create and version the buckets
+### バケットの作成とバージョニング
 
-Create the source bucket:
+ソースバケットを作成します。
 
 ```bash
 rc bucket create source/my-bucket
 ```
 
-Create the target bucket:
+ターゲットバケットを作成します。
 
 ```bash
 rc bucket create target/my-bucket-replica
 ```
 
-Enable versioning on both buckets:
+両方のバケットでバージョニングを有効にします。
 
 ```bash
 rc bucket version enable source/my-bucket
@@ -100,53 +100,53 @@ rc bucket version info source/my-bucket
 rc bucket version info target/my-bucket-replica
 ```
 
-Do not suspend source-bucket versioning while replication is configured.
+レプリケーションを設定しているあいだは、ソースバケットのバージョニングを停止してはなりません。
 
-## Usage
+## 使い方
 
-### Configure replication in the Console
+### Console でレプリケーションを設定する
 
-The RustFS Console combines remote-target registration and replication-rule configuration in one form.
+RustFS Console では、リモートターゲットの登録とレプリケーションルールの設定を、1 つのフォームで行います。
 
-1. Sign in to the source deployment's Console.
-2. Open **Buckets**, locate the source bucket, and select **Settings**.
-3. Under **Data Protection**, enable **Versioning** if it is disabled.
-4. Under **Automation**, select **Open Bucket Replication**.
-5. Select **Add Replication Rule**.
-6. Configure the destination and rule:
+1. ソースデプロイの Console にサインインします。
+2. **Buckets**（バケット）を開き、ソースバケットを見つけて **Settings**（設定）を選びます。
+3. **Data Protection**（データ保護）で、無効なら **Versioning**（バージョニング）を有効にします。
+4. **Automation**（自動化）で **Open Bucket Replication**（バケットレプリケーションを開く）を選びます。
+5. **Add Replication Rule**（レプリケーションルールを追加）を選びます。
+6. 宛先とルールを設定します。
 
-| Console field | Value |
+| Console のフィールド | 値 |
 | --- | --- |
-| **Priority** | Rule evaluation priority. The initial value is `1`. |
-| **Mode** | Select **Asynchronous** or **Synchronous**. Asynchronous is selected by default. |
-| **Endpoint** | Target S3 API address as `host:port`, without a URL scheme. |
-| **Bucket** | Versioned destination bucket name. |
-| **Access Key** and **Secret Key** | Dedicated credentials authorized to replicate into the destination bucket. |
-| **Region** | Target region. The initial value is `us-east-1`. |
-| **Storage Class** | Storage class applied at the destination. The initial value is `STANDARD`. |
-| **Prefix** | Optional key prefix used to limit matching objects. |
-| **Tags** | Optional object-tag name and value filters. Select **Add Tag** for additional filters. |
-| **Use TLS** | Enables HTTPS for the destination connection. |
-| **Replicate Existing Objects** | Includes objects created before the rule. Enabled by default. |
-| **Replicate Delete Markers** | Copies delete markers to the destination. Enabled by default. |
-| **Replicate Delete** | Copies deletion of a specific object version. Enabled by default. |
-| **Health Check Interval** | Target health-check interval in seconds. The initial value is `60`. |
-| **Bandwidth Limit** | Per-target transfer limit, selectable in KiB/s, MiB/s, or GiB/s. |
+| **Priority**（優先度） | ルール評価の優先度です。初期値は `1` です。 |
+| **Mode**（モード） | **Asynchronous**（非同期）または **Synchronous**（同期）を選びます。既定では非同期が選ばれています。 |
+| **Endpoint**（エンドポイント） | ターゲットの S3 API アドレスを、URL スキームなしの `host:port` で指定します。 |
+| **Bucket**（バケット） | バージョニング済みの宛先バケット名です。 |
+| **Access Key**（アクセスキー）と **Secret Key**（シークレットキー） | 宛先バケットへのレプリケーションを認可された、専用の認証情報です。 |
+| **Region**（リージョン） | ターゲットのリージョンです。初期値は `us-east-1` です。 |
+| **Storage Class**（ストレージクラス） | 宛先で適用するストレージクラスです。初期値は `STANDARD` です。 |
+| **Prefix**（プレフィックス） | 一致するオブジェクトを限定する、任意のキープレフィックスです。 |
+| **Tags**（タグ） | 任意のオブジェクトタグについて、名前と値のフィルターです。フィルターを追加するには **Add Tag**（タグを追加）を選びます。 |
+| **Use TLS**（TLS を使う） | 宛先への接続で HTTPS を有効にします。 |
+| **Replicate Existing Objects**（既存オブジェクトをレプリケート） | ルールより前に作成されたオブジェクトを含めます。既定で有効です。 |
+| **Replicate Delete Markers**（削除マーカーをレプリケート） | 削除マーカーを宛先へコピーします。既定で有効です。 |
+| **Replicate Delete**（削除をレプリケート） | 特定のオブジェクトバージョンの削除をコピーします。既定で有効です。 |
+| **Health Check Interval**（ヘルスチェック間隔） | ターゲットのヘルスチェック間隔（秒）です。初期値は `60` です。 |
+| **Bandwidth Limit**（帯域幅の上限） | ターゲットごとの転送上限です。単位は KiB/s、MiB/s、GiB/s から選べます。 |
 
-7. Select **Save**. RustFS validates the source bucket, target connection, target credentials, and target-bucket versioning before accepting the rule.
-8. Return to **Bucket Replication** to review the rule or select **Refresh** to update its displayed state.
+7. **Save**（保存）を選びます。RustFS は、ルールを受け付ける前に、ソースバケット、ターゲットへの接続、ターゲットの認証情報、ターゲットバケットのバージョニングを検証します。
+8. **Bucket Replication**（バケットレプリケーション）に戻り、ルールを確認します。表示されている状態を更新するには、**Refresh**（再読み込み）を選びます。
 
-:::warning[Enable versioning on both deployments]
+:::warning[両方のデプロイでバージョニングを有効にする]
 
-The source and destination buckets must both have versioning enabled before you save the rule. Sign in to the target deployment's Console and enable versioning under **Buckets** → **Settings** → **Data Protection** when needed.
+ルールを保存する前に、ソースと宛先の両方のバケットでバージョニングを有効にする必要があります。必要な場合は、ターゲットデプロイの Console にサインインし、**Buckets** → **Settings** → **Data Protection** でバージョニングを有効にします。
 
 :::
 
-For repeatable automation or configuration management, use the `rc` workflow below.
+繰り返し実行する自動化や、構成管理には、以下の `rc` の手順を使います。
 
-### Add a replication rule with rc
+### rc でレプリケーションルールを追加する
 
-Create an asynchronous rule that copies new and existing objects and propagates delete markers and explicit version deletions:
+新規オブジェクトと既存オブジェクトをコピーし、削除マーカーと明示的なバージョン削除を伝播する、非同期ルールを作成します。
 
 ```bash
 rc bucket replication add source/my-bucket \
@@ -156,9 +156,9 @@ rc bucket replication add source/my-bucket \
 	--replicate delete,delete-marker,existing-objects
 ```
 
-`rc` registers the target, obtains its generated ARN, and applies the replication rule in one operation. Omit `--replicate` flags for behaviors you do not want. Add `--sync` only when writes must wait for synchronous replication.
+`rc` は、ターゲットの登録、生成された ARN の取得、レプリケーションルールの適用を、1 回の操作で行います。不要な動作については、`--replicate` のフラグを省きます。書き込みが同期レプリケーションの完了を待つ必要がある場合にだけ、`--sync` を付けます。
 
-To limit replication to a prefix, add `--prefix`:
+レプリケーションをプレフィックスに限定するには、`--prefix` を追加します。
 
 ```bash
 rc bucket replication add source/my-bucket \
@@ -169,18 +169,18 @@ rc bucket replication add source/my-bucket \
 	--replicate delete-marker,existing-objects
 ```
 
-Objects that do not match an enabled rule remain only in the source bucket. Use `--bandwidth` to set a byte-per-second limit, `--healthcheck-seconds` to change the target health-check interval, and `--storage-class` to override the destination storage class.
+有効なルールに一致しないオブジェクトは、ソースバケットにだけ残ります。1 秒あたりのバイト数の上限は `--bandwidth`、ターゲットのヘルスチェック間隔の変更は `--healthcheck-seconds`、宛先ストレージクラスの上書きは `--storage-class` で指定します。
 
-### List and update rules
+### ルールの一覧と更新
 
-List the active rules:
+有効なルールを一覧します。
 
 ```bash
 rc bucket replication list source/my-bucket
 rc bucket replication list source/my-bucket --json
 ```
 
-Update a rule by its ID. Only supplied settings are changed:
+ルールは ID を指定して更新します。変更されるのは、指定した設定だけです。
 
 ```bash
 rc bucket replication update source/my-bucket \
@@ -190,25 +190,25 @@ rc bucket replication update source/my-bucket \
 	--healthcheck-seconds 60
 ```
 
-Use `--status Enabled|Disabled` to enable or disable a rule and `--sync true|false` to change its replication mode.
+ルールの有効化と無効化は `--status Enabled|Disabled`、レプリケーションモードの変更は `--sync true|false` で指定します。
 
-### Export and import configuration
+### 設定のエクスポートとインポート
 
-Export the complete replication configuration for review or backup:
+確認またはバックアップのため、レプリケーション設定の全体をエクスポートします。
 
 ```bash
 rc bucket replication export source/my-bucket --json > replication.json
 ```
 
-The export includes remote-target metadata and the target Access Key, although the Secret Key is omitted. Protect the file as sensitive configuration.
+エクスポートには、リモートターゲットのメタデータと、ターゲットのアクセスキーが含まれます。シークレットキーは含まれません。このファイルは、機密の設定として保護します。
 
-Import a previously exported configuration:
+以前にエクスポートした設定をインポートします。
 
 ```bash
 rc bucket replication import source/my-bucket replication.json
 ```
 
-### Delete replication configuration
+### レプリケーション設定を削除する
 
 ```bash
 rc bucket replication remove source/my-bucket --id replicate-all
@@ -217,49 +217,49 @@ rc bucket replication remove source/my-bucket --id replicate-all
 rc bucket replication remove source/my-bucket --all
 ```
 
-RustFS also removes replication remote targets referenced by the deleted configuration. It does not delete objects or versions already copied to the target bucket. Remove or retain those objects according to the target bucket's lifecycle and retention requirements.
+RustFS は、削除した設定が参照していたレプリケーションのリモートターゲットも削除します。ターゲットバケットへすでにコピーされたオブジェクトやバージョンは、削除しません。それらのオブジェクトは、ターゲットバケットのライフサイクルと保持の要件に従って、削除するか保持します。
 
-:::note[rc 0.1.29 removal response]
+:::note[rc 0.1.29 の削除応答]
 
-After RustFS removes the replication configuration and its targets, `rc 0.1.29` can report `Remote target not found` while attempting a second target cleanup. Run `rc bucket replication list source/my-bucket --json`; an empty `rules` array confirms that the configuration was removed.
+RustFS がレプリケーション設定とそのターゲットを削除したあと、`rc 0.1.29` は 2 回目のターゲット削除を試みるときに、`Remote target not found` と報告することがあります。`rc bucket replication list source/my-bucket --json` を実行します。`rules` 配列が空であれば、設定が削除されたことを確認できます。
 
 :::
 
-## Verification
+## 検証
 
-### Check target readiness
+### ターゲットの準備状況を確認する
 
-`rc bucket replication add` checks source access, target connectivity, target credentials, and bucket versioning before it creates the rule. Confirm the resulting destination and rule settings:
+`rc bucket replication add` は、ルールを作成する前に、ソースへのアクセス、ターゲットへの接続、ターゲットの認証情報、バケットのバージョニングを確認します。作成された宛先とルールの設定を確認します。
 
 ```bash
 rc bucket replication list source/my-bucket --json
 ```
 
-### Replicate an object
+### オブジェクトをレプリケートする
 
-Upload a test object to the source:
+ソースへテスト用オブジェクトをアップロードします。
 
 ```bash
 printf 'hello from RustFS replication\n' > /tmp/hello.txt
 rc object copy /tmp/hello.txt source/my-bucket/hello.txt
 ```
 
-Inspect the source object:
+ソースオブジェクトを確認します。
 
 ```bash
 rc object stat source/my-bucket/hello.txt --json
 ```
 
-Because replication is asynchronous by default, the target object might not appear immediately. Repeat this command until it succeeds:
+レプリケーションは既定で非同期であるため、ターゲットオブジェクトは直ちには表示されないことがあります。成功するまで、次のコマンドを繰り返します。
 
 ```bash
 rc object stat target/my-bucket-replica/hello.txt --json
 rc object show target/my-bucket-replica/hello.txt
 ```
 
-Compare the source and target `etag` and `size_bytes` values, then confirm that `object show` returns the expected content.
+ソースとターゲットの `etag` および `size_bytes` を比較し、`object show` が想定した内容を返すことを確認します。
 
-To verify delete-marker replication, delete the source object and list versions on both buckets:
+削除マーカーのレプリケーションを確認するには、ソースオブジェクトを削除し、両方のバケットでバージョンを一覧します。
 
 ```bash
 rc object remove source/my-bucket/hello.txt --force
@@ -268,31 +268,31 @@ rc bucket version list source/my-bucket/hello.txt --json
 rc bucket version list target/my-bucket-replica/hello.txt --json
 ```
 
-When delete-marker replication succeeds, the latest entry on both buckets has `is_delete_marker: true`.
+削除マーカーのレプリケーションが成功すると、両方のバケットの最新エントリは `is_delete_marker: true` になります。
 
-### Inspect replication metrics
+### レプリケーションメトリクスを確認する
 
 ```bash
 rc bucket replication status source/my-bucket
 rc bucket replication status source/my-bucket --json
 ```
 
-The command returns the source node's current in-memory replication statistics. Metrics can remain zero even after an object reaches the destination, so use them together with target-object and version checks rather than as the only verification signal.
+このコマンドは、ソースノードが現在メモリ上に持つレプリケーション統計を返します。オブジェクトが宛先に到達したあとでも、メトリクスはゼロのままであることがあります。メトリクスだけを検証の根拠にせず、ターゲットオブジェクトとバージョンの確認とあわせて使います。
 
-### Troubleshoot failures
+### 障害を調査する
 
-| Symptom | Check |
+| 症状 | 確認項目 |
 | --- | --- |
-| `bucket versioning must be enabled` | Enable versioning on the source bucket. |
-| Target registration reports `not versioned` | Enable versioning on the target bucket. |
-| `replication target configuration not found` | Recheck the target alias, credentials, and destination bucket, then rerun `replication add`. |
-| Rule reports a stale target | Refresh the rule list and retry `replication add`; if it persists, remove the failed configuration and recreate the target. |
-| Target object does not appear | Check target reachability, credentials, target quota, and `rc bucket replication status`. |
-| Replication fails | Inspect source-node logs for the target ARN and object key. |
-| Target removal is disallowed | Delete or replace the replication configuration before removing a referenced target. |
+| `bucket versioning must be enabled` | ソースバケットのバージョニングを有効にします。 |
+| ターゲットの登録が `not versioned` と報告する | ターゲットバケットのバージョニングを有効にします。 |
+| `replication target configuration not found` | ターゲットのエイリアス、認証情報、宛先バケットを再確認し、`replication add` を再実行します。 |
+| ルールが古くなったターゲットを報告する | ルールの一覧を更新し、`replication add` を再試行します。解消しない場合は、失敗した設定を削除してターゲットを作り直します。 |
+| ターゲットオブジェクトが表示されない | ターゲットへの到達性、認証情報、ターゲットのクォータ、`rc bucket replication status` を確認します。 |
+| レプリケーションが失敗する | ターゲット ARN とオブジェクトキーについて、ソースノードのログを確認します。 |
+| ターゲットの削除が拒否される | 参照されているターゲットを削除する前に、レプリケーション設定を削除または置き換えます。 |
 
-## Next steps
+## 次のステップ
 
-- [Manage bucket lifecycle](../lifecycle-management.md)
-- [Configure bucket quotas](./quota.md)
-- [Configure observability](/operations/observability)
+- [バケットのライフサイクルを管理する](../lifecycle-management.md)
+- [バケットクォータを設定する](./quota.md)
+- [オブザーバビリティを設定する](/ja/operations/observability)

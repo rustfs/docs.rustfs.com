@@ -6,8 +6,8 @@ description: "Install RustFS on Linux, containers, Kubernetes, macOS, or Windows
 <div className="rustfs-install-home">
   <div className="rustfs-install-intro">
     <div className="rustfs-install-lede">
-      RustFS is a distributed object storage system written in Rust and built
-      for S3-compatible workloads. This documentation covers installation,
+      RustFS is a distributed, S3-compatible object storage system written in Rust.
+      This documentation covers installation,
       administration, security, and operations for RustFS clusters.
     </div>
     <a className="rustfs-install-overview" href="/en/installation">
@@ -15,6 +15,8 @@ description: "Install RustFS on Linux, containers, Kubernetes, macOS, or Windows
       <ArrowRight aria-hidden="true" />
     </a>
   </div>
+
+  <h2 className="rustfs-install-heading">Self Host</h2>
 
   <div className="rustfs-install-grid">
     <a className="rustfs-install-card" href="/en/installation/linux/quick-start">
@@ -75,7 +77,7 @@ description: "Install RustFS on Linux, containers, Kubernetes, macOS, or Windows
       <span className="rustfs-install-icon rustfs-install-icon--windows"><BrandLogo name="windows" /></span>
       <span className="rustfs-install-copy">
         <strong>Install on Windows</strong>
-        <span>Install and run RustFS on a supported Windows environment.</span>
+        <span>Run RustFS locally on Windows for development and debugging only.</span>
       </span>
       <ArrowRight className="rustfs-install-arrow" aria-hidden="true" />
     </a>
@@ -87,6 +89,38 @@ description: "Install RustFS on Linux, containers, Kubernetes, macOS, or Windows
         <span>Deploy single-node or distributed RustFS on Docker Swarm with the SwarmCLI rustfs chart.</span>
       </span>
       <ArrowRight className="rustfs-install-arrow" aria-hidden="true" />
+    </a>
+  </div>
+
+  <h2 className="rustfs-install-heading">Cloud Provider</h2>
+
+  <div className="rustfs-install-grid">
+    <a
+      className="rustfs-install-card rustfs-install-card--external"
+      href="https://sealos.io/products/app-store/rustfs"
+      target="_blank"
+      rel="noreferrer"
+    >
+      <span className="rustfs-install-icon rustfs-install-icon--sealos"><BrandLogo name="sealos" /></span>
+      <span className="rustfs-install-copy">
+        <strong>Deploy on Sealos</strong>
+        <span>One-click RustFS deployment from the Sealos App Store, with managed HTTPS and persistent storage.</span>
+      </span>
+      <ArrowUpRight className="rustfs-install-arrow" aria-hidden="true" />
+    </a>
+
+    <a
+      className="rustfs-install-card rustfs-install-card--external"
+      href="https://elest.io/open-source/rustfs"
+      target="_blank"
+      rel="noreferrer"
+    >
+      <span className="rustfs-install-icon rustfs-install-icon--elestio"><BrandLogo name="elestio" /></span>
+      <span className="rustfs-install-copy">
+        <strong>Deploy on Elestio</strong>
+        <span>Fully managed RustFS on dedicated VMs with automated backups, SSL, and monitoring.</span>
+      </span>
+      <ArrowUpRight className="rustfs-install-arrow" aria-hidden="true" />
     </a>
   </div>
 </div>

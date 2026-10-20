@@ -1,123 +1,125 @@
 ---
-title: "Install RustFS on Windows"
-description: "Install a local RustFS instance on Windows with RustFS Launcher or the standalone server binary."
+title: "RustFS unter Windows installieren"
+description: "Installieren Sie eine lokale RustFS-Instanz unter Windows mit RustFS Launcher oder der eigenständigen Server-Binary."
 ---
 
-This guide provides two ways to run **RustFS** on Windows: use the graphical **RustFS Launcher**, or download and run the standalone server binary from PowerShell. Both methods create a local, single-node instance suitable for evaluation, development, and testing.
+Diese Anleitung zeigt zwei Wege, **RustFS** auf Windows zu betreiben: über die grafische Anwendung **RustFS Launcher** oder indem Sie die eigenständige Server-Binary herunterladen und in PowerShell ausführen. Beide Wege erzeugen eine lokale Einzelknoten-Instanz für Evaluierung, Entwicklung und Tests.
 
-:::note[Deployment scope]
+:::warning[Nur für Entwicklung und Fehlersuche]
 
-These procedures run RustFS as a desktop process, not as a Windows service. For a production or distributed deployment, use the [Linux installation guides](/installation/linux).
+Die Windows-Version von RustFS ist ausschließlich für Entwicklung und Fehlersuche vorgesehen und wird **für produktive Bereitstellungen nicht empfohlen**. Für produktive Arbeitslasten empfehlen wir [Linux](/de/installation/linux).
 
-:::
-
-## 1. Check the prerequisites
-
-Before you begin, make sure that:
-
-- You are using 64-bit Windows on an x86-64 processor. Launcher currently bundles the Windows x86-64 RustFS binary.
-- You have permission to install or run applications and to write to the selected data directory.
-- TCP ports `9000` and `9001` are available, or you have selected two other unused ports.
-- You have created a dedicated data directory, such as `D:\rustfs\data`.
-
-:::warning[Protect the data directory]
-
-Use an empty directory on a disk with enough free space. Do not store unrelated files in this directory, and do not edit RustFS data files while the server is running.
+Diese Verfahren führen RustFS als Desktop-Prozess aus, nicht als Windows-Dienst. Für eine produktive oder verteilte Bereitstellung verwenden Sie die [Linux-Installationsanleitungen](/de/installation/linux).
 
 :::
 
-## 2. Choose an installation method
+## 1. Voraussetzungen prüfen
 
-| Method | Use it when | Management model |
+Stellen Sie vor dem Start Folgendes sicher:
+
+- Sie verwenden 64-Bit-Windows auf einem x86-64-Prozessor. Launcher bündelt derzeit die Windows-x86-64-Binary von RustFS.
+- Sie dürfen Anwendungen installieren oder ausführen und in das gewählte Datenverzeichnis schreiben.
+- Die TCP-Ports `9000` und `9001` sind frei, oder Sie haben zwei andere ungenutzte Ports gewählt.
+- Sie haben ein eigenes Datenverzeichnis angelegt, zum Beispiel `D:\rustfs\data`.
+
+:::warning[Datenverzeichnis schützen]
+
+Verwenden Sie ein leeres Verzeichnis auf einem Datenträger mit ausreichend freiem Speicher. Legen Sie dort keine fremden Dateien ab und bearbeiten Sie RustFS-Datendateien nicht, während der Server läuft.
+
+:::
+
+## 2. Installationsmethode wählen
+
+| Methode | Geeignet, wenn | Verwaltungsmodell |
 | --- | --- | --- |
-| RustFS Launcher | You want a graphical setup and built-in log viewer. | Launcher starts and stops the bundled RustFS process. |
-| Standalone binary | You want explicit PowerShell commands or scripting. | The PowerShell session owns the RustFS process. |
+| RustFS Launcher | Sie eine grafische Einrichtung und eine integrierte Protokollanzeige möchten. | Launcher startet und stoppt den mitgelieferten RustFS-Prozess. |
+| Eigenständige Binary | Sie explizite PowerShell-Befehle oder Skripte möchten. | Der RustFS-Prozess läuft in der PowerShell-Sitzung. |
 
-## Install with RustFS Launcher
+## Mit RustFS Launcher installieren
 
-### 3. Download and install Launcher
+### 3. Launcher herunterladen und installieren
 
-1. Open the [RustFS Launcher Releases page](https://github.com/rustfs/launcher/releases).
-2. Select the latest release and download its Windows x86-64 installer from **Assets**. Do not download **Source code**, which is for building Launcher from source.
-3. Double-click the installer and follow the prompts.
-4. Open **RustFS Launcher** from the Start menu if it does not open automatically.
+1. Öffnen Sie die [Release-Seite von RustFS Launcher](https://github.com/rustfs/launcher/releases).
+2. Wählen Sie das neueste Release und laden Sie das Windows-x86-64-Installationsprogramm aus **Assets** herunter. Laden Sie **Source code** nicht herunter. Es dient dazu, Launcher aus dem Quellcode zu bauen.
+3. Doppelklicken Sie auf das Installationsprogramm und folgen Sie den Eingabeaufforderungen.
+4. Öffnen Sie **RustFS Launcher** aus dem Startmenü, falls die Anwendung nicht automatisch startet.
 
-If Microsoft Defender SmartScreen displays a warning, verify that the installer came from the official `rustfs/launcher` Releases page before allowing it to run. Do not disable Windows security features globally.
+Wenn Microsoft Defender SmartScreen eine Warnung anzeigt, prüfen Sie, dass das Installationsprogramm von der offiziellen Release-Seite `rustfs/launcher` stammt, bevor Sie die Ausführung zulassen. Deaktivieren Sie Windows-Sicherheitsfunktionen nicht global.
 
-### 4. Configure Launcher
+### 4. Launcher konfigurieren
 
-Configure the fields in the Launcher window:
+Konfigurieren Sie die Felder im Launcher-Fenster:
 
-| Section | Field | Recommended value | Description |
+| Bereich | Feld | Empfohlener Wert | Beschreibung |
 | --- | --- | --- | --- |
-| Dataset Mount | Data Path | `D:\rustfs\data` | Existing directory where RustFS stores object data. |
-| Ports & Access | API Port | `9000` | S3-compatible API port. |
-| Ports & Access | Host | `127.0.0.1` | Restricts access to this computer. |
-| Ports & Access | Console Endpoint | Enabled | Enables the web Console; Launcher disables it by default. |
-| Ports & Access | Console Port | `9001` | Console port, which must differ from the API port. |
-| Credentials | Access Key | `<your-access-key>` | Administrator access key for this instance. |
-| Credentials | Secret Key | `<your-secret-key>` | Administrator secret key for this instance. |
+| Dataset Mount | Data Path | `D:\rustfs\data` | Vorhandenes Verzeichnis, in dem RustFS Objektdaten speichert. |
+| Ports & Access | API Port | `9000` | Port der S3-kompatiblen API. |
+| Ports & Access | Host | `127.0.0.1` | Beschränkt den Zugriff auf diesen Computer. |
+| Ports & Access | Console Endpoint | Enabled | Aktiviert die Console (Weboberfläche). Launcher deaktiviert sie standardmäßig. |
+| Ports & Access | Console Port | `9001` | Console-Port. Er muss sich vom API-Port unterscheiden. |
+| Credentials | Access Key | `<your-access-key>` | Administrator-Zugriffsschlüssel für diese Instanz. |
+| Credentials | Secret Key | `<your-secret-key>` | Geheimer Administrator-Zugriffsschlüssel für diese Instanz. |
 
-Select the data directory with **Browse** or drag it into Launcher. Launcher requires the directory to exist before startup.
+Wählen Sie das Datenverzeichnis mit **Browse** oder ziehen Sie es in Launcher. Launcher setzt voraus, dass das Verzeichnis vor dem Start existiert.
 
-Replace the credential placeholders with your own values. Launcher initially displays default local-test credentials; do not retain them on a computer accessible by other users.
+Ersetzen Sie die Platzhalter für die Zugangsdaten durch eigene Werte. Launcher zeigt anfangs die standardmäßigen lokalen Test-Zugangsdaten an. Behalten Sie sie nicht auf einem Computer bei, auf den andere Benutzer zugreifen können.
 
-:::warning[Network exposure]
+:::warning[Netzwerkexposition]
 
-Keep **Host** set to `127.0.0.1` unless another computer must connect to RustFS. A non-loopback address exposes the API and Console on the corresponding network interfaces. Configure Windows Defender Firewall and strong credentials before allowing remote access.
+Lassen Sie **Host** auf `127.0.0.1`, sofern nicht ein anderer Computer eine Verbindung zu RustFS herstellen muss. Jede Adresse außer `127.0.0.1` legt die API und die Console auf den zugehörigen Netzwerkschnittstellen offen. Konfigurieren Sie die Windows Defender Firewall und starke Zugangsdaten, bevor Sie Fernzugriff zulassen.
 
 :::
 
-### 5. Start and verify RustFS
+### 5. RustFS starten und prüfen
 
-1. Select **Launch RustFS**.
-2. Wait for Launcher to report that the configured endpoint is online.
-3. Open `http://localhost:9001` and sign in with the access key and secret key that you configured.
-4. Use `http://localhost:9000` as the endpoint for S3-compatible clients.
+1. Wählen Sie **Launch RustFS**.
+2. Warten Sie, bis Launcher meldet, dass der konfigurierte Endpunkt online ist.
+3. Öffnen Sie `http://localhost:9001` und melden Sie sich mit dem Zugriffsschlüssel und dem geheimen Zugriffsschlüssel an, die Sie konfiguriert haben.
+4. Verwenden Sie `http://localhost:9000` als Endpunkt für S3-kompatible Clients.
 
-![RustFS Launcher showing the service online with API port 9000, Console port 9001, and successful startup logs](./images/windows-rustfs-launcher.jpg)
+![RustFS Launcher mit online gemeldetem Dienst, API-Port 9000, Console-Port 9001 und erfolgreichen Startprotokollen](./images/windows-rustfs-launcher.jpg)
 
-If you changed the host or ports, use those values instead. The Console URL is available only when **Console Endpoint** is enabled.
+Wenn Sie Host oder Ports geändert haben, verwenden Sie diese Werte. Die Console-URL ist nur verfügbar, wenn **Console Endpoint** aktiviert ist.
 
-Launcher locks its configuration while it manages a running process. It also creates a `logs` directory next to the data directory. For example, a data path of `D:\rustfs\data` places server log files under `D:\rustfs\logs`.
+Launcher sperrt seine Konfiguration, solange er einen laufenden Prozess verwaltet. Er legt außerdem ein Verzeichnis `logs` neben dem Datenverzeichnis an. Bei einem Datenpfad `D:\rustfs\data` liegen die Server-Protokolldateien beispielsweise unter `D:\rustfs\logs`.
 
-### 6. Stop or exit Launcher
+### 6. Launcher anhalten oder beenden
 
-Select **Stop RustFS** before changing configuration, disconnecting the data disk, or shutting down Windows.
+Wählen Sie **Stop RustFS**, bevor Sie die Konfiguration ändern, den Datenträger trennen oder Windows herunterfahren.
 
-Closing the Launcher window hides it in the Windows system tray; it does not stop RustFS. To stop the managed process and exit Launcher, right-click the tray icon and select **Quit**. Select **Show**, or left-click the tray icon, to restore the window.
+Wenn Sie das Launcher-Fenster schließen, wird es im Infobereich von Windows ausgeblendet. RustFS wird dadurch nicht angehalten. Um den verwalteten Prozess anzuhalten und Launcher zu beenden, klicken Sie mit der rechten Maustaste auf das Symbol im Infobereich und wählen Sie **Quit**. Wählen Sie **Show** oder klicken Sie mit der linken Maustaste auf das Symbol, um das Fenster wiederherzustellen.
 
-## Install the standalone binary
+## Eigenständige Binary installieren
 
-### 7. Download and extract the binary
+### 7. Binary herunterladen und entpacken
 
-1. Open the [RustFS Releases page](https://github.com/rustfs/rustfs/releases).
-2. Select the required release and download the Windows x86-64 ZIP archive from **Assets**. The asset name begins with `rustfs-windows-x86_64`.
-3. Open PowerShell and create directories for the program and its data:
+1. Öffnen Sie die [RustFS-Release-Seite](https://github.com/rustfs/rustfs/releases).
+2. Wählen Sie das benötigte Release und laden Sie das Windows-x86-64-ZIP-Archiv aus **Assets** herunter. Der Asset-Name beginnt mit `rustfs-windows-x86_64`.
+3. Öffnen Sie PowerShell und legen Sie Verzeichnisse für das Programm und seine Daten an:
 
 ```powershell
 New-Item -ItemType Directory -Force -Path C:\rustfs\bin
 New-Item -ItemType Directory -Force -Path D:\rustfs\data
 ```
 
-4. Extract the downloaded archive. Replace `<version>` with the version in the downloaded filename:
+4. Entpacken Sie das heruntergeladene Archiv. Ersetzen Sie `<version>` durch die Version im heruntergeladenen Dateinamen:
 
 ```powershell
 Expand-Archive -Path "$HOME\Downloads\rustfs-windows-x86_64-<version>.zip" -DestinationPath C:\rustfs\bin -Force
 ```
 
-5. Confirm that the extracted binary runs:
+5. Prüfen Sie, dass die entpackte Binary startet:
 
 ```powershell
 Set-Location C:\rustfs\bin
 .\rustfs.exe --help
 ```
 
-If the archive extracts `rustfs.exe` into a nested directory, change to that directory or move the executable into `C:\rustfs\bin` before continuing.
+Wenn das Archiv `rustfs.exe` in ein verschachteltes Verzeichnis entpackt, wechseln Sie in dieses Verzeichnis oder verschieben Sie die ausführbare Datei nach `C:\rustfs\bin`, bevor Sie fortfahren.
 
-### 8. Start the standalone server
+### 8. Eigenständigen Server starten
 
-Set credentials only for the current PowerShell session, then start RustFS with explicit addresses:
+Setzen Sie die Zugangsdaten nur für die aktuelle PowerShell-Sitzung und starten Sie RustFS anschließend mit expliziten Adressen:
 
 ```powershell
 $env:RUSTFS_ACCESS_KEY = "<your-access-key>"
@@ -131,61 +133,61 @@ Set-Location C:\rustfs\bin
 	"D:\rustfs\data"
 ```
 
-Keep the PowerShell window open while RustFS is running. Press `Ctrl+C` in that window to stop the server.
+Lassen Sie das PowerShell-Fenster geöffnet, solange RustFS läuft. Drücken Sie in diesem Fenster `Ctrl+C`, um den Server anzuhalten.
 
-:::tip[Credential handling]
+:::tip[Umgang mit Zugangsdaten]
 
-Session environment variables avoid placing credentials directly in the command line. For repeated or automated use, prefer the `RUSTFS_ACCESS_KEY_FILE` and `RUSTFS_SECRET_KEY_FILE` environment variables and protect those files with Windows access controls.
+Sitzungs-Umgebungsvariablen vermeiden es, Zugangsdaten direkt in die Befehlszeile zu schreiben. Bevorzugen Sie für wiederholte oder automatisierte Nutzung die Umgebungsvariablen `RUSTFS_ACCESS_KEY_FILE` und `RUSTFS_SECRET_KEY_FILE` und schützen Sie diese Dateien mit den Windows-Zugriffssteuerungen.
 
 :::
 
-### 9. Verify the standalone server
+### 9. Eigenständigen Server prüfen
 
-Open `http://localhost:9001` and sign in with the configured credentials. Use `http://localhost:9000` as the endpoint for S3-compatible clients. RustFS defaults to path-style addressing, so configure clients accordingly.
+Öffnen Sie `http://localhost:9001` und melden Sie sich mit den konfigurierten Zugangsdaten an. Verwenden Sie `http://localhost:9000` als Endpunkt für S3-kompatible Clients. RustFS verwendet standardmäßig pfadbasierte Adressierung (Path-Style). Konfigurieren Sie die Clients entsprechend.
 
-To perform an end-to-end check, create a bucket named `my-bucket`, upload `hello.txt`, and confirm that the object appears in the bucket.
+Prüfen Sie den Ablauf durchgehend: Legen Sie einen Bucket namens `my-bucket` an, laden Sie `hello.txt` hoch und prüfen Sie, dass das Objekt im Bucket erscheint.
 
-## Confirm a successful installation
+## Erfolgreiche Installation bestätigen
 
-Whether you used Launcher or the standalone binary, a successful Console sign-in opens the **Buckets** page. From here, you can create `my-bucket` and begin storing objects.
+Nach der Anmeldung an der Console öffnet sich die Seite **Buckets**, unabhängig davon, ob Sie Launcher oder die eigenständige Binary verwendet haben. Von hier aus können Sie `my-bucket` anlegen und Objekte speichern.
 
-![RustFS Console Buckets page after a successful sign-in](./images/rustfs-console-login.png)
+![Seite Buckets der RustFS Console nach erfolgreicher Anmeldung](./images/rustfs-console-login.png)
 
-## Troubleshooting
+## Fehlerbehebung
 
-### Windows blocks the installer or executable
+### Windows blockiert das Installationsprogramm oder die ausführbare Datei
 
-Confirm that the file came from the official RustFS GitHub organization. Inspect the file's **Properties** dialog and, when Windows provides the option, select **Unblock** only after verifying the source.
+Prüfen Sie, dass die Datei aus der offiziellen GitHub-Organisation von RustFS stammt. Öffnen Sie den Dialog **Properties** (Eigenschaften) der Datei. Wenn Windows die Option anbietet, wählen Sie **Unblock** (Zulassen) erst, nachdem Sie die Quelle geprüft haben.
 
-### The data path is rejected
+### Der Datenpfad wird abgelehnt
 
-Confirm that the directory exists and that your Windows account has read and write access. Launcher does not create the selected data directory for you.
+Prüfen Sie, dass das Verzeichnis existiert und Ihr Windows-Konto Lese- und Schreibzugriff hat. Launcher legt das gewählte Datenverzeichnis nicht für Sie an.
 
-### The API or Console port is unavailable
+### Der API- oder Console-Port ist nicht verfügbar
 
-The ports must be numbers from `1` to `65535`, must differ from each other, and must not already be in use. Inspect the default ports in PowerShell:
+Die Ports müssen Zahlen von `1` bis `65535` sein, sich voneinander unterscheiden und dürfen nicht bereits belegt sein. Prüfen Sie die Standardports in PowerShell:
 
 ```powershell
 Get-NetTCPConnection -LocalPort 9000,9001 -ErrorAction SilentlyContinue
 ```
 
-Stop the conflicting application or select unused ports, then start RustFS again.
+Beenden Sie die kollidierende Anwendung oder wählen Sie freie Ports und starten Sie RustFS erneut.
 
-### The Console does not open
+### Die Console öffnet sich nicht
 
-For Launcher, confirm that **Console Endpoint** is enabled. For the standalone binary, confirm that the process is still running and that `--console-enable true` is present. The current Console default is port `9001`; port `7001` is not used by the current Launcher configuration.
+Prüfen Sie bei Launcher, dass **Console Endpoint** aktiviert ist. Prüfen Sie bei der eigenständigen Binary, dass der Prozess noch läuft und `--console-enable true` gesetzt ist. Der aktuelle Console-Standard ist Port `9001`. Die aktuelle Launcher-Konfiguration verwendet Port `7001` nicht.
 
-### Launcher reports an external RustFS process
+### Launcher meldet einen externen RustFS-Prozess
 
-Another process is listening on the configured API address, but Launcher did not start it. Stop that process or choose another API port. Launcher cannot stop a process it does not manage.
+Ein anderer Prozess lauscht auf der konfigurierten API-Adresse, aber Launcher hat ihn nicht gestartet. Beenden Sie diesen Prozess oder wählen Sie einen anderen API-Port. Launcher kann einen Prozess nicht anhalten, den er nicht verwaltet.
 
-### RustFS exits after launch
+### RustFS beendet sich nach dem Start
 
-In Launcher, inspect both the application and RustFS tabs in the built-in log viewer. For a standalone installation, inspect the PowerShell output. Common causes include a missing data directory, insufficient permissions, or a port conflict.
+Prüfen Sie in Launcher beide Registerkarten, die der Anwendung und die von RustFS, in der integrierten Protokollanzeige. Prüfen Sie bei einer eigenständigen Installation die PowerShell-Ausgabe. Häufige Ursachen sind ein fehlendes Datenverzeichnis, unzureichende Berechtigungen oder ein Portkonflikt.
 
-## Next steps
+## Nächste Schritte
 
-- Review the [S3 API guide](/administration/protocols/s3) before connecting a client.
-- Learn how to [create a bucket](/administration/data/bucket/creation).
-- See [status checks](/operations/status-check) for additional verification methods.
-- Use the [Linux installation guides](/installation/linux) for a production-oriented deployment.
+- Lesen Sie die [S3-API-Anleitung](/de/administration/protocols/s3), bevor Sie einen Client verbinden.
+- Erfahren Sie, wie Sie [einen Bucket anlegen](/de/administration/data/bucket/creation).
+- Weitere Prüfmöglichkeiten finden Sie unter [Statusprüfungen](/de/operations/status-check).
+- Verwenden Sie die [Linux-Installationsanleitungen](/de/installation/linux) für eine auf den Produktivbetrieb ausgerichtete Bereitstellung.

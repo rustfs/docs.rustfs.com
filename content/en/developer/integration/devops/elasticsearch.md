@@ -259,4 +259,4 @@ docker compose logs create-bucket
 
 - Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional S3 operations.
 - Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Elasticsearch snapshot documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshot-restore.html) for snapshot lifecycle management (SLM).
+- Follow the [Elasticsearch snapshot documentation](https://www.elastic.co/docs/deploy-manage/tools/snapshot-and-restore) for snapshot lifecycle management (SLM).

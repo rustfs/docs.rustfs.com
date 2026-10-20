@@ -1,24 +1,24 @@
 ---
 title: "Apache Hudi"
-description: "Write Apache Hudi tables to RustFS through Spark and the s3a connector."
+description: "Schreiben Sie Apache-Hudi-Tabellen über Spark und den Connector s3a nach RustFS."
 ---
 
-This guide connects [Apache Hudi](https://github.com/apache/hudi) — the transactional data lake platform — to **RustFS** as its copy-on-write table store. You will run Spark with the Hudi bundle, write a table to the `s3a://` location inside a RustFS bucket, read it back, and verify the table files. The workflow was verified with `apache/spark:3.5.6`, `hudi-spark3.5-bundle_2.12:0.15.0`, `hadoop-aws:3.3.4`, and `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [Apache Hudi](https://github.com/apache/hudi) — die transaktionale Data-Lake-Plattform — mit **RustFS** als Copy-on-Write-Tabellenspeicher. Sie betreiben Spark mit dem Hudi-Bundle, schreiben eine Tabelle an den Speicherort `s3a://` in einem RustFS-Bucket, lesen sie zurück und prüfen die Tabellendateien. Der Ablauf wurde mit `apache/spark:3.5.6`, `hudi-spark3.5-bundle_2.12:0.15.0`, `hadoop-aws:3.3.4` und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Sie benötigen Docker. Diese Bereitstellung ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
 	Job["Spark + Hudi"] -->|"commit + parquet"| RustFS["RustFS :9000"]
 ```
 
-Hudi stores the `.hoodie/` timeline, commit files, and Parquet data blocks under the table path in the bucket. Reads resolve the latest table snapshot from the timeline, so every write and query goes through the S3 API.
+Hudi speichert die Timeline `.hoodie/`, Commit-Dateien und Parquet-Datenblöcke unter dem Tabellenpfad im Bucket. Lesevorgänge lösen den aktuellen Tabellen-Snapshot aus der Timeline auf, daher läuft jeder Schreib- und Abfragevorgang über die S3-API.
 
-## 1. Run the Spark write
+## 1. Den Spark-Schreibvorgang ausführen
 
-Hudi requires the Kryo serializer and the s3a credentials as Hadoop properties. The following `spark-shell` session creates a non-partitioned table in `my-bucket` — replace all connection placeholders:
+Hudi verlangt den Kryo-Serializer und die s3a-Zugangsdaten als Hadoop-Properties. Die folgende `spark-shell`-Sitzung legt eine nicht partitionierte Tabelle in `my-bucket` an. Ersetzen Sie alle Verbindungsplatzhalter:
 
 ```scala
 import org.apache.spark.sql.SaveMode
@@ -52,7 +52,7 @@ docker run --rm --network oo-rustfs_default \
   -i /tmp/hudi_test.scala
 ```
 
-The `--packages` flags download the Hudi bundle and the s3a connector on first run. The `spark.jars.ivy` setting avoids Ivy cache permission errors in the container. The read-back `show()` prints the three rows:
+Die Flags `--packages` laden das Hudi-Bundle und den Connector s3a beim ersten Lauf herunter. Die Einstellung `spark.jars.ivy` vermeidet Berechtigungsfehler des Ivy-Cache im Container. Das zurückgelesene `show()` gibt die drei Zeilen aus:
 
 ```text
 +---+----+
@@ -62,15 +62,15 @@ The `--packages` flags download the Hudi bundle and the s3a connector on first r
 +---+----+
 ```
 
-## 2. Verify objects in RustFS
+## 2. Objekte in RustFS prüfen
 
-List the table prefix:
+Listen Sie das Tabellenpräfix auf:
 
 ```bash
 rc ls rustfs/my-bucket/hudi-demo/ -r
 ```
 
-The Hudi table layout appears under the table path — the `.hoodie/` timeline with the commit file, plus the Parquet data block:
+Das Hudi-Tabellenlayout erscheint unter dem Tabellenpfad: die Timeline `.hoodie/` mit der Commit-Datei sowie der Parquet-Datenblock:
 
 ```text
 hudi-demo/events/.hoodie/20260922015803291.commit
@@ -78,32 +78,32 @@ hudi-demo/events/.hoodie/20260922015803291.commit.requested
 hudi-demo/events/<partition>/<filegroup>/<parquet-block>
 ```
 
-![Hudi table files stored in the RustFS Console](./images/rustfs-hudi-table.png)
+![In der RustFS-Console gespeicherte Hudi-Tabellendateien](./images/rustfs-hudi-table.png)
 
-## 3. Stop or reset
+## 3. Stoppen oder zurücksetzen
 
-Spark runs as a one-shot client and holds no state. To delete the demo table:
+Spark läuft als einmaliger Client und hält keinen Zustand. So löschen Sie die Demo-Tabelle:
 
 ```bash
 rc rm rustfs/my-bucket/hudi-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
 ### `hoodie only support org.apache.spark.serializer.KryoSerializer as spark.serializer`
 
-Hudi rejects the default Spark serializer. Pass `--conf spark.serializer=org.apache.spark.serializer.KryoSerializer` as shown above.
+Hudi lehnt den Standard-Serializer von Spark ab. Übergeben Sie `--conf spark.serializer=org.apache.spark.serializer.KryoSerializer` wie oben gezeigt.
 
-### `Partition-path field has to be non-empty` or keygenerator class errors
+### `Partition-path field has to be non-empty` oder Fehler der Keygenerator-Klasse
 
-For a non-partitioned table, keep the default key generator (do not set `hoodie.datasource.write.keygenerator.class`) and set `hoodie.datasource.write.partitionpath.field` to the empty string.
+Belassen Sie für eine nicht partitionierte Tabelle den Standard-Key-Generator und setzen Sie `hoodie.datasource.write.keygenerator.class` nicht. Setzen Sie `hoodie.datasource.write.partitionpath.field` auf die leere Zeichenkette.
 
-### `NoSuchMethodError` or `ClassNotFoundException` in the Hudi write
+### `NoSuchMethodError` oder `ClassNotFoundException` beim Hudi-Schreibvorgang
 
-The Spark and Hudi bundle versions must match: `hudi-spark3.5-bundle_2.12` goes with Spark 3.5.x, and the bundled Hadoop client must be compatible with `hadoop-aws:3.3.4`.
+Die Versionen von Spark und dem Hudi-Bundle müssen zusammenpassen: `hudi-spark3.5-bundle_2.12` gehört zu Spark 3.5.x, und der gebündelte Hadoop-Client muss mit `hadoop-aws:3.3.4` kompatibel sein.
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Hudi operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Hudi Spark guide](https://hudi.apache.org/docs/quick-start-guide/) to add upserts, compaction, and query integrations on the same table.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere Hudi-Operationen einsetzen.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie dem [Hudi-Spark-Leitfaden](https://hudi.apache.org/docs/quick-start-guide/), um Upserts, Compaction und Abfrageintegrationen auf derselben Tabelle hinzuzufügen.

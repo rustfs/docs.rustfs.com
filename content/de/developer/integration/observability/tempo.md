@@ -3,7 +3,7 @@ title: "Tempo"
 description: "Betreiben Sie Grafana Tempo mit RustFS als S3-Backend für Trace-Daten, bereitgestellt mit Docker Compose."
 ---
 
-Diese Anleitung betreibt [Grafana Tempo](https://github.com/grafana/tempo) — das verteilte Tracing-Backend von Grafana Labs — mit **RustFS** als Trace-Speicher. Sie starten einen Single-Binary-Tempo mit Docker Compose, pushen einen Trace über den Zipkin-kompatiblen Empfänger, fragen ihn über die Such-API ab und prüfen, dass der Trace-Block als Parquet-Objekt in RustFS gespeichert wird. Der Ablauf wurde mit `grafana/tempo:2.9.5` und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
+In dieser Anleitung betreiben Sie [Grafana Tempo](https://github.com/grafana/tempo) — das verteilte Tracing-Backend von Grafana Labs — mit **RustFS** als Trace-Speicher. Sie starten Tempo im Single-Binary-Modus mit Docker Compose, senden einen Trace über den Zipkin-kompatiblen Empfänger, fragen ihn über die Such-API ab und prüfen, dass der Trace-Block als Parquet-Objekt in RustFS gespeichert wird. Der Ablauf wurde mit `grafana/tempo:2.9.5` und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
 Sie benötigen Docker mit dem Compose-Plugin. Dieses Setup ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
@@ -27,16 +27,16 @@ mkdir rustfs-tempo
 cd rustfs-tempo
 ```
 
-Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Anmeldeinformationen:
+Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Zugangsdaten:
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Verwenden Sie dedizierte Anmeldeinformationen für den Bucket. Committen Sie `.env` nicht in die Versionsverwaltung.
+Verwenden Sie dedizierte Zugangsdaten für den Bucket. Nehmen Sie `.env` nicht in die Versionsverwaltung auf.
 
-Erstellen Sie die Tempo-Konfiguration — ein Single-Binary-Setup mit dem S3-Backend, das auf RustFS zeigt, und einer kurzen Blockdauer, damit ein Verifikationslauf nicht die standardmäßigen 30 Minuten warten muss:
+Erstellen Sie die Tempo-Konfiguration — eine Single-Binary-Konfiguration mit S3-Backend auf RustFS und kurzer Blockdauer, damit ein Prüflauf nicht die üblichen 30 Minuten warten muss:
 
 ```yaml title="tempo.yml"
 server:
@@ -69,7 +69,7 @@ storage:
     blocklist_poll: 30s
 ```
 
-`forcepathstyle: true` und `insecure: true` wählen Path-Style-Adressierung über Plain HTTP, was der Container-Netzwerk-Endpunkt von RustFS erwartet. `max_block_duration: 1m` und `blocklist_poll: 30s` beschleunigen den Flush- und Entdeckungszyklus für Tests.
+`forcepathstyle: true` und `insecure: true` wählen pfadbasierte Adressierung (Path-Style) über unverschlüsseltes HTTP (Plain HTTP) — so erwartet es der Container-Netzwerk-Endpunkt von RustFS. `max_block_duration: 1m` und `blocklist_poll: 30s` beschleunigen den Flush- und Entdeckungszyklus für Tests.
 
 Erstellen Sie die Compose-Datei:
 
@@ -240,9 +240,9 @@ docker compose run --rm --entrypoint /bin/sh create-bucket -c \
 [2026-09-20 15:03:54]  25.16 KiB single-tenant/619118dc-a512-4ca6-90f5-e8b15bc9013f/data.parquet
 ```
 
-Sie können das Präfix auch in der RustFS-Konsole anzeigen:
+Sie können das Präfix auch in der RustFS Console anzeigen:
 
-![Der in der RustFS-Konsole gespeicherte Tempo-Trace-Block](./images/rustfs-tempo-blocks.png)
+![Der in der RustFS Console gespeicherte Tempo-Trace-Block](./images/rustfs-tempo-blocks.png)
 
 Da der Block in RustFS liegt, bleibt der Trace über Tempo-Neustarts hinweg abfragbar — starten Sie den Container neu und wiederholen Sie die Suche zur Bestätigung.
 
@@ -276,7 +276,7 @@ docker compose logs tempo
 
 ### AccessDenied- oder 403-Antworten
 
-Stellen Sie sicher, dass die Anmeldeinformationen in `tempo.yml` mit den RustFS-Anmeldeinformationen übereinstimmen und dass der Dienst `create-bucket` erfolgreich abgeschlossen wurde:
+Stellen Sie sicher, dass die Zugangsdaten in `tempo.yml` mit den RustFS-Zugangsdaten übereinstimmen und dass der Dienst `create-bucket` erfolgreich abgeschlossen wurde:
 
 ```bash
 docker compose logs create-bucket
@@ -284,10 +284,10 @@ docker compose logs create-bucket
 
 ### Verbindungs- oder Zertifikatsfehler
 
-`endpoint` nimmt kein Schema an; `insecure: true` wählt Plain HTTP und `forcepathstyle: true` Path-Style-Adressierung für den Container-Netzwerk-Endpunkt. Verwenden Sie innerhalb des Compose-Netzwerks `rustfs:9000` und auf dem Host `localhost:9000`.
+`endpoint` nimmt kein Schema an; `insecure: true` wählt unverschlüsseltes HTTP (Plain HTTP) und `forcepathstyle: true` die pfadbasierte Adressierung (Path-Style) für den Container-Netzwerk-Endpunkt. Verwenden Sie innerhalb des Compose-Netzwerks `rustfs:9000` und auf dem Host `localhost:9000`.
 
 ## Nächste Schritte
 
-- Lesen Sie die [S3-Kompatibilitätshinweise](/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
-- Erstellen Sie dedizierte Produktions-Anmeldeinformationen mit dem [Access Key Management](/security-compliance/iam/access-token).
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
 - Folgen Sie der [Grafana-Tempo-Dokumentation](https://grafana.com/docs/tempo/latest/), um den OpenTelemetry Collector oder instrumentierte Anwendungen als Trace-Producer anzubinden.

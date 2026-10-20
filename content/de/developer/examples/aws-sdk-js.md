@@ -1,19 +1,19 @@
 ---
-title: "AWS SDK for JavaScript"
-description: "Connect the AWS SDK for JavaScript v3 to RustFS and perform basic object operations from Node.js."
+title: "AWS SDK für JavaScript"
+description: "Verbinden Sie das AWS SDK für JavaScript v3 mit RustFS und führen Sie grundlegende Objektoperationen aus Node.js aus."
 ---
 
-The [AWS SDK for JavaScript v3](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/) connects to RustFS through a custom endpoint. This is the minimal connection recipe; see the [JavaScript SDK guide](../sdk/javascript.md) for a full program.
+Das [AWS SDK für JavaScript v3](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/) verbindet sich über einen benutzerdefinierten Endpunkt mit RustFS. Dies ist das minimale Verbindungsbeispiel. Ein vollständiges Programm steht in der [JavaScript-SDK-Anleitung](../sdk/javascript.md).
 
-## Install
+## Installation
 
 ```bash
 npm install @aws-sdk/client-s3
 ```
 
-## Configure
+## Konfiguration
 
-Replace `http://localhost:9000` with your server address and use your own [access keys](../../security-compliance/iam/access-token.md). RustFS requires path-style addressing (`forcePathStyle: true`):
+Ersetzen Sie `http://localhost:9000` durch Ihre Serveradresse und verwenden Sie Ihre eigenen [Zugriffsschlüssel](../../security-compliance/iam/access-token.md). RustFS erfordert pfadbasierte Adressierung (Path-Style) (`forcePathStyle: true`):
 
 ```javascript title="index.mjs" {8}
 import { S3Client, CreateBucketCommand, PutObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
@@ -27,7 +27,7 @@ const s3 = new S3Client({
 });
 ```
 
-## Verify
+## Überprüfung
 
 ```javascript
 await s3.send(new CreateBucketCommand({ Bucket: "my-bucket" }));
@@ -41,6 +41,6 @@ for (const obj of out.Contents ?? []) console.log(obj.Key, obj.Size);
 hello.txt 12
 ```
 
-## Next steps
+## Nächste Schritte
 
-See the full [JavaScript SDK guide](../sdk/javascript.md), or manage objects with [`rc`](/operations/rc).
+Lesen Sie die vollständige [JavaScript-SDK-Anleitung](../sdk/javascript.md), oder verwalten Sie Objekte mit [`rc`](/de/operations/rc).

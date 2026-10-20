@@ -15,7 +15,7 @@ flowchart LR
 	Init["init-bucket job"] -->|"create my-bucket"| RustFS
 ```
 
-Spark は `hadoop-aws` の S3A ファイルシステムを通じて RustFS と通信します。エンドポイント、パススタイルアドレス指定、平文 HTTP、認証情報といったコネクタ設定は `spark.hadoop.fs.s3a.*` プロパティとして渡します。
+Spark は `hadoop-aws` の S3A ファイルシステムを通じて RustFS と通信します。エンドポイント、パススタイルアクセス、平文 HTTP、認証情報といったコネクタ設定は `spark.hadoop.fs.s3a.*` プロパティとして渡します。
 
 ## 1. プロジェクトファイルを作成する
 
@@ -177,9 +177,9 @@ RustFS コンソールでこのプレフィックスを参照することもで�
 
 ## 4. RustFS S3 Tables を使用する
 
-RustFS S3 Tables は組み込みの Apache Iceberg REST カタログを提供します。Flink と同様に、Spark はテーブルバケットを管理された Iceberg ウェアハウスとして扱え、データは RustFS 内に保持されます。[S3 Tables](/administration/data/s3-tables) の説明に従ってテーブルバケットを有効化し、Spark の Iceberg REST カタログを接続してください。REST カタログ URI は `http://<rustfs-host>:9000/iceberg`、ウェアハウスはバケット名で、カタログリクエスト（AWS Signature Version 4、署名名 `s3`）と S3 ファイルアクセスの両方がパススタイルのアドレス指定を使います。
+RustFS S3 Tables は組み込みの Apache Iceberg REST カタログを提供します。Flink と同様に、Spark はテーブルバケットを管理された Iceberg ウェアハウスとして扱え、データは RustFS 内に保持されます。[S3 Tables](/ja/administration/data/s3-tables) の説明に従ってテーブルバケットを有効化し、Spark の Iceberg REST カタログを接続してください。REST カタログ URI は `http://<rustfs-host>:9000/iceberg`、ウェアハウスはバケット名で、カタログリクエスト（AWS Signature Version 4、署名名 `s3`）と S3 ファイルアクセスの両方がパススタイルアクセスを使います。
 
-S3 Tables のサポートマトリクスに従い、本番でこの経路を採用する前に、実際にデプロイする Spark と Iceberg のバージョンでカタログを検証してください。
+S3 Tables のサポートマトリックスに従い、本番でこの経路を採用する前に、実際にデプロイする Spark と Iceberg のバージョンでカタログを検証してください。
 
 ## 5. スタックを停止・リセットする
 
@@ -215,6 +215,6 @@ docker compose logs create-bucket
 
 ## 次のステップ
 
-- 追加の S3 オペレーションを採用する前に、[S3 互換性ノート](/administration/protocols/s3)を確認してください。
-- [アクセスキー管理](/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
+- 追加の S3 オペレーションを採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認してください。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
 - [Spark ドキュメント](https://spark.apache.org/docs/latest/)で構造化ストリーミングやデータソースのオプションを確認してください。

@@ -1,13 +1,13 @@
 ---
 title: "Terraform"
-description: "Manage RustFS buckets and objects with Terraform using the AWS provider pointed at a custom endpoint."
+description: "Gérez les compartiments et les objets RustFS avec Terraform, en pointant le fournisseur AWS vers un point de terminaison personnalisé."
 ---
 
-The [Terraform AWS provider](https://registry.terraform.io/providers/hashicorp/aws/latest) works against RustFS when you point its S3 endpoint at your server and enable path-style addressing.
+Le [fournisseur AWS de Terraform](https://registry.terraform.io/providers/hashicorp/aws/latest) fonctionne avec RustFS lorsque vous pointez son point de terminaison S3 vers votre serveur et que vous activez l’adressage de type chemin (path-style).
 
-## Configure
+## Configuration
 
-Replace `http://localhost:9000` with your server address and use your own [access keys](../../security-compliance/iam/access-token.md). The skip flags stop the provider from calling AWS-only metadata and STS endpoints:
+Remplacez `http://localhost:9000` par l’adresse de votre serveur et utilisez vos propres [clés d’accès](../../security-compliance/iam/access-token.md). Les options d’omission empêchent le fournisseur d’appeler les points de terminaison de métadonnées et STS propres à AWS :
 
 ```hcl title="main.tf"
 provider "aws" {
@@ -35,7 +35,7 @@ resource "aws_s3_object" "hello" {
 }
 ```
 
-## Apply
+## Application
 
 ```bash
 terraform init
@@ -51,6 +51,6 @@ aws_s3_object.hello: Creation complete after 0s [id=hello.txt]
 Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
 ```
 
-## Next steps
+## Étapes suivantes
 
-See the [SDK overview](../sdk/index.md) to connect an application, or the [AWS CLI example](aws-cli.md) for ad-hoc commands.
+Consultez la [présentation des SDK](../sdk/index.md) pour connecter une application, ou l’[exemple AWS CLI](aws-cli.md) pour des commandes ponctuelles.

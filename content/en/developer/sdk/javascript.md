@@ -3,11 +3,11 @@ title: "JavaScript SDK Guide"
 description: "Use the official AWS SDK for JavaScript v3 with RustFS."
 ---
 
-## I. Overview
+## Overview
 
 RustFS ships no first-party JavaScript SDK — it is S3-compatible, so you use the official AWS SDK for JavaScript (v3) configured to point at your RustFS server. This guide shows how to connect to RustFS and perform common object storage operations.
 
-## II. Prerequisites
+## Prerequisites
 
 * Node.js 18 or later
 * A running RustFS instance (see the [Installation Guide](../../installation/index.md)) — the S3 API listens on port `9000`, the Console on port `9001`
@@ -19,9 +19,9 @@ If you did not set credentials at install time, the server defaults to `rustfsad
 
 :::
 
-### 2.1 SDK Installation
+### Install the SDK
 
-Install the required AWS SDK v3 modules with NPM:
+Install the required AWS SDK v3 modules with npm:
 
 ```bash
 npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
@@ -31,7 +31,7 @@ The examples below use ES modules (`import`). Set `"type": "module"` in your `pa
 
 ---
 
-## III. Initializing the Client
+## Initialize the client
 
 The following is a complete, runnable script. Replace `localhost` with your server's IP address if RustFS runs on another machine, and fill in your own access keys:
 
@@ -67,9 +67,9 @@ All snippets below reuse this `s3` client.
 
 ---
 
-## IV. Basic Operations
+## Basic operations
 
-### 4.1 Create Bucket
+### Create a bucket
 
 ```js
 import { CreateBucketCommand } from "@aws-sdk/client-s3";
@@ -84,7 +84,7 @@ Bucket created
 
 ---
 
-### 4.2 Upload Object
+### Upload an object
 
 ```js
 import { PutObjectCommand } from "@aws-sdk/client-s3";
@@ -109,7 +109,7 @@ File uploaded
 
 ---
 
-### 4.3 Download Object
+### Download an object
 
 ```js
 import { GetObjectCommand } from "@aws-sdk/client-s3";
@@ -137,7 +137,7 @@ File downloaded
 
 ---
 
-### 4.4 List Objects
+### List objects
 
 ```js
 import { ListObjectsV2Command } from "@aws-sdk/client-s3";
@@ -152,7 +152,7 @@ hello.txt (12 bytes)
 
 ---
 
-### 4.5 Delete Object
+### Delete an object
 
 ```js
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
@@ -167,11 +167,11 @@ File deleted
 
 ---
 
-## V. Advanced Features
+## Advanced features
 
-### 5.1 Generate Presigned URLs
+### Generate presigned URLs
 
-> Allows frontend or third parties to use temporary links for uploading/downloading files
+Presigned URLs let browser clients or third parties upload or download objects through temporary links.
 
 #### Download (GET)
 
@@ -209,7 +209,7 @@ console.log("Presigned PUT URL:", url);
 
 ---
 
-### 5.2 Multipart Upload
+### Upload an object in parts
 
 ```js
 import {
@@ -275,21 +275,21 @@ Multipart upload completed
 
 ---
 
-## VI. Common Issues and Notes
+## Troubleshooting
 
 | Problem | Cause | Solution |
 | --------------------------- | -------------------- | --------------------------------------- |
-| SignatureDoesNotMatch | Wrong signature version | JS SDK v3 uses v4 by default, ensure RustFS supports v4 |
-| EndpointConnectionError | Endpoint address misconfigured or not started | Check if RustFS address is accessible |
-| NoSuchKey | File does not exist | Check if `Key` is spelled correctly |
+| SignatureDoesNotMatch | Signature mismatch | SDK v3 signs with SigV4 by default; check credentials, region, and endpoint |
+| EndpointConnectionError | Endpoint address misconfigured or not started | Check that the RustFS address is reachable |
+| NoSuchKey | Object does not exist | Check the object key |
 | InvalidAccessKeyId / Secret | Credentials misconfigured | Check `accessKeyId` / `secretAccessKey` configuration |
 | Upload failure (path issue) | Path-style not enabled | Set `forcePathStyle: true` |
 
 ---
 
-## VII. Appendix: Frontend Upload Adaptation
+## Appendix: Browser uploads
 
-Using presigned URLs allows browsers to upload files directly without passing AccessKey.
+With presigned URLs, browsers can upload objects directly without access to your credentials.
 
 Frontend (HTML+JS) upload example:
 
@@ -312,4 +312,4 @@ Frontend (HTML+JS) upload example:
 </script>
 ```
 
-For other operations (object tagging, bucket policies, and more), see the [AWS SDK for JavaScript v3 documentation](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/) — every S3-compatible call works against RustFS the same way.
+For other operations (object tagging, bucket policies, and more), see the [AWS SDK for JavaScript v3 documentation](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/) — most S3 operations work the same way against RustFS; see [S3 compatibility](/reference/s3-compatibility) for exceptions.

@@ -1,23 +1,23 @@
 ---
-title: "Rust SDK Guide"
-description: "Operate RustFS instances through the AWS SDK for Rust, including creation and deletion of buckets and objects."
+title: "Rust"
+description: "AWS SDK for Rust を使い、RustFS でバケットとオブジェクトを作成および削除します。"
 ---
 
-RustFS ships no first-party Rust client crate — it is fully S3-compatible, so you use the official AWS SDK for Rust (`aws-sdk-s3`) configured to point at your RustFS server. Through the SDK, you can operate RustFS, including creation and deletion of buckets/objects, file upload and download, etc.
+RustFS は独自の Rust クライアントクレートを提供していません。S3 互換であるため、公式の AWS SDK for Rust（`aws-sdk-s3`）を、RustFS サーバーを指すように設定して使います。この SDK で、バケットの作成と削除、およびオブジェクトのアップロード、ダウンロード、削除ができます。
 
-## Prerequisites
+## 前提条件
 
-- Rust 1.78 or later (install via [rustup](https://rustup.rs/))
-- An available RustFS instance (refer to [Installation Guide](../../installation/index.md)) — the S3 API listens on port `9000`, the Console on port `9001`
-- Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (refer to [Access Key Management](../../security-compliance/iam/access-token.md))
+- Rust 1.78 以降（[rustup](https://rustup.rs/) でインストールします）
+- 利用できる RustFS インスタンス（[インストールガイド](../../installation/index.md)を参照）。S3 API はポート `9000`、Console はポート `9001` で待ち受けます
+- インストール時に環境変数 `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` で設定するアクセスキー（[アクセスキーの管理](../../security-compliance/iam/access-token.md)を参照）
 
-:::tip[Local test]
+:::tip[ローカル検証]
 
-If you did not set credentials at install time, the server defaults to `rustfsadmin` / `rustfsadmin` — fine for a throwaway local trial, never for anything reachable by others.
+インストール時に認証情報を設定しなかった場合、サーバーの既定値は `rustfsadmin` / `rustfsadmin` です。使い捨てのローカル検証であれば問題ありませんが、外部から到達できる環境では使わないでください。
 
 :::
 
-Create a project and add the dependencies:
+プロジェクトを作成し、依存関係を追加します。
 
 ```bash
 cargo new rustfs-rust-demo && cd rustfs-rust-demo
@@ -25,7 +25,7 @@ cargo add aws-config aws-sdk-s3 anyhow
 cargo add tokio --features full
 ```
 
-Your `Cargo.toml` should contain:
+`Cargo.toml` は、次の内容になっているはずです。
 
 ```toml title="Cargo.toml"
 [dependencies]
@@ -35,9 +35,9 @@ aws-sdk-s3 = "1"
 tokio = { version = "1", features = ["full"] }
 ```
 
-## Initializing the Client
+## クライアントの初期化
 
-The following is a complete, runnable program. It loads the connection settings from environment variables, initializes the S3 client, and lists your buckets:
+次のプログラムは、そのまま実行できます。環境変数から接続設定を読み込み、S3 クライアントを初期化して、バケットを一覧します。
 
 ```rust title="src/main.rs"
 use anyhow::Result;
@@ -108,11 +108,11 @@ async fn main() -> Result<()> {
 
 :::note
 
-These environment variable names (`RUSTFS_ENDPOINT_URL`, `RUSTFS_REGION`, `RUSTFS_ACCESS_KEY_ID`, `RUSTFS_SECRET_ACCESS_KEY`) are just this example's client-side conventions — they are read by your program, not by RustFS. They are distinct from the server-side `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` variables used when installing RustFS.
+これらの環境変数名（`RUSTFS_ENDPOINT_URL`、`RUSTFS_REGION`、`RUSTFS_ACCESS_KEY_ID`、`RUSTFS_SECRET_ACCESS_KEY`）は、この例だけのクライアント側の取り決めです。このプログラムが読み取り、RustFS サーバーは参照しません。インストール時に使うサーバー側の `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` とは別の変数です。
 
 :::
 
-Run it (replace `localhost` with your server's IP address if RustFS runs on another machine):
+実行します（RustFS が別のマシンで動作している場合は、`localhost` をサーバーの IP アドレスに置き換えます）。
 
 ```bash
 export RUSTFS_ENDPOINT_URL="http://localhost:9000"
@@ -126,9 +126,9 @@ cargo run
 Bucket: Some("my-bucket")
 ```
 
-You can now use the client for the operations below. Each snippet runs inside `main`, reusing `rustfs_client`.
+これで、以下の操作にクライアントを使えます。各コード片は `main` の中で実行し、`rustfs_client` を再利用します。
 
-## Create Bucket
+## バケットの作成
 
 ```rust
 match rustfs_client
@@ -151,7 +151,7 @@ match rustfs_client
 Bucket created successfully
 ```
 
-## Delete Bucket
+## バケットの削除
 
 ```rust
 match rustfs_client
@@ -174,7 +174,7 @@ match rustfs_client
 Bucket deleted successfully
 ```
 
-## List Buckets
+## バケットの一覧
 
 ```rust
 match rustfs_client.list_buckets().send().await {
@@ -196,7 +196,7 @@ Total buckets number is 1
 Bucket: Some("my-bucket")
 ```
 
-## List Objects
+## オブジェクトの一覧
 
 ```rust
 match rustfs_client
@@ -223,16 +223,16 @@ Total objects number is 1
 Object: Some("hello.txt")
 ```
 
-## Upload File
+## ファイルのアップロード
 
-Add these imports at the top of `src/main.rs`:
+`src/main.rs` の先頭に、次の import を追加します。
 
 ```rust
 use aws_sdk_s3::primitives::ByteStream;
 use tokio::fs;
 ```
 
-Then upload a local file:
+続けて、ローカルファイルをアップロードします。
 
 ```rust
 let data = fs::read("/path/to/hello.txt").await.expect("can not open the file");
@@ -259,7 +259,7 @@ match rustfs_client
 Object uploaded successfully, res: PutObjectOutput { e_tag: Some("\"...\""), ... }
 ```
 
-## Download Object
+## オブジェクトのダウンロード
 
 ```rust
 match rustfs_client
@@ -284,4 +284,4 @@ match rustfs_client
 Object content: hello rustfs
 ```
 
-For other operations (presigned URLs, multipart uploads, and more), see the [AWS SDK for Rust documentation](https://docs.aws.amazon.com/sdk-for-rust/latest/dg/) — every S3-compatible call works against RustFS the same way.
+署名付き URL、マルチパートアップロードなどの操作については、[AWS SDK for Rust のドキュメント](https://docs.aws.amazon.com/sdk-for-rust/latest/dg/)を参照します。ほとんどの S3 操作は、RustFS に対しても同じように動作します。例外は [S3 互換性](/ja/reference/s3-compatibility) を参照します。

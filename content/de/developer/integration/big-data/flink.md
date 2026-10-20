@@ -16,7 +16,7 @@ flowchart LR
 	Init["init-bucket job"] -->|"create my-bucket"| RustFS
 ```
 
-Das Plugin `flink-s3-fs-hadoop` registriert das `s3://`-Schema für Flinks filesystem-Connector. Endpunkt, Path-Style-Adressierung, Plain HTTP und Anmeldeinformationen werden über `s3.*`-Properties in `flink-conf.yaml` konfiguriert (übergeben via `FLINK_PROPERTIES`).
+Das Plugin `flink-s3-fs-hadoop` registriert das Schema `s3://` für den Filesystem-Connector von Flink. Endpunkt, pfadbasierte Adressierung (Path-Style), Plain HTTP und Zugangsdaten werden über `s3.*`-Properties in `flink-conf.yaml` konfiguriert (übergeben via `FLINK_PROPERTIES`).
 
 ## 1. Projektdateien anlegen
 
@@ -27,14 +27,14 @@ mkdir rustfs-flink
 cd rustfs-flink
 ```
 
-Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Anmeldeinformationen:
+Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Zugangsdaten:
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Verwenden Sie dedizierte Anmeldeinformationen für den Bucket. Committen Sie `.env` nicht in die Versionsverwaltung.
+Verwenden Sie dedizierte Zugangsdaten für den Bucket. Nehmen Sie `.env` nicht in die Versionsverwaltung auf.
 
 Das S3-Plugin liegt im Image unter `/opt/flink/opt/` und muss geladen werden, indem es nach `/opt/flink/plugins/s3fs/` kopiert wird. Bereiten Sie ein lokales Verzeichnis dafür vor:
 
@@ -187,7 +187,7 @@ Der Job endet, sobald alle Zeilen geschrieben sind.
 
 ## 4. Die Daten zurücklesen
 
-Erstellen Sie die Lesekonfiguration — der filesystem-Connector durchsucht das Präfix:
+Erstellen Sie die Lesekonfiguration — der Filesystem-Connector durchsucht das Präfix:
 
 ```yaml title="read.sql"
 CREATE TABLE readings (
@@ -233,13 +233,13 @@ docker compose run --rm --entrypoint /bin/sh create-bucket -c \
 [2026-09-21 01:34:52]       41 B flink-out/part-f759f9e8-3d1b-46a1-a92e-53e9b727e831-task-0-file-0
 ```
 
-Sie können das Präfix auch in der RustFS-Konsole anzeigen:
+Sie können das Präfix auch in der RustFS Console anzeigen:
 
-![Die in der RustFS-Konsole gespeicherte Flink-Ausgabedatei](./images/rustfs-flink-objects.png)
+![Die in der RustFS Console gespeicherte Flink-Ausgabedatei](./images/rustfs-flink-objects.png)
 
 ## 6. RustFS S3 Tables verwenden
 
-RustFS S3 Tables bietet einen integrierten Apache-Iceberg-REST-Katalog, sodass Flink einen Table-Bucket als verwaltetes Iceberg-Warehouse nutzen kann, während die Daten in RustFS bleiben. Aktivieren Sie einen Table-Bucket und richten Sie den REST-Katalog des Flink-Iceberg-Connectors auf RustFS, wie in [S3 Tables](/administration/data/s3-tables) beschrieben: Die REST-Katalog-URI ist `http://<rustfs-host>:9000/iceberg`, das Warehouse ist der Bucket-Name, und sowohl Kataloganfragen (AWS Signature Version 4, Signing-Name `s3`) als auch der S3-Dateizugriff verwenden Path-Style-Adressierung.
+RustFS S3 Tables bietet einen integrierten Apache-Iceberg-REST-Katalog, sodass Flink einen Tabellen-Bucket als verwaltetes Iceberg-Warehouse nutzen kann, während die Daten in RustFS bleiben. Aktivieren Sie einen Tabellen-Bucket und richten Sie den REST-Katalog des Flink-Iceberg-Connectors auf RustFS, wie in [S3 Tables](/de/administration/data/s3-tables) beschrieben: Die REST-Katalog-URI ist `http://<rustfs-host>:9000/iceberg`, das Warehouse ist der Bucket-Name, und sowohl Kataloganfragen (AWS Signature Version 4, Signing-Name `s3`) als auch der S3-Dateizugriff verwenden pfadbasierte Adressierung (Path-Style).
 
 Laut der S3-Tables-Support-Matrix validieren Sie die exakten Flink- und Iceberg-Versionen Ihrer Bereitstellung gegen den Katalog, bevor Sie diesen Pfad in Produktion übernehmen.
 
@@ -261,7 +261,7 @@ docker compose down --volumes
 
 ### No AWS Credentials provided / AccessDenied bei Schreibvorgängen
 
-Das S3-Plugin liest seine Anmeldeinformationen aus den `s3.*`-Properties in `flink-conf.yaml`. Stellen Sie sicher, dass `s3.access-key`, `s3.secret-key`, `s3.endpoint` und `s3.path-style-access` in `FLINK_PROPERTIES` für **sowohl** den JobManager als auch den TaskManager gesetzt sind und dass das Plugin-jar auf beiden unter `/opt/flink/plugins/s3fs/` liegt.
+Das S3-Plugin liest seine Zugangsdaten aus den `s3.*`-Properties in `flink-conf.yaml`. Stellen Sie sicher, dass `s3.access-key`, `s3.secret-key`, `s3.endpoint` und `s3.path-style-access` in `FLINK_PROPERTIES` für **sowohl** den JobManager als auch den TaskManager gesetzt sind und dass das Plugin-jar auf beiden unter `/opt/flink/plugins/s3fs/` liegt.
 
 ### Der TaskManager kann den Host `rustfs` nicht auflösen
 
@@ -273,6 +273,6 @@ Die Wiederherstellung eines laufenden S3-Uploads nach einem Fehler kann den Writ
 
 ## Nächste Schritte
 
-- Lesen Sie die [S3-Kompatibilitätshinweise](/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
-- Erstellen Sie dedizierte Produktions-Anmeldeinformationen mit dem [Access Key Management](/security-compliance/iam/access-token).
-- Folgen Sie der [Apache-Flink-Dokumentation](https://nightlies.apache.org/flink/flink-docs-stable/) für filesystem-Connector-Optionen wie Partitionierung und Kompaktierung.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [Apache-Flink-Dokumentation](https://nightlies.apache.org/flink/flink-docs-stable/) für Filesystem-Connector-Optionen wie Partitionierung und Kompaktierung.

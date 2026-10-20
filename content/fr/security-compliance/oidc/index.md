@@ -1,40 +1,40 @@
 ---
 title: "OIDC"
-description: "Understand how RustFS uses OpenID Connect providers for Console single sign-on."
+description: "Comprenez comment RustFS utilise les fournisseurs OpenID Connect pour l’authentification unique de la Console."
 ---
 
-RustFS supports OpenID Connect (OIDC) for Console single sign-on. Use this overview to understand the authentication flow, prepare an identity provider, and choose a provider-specific configuration guide.
+RustFS prend en charge OpenID Connect (OIDC) pour l’authentification unique de la Console. Utilisez cette vue d’ensemble pour comprendre le flux d’authentification, préparer un fournisseur d’identité et choisir un guide de configuration propre à un fournisseur.
 
-## How OIDC works
+## Fonctionnement d’OIDC
 
-RustFS uses the OIDC Authorization Code Flow with Proof Key for Code Exchange (PKCE):
+RustFS utilise le flux Authorization Code d’OIDC avec Proof Key for Code Exchange (PKCE) :
 
-1. RustFS sends an authorization request with an S256 PKCE challenge.
-2. The identity provider authenticates you and returns an authorization code to the RustFS callback URL.
-3. RustFS exchanges the code at the provider's token endpoint.
-4. RustFS verifies the ID token signature, issuer, audience, expiry, and nonce.
-5. RustFS maps configured token claims to local Identity and Access Management (IAM) policies and creates a Console session with temporary credentials.
+1. RustFS envoie une demande d’autorisation avec un défi PKCE S256.
+2. Le fournisseur d’identité vous authentifie et renvoie un code d’autorisation à l’URL de rappel de RustFS.
+3. RustFS échange le code auprès du point de terminaison de jeton du fournisseur.
+4. RustFS vérifie la signature du jeton d’identité, l’émetteur, l’audience, l’expiration et le nonce.
+5. RustFS associe les claims de jeton configurés à des politiques locales de gestion des identités et des accès (IAM) et crée une session Console avec des identifiants temporaires.
 
-The identity provider authenticates you, while RustFS policies authorize S3 and administration operations.
+Le fournisseur d’identité vous authentifie, tandis que les politiques RustFS autorisent les opérations S3 et d’administration.
 
-## Provider requirements
+## Exigences du fournisseur
 
-Before configuring a provider, prepare:
+Avant de configurer un fournisseur, préparez :
 
-- An OIDC discovery URL that exposes the authorization, token, and JSON Web Key Set (JWKS) endpoints.
-- A confidential client that supports the Authorization Code Flow, S256 PKCE, and client-secret authentication in the token request body.
-- An exact callback URL in the form `https://<rustfs-host>/rustfs/admin/v3/oidc/callback/<provider-id>`.
-- A public HTTPS origin for the RustFS Console.
-- A flat group or role claim whose values match existing RustFS policy names.
+- Une URL de découverte OIDC qui expose les points de terminaison d’autorisation, de jeton et de jeu de clés JSON Web (JWKS).
+- Un client confidentiel qui prend en charge le flux Authorization Code, PKCE S256 et l’authentification par secret client dans le corps de la requête de jeton.
+- Une URL de rappel exacte de la forme `https://<rustfs-host>/rustfs/admin/v3/oidc/callback/<provider-id>`.
+- Une origine HTTPS publique pour la Console RustFS.
+- Un claim de groupe ou de rôle plat dont les valeurs correspondent à des noms de politiques RustFS existants.
 
-Use a dedicated client for RustFS and grant each identity only the policies it requires.
+Utilisez un client dédié à RustFS et n’accordez à chaque identité que les politiques dont elle a besoin.
 
-## Provider guides
+## Guides des fournisseurs
 
-- [Configure Keycloak](/security-compliance/oidc/keycloak) as an OIDC provider for the RustFS Console.
-- [Configure GitLab](/security-compliance/oidc/gitlab) as an OIDC provider for the RustFS Console.
+- [Configurer Keycloak](/fr/security-compliance/oidc/keycloak) comme fournisseur OIDC pour la Console RustFS.
+- [Configurer GitLab](/fr/security-compliance/oidc/gitlab) comme fournisseur OIDC pour la Console RustFS.
 
-## Next steps
+## Étapes suivantes
 
-- Review [users, groups, and policies](/security-compliance/iam/policies) before mapping identity-provider claims.
-- Review the [Console security notes](/administration/console) before exposing the login endpoint publicly.
+- Consultez [Utilisateurs, groupes et politiques](/fr/security-compliance/iam/policies) avant d’associer les claims du fournisseur d’identité.
+- Consultez les [notes de sécurité de la Console](/fr/administration/console) avant d’exposer publiquement le point de terminaison de connexion.

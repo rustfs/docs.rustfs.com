@@ -1,20 +1,20 @@
 ---
-title: "CLI Client (rc)"
-description: "Install the RustFS command-line client and use it to connect to and inspect a RustFS cluster."
+title: "CLI-Client (rc)"
+description: "Installieren Sie den RustFS-Kommandozeilenclient und nutzen Sie ihn, um eine Verbindung zu einem RustFS-Cluster herzustellen und den Cluster einzusehen."
 ---
 
-`rc` is the RustFS command-line client for S3 object operations and RustFS administration. This guide installs `rc`, configures a cluster alias, and introduces the main inspection commands. The download examples use `v0.1.30`; check the [RustFS CLI releases](https://github.com/rustfs/cli/releases) for a newer version before installing.
+`rc` ist der RustFS-Kommandozeilenclient für S3-Objektoperationen und die RustFS-Verwaltung. In dieser Anleitung installieren Sie `rc`, konfigurieren einen Cluster-Alias und lernen die wichtigsten Befehle zur Einsicht kennen. Die Download-Beispiele verwenden `v0.1.30`. Prüfen Sie vor der Installation die [RustFS-CLI-Releases](https://github.com/rustfs/cli/releases) auf eine neuere Version.
 
 ## Installation
 
 ### Linux
 
-The default Linux archives are statically linked with musl for broad compatibility. Choose the tab that matches `uname -m`.
+Die Standardarchive für Linux sind für eine breite Kompatibilität statisch mit musl gelinkt. Wählen Sie die Registerkarte, die zu `uname -m` passt.
 
 <Tabs items={["AMD64", "ARM64"]} updateAnchor={false}>
 	<Tab value="AMD64" id="rc-linux-amd64">
 
-For an `x86_64` host:
+Für einen Host mit `x86_64`:
 
 ```bash
 curl -fLO https://github.com/rustfs/cli/releases/download/v0.1.30/rustfs-cli-linux-amd64-v0.1.30.tar.gz
@@ -25,7 +25,7 @@ sudo install -m 0755 rc /usr/local/bin/rc
 	</Tab>
 	<Tab value="ARM64" id="rc-linux-arm64">
 
-For an `aarch64` host:
+Für einen Host mit `aarch64`:
 
 ```bash
 curl -fLO https://github.com/rustfs/cli/releases/download/v0.1.30/rustfs-cli-linux-arm64-v0.1.30.tar.gz
@@ -36,16 +36,16 @@ sudo install -m 0755 rc /usr/local/bin/rc
 	</Tab>
 </Tabs>
 
-If your environment specifically requires a glibc-linked binary, select the `linux-amd64-gnu` or `linux-arm64-gnu` archive from the release page.
+Wenn Ihre Umgebung ausdrücklich eine mit glibc gelinkte Binärdatei benötigt, wählen Sie auf der Release-Seite das Archiv `linux-amd64-gnu` oder `linux-arm64-gnu`.
 
 ### macOS
 
-Choose the tab that matches the value returned by `uname -m`.
+Wählen Sie die Registerkarte, die zum Wert von `uname -m` passt.
 
 <Tabs items={["Intel", "Apple silicon"]} updateAnchor={false}>
 	<Tab value="Intel" id="rc-macos-amd64">
 
-For an Intel (`x86_64`) Mac:
+Für einen Intel-Mac (`x86_64`):
 
 ```bash
 curl -fLO https://github.com/rustfs/cli/releases/download/v0.1.30/rustfs-cli-macos-amd64-v0.1.30.tar.gz
@@ -56,7 +56,7 @@ sudo install -m 0755 rc /usr/local/bin/rc
 	</Tab>
 	<Tab value="Apple silicon" id="rc-macos-arm64">
 
-For an Apple silicon (`arm64`) Mac:
+Für einen Mac mit Apple Silicon (`arm64`):
 
 ```bash
 curl -fLO https://github.com/rustfs/cli/releases/download/v0.1.30/rustfs-cli-macos-arm64-v0.1.30.tar.gz
@@ -67,7 +67,7 @@ sudo install -m 0755 rc /usr/local/bin/rc
 	</Tab>
 </Tabs>
 
-You can alternatively install the package through Homebrew:
+Sie können das Paket alternativ über Homebrew installieren:
 
 ```bash
 brew install rustfs/tap/rc
@@ -75,63 +75,63 @@ brew install rustfs/tap/rc
 
 ### Windows
 
-The current Windows release provides an AMD64 binary. Install it through the official Scoop bucket:
+Die aktuelle Windows-Version stellt eine AMD64-Binärdatei bereit. Installieren Sie sie über den offiziellen Scoop-Bucket:
 
 ```powershell
 scoop bucket add rustfs https://github.com/rustfs/scoop-bucket
 scoop install rustfs/rc
 ```
 
-### Verify the installation
+### Installation prüfen
 
-Open a new terminal and verify that `rc` is available:
+Öffnen Sie ein neues Terminal und prüfen Sie, ob `rc` verfügbar ist:
 
 ```bash
 rc --version
 rc --help
 ```
 
-## Usage
+## Verwendung
 
-### Configure an alias
+### Alias konfigurieren
 
-An alias stores the RustFS endpoint and credentials so you do not need to repeat them for every command. Replace the credentials before running:
+Ein Alias speichert den RustFS-Endpunkt und die Zugangsdaten, damit Sie sie nicht bei jedem Befehl wiederholen müssen. Ersetzen Sie die Zugangsdaten, bevor Sie den Befehl ausführen:
 
 ```bash
 rc alias set local http://localhost:9000 <your-access-key> <your-secret-key>
 rc alias list
 ```
 
-`alias set` replaces an existing alias with the same name. `alias list` does not print secret keys.
+`alias set` ersetzt einen vorhandenen Alias mit demselben Namen. `alias list` gibt geheime Zugriffsschlüssel nicht aus.
 
-### Check service health
+### Integrität des Dienstes prüfen
 
-Check whether the service is live and whether its required dependencies are ready:
+Prüfen Sie, ob der Dienst läuft und ob die erforderlichen Abhängigkeiten bereit sind:
 
 ```bash
 rc ping local
 rc ready local
 ```
 
-### Inspect the cluster
+### Cluster einsehen
 
-Use the administrative cluster information command to inspect cluster status, servers, disks, and storage capacity:
+Nutzen Sie den administrativen Befehl für Clusterinformationen, um Clusterstatus, Server, Laufwerke und Speicherkapazität einzusehen:
 
 ```bash
 rc admin info cluster local
 ```
 
-List server pools when the deployment uses multiple pools:
+Listen Sie die Serverpools auf, wenn die Bereitstellung mehrere Speicherpools verwendet:
 
 ```bash
 rc admin pool list local
 ```
 
-Administrative commands require credentials with the corresponding RustFS Admin API permissions.
+Administrative Befehle erfordern Zugangsdaten mit den entsprechenden Berechtigungen der RustFS Admin API.
 
-### Inspect buckets and objects
+### Buckets und Objekte einsehen
 
-Prefer the noun-first command groups for new scripts:
+Bevorzugen Sie für neue Skripte die Befehlsgruppen, die mit dem Substantiv beginnen:
 
 ```bash
 rc bucket list local/
@@ -139,9 +139,9 @@ rc object list local/my-bucket
 rc object stat local/my-bucket/hello.txt
 ```
 
-### Manage lifecycle rules and storage tiers
+### Lebenszyklusregeln und Speicherstufen verwalten
 
-`rc` groups lifecycle rules, remote storage tiers, and restore requests under `bucket lifecycle`:
+`rc` fasst Lebenszyklusregeln, entfernte Speicherstufen und Wiederherstellungsanforderungen unter `bucket lifecycle` zusammen:
 
 ```bash
 rc bucket lifecycle rule list local/my-bucket
@@ -149,13 +149,13 @@ rc bucket lifecycle tier list local
 rc bucket lifecycle restore local/my-bucket/hello.txt --days 7
 ```
 
-Use the `rule` commands to add, edit, remove, export, or import bucket lifecycle rules. Use the `tier` commands to add, inspect, update credentials for, or remove a remote tier. The older `rc ilm` form remains available as a compatibility alias, but we recommend `rc bucket lifecycle` for new scripts.
+Mit den `rule`-Befehlen fügen Sie Bucket-Lebenszyklusregeln hinzu, bearbeiten, entfernen, exportieren oder importieren sie. Mit den `tier`-Befehlen fügen Sie eine entfernte Stufe hinzu, lesen sie aus, aktualisieren ihre Zugangsdaten oder entfernen sie. Die ältere Form `rc ilm` bleibt als Kompatibilitätsalias verfügbar. Wir empfehlen für neue Skripte `rc bucket lifecycle`.
 
-See [Lifecycle Management](/administration/data/lifecycle-management) for rule and restore workflows, and [Tiered Storage](/administration/data/tiered-storage) for remote-tier configuration and maintenance.
+Siehe [Lebenszyklusverwaltung](/de/administration/data/lifecycle-management) für Abläufe zu Regeln und Wiederherstellung und [Gestufte Speicherung](/de/administration/data/tiered-storage) für Konfiguration und Wartung entfernter Stufen.
 
-### Discover more commands
+### Weitere Befehle anzeigen
 
-Use `--help` at any command level to see the commands and options supported by your installed version:
+Verwenden Sie `--help` auf jeder Befehlsebene, um die Befehle und Optionen Ihrer installierten Version anzuzeigen:
 
 ```bash
 rc --help
@@ -167,4 +167,4 @@ rc bucket lifecycle --help
 rc object --help
 ```
 
-For the complete source and command reference, see the [RustFS CLI repository](https://github.com/rustfs/cli).
+Den vollständigen Quellcode und die Befehlsreferenz finden Sie im [RustFS-CLI-Repository](https://github.com/rustfs/cli).

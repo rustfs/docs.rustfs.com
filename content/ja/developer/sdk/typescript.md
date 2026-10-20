@@ -1,32 +1,32 @@
 ---
-title: "RustFS TypeScript SDK Usage Guide"
-description: "Operate RustFS from TypeScript with the AWS SDK for JavaScript v3, including creation and deletion of buckets and objects."
+title: "TypeScript"
+description: "AWS SDK for JavaScript v3 を使い、TypeScript から RustFS のバケットとオブジェクトを作成および削除します。"
 ---
 
-RustFS ships no first-party TypeScript SDK — it is fully S3-compatible, so you use the official AWS SDK for JavaScript v3 (which ships its own TypeScript type definitions) configured to point at your RustFS server. Through the SDK, you can operate RustFS, including creation and deletion of buckets/objects, file upload and download, etc.
+RustFS は独自の TypeScript SDK を提供していません。S3 互換であるため、公式の AWS SDK for JavaScript v3（TypeScript の型定義を含みます）を、RustFS サーバーを指すように設定して使います。この SDK で、バケットの作成と削除、およびオブジェクトのアップロード、ダウンロード、削除ができます。
 
-## Prerequisites
+## 前提条件
 
-- Node.js 18 or later (the examples use ES modules — set `"type": "module"` in your `package.json`)
-- An available RustFS instance (refer to [Installation Guide](../../installation/index.md) for installation) — the S3 API listens on port `9000`, the Console on port `9001`
-- Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (refer to [Access Key Management](../../security-compliance/iam/access-token.md) for creation)
+- Node.js 18 以降（例は ES modules を使います。`package.json` に `"type": "module"` を設定します）
+- 稼働している RustFS インスタンス（[インストールガイド](../../installation/index.md)を参照）。S3 API はポート `9000`、Console はポート `9001` で待ち受けます
+- インストール時に環境変数 `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` で設定するアクセスキー（作成方法は[アクセスキーの管理](../../security-compliance/iam/access-token.md)を参照）
 
-:::tip[Local test]
+:::tip[ローカル検証]
 
-If you did not set credentials at install time, the server defaults to `rustfsadmin` / `rustfsadmin` — fine for a throwaway local trial, never for anything reachable by others.
+インストール時に認証情報を設定しなかった場合、サーバーの既定値は `rustfsadmin` / `rustfsadmin` です。使い捨てのローカル検証であれば問題ありませんが、外部から到達できる環境では使わないでください。
 
 :::
 
-Install the dependencies:
+依存関係をインストールします。
 
 ```bash
 npm install @aws-sdk/client-s3
 npm install --save-dev typescript tsx @types/node
 ```
 
-## Initializing the Client
+## クライアントの初期化
 
-The following is a complete, runnable example. Replace `localhost` with your server's IP address if RustFS runs on another machine, and fill in your own access keys:
+次の例は、そのまま実行できます。RustFS が別のマシンで動作している場合は `localhost` をサーバーの IP アドレスに置き換え、アクセスキーも自分の値にします。
 
 ```typescript title="main.ts"
 import {
@@ -55,7 +55,7 @@ const response = await rustfs_client.send(new ListBucketsCommand({}));
 console.log(response.Buckets?.map((bucket) => bucket.Name) ?? []);
 ```
 
-Run it:
+実行します。
 
 ```bash
 npx tsx main.ts
@@ -65,9 +65,9 @@ npx tsx main.ts
 [ 'my-bucket' ]
 ```
 
-Then use the constructed `rustfs_client` for the operations below.
+以降の操作では、ここで構築した `rustfs_client` を使います。
 
-## Create Bucket
+## バケットの作成
 
 ```typescript
 async function createBucket() {
@@ -88,7 +88,7 @@ async function createBucket() {
 Bucket created: /my-bucket
 ```
 
-## Delete Bucket
+## バケットの削除
 
 ```typescript
 async function deleteBucket() {
@@ -109,7 +109,7 @@ async function deleteBucket() {
 Bucket deleted
 ```
 
-## List Buckets
+## バケットの一覧
 
 ```typescript
 async function listBuckets() {
@@ -126,7 +126,7 @@ async function listBuckets() {
 my-bucket
 ```
 
-## List Objects
+## オブジェクトの一覧
 
 ```typescript
 async function listObjects() {
@@ -147,7 +147,7 @@ async function listObjects() {
 test/hello.txt (12 bytes)
 ```
 
-## Upload File
+## ファイルのアップロード
 
 ```typescript
 async function uploadFile() {
@@ -170,7 +170,7 @@ async function uploadFile() {
 Object uploaded
 ```
 
-## Download Object
+## オブジェクトのダウンロード
 
 ```typescript
 async function getObject() {
@@ -201,4 +201,4 @@ async function getObject() {
 Object content: hello rustfs
 ```
 
-For other operations (presigned URLs, multipart uploads, and more), see the [AWS SDK for JavaScript v3 documentation](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/) — every S3-compatible call works against RustFS the same way.
+署名付き URL、マルチパートアップロードなどの操作については、[AWS SDK for JavaScript v3 のドキュメント](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/)を参照します。ほとんどの S3 操作は、RustFS に対しても同じように動作します。例外は [S3 互換性](/ja/reference/s3-compatibility) を参照します。

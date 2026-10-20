@@ -1,13 +1,13 @@
 ---
 title: "ClickHouse"
-description: "Run ClickHouse with an S3 disk backed by RustFS for MergeTree table data."
+description: "MergeTree テーブルのデータ向けに、RustFS をバックエンドとする S3 ディスクで ClickHouse を実行します。"
 ---
 
-This guide connects [ClickHouse](https://github.com/ClickHouse/ClickHouse) — the real-time OLAP database — to **RustFS** through ClickHouse's S3 disk storage policy. You will start a ClickHouse server with Docker, create a MergeTree table that stores its parts on RustFS, insert rows, and verify that the table data lives in the bucket. The workflow was verified with `clickhouse/clickhouse-server:25.8` and `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、リアルタイム OLAP データベースである [ClickHouse](https://github.com/ClickHouse/ClickHouse) を、ClickHouse の S3 ディスクストレージポリシーを通じて **RustFS** に接続します。Docker で ClickHouse サーバーを起動し、パーツを RustFS に保存する MergeTree テーブルを作成して行を挿入し、テーブルデータがバケットにあることを確認します。この流れは `clickhouse/clickhouse-server:25.8` と `rustfs/rustfs-x86-musl:v2.3.1` で検証済みです。
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Docker が必要です。このデプロイはローカルでの統合テストを目的としており、本番環境向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -15,18 +15,18 @@ flowchart LR
 	CH -->|"MergeTree parts"| RustFS["RustFS :9000"]
 ```
 
-The `rustfs` disk is a ClickHouse S3 disk pointed at the `clickhouse-data` bucket. Tables created with the matching storage policy write their parts — data, index, and checksum files — to the bucket instead of the local filesystem.
+`rustfs` ディスクは、`clickhouse-data` バケットを指す ClickHouse の S3 ディスクです。対応するストレージポリシーで作成したテーブルは、パーツ（データ、インデックス、チェックサムのファイル）をローカルファイルシステムではなくバケットへ書き込みます。
 
-## 1. Create the project files
+## 1. プロジェクトファイルを作成する
 
-Create the bucket first — ClickHouse does not create buckets:
+先にバケットを作成します。ClickHouse はバケットを作成しません。
 
 ```bash
 rc alias set rustfs http://<your-rustfs-endpoint>:9000 <your-access-key> <your-secret-key>
 rc mb rustfs/clickhouse-data
 ```
 
-Create the storage configuration, replacing both credential placeholders:
+両方の認証情報プレースホルダーを置き換え、ストレージ設定を作成します。
 
 ```xml title="storage.xml"
 <clickhouse>
@@ -52,9 +52,9 @@ Create the storage configuration, replacing both credential placeholders:
 </clickhouse>
 ```
 
-The endpoint must end with `/` and includes the bucket name as the first path segment. Inside the Compose network the hostname is `rustfs`; from the host use `http://localhost:9000/clickhouse-data/`.
+エンドポイントは `/` で終わる必要があり、先頭のパスセグメントにバケット名を含めます。Compose ネットワーク内のホスト名は `rustfs` です。ホストからは `http://localhost:9000/clickhouse-data/` を使います。
 
-Start ClickHouse with the configuration mounted:
+設定をマウントして ClickHouse を起動します。
 
 ```bash
 docker run -d --name clickhouse --network oo-rustfs_default \
@@ -64,9 +64,9 @@ docker run -d --name clickhouse --network oo-rustfs_default \
   clickhouse/clickhouse-server:25.8
 ```
 
-## 2. Create a table on the S3 disk
+## 2. S3 ディスク上にテーブルを作成する
 
-Wait for the HTTP interface, then create a database and a MergeTree table with the storage policy:
+HTTP インターフェースを待ち、ストレージポリシー付きのデータベースと MergeTree テーブルを作成します。
 
 ```bash
 curl "http://localhost:8123/?password=<your-clickhouse-password>" \
@@ -83,7 +83,7 @@ curl "http://localhost:8123/?password=<your-clickhouse-password>" \
     VALUES (1, 'clickhouse-on-rustfs'), (2, 'second')"
 ```
 
-Read the rows back and confirm ClickHouse reports the part on the `rustfs` disk:
+行を読み戻し、ClickHouse がパーツを `rustfs` ディスク上にあると報告することを確認します。
 
 ```bash
 curl "http://localhost:8123/?password=<your-clickhouse-password>" \
@@ -99,15 +99,15 @@ curl "http://localhost:8123/?password=<your-clickhouse-password>" \
 all_1_1_0  rustfs
 ```
 
-## 3. Verify objects in RustFS
+## 3. RustFS 内のオブジェクトを確認する
 
-List the bucket:
+バケットを一覧します。
 
 ```bash
 rc ls rustfs/clickhouse-data/ -r
 ```
 
-ClickHouse writes each part as content-addressed blobs. The output contains several small objects, and the count grows as more parts are written:
+ClickHouse は各パーツをコンテンツアドレス方式のブロブとして書き込みます。出力には複数の小さなオブジェクトが含まれ、パーツが増えると件数も増えます。
 
 ```text
 dtg/hpsyncexixvdnsgorvseobogcgowg
@@ -115,9 +115,9 @@ dzp/zfblobhsatzdveqdrsfqcupkdehja
 izg/gvhchqobrizpkdftuvlmakkoutwps
 ```
 
-![ClickHouse parts stored in the RustFS Console](./images/rustfs-clickhouse-disk.png)
+![RustFS Console に保存された ClickHouse のパーツ](./images/rustfs-clickhouse-disk.png)
 
-The data survives a container restart because the parts live in RustFS:
+パーツは RustFS にあるため、データはコンテナの再起動後も残ります。
 
 ```bash
 docker restart clickhouse
@@ -125,36 +125,36 @@ curl "http://localhost:8123/?password=<your-clickhouse-password>" \
   --data-binary "SELECT count() FROM rustfs_demo.events"
 ```
 
-## 4. Stop or reset the deployment
+## 4. デプロイを停止またはリセットする
 
-Stop the server while keeping the data:
+データを残したままサーバーを停止します。
 
 ```bash
 docker rm -f clickhouse
 ```
 
-The parts stay in the `clickhouse-data` bucket and the table can be queried again after the next start. To delete the data, remove the bucket:
+パーツは `clickhouse-data` バケットに残り、次回起動後にテーブルを再びクエリできます。データを削除する場合はバケットを取り除きます。
 
 ```bash
 rc rb rustfs/clickhouse-data --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### `REQUIRED_PASSWORD` on every query
+### すべてのクエリで `REQUIRED_PASSWORD` が出る
 
-ClickHouse 25.8 images require a password for the `default` user. Set `CLICKHOUSE_PASSWORD` on the container and pass the same value as the `password` query parameter, as shown above.
+ClickHouse 25.8 のイメージでは、`default` ユーザーにパスワードが必要です。コンテナに `CLICKHOUSE_PASSWORD` を設定し、上記のとおり同じ値を `password` クエリパラメーターとして渡します。
 
-### Table creation fails with a disk or endpoint error
+### ディスクまたはエンドポイントのエラーでテーブル作成が失敗する
 
-Confirm that the bucket exists before the table is created, that the endpoint ends with `/`, and that the credentials match the RustFS deployment. Check the server log for the underlying S3 error:
+テーブル作成前にバケットが存在すること、エンドポイントが `/` で終わること、認証情報が RustFS のデプロイと一致することを確認します。根本の S3 エラーはサーバーログで確認します。
 
 ```bash
 docker logs clickhouse | grep -i s3 | tail
 ```
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional ClickHouse operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [ClickHouse S3 disk documentation](https://clickhouse.com/docs/engines/table-engines/mergetree-family/mergetree#table_engine-mergetree-s3) to add a cache disk or a tiered hot/cold policy.
+- 追加の ClickHouse 操作を採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認します。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- キャッシュディスクやホット / コールドの階層ポリシーを追加するには、[ClickHouse S3 ディスクのドキュメント](https://clickhouse.com/docs/engines/table-engines/mergetree-family/mergetree#table_engine-mergetree-s3)に従います。

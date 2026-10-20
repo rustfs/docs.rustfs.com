@@ -3,7 +3,7 @@ title: "Matrice de compatibilité S3"
 description: "Consultez les comportements Amazon S3 testés et volontairement exclus du contrôle de compatibilité RustFS actuel."
 ---
 
-RustFS implémente un sous-ensemble testé de l’API Amazon S3. Cette matrice résume les listes exécutables Ceph s3tests maintenues dans `rustfs/rustfs` ; elle ne prétend pas couvrir tous les comportements S3 standard ou propres à un fournisseur.
+RustFS implémente un sous-ensemble testé de l’API Amazon S3. Cette matrice résume les listes exécutables Ceph s3tests maintenues dans `rustfs/rustfs` ; elle ne prétend pas couvrir tous les comportements S3 standard ou propres à un fournisseur.
 
 L’instantané ci-dessous a été vérifié le 9 août 2026 à partir du commit RustFS [`1e6f5f1e`](https://github.com/rustfs/rustfs/commit/1e6f5f1e35f188f28844a7f81361ccca4d5d0c7b).
 
@@ -18,13 +18,13 @@ L’instantané ci-dessous a été vérifié le 9 août 2026 à partir du commit
 ## Listes de tests exécutables
 
 | Liste | Cas | Rôle |
-| --- | ---: | --- |
+| --- | --- : | --- |
 | [Tests implémentés](https://github.com/rustfs/rustfs/blob/main/scripts/s3-tests/implemented_tests.txt) | 455 | Cas standard censés réussir dans le contrôle par défaut |
 | [Tests du cycle de vie](https://github.com/rustfs/rustfs/blob/main/scripts/s3-tests/lifecycle_behavior_tests.txt) | 5 | Cas d’expiration exécutés dans le contrôle dédié au cycle de vie |
 | [Tests non implémentés](https://github.com/rustfs/rustfs/blob/main/scripts/s3-tests/unimplemented_tests.txt) | 17 | Comportements standard encore planifiés |
 | [Tests exclus](https://github.com/rustfs/rustfs/blob/main/scripts/s3-tests/excluded_tests.txt) | 270 | Cas qui ne bloquent pas le contrôle de compatibilité RustFS |
 
-Le comptage ignore les lignes vides et les commentaires. Les tests changent de liste au fil des évolutions ; consultez les fichiers liés pour obtenir l’état le plus récent.
+Le comptage ignore les lignes vides et les commentaires. Les tests changent de liste au fil des évolutions ; consultez les fichiers liés pour obtenir l’état le plus récent.
 
 ## Opérations sur les compartiments
 
@@ -46,12 +46,12 @@ Le comptage ignore les lignes vides et les commentaires. Les tests changent de l
 | Charger, obtenir, copier, inspecter et supprimer des objets | ✅ Testé | Opérations courantes sur les objets |
 | Comportement de liste avec préfixe, délimiteur, marqueur et `max-keys` | ✅ Testé | `ListObjects` et `ListObjectsV2` |
 | Lectures par plage et conditionnelles | ✅ Testé | Certains cas HTTP Range et de précondition |
-| Métadonnées utilisateur et étiquettes d’objet | ✅ Testé | Aller-retour des métadonnées et des étiquettes |
+| Métadonnées utilisateur et étiquettes d’objet | ✅ Testé | Écriture puis relecture des métadonnées et des étiquettes |
 | URL GET et PUT présignées | ✅ Testé | Certains cas de signature et de requête |
 | SSE-C et certains comportements SSE-KMS | ✅ Testé | Uniquement les objets gérés de bout en bout par RustFS |
 | Gestion des sommes de contrôle des formulaires POST Object | ❌ Planifié | Répertoriée dans la liste non implémentée |
 
-Les formats d’objets chiffrés ne sont pas portables entre RustFS et les autres implémentations S3. La réussite d’un test de chiffrement signifie que RustFS peut lire les objets chiffrés par RustFS ; elle ne garantit pas la lecture d’un objet chiffré copié directement depuis une autre implémentation.
+Les formats d’objets chiffrés ne sont pas portables entre RustFS et les autres implémentations S3. La réussite d’un test de chiffrement signifie que RustFS peut lire les objets chiffrés par RustFS ; elle ne garantit pas la lecture d’un objet chiffré copié directement depuis une autre implémentation.
 
 ## Chargements partitionnés
 

@@ -1,33 +1,33 @@
 ---
 title: "Nginx"
-description: "Deploy RustFS behind Nginx with separate HTTPS endpoints for the S3 API and Console."
+description: "Stellen Sie RustFS hinter Nginx mit getrennten HTTPS-Endpunkten für die S3-API und die Console bereit."
 ---
 
-Use **Nginx** to terminate TLS and route separate hostnames to the RustFS S3 API and Console. This deployment runs Nginx and a single-node RustFS instance with Docker Compose. You need Docker Engine, Docker Compose, two DNS records, and a TLS certificate that covers both hostnames.
+Verwenden Sie **Nginx**, um TLS zu terminieren und getrennte Hostnamen zur RustFS-S3-API und zur Console (Weboberfläche) zu leiten. In dieser Bereitstellung betreiben Sie Nginx und eine RustFS-Instanz mit einem Knoten unter Docker Compose. Sie benötigen Docker Engine, Docker Compose, zwei DNS-Einträge und ein TLS-Zertifikat, das beide Hostnamen abdeckt.
 
-This guide uses these example hostnames:
+Diese Anleitung verwendet diese Beispiel-Hostnamen:
 
-- `s3.example.com` for the S3 API
-- `console.example.com` for the Console
+- `s3.example.com` für die S3-API
+- `console.example.com` für die Console
 
-Replace them with hostnames that resolve to the Docker host.
+Ersetzen Sie sie durch Hostnamen, die auf den Docker-Host zeigen.
 
-:::warning[Serve S3 from the root path]
+:::warning[S3 vom Wurzelpfad bereitstellen]
 
-Do not publish the S3 API under a path such as `/s3/`. AWS Signature Version 4 includes the request path and host, so rewriting either value can invalidate signed requests.
+Veröffentlichen Sie die S3-API nicht unter einem Pfad wie `/s3/`. AWS Signature Version 4 enthält den Anfragepfad und den Host, daher kann das Umschreiben eines der beiden Werte signierte Anfragen ungültig machen.
 
 :::
 
-## 1. Create the deployment directories
+## 1. Die Bereitstellungsverzeichnisse anlegen
 
-Create directories for the Nginx configuration and TLS certificate:
+Legen Sie Verzeichnisse für die Nginx-Konfiguration und das TLS-Zertifikat an:
 
 ```bash
 mkdir -p rustfs-nginx/sites rustfs-nginx/certs
 cd rustfs-nginx
 ```
 
-Copy your certificate chain and private key into `certs/`:
+Kopieren Sie Ihre Zertifikatskette und den privaten Schlüssel nach `certs/`:
 
 ```text
 rustfs-nginx/
@@ -37,26 +37,26 @@ rustfs-nginx/
 └── sites/
 ```
 
-Restrict access to the private key:
+Schränken Sie den Zugriff auf den privaten Schlüssel ein:
 
 ```bash
 chmod 600 certs/privkey.pem
 ```
 
-## 2. Set RustFS credentials
+## 2. RustFS-Zugangsdaten setzen
 
-Create an environment file and replace both credential placeholders:
+Legen Sie eine Umgebungsdatei an und ersetzen Sie beide Platzhalter für die Zugangsdaten:
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Do not commit this file to source control.
+Nehmen Sie diese Datei nicht in die Versionsverwaltung auf.
 
-## 3. Configure Nginx
+## 3. Nginx konfigurieren
 
-Create the Nginx configuration:
+Legen Sie die Nginx-Konfiguration an:
 
 ```nginx title="sites/rustfs.conf"
 map $http_upgrade $connection_upgrade {
@@ -137,11 +137,11 @@ server {
 }
 ```
 
-The S3 server preserves the original host and request path, disables request buffering for streaming uploads, and does not convert signed `HEAD` requests. The Console server also forwards WebSocket upgrade headers.
+Der S3-Server behält den ursprünglichen Host und den Anfragepfad, deaktiviert die Anfragepufferung für Streaming-Uploads und wandelt signierte `HEAD`-Anfragen nicht um. Der Console-Server leitet außerdem die Header für WebSocket-Upgrades weiter.
 
-## 4. Create the Compose file
+## 4. Die Compose-Datei anlegen
 
-Create the deployment definition:
+Legen Sie die Bereitstellungsdefinition an:
 
 ```yaml title="compose.yaml"
 services:
@@ -192,11 +192,11 @@ networks:
   rustfs:
 ```
 
-Only Nginx publishes host ports. RustFS ports `9000` and `9001` remain reachable inside the Compose network.
+Nur Nginx veröffentlicht Host-Ports. Die RustFS-Ports `9000` und `9001` bleiben innerhalb des Compose-Netzwerks erreichbar.
 
-## 5. Validate and start the deployment
+## 5. Die Bereitstellung prüfen und starten
 
-Validate both configuration files before starting the services:
+Prüfen Sie beide Konfigurationsdateien, bevor Sie die Dienste starten:
 
 ```bash
 docker compose config
@@ -204,41 +204,41 @@ docker compose up -d rustfs
 docker compose run --rm --no-deps nginx nginx -t
 ```
 
-Start Nginx and check both services:
+Starten Sie Nginx und prüfen Sie beide Dienste:
 
 ```bash
 docker compose up -d nginx
 docker compose ps
 ```
 
-If a service does not become healthy, inspect its logs:
+Wenn ein Dienst nicht gesund wird, prüfen Sie seine Logs:
 
 ```bash
 docker compose logs nginx
 docker compose logs rustfs
 ```
 
-## 6. Verify both endpoints
+## 6. Beide Endpunkte prüfen
 
-Verify the API and Console through their public HTTPS hostnames:
+Prüfen Sie die API und die Console über ihre öffentlichen HTTPS-Hostnamen:
 
 ```bash
 curl --fail https://s3.example.com/health/ready
 curl --fail https://console.example.com/rustfs/console/health
 ```
 
-Configure S3 clients with `https://s3.example.com` as the endpoint and enable path-style addressing. Open `https://console.example.com/rustfs/console/` to sign in to the Console.
+Konfigurieren Sie S3-Clients mit `https://s3.example.com` als Endpunkt und aktivieren Sie pfadbasierte Adressierung (Path-Style). Öffnen Sie `https://console.example.com/rustfs/console/`, um sich an der Console anzumelden.
 
-When you replace a renewed certificate or key in `certs/`, validate and reload Nginx without interrupting active connections:
+Wenn Sie ein erneuertes Zertifikat oder einen Schlüssel in `certs/` ersetzen, prüfen Sie Nginx und laden Sie es neu, ohne aktive Verbindungen zu unterbrechen:
 
 ```bash
 docker compose exec nginx nginx -t
 docker compose exec nginx nginx -s reload
 ```
 
-## Multi-node upstreams
+## Upstreams mit mehreren Knoten
 
-For a distributed RustFS deployment, replace the single server in each upstream with all RustFS nodes:
+Ersetzen Sie für eine verteilte RustFS-Bereitstellung den einzelnen Server in jedem Upstream durch alle RustFS-Knoten:
 
 ```nginx title="sites/rustfs.conf"
 upstream rustfs_s3 {
@@ -260,10 +260,10 @@ upstream rustfs_console {
 }
 ```
 
-The Console upstream uses client affinity because an in-progress OpenID Connect login stores its `state` on one RustFS node. Keep port `9000` open between RustFS nodes because internal node RPC uses the same listener.
+Der Console-Upstream verwendet Client-Affinität, weil eine laufende OpenID-Connect-Anmeldung ihren `state` auf einem RustFS-Knoten speichert. Halten Sie Port `9000` zwischen den RustFS-Knoten offen, weil der interne Knoten-RPC denselben Listener verwendet.
 
-## Next steps
+## Nächste Schritte
 
-- [Configure an S3 client](/developer/examples/aws-cli)
-- [Enable virtual-hosted-style bucket URLs](/integration/virtual)
-- [Review health and readiness endpoints](/operations/status-check)
+- [Einen S3-Client konfigurieren](/de/developer/examples/aws-cli)
+- [Bucket-URLs mit Adressierung im Virtual-Hosted-Stil aktivieren](/de/integration/virtual)
+- [Endpunkte für Integritätsprüfung und Bereitschaft prüfen](/de/operations/status-check)

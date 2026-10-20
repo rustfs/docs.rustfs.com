@@ -1,46 +1,46 @@
 ---
-title: "Bucket Replication"
-description: "Configure, validate, and monitor asynchronous replication between versioned RustFS buckets."
+title: "Réplication de compartiment"
+description: "Configurez, validez et surveillez la réplication asynchrone entre des compartiments RustFS dont la gestion des versions est activée."
 ---
 
-RustFS bucket replication copies selected object versions from a source bucket to a target bucket. Use it to maintain a remote copy of bucket data, distribute objects between deployments, or prepare a secondary copy for recovery workflows.
+La réplication de compartiment (bucket) RustFS copie les versions d’objets sélectionnées d’un compartiment source vers un compartiment cible. Utilisez-la pour conserver une copie distante des données du compartiment, répartir des objets entre des déploiements ou préparer une copie secondaire pour des flux de reprise.
 
-## Overview
+## Vue d’ensemble
 
-Bucket replication has two configuration layers:
+La réplication de compartiment comporte deux couches de configuration :
 
-1. A **remote target** stores the target endpoint, bucket, credentials, and generated target ARN.
-2. An S3 **replication configuration** attaches rules to the source bucket and references that target ARN.
+1. Une **cible distante** enregistre le point de terminaison cible, le compartiment, les identifiants et l’ARN de cible généré.
+2. Une **configuration de réplication** S3 attache des règles au compartiment source et référence cet ARN de cible.
 
-Both the source and target buckets must have versioning enabled. RustFS verifies the target connection and target-bucket versioning when you register the remote target. It rejects a replication configuration whose enabled rules reference an unknown or stale target ARN.
+Le compartiment source et le compartiment cible doivent tous deux avoir la gestion des versions activée. RustFS vérifie la connexion à la cible et la gestion des versions du compartiment cible lorsque vous enregistrez la cible distante. Il rejette une configuration de réplication dont les règles activées référencent un ARN de cible inconnu ou obsolète.
 
-Replication is asynchronous by default. A successful source upload means RustFS accepted the source object; it does not mean the target copy is already complete.
+La réplication est asynchrone par défaut. Un chargement (upload) source réussi signifie que RustFS a accepté l’objet source ; cela ne signifie pas que la copie cible est déjà terminée.
 
-Rules can select objects by prefix or object tags and control these behaviors:
+Les règles peuvent sélectionner des objets par préfixe ou par étiquettes d’objet, et contrôler ces comportements :
 
-| Rule setting | Behavior |
+| Réglage de règle | Comportement |
 | --- | --- |
-| `Status` | Enables or disables the rule. |
-| `Filter` | Restricts replication by key prefix, object tags, or both. |
-| `ExistingObjectReplication` | Includes objects that existed before the rule when set to `Enabled`. |
-| `DeleteMarkerReplication` | Replicates delete markers when set to `Enabled`. |
-| `DeleteReplication` | Replicates deletion of a specific object version when set to `Enabled`. |
-| `Destination` | Identifies the registered remote target by ARN. |
+| `Status` | Active ou désactive la règle. |
+| `Filter` | Restreint la réplication par préfixe de clé, par étiquettes d’objet, ou par les deux. |
+| `ExistingObjectReplication` | Inclut les objets qui existaient avant la règle lorsqu’il vaut `Enabled`. |
+| `DeleteMarkerReplication` | Réplique les marqueurs de suppression lorsqu’il vaut `Enabled`. |
+| `DeleteReplication` | Réplique la suppression d’une version d’objet précise lorsqu’il vaut `Enabled`. |
+| `Destination` | Identifie la cible distante enregistrée par son ARN. |
 
-Bucket replication is directional. Configure a separate target and rule in the opposite direction if both buckets must accept writes and replicate them to each other. Do not confuse bucket replication with [site replication](/operations/high-availability/site-replication), which synchronizes broader site configuration and identity data.
+La réplication de compartiment est directionnelle. Configurez une cible et une règle distinctes dans le sens inverse si les deux compartiments doivent accepter des écritures et les répliquer l’un vers l’autre. Ne confondez pas la réplication de compartiment avec la [réplication de site](/fr/operations/high-availability/site-replication), qui synchronise une configuration de site et des données d’identité plus larges.
 
 ## Configuration
 
-### Requirements
+### Prérequis
 
-- A source RustFS deployment and a reachable target S3-compatible deployment.
-- A source bucket and target bucket with versioning enabled.
-- A dedicated target credential that can inspect the target bucket's versioning and write replicated object versions and delete markers.
-- A source administrator allowed to manage remote targets and replication configuration.
-- Network access from every source node that can run replication work to the target endpoint.
-- The RustFS [`rc`](/operations/rc) client installed on an administration host.
+- Un déploiement RustFS source et un déploiement cible joignable, compatible avec S3.
+- Un compartiment source et un compartiment cible avec la gestion des versions activée.
+- Un identifiant cible dédié qui peut inspecter la gestion des versions du compartiment cible et écrire les versions d’objets répliquées ainsi que les marqueurs de suppression.
+- Un administrateur source autorisé à gérer les cibles distantes et la configuration de réplication.
+- Un accès réseau vers le point de terminaison cible, depuis chaque nœud source qui peut exécuter le travail de réplication.
+- Le client RustFS [`rc`](/fr/operations/rc) installé sur un hôte d’administration.
 
-Configure one `rc` alias for each deployment. Use dedicated credentials and replace the example endpoints before running the commands:
+Configurez un alias `rc` pour chaque déploiement. Utilisez des identifiants dédiés et remplacez les points de terminaison d’exemple avant d’exécuter les commandes :
 
 ```bash
 rc alias set source https://source.example.com:9000 \
@@ -54,43 +54,43 @@ rc alias set target https://target.example.com:9000 \
 rc alias list
 ```
 
-The source deployment uses the target alias credentials when it registers the remote target. `rc alias list` displays endpoints but does not print secret keys.
+Le déploiement source utilise les identifiants de l’alias cible lorsqu’il enregistre la cible distante. `rc alias list` affiche les points de terminaison, mais n’affiche pas les clés secrètes.
 
-:::warning[Protect target credentials]
+:::warning[Protégez les identifiants cibles]
 
-RustFS stores the target credential as part of the source bucket's remote-target configuration. Use a dedicated credential with access limited to the target bucket and do not reuse a root credential.
+RustFS stocke l’identifiant cible dans la configuration de cible distante du compartiment source. Utilisez un identifiant dédié dont l’accès est limité au compartiment cible, et ne réutilisez pas un identifiant racine.
 
 :::
 
-### Permissions
+### Autorisations
 
-Source-side administration uses these policy actions:
+L’administration côté source utilise ces actions de politique :
 
-| Operation | Required action |
+| Opération | Action requise |
 | --- | --- |
-| Register, update, or remove a remote target | `admin:SetBucketTarget` |
-| List remote targets | `admin:GetBucketTarget` |
-| Read replication metrics | `admin:GetReplicationMetrics` |
-| Apply or delete replication configuration | `s3:PutReplicationConfiguration` |
-| Read replication configuration | `s3:GetReplicationConfiguration` |
+| Enregistrer, mettre à jour ou supprimer une cible distante | `admin:SetBucketTarget` |
+| Lister les cibles distantes | `admin:GetBucketTarget` |
+| Lire les métriques de réplication | `admin:GetReplicationMetrics` |
+| Appliquer ou supprimer la configuration de réplication | `s3:PutReplicationConfiguration` |
+| Lire la configuration de réplication | `s3:GetReplicationConfiguration` |
 
-The target credential must pass RustFS target validation, which checks bucket access, versioning, replicated-object writes, replicated delete markers, and object-version deletion. When Object Lock is enabled on the source bucket, the target must have compatible Object Lock support.
+L’identifiant cible doit réussir la validation de cible de RustFS, qui vérifie l’accès au compartiment, la gestion des versions, les écritures d’objets répliqués, les marqueurs de suppression répliqués et la suppression de versions d’objet. Lorsque le verrouillage d’objet (Object Lock) est activé sur le compartiment source, la cible doit offrir une prise en charge compatible du verrouillage d’objet.
 
-### Create and version the buckets
+### Créer les compartiments et activer la gestion des versions
 
-Create the source bucket:
+Créez le compartiment source :
 
 ```bash
 rc bucket create source/my-bucket
 ```
 
-Create the target bucket:
+Créez le compartiment cible :
 
 ```bash
 rc bucket create target/my-bucket-replica
 ```
 
-Enable versioning on both buckets:
+Activez la gestion des versions sur les deux compartiments :
 
 ```bash
 rc bucket version enable source/my-bucket
@@ -100,53 +100,53 @@ rc bucket version info source/my-bucket
 rc bucket version info target/my-bucket-replica
 ```
 
-Do not suspend source-bucket versioning while replication is configured.
+Ne suspendez pas la gestion des versions du compartiment source tant que la réplication est configurée.
 
-## Usage
+## Utilisation
 
-### Configure replication in the Console
+### Configurer la réplication dans la Console
 
-The RustFS Console combines remote-target registration and replication-rule configuration in one form.
+La Console RustFS regroupe l’enregistrement de la cible distante et la configuration des règles de réplication dans un seul formulaire.
 
-1. Sign in to the source deployment's Console.
-2. Open **Buckets**, locate the source bucket, and select **Settings**.
-3. Under **Data Protection**, enable **Versioning** if it is disabled.
-4. Under **Automation**, select **Open Bucket Replication**.
-5. Select **Add Replication Rule**.
-6. Configure the destination and rule:
+1. Connectez-vous à la Console du déploiement source.
+2. Ouvrez **Buckets** (compartiments), localisez le compartiment source et sélectionnez **Settings** (paramètres).
+3. Sous **Data Protection** (protection des données), activez **Versioning** (gestion des versions) s’il est désactivé.
+4. Sous **Automation** (automatisation), sélectionnez **Open Bucket Replication** (ouvrir la réplication de compartiment).
+5. Sélectionnez **Add Replication Rule** (ajouter une règle de réplication).
+6. Configurez la destination et la règle :
 
-| Console field | Value |
+| Champ de la Console | Valeur |
 | --- | --- |
-| **Priority** | Rule evaluation priority. The initial value is `1`. |
-| **Mode** | Select **Asynchronous** or **Synchronous**. Asynchronous is selected by default. |
-| **Endpoint** | Target S3 API address as `host:port`, without a URL scheme. |
-| **Bucket** | Versioned destination bucket name. |
-| **Access Key** and **Secret Key** | Dedicated credentials authorized to replicate into the destination bucket. |
-| **Region** | Target region. The initial value is `us-east-1`. |
-| **Storage Class** | Storage class applied at the destination. The initial value is `STANDARD`. |
-| **Prefix** | Optional key prefix used to limit matching objects. |
-| **Tags** | Optional object-tag name and value filters. Select **Add Tag** for additional filters. |
-| **Use TLS** | Enables HTTPS for the destination connection. |
-| **Replicate Existing Objects** | Includes objects created before the rule. Enabled by default. |
-| **Replicate Delete Markers** | Copies delete markers to the destination. Enabled by default. |
-| **Replicate Delete** | Copies deletion of a specific object version. Enabled by default. |
-| **Health Check Interval** | Target health-check interval in seconds. The initial value is `60`. |
-| **Bandwidth Limit** | Per-target transfer limit, selectable in KiB/s, MiB/s, or GiB/s. |
+| **Priority** (priorité) | Priorité d’évaluation de la règle. La valeur initiale est `1`. |
+| **Mode** | Sélectionnez **Asynchronous** (asynchrone) ou **Synchronous** (synchrone). Le mode asynchrone est sélectionné par défaut. |
+| **Endpoint** (point de terminaison) | Adresse de l’API S3 cible sous la forme `host:port`, sans schéma d’URL. |
+| **Bucket** (compartiment) | Nom du compartiment de destination avec gestion des versions. |
+| **Access Key** (clé d’accès) et **Secret Key** (clé secrète) | Identifiants dédiés autorisés à répliquer vers le compartiment de destination. |
+| **Region** (région) | Région cible. La valeur initiale est `us-east-1`. |
+| **Storage Class** (classe de stockage) | Classe de stockage appliquée à la destination. La valeur initiale est `STANDARD`. |
+| **Prefix** (préfixe) | Préfixe de clé facultatif qui limite les objets correspondants. |
+| **Tags** (étiquettes) | Filtres facultatifs sur le nom et la valeur d’une étiquette d’objet. Sélectionnez **Add Tag** (ajouter une étiquette) pour des filtres supplémentaires. |
+| **Use TLS** (utiliser TLS) | Active HTTPS pour la connexion à la destination. |
+| **Replicate Existing Objects** (répliquer les objets existants) | Inclut les objets créés avant la règle. Activé par défaut. |
+| **Replicate Delete Markers** (répliquer les marqueurs de suppression) | Copie les marqueurs de suppression vers la destination. Activé par défaut. |
+| **Replicate Delete** (répliquer la suppression) | Copie la suppression d’une version d’objet précise. Activé par défaut. |
+| **Health Check Interval** (intervalle de contrôle d’intégrité) | Intervalle de contrôle d’intégrité de la cible, en secondes. La valeur initiale est `60`. |
+| **Bandwidth Limit** (limite de bande passante) | Limite de transfert par cible, au choix en KiB/s, MiB/s ou GiB/s. |
 
-7. Select **Save**. RustFS validates the source bucket, target connection, target credentials, and target-bucket versioning before accepting the rule.
-8. Return to **Bucket Replication** to review the rule or select **Refresh** to update its displayed state.
+7. Sélectionnez **Save** (enregistrer). RustFS valide le compartiment source, la connexion à la cible, les identifiants cibles et la gestion des versions du compartiment cible avant d’accepter la règle.
+8. Revenez à **Bucket Replication** (réplication de compartiment) pour examiner la règle, ou sélectionnez **Refresh** (actualiser) afin de mettre à jour l’état affiché.
 
-:::warning[Enable versioning on both deployments]
+:::warning[Activez la gestion des versions sur les deux déploiements]
 
-The source and destination buckets must both have versioning enabled before you save the rule. Sign in to the target deployment's Console and enable versioning under **Buckets** → **Settings** → **Data Protection** when needed.
+Le compartiment source et le compartiment de destination doivent tous deux avoir la gestion des versions activée avant l’enregistrement de la règle. Connectez-vous à la Console du déploiement cible et activez la gestion des versions sous **Buckets** → **Settings** → **Data Protection** si nécessaire.
 
 :::
 
-For repeatable automation or configuration management, use the `rc` workflow below.
+Pour une automatisation reproductible ou une gestion de la configuration, utilisez le flux `rc` ci-dessous.
 
-### Add a replication rule with rc
+### Ajouter une règle de réplication avec rc
 
-Create an asynchronous rule that copies new and existing objects and propagates delete markers and explicit version deletions:
+Créez une règle asynchrone qui copie les objets nouveaux et existants, et qui propage les marqueurs de suppression ainsi que les suppressions explicites de version :
 
 ```bash
 rc bucket replication add source/my-bucket \
@@ -156,9 +156,9 @@ rc bucket replication add source/my-bucket \
 	--replicate delete,delete-marker,existing-objects
 ```
 
-`rc` registers the target, obtains its generated ARN, and applies the replication rule in one operation. Omit `--replicate` flags for behaviors you do not want. Add `--sync` only when writes must wait for synchronous replication.
+`rc` enregistre la cible, obtient l’ARN qu’elle a généré et applique la règle de réplication en une seule opération. Omettez les options `--replicate` correspondant aux comportements que vous ne souhaitez pas. N’ajoutez `--sync` que lorsque les écritures doivent attendre la réplication synchrone.
 
-To limit replication to a prefix, add `--prefix`:
+Pour limiter la réplication à un préfixe, ajoutez `--prefix` :
 
 ```bash
 rc bucket replication add source/my-bucket \
@@ -169,18 +169,18 @@ rc bucket replication add source/my-bucket \
 	--replicate delete-marker,existing-objects
 ```
 
-Objects that do not match an enabled rule remain only in the source bucket. Use `--bandwidth` to set a byte-per-second limit, `--healthcheck-seconds` to change the target health-check interval, and `--storage-class` to override the destination storage class.
+Les objets qui ne correspondent à aucune règle activée restent uniquement dans le compartiment source. Utilisez `--bandwidth` pour fixer une limite en octets par seconde, `--healthcheck-seconds` pour modifier l’intervalle de contrôle d’intégrité de la cible, et `--storage-class` pour remplacer la classe de stockage de destination.
 
-### List and update rules
+### Lister et mettre à jour les règles
 
-List the active rules:
+Listez les règles actives :
 
 ```bash
 rc bucket replication list source/my-bucket
 rc bucket replication list source/my-bucket --json
 ```
 
-Update a rule by its ID. Only supplied settings are changed:
+Mettez à jour une règle à l’aide de son ID. Seuls les réglages fournis sont modifiés :
 
 ```bash
 rc bucket replication update source/my-bucket \
@@ -190,25 +190,25 @@ rc bucket replication update source/my-bucket \
 	--healthcheck-seconds 60
 ```
 
-Use `--status Enabled|Disabled` to enable or disable a rule and `--sync true|false` to change its replication mode.
+Utilisez `--status Enabled|Disabled` pour activer ou désactiver une règle, et `--sync true|false` pour changer son mode de réplication.
 
-### Export and import configuration
+### Exporter et importer la configuration
 
-Export the complete replication configuration for review or backup:
+Exportez la configuration de réplication complète à des fins d’examen ou de sauvegarde :
 
 ```bash
 rc bucket replication export source/my-bucket --json > replication.json
 ```
 
-The export includes remote-target metadata and the target Access Key, although the Secret Key is omitted. Protect the file as sensitive configuration.
+L’export inclut les métadonnées de la cible distante et la clé d’accès cible, bien que la clé secrète soit omise. Protégez ce fichier comme une configuration sensible.
 
-Import a previously exported configuration:
+Importez une configuration exportée auparavant :
 
 ```bash
 rc bucket replication import source/my-bucket replication.json
 ```
 
-### Delete replication configuration
+### Supprimer la configuration de réplication
 
 ```bash
 rc bucket replication remove source/my-bucket --id replicate-all
@@ -217,49 +217,49 @@ rc bucket replication remove source/my-bucket --id replicate-all
 rc bucket replication remove source/my-bucket --all
 ```
 
-RustFS also removes replication remote targets referenced by the deleted configuration. It does not delete objects or versions already copied to the target bucket. Remove or retain those objects according to the target bucket's lifecycle and retention requirements.
+RustFS supprime également les cibles distantes de réplication référencées par la configuration supprimée. Il ne supprime pas les objets ni les versions déjà copiés dans le compartiment cible. Supprimez ou conservez ces objets selon les exigences de gestion du cycle de vie et de conservation du compartiment cible.
 
-:::note[rc 0.1.29 removal response]
+:::note[Réponse de suppression de rc 0.1.29]
 
-After RustFS removes the replication configuration and its targets, `rc 0.1.29` can report `Remote target not found` while attempting a second target cleanup. Run `rc bucket replication list source/my-bucket --json`; an empty `rules` array confirms that the configuration was removed.
+Après que RustFS a supprimé la configuration de réplication et ses cibles, `rc 0.1.29` peut signaler `Remote target not found` lors d’une seconde tentative de nettoyage de la cible. Exécutez `rc bucket replication list source/my-bucket --json` ; un tableau `rules` vide confirme que la configuration a été supprimée.
 
 :::
 
-## Verification
+## Vérification
 
-### Check target readiness
+### Vérifier l’état de préparation de la cible
 
-`rc bucket replication add` checks source access, target connectivity, target credentials, and bucket versioning before it creates the rule. Confirm the resulting destination and rule settings:
+`rc bucket replication add` vérifie l’accès à la source, la connectivité de la cible, les identifiants cibles et la gestion des versions des compartiments avant de créer la règle. Confirmez la destination obtenue et les réglages de la règle :
 
 ```bash
 rc bucket replication list source/my-bucket --json
 ```
 
-### Replicate an object
+### Répliquer un objet
 
-Upload a test object to the source:
+Chargez un objet de test sur la source :
 
 ```bash
 printf 'hello from RustFS replication\n' > /tmp/hello.txt
 rc object copy /tmp/hello.txt source/my-bucket/hello.txt
 ```
 
-Inspect the source object:
+Inspectez l’objet source :
 
 ```bash
 rc object stat source/my-bucket/hello.txt --json
 ```
 
-Because replication is asynchronous by default, the target object might not appear immediately. Repeat this command until it succeeds:
+La réplication étant asynchrone par défaut, l’objet cible peut ne pas apparaître immédiatement. Répétez cette commande jusqu’à ce qu’elle réussisse :
 
 ```bash
 rc object stat target/my-bucket-replica/hello.txt --json
 rc object show target/my-bucket-replica/hello.txt
 ```
 
-Compare the source and target `etag` and `size_bytes` values, then confirm that `object show` returns the expected content.
+Comparez les valeurs `etag` et `size_bytes` de la source et de la cible, puis confirmez que `object show` renvoie le contenu attendu.
 
-To verify delete-marker replication, delete the source object and list versions on both buckets:
+Pour vérifier la réplication des marqueurs de suppression, supprimez l’objet source et listez les versions dans les deux compartiments :
 
 ```bash
 rc object remove source/my-bucket/hello.txt --force
@@ -268,31 +268,31 @@ rc bucket version list source/my-bucket/hello.txt --json
 rc bucket version list target/my-bucket-replica/hello.txt --json
 ```
 
-When delete-marker replication succeeds, the latest entry on both buckets has `is_delete_marker: true`.
+Lorsque la réplication du marqueur de suppression réussit, la dernière entrée de chaque compartiment contient `is_delete_marker: true`.
 
-### Inspect replication metrics
+### Inspecter les métriques de réplication
 
 ```bash
 rc bucket replication status source/my-bucket
 rc bucket replication status source/my-bucket --json
 ```
 
-The command returns the source node's current in-memory replication statistics. Metrics can remain zero even after an object reaches the destination, so use them together with target-object and version checks rather than as the only verification signal.
+La commande renvoie les statistiques de réplication en mémoire actuelles du nœud source. Les métriques peuvent rester à zéro même après l’arrivée d’un objet à destination. Utilisez-les donc conjointement aux contrôles de l’objet cible et des versions, et non comme unique signal de vérification.
 
-### Troubleshoot failures
+### Diagnostiquer les échecs
 
-| Symptom | Check |
+| Symptôme | Vérification |
 | --- | --- |
-| `bucket versioning must be enabled` | Enable versioning on the source bucket. |
-| Target registration reports `not versioned` | Enable versioning on the target bucket. |
-| `replication target configuration not found` | Recheck the target alias, credentials, and destination bucket, then rerun `replication add`. |
-| Rule reports a stale target | Refresh the rule list and retry `replication add`; if it persists, remove the failed configuration and recreate the target. |
-| Target object does not appear | Check target reachability, credentials, target quota, and `rc bucket replication status`. |
-| Replication fails | Inspect source-node logs for the target ARN and object key. |
-| Target removal is disallowed | Delete or replace the replication configuration before removing a referenced target. |
+| `bucket versioning must be enabled` | Activez la gestion des versions sur le compartiment source. |
+| L’enregistrement de la cible indique `not versioned` | Activez la gestion des versions sur le compartiment cible. |
+| `replication target configuration not found` | Vérifiez de nouveau l’alias cible, les identifiants et le compartiment de destination, puis relancez `replication add`. |
+| La règle signale une cible obsolète | Actualisez la liste des règles et réessayez `replication add` ; s’il persiste, supprimez la configuration en échec et recréez la cible. |
+| L’objet cible n’apparaît pas | Vérifiez la joignabilité de la cible, les identifiants, le quota cible et `rc bucket replication status`. |
+| La réplication échoue | Examinez les journaux du nœud source pour y trouver l’ARN de cible et la clé d’objet. |
+| La suppression de la cible n’est pas autorisée | Supprimez ou remplacez la configuration de réplication avant de supprimer une cible référencée. |
 
-## Next steps
+## Étapes suivantes
 
-- [Manage bucket lifecycle](../lifecycle-management.md)
-- [Configure bucket quotas](./quota.md)
-- [Configure observability](/operations/observability)
+- [Gérer le cycle de vie du compartiment](../lifecycle-management.md)
+- [Configurer les quotas de compartiment](./quota.md)
+- [Configurer l’observabilité](/fr/operations/observability)
