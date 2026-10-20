@@ -1,13 +1,13 @@
 ---
 title: "SwarmCLI-Chart"
-description: "Stellen Sie RustFS mit dem rustfs-Chart von SwarmCLI in Docker Swarm bereit, als Dienst auf einem Knoten oder als verteilten Cluster mit Erasure Coding: Anmeldedaten in Docker-Secrets, versionierte Upgrades und Rollbacks sowie optional HTTPS über Traefik."
+description: "Stellen Sie RustFS mit dem rustfs-Chart von SwarmCLI in Docker Swarm bereit, als Dienst auf einem Knoten oder als verteilten Cluster mit Erasure Coding: Zugangsdaten in Docker-Secrets, versionierte Upgrades und Rollbacks sowie optional HTTPS über Traefik."
 ---
 
 [SwarmCLI](https://github.com/Eldara-Tech/swarmcli) ist ein von Helm inspirierter Paketmanager und eine Terminal-Oberfläche für Docker Swarm. Sein quelloffenes [`rustfs`-Chart](https://github.com/Eldara-Tech/swarmcli-charts/tree/main/charts/rustfs) stellt RustFS in Docker Swarm bereit. Beide werden von Eldara Tech gepflegt, nicht vom RustFS-Projekt.
 
 Gegenüber einer von Hand geschriebenen Stack-Datei bietet das Chart zusätzlich:
 
-- **Anmeldedaten in Docker-Secrets.** RustFS liest seine Root-Schlüssel über `RUSTFS_ACCESS_KEY_FILE` und `RUSTFS_SECRET_KEY_FILE` aus Dateien, sodass keiner der beiden Werte in der Dienstdefinition oder in `docker inspect` erscheint. Der Standardschlüssel `rustfsadmin` wird abgelehnt.
+- **Zugangsdaten in Docker-Secrets.** RustFS liest seine Root-Schlüssel über `RUSTFS_ACCESS_KEY_FILE` und `RUSTFS_SECRET_KEY_FILE` aus Dateien, sodass keiner der beiden Werte in der Dienstdefinition oder in `docker inspect` erscheint. Der Standardschlüssel `rustfsadmin` wird abgelehnt.
 - **Versionierte Releases.** Prüfen Sie ein Upgrade vorab, wenden Sie es an und kehren Sie zu einer früheren Revision zurück. SwarmCLI speichert den Revisionsverlauf im Swarm selbst, sodass keine zusätzliche Datenbank nötig ist.
 - **HTTPS über Traefik.** Mit dem zugehörigen [`traefik`-Chart](https://github.com/Eldara-Tech/swarmcli-charts/tree/main/charts/traefik) erhalten die S3-API und die Console eigene Hostnamen und Zertifikate von Let's Encrypt, und die Console kann Single Sign-on über OpenID Connect nutzen.
 - **Rollouts mit Integritätsprüfung.** In den Werten aufgeführte Buckets werden beim Start angelegt, und jeder Rollout eines Standalone-Releases wird über den Endpunkt `/health/ready` von RustFS überwacht, sodass `--wait` bei einem fehlerhaften Upgrade einen Fehler statt eines Erfolgs meldet.
@@ -22,9 +22,9 @@ Das Chart läuft in einem von zwei Modi, den Sie bei der Installation wählen. D
 * Für den Standalone-Modus ein freier Port 9000 (S3-API) auf den Swarm-Knoten, da Schritt 4 ihn im Routing-Mesh des Swarms veröffentlicht
 * Für den verteilten Modus ein Knoten pro Peer, mindestens vier (für die Entwicklung genügt ein einzelner Knoten; siehe Schritt 5)
 
-## 2. Anmeldedaten als Docker-Secrets anlegen
+## 2. Zugangsdaten als Docker-Secrets anlegen
 
-Ersetzen Sie die Platzhalter für die Anmeldedaten und legen Sie dann für jeden Schlüssel ein Secret an:
+Ersetzen Sie die Platzhalter für die Zugangsdaten und legen Sie dann für jeden Schlüssel ein Secret an:
 
 ```bash
 printf '%s' '<your-access-key>' | docker secret create rustfs-access-key -
@@ -33,9 +33,9 @@ printf '%s' '<your-secret-key>' | docker secret create rustfs-secret-key -
 
 Jeder Wert muss in einer Zeile stehen und darf keine Leerzeichen enthalten. Einen starken geheimen Zugriffsschlüssel erzeugen Sie zum Beispiel mit `openssl rand -base64 30`. Im verteilten Modus liest jeder Peer dieselben beiden Secrets.
 
-:::warning[Der Dienst lehnt schwache Anmeldedaten ab]
+:::warning[Der Dienst lehnt schwache Zugangsdaten ab]
 
-SwarmCLI verweigert die Installation des Charts, solange eines der Secrets fehlt, und der Container beendet sich beim Start, wenn ein Schlüssel leer ist, Leerzeichen enthält oder den allgemein bekannten Wert `rustfsadmin` hat. Docker-Secrets lassen sich nicht bearbeiten: Um die Anmeldedaten zu rotieren, legen Sie Secrets unter neuen Namen an und aktualisieren anschließend das Release, wobei `s3.accessKeySecret` und `s3.secretKeySecret` auf die neuen Secrets verweisen. Im verteilten Modus erfordert die Rotation einen vollständigen Stopp, wie unter Upgrade und Rollback beschrieben.
+SwarmCLI verweigert die Installation des Charts, solange eines der Secrets fehlt, und der Container beendet sich beim Start, wenn ein Schlüssel leer ist, Leerzeichen enthält oder den allgemein bekannten Wert `rustfsadmin` hat. Docker-Secrets lassen sich nicht bearbeiten: Um die Zugangsdaten zu rotieren, legen Sie Secrets unter neuen Namen an und aktualisieren anschließend das Release, wobei `s3.accessKeySecret` und `s3.secretKeySecret` auf die neuen Secrets verweisen. Im verteilten Modus erfordert die Rotation einen vollständigen Stopp, wie unter Upgrade und Rollback beschrieben.
 
 :::
 
@@ -117,7 +117,7 @@ docker service ps rustfs_rustfs
 curl --fail http://localhost:9000/health/ready
 ```
 
-Die S3-API ist auf jedem Swarm-Knoten unter `http://localhost:9000` erreichbar. Clients verwenden pfadbasierte Adressierung und die Region `us-east-1`. Bleibt der Task mit `no suitable node` im Status Pending, trägt kein Knoten das Label `rustfs-data=true` aus Schritt 4.
+Die S3-API ist auf jedem Swarm-Knoten unter `http://localhost:9000` erreichbar. Clients verwenden pfadbasierte Adressierung (Path-Style) und die Region `us-east-1`. Bleibt der Task mit `no suitable node` im Status Pending, trägt kein Knoten das Label `rustfs-data=true` aus Schritt 4.
 
 Prüfen Sie im verteilten Modus das Release und die Tasks der Peers und fragen Sie dann aus einem Container im Overlay-Netzwerk `rustfs-net` ab, ob der Cluster Anfragen bedient:
 
@@ -165,7 +165,7 @@ swarmcli charts upgrade rustfs swarmcli-charts/rustfs -f distributed-values.yaml
 
 Ein Rollback geht bei den Peers auf dieselbe Weise vor. Startet bei einem Upgrade ein Peer nicht, hält das Upgrade an dieser Stelle an, und die übrigen Peers bleiben unangetastet.
 
-:::warning[Die Rotation der Anmeldedaten eines Clusters erfordert einen vollständigen Stopp]
+:::warning[Die Rotation der Zugangsdaten eines Clusters erfordert einen vollständigen Stopp]
 
 Jeder Peer leitet sein Internode-Secret aus dem Schlüsselpaar ab. Peers mit dem alten Paar und Peers mit dem neuen Paar können einander daher nicht erreichen, und ein Upgrade, das die Peers einzeln nacheinander aktualisiert, würde den Cluster spalten. Legen Sie die neuen Secrets an:
 
