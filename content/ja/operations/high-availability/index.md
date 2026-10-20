@@ -1,7 +1,7 @@
 ---
-title: "High Availability"
-description: "Review RustFS site replication and node recovery guidance."
+title: "高可用性"
+description: "RustFS のサイトレプリケーションとノード復旧の手順を確認します。"
 ---
 
-- [Site Replication](./site-replication.md)
-- [Node Healing](./node-healing.md)
+- [サイトレプリケーション](./site-replication.md)
+- [ノードのデータ修復](./node-healing.md)

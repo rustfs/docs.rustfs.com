@@ -1,28 +1,28 @@
 ---
 title: mTLS
-description: Configure mutual TLS between RustFS Pods deployed by the Helm chart.
+description: Configurez le TLS mutuel entre les pods RustFS déployés par le chart Helm.
 ---
 
-The chart can enable mutual Transport Layer Security (mTLS) for RustFS Pod communication. When enabled, RustFS requires client certificates, uses HTTPS for generated peer URLs, and mounts server, client, and CA material into every Pod.
+Le chart peut activer le TLS mutuel (mTLS) pour la communication entre les pods RustFS. Lorsque le mTLS est activé, RustFS exige des certificats client, utilise HTTPS pour les URL de pairs générées et monte dans chaque pod le matériel du serveur, du client et de l’autorité de certification.
 
-## Requirements
+## Prérequis
 
-mTLS uses cert-manager `Issuer` and `Certificate` resources. Install cert-manager before enabling it and confirm that its CRDs are available:
+Le mTLS utilise les ressources cert-manager `Issuer` et `Certificate`. Installez cert-manager avant de l’activer et confirmez que ses CRD sont disponibles :
 
 ```bash
 kubectl get crd certificates.cert-manager.io issuers.cert-manager.io
 ```
 
-## 1. Use the chart-managed CA
+## 1. Utiliser l’autorité de certification gérée par le chart
 
-Add the following setting to your existing values file:
+Ajoutez le réglage suivant à votre fichier de valeurs existant :
 
 ```yaml title="values.yaml"
 mtls:
   enabled: true
 ```
 
-Upgrade the release:
+Mettez à niveau la release :
 
 ```bash
 helm upgrade rustfs ./helm/rustfs \
@@ -30,11 +30,11 @@ helm upgrade rustfs ./helm/rustfs \
   -f values.yaml
 ```
 
-The chart creates a self-signed root CA, a namespace Issuer, and server and client Certificates. It mounts the resulting Secrets and configures RustFS with `RUSTFS_SERVER_MTLS_ENABLE=1` and `RUSTFS_TLS_PATH=/opt/tls`. Health probes also use the generated client certificate.
+Le chart crée une autorité de certification racine auto-signée, un Issuer d’espace de noms, ainsi que des Certificates serveur et client. Il monte les Secrets obtenus et configure RustFS avec `RUSTFS_SERVER_MTLS_ENABLE=1` et `RUSTFS_TLS_PATH=/opt/tls`. Les sondes d’intégrité utilisent aussi le certificat client généré.
 
-## 2. Use an existing Issuer
+## 2. Utiliser un Issuer existant
 
-To use an Issuer or ClusterIssuer already managed by your platform, configure its reference:
+Pour utiliser un Issuer ou un ClusterIssuer déjà géré par votre plateforme, configurez sa référence :
 
 ```yaml title="values.yaml"
 mtls:
@@ -46,9 +46,9 @@ mtls:
     group: cert-manager.io
 ```
 
-The issuer must be ready and able to issue both server and client certificates in the `rustfs` namespace. Use `kind: Issuer` for a namespace-scoped issuer.
+L’émetteur doit être prêt et en mesure d’émettre à la fois des certificats serveur et des certificats client dans l’espace de noms `rustfs`. Utilisez `kind: Issuer` pour un émetteur limité à un espace de noms.
 
-## 3. Verify mTLS
+## 3. Vérifier le mTLS
 
 ```bash
 kubectl -n rustfs get issuer,certificate,secret
@@ -57,10 +57,10 @@ kubectl -n rustfs describe certificate rustfs-client-tls
 kubectl -n rustfs get pods
 ```
 
-For a release named `rustfs`, the generated certificate Secrets are `rustfs-server-tls` and `rustfs-client-tls`.
+Pour une release nommée `rustfs`, les Secrets de certificats générés sont `rustfs-server-tls` et `rustfs-client-tls`.
 
-:::warning[Plan external access]
+:::warning[Planifiez l’accès externe]
 
-mTLS requires clients to present a trusted certificate. Validate how your Ingress controller or other external client presents that certificate before enabling mTLS on an existing deployment.
+Le mTLS exige que les clients présentent un certificat de confiance. Validez la manière dont votre contrôleur Ingress ou un autre client externe présente ce certificat avant d’activer le mTLS sur un déploiement existant.
 
 :::

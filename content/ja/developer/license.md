@@ -1,203 +1,96 @@
 ---
-title: RustFS Open Source License
-description: RustFS is released under the Apache 2.0 license.
+title: RustFS オープンソースライセンス
+description: RustFS は Apache 2.0 ライセンスの下でリリースされています。
 ---
 
-## Open Source License
+## オープンソースライセンス
 
-- RustFS is released under the Apache 2.0 license.
+- RustFS は Apache 2.0 ライセンスの下でリリースされています。
 - [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0)
 
-## License Terms
+## ライセンス条項
 
-_Version 2.0, January 2004_
+_バージョン 2.0、2004年1月_
 http://www.apache.org/licenses/
 
-### Terms and Conditions for use, reproduction, and distribution
+### 使用、複製、および頒布に関する条項および条件
 
-#### Definitions
+#### 定義
 
-"License" shall mean the terms and conditions for use, reproduction, and
-distribution as defined by Sections 1 through 9 of this document.
+「ライセンス」とは、本文書の第 1 条から第 9 条までに定義される、使用、複製、および頒布に関する条項および条件を意味します。
 
-"Licensor" shall mean the copyright owner or entity authorized by the copyright
-owner that is granting the License.
+「ライセンサー」とは、著作権所有者、またはライセンスを付与する権限を著作権所有者から与えられた団体を意味します。
 
-"Legal Entity" shall mean the union of the acting entity and all other entities
-that control, are controlled by, or are under common control with that entity.
-For the purposes of this definition, "control" means **(i)** the power, direct or
-indirect, to cause the direction or management of such entity, whether by
-contract or otherwise, or **(ii)** ownership of fifty percent (50%) or more of the
-outstanding shares, or **(iii)** beneficial ownership of such entity.
+「法人」とは、行為を行う団体と、その団体を支配し、その団体に支配され、またはその団体と共通の支配下にある他のすべての団体との結合を意味します。この定義において「支配」とは、**(i)** 契約その他の方法により、直接または間接に、当該団体の指揮または経営を行わせる権限、または **(ii)** 発行済株式の 50 パーセント（50%）以上の所有、または **(iii)** 当該団体の受益所有を意味します。
 
-"You" (or "Your") shall mean an individual or Legal Entity exercising
-permissions granted by this License.
+「あなた」（または「あなたの」）とは、このライセンスにより付与された許諾を行使する個人または法人を意味します。
 
-"Source" form shall mean the preferred form for making modifications, including
-but not limited to software source code, documentation source, and configuration
-files.
+「ソース」形式とは、修正を加えるための好ましい形式を意味し、ソフトウェアのソースコード、ドキュメントのソース、および設定ファイルを含みますが、これらに限定されません。
 
-"Object" form shall mean any form resulting from mechanical transformation or
-translation of a Source form, including but not limited to compiled object code,
-generated documentation, and conversions to other media types.
+「オブジェクト」形式とは、ソース形式を機械的に変換または翻訳した結果生じるあらゆる形式を意味し、コンパイルされたオブジェクトコード、生成されたドキュメント、および他のメディア種別への変換を含みますが、これらに限定されません。
 
-"Work" shall mean the work of authorship, whether in Source or Object form, made
-available under the License, as indicated by a copyright notice that is included
-in or attached to the work (an example is provided in the Appendix below).
+「作品」とは、ソース形式かオブジェクト形式かを問わず、ライセンスの下で利用可能にされた著作物であって、作品に含まれるか作品に添付された著作権表示により示されるものを意味します（例は下記の付録にあります）。
 
-"Derivative Works" shall mean any work, whether in Source or Object form, that
-is based on (or derived from) the Work and for which the editorial revisions,
-annotations, elaborations, or other modifications represent, as a whole, an
-original work of authorship. For the purposes of this License, Derivative Works
-shall not include works that remain separable from, or merely link (or bind by
-name) to the interfaces of, the Work and Derivative Works thereof.
+「派生物」とは、ソース形式かオブジェクト形式かを問わず、作品に基づく（または作品から派生した）著作物であって、編集上の改訂、注釈、加筆、またはその他の修正が、全体として独自の著作物を構成するものを意味します。このライセンスにおいて、派生物には、作品およびその派生物から分離したままである著作物、または作品およびその派生物のインターフェースに単にリンクする（もしくは名前により結合する）だけの著作物は含まれません。
 
-"Contribution" shall mean any work of authorship, including the original version
-of the Work and any modifications or additions to that Work or Derivative Works
-thereof, that is intentionally submitted to Licensor for inclusion in the Work
-by the copyright owner or by an individual or Legal Entity authorized to submit
-on behalf of the copyright owner. For the purposes of this definition,
-"submitted" means any form of electronic, verbal, or written communication sent
-to the Licensor or its representatives, including but not limited to
-communication on electronic mailing lists, source code control systems, and
-issue tracking systems that are managed by, or on behalf of, the Licensor for
-the purpose of discussing and improving the Work, but excluding communication
-that is conspicuously marked or otherwise designated in writing by the copyright
-owner as "Not a Contribution."
+「コントリビューション」とは、作品の原版、ならびに当該作品またはその派生物に対する修正または追加を含む著作物であって、著作権所有者、または著作権所有者に代わって提出する権限を与えられた個人もしくは法人が、作品に含めることを意図してライセンサーに意図的に提出したものを意味します。この定義において「提出」とは、ライセンサーまたはその代表者に送られる、電子的、口頭、または書面によるあらゆる形式の通信を意味します。これには、作品を議論し改善する目的で、ライセンサーにより、またはライセンサーのために管理される電子メーリングリスト、ソースコード管理システム、および課題追跡システム上の通信を含みますが、これらに限定されません。ただし、著作権所有者が「Not a Contribution」と顕著に表示するか、または書面でそのように指定した通信は除きます。
 
-"Contributor" shall mean Licensor and any individual or Legal Entity on behalf
-of whom a Contribution has been received by Licensor and subsequently
-incorporated within the Work.
+「コントリビューター」とは、ライセンサー、および、その者に代わってライセンサーがコントリビューションを受領し、その後作品に組み込んだ個人または法人を意味します。
 
-#### Grant of Copyright License
+#### 著作権ライセンスの付与
 
-Subject to the terms and conditions of this License, each Contributor hereby
-grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free,
-irrevocable copyright license to reproduce, prepare Derivative Works of,
-publicly display, publicly perform, sublicense, and distribute the Work and such
-Derivative Works in Source or Object form.
+このライセンスの条項および条件に従うことを前提として、各コントリビューターは、あなたに対し、作品および当該派生物をソース形式またはオブジェクト形式で複製し、派生物を作成し、公に展示し、公に実演し、サブライセンスし、および頒布するための、永続的、全世界的、非独占的、無償、使用料無料、かつ取消不能の著作権ライセンスを、ここに付与します。
 
-#### Grant of Patent License
+#### 特許ライセンスの付与
 
-Subject to the terms and conditions of this License, each Contributor hereby
-grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free,
-irrevocable (except as stated in this section) patent license to make, have
-made, use, offer to sell, sell, import, and otherwise transfer the Work, where
-such license applies only to those patent claims licensable by such Contributor
-that are necessarily infringed by their Contribution(s) alone or by combination
-of their Contribution(s) with the Work to which such Contribution(s) was
-submitted. If You institute patent litigation against any entity (including a
-cross-claim or counterclaim in a lawsuit) alleging that the Work or a
-Contribution incorporated within the Work constitutes direct or contributory
-patent infringement, then any patent licenses granted to You under this License
-for that Work shall terminate as of the date such litigation is filed.
+このライセンスの条項および条件に従うことを前提として、各コントリビューターは、あなたに対し、作品を製造し、製造させ、使用し、販売の申出をし、販売し、輸入し、およびその他の方法で移転するための、永続的、全世界的、非独占的、無償、使用料無料、かつ取消不能（この節に定める場合を除きます）の特許ライセンスを、ここに付与します。このライセンスは、当該コントリビューターがライセンスできる特許クレームのうち、そのコントリビューションのみによって、またはそのコントリビューションと、当該コントリビューションが提出された作品との組み合わせによって、必然的に侵害されるものにのみ適用されます。あなたがいずれかの団体に対し、作品または作品に組み込まれたコントリビューションが直接の特許侵害または寄与による特許侵害を構成すると主張して、特許訴訟（訴訟における交差請求または反訴を含みます）を提起した場合、このライセンスに基づき当該作品についてあなたに付与された特許ライセンスは、当該訴訟が提起された日に終了します。
 
-#### Redistribution
+#### 再頒布
 
-You may reproduce and distribute copies of the Work or Derivative Works thereof
-in any medium, with or without modifications, and in Source or Object form,
-provided that You meet the following conditions:
+あなたは、改変の有無を問わず、ソース形式またはオブジェクト形式で、いかなる媒体によっても、作品またはその派生物の複製を作成し、頒布できます。ただし、次の条件を満たす必要があります。
 
-* **(a)** You must give any other recipients of the Work or Derivative Works a copy of
-this License; and
-* **(b)** You must cause any modified files to carry prominent notices stating that You
-changed the files; and
-* **(c)** You must retain, in the Source form of any Derivative Works that You distribute,
-all copyright, patent, trademark, and attribution notices from the Source form
-of the Work, excluding those notices that do not pertain to any part of the
-Derivative Works; and
-* **(d)** If the Work includes a "NOTICE" text file as part of its distribution, then any
-Derivative Works that You distribute must include a readable copy of the
-attribution notices contained within such NOTICE file, excluding those notices
-that do not pertain to any part of the Derivative Works, in at least one of the
-following places: within a NOTICE text file distributed as part of the
-Derivative Works; within the Source form or documentation, if provided along
-with the Derivative Works; or, within a display generated by the Derivative
-Works, if and wherever such third-party notices normally appear. The contents of
-the NOTICE file are for informational purposes only and do not modify the
-License. You may add Your own attribution notices within Derivative Works that
-You distribute, alongside or as an addendum to the NOTICE text from the Work,
-provided that such additional attribution notices cannot be construed as
-modifying the License.
+* **(a)** 作品または派生物の他の受領者に、このライセンスの複製を渡す必要があります。かつ
+* **(b)** 改変したファイルには、あなたが当該ファイルを変更したことを述べる顕著な通知を記載する必要があります。かつ
+* **(c)** あなたが頒布する派生物のソース形式には、作品のソース形式にある著作権、特許、商標、および帰属に関する表示のすべてを、派生物のいずれの部分にも関係しない表示を除いて、保持する必要があります。かつ
+* **(d)** 作品の頒布物の一部として「NOTICE」テキストファイルが含まれる場合、あなたが頒布する派生物には、当該 NOTICE ファイルに含まれる帰属表示のうち、派生物のいずれの部分にも関係しないものを除いた、読み取ることのできる複製を、次の少なくとも 1 箇所に含める必要があります。すなわち、派生物の一部として頒布する NOTICE テキストファイルの中、派生物とともに提供される場合はそのソース形式またはドキュメントの中、または、そのような第三者の表示が通常表示される場合には、通常表示されるその場所にある、派生物が生成する表示の中です。NOTICE ファイルの内容は、情報提供のみを目的とし、ライセンスを変更しません。あなたは、頒布する派生物の中に、作品の NOTICE テキストと並べて、またはその補遺として、自身の帰属表示を追加できます。ただし、その追加の帰属表示が、ライセンスを変更するものと解釈できないことが条件です。
 
-You may add Your own copyright statement to Your modifications and may provide
-additional or different license terms and conditions for use, reproduction, or
-distribution of Your modifications, or for any such Derivative Works as a whole,
-provided Your use, reproduction, and distribution of the Work otherwise complies
-with the conditions stated in this License.
+あなたは、自身の改変物に自身の著作権表示を追加でき、また、自身の改変物の使用、複製、もしくは頒布について、または当該派生物の全体について、追加の、または異なるライセンスの条項および条件を定めることができます。ただし、作品についてのあなたの使用、複製、および頒布が、その他の点でこのライセンスに記載された条件に従っていることが条件です。
 
-#### Submission of Contributions
+#### コントリビューションの提出
 
-Unless You explicitly state otherwise, any Contribution intentionally submitted
-for inclusion in the Work by You to the Licensor shall be under the terms and
-conditions of this License, without any additional terms or conditions.
-Notwithstanding the above, nothing herein shall supersede or modify the terms of
-any separate license agreement you may have executed with Licensor regarding
-such Contributions.
+あなたが明示的に別段の定めをしない限り、あなたが作品に含めることを意図してライセンサーに提出したコントリビューションは、追加の条項または条件を伴わず、このライセンスの条項および条件に従います。上記にかかわらず、本文書のいかなる規定も、当該コントリビューションについてあなたがライセンサーとの間で締結していることがある別個のライセンス契約の条項に、優先せず、またこれを変更しません。
 
-#### Trademarks
+#### 商標
 
-This License does not grant permission to use the trade names, trademarks,
-service marks, or product names of the Licensor, except as required for
-reasonable and customary use in describing the origin of the Work and
-reproducing the content of the NOTICE file.
+このライセンスは、作品の出所を説明するとき、および NOTICE ファイルの内容を複製するときに合理的かつ慣行的に必要となる使用を除き、ライセンサーの商号、商標、サービスマーク、または製品名を使用する許諾を与えません。
 
-#### Disclaimer of Warranty
+#### 保証の否認
 
-Unless required by applicable law or agreed to in writing, Licensor provides the
-Work (and each Contributor provides its Contributions) on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied,
-including, without limitation, any warranties or conditions of TITLE,
-NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A PARTICULAR PURPOSE. You are
-solely responsible for determining the appropriateness of using or
-redistributing the Work and assume any risks associated with Your exercise of
-permissions under this License.
+適用される法令により要求される場合、または書面により合意した場合を除き、ライセンサーは作品を（そして各コントリビューターは自身のコントリビューションを）、明示であると黙示であるとを問わず、権原（TITLE）、非侵害（NON-INFRINGEMENT）、商品性（MERCHANTABILITY）、もしくは特定目的適合性（FITNESS FOR A PARTICULAR PURPOSE）に関するものを含め、いかなる種類の保証も条件も伴わない「現状有姿」（AS IS）で提供します。作品を使用または再頒布することが適切であるかを判断する責任はあなたのみが負い、このライセンスに基づく許諾の行使に伴うリスクはあなたが引き受けます。
 
-#### Limitation of Liability
+#### 責任の制限
 
-In no event and under no legal theory, whether in tort (including negligence),
-contract, or otherwise, unless required by applicable law (such as deliberate
-and grossly negligent acts) or agreed to in writing, shall any Contributor be
-liable to You for damages, including any direct, indirect, special, incidental,
-or consequential damages of any character arising as a result of this License or
-out of the use or inability to use the Work (including but not limited to
-damages for loss of goodwill, work stoppage, computer failure or malfunction, or
-any and all other commercial damages or losses), even if such Contributor has
-been advised of the possibility of such damages.
+いかなる場合においても、また不法行為（過失を含みます）、契約、またはその他のいずれの法理論においても、適用される法令により要求される場合（故意および重過失による行為など）、または書面により合意した場合を除き、コントリビューターは、このライセンスに起因し、または作品の使用もしくは使用不能から生じる損害について、あなたに対して責任を負いません。この損害には、直接、間接、特別、付随的、または結果的な、いかなる性質の損害も含まれます（営業権の喪失、業務の停止、コンピューターの故障もしくは誤動作、またはその他一切の商業上の損害もしくは損失に対する損害を含みますが、これらに限定されません）。当該コントリビューターがそのような損害の可能性を知らされていた場合であっても、同様です。
 
-#### Accepting Warranty or Additional Liability
+#### 保証または追加責任の引き受け
 
-While redistributing the Work or Derivative Works thereof, You may choose to
-offer, and charge a fee for, acceptance of support, warranty, indemnity, or
-other liability obligations and/or rights consistent with this License. However,
-in accepting such obligations, You may act only on Your own behalf and on Your
-sole responsibility, not on behalf of any other Contributor, and only if You
-agree to indemnify, defend, and hold each Contributor harmless for any liability
-incurred by, or claims asserted against, such Contributor by reason of your
-accepting any such warranty or additional liability.
+作品またはその派生物を再頒布するにあたり、あなたは、このライセンスに整合するサポート、保証、補償、もしくはその他の責任に関する義務、および／または権利の引き受けを申し出、その対価を請求することを選べます。ただし、そのような義務を引き受ける場合、あなたは自己のために、かつ自己の単独の責任においてのみ行為でき、他のコントリビューターのために行為することはできません。また、あなたが当該の保証または追加の責任を引き受けたことを理由として、当該コントリビューターに生じた責任、または当該コントリビューターに対して主張された請求について、各コントリビューターを補償し、防御し、かつ免責することに、あなたが同意する場合に限ります。
 
-_END OF TERMS AND CONDITIONS_
+_条項および条件の終わり_
 
-### APPENDIX: How to apply the Apache License to your work
+### 付録: 作品に Apache ライセンスを適用する方法
 
-To apply the Apache License to your work, attach the following boilerplate
-notice, with the fields enclosed by brackets `[]` replaced with your own
-identifying information. (Don't include the brackets!) The text should be
-enclosed in the appropriate comment syntax for the file format. We also
-recommend that a file or class name and description of purpose be included on
-the same "printed page" as the copyright notice for easier identification within
-third-party archives.
+作品に Apache ライセンスを適用するには、次の定型通知を添付し、角括弧 `[]` で囲まれた欄を、自身を特定する情報に置き換えます（括弧は含めないでください）。この文章は、ファイル形式に適したコメント構文で囲むことを推奨します。また、第三者のアーカイブ内で識別しやすくするため、ファイル名またはクラス名と目的の説明を、著作権表示と同じ「印刷ページ」に含めることを推奨します。
 
  Copyright 2024-2026 RustFS, Inc.
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+ このファイルは、Apache License, Version 2.0（以下「ライセンス」）の下でライセンスされています。
+ ライセンスに従う場合を除き、このファイルを使用することはできません。
+ ライセンスの複製は、次の場所から入手できます。
 
  http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+ 適用される法令により要求される場合、または書面により合意した場合を除き、
+ ライセンスの下で頒布されるソフトウェアは、「現状有姿」（AS IS）で頒布され、
+ 明示であると黙示であるとを問わず、いかなる種類の保証も条件も伴いません。
+ ライセンスに基づく許諾および制限を定める具体的な文言については、ライセンスを参照してください。

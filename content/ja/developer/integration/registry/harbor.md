@@ -16,7 +16,7 @@ flowchart LR
 	Init["init-bucket job"] -->|"create my-bucket"| RustFS
 ```
 
-registry は、S3 ストレージドライバーを通じて、すべての blob・マニフェスト・リポジトリリンクをバケット内の `docker/registry/v2/` の下に保存します。ドライバー設定の `regionendpoint`、`secure: false`、`skipverify: true` により、ドライバーが使用する AWS S3 クライアントが、平文 HTTP 上のパススタイルアドレス指定で RustFS エンドポイントに向くようになります。
+registry は、S3 ストレージドライバーを通じて、すべての blob・マニフェスト・リポジトリリンクをバケット内の `docker/registry/v2/` の下に保存します。ドライバー設定の `regionendpoint`、`secure: false`、`skipverify: true` により、ドライバーが使用する AWS S3 クライアントが、平文 HTTP 上のパススタイルアクセスで RustFS エンドポイントに向くようになります。
 
 ## 1. プロジェクトファイルを作成する
 
@@ -274,6 +274,6 @@ docker compose logs create-bucket
 
 ## 次のステップ
 
-- 追加の S3 オペレーションを採用する前に、[S3 互換性ノート](/administration/protocols/s3)を確認してください。
-- [アクセスキー管理](/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
+- 追加の S3 オペレーションを採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認してください。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
 - [Harbor ドキュメント](https://goharbor.io/docs/)に従って、レプリケーション・脆弱性スキャン・RBAC を備えた完全な Harbor デプロイを構成してください。

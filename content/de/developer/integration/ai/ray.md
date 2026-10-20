@@ -1,13 +1,13 @@
 ---
 title: "Ray"
-description: "Use Ray Data with RustFS as S3-compatible storage for dataset writes and reads."
+description: "Verwenden Sie Ray Data mit RustFS als S3-kompatiblem Speicher für das Schreiben und Lesen von Datensätzen."
 ---
 
-This guide connects [Ray](https://github.com/ray-project/ray) — the distributed AI and Python compute framework — to **RustFS** through Ray Data's S3 filesystem support. You will run a Ray job inside the official image, write a dataset as Parquet to a RustFS bucket, read it back, and verify the objects. The workflow was verified with `rayproject/ray:2.44.0-py311` (Ray 2.44, pyarrow filesystem) and `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [Ray](https://github.com/ray-project/ray) — das verteilte KI- und Python-Compute-Framework — über die S3-Dateisystemunterstützung von Ray Data mit **RustFS**. Sie führen einen Ray-Job im offiziellen Image aus, schreiben einen Datensatz als Parquet in einen RustFS-Bucket, lesen ihn zurück und prüfen die Objekte. Der Ablauf wurde mit `rayproject/ray:2.44.0-py311` (Ray 2.44, pyarrow-Dateisystem) und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Sie benötigen Docker. Dieses Setup ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -15,11 +15,11 @@ flowchart LR
 	DS -->|"Parquet files"| RustFS["RustFS :9000"]
 ```
 
-Ray Data reads and writes datasets through pyarrow's `S3FileSystem`. Passing an `S3FileSystem` configured for RustFS redirects every dataset operation — Parquet, CSV, JSON — to the bucket.
+Ray Data liest und schreibt Datensätze über das `S3FileSystem` von pyarrow. Wenn Sie ein für RustFS konfiguriertes `S3FileSystem` übergeben, gehen alle Datensatzoperationen — Parquet, CSV und JSON — an den Bucket.
 
-## 1. Create the job file
+## 1. Job-Datei anlegen
 
-Create the script, replacing all connection placeholders:
+Erstellen Sie das Skript und ersetzen Sie alle Verbindungsplatzhalter:
 
 ```python title="ray_s3.py"
 import ray
@@ -45,11 +45,11 @@ print("sample:", back[0])
 ray.shutdown()
 ```
 
-`endpoint_override` takes the full endpoint URL including the scheme. pyarrow's `S3FileSystem` uses path-style requests for custom endpoints, so no extra flag is needed. The same filesystem object works for `write_csv`, `read_json`, and the other Ray Data methods.
+`endpoint_override` erwartet die vollständige Endpunkt-URL einschließlich des Schemas. Das `S3FileSystem` von pyarrow verwendet für eigene Endpunkte Anfragen mit pfadbasierter Adressierung (Path-Style), daher ist kein zusätzliches Flag nötig. Dasselbe Dateisystem-Objekt funktioniert für `write_csv`, `read_json` und die übrigen Methoden von Ray Data.
 
-## 2. Run the job
+## 2. Job ausführen
 
-Run the script in the Ray image on the same Docker network as RustFS:
+Führen Sie das Skript im Ray-Image im selben Docker-Netzwerk wie RustFS aus:
 
 ```bash
 docker run --rm --network oo-rustfs_default \
@@ -57,47 +57,48 @@ docker run --rm --network oo-rustfs_default \
   rayproject/ray:2.44.0-py311 python /tmp/ray_s3.py
 ```
 
+
 ```text
 rows: 5
 sample: {'id': 0, 'value': 0.0}
 ```
 
-## 3. Verify objects in RustFS
+## 3. Objekte in RustFS prüfen
 
-List the dataset prefix:
+Listen Sie das Datensatz-Präfix auf:
 
 ```bash
 rc ls rustfs/my-bucket/ray-demo/ -r
 ```
 
-Ray Data wrote the dataset as a Parquet block:
+Ray Data hat den Datensatz als Parquet-Block geschrieben:
 
 ```text
 ray-demo/events/0_000000_000000.parquet
 ```
 
-![Ray dataset files stored in the RustFS Console](./images/rustfs-ray-data.png)
+![In der RustFS Console gespeicherte Ray-Datensatzdateien](./images/rustfs-ray-data.png)
 
-## 4. Stop or reset
+## 4. Anhalten oder zurücksetzen
 
-Ray Data holds no state of its own. To delete the demo dataset:
+Ray Data hält keinen eigenen Zustand. So löschen Sie den Demo-Datensatz:
 
 ```bash
 rc rm rustfs/my-bucket/ray-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
-### `Unable to connect to endpoint` or timeouts
+### `Unable to connect to endpoint` oder Zeitüberschreitungen
 
-Confirm `endpoint_override` includes the scheme and is reachable from the Ray container. Inside a Compose network the hostname is `rustfs`; from the host use `http://localhost:9000`.
+Stellen Sie sicher, dass `endpoint_override` das Schema enthält und vom Ray-Container aus erreichbar ist. Im Compose-Netzwerk lautet der Hostname `rustfs`; vom Host aus verwenden Sie `http://localhost:9000`.
 
-### `Access Denied` on write
+### `Access Denied` beim Schreiben
 
-Confirm the access key and secret key are passed to `S3FileSystem` itself — Ray does not read the container's AWS environment variables through this code path.
+Stellen Sie sicher, dass Zugriffsschlüssel und geheimer Zugriffsschlüssel direkt an `S3FileSystem` übergeben werden. Ray liest auf diesem Codepfad die AWS-Umgebungsvariablen des Containers nicht.
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Ray operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Ray Data documentation](https://docs.ray.io/en/latest/data/data.html) to chain transformations, training ingestion, and checkpointing on the same bucket.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere Ray-Operationen verwenden.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [Ray-Data-Dokumentation](https://docs.ray.io/en/latest/data/data.html), um Transformationen, das Einlesen für das Training und Checkpoints auf demselben Bucket zu verketten.

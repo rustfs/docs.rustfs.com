@@ -1,33 +1,33 @@
 ---
 title: "Apache HTTP Server"
-description: "Deploy RustFS behind Apache HTTP Server with TLS termination for separate S3 API and Console hostnames."
+description: "S3 API と Console を別々のホスト名で公開し、TLS を終端する Apache HTTP Server の背後に RustFS をデプロイします。"
 ---
 
-Use **Apache HTTP Server** (httpd) to terminate TLS and route separate hostnames to the RustFS S3 API and Console. This deployment runs httpd and a single-node RustFS instance with Docker Compose. You need Docker Engine, Docker Compose, two DNS records, and a TLS certificate that covers both hostnames.
+**Apache HTTP Server**（httpd）で TLS を終端し、別々のホスト名を RustFS の S3 API と Console へ振り分けます。このデプロイでは、Docker Compose で httpd とシングルノードの RustFS を動かします。Docker Engine、Docker Compose、DNS レコード 2 件、および両方のホスト名をカバーする TLS 証明書が必要です。
 
-This guide uses these example hostnames:
+このガイドでは、次のホスト名を例に使います。
 
-- `s3.example.com` for the S3 API
-- `console.example.com` for the Console
+- S3 API 用の `s3.example.com`
+- Console 用の `console.example.com`
 
-Replace them with hostnames that resolve to the Docker host.
+Docker ホストへ解決するホスト名に置き換えます。
 
-:::warning[Serve S3 from the root path]
+:::warning[S3 はルートパスから公開する]
 
-Do not publish the S3 API under a path such as `/s3/`. AWS Signature Version 4 includes the request path and host, so rewriting either value can invalidate signed requests. Apache rewrites proxied URLs unless you disable canonicalization, which this configuration does with `nocanon`.
+`/s3/` のようなパスの下に S3 API を公開しないでください。AWS Signature Version 4 はリクエストパスとホストを署名対象に含めるため、どちらかを書き換えると署名済みリクエストが無効になることがあります。Apache は正規化を無効にしない限り、プロキシする URL を書き換えます。この構成では `nocanon` で正規化を無効にしています。
 
 :::
 
-## 1. Create the deployment directories
+## 1. デプロイ用ディレクトリを作成する
 
-Create directories for the httpd configuration and TLS certificate:
+httpd の設定と TLS 証明書用のディレクトリを作成します。
 
 ```bash
 mkdir -p rustfs-httpd/config rustfs-httpd/certs
 cd rustfs-httpd
 ```
 
-Copy your certificate chain and private key into `certs/`:
+証明書チェーンと秘密鍵を `certs/` へコピーします。
 
 ```text
 rustfs-httpd/
@@ -37,28 +37,28 @@ rustfs-httpd/
 └── config/
 ```
 
-Restrict access to the private key:
+秘密鍵へのアクセスを制限します。
 
 ```bash
 chmod 600 certs/privkey.pem
 ```
 
-The certificate must cover both public hostnames.
+証明書は、公開する両方のホスト名をカバーする必要があります。
 
-## 2. Set RustFS credentials
+## 2. RustFS の認証情報を設定する
 
-Create an environment file and replace both credential placeholders:
+環境ファイルを作成し、認証情報のプレースホルダーを両方とも置き換えます。
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Do not commit this file to source control.
+このファイルはソース管理にコミットしないでください。
 
-## 3. Build the httpd image
+## 3. httpd イメージをビルドする
 
-The stock `httpd` image ships with its proxy and TLS modules commented out. Build a small image that enables them and loads the RustFS virtual hosts:
+標準の `httpd` イメージでは、プロキシと TLS のモジュールがコメントアウトされた状態で配布されています。これらを有効にし、RustFS の仮想ホストを読み込む小さなイメージをビルドします。
 
 ```dockerfile title="Dockerfile"
 FROM httpd:2.4-alpine
@@ -79,11 +79,11 @@ RUN sed -i \
       && printf '\nInclude conf/rustfs.conf\n' >> /usr/local/apache2/conf/httpd.conf
 ```
 
-`proxy_balancer`, `slotmem_shm`, and `lbmethod_byrequests` are only used by the [multi-node](#multi-node-backends) configuration. Loading them on single-node deployments is harmless.
+`proxy_balancer`、`slotmem_shm`、`lbmethod_byrequests` を使うのは、[マルチノード](#multi-node-backends)の設定だけです。シングルノードのデプロイで読み込んでも害はありません。
 
-## 4. Configure Apache HTTP Server
+## 4. Apache HTTP Server を設定する
 
-Create the httpd configuration with one virtual host per RustFS endpoint:
+RustFS のエンドポイントごとに、仮想ホストを 1 つ持つ httpd の設定を作成します。
 
 ```apache title="config/rustfs.conf"
 # Global settings shared by the RustFS virtual hosts.
@@ -161,11 +161,11 @@ LimitRequestBody 0
 </VirtualHost>
 ```
 
-`Listen 443` is required because the stock `httpd.conf` only opens port `80`; virtual hosts alone do not open ports. The two `VirtualHost *:80` blocks redirect all plain-HTTP traffic to HTTPS with explicit target hostnames.
+標準の `httpd.conf` が開くのはポート `80` だけであり、仮想ホストだけではポートは開かないため、`Listen 443` が必要です。2 つの `VirtualHost *:80` ブロックは、平文 HTTP のトラフィックを、対象ホスト名を明示して HTTPS へリダイレクトします。
 
-## 5. Create the Compose file
+## 5. Compose ファイルを作成する
 
-Create the httpd and RustFS services:
+httpd と RustFS のサービスを作成します。
 
 ```yaml title="compose.yaml"
 services:
@@ -216,126 +216,126 @@ networks:
   rustfs:
 ```
 
-Only httpd publishes host ports. RustFS ports `9000` and `9001` remain reachable inside the Compose network.
+ホストのポートを公開するのは httpd だけです。RustFS のポート `9000` と `9001` には、Compose ネットワークの内部からのみ到達できます。
 
-:::note[RustFS log directory]
+:::note[RustFS のログディレクトリ]
 
-`RUSTFS_OBS_LOG_DIRECTORY` must point to a directory the container can create. The RustFS image runs as a non-root user, so `/logs` works while paths under `/var/log` make the container exit at startup with `Permission denied`.
+`RUSTFS_OBS_LOG_DIRECTORY` は、コンテナが作成できるディレクトリを指す必要があります。RustFS イメージは root 以外のユーザーで動作するため、`/logs` は使えますが、`/var/log` 配下のパスでは起動時に `Permission denied` でコンテナが終了します。
 
 :::
 
-## 6. Validate and start the deployment
+## 6. デプロイを検証して起動する
 
-Render the Compose configuration and start RustFS:
+Compose の設定を展開し、RustFS を起動します。
 
 ```bash
 docker compose config
 docker compose up -d rustfs
 ```
 
-Validate the httpd configuration with the same image used by the deployment:
+デプロイと同じイメージで httpd の設定を検証します。
 
 ```bash
 docker compose run --rm --no-deps httpd httpd -t
 ```
 
-Start httpd and check both services:
+httpd を起動し、両方のサービスを確認します。
 
 ```bash
 docker compose up -d httpd
 docker compose ps
 ```
 
-If a service does not become healthy, inspect its logs:
+サービスが正常にならない場合は、ログを確認します。
 
 ```bash
 docker compose logs httpd
 docker compose logs rustfs
 ```
 
-## 7. Verify both endpoints
+## 7. 両方のエンドポイントを確認する
 
-Verify the API and Console through their public HTTPS hostnames:
+公開 HTTPS ホスト名経由で API と Console を確認します。
 
 ```bash
 curl --fail https://s3.example.com/health/ready
 curl --fail https://console.example.com/rustfs/console/health
 ```
 
-Configure S3 clients with `https://s3.example.com` as the endpoint and enable path-style addressing. Open `https://console.example.com/rustfs/console/` to sign in to the Console.
+S3 クライアントのエンドポイントを `https://s3.example.com` に設定し、パススタイルアクセスを有効にします。`https://console.example.com/rustfs/console/` を開いて Console にサインインします。
 
-:::note[Console root path]
+:::note[Console のルートパス]
 
-In RustFS v2.x the Console is served under the `/rustfs/console/` path prefix. Requesting the root path of the Console hostname returns an S3-style XML access-denied response, which is expected.
+RustFS v2.x では、Console はパスプレフィックス `/rustfs/console/` の下で提供されます。Console ホスト名のルートパスをリクエストすると、S3 形式の XML によるアクセス拒否応答が返ります。これは想定どおりの動作です。
 
 :::
 
-When you replace a renewed certificate or key in `certs/`, validate the configuration and reload httpd gracefully without dropping active transfers:
+`certs/` の証明書または鍵を更新したものに差し替えたら、設定を検証し、進行中の転送を切らずに httpd をグレースフルに再読み込みします。
 
 ```bash
 docker compose exec httpd httpd -t
 docker compose exec httpd httpd -k graceful
 ```
 
-## How this configuration preserves S3 signatures
+## この設定が S3 署名を保持する仕組み
 
-AWS Signature Version 4 signs the HTTP method, the `Host` header, and the raw request path. Every directive below keeps one of those values byte-identical between the client and RustFS:
+AWS Signature Version 4 は、HTTP メソッド、`Host` ヘッダー、生のリクエストパスに署名します。以下の各ディレクティブは、これらの値のいずれかを、クライアントから RustFS まで 1 バイトも変えずに保ちます。
 
-- **`ProxyPreserveHost On`** keeps the client's `Host` header. With the default (`Off`), Apache rewrites `Host` to the backend host and RustFS answers `SignatureDoesNotMatch`.
-- **`nocanon`** on the `ProxyPass` line passes the request path to RustFS without URL canonicalization. Without it, Apache rewrites paths during forwarding (for example collapsing `//`), and any signed path no longer matches.
-- **`AllowEncodedSlashes NoDecode`** lets object keys containing `%2F` reach the proxy handlers instead of returning `404`, and keeps the encoding intact.
-- **`RequestHeader set X-Forwarded-Proto "https"`** tells RustFS the original scheme. Apache's `ProxyAddHeaders` (default `On`) adds `X-Forwarded-For`, `X-Forwarded-Host`, and `X-Forwarded-Server`, but not `X-Forwarded-Proto`.
+- **`ProxyPreserveHost On`** は、クライアントの `Host` ヘッダーを保持します。既定（`Off`）では Apache が `Host` をバックエンドのホストへ書き換えるため、RustFS は `SignatureDoesNotMatch` を返します。
+- `ProxyPass` 行の **`nocanon`** は、URL を正規化せずにリクエストパスを RustFS へ渡します。これがないと、Apache は転送中にパスを書き換えます（たとえば `//` を折りたたみます）。その結果、署名済みのパスが一致しなくなります。
+- **`AllowEncodedSlashes NoDecode`** は、`%2F` を含むオブジェクトキーが `404` にならずプロキシハンドラーへ届くようにし、エンコーディングもそのまま保ちます。
+- **`RequestHeader set X-Forwarded-Proto "https"`** は、元のスキームを RustFS に伝えます。Apache の `ProxyAddHeaders`（既定は `On`）が追加するのは `X-Forwarded-For`、`X-Forwarded-Host`、`X-Forwarded-Server` であり、`X-Forwarded-Proto` は含まれません。
 
-Presigned URLs, multipart uploads, and browser POST uploads rely on the same path and host preservation and need no extra directives.
+署名付き URL、マルチパートアップロード、ブラウザーからの POST アップロードは、同じパスとホストの保持に依存するため、追加のディレクティブは不要です。
 
-The Console virtual host adds `upgrade=websocket` to its `ProxyPass` line so that WebSocket upgrades are tunneled end to end. Since 2.4.47, `mod_proxy_http` handles the upgrade itself and only tunnels connections the backend accepts with `101 Switching Protocols`; the older `mod_proxy_wstunnel` module is deprecated.
+Console の仮想ホストは、`ProxyPass` 行に `upgrade=websocket` を付け、WebSocket のアップグレードをエンドツーエンドでトンネルします。2.4.47 以降、`mod_proxy_http` 自身がアップグレードを処理し、バックエンドが `101 Switching Protocols` で受け付けた接続だけをトンネルします。古い `mod_proxy_wstunnel` モジュールは非推奨です。
 
-## Request bodies, large objects, and timeouts
+## リクエストボディ、大きなオブジェクト、タイムアウト
 
-Apache forwards request bodies to RustFS without a size limit and without writing them to the proxy's disk. Bodies that arrive with a `Content-Length` (what AWS CLI, AWS SDKs, and `mc` send) stream through as they arrive. Bodies that arrive with `Transfer-Encoding: chunked` are also forwarded as chunked encoding, which RustFS rejects — see the warnings below.
+Apache は、サイズ制限を設けず、プロキシのディスクへ書き出さずに、リクエストボディを RustFS へ転送します。`Content-Length` 付きで届くボディ（AWS CLI、AWS SDK、`mc` が送る形式）は、到着したままストリーム転送されます。`Transfer-Encoding: chunked` で届くボディもチャンク転送のまま転送されますが、RustFS はこれを拒否します。下記の警告を参照してください。
 
-The timeout directives trade safety for long transfers:
+タイムアウトのディレクティブは、安全性を下げて長時間の転送を通します。
 
-- **`Timeout 600`** covers connection I/O in both directions, so slow downloads and uploads are not cut mid-transfer.
-- **`ProxyTimeout 600`** applies the same budget to the connection with RustFS.
-- **`RequestReadTimeout`** bounds slow clients without punishing steady ones: a request is dropped only when headers stall or the body rate falls below `MinRate`.
-- **`LimitRequestBody 0`** states the default explicitly: request bodies of any size are accepted.
+- **`Timeout 600`** は双方向の接続 I/O を対象にするため、遅いダウンロードやアップロードが転送の途中で切れません。
+- **`ProxyTimeout 600`** は、RustFS との接続に同じ上限を適用します。
+- **`RequestReadTimeout`** は、安定して送っているクライアントを不利にせず、遅いクライアントを制限します。リクエストが破棄されるのは、ヘッダーが停滞したとき、またはボディの速度が `MinRate` を下回ったときだけです。
+- **`LimitRequestBody 0`** は既定を明示したもので、任意のサイズのリクエストボディを受け付けます。
 
-:::warning[Uploads must carry a Content-Length]
+:::warning[アップロードには Content-Length が必要]
 
-RustFS rejects request bodies forwarded as `Transfer-Encoding: chunked` with `400 UnexpectedContent` (`This request does not support content.`). Clients must upload with a `Content-Length`. All major S3 clients do this out of the box, so this only affects hand-rolled HTTP scripts that stream from a pipe. Apache's default body handling converts small chunked bodies to `Content-Length` in memory but forwards large ones as chunked, so such a client can appear to work for small files and fail for large ones. `SetEnv proxy-sendcl 1` converts chunked bodies to `Content-Length` as a fallback — at the cost of spooling each body to the proxy's disk first.
-
-:::
-
-:::warning[Presigned URLs and the Content-Type header]
-
-A presigned URL fixes the headers covered by its signature. If the URL was generated without a `Content-Type`, the upload must not add one — RustFS answers `403 SignatureDoesNotMatch` for the unsigned header. Note that `curl -d` and `curl --data-binary` add `Content-Type: application/x-www-form-urlencoded` on their own. When the upload sends a `Content-Type`, presign the URL with the same value (the `ContentType` parameter in AWS SDKs) and make the request match it exactly.
+RustFS は、`Transfer-Encoding: chunked` として転送されたリクエストボディを `400 UnexpectedContent`（`This request does not support content.`）で拒否します。クライアントは `Content-Length` 付きでアップロードする必要があります。主要な S3 クライアントはすべて最初からそうするため、影響があるのはパイプからストリームする自作の HTTP スクリプトだけです。Apache の既定のボディ処理は、小さなチャンクボディをメモリ上で `Content-Length` に変換しますが、大きなボディはチャンクのまま転送します。そのため、そのようなクライアントは小さなファイルでは動いて見え、大きなファイルで失敗することがあります。`SetEnv proxy-sendcl 1` はフォールバックとしてチャンクボディを `Content-Length` に変換します。その代わり、各ボディを先にプロキシのディスクへスプールします。
 
 :::
 
-## Settings that do not suit RustFS
+:::warning[署名付き URL と Content-Type ヘッダー]
 
-The following Apache defaults and options break S3 semantics or waste resources. This configuration avoids all of them.
+署名付き URL は、署名の対象にしたヘッダーを固定します。`Content-Type` なしで URL を生成した場合、アップロード側でそのヘッダーを追加してはいけません。署名に含まれないヘッダーに対して、RustFS は `403 SignatureDoesNotMatch` を返します。`curl -d` と `curl --data-binary` は、独自に `Content-Type: application/x-www-form-urlencoded` を付けます。アップロードが `Content-Type` を送る場合は、同じ値で URL に署名し（AWS SDK では `ContentType` パラメーター）、リクエストをその値と完全に一致させます。
 
-| Setting | Effect on RustFS |
+:::
+
+## RustFS に合わない設定
+
+次の Apache の既定値とオプションは、S3 のセマンティクスを壊すか、リソースを無駄にします。この設定では、いずれも使っていません。
+
+| 設定 | RustFS への影響 |
 | --- | --- |
-| `ProxyPreserveHost Off` (default) | Rewrites `Host`; signed requests fail with `SignatureDoesNotMatch`. |
-| `ProxyPass` without `nocanon` | Canonicalizes the request path; signed paths fail to verify. |
-| `AllowEncodedSlashes Off` (default) | Returns `404` for object keys containing `%2F`. |
-| Path prefixes (`ProxyPass /s3/`, `Alias`, rewrite rules) | Rewrites the request path; keep the S3 API on the root path. |
-| `ProxyErrorOverride On` | Replaces RustFS S3 XML errors with Apache error pages; S3 SDKs cannot parse them. |
-| `SetEnv proxy-sendcl 1`, `SetEnv force-proxy-request-1.0 1` | Forces a `Content-Length` upstream and spools chunked request bodies to disk before forwarding. It rescues chunked-only clients but adds disk I/O to large uploads. |
-| `SetEnv proxy-sendchunked 1` | Forces chunked encoding upstream, which RustFS rejects with `400 UnexpectedContent`. |
-| `mod_proxy_wstunnel` (`ProxyPass ... ws://`) | Deprecated since 2.4.47; use `upgrade=websocket` on `mod_proxy_http` instead. |
+| `ProxyPreserveHost Off`（既定） | `Host` を書き換えます。署名済みリクエストは `SignatureDoesNotMatch` で失敗します。 |
+| `nocanon` のない `ProxyPass` | リクエストパスを正規化します。署名済みのパスは検証に失敗します。 |
+| `AllowEncodedSlashes Off`（既定） | `%2F` を含むオブジェクトキーに対して `404` を返します。 |
+| パスプレフィックス（`ProxyPass /s3/`、`Alias`、rewrite ルール） | リクエストパスを書き換えます。S3 API はルートパスのままにします。 |
+| `ProxyErrorOverride On` | RustFS の S3 XML エラーを Apache のエラーページに置き換えます。S3 SDK はこれを解析できません。 |
+| `SetEnv proxy-sendcl 1`、`SetEnv force-proxy-request-1.0 1` | アップストリームへ `Content-Length` を強制し、転送前にチャンクのリクエストボディをディスクへスプールします。チャンクしか送れないクライアントは救えますが、大きなアップロードにディスク I/O が加わります。 |
+| `SetEnv proxy-sendchunked 1` | アップストリームへチャンク転送を強制します。RustFS はこれを `400 UnexpectedContent` で拒否します。 |
+| `mod_proxy_wstunnel`（`ProxyPass ... ws://`） | 2.4.47 以降は非推奨です。代わりに `mod_proxy_http` の `upgrade=websocket` を使います。 |
 
-Two RustFS-side limits are worth marking because no proxy setting can remove them:
+プロキシの設定では取り除けない、RustFS 側の制限が 2 つあります。
 
-- Object keys containing empty (`//`) or dot (`.`) path segments are rejected with `InvalidArgument` even without a proxy.
-- In RustFS v2.x the Console lives under `/rustfs/console/`; the Console root path answers with S3-style XML.
+- 空のパスセグメント（`//`）またはドット（`.`）を含むオブジェクトキーは、プロキシがなくても `InvalidArgument` で拒否されます。
+- RustFS v2.x では Console は `/rustfs/console/` の下にあり、Console のルートパスは S3 形式の XML で応答します。
 
-## Multi-node backends
+## マルチノードのバックエンド [#multi-node-backends]
 
-For a distributed RustFS deployment, replace each single `ProxyPass` target with a balancer that lists every RustFS node. Replace the S3 virtual host's proxy block with:
+分散構成の RustFS デプロイでは、単一の `ProxyPass` 先を、すべての RustFS ノードを列挙したバランサーに置き換えます。S3 仮想ホストのプロキシブロックは、次に置き換えます。
 
 ```apache title="config/rustfs.conf"
     <Proxy "balancer://s3">
@@ -349,7 +349,7 @@ For a distributed RustFS deployment, replace each single `ProxyPass` target with
     ProxyPassReverse / balancer://s3/
 ```
 
-Replace the Console virtual host's proxy block with:
+Console 仮想ホストのプロキシブロックは、次に置き換えます。
 
 ```apache title="config/rustfs.conf"
     # Keep an in-progress login on the node that created its state.
@@ -366,10 +366,10 @@ Replace the Console virtual host's proxy block with:
     ProxyPassReverse / balancer://console/
 ```
 
-The `ROUTEID` cookie keeps an in-progress OpenID Connect login on the RustFS node that created its `state`. Keep `upgrade=websocket` on each `BalancerMember` line; `ProxySet` does not accept that parameter. Keep port `9000` open directly between RustFS nodes because internal node RPC uses the same listener.
+`ROUTEID` Cookie により、進行中の OpenID Connect ログインは、その `state` を作成した RustFS ノードに留まります。`upgrade=websocket` は各 `BalancerMember` 行に残します。`ProxySet` はこのパラメーターを受け付けません。ノード間の内部 RPC は同じリスナーを使うため、RustFS ノード間ではポート `9000` を直接開けたままにします。
 
-## Next steps
+## 次のステップ
 
-- [Configure an S3 client](/developer/examples/aws-cli)
-- [Enable virtual-hosted-style bucket URLs](/integration/virtual)
-- [Review health and readiness endpoints](/operations/status-check)
+- [S3 クライアントを設定する](/ja/developer/examples/aws-cli)
+- [仮想ホスト形式のバケット URL を有効にする](/ja/integration/virtual)
+- [ヘルスと準備完了のエンドポイントを確認する](/ja/operations/status-check)

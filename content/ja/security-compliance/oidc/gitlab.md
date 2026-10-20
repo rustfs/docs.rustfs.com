@@ -1,76 +1,76 @@
 ---
 title: "GitLab"
-description: "Configure GitLab as an OpenID Connect identity provider for RustFS Console single sign-on."
+description: "GitLab を、RustFS Console のシングルサインオン用 OpenID Connect アイデンティティプロバイダーとして設定します。"
 ---
 
-RustFS integrates with **GitLab** through the OpenID Connect (OIDC) Authorization Code Flow. The examples on this page use the default RustFS provider ID, `default`.
+RustFS は、OpenID Connect（OIDC）の Authorization Code Flow を通じて **GitLab** と連携します。このページの例では、RustFS のデフォルトプロバイダー ID である `default` を使います。
 
-## Requirements
+## 要件
 
-Before you begin, prepare:
+開始する前に、次を準備します。
 
-- An [installed GitLab instance](https://about.gitlab.com/install/) and access to its Admin area.
-- A RustFS deployment with a public HTTPS Console origin.
-- A RustFS policy to assign to GitLab users. The examples use `consoleAdmin`; use a policy with only the permissions your users require in production.
+- [インストール済みの GitLab インスタンス](https://about.gitlab.com/install/)と、その管理エリアへのアクセス。
+- 公開 HTTPS の Console オリジンを持つ RustFS のデプロイ。
+- GitLab ユーザーに割り当てる RustFS ポリシー。例では `consoleAdmin` を使います。本番では、ユーザーに必要な権限だけを持つポリシーを使います。
 
-## Overview
+## 概要
 
-The browser login flow is:
+ブラウザのログインの流れは次のとおりです。
 
-1. RustFS sends an authorization-code request with a Proof Key for Code Exchange (PKCE) S256 challenge.
-2. GitLab authenticates the user and redirects the browser to RustFS with `code` and `state`.
-3. RustFS exchanges the code at the GitLab token endpoint.
-4. RustFS verifies the ID token signature, issuer, audience, expiry, and nonce.
-5. RustFS assigns the configured local Identity and Access Management (IAM) policy and issues temporary credentials for the Console session.
+1. RustFS は、Proof Key for Code Exchange（PKCE）の S256 チャレンジ付きで認可コードリクエストを送ります。
+2. GitLab がユーザーを認証し、`code` と `state` を付けてブラウザを RustFS へリダイレクトします。
+3. RustFS は、GitLab のトークンエンドポイントでコードを交換します。
+4. RustFS は、ID トークンの署名、発行者、オーディエンス、有効期限、nonce を検証します。
+5. RustFS は、設定されたローカルのアイデンティティとアクセス管理（IAM）ポリシーを割り当て、Console セッション用の一時認証情報を発行します。
 
-GitLab authenticates the user, while RustFS policies authorize S3 and administration operations.
+GitLab がユーザーを認証し、RustFS のポリシーが S3 と管理操作を認可します。
 
-The examples use the following values. Replace the hostnames and client secret for your environment:
+例では次の値を使います。ホスト名とクライアントシークレットは、環境に合わせて置き換えます。
 
-| Setting | Example |
+| 設定 | 例 |
 | --- | --- |
-| GitLab issuer | `https://gitlab.example.com` |
-| GitLab application ID | `<gitlab-application-id>` |
-| Public RustFS origin | `https://rustfs.example.com` |
-| RustFS callback URL | `https://rustfs.example.com/rustfs/admin/v3/oidc/callback/default` |
+| GitLab の発行者 | `https://gitlab.example.com` |
+| GitLab のアプリケーション ID | `<gitlab-application-id>` |
+| 公開する RustFS のオリジン | `https://rustfs.example.com` |
+| RustFS のコールバック URL | `https://rustfs.example.com/rustfs/admin/v3/oidc/callback/default` |
 
-## Configuration
+## 設定
 
-### GitLab configuration
+### GitLab の設定
 
-#### Create the OAuth application
+#### OAuth アプリケーションを作成する
 
-1. Sign in to GitLab as an administrator.
-2. Open **Admin Area**, select **Applications**, and select **New application**.
-3. Enter `RustFS OIDC` as the application name.
-4. Set **Redirect URI** to the exact RustFS callback URL:
+1. GitLab に管理者としてサインインします。
+2. **Admin Area**（管理エリア）を開き、**Applications**（アプリケーション）を選択し、**New application**（新規アプリケーション）を選択します。
+3. アプリケーション名として `RustFS OIDC` を入力します。
+4. **Redirect URI**（リダイレクト URI）を、RustFS のコールバック URL に完全一致で設定します。
 
   ```text
   https://rustfs.example.com/rustfs/admin/v3/oidc/callback/default
   ```
 
-5. Enable **Confidential**.
-6. Enable **Trusted** to skip the user authorization prompt for this instance-wide application.
-7. Select the `openid`, `profile`, and `email` scopes.
-8. Save the application, then copy the generated application ID and secret.
+5. **Confidential**（機密）を有効にします。
+6. このインスタンス全体のアプリケーションでユーザー認可の確認を省略するため、**Trusted**（信頼済み）を有効にします。
+7. `openid`、`profile`、`email` スコープを選択します。
+8. アプリケーションを保存し、生成されたアプリケーション ID とシークレットをコピーします。
 
-See the [GitLab OAuth provider documentation](https://docs.gitlab.com/integration/oauth_provider/) for details about administering applications.
+アプリケーション管理の詳細は、[GitLab の OAuth プロバイダーに関するドキュメント](https://docs.gitlab.com/integration/oauth_provider/)を参照します。
 
-![GitLab Admin area showing the RustFS OIDC instance OAuth application as trusted and confidential](./images/gitlab-oidc-configuration.png)
+![信頼済みかつ機密として表示された、RustFS OIDC のインスタンス OAuth アプリケーションを示す GitLab の管理エリア](./images/gitlab-oidc-configuration.png)
 
-:::note[Test environment shown]
+:::note[テスト環境の画面]
 
-The screenshot shows an HTTP callback URL from a test environment. Use the public HTTPS callback URL for your RustFS deployment.
+スクリーンショットは、テスト環境の HTTP コールバック URL を示しています。RustFS のデプロイでは、公開された HTTPS のコールバック URL を使います。
 
 :::
 
-### RustFS configuration
+### RustFS の設定
 
-Configure the GitLab provider through environment variables.
+環境変数で GitLab プロバイダーを設定します。
 
-#### Configure with environment variables
+#### 環境変数で設定する
 
-Add the GitLab provider and public browser origin to the RustFS service environment:
+GitLab プロバイダーと、ブラウザ向けの公開オリジンを、RustFS サービスの環境に追加します。
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_BROWSER_REDIRECT_URL="https://rustfs.example.com"
@@ -88,23 +88,23 @@ RUSTFS_IDENTITY_OPENID_USERNAME_CLAIM="preferred_username"
 RUSTFS_IDENTITY_OPENID_ROLE_POLICY="consoleAdmin"
 ```
 
-Restart RustFS after applying the configuration.
+設定を適用したあと、RustFS を再起動します。
 
-`RUSTFS_BROWSER_REDIRECT_URL` must contain the public scheme and authority without a path. It controls the Console success redirect and logout fallback URL. The provider callback URL must exactly match the URL registered in GitLab.
+`RUSTFS_BROWSER_REDIRECT_URL` には、パスを除いた公開スキームとオーソリティを指定する必要があります。Console の成功時リダイレクトと、ログアウト時のフォールバック URL を制御します。プロバイダーのコールバック URL は、GitLab に登録した URL と完全に一致する必要があります。
 
-:::warning[Limit the assigned policy]
+:::warning[割り当てるポリシーを制限する]
 
-`RUSTFS_IDENTITY_OPENID_ROLE_POLICY` assigns the same RustFS policy to every user who signs in through this provider. Replace `consoleAdmin` with a policy that grants only the permissions required by your GitLab users.
+`RUSTFS_IDENTITY_OPENID_ROLE_POLICY` は、このプロバイダー経由でサインインするすべてのユーザーに同じ RustFS ポリシーを割り当てます。`consoleAdmin` は、GitLab ユーザーに必要な権限だけを付与するポリシーに置き換えます。
 
 :::
 
-For a reverse proxy or load balancer, preserve the callback query string and route the authorize and callback requests to the same RustFS node. The in-flight OIDC `state` is local to that node.
+リバースプロキシまたはロードバランサーを使う場合は、コールバックのクエリ文字列を保持し、認可リクエストとコールバックリクエストを同じ RustFS ノードへルーティングします。処理中の OIDC `state` は、そのノードのローカルにあります。
 
-## Verification
+## 確認
 
-### Verify GitLab discovery
+### GitLab のディスカバリーを確認する
 
-Query the GitLab discovery document:
+GitLab のディスカバリードキュメントを問い合わせます。
 
 ```bash
 curl -fsS "https://gitlab.example.com/.well-known/openid-configuration" | jq '{
@@ -117,44 +117,44 @@ curl -fsS "https://gitlab.example.com/.well-known/openid-configuration" | jq '{
 }'
 ```
 
-Confirm that:
+次を確認します。
 
-- `issuer` is `https://gitlab.example.com`.
-- `authorization_endpoint`, `token_endpoint`, and `jwks_uri` are present.
-- `scopes_supported` includes `openid`, `profile`, and `email`.
-- `code_challenge_methods_supported` includes `S256`.
+- `issuer` が `https://gitlab.example.com` であること。
+- `authorization_endpoint`、`token_endpoint`、`jwks_uri` があること。
+- `scopes_supported` に `openid`、`profile`、`email` が含まれること。
+- `code_challenge_methods_supported` に `S256` が含まれること。
 
-### Verify the RustFS provider
+### RustFS のプロバイダーを確認する
 
-After restarting RustFS, check that the provider is available:
+RustFS を再起動したあと、プロバイダーが利用できることを確認します。
 
 ```bash
 curl -fsS "https://rustfs.example.com/rustfs/admin/v3/oidc/providers" | jq
 ```
 
-The response should include the `default` provider with the display name `GitLab`.
+レスポンスには、表示名 `GitLab` の `default` プロバイダーが含まれるはずです。
 
-### Test Console login
+### Console ログインを試す
 
-Open the RustFS Console and select **GitLab**, or open the authorization endpoint directly:
+RustFS Console を開き **GitLab** を選択するか、認可エンドポイントを直接開きます。
 
 ```text
 https://rustfs.example.com/rustfs/admin/v3/oidc/authorize/default
 ```
 
-![RustFS Console login page showing the Login with GitLab option](./images/rustfs-console-gitlab-oidc.png)
+![Login with GitLab の選択肢を示す RustFS Console のログインページ](./images/rustfs-console-gitlab-oidc.png)
 
-Verify the complete flow:
+一連の流れを確認します。
 
-1. The browser redirects to GitLab.
-2. The user signs in and authorizes the application when prompted.
-3. GitLab redirects to the RustFS callback URL with `code` and `state`.
-4. RustFS validates the ID token and creates the Console session.
-5. The Console opens with the configured RustFS policy.
+1. ブラウザが GitLab へリダイレクトされます。
+2. ユーザーがサインインし、確認を求められたらアプリケーションを認可します。
+3. GitLab が `code` と `state` を付けて RustFS のコールバック URL へリダイレクトします。
+4. RustFS が ID トークンを検証し、Console セッションを作成します。
+5. 設定した RustFS ポリシーで Console が開きます。
 
-If GitLab reports a redirect URI mismatch, confirm that the URI registered in the GitLab application exactly matches `RUSTFS_IDENTITY_OPENID_REDIRECT_URI`.
+GitLab がリダイレクト URI の不一致を報告した場合は、GitLab アプリケーションに登録した URI が `RUSTFS_IDENTITY_OPENID_REDIRECT_URI` と完全に一致することを確認します。
 
-## Next steps
+## 次のステップ
 
-- Review [users, groups, and policies](../iam/policies.md) before selecting the policy assigned to GitLab users.
-- Review the [Console security notes](/administration/console) before exposing the login endpoint publicly.
+- GitLab ユーザーに割り当てるポリシーを選ぶ前に、[ユーザー、グループ、ポリシー](../iam/policies.md)を確認します。
+- ログインエンドポイントを公開する前に、[Console のセキュリティに関する注意](/ja/administration/console)を確認します。

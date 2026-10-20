@@ -62,7 +62,7 @@ rc bucket encryption info rustfs/my-bucket
 
 Clearing or changing the bucket default affects only later writes. It does not decrypt or rewrite existing objects.
 
-## Request contract
+## Request headers
 
 S3 clients request SSE-S3 with:
 

@@ -1,13 +1,13 @@
 ---
 title: "Delta Lake"
-description: "Write and read Delta tables on RustFS with delta-rs."
+description: "Schreiben und lesen Sie Delta-Tabellen auf RustFS mit delta-rs."
 ---
 
-This guide connects [Delta Lake](https://github.com/delta-io/delta) — the open-source lakehouse table format — to **RustFS** through delta-rs, the Rust-native Delta implementation. You will write a Delta table to a RustFS bucket from Python, read it back with ACID transaction history, and confirm the `_delta_log` and Parquet files in the bucket. The workflow was verified with the `deltalake` Python package (delta-rs) and pandas against `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [Delta Lake](https://github.com/delta-io/delta) — das quelloffene Lakehouse-Tabellenformat — über delta-rs, die Rust-native Delta-Implementierung, mit **RustFS**. Sie schreiben aus Python eine Delta-Tabelle in einen RustFS-Bucket, lesen sie mit der ACID-Transaktionshistorie zurück und prüfen die Dateien `_delta_log` und Parquet im Bucket. Der Ablauf wurde mit dem Python-Paket `deltalake` (delta-rs) und pandas gegen `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Python 3.9 or newer. This deployment is intended for local integration testing, not production.
+Sie benötigen Python 3.9 oder neuer. Diese Bereitstellung ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -16,19 +16,19 @@ flowchart LR
 	Query["DeltaTable"] -->|"read / time travel"| RustFS
 ```
 
-delta-rs stores each table as Parquet files plus a transaction log (`_delta_log/`). All I/O goes through the `object_store` crate, configured with the same AWS environment variables as other S3 clients.
+delta-rs speichert jede Tabelle als Parquet-Dateien plus ein Transaktionsprotokoll (`_delta_log/`). Die gesamte Ein- und Ausgabe läuft über die Crate `object_store`, konfiguriert mit denselben AWS-Umgebungsvariablen wie andere S3-Clients.
 
-## 1. Install the client
+## 1. Den Client installieren
 
 ```bash
 pip install deltalake pandas pyarrow
 ```
 
-`pyarrow` is required to convert pandas frames into Delta-compatible record batches.
+`pyarrow` wird benötigt, um pandas-Frames in Delta-kompatible Record-Batches umzuwandeln.
 
-## 2. Write a Delta table
+## 2. Eine Delta-Tabelle schreiben
 
-Create the bucket and write a table, replacing all connection placeholders. `AWS_S3_ALLOW_UNSAFE_RENAME` is needed because RustFS does not provide copy-if-not-exists, which delta-rs otherwise uses for commit conflicts:
+Legen Sie den Bucket an und schreiben Sie eine Tabelle. Ersetzen Sie alle Verbindungsplatzhalter. `AWS_S3_ALLOW_UNSAFE_RENAME` ist erforderlich, weil RustFS kein copy-if-not-exists bereitstellt, das delta-rs sonst für Commit-Konflikte verwendet:
 
 ```python title="delta_s3.py"
 import pandas as pd
@@ -53,9 +53,9 @@ print("written:", df.shape[0], "rows")
 written: 3 rows
 ```
 
-The `table` URI uses the standard `s3://bucket/prefix` form; the endpoint and credentials come from `storage_options`.
+Die URI `table` verwendet die übliche Form `s3://bucket/prefix`. Endpunkt und Zugangsdaten kommen aus `storage_options`.
 
-## 3. Read the table back
+## 3. Die Tabelle zurücklesen
 
 ```python title="delta_read.py"
 from deltalake import DeltaTable
@@ -75,51 +75,51 @@ read back: 3 rows
 version: 0
 ```
 
-Because the version is tracked in the transaction log, the same table supports time travel with `DeltaTable(..., version=N)` and appends that bump the version.
+Weil die Version im Transaktionsprotokoll geführt wird, unterstützt dieselbe Tabelle Time Travel mit `DeltaTable(..., version=N)` und Anhänge, die die Version erhöhen.
 
-## 4. Verify objects in RustFS
+## 4. Objekte in RustFS prüfen
 
-List the table prefix:
+Listen Sie das Tabellenpräfix auf:
 
 ```bash
 rc ls rustfs/<your-bucket>/ -r
 ```
 
-The first commit created the transaction log and one Parquet file:
+Der erste Commit hat das Transaktionsprotokoll und eine Parquet-Datei angelegt:
 
 ```text
 events/_delta_log/00000000000000000000.json
 events/part-00000-3859855e-45e4-4ae5-94ff-2d8eab5e7ebb-c000.snappy.parquet
 ```
 
-Every new write adds a `NNNNNNNNNNNNNNNNNNNN.json` log entry and Parquet parts; readers replay the log to get a consistent snapshot.
+Jeder weitere Schreibvorgang fügt einen Protokolleintrag `NNNNNNNNNNNNNNNNNNNN.json` und Parquet-Teile hinzu. Leser spielen das Protokoll ab, um einen konsistenten Snapshot zu erhalten.
 
-![Delta table files stored in the RustFS Console](./images/rustfs-delta-table.png)
+![In der RustFS-Console gespeicherte Delta-Tabellendateien](./images/rustfs-delta-table.png)
 
-## 5. Stop or reset
+## 5. Stoppen oder zurücksetzen
 
-delta-rs holds no state of its own. To delete the table:
+delta-rs hält keinen eigenen Zustand. So löschen Sie die Tabelle:
 
 ```bash
 rc rm rustfs/<your-bucket>/events/ --recursive --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
-### `Import pyarrow failed` when writing a pandas DataFrame
+### `Import pyarrow failed` beim Schreiben eines pandas-DataFrame
 
-`write_deltalake` converts frames through Arrow. Install `pyarrow` alongside `deltalake` and `pandas`.
+`write_deltalake` wandelt Frames über Arrow um. Installieren Sie `pyarrow` zusammen mit `deltalake` und `pandas`.
 
-### `Generic DeltaTable error: commit conflict` or rename errors on commit
+### `Generic DeltaTable error: commit conflict` oder Umbenennungsfehler beim Commit
 
-delta-rs commits by copying and renaming temporary objects, which requires atomic rename on the backend. For S3-compatible stores without copy-if-not-exists, set `AWS_S3_ALLOW_UNSAFE_RENAME: "true"` in `storage_options` — acceptable for a single writer, not for concurrent writers.
+delta-rs committet, indem es temporäre Objekte kopiert und umbenennt. Dafür ist ein atomares Umbenennen auf dem Backend nötig. Setzen Sie bei S3-kompatiblen Speichern ohne copy-if-not-exists in `storage_options` den Wert `AWS_S3_ALLOW_UNSAFE_RENAME: "true"`. Das ist für einen einzelnen Schreiber akzeptabel, für gleichzeitige Schreiber nicht.
 
 ### `Unknown lengthy error: AWS connectivity or endpoint errors`
 
-Confirm `AWS_ENDPOINT_URL` includes the scheme and that `AWS_ALLOW_HTTP` is `"true"` for plain-HTTP endpoints; without it the S3 client only speaks HTTPS.
+Prüfen Sie, dass `AWS_ENDPOINT_URL` das Schema enthält und dass `AWS_ALLOW_HTTP` für Endpunkte mit unverschlüsseltem HTTP auf `"true"` steht. Ohne diesen Wert spricht der S3-Client nur HTTPS.
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Delta clients.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [delta-rs usage documentation](https://delta-io.github.io/delta-rs/usage/writing/writing-to-s3/) for concurrent-writer setups with DynamoDB-backed commit coordination.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere Delta-Clients einsetzen.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [delta-rs-Dokumentation zum Schreiben](https://delta-io.github.io/delta-rs/usage/writing/writing-to-s3/) für Konfigurationen mit gleichzeitigen Schreibern und einer Commit-Koordination auf DynamoDB-Basis.

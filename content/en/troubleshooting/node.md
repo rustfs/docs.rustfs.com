@@ -1,83 +1,83 @@
 ---
-title: "Node Failures"
-description: "Complete steps for handling node failures in RustFS clusters. Mainly includes: replacement node hardware preparation, configuration updates, service deployment, rejoining the cluster, data healing, and subsequent checks and best practices."
+title: "Node failures"
+description: "Prepare a replacement node, update its configuration, restore cluster membership, and verify data healing."
 ---
 
-In distributed RustFS clusters, erasure coding mechanisms are adopted to ensure read/write access can still be provided when some nodes fail, and automatic data healing occurs after nodes rejoin. This document will guide you through the following process:
+A distributed RustFS cluster uses erasure coding to stay readable and writable when some nodes fail, and it heals data automatically when a node rejoins. This guide walks you through the following steps:
 
-1. Start replacement node and synchronize environment
-2. Update DNS/hostname to point old node identifiers to new nodes
-3. Download and deploy RustFS services consistent with the cluster
-4. Rejoin new nodes to the cluster and trigger data healing
-5. Monitor healing progress and perform subsequent checks and optimization
+1. Start the replacement node and match its software environment to the cluster.
+2. Update DNS or `/etc/hosts` so that the old hostname resolves to the new node.
+3. Install the same RustFS version as the other nodes.
+4. Start the replacement nodes so they rejoin the cluster and begin data healing.
+5. Monitor healing progress, then run follow-up checks.
 
-## 1) Start Replacement Node
+## 1. Prepare the replacement node
 
-* **Hardware and System Preparation**
-  Ensure the replacement node server hardware is roughly consistent with the failed node, including CPU, memory, network configuration, and disk type; even using higher configurations won't affect cluster performance.
-  Software environment needs to maintain version consistency with other nodes (operating system, kernel, dependency libraries, etc.) to avoid cluster abnormal behavior caused by environment differences.
+* **Hardware**
+  Make sure that the replacement node's hardware (CPU, memory, network, and drive type) roughly matches the failed node. Higher-spec hardware does not hurt cluster performance.
+  Run the same operating system, kernel, and library versions as the other nodes so the replacement does not behave differently from the rest of the cluster.
 
-* **Drive Exclusive Access**
-  As with physical drive operations, RustFS requires exclusive access to storage volumes, prohibiting any other processes or scripts from directly modifying data within storage volumes, otherwise data corruption or redundancy loss can easily occur.
+* **Exclusive drive access**
+  As with physical drive operations, RustFS requires exclusive access to its storage volumes. Do not let other processes or scripts modify data on these volumes directly, as this can corrupt data or reduce redundancy.
 
-## 2) Update Hostname and Network Resolution
+## 2. Update hostname and network resolution
 
-* **DNS/Hosts Configuration**
-  If the replacement node's IP address differs from the failed node, you need to re-resolve the old node's hostname (such as `rustfs-node-2.example.net`) to the new node to ensure nodes within the cluster discover each other through the same address.
+* **DNS or `/etc/hosts`**
+  If the replacement node's IP address differs from the failed node, point the old node's hostname (for example, `rustfs-node-2.example.net`) to the new node's IP address so that cluster nodes can still reach each other by the same name.
 
  ```bash
  # Example: Add or modify line in /etc/hosts
  192.168.1.12 rustfs-node-2.example.net
  ```
 
-  After correct resolution, you can verify the hostname points to the new node through `ping` or `nslookup`.
+  Use `ping` or `nslookup` to verify that the hostname resolves to the new node.
 
-## 3) Deploy and Configure RustFS Services
+## 3. Deploy and configure RustFS services
 
-* **Download and Installation**
-  Follow the same version deployment process as RustFS official, download binaries or installation packages consistent with existing nodes, and extract to a unified directory. Ensure startup scripts, environment variables, and configuration files (such as `/etc/default/rustfs`) are completely consistent with other nodes in the cluster.
+* **Install the same version**
+  Install the same RustFS version as the existing nodes, using the same installation method and directory. Make sure that startup scripts, environment variables, and configuration files (such as `/etc/default/rustfs`) are identical to those on the other nodes.
 
-* **Configuration Verification**
+* **Check the configuration**
 
  * Check that `RUSTFS_VOLUMES` in `/etc/default/rustfs` is byte-for-byte identical to the other nodes, and that it covers the replacement node's hostname and port.
- * Ensure all nodes have the same access keys and permission configurations to avoid new nodes being unable to join due to authentication failures.
+ * Make sure that all nodes use the same access keys and permission settings; otherwise, the new node fails to authenticate and cannot join the cluster.
 
-## 4) Rejoin Cluster and Trigger Data Healing
+## 4. Rejoin the cluster and trigger data healing
 
-* **Start Service**
+* **Start the service**
 
  ```bash
  systemctl start rustfs
  ```
 
-  Or use your custom startup script to start RustFS services, and view startup logs through `journalctl -u rustfs -f` to confirm the new node has detected other online nodes and started the data healing process.
+  Alternatively, start RustFS with your own startup script. Then run `journalctl -u rustfs -f` to confirm that the new node has detected the other nodes and started healing.
 
-* **Monitor Healing Status**
+* **Watch healing**
   Healing runs in the background once the node rejoins; no manual command is required. Watch its progress through the service logs on the replacement node, and check node and disk status in the RustFS Console:
 
  ```bash
  journalctl -u rustfs -f
  ```
 
-* **Community Experience Reference**
-  Community testing shows that when nodes go offline and rejoin, RustFS will only perform healing operations on new nodes, not fully rebalance the cluster, thus avoiding unnecessary network and I/O peaks.
+* **Community observations**
+  In community testing, when a node goes offline and rejoins, RustFS heals only that node instead of rebalancing the entire cluster. This avoids unnecessary network and I/O spikes.
 
-## 5) Subsequent Checks and Best Practices
+## 5. Follow-up checks and best practices
 
 * **Monitoring and Alerts**
 
- * During healing, monitor disk and network load to ensure the cluster meets read/write and network bandwidth requirements.
+ * During healing, monitor disk and network load to make sure the cluster still meets its read, write, and bandwidth requirements.
  * Set up alerts to notify operations teams when node healing fails or progress stalls beyond thresholds.
 
-* **Repeated Failure Drills**
-  Regularly simulate node failures and drill the entire recovery process to ensure team familiarity with operation commands and emergency procedures.
+* **Regular failure testing**
+  Run regular node failure drills and practice the full recovery procedure so your team is familiar with the commands and incident response process.
 
-* **Root Cause Analysis**
-  Conduct in-depth hardware health diagnostics (SMART, BIOS logs, etc.) on frequently failing nodes or disks, and implement preventive maintenance plans.
+* **Find the cause**
+  Run detailed hardware diagnostics (for example, SMART data and BIOS logs) on nodes or drives that fail repeatedly, and put a preventive maintenance plan in place.
 
-* **Professional Support**
-  If deeper-level fault location and recovery guidance is needed, contact the RustFS development team or community for help.
+* **Ask for help**
+  For in-depth troubleshooting and recovery help, contact the RustFS team or the community.
 
 ---
 
-**Summary**: Through the above process, RustFS can quickly and safely replace nodes and complete data healing after node hardware completely fails, minimizing cluster availability interruptions. Be sure to cross-reference with your own environment and specific command-line tools to ensure configuration consistency and correct operation sequence.
+These steps replace a failed node and heal its data. Adapt the commands to your environment, and keep the configuration identical across nodes.

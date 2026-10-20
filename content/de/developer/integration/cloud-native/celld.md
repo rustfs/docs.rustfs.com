@@ -1,13 +1,13 @@
 ---
 title: "celld"
-description: "Run denoland celld — self-hosted Durable Objects — with fleet state on RustFS."
+description: "Betreiben Sie denoland celld — selbst gehostete Durable Objects — mit Fleet-Zustand auf RustFS."
 ---
 
-This guide connects [celld](https://github.com/denoland/celld) — the self-hosted, distributed Durable Objects runtime from Denoland — to **RustFS** as its fleet bucket. You will run `celld diagnose` against a RustFS bucket (including the conditional-write probe), deploy a Counter worker, mutate Durable Object state over HTTP, restart celld, and confirm the state survives. The workflow was verified with celld v0.6.2 against `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [celld](https://github.com/denoland/celld) — die selbst gehostete, verteilte Durable-Objects-Laufzeitumgebung von Denoland — mit **RustFS** als Fleet-Bucket. Sie führen `celld diagnose` gegen einen RustFS-Bucket aus (einschließlich der Prüfung auf bedingtes Schreiben), stellen einen Counter-Worker bereit, ändern den Zustand eines Durable Object über HTTP, starten celld neu und bestätigen, dass der Zustand erhalten bleibt. Der Ablauf wurde mit celld v0.6.2 gegen `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need the `celld` binary, `esbuild` (for bundling), and Node.js to drive the deployed worker.
+Sie benötigen die Binärdatei `celld`, `esbuild` (zum Bündeln) und Node.js, um den bereitgestellten Worker anzusteuern.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -15,9 +15,9 @@ flowchart LR
 	celld -->|"LTX replicas + ownership + deploy"| RustFS["RustFS :9000"]
 ```
 
-celld keeps only a local WAL. Every committed SQLite write is captured in LTX format and uploaded to the fleet bucket; a conditional bucket write (put-if-not-exists) assigns node ownership. The bucket is the source of truth — nodes can crash or restart without losing Durable Object state.
+celld behält nur ein lokales WAL. Jeder committete SQLite-Schreibvorgang wird im LTX-Format erfasst und in den Fleet-Bucket hochgeladen. Ein bedingter Bucket-Schreibvorgang (put-if-not-exists) weist die Knoten-Eigentümerschaft zu. Der Bucket ist die Quelle der Wahrheit. Knoten können abstürzen oder neu starten, ohne den Zustand der Durable Objects zu verlieren.
 
-## 1. Install celld
+## 1. celld installieren
 
 ```bash
 curl -sLo /tmp/celld.gz \
@@ -31,15 +31,15 @@ celld --version
 celld 0.6.2
 ```
 
-Install esbuild as well — `celld deploy` bundles workers with it:
+Installieren Sie auch esbuild. `celld deploy` bündelt Worker damit:
 
 ```bash
 npm install -g esbuild
 ```
 
-## 2. Diagnose the bucket
+## 2. Den Bucket prüfen
 
-`celld diagnose` probes the bucket including the conditional write that celld requires for ownership fencing:
+`celld diagnose` prüft den Bucket einschließlich des bedingten Schreibens, das celld für das Ownership-Fencing benötigt:
 
 ```bash
 export S3_ENDPOINT=http://<your-rustfs-endpoint>:9000
@@ -58,11 +58,11 @@ ok bucket conditional write: create, reject-create, update, reject-stale
 ok fleet: 0 node lease(s) enumerated
 ```
 
-`ok bucket conditional write` is the important line — RustFS supports put-if-not-exists natively, so no fallback storage is needed.
+`ok bucket conditional write` ist die wichtige Zeile. RustFS unterstützt put-if-not-exists nativ, daher ist kein Ausweichspeicher nötig.
 
-## 3. Start a node
+## 3. Einen Knoten starten
 
-A non-loopback `--listen` requires an explicit `--internal-listen`:
+Ein `--listen` außerhalb von Loopback verlangt ein ausdrückliches `--internal-listen`:
 
 ```bash
 nohup celld --bucket s3://celld-demo \
@@ -76,9 +76,9 @@ INFO celld: host runtime initialized event="host_runtime" worker_count=4
 INFO celld::fleet: no deployment yet; run `celld deploy` ...
 ```
 
-## 4. Deploy the Counter worker
+## 4. Den Counter-Worker bereitstellen
 
-Use the counter example from the celld repository — a Durable Object that increments `n` in SQLite storage on every request:
+Verwenden Sie das Counter-Beispiel aus dem celld-Repository. Es ist ein Durable Object, das `n` im SQLite-Speicher bei jeder Anfrage erhöht:
 
 ```bash
 curl -sLo /tmp/celld.zip https://codeload.github.com/denoland/celld/zip/refs/tags/v0.6.2
@@ -93,9 +93,9 @@ Uploaded counter (0.02 sec)
 Current Version ID: bf5806589892a6cc
 ```
 
-## 5. Mutate Durable Object state
+## 5. Den Zustand des Durable Object ändern
 
-Each request routes to the `Counter` Durable Object, which reads `n` from storage, increments, and writes it back:
+Jede Anfrage wird an das Durable Object `Counter` geleitet, das `n` aus dem Speicher liest, erhöht und zurückschreibt:
 
 ```bash
 curl -s "http://127.0.0.1:18080/?name=rustfs"
@@ -109,9 +109,9 @@ curl -s "http://127.0.0.1:18080/?name=rustfs"
 {"n":3,"url":"http://127.0.0.1:18080/?name=rustfs"}
 ```
 
-## 6. Restart celld and verify persistence
+## 6. celld neu starten und die Persistenz prüfen
 
-Kill the node, start it again, and hit the same URL — the counter continues from where it stopped, because the state was in RustFS the whole time:
+Beenden Sie den Knoten, starten Sie ihn erneut und rufen Sie dieselbe URL auf. Der Zähler setzt dort fort, wo er aufgehört hat, weil der Zustand die ganze Zeit in RustFS lag:
 
 ```bash
 pkill -f "celld --bucket"
@@ -126,7 +126,7 @@ curl -s "http://127.0.0.1:18080/?name=rustfs"
 {"n":4,"url":"http://127.0.0.1:18080/?name=rustfs"}
 ```
 
-List the bucket — the fleet state is all there:
+Listen Sie den Bucket auf. Der Fleet-Zustand liegt vollständig dort:
 
 ```bash
 rc ls rustfs/celld-demo/ -r | head -5
@@ -139,35 +139,35 @@ deploy/counter/bf5806589892a6cc/index.js
 deploy/counter/current.json
 ```
 
-![celld state stored in the RustFS Console](./images/rustfs-celld-state.png)
+![In der RustFS-Console gespeicherter celld-Zustand](./images/rustfs-celld-state.png)
 
-## 7. Stop or reset
+## 7. Stoppen oder zurücksetzen
 
 ```bash
 pkill -f "celld --bucket"
 rc rm rustfs/celld-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
 ### `bind --listen 127.0.0.0.1:8080 ... Address already in use`
 
-Port 8080 is commonly taken (a local GitLab registry or dev server). Move the Worker listener: `--listen 0.0.0.0:18080`.
+Port 8080 ist häufig belegt (eine lokale GitLab-Registry oder ein Entwicklungsserver). Verschieben Sie den Worker-Listener: `--listen 0.0.0.0:18080`.
 
 ### `a non-loopback --listen requires an explicit --internal-listen`
 
-Binding a public interface requires a separate peer listener: add `--internal-listen 0.0.0.0:9099 --advertise 127.0.0.1:9099`.
+Das Binden einer öffentlichen Schnittstelle verlangt einen eigenen Peer-Listener: fügen Sie `--internal-listen 0.0.0.0:9099 --advertise 127.0.0.1:9099` hinzu.
 
 ### `esbuild not found`
 
-`celld deploy` bundles the worker with esbuild. Install it globally (`npm install -g esbuild`) or point `CELLD_ESBUILD` at the binary.
+`celld deploy` bündelt den Worker mit esbuild. Installieren Sie es global (`npm install -g esbuild`) oder zeigen Sie mit `CELLD_ESBUILD` auf die Binärdatei.
 
-### `celld deploy` on the example prints `unknown command init for argo` at runtime
+### `celld deploy` auf dem Beispiel gibt zur Laufzeit `unknown command init for argo` aus
 
-That means the executor container/pod is running an `argo` CLI binary instead of argoexec — a sign the wrong image was tagged as the executor in your cluster setup, unrelated to celld itself. On a plain host (no cluster) this does not occur.
+Das bedeutet, dass der Executor-Container oder -Pod eine `argo`-CLI-Binärdatei statt argoexec ausführt. Das ist ein Zeichen, dass im Cluster-Setup das falsche Image als Executor getaggt wurde, und hat mit celld selbst nichts zu tun. Auf einem einfachen Host ohne Cluster tritt das nicht auf.
 
-## Next steps
+## Nächste Schritte
 
-- Compare with the [Cloudflare Durable Objects documentation](https://developers.cloudflare.com/durable-objects/) — celld runs the same programming model on your own bucket.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [celld README](https://github.com/denoland/celld) for multi-node fleets: point a second node at the same bucket and let conditional writes elect the owner.
+- Vergleichen Sie die Anleitung mit der [Cloudflare-Dokumentation zu Durable Objects](https://developers.cloudflare.com/durable-objects/). celld betreibt dasselbe Programmiermodell auf Ihrem eigenen Bucket.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [celld-README](https://github.com/denoland/celld) für Fleets mit mehreren Knoten: richten Sie einen zweiten Knoten auf denselben Bucket aus und lassen Sie bedingte Schreibvorgänge den Eigentümer wählen.

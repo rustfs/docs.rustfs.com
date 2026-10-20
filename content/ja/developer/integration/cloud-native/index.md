@@ -1,14 +1,14 @@
 ---
 title: "クラウドネイティブ"
-description: "Connect cloud native platforms to RustFS through S3-compatible object storage interfaces."
+description: "S3 互換のオブジェクトストレージインターフェースを経由して、クラウドネイティブプラットフォームを RustFS に接続します。"
 ---
 
-Use **RustFS** as the object storage layer for cloud native platforms that support an S3-compatible endpoint.
+S3 互換エンドポイントをサポートするクラウドネイティブプラットフォームのオブジェクトストレージ層として **RustFS** を使用します。
 
-## Platforms
+## プラットフォーム
 
 - [Cortex](./cortex.md)
 - [Flux](./flux.md)
 - [celld](./celld.md)
 
-Keep platform state in a dedicated bucket, and use credentials scoped to the required bucket operations.
+プラットフォームの状態は専用バケットに保存し、必要なバケット操作だけに絞った認証情報を使用します。

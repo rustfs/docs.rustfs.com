@@ -1,26 +1,26 @@
 ---
-title: "Kubernetes Upgrade"
-description: "Upgrade RustFS deployments managed by the Helm chart or RustFS Operator and verify each rollout."
+title: "Mise à niveau Kubernetes"
+description: "Mettez à niveau les déploiements RustFS gérés par le chart Helm ou par RustFS Operator, puis vérifiez chaque déploiement."
 ---
 
-Upgrade a Kubernetes deployment through the tool that owns its resources. Use Helm for a direct RustFS Helm chart installation. For an Operator installation, upgrade the Operator release and each Tenant through their respective declarative configurations.
+Mettez à niveau un déploiement Kubernetes avec l’outil qui possède ses ressources. Utilisez Helm pour une installation directe du chart Helm RustFS. Pour une installation avec l’Operator, mettez à niveau la version de l’Operator et chaque Tenant au moyen de leurs configurations déclaratives respectives.
 
-## Before you upgrade
+## Avant la mise à niveau
 
-Read the RustFS, chart, and Operator release notes that apply to your deployment. Confirm that the cluster has enough capacity to replace pods and that all current workloads are ready:
+Lisez les notes de version de RustFS, du chart et de l’Operator qui s’appliquent à votre déploiement. Confirmez que le cluster dispose d’assez de capacité pour remplacer les pods et que toutes les charges de travail actuelles sont prêtes :
 
 ```bash
 kubectl get nodes
 kubectl -n <namespace> get pods,pvc
 ```
 
-Do not delete PersistentVolumeClaims (PVCs) during an upgrade or rollback. Keep the existing deployment values and manifests under version control, including any image tags, storage topology, scheduling rules, and Secret references.
+Ne supprimez pas les PersistentVolumeClaims (PVC) pendant une mise à niveau ou un retour arrière. Conservez sous contrôle de version les valeurs et les manifestes du déploiement existant, y compris les étiquettes d’image, la topologie de stockage, les règles de planification et les références aux Secrets.
 
-## Upgrade a Helm chart deployment
+## Mettre à niveau un déploiement par chart Helm
 
-This workflow applies to RustFS installed directly with the [RustFS Helm chart](/installation/cloud-native/helm-chart/installation). It does not apply to a Tenant created by RustFS Operator.
+Ce flux s’applique à RustFS installé directement avec le [chart Helm RustFS](/fr/installation/cloud-native/helm-chart/installation). Il ne s’applique pas à un Tenant créé par RustFS Operator.
 
-Record the current release revision, chart version, application version, and effective user-supplied values:
+Relevez la révision actuelle de la release, la version du chart, la version de l’application et les valeurs effectives fournies par l’utilisateur :
 
 ```bash
 helm status rustfs --namespace rustfs
@@ -28,20 +28,20 @@ helm history rustfs --namespace rustfs
 helm get values rustfs --namespace rustfs -o yaml > rustfs-values.previous.yaml
 ```
 
-Prepare the target chart in the same way as the installation. If you use the chart repository, update its index and set the chart reference:
+Préparez le chart cible de la même façon que lors de l’installation. Si vous utilisez le dépôt du chart, mettez à jour son index et définissez la référence du chart :
 
 ```bash
 helm repo update rustfs
 export RUSTFS_CHART=rustfs/rustfs
 ```
 
-If you use a source checkout, check out the target RustFS release and point `RUSTFS_CHART` at its chart directory:
+Si vous utilisez une copie des sources, placez-vous sur la version RustFS cible et faites pointer `RUSTFS_CHART` vers le répertoire de son chart :
 
 ```bash
 export RUSTFS_CHART=./helm/rustfs
 ```
 
-Update your maintained values file for any release-specific changes. Set `image.rustfs.tag` to the explicit RustFS version you intend to run, then apply the upgrade:
+Mettez à jour le fichier de valeurs que vous maintenez pour tout changement propre à la version. Définissez `image.rustfs.tag` sur la version RustFS explicite que vous comptez exécuter, puis appliquez la mise à niveau :
 
 ```bash
 helm upgrade rustfs "$RUSTFS_CHART" \
@@ -52,34 +52,34 @@ helm upgrade rustfs "$RUSTFS_CHART" \
 	--timeout 10m
 ```
 
-Helm performs a rolling update. Monitor the release and pods until the rollout completes:
+Helm effectue une mise à jour continue. Surveillez la release et les pods jusqu’à la fin du déploiement :
 
 ```bash
 helm status rustfs --namespace rustfs
 kubectl -n rustfs get pods,pvc,services
 ```
 
-Distributed mode creates a StatefulSet:
+Le mode distribué crée un StatefulSet :
 
 ```bash
 kubectl -n rustfs rollout status statefulset/rustfs --timeout=10m
 ```
 
-Standalone mode creates a Deployment:
+Le mode autonome crée un Deployment :
 
 ```bash
 kubectl -n rustfs rollout status deployment/rustfs --timeout=10m
 ```
 
-Verify the S3 API after the rollout. If it is not exposed outside the cluster, start the port forward documented in the installation guide first:
+Vérifiez l’API S3 après le déploiement. Si elle n’est pas exposée à l’extérieur du cluster, démarrez d’abord le réacheminement de port documenté dans le guide d’installation :
 
 ```bash
 curl -fsS http://localhost:9000/health/ready
 ```
 
-### Roll back a Helm release
+### Revenir en arrière sur une release Helm
 
-List the release history, identify the last working revision, and let Helm restore its chart, values, and image configuration:
+Listez l’historique de la release, identifiez la dernière révision fonctionnelle et laissez Helm restaurer son chart, ses valeurs et sa configuration d’image :
 
 ```bash
 helm history rustfs --namespace rustfs
@@ -89,20 +89,20 @@ helm rollback rustfs <previous-revision> \
 	--timeout 10m
 ```
 
-Check the workload and readiness endpoint again after rollback. Do not uninstall the release or delete its PVCs.
+Contrôlez de nouveau la charge de travail et le point de terminaison d’état de préparation après le retour arrière. Ne désinstallez pas la release et ne supprimez pas ses PVC.
 
-## Upgrade an Operator deployment
+## Mettre à niveau un déploiement Operator
 
-An Operator deployment has two independent upgrade surfaces:
+Un déploiement Operator comporte deux périmètres de mise à niveau indépendants :
 
-- The RustFS Operator and Operator Console run from the `rustfs-operator` Helm release.
-- Each Tenant runs the RustFS image declared in that Tenant's `spec.image` field.
+- RustFS Operator et Operator Console s’exécutent à partir de la release Helm `rustfs-operator`.
+- Chaque Tenant exécute l’image RustFS déclarée dans le champ `spec.image` de ce Tenant.
 
-Upgrade and validate the Operator control plane before changing Tenant images. Do not combine an Operator upgrade with multiple Tenant upgrades in one maintenance step.
+Mettez à niveau et validez le plan de contrôle de l’Operator avant de modifier les images des Tenants. Ne combinez pas une mise à niveau de l’Operator et plusieurs mises à niveau de Tenants dans une même étape de maintenance.
 
-### Upgrade the Operator release
+### Mettre à niveau la release Operator
 
-Record the current release and save its values:
+Relevez la release actuelle et enregistrez ses valeurs :
 
 ```bash
 helm status rustfs-operator --namespace rustfs-system
@@ -111,7 +111,7 @@ helm get values rustfs-operator --namespace rustfs-system -o yaml \
 	> rustfs-operator-values.previous.yaml
 ```
 
-Update the Operator source checkout to the target release and review changes to its chart values and CustomResourceDefinitions (CRDs). Helm does not upgrade CRDs stored in a chart's `crds/` directory, so apply both target CRDs before upgrading the controller:
+Mettez à jour la copie des sources de l’Operator vers la version cible et examinez les changements de ses valeurs de chart et de ses CustomResourceDefinitions (CRD). Helm ne met pas à niveau les CRD stockées dans le répertoire `crds/` d’un chart ; appliquez donc les deux CRD cibles avant de mettre à niveau le contrôleur :
 
 ```bash
 kubectl apply --server-side --force-conflicts \
@@ -122,7 +122,7 @@ kubectl apply --server-side --force-conflicts \
 	-f deploy/rustfs-operator/crds/policybinding-crd.yaml
 ```
 
-The CRDs are cluster-scoped and shared by every Tenant namespace. Applying them first allows the Kubernetes API server to accept fields introduced by the new controller. After both commands succeed, upgrade the Operator with your maintained values file:
+Les CRD ont une portée de cluster et sont partagées par chaque espace de noms de Tenant. Les appliquer d’abord permet au serveur d’API Kubernetes d’accepter les champs introduits par le nouveau contrôleur. Lorsque les deux commandes ont réussi, mettez à niveau l’Operator avec le fichier de valeurs que vous maintenez :
 
 ```bash
 helm upgrade rustfs-operator deploy/rustfs-operator/ \
@@ -134,7 +134,7 @@ helm upgrade rustfs-operator deploy/rustfs-operator/ \
 	--timeout 10m
 ```
 
-Verify the CRDs and all control-plane components before upgrading a Tenant:
+Vérifiez les CRD et tous les composants du plan de contrôle avant de mettre à niveau un Tenant :
 
 ```bash
 kubectl get crd tenants.rustfs.com
@@ -143,7 +143,7 @@ kubectl -n rustfs-system rollout status deployment/rustfs-operator-console --tim
 kubectl get tenants --all-namespaces
 ```
 
-CRD changes are not part of Helm release history and `helm rollback` does not restore them. Review the target release's compatibility and migration notes before considering a controller rollback. If that release explicitly supports downgrading, restore the previous Helm revision without applying older CRD files:
+Les changements de CRD ne font pas partie de l’historique de release Helm, et `helm rollback` ne les restaure pas. Consultez les notes de compatibilité et de migration de la version cible avant d’envisager un retour arrière du contrôleur. Si cette version prend explicitement en charge la rétrogradation, restaurez la révision Helm précédente sans appliquer d’anciens fichiers de CRD :
 
 ```bash
 helm history rustfs-operator --namespace rustfs-system
@@ -153,13 +153,13 @@ helm rollback rustfs-operator <previous-revision> \
 	--timeout 10m
 ```
 
-Do not downgrade across a documented one-way workload or security migration. Roll forward to a fixed Operator release instead.
+Ne rétrogradez pas au-delà d’une migration de charge de travail ou de sécurité documentée comme unidirectionnelle. Avancez plutôt vers une version corrigée de l’Operator.
 
-### Upgrade a Tenant
+### Mettre à niveau un Tenant
 
-The Operator owns each Tenant's StatefulSets. Do not change their container images directly because reconciliation restores the image declared by the Tenant.
+L’Operator possède les StatefulSets de chaque Tenant. Ne modifiez pas directement les images de leurs conteneurs, car la réconciliation rétablit l’image déclarée par le Tenant.
 
-Record the current Tenant image and confirm its `Ready` condition:
+Relevez l’image actuelle du Tenant et confirmez sa condition `Ready` :
 
 ```bash
 kubectl -n storage-a get tenant tenant-a \
@@ -168,7 +168,7 @@ kubectl -n storage-a get tenant tenant-a
 kubectl -n storage-a get pods,pvc -l rustfs.tenant=tenant-a
 ```
 
-In the complete `tenant.yaml` used to install the Tenant, change only `spec.image` to `rustfs/rustfs:<target-version>`. Leave its pools, PVC templates, credentials, and other settings unchanged. Apply the complete manifest and wait for the Operator to reconcile the new generation:
+Dans le fichier `tenant.yaml` complet utilisé pour installer le Tenant, ne modifiez que `spec.image`, en la remplaçant par `rustfs/rustfs:<target-version>`. Laissez inchangés ses pools, ses modèles de PVC, ses identifiants et ses autres réglages. Appliquez le manifeste complet et attendez que l’Operator réconcilie la nouvelle génération :
 
 ```bash
 kubectl apply -f tenant.yaml
@@ -178,11 +178,11 @@ kubectl -n storage-a wait tenant/tenant-a \
 kubectl -n storage-a get pods -l rustfs.tenant=tenant-a
 ```
 
-Upgrade one Tenant at a time. Confirm its S3 API and [cluster status](/operations/status-check) before updating another Tenant.
+Mettez à niveau un Tenant à la fois. Confirmez son API S3 et l’[état du cluster](/fr/operations/status-check) avant de mettre à jour un autre Tenant.
 
-### Roll back a Tenant
+### Revenir en arrière sur un Tenant
 
-Restore the previously recorded image in `spec.image`, apply the complete Tenant manifest, and wait for `Ready` again:
+Restaurez dans `spec.image` l’image précédemment relevée, appliquez le manifeste complet du Tenant et attendez de nouveau la condition `Ready` :
 
 ```bash
 kubectl apply -f tenant.yaml
@@ -191,8 +191,8 @@ kubectl -n storage-a wait tenant/tenant-a \
 	--timeout=10m
 ```
 
-The Operator reuses the Tenant's existing PVCs. Do not delete the Tenant, its StatefulSets, or its PVCs during rollback.
+L’Operator réutilise les PVC existants du Tenant. Ne supprimez pas le Tenant, ses StatefulSets ni ses PVC pendant le retour arrière.
 
-## Next steps
+## Étapes suivantes
 
-Review [Status Check](/operations/status-check) and [Observability](/operations/observability) to validate the deployment after the rollout.
+Consultez [Contrôle de l’état](/fr/operations/status-check) et [Observabilité](/fr/operations/observability) pour valider le déploiement après la mise à jour.

@@ -1,13 +1,13 @@
 ---
 title: "Console"
-description: "Enable the RustFS Console, connect it to a server, and sign in securely."
+description: "Aktivieren Sie die RustFS-Console, verbinden Sie sie mit einem Server und melden Sie sich sicher an."
 ---
 
-The **RustFS Console** is the web administration interface for RustFS. Use this page to enable the Console, open the login page, and choose the appropriate sign-in method. Detailed procedures for buckets, objects, and identity management are covered in their respective documentation sections.
+Die **RustFS Console** ist die Weboberfläche für die Administration von RustFS. Auf dieser Seite aktivieren Sie die Console, öffnen die Anmeldeseite und wählen das passende Anmeldeverfahren. Ausführliche Abläufe für Buckets, Objekte und die Identitätsverwaltung stehen in den jeweiligen Dokumentationsabschnitten.
 
-## Enable the Console
+## Console aktivieren
 
-The Console is enabled by default and listens on port `9001`, separately from the S3 API on port `9000`. You can set the behavior explicitly with the following environment variables:
+Die Console ist standardmäßig aktiviert und lauscht auf Port `9001`, getrennt von der S3-API auf Port `9000`. Das Verhalten legen Sie mit den folgenden Umgebungsvariablen ausdrücklich fest:
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_ADDRESS=":9000"
@@ -17,56 +17,56 @@ RUSTFS_OBS_LOGGER_LEVEL=error
 RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
 ```
 
-Restart RustFS after changing these values. Set `RUSTFS_CONSOLE_ENABLE=false` when the Console must not run.
+Starten Sie RustFS neu, nachdem Sie diese Werte geändert haben. Setzen Sie `RUSTFS_CONSOLE_ENABLE=false`, wenn die Console nicht laufen darf.
 
-The equivalent command-line options are `--console-enable` and `--console-address`. See the [CLI reference](/reference/cli) and [environment variable reference](/reference/environment-variables) for the complete server configuration.
+Die entsprechenden Kommandozeilenoptionen sind `--console-enable` und `--console-address`. Die vollständige Serverkonfiguration finden Sie in der [CLI-Referenz](/de/reference/cli) und in der [Referenz der Umgebungsvariablen](/de/reference/environment-variables).
 
-## Open the Console
+## Console öffnen
 
-Open the following address, replacing `<server-ip>` with the RustFS server address:
+Öffnen Sie die folgende Adresse und ersetzen Sie `<server-ip>` durch die Adresse des RustFS-Servers:
 
 ```text
 http://<server-ip>:9001
 ```
 
-![RustFS Console login page with key, STS, and OIDC sign-in options](./images/rustfs-console-login.png)
+![Anmeldeseite der RustFS-Console mit den Anmeldeoptionen Schlüssel, STS und OIDC](./images/rustfs-console-login.png)
 
-For a local deployment, use `http://localhost:9001`. Windows and macOS desktop launchers use port `7001` instead.
+Für eine lokale Bereitstellung, einschließlich der Desktop-Starter für Windows und macOS, öffnen Sie `http://localhost:9001`. Die S3-API lauscht auf Port `9000`.
 
-If the login page cannot reach the target RustFS service, select **Server Configuration** or open `/config`. Enter the externally reachable RustFS service address and save it after the health check succeeds. **Reset** clears the saved address; **Skip** returns to login without changing it.
+Wenn die Anmeldeseite den Ziel-RustFS-Dienst nicht erreicht, wählen Sie **Server Configuration** (Serverkonfiguration) oder öffnen Sie `/config`. Geben Sie die von außen erreichbare Adresse des RustFS-Dienstes ein und speichern Sie sie, nachdem die Integritätsprüfung erfolgreich war. **Reset** (Zurücksetzen) löscht die gespeicherte Adresse. **Skip** (Überspringen) kehrt zur Anmeldung zurück, ohne sie zu ändern.
 
-## Log in
+## Anmelden
 
-The login methods shown depend on the deployment configuration:
+Welche Anmeldeverfahren angezeigt werden, hängt von der Konfiguration der Bereitstellung ab:
 
-- **Key Login** uses the access key and secret key configured for the RustFS deployment. This is the standard login method for a local administrator.
-- **STS Login** uses temporary Security Token Service (STS) credentials. Use it only when your identity workflow has issued a valid session token.
-- **OIDC Login** appears when an OpenID Connect (OIDC) provider is configured. Select the provider and complete authentication with the identity provider.
+- **Key Login** (Anmeldung mit Schlüssel) verwendet den Zugriffsschlüssel und den geheimen Zugriffsschlüssel der RustFS-Bereitstellung. Das ist das übliche Anmeldeverfahren für eine lokale Administration.
+- **STS Login** (STS-Anmeldung) verwendet temporäre Zugangsdaten des Security Token Service (STS). Verwenden Sie es nur, wenn Ihr Identitätsablauf ein gültiges Sitzungstoken ausgestellt hat.
+- **OIDC Login** (OIDC-Anmeldung) erscheint, wenn ein OpenID-Connect-Anbieter (OIDC) konfiguriert ist. Wählen Sie den Anbieter und schließen Sie die Authentifizierung beim Identitätsanbieter ab.
 
-After login, the Console opens the first page your account can access. Menus and actions vary by account policy and enabled platform capabilities; a missing menu does not necessarily indicate a Console error.
+Nach der Anmeldung öffnet die Console die erste Seite, auf die Ihr Konto zugreifen kann. Menüs und Aktionen hängen von der Kontorichtlinie und den aktivierten Plattformfunktionen ab. Ein fehlendes Menü weist nicht zwangsläufig auf einen Fehler der Console hin.
 
-If login fails, verify the selected login method, credentials, target server address, and account status before retrying.
+Wenn die Anmeldung fehlschlägt, prüfen Sie das gewählte Anmeldeverfahren, die Anmeldedaten, die Zielserveradresse und den Kontostatus, bevor Sie es erneut versuchen.
 
-:::warning[Do not expose default credentials]
+:::warning[Standard-Anmeldedaten nicht offenlegen]
 
-RustFS falls back to `rustfsadmin` / `rustfsadmin` when custom credentials are not configured. Use these defaults only for a throwaway local test. Configure a unique access key and a strong secret key before making the Console reachable by other users.
+RustFS fällt auf `rustfsadmin` / `rustfsadmin` zurück, wenn keine eigenen Anmeldedaten konfiguriert sind. Verwenden Sie diese Standardwerte nur für einen lokalen Test, den Sie anschließend verwerfen. Konfigurieren Sie einen eindeutigen Zugriffsschlüssel und einen starken geheimen Zugriffsschlüssel, bevor andere Benutzer die Console erreichen können.
 
 :::
 
-## Operational notes
+## Betriebshinweise
 
-- Use [TLS](/integration/tls-configured) before exposing the Console outside a trusted network.
-- Restrict network access to the Console listener and configure [Console CORS](/administration/cors) only when cross-origin access is required.
-- The Console session inherits the permissions of the signed-in identity. Use a least-privilege account for routine work.
-- Signing out or an expired session returns you to the login page. Do not store administrator credentials in shared browsers.
+- Verwenden Sie [TLS](/de/integration/tls-configured), bevor Sie die Console außerhalb eines vertrauenswürdigen Netzwerks erreichbar machen.
+- Beschränken Sie den Netzwerkzugriff auf den Console-Listener und konfigurieren Sie [CORS der Console](/de/administration/cors) nur, wenn ursprungsübergreifender Zugriff erforderlich ist.
+- Die Console-Sitzung übernimmt die Berechtigungen der angemeldeten Identität. Verwenden Sie für die tägliche Arbeit ein Konto mit minimalen Rechten.
+- Abmelden oder eine abgelaufene Sitzung führt Sie zur Anmeldeseite zurück. Speichern Sie Administrator-Anmeldedaten nicht in gemeinsam genutzten Browsern.
 
-## Management workflows
+## Verwaltungsabläufe
 
-- [Create and manage buckets](/administration/data/bucket/creation)
-- [Upload and manage objects](/administration/data/object/creation)
-- [Manage access keys](/security-compliance/iam/access-token)
-- [Configure identity and access management](/security-compliance/iam)
+- [Buckets erstellen und verwalten](/de/administration/data/bucket/creation)
+- [Objekte hochladen und verwalten](/de/administration/data/object/creation)
+- [Zugriffsschlüssel verwalten](/de/security-compliance/iam/access-token)
+- [Identitäts- und Zugriffsverwaltung konfigurieren](/de/security-compliance/iam)
 
-## Next steps
+## Nächste Schritte
 
-Review the [security checklist](/installation/requirement/checklists/security-checklists) before exposing the Console outside a trusted network. For OIDC-based login, continue with the [OIDC configuration guide](/security-compliance/oidc).
+Prüfen Sie die [Sicherheitscheckliste](/de/installation/requirement/checklists/security-checklists), bevor Sie die Console außerhalb eines vertrauenswürdigen Netzwerks erreichbar machen. Für die Anmeldung über OIDC fahren Sie mit der [OIDC-Konfiguration](/de/security-compliance/oidc) fort.

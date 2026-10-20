@@ -86,7 +86,7 @@ rustfs-mcp --help
 rustfs-mcp
 
 # Or with custom options
-rustfs-mcp --log-level debug --region us-west-2
+rustfs-mcp --log-level debug --region us-east-1
 ```
 
 ### 与聊天客户端集成
@@ -101,7 +101,7 @@ rustfs-mcp --log-level debug --region us-west-2
       "args": [
         "--access-key-id", "your_access_key",
         "--secret-access-key", "your_secret_key",
-        "--region", "us-west-2",
+        "--region", "us-east-1",
         "--log-level", "info"
       ]
     }
@@ -183,7 +183,7 @@ docker build -f crates/mcp/Dockerfile -t rustfs/rustfs-mcp .
 在 Trae 中，你可以通过输入相应的提示词使用对应工具。例如，在 Trae 的聊天对话框中输入：
 
 ```text
-Please help me list the buckets in the current rustfs instance, thank you!
+List the buckets in this RustFS instance.
 ```
 
 将返回以下响应：

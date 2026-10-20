@@ -15,7 +15,7 @@ A service account is an access key/secret key pair that belongs to a parent IAM 
 
 Service accounts cannot call `AssumeRole`, and a service account access key cannot be turned into a regular IAM user.
 
-In the Console, service accounts are managed on the **Access Keys** page — see [Access Key Management](./access-token.md). The admin API exposes:
+On the Console, service accounts are managed on the **Access Keys** page. See [Access keys](./access-token.md). The admin API exposes:
 
 | Operation | Method and path | Notes |
 | --- | --- | --- |

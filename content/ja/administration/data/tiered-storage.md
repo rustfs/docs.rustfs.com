@@ -1,11 +1,11 @@
 ---
-title: "Tiered Storage"
-description: "Configure lifecycle-driven object transitions from RustFS to a remote storage tier."
+title: "階層化ストレージ"
+description: "ライフサイクルに基づき、RustFS のオブジェクトをリモートのストレージ階層へ移行する設定を説明します。"
 ---
 
-RustFS tiered storage moves objects from local storage to a configured remote backend. This page explains the supported targets and shows how to add and maintain a RustFS tier in the Console.
+RustFS の階層化ストレージは、ローカルストレージ上のオブジェクトを、設定したリモートバックエンドへ移します。このページでは、対応しているターゲットを説明し、Console で RustFS の階層を追加して維持する方法を示します。
 
-Tiering is asynchronous. RustFS keeps the object metadata locally, transfers the object data to the remote tier, and continues to serve S3 reads through the original bucket and object key.
+階層化は非同期です。RustFS はオブジェクトのメタデータをローカルに保持し、オブジェクトデータをリモート階層へ転送し、元のバケットとオブジェクトキーを通じた S3 の読み取りを継続して提供します。
 
 ```mermaid
 flowchart LR
@@ -14,87 +14,87 @@ flowchart LR
     H -->|Read transitioned object| T
 ```
 
-:::note[Tier names are not AWS storage classes]
+:::note[階層名は AWS のストレージクラスではない]
 
-Lifecycle rules refer to a registered tier by its uppercase name, such as `COLDTIER`. Do not substitute AWS class labels such as `INTELLIGENT_TIERING`, `GLACIER`, or `DEEP_ARCHIVE` unless you have registered a RustFS tier with that exact valid name and verified the target behavior.
+ライフサイクルルールは、`COLDTIER` のような大文字の名前で、登録済みの階層を参照します。その文字列と完全に一致する有効な名前で RustFS の階層を登録し、ターゲットの動作を確認していない限り、`INTELLIGENT_TIERING`、`GLACIER`、`DEEP_ARCHIVE` のような AWS のクラスラベルで代用してはなりません。
 
 :::
 
-## Supported backends
+## 対応しているバックエンド
 
-The RustFS source defines warm-backend implementations for these target types:
+RustFS のソースは、次のターゲット種別について、ウォームバックエンドの実装を定義しています。
 
-| Type | Configuration key | Typical target |
+| 種別 | 設定キー | 典型的なターゲット |
 | --- | --- | --- |
-| RustFS | `rustfs` | Another RustFS deployment |
-| S3 | `s3` | Amazon S3 or an S3 endpoint supported by this backend |
-| Wasabi | `wasabi` | Wasabi object storage |
-| MinIO | `minio` | A MinIO deployment |
-| Aliyun | `aliyun` | Alibaba Cloud Object Storage Service (OSS) |
-| Tencent | `tencent` | Tencent Cloud Object Storage (COS) |
-| Huaweicloud | `huaweicloud` | Huawei Cloud Object Storage Service (OBS) |
+| RustFS | `rustfs` | 別の RustFS デプロイ |
+| S3 | `s3` | Amazon S3、またはこのバックエンドが対応する S3 エンドポイント |
+| Wasabi | `wasabi` | Wasabi のオブジェクトストレージ |
+| MinIO | `minio` | MinIO デプロイ |
+| Aliyun | `aliyun` | Alibaba Cloud Object Storage Service（OSS） |
+| Tencent | `tencent` | Tencent Cloud Object Storage（COS） |
+| Huaweicloud | `huaweicloud` | Huawei Cloud Object Storage Service（OBS） |
 | Azure | `azure` | Azure Blob Storage |
 | GCS | `gcs` | Google Cloud Storage |
 | R2 | `r2` | Cloudflare R2 |
 
-Provider payloads and credential requirements differ. The complete workflow below uses the RustFS backend because the RustFS source includes an end-to-end hot-cluster-to-cold-cluster test for this path.
+プロバイダーごとのペイロードと、認証情報の要件は異なります。以下の一連の手順では RustFS バックエンドを使います。RustFS のソースに、この経路のホットクラスターからコールドクラスターまでのエンドツーエンドテストが含まれているためです。
 
-## Before you begin
+## 始める前に
 
-Prepare the following:
+次を準備します。
 
-- A source RustFS deployment that stores the hot data.
-- A separate target RustFS deployment and an existing target bucket. This example uses `my-bucket` on the target.
-- Target credentials with permission to put, get, list, and delete objects in that bucket.
-- Access to the source deployment's RustFS Console.
+- ホットデータを格納する、ソースの RustFS デプロイ。
+- ソースとは別のターゲット RustFS デプロイと、既存のターゲットバケット。この例では、ターゲット上の `my-bucket` を使います。
+- そのバケットでオブジェクトの書き込み、取得、一覧表示、削除ができる、ターゲットの認証情報。
+- ソースデプロイの RustFS Console へのアクセス。
 
-Use TLS for both deployments in production. Restrict the target credentials to the dedicated tier bucket and prefix.
+本番では、両方のデプロイに TLS を使います。ターゲットの認証情報は、階層専用のバケットとプレフィックスに制限します。
 
-## 1. Open Tiered Storage
+## 1. 階層化ストレージを開く
 
-Sign in to the source deployment's RustFS Console. In the left navigation, select **Tiered Storage**, then select **Add Tier** in the upper-right corner.
+ソースデプロイの RustFS Console にサインインします。左のナビゲーションで **Tiered Storage**（階層化ストレージ）を選び、右上の **Add Tier**（階層を追加）を選びます。
 
-## 2. Select the target
+## 2. ターゲットを選択する
 
-Select the target provider. This example uses **RustFS** to connect the source deployment to another RustFS deployment.
+ターゲットのプロバイダーを選びます。この例では **RustFS** を選び、ソースデプロイを別の RustFS デプロイへ接続します。
 
-## 3. Enter the target details
+## 3. ターゲットの詳細を入力する
 
-Complete the form:
+フォームに入力します。
 
-| Field | Value |
+| フィールド | 値 |
 | --- | --- |
-| **Name (A-Z,0-9,_)** | Enter a unique uppercase tier name, such as `COLDTIER`. |
-| **Endpoint** | Enter the target RustFS S3 endpoint. |
-| **Access Key** | Enter the access key for the target deployment. |
-| **Secret Key** | Enter the secret key for the target deployment. |
-| **Bucket** | Enter the existing target bucket name, such as `my-bucket`. |
-| **Prefix (Optional)** | Optionally enter a prefix dedicated to tiered objects. |
-| **Region** | Optionally enter the target region, such as `us-east-1`. |
+| **Name (A-Z,0-9,_)**（名前。A-Z、0-9、_） | `COLDTIER` のような、一意で大文字の階層名を入力します。 |
+| **Endpoint**（エンドポイント） | ターゲットとなる RustFS の S3 エンドポイントを入力します。 |
+| **Access Key**（アクセスキー） | ターゲットデプロイのアクセスキーを入力します。 |
+| **Secret Key**（シークレットキー） | ターゲットデプロイのシークレットキーを入力します。 |
+| **Bucket**（バケット） | `my-bucket` のような、既存のターゲットバケット名を入力します。 |
+| **Prefix (Optional)**（プレフィックス。任意） | 階層へ移すオブジェクト専用のプレフィックスを、必要に応じて入力します。 |
+| **Region**（リージョン） | `us-east-1` のようなターゲットのリージョンを、必要に応じて入力します。 |
 
-Leave **Storage Class** at its default unless the target backend requires a different supported storage class.
+ターゲットバックエンドが、別の対応ストレージクラスを要求する場合を除き、**Storage Class**（ストレージクラス）は既定のままにします。
 
-:::warning[Protect tier credentials]
+:::warning[階層の認証情報を保護する]
 
-The form contains a secret key. Use credentials restricted to the target bucket and prefix. Do not expose the key in screenshots, tickets, or logs.
+フォームにはシークレットキーが含まれます。ターゲットのバケットとプレフィックスに制限した認証情報を使います。スクリーンショット、チケット、ログにキーを出してはなりません。
 
 :::
 
-## 4. Save the tier
+## 4. 階層を保存する
 
-Select **Save**. RustFS validates the backend and probes it by writing, reading, and removing a small object. Saving fails when the endpoint, credentials, bucket permissions, or backend configuration cannot complete that probe.
+**Save**（保存）を選びます。RustFS はバックエンドを検証し、小さなオブジェクトの書き込み、読み取り、削除によって疎通を確認します。エンドポイント、認証情報、バケットの権限、またはバックエンド設定がその確認を完了できない場合、保存は失敗します。
 
-After the tier appears in the **Tiers** list, configure a transition rule in [Lifecycle Management](/administration/data/lifecycle-management). A registered tier does not move objects until a lifecycle rule references its name.
+**Tiers**（階層）の一覧に階層が表示されたあと、[ライフサイクル管理](/ja/administration/data/lifecycle-management) で移行ルールを設定します。登録しただけではオブジェクトは移動しません。ライフサイクルルールがその階層名を参照して初めて移動します。
 
-## Manage tiers with `rc`
+## `rc` で階層を管理する
 
-Install and configure [`rc`](/operations/rc), then list the tiers registered on the source deployment:
+[`rc`](/ja/operations/rc) をインストールして設定し、ソースデプロイに登録された階層を一覧します。
 
 ```bash
 rc bucket lifecycle tier list local
 ```
 
-Add a RustFS tier with the same settings described in the Console workflow:
+Console の手順で説明したのと同じ設定で、RustFS の階層を追加します。
 
 ```bash
 rc bucket lifecycle tier add rustfs COLDTIER local \
@@ -105,13 +105,13 @@ rc bucket lifecycle tier add rustfs COLDTIER local \
   --region us-east-1
 ```
 
-Inspect the tier configuration and available statistics:
+階層の設定と、取得できる統計を確認します。
 
 ```bash
 rc bucket lifecycle tier info COLDTIER local
 ```
 
-The remaining tier commands update credentials or remove a tier:
+残りの階層コマンドは、認証情報の更新と、階層の削除です。
 
 ```bash
 rc bucket lifecycle tier edit COLDTIER local \
@@ -120,60 +120,60 @@ rc bucket lifecycle tier edit COLDTIER local \
 rc bucket lifecycle tier remove COLDTIER local
 ```
 
-See [Lifecycle Management](/administration/data/lifecycle-management) to create transition rules, confirm transitions, and restore local copies. Run `rc bucket lifecycle tier <command> --help` to inspect provider-specific options before changing a tier.
+移行ルールの作成、移行の確認、ローカルコピーの復元は、[ライフサイクル管理](/ja/administration/data/lifecycle-management) を参照します。階層を変更する前に `rc bucket lifecycle tier <command> --help` を実行し、プロバイダー固有のオプションを確認します。
 
-## Monitor tier activity
+## 階層の稼働状況を監視する
 
-Use the tier statistics endpoint with a SigV4-signed request and `admin:ListTier` permission:
+SigV4 で署名したリクエストと、`admin:ListTier` 権限を使い、階層の統計エンドポイントを呼び出します。
 
 ```http
 GET /rustfs/admin/v3/tier-stats?tier=COLDTIER HTTP/1.1
 Host: <hot-rustfs-endpoint>
 ```
 
-Monitor transition failures together with source-cluster capacity and target-side availability. A configured tier adds the target service and network path to the read path for objects that do not have a restored local copy.
+移行の失敗は、ソースクラスターの容量と、ターゲット側の可用性とともに監視します。階層を設定すると、復元済みのローカルコピーがないオブジェクトの読み取り経路に、ターゲットのサービスとネットワーク経路が加わります。
 
-## Change or remove a tier
+## 階層を変更または削除する
 
-The Admin API exposes these mutation routes, all requiring `admin:SetTier`:
+Admin API は、次の変更用ルートを公開しています。いずれも `admin:SetTier` が必要です。
 
-| Operation | Route |
+| 操作 | ルート |
 | --- | --- |
-| Edit a tier | `POST /rustfs/admin/v3/tier/{tiername}` |
-| Remove a tier | `DELETE /rustfs/admin/v3/tier/{tiername}` |
-| Clear all tiers | `POST /rustfs/admin/v3/tier/clear` |
+| 階層を編集する | `POST /rustfs/admin/v3/tier/{tiername}` |
+| 階層を削除する | `DELETE /rustfs/admin/v3/tier/{tiername}` |
+| すべての階層を消去する | `POST /rustfs/admin/v3/tier/clear` |
 
-Before editing or removing a tier:
+階層を編集または削除する前に、次を行います。
 
-1. Disable lifecycle rules that reference the tier.
-2. Confirm that no transition jobs are still using it.
-3. Confirm that no source objects depend on data stored in its target bucket or prefix.
-4. Back up the tier configuration and record the target location.
+1. その階層を参照するライフサイクルルールを無効にします。
+2. 移行ジョブが、その階層をまだ使っていないことを確認します。
+3. ソースのオブジェクトが、そのターゲットバケットまたはプレフィックスに保存されたデータに依存していないことを確認します。
+4. 階層の設定をバックアップし、ターゲットの場所を記録します。
 
-Normal tier mutations check backend usage and protect non-empty targets. Do not use a `force` option to bypass those checks unless you have independently proved that every transitioned object remains recoverable. Removing configuration for an active tier can make transitioned objects unreadable from the source cluster.
+通常の階層の変更では、バックエンドの使用状況を確認し、空でないターゲットを保護します。移行済みオブジェクトがすべて回復できることを独自に証明していない限り、それらの確認を迂回する `force` オプションを使ってはなりません。使用中の階層の設定を削除すると、ソースクラスターから移行済みオブジェクトを読み取れなくなることがあります。
 
-:::warning[Do not modify tier objects directly]
+:::warning[階層上のオブジェクトを直接変更しない]
 
-Do not rename, overwrite, or delete generated objects in the target bucket. Manage source objects through the hot RustFS cluster so RustFS can keep local transition metadata and remote data consistent.
+ターゲットバケット内で生成されたオブジェクトの名前変更、上書き、削除をしてはなりません。ローカルの移行メタデータとリモートデータの整合を RustFS が保てるよう、ソースオブジェクトはホット側の RustFS クラスターを通して管理します。
 
 :::
 
-## Admin API reference
+## Admin API リファレンス
 
-The current RustFS source registers these tier routes:
+現在の RustFS ソースは、次の階層用ルートを登録しています。
 
-| Method | Route | Permission |
+| メソッド | ルート | 権限 |
 | --- | --- | --- |
 | `PUT` | `/rustfs/admin/v3/tier` | `admin:SetTier` |
 | `POST` | `/rustfs/admin/v3/tier/{tiername}` | `admin:SetTier` |
 | `DELETE` | `/rustfs/admin/v3/tier/{tiername}` | `admin:SetTier` |
 | `POST` | `/rustfs/admin/v3/tier/clear` | `admin:SetTier` |
-| `GET` | `/rustfs/admin/v3/tier` (list configurations) | `admin:ListTier` |
-| `GET` | `/rustfs/admin/v3/tier/{tier}` (verify connectivity) | `admin:ListTier` |
-| `GET` | `/rustfs/admin/v3/tier-stats` (read statistics) | `admin:ListTier` |
+| `GET` | `/rustfs/admin/v3/tier`（設定の一覧） | `admin:ListTier` |
+| `GET` | `/rustfs/admin/v3/tier/{tier}`（接続の確認） | `admin:ListTier` |
+| `GET` | `/rustfs/admin/v3/tier-stats`（統計の読み取り） | `admin:ListTier` |
 
-All Admin API requests require SigV4 authentication. These routes are an administrative interface, not ordinary S3 bucket operations.
+Admin API のリクエストには、すべて SigV4 認証が必要です。これらのルートは管理用インターフェースであり、通常の S3 バケット操作ではありません。
 
-## Next steps
+## 次のステップ
 
-Review [lifecycle management](/administration/data/lifecycle-management) and configure [access policies](/security-compliance/iam/policies) for the administrators and service credentials used by tiered storage.
+[ライフサイクル管理](/ja/administration/data/lifecycle-management) を確認し、階層化ストレージで使う管理者とサービス認証情報に [アクセスポリシー](/ja/security-compliance/iam/policies) を設定します。

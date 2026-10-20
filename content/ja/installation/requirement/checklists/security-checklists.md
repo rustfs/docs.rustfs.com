@@ -1,78 +1,78 @@
 ---
-title: "Security Checklist"
-description: "Security checklist for enterprise deployments."
+title: "セキュリティチェックリスト"
+description: "エンタープライズのデプロイに使う、セキュリティのチェックリストです。"
 ---
 
-> Security best practices for RustFS. Review this checklist during deployment to ensure system security and reliability.
+> RustFS のセキュリティに関するベストプラクティスです。デプロイ時にこのチェックリストを確認し、システムのセキュリティと信頼性を保ちます。
 
-## Authentication & Access Control
+## 認証とアクセス制御
 
-- **Use S3-Compatible Key Authentication**
- RustFS uses AWS Signature V4. Ensure all requests are authenticated with valid Access Keys and Secret Keys.
+- **S3 互換のキー認証を使う**
+ RustFS は AWS Signature V4 を使います。すべてのリクエストが、有効なアクセスキーとシークレットキーで署名されていることを確認します。
 
-- **Policy-Based Access Control**
- Define access policies based on the principle of least privilege. Explicitly define allowed operations; deny all others by default.
+- **ポリシーに基づくアクセス制御**
+ 最小権限の原則に基づいてアクセスポリシーを定義します。許可する操作を明示し、それ以外はデフォルトで拒否します。
 
-## Encryption (TLS/SSL)
+## 暗号化（TLS/SSL）
 
-- **Enable TLS/SSL**
- Configure valid SSL certificates. We recommend using different certificates for external and internal access, and enforcing TLS 1.2+.
+- **TLS/SSL を有効にする**
+ 有効な TLS 証明書を設定します。外部アクセスと内部アクセスで別々の証明書を使い、TLS 1.2 以上を必須とすることを推奨します。
 
-- **Certificate Management**
- Use certificates from trusted CAs. Protect private keys with strict file permissions.
+- **証明書の管理**
+ 信頼できる CA が発行した証明書を使います。秘密鍵は、厳格なファイル権限で保護します。
 
-- **Multi-Domain and Cipher Suites**
- Configure independent certificates for multiple domains. Use strong encryption algorithms (e.g., 2048-bit RSA or 256-bit ECC).
+- **マルチドメインと暗号スイート**
+ ドメインごとに別の証明書を使います。強力な鍵アルゴリズム（例: RSA 2048 ビット、ECDSA P-256）を使います。
 
-## Credential Protection
+## 認証情報の保護
 
-- **Change Default Credentials**
- Never keep the example placeholders (`<your-access-key>` / `<your-secret-key>`) in production. Set a unique access key and a strong, random secret — e.g. generate one with `openssl rand -base64 24` — immediately after initialization.
+- **デフォルトの認証情報を変更する**
+ 本番環境では、例示用のプレースホルダー（`<your-access-key>` / `<your-secret-key>`）を残さないでください。初期化の直後に、一意のアクセスキーと、強力でランダムなシークレットを設定します。シークレットは、たとえば `openssl rand -base64 24` で生成できます。
 
-- **Secure Storage**
- Do not hardcode credentials. Use environment variables or secrets management systems (e.g., Kubernetes Secrets).
+- **安全な保管**
+ 認証情報をハードコードしないでください。環境変数、またはシークレット管理システム（例: Kubernetes Secrets）を使います。
 
-## Logging & Auditing
+## ログと監査
 
-- **Enable Audit Logs**
- Export audit logs to external systems (HTTP Webhook, Kafka, ELK, Splunk).
+- **監査ログを有効にする**
+ 監査ログを外部システム（HTTP Webhook、Kafka、ELK、Splunk）へエクスポートします。
 
-- **Log Collection**
- Collect logs using standard tools (systemd, Docker, K8s) and analyze with ELK or Grafana Loki.
+- **ログの収集**
+ 標準的なツール（journald、Docker、Kubernetes）でログを収集し、ELK または Grafana Loki で分析します。
 
-- **Monitoring and Alerts**
- Set alerts for abnormal behavior (login failures, unusual access patterns, mass deletions).
+- **監視とアラート**
+ 異常な挙動（ログイン失敗、通常と異なるアクセスパターン、大量削除）に対するアラートを設定します。
 
-- **Observability**
- Monitor function execution times to optimize performance.
+- **オブザーバビリティ**
+ リクエストのレイテンシを監視し、性能上の問題を見つけます。
 
-## API Security
+## API のセキュリティ
 
-- **Restrict Network Access**
- Restrict access to the S3 API (port 9000) and Console (port 9001) using firewalls or security groups.
+- **ネットワークアクセスを制限する**
+ ファイアウォールまたはセキュリティグループを使い、S3 API（ポート 9000）と Console（ポート 9001）へのアクセスを制限します。
 
-- **Network Isolation**
- Use reverse proxies (e.g., Nginx) instead of exposing storage nodes directly.
+- **ネットワークの分離**
+ ストレージノードを直接公開せず、リバースプロキシ（例: Nginx）を経由します。
 
-- **Close Unnecessary Ports**
- Disable unused ports and do not expose management interfaces to the public internet.
+- **不要なポートを閉じる**
+ 未使用のポートを無効にします。管理インターフェースを公開インターネットへ公開しないでください。
 
-## WORM Compliance
+## WORM コンプライアンス
 
-- **Version Control and Object Locking**
- Enable versioning and object locking to meet regulatory requirements.
+- **バージョニングとオブジェクトロック**
+ 規制要件を満たすため、バージョニングとオブジェクトロックを有効にします。
 
-## Updates
+## 更新
 
-- **Apply Patches**
- Regularly check for and apply RustFS updates.
+- **パッチを適用する**
+ RustFS の更新を定期的に確認し、適用します。
 
-- **Non-Disruptive Upgrades**
- Use the rolling restart process for zero-downtime upgrades.
+- **無停止アップグレード**
+ ダウンタイムなしでアップグレードするには、ローリングリスタートの手順を使います。
 
-- **OS and Dependencies**
- Keep the operating system and dependencies (e.g., OpenSSL) updated.
+- **OS と依存関係**
+ オペレーティングシステムと依存関係（例: OpenSSL）を最新の状態に保ちます。
 
 ---
 
-Review this checklist regularly to maintain a secure RustFS deployment.
+安全な RustFS のデプロイを維持するため、このチェックリストを定期的に見直します。

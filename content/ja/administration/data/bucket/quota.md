@@ -1,47 +1,47 @@
 ---
-title: "Bucket Quota"
-description: "Configure, inspect, and verify hard storage quotas for individual RustFS buckets."
+title: "バケットクォータ"
+description: "個々の RustFS バケットに、ハードなストレージクォータを設定、確認、検証します。"
 ---
 
-RustFS bucket quotas limit the total object data stored in an individual bucket. Use a quota to prevent one workload from consuming more than its assigned capacity while allowing other buckets to use the remaining storage.
+RustFS のバケットクォータは、個々のバケットに保存するオブジェクトデータの合計を制限します。クォータを使うと、1 つのワークロードが割り当てられた容量を超えて消費することを防ぎ、ほかのバケットは残りのストレージを使えます。
 
-## Overview
+## 概要
 
-RustFS currently supports hard, byte-based quotas. Before accepting a write, RustFS compares the bucket's current usage plus the requested object size with the configured limit. A write that would exceed the limit is rejected with `InvalidRequest` and a `Bucket quota exceeded` message.
+RustFS が現在サポートするのは、バイト単位のハードクォータです。書き込みを受け付ける前に、RustFS は、バケットの現在の使用量に要求されたオブジェクトサイズを加えた値と、設定された上限を比較します。上限を超える書き込みは、`InvalidRequest` とメッセージ `Bucket quota exceeded` で拒否されます。
 
-Quota checks cover these operations:
+クォータの確認は、次の操作を対象とします。
 
-| Operation | Quota behavior |
+| 操作 | クォータの動作 |
 | --- | --- |
-| Upload an object | Rejects the upload when current usage plus the object size exceeds the limit. |
-| Complete a multipart upload | Checks the completed object size before committing the upload. |
-| Copy an object into the bucket | Checks the source object size against the destination bucket quota. |
-| Delete an object | Always allowed so that you can recover capacity. |
+| オブジェクトのアップロード | 現在の使用量にオブジェクトサイズを加えた値が上限を超える場合、アップロードを拒否します。 |
+| マルチパートアップロードの完了 | アップロードを確定する前に、完了したオブジェクトのサイズを確認します。 |
+| バケットへのオブジェクトのコピー | コピー元オブジェクトのサイズを、コピー先バケットのクォータと照合します。 |
+| オブジェクトの削除 | 容量を回復できるよう、常に許可されます。 |
 
-The quota applies to object data, not the number of objects or request rate. A bucket without a configured limit is unlimited.
+クォータの対象はオブジェクトデータです。オブジェクト数やリクエストレートは対象ではありません。上限を設定していないバケットは、無制限です。
 
-:::note[Replacement uploads]
+:::note[置き換えアップロード]
 
-The quota check reserves the full incoming object size against the bucket's current usage. Replacing an existing key can therefore require enough headroom for the complete replacement object.
+クォータの確認では、受信するオブジェクトのサイズ全体を、バケットの現在の使用量に対して確保します。そのため、既存のキーを置き換えるには、置き換え後のオブジェクト全体が入る空きが必要になることがあります。
 
 :::
 
-## Configure in the Console
+## Console で設定する
 
-1. Sign in to the RustFS Console and open **Browser**.
-2. Find the bucket and select **Settings**.
-3. Under **Capacity & Metadata**, find **Bucket Quota** and select **Edit**.
-4. Enable **Bucket Quota**.
-5. Enter the quota size and select **MiB**, **GiB**, **TiB**, or **PiB**.
-6. Select **Save Quota**.
+1. RustFS Console にサインインし、**Browser**（ブラウザー）を開きます。
+2. バケットを見つけ、**Settings**（設定）を選びます。
+3. **Capacity & Metadata**（容量とメタデータ）で **Bucket Quota**（バケットクォータ）を見つけ、**Edit**（編集）を選びます。
+4. **Bucket Quota** を有効にします。
+5. クォータサイズを入力し、**MiB**、**GiB**、**TiB**、**PiB** のいずれかを選びます。
+6. **Save Quota**（クォータを保存）を選びます。
 
-![Set Bucket Quota dialog with quota size and unit controls](./images/bucket-quota-console.png)
+![クォータサイズと単位のコントロールがある Set Bucket Quota ダイアログ](./images/bucket-quota-console.png)
 
-To remove the limit, open the dialog again, disable **Bucket Quota**, and save the change.
+上限を外すには、ダイアログを再び開き、**Bucket Quota** を無効にして、変更を保存します。
 
-## Use rc
+## rc を使う
 
-Configure an alias for your RustFS deployment:
+RustFS デプロイ向けのエイリアスを設定します。
 
 ```bash
 rc alias set rustfs http://localhost:9000 \
@@ -49,29 +49,29 @@ rc alias set rustfs http://localhost:9000 \
 	--region us-east-1 --bucket-lookup path
 ```
 
-Replace `localhost` with the RustFS server address when `rc` runs on another host.
+`rc` を別のホストで実行する場合は、`localhost` を RustFS サーバーのアドレスに置き換えます。
 
-### Permissions
+### 権限
 
-Quota operations require these policy actions:
+クォータの操作には、次のポリシーアクションが必要です。
 
-| Operation | Required action |
+| 操作 | 必要なアクション |
 | --- | --- |
-| Set or clear a quota | `admin:SetBucketQuota` |
-| Read quota configuration or statistics | `s3:GetBucketQuota` |
-| Check whether a proposed operation fits | `s3:GetBucketQuota` |
+| クォータの設定または解除 | `admin:SetBucketQuota` |
+| クォータ設定または統計の読み取り | `s3:GetBucketQuota` |
+| 提案された操作が収まるかどうかの確認 | `s3:GetBucketQuota` |
 
-The root credential has these permissions. For delegated administration, attach only the actions needed for the workflow.
+ルート認証情報には、これらの権限があります。管理を委任する場合は、そのワークフローに必要なアクションだけを付与します。
 
-### Set a quota
+### クォータを設定する
 
-Set a 1 GiB hard quota. `rc` accepts byte values or units such as `1G`, `500M`, and `10KB`:
+1 GiB のハードクォータを設定します。`rc` は、バイト値、または `1G`、`500M`、`10KB` のような単位を受け付けます。
 
 ```bash
 rc bucket quota set rustfs/my-bucket 1G
 ```
 
-The response includes the configured limit and current usage:
+応答には、設定した上限と現在の使用量が含まれます。
 
 ```text
 Bucket: my-bucket
@@ -80,42 +80,42 @@ Usage: 0 B
 Type:  HARD
 ```
 
-### Read the quota
+### クォータを読み取る
 
 ```bash
 rc bucket quota info rustfs/my-bucket
 ```
 
-Use `--json` when another tool needs to process the result:
+別のツールが結果を処理する必要がある場合は、`--json` を使います。
 
 ```bash
 rc bucket quota info rustfs/my-bucket --json
 ```
 
-When no limit is configured, the human-readable output reports `Quota: unlimited`.
+上限が設定されていない場合、人が読める形式の出力は `Quota: unlimited` と報告します。
 
-:::note[Configuration propagation]
+:::note[設定の反映]
 
-A query issued immediately after setting or clearing a quota can briefly return the previous state. Query the quota again and confirm the expected value before starting the verification workflow.
+クォータを設定または解除した直後の照会は、短時間、以前の状態を返すことがあります。検証の手順を始める前に、クォータを再度照会し、想定した値であることを確認します。
 
 :::
 
-### Clear a quota
+### クォータを解除する
 
-Remove the limit without deleting objects:
+オブジェクトを削除せずに、上限を外します。
 
 ```bash
 rc bucket quota clear rustfs/my-bucket
 rc bucket quota info rustfs/my-bucket
 ```
 
-The bucket becomes unlimited after the configuration change is applied.
+設定の変更が適用されると、バケットは無制限になります。
 
-## Advanced quota checks
+## 高度なクォータ確認
 
-`rc 0.1.29` does not expose commands for detailed usage statistics or advisory checks for proposed writes. Use the RustFS Admin API for these operations. Requests must use AWS Signature Version 4 with an active RustFS credential.
+`rc 0.1.29` には、詳細な使用量統計や、提案された書き込みの事前確認を行うコマンドがありません。これらの操作には、RustFS の Admin API を使います。リクエストは、有効な RustFS 認証情報を使い、AWS 署名バージョン 4 で署名する必要があります。
 
-The examples use these shell variables:
+例では、次のシェル変数を使います。
 
 ```bash
 export RUSTFS_ENDPOINT=http://localhost:9000
@@ -124,15 +124,15 @@ export RUSTFS_SECRET_KEY=<your-secret-key>
 export BUCKET_NAME=my-bucket
 ```
 
-:::warning[Protect credentials]
+:::warning[認証情報を保護する]
 
-Environment variables are convenient for local testing but may be visible to processes running as the same operating-system user. Use your platform's secret manager or a restricted credentials file in production.
+環境変数はローカルテストには便利ですが、同じオペレーティングシステムユーザーで動作するプロセスから見えることがあります。本番では、プラットフォームのシークレットマネージャー、またはアクセスを制限した認証情報ファイルを使います。
 
 :::
 
-### Read detailed usage statistics
+### 詳細な使用量統計を読み取る
 
-Use the statistics endpoint to retrieve the limit, current usage, remaining bytes, and percentage used:
+統計エンドポイントを使い、上限、現在の使用量、残りのバイト数、使用率を取得します。
 
 ```bash
 curl --fail-with-body \
@@ -151,11 +151,11 @@ curl --fail-with-body \
 }
 ```
 
-Usage values come from RustFS data-usage accounting. Allow time for that view to reflect very recent changes before using the statistics response for external billing or orchestration.
+使用量の値は、RustFS のデータ使用量集計から得られます。統計の応答を外部の課金やオーケストレーションに使う前に、ごく最近の変更がそのビューへ反映される時間を取ります。
 
-### Check a proposed upload
+### 提案されたアップロードを確認する
 
-Check whether a 64 MiB upload would fit without writing an object:
+オブジェクトを書き込まずに、64 MiB のアップロードが収まるかを確認します。
 
 ```bash
 curl --fail-with-body \
@@ -167,11 +167,11 @@ curl --fail-with-body \
 	"${RUSTFS_ENDPOINT}/rustfs/admin/v3/quota-check/${BUCKET_NAME}"
 ```
 
-The `allowed` field reports the decision. This check is advisory: another write can consume capacity before the planned upload starts, so the actual upload remains authoritative.
+`allowed` フィールドが、その判定を示します。この確認は参考情報です。計画したアップロードが始まる前に、別の書き込みが容量を消費することがあるため、最終的な判定は実際のアップロードの結果です。
 
-## Verification
+## 検証
 
-Set a small test quota, upload an object that fits, and then attempt to upload an object that exceeds the remaining capacity:
+小さなテスト用クォータを設定し、収まるオブジェクトをアップロードしたあと、残りの容量を超えるオブジェクトのアップロードを試みます。
 
 ```bash
 rc bucket quota set rustfs/my-bucket 1M
@@ -183,9 +183,9 @@ rc object copy /tmp/quota-small.bin rustfs/my-bucket/hello.bin
 rc object copy /tmp/quota-large.bin rustfs/my-bucket/too-large.bin
 ```
 
-The 256 KiB object succeeds. The 2 MiB object exceeds the 1 MiB bucket quota, so `rc` exits with an error and RustFS does not create `too-large.bin`.
+256 KiB のオブジェクトは成功します。2 MiB のオブジェクトは 1 MiB のバケットクォータを超えるため、`rc` はエラーで終了し、RustFS は `too-large.bin` を作成しません。
 
-Delete the first object and clear the test quota:
+最初のオブジェクトを削除し、テスト用クォータを解除します。
 
 ```bash
 rc object remove rustfs/my-bucket/hello.bin --force
@@ -193,12 +193,12 @@ rc bucket quota clear rustfs/my-bucket
 rc bucket quota info rustfs/my-bucket
 ```
 
-Confirm that the final query reports `Quota: unlimited`.
+最後の照会が `Quota: unlimited` と報告することを確認します。
 
-If quota enforcement cannot read or parse its internal configuration, RustFS logs `Bucket quota check degraded to allow` and permits the write. Monitor for this warning because it means quota enforcement is temporarily unavailable.
+クォータの適用処理が内部設定を読み取れない、または解析できない場合、RustFS は `Bucket quota check degraded to allow` をログに記録し、書き込みを許可します。この警告は、クォータの適用が一時的に利用できないことを意味するため、監視します。
 
-## Next steps
+## 次のステップ
 
-- [Create a bucket](./creation.md)
-- [Manage lifecycle rules](../lifecycle-management.md)
-- [Configure observability](/operations/observability)
+- [バケットを作成する](./creation.md)
+- [ライフサイクルルールを管理する](../lifecycle-management.md)
+- [オブザーバビリティを設定する](/ja/operations/observability)

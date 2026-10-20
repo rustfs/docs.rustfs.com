@@ -1,21 +1,21 @@
 ---
 title: "rclone"
-description: "Connect rclone to RustFS and perform basic object operations."
+description: "Connectez rclone à RustFS et effectuez des opérations objet de base."
 ---
 
-[rclone](https://rclone.org/) is a command-line program for syncing files with cloud storage and speaks the S3 protocol that RustFS implements.
+[rclone](https://rclone.org/) est un programme en ligne de commande qui synchronise des fichiers avec un stockage cloud et utilise le protocole S3 implémenté par RustFS.
 
-## Install
+## Installation
 
 ```bash
 curl https://rclone.org/install.sh | sudo bash
 ```
 
-Or see the [official install guide](https://rclone.org/install/).
+Vous pouvez aussi consulter le [guide d’installation officiel](https://rclone.org/install/).
 
-## Configure
+## Configuration
 
-Add a remote to `~/.config/rclone/rclone.conf`. Replace `http://localhost:9000` with your server address, and use your own [access keys](../../security-compliance/iam/access-token.md). `force_path_style = true` is required because RustFS uses path-style addressing:
+Ajoutez une cible distante dans `~/.config/rclone/rclone.conf`. Remplacez `http://localhost:9000` par l’adresse de votre serveur et utilisez vos propres [clés d’accès](../../security-compliance/iam/access-token.md). `force_path_style = true` est obligatoire, car RustFS utilise l’adressage de type chemin (path-style) :
 
 ```ini title="~/.config/rclone/rclone.conf"
 [rustfs]
@@ -28,21 +28,21 @@ region = us-east-1
 force_path_style = true
 ```
 
-## Verify
+## Vérification
 
-Create a bucket:
+Créez un compartiment (bucket) :
 
 ```bash
 rclone mkdir rustfs:my-bucket
 ```
 
-Upload a file:
+Chargez (upload) un fichier :
 
 ```bash
 rclone copy /path/to/hello.txt rustfs:my-bucket
 ```
 
-List buckets and contents:
+Listez les compartiments et leur contenu :
 
 ```bash
 rclone lsd rustfs:
@@ -54,6 +54,6 @@ rclone ls rustfs:my-bucket
        12 hello.txt
 ```
 
-## Next steps
+## Étapes suivantes
 
-Build applications against RustFS with an [S3 SDK](../sdk/index.md), or manage objects with [`rc`](/operations/rc).
+Développez des applications qui s’appuient sur RustFS avec un [SDK S3](../sdk/index.md), ou gérez les objets avec [`rc`](/fr/operations/rc).

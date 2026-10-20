@@ -1,32 +1,32 @@
 ---
-title: "EC Configuration"
-description: "Plan and configure RustFS erasure-set size and parity before deploying storage pools."
+title: "EC-Konfiguration"
+description: "Diese Seite beschreibt, wie Sie die Größe des Erasure-Sets und die Parität von RustFS planen und konfigurieren, bevor Sie Speicherpools bereitstellen."
 ---
 
-RustFS uses Reed-Solomon erasure coding (EC) to distribute each object across the drives in an erasure set. Use this page to estimate usable capacity, understand the automatic defaults, and decide whether your deployment needs an explicit parity setting.
+RustFS verwendet Reed-Solomon-Erasure-Coding (EC), um jedes Objekt auf die Datenträger eines Erasure-Sets zu verteilen. Schätzen Sie auf dieser Seite die nutzbare Kapazität, verstehen Sie die automatischen Standardwerte und entscheiden Sie, ob Ihre Bereitstellung eine ausdrückliche Paritätseinstellung benötigt.
 
-## Understand the layout
+## Den Aufbau verstehen
 
-Each storage pool is divided into one or more erasure sets. For a set with `N` drives and `M` parity shards:
+Jeder Speicherpool ist in ein oder mehrere Erasure-Sets unterteilt. Für ein Set mit `N` Datenträgern und `M` Paritätsshards gilt:
 
-- data shards: `N - M`
-- parity shards: `M`
-- maximum unavailable shards that can be reconstructed: `M`
-- approximate capacity efficiency: `(N - M) / N`
+- Datenshards: `N - M`
+- Paritätsshards: `M`
+- maximale Anzahl nicht verfügbarer Shards, die rekonstruiert werden können: `M`
+- ungefähre Kapazitätseffizienz: `(N - M) / N`
 
-For example, a 16-drive set with `EC:4` stores 12 data shards and 4 parity shards. Its approximate capacity efficiency is 75% before file-system, metadata, and operational overhead.
+Ein Set mit 16 Datenträgern und `EC:4` speichert beispielsweise 12 Datenshards und 4 Paritätsshards. Die ungefähre Kapazitätseffizienz beträgt 75 %, bevor der Aufwand für Dateisystem, Metadaten und Betrieb hinzukommt.
 
-:::note[Failure domains]
+:::note[Ausfalldomänen]
 
-Parity describes unavailable shards within one erasure set. Node-level fault tolerance depends on how the set's drives are distributed across nodes. Do not assume that `EC:4` always tolerates four complete node failures; a node can host multiple drives from the same set.
+Die Parität beschreibt nicht verfügbare Shards innerhalb eines Erasure-Sets. Die Fehlertoleranz auf Knotenebene hängt davon ab, wie die Datenträger des Sets auf die Knoten verteilt sind. Gehen Sie nicht davon aus, dass `EC:4` immer vier vollständige Knotenausfälle toleriert; ein Knoten kann mehrere Datenträger desselben Sets aufnehmen.
 
 :::
 
-## Automatic parity
+## Automatische Parität
 
-We recommend leaving `RUSTFS_STORAGE_CLASS_STANDARD` unset unless you have a specific, validated durability or capacity requirement. RustFS derives STANDARD parity independently for each pool from its drives per erasure set:
+Wir empfehlen, `RUSTFS_STORAGE_CLASS_STANDARD` nicht zu setzen, sofern Sie keine konkrete, geprüfte Anforderung an Haltbarkeit oder Kapazität haben. RustFS leitet die STANDARD-Parität für jeden Pool unabhängig aus der Anzahl der Datenträger pro Erasure-Set ab:
 
-| Drives per erasure set (`N`) | Automatic STANDARD parity | Data shards | Approximate efficiency |
+| Datenträger pro Erasure-Set (`N`) | Automatische STANDARD-Parität | Datenshards | Ungefähre Effizienz |
 | --- | --- | --- | --- |
 | 1 | `EC:0` | 1 | 100% |
 | 2–3 | `EC:1` | `N - 1` | 50%–67% |
@@ -34,82 +34,82 @@ We recommend leaving `RUSTFS_STORAGE_CLASS_STANDARD` unset unless you have a spe
 | 6–7 | `EC:3` | `N - 3` | 50%–57% |
 | 8–16 | `EC:4` | `N - 4` | 50%–75% |
 
-Multi-drive erasure sets contain between 2 and 16 drives. A single-drive deployment is a separate layout with zero parity.
+Erasure-Sets mit mehreren Datenträgern umfassen 2 bis 16 Datenträger. Eine Bereitstellung mit einem einzelnen Datenträger ist eine eigene Anordnung ohne Parität.
 
-:::warning[Use the set width, not the cluster total]
+:::warning[Die Set-Breite verwenden, nicht die Summe des Clusters]
 
-Validate parity against the number of drives in each erasure set, not the total number of drives in the cluster. A cluster can contain multiple sets or pools with different widths.
+Prüfen Sie die Parität anhand der Anzahl der Datenträger in jedem Erasure-Set, nicht anhand der Gesamtzahl der Datenträger im Cluster. Ein Cluster kann mehrere Erasure-Sets oder Speicherpools mit unterschiedlicher Breite enthalten.
 
 :::
 
-## Estimate usable capacity
+## Nutzbare Kapazität schätzen
 
-For a pool whose sets all use the same width and parity, estimate EC capacity with:
+Schätzen Sie die EC-Kapazität für einen Pool, dessen Sets alle dieselbe Breite und dieselbe Parität verwenden, mit:
 
 $$
-\text{usable capacity} \approx \text{raw capacity} \times \frac{N-M}{N}
+\text{nutzbare Kapazität} \approx \text{Rohkapazität} \times \frac{N-M}{N}
 $$
 
-For example, 16 equal 10 TiB drives arranged as one 16-drive set with `EC:4` provide approximately:
+16 gleiche Datenträger mit je 10 TiB, angeordnet als ein Set mit 16 Datenträgern und `EC:4`, ergeben beispielsweise ungefähr:
 
 $$
 160\ \text{TiB} \times \frac{16-4}{16} = 120\ \text{TiB}
 $$
 
-Reserve additional capacity for XFS, object metadata, versioning, incomplete uploads, healing, and normal operational headroom. Treat the result as a planning estimate, not guaranteed available space.
+Reservieren Sie zusätzliche Kapazität für XFS, Objektmetadaten, Versionierung, unvollständige Uploads, Datenwiederherstellung (Healing) und den normalen betrieblichen Spielraum. Behandeln Sie das Ergebnis als Planungsschätzung, nicht als garantiert verfügbaren Speicherplatz.
 
-## Configure parity
+## Parität konfigurieren
 
-Set EC variables in the same environment file used by the RustFS service, such as `/etc/default/rustfs`.
+Setzen Sie die EC-Variablen in derselben Umgebungsdatei, die der RustFS-Dienst verwendet, zum Beispiel in `/etc/default/rustfs`.
 
-To use the recommended automatic STANDARD parity, omit `RUSTFS_STORAGE_CLASS_STANDARD` or leave it empty:
+Lassen Sie `RUSTFS_STORAGE_CLASS_STANDARD` weg oder leer, um die empfohlene automatische STANDARD-Parität zu verwenden:
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_STORAGE_CLASS_STANDARD=
 ```
 
-To pin parity explicitly, use the `EC:<parity>` format:
+Um die Parität ausdrücklich festzulegen, verwenden Sie das Format `EC:<parity>`:
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_STORAGE_CLASS_STANDARD=EC:4
 RUSTFS_STORAGE_CLASS_RRS=EC:1
 ```
 
-`RUSTFS_STORAGE_CLASS_STANDARD` controls writes using the `STANDARD` storage class. `RUSTFS_STORAGE_CLASS_RRS` controls `REDUCED_REDUNDANCY` writes and defaults to one parity shard on multi-drive sets. RustFS accepts these two storage classes for local writes.
+`RUSTFS_STORAGE_CLASS_STANDARD` steuert Schreibvorgänge mit der Speicherklasse `STANDARD`. `RUSTFS_STORAGE_CLASS_RRS` steuert Schreibvorgänge mit `REDUCED_REDUNDANCY` und verwendet auf Sets mit mehreren Datenträgern standardmäßig einen Paritätsshard. RustFS akzeptiert diese beiden Speicherklassen für lokale Schreibvorgänge.
 
-Explicit settings must satisfy all of these rules:
+Ausdrückliche Einstellungen müssen alle folgenden Regeln erfüllen:
 
-- parity must be no greater than half of the drives in every target set: `M <= N / 2`
-- STANDARD parity must be greater than or equal to REDUCED_REDUNDANCY parity when both are non-zero
-- the configured parity must be valid for every pool, including the narrowest pool
+- Die Parität darf in jedem Ziel-Set höchstens die Hälfte der Datenträger betragen: `M <= N / 2`
+- Die STANDARD-Parität muss größer oder gleich der Parität von `REDUCED_REDUNDANCY` sein, wenn beide ungleich null sind
+- Die konfigurierte Parität muss für jeden Pool gültig sein, einschließlich des schmalsten Pools
 
-RustFS validates explicit storage classes against each pool during startup. An invalid value causes startup to fail instead of silently reducing parity. Remove the explicit STANDARD value to return to per-pool automatic parity, or choose a value every pool can satisfy.
+RustFS prüft ausdrückliche Speicherklassen beim Start gegen jeden Pool. Ein ungültiger Wert lässt den Start fehlschlagen, statt die Parität stillschweigend zu senken. Entfernen Sie den ausdrücklichen STANDARD-Wert, um zur automatischen Parität je Pool zurückzukehren, oder wählen Sie einen Wert, den jeder Pool erfüllen kann.
 
-## Control erasure-set width
+## Breite des Erasure-Sets steuern
 
-RustFS normally selects a valid set width automatically from the volume topology. Multi-drive set widths range from 2 through 16.
+RustFS wählt eine gültige Set-Breite normalerweise automatisch aus der Volume-Topologie. Die Breite von Sets mit mehreren Datenträgern reicht von 2 bis 16.
 
-`RUSTFS_ERASURE_SET_DRIVE_COUNT` can pin the width when you need a specific symmetric layout:
+Mit `RUSTFS_ERASURE_SET_DRIVE_COUNT` können Sie die Breite festlegen, wenn Sie eine bestimmte symmetrische Anordnung benötigen:
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_ERASURE_SET_DRIVE_COUNT=16
 ```
 
-The value must divide the pool topology symmetrically and be valid for every volume expansion pattern. RustFS rejects a width that cannot evenly partition the configured endpoints. Leave this variable unset unless you have verified the complete pool layout.
+Der Wert muss die Pool-Topologie symmetrisch teilen und für jedes Muster zur Erweiterung der Volumes gültig sein. RustFS lehnt eine Breite ab, die die konfigurierten Endpunkte nicht gleichmäßig aufteilen kann. Setzen Sie diese Variable nicht, sofern Sie die vollständige Anordnung des Pools nicht geprüft haben.
 
-## Validate the configuration
+## Konfiguration prüfen
 
-Before starting or restarting RustFS:
+Bevor Sie RustFS starten oder neu starten:
 
-1. Determine the drives per erasure set for every pool.
-2. Confirm that explicit parity does not exceed half of the narrowest set width.
-3. Estimate usable capacity and reserve operational headroom.
-4. Keep the same service environment configuration on every node.
+1. Ermitteln Sie für jeden Pool die Anzahl der Datenträger pro Erasure-Set.
+2. Bestätigen Sie, dass die ausdrückliche Parität nicht die Hälfte der schmalsten Set-Breite überschreitet.
+3. Schätzen Sie die nutzbare Kapazität und reservieren Sie betrieblichen Spielraum.
+4. Behalten Sie auf jedem Knoten dieselbe Umgebungskonfiguration des Dienstes bei.
 
-After startup, use the Console **Status** page or `rc admin info cluster` to confirm the backend layout, erasure-coding parity, drive availability, and pool membership. See [Status Check](/operations/status-check) for the complete workflow.
+Verwenden Sie nach dem Start die Seite **Status** der Console (Weboberfläche) oder `rc admin info cluster`, um den Aufbau des Backends, die Erasure-Coding-Parität, die Verfügbarkeit der Datenträger und die Pool-Zugehörigkeit zu bestätigen. Den vollständigen Ablauf beschreibt [Statusprüfung](/de/operations/status-check).
 
-## Next steps
+## Nächste Schritte
 
-- [Prepare data disks](./disk-preparation.md)
-- [Choose a deployment topology](/installation#deployment-mode-comparison)
-- [Review all storage environment variables](/reference/environment-variables#storage--erasure)
+- [Speicherdatenträger vorbereiten](./disk-preparation.md)
+- [Bereitstellungstopologie auswählen](/de/installation#deployment-mode-comparison)
+- [Alle Umgebungsvariablen für den Speicher prüfen](/de/reference/environment-variables#storage--erasure)

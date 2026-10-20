@@ -1,50 +1,50 @@
 ---
-title: "Software Checklist"
-description: "Software requirements and considerations."
+title: "Liste de contrôle logicielle"
+description: "Cette page indique les exigences logicielles et les points à vérifier avant le déploiement."
 ---
 
-Ensure the following requirements are met before deployment.
+Vérifiez que les exigences suivantes sont satisfaites avant le déploiement.
 
-## OS Requirements
+## Exigences du système d’exploitation
 
-- **Operating System**: Use LTS versions (Ubuntu 20.04+, RHEL 8/9).
-- **Kernel**: Linux 5.x+ is recommended.
-- **CPU & Memory**: x86_64 or ARM. Minimum 2 GB RAM for testing, 64 GB+ for production.
-- **Disable Interfering Services**: Disable file indexing and auditing services (e.g., `mlocate`, `auditd`, antivirus) to prevent I/O interference.
+- **Système d’exploitation** : utilisez des versions LTS (Ubuntu 20.04 ou ultérieur, RHEL 8/9).
+- **Noyau** : Linux 5.x ou ultérieur est recommandé.
+- **Processeur et mémoire** : x86_64 ou ARM. Au minimum 2 Go de RAM pour les tests, et 64 Go ou plus en production.
+- **Désactivez les services perturbateurs** : désactivez les services d’indexation de fichiers et d’audit (par exemple, `mlocate`, `auditd`, un antivirus) afin d’éviter les interférences d’E/S.
 
-> **Why Linux 5.x+?**
-> Modern LTS kernels bring mature async I/O and filesystem improvements. RustFS also offers an optional `io_uring` read path (`RUSTFS_IO_URING_READ_ENABLE`, disabled by default), which requires Linux 5.10+ to be effective.
+> **Pourquoi Linux 5.x ou ultérieur ?**
+> Les noyaux LTS modernes apportent des E/S asynchrones éprouvées et des améliorations des systèmes de fichiers. RustFS propose aussi un chemin de lecture `io_uring` facultatif (`RUSTFS_IO_URING_READ_ENABLE`, désactivé par défaut), qui exige Linux 5.10 ou ultérieur pour être effectif.
 
-## Binary Deployment
+## Déploiement du binaire
 
-- **Official Download**: Download binaries only from official RustFS channels.
-- **Integrity Verification**: Verify SHA256 checksums.
-- **Consistency**: Ensure all nodes run the same RustFS version.
-- **Installation Location**: Place binaries in `/usr/local/bin` and ensure they are executable (`chmod +x`).
+- **Téléchargement officiel** : ne téléchargez les binaires que depuis les canaux officiels de RustFS.
+- **Vérification d’intégrité** : vérifiez les sommes de contrôle SHA256.
+- **Cohérence** : assurez-vous que tous les nœuds exécutent la même version de RustFS.
+- **Emplacement d’installation** : placez les binaires dans `/usr/local/bin` et assurez-vous qu’ils sont exécutables (`chmod +x`).
 
-## File System & Disks
+## Système de fichiers et disques
 
-- **Dedicated Data Disks**: Use dedicated disks for RustFS data. Do not share with the OS.
-- **File System**: Use XFS or Ext4 with performance options (e.g., `noatime`).
-- **Disk Configuration**: Use JBOD (independent volumes). Do not use hardware RAID.
-- **Permissions**: Ensure the RustFS user has read/write access to data directories.
+- **Disques de données dédiés** : utilisez des disques dédiés pour les données RustFS. Ne les partagez pas avec le système d’exploitation.
+- **Système de fichiers** : utilisez XFS ou ext4 avec des options de montage orientées performances, telles que `noatime`.
+- **Configuration des disques** : utilisez le JBOD (volumes indépendants). N’utilisez pas le RAID matériel.
+- **Permissions** : assurez-vous que l’utilisateur RustFS dispose d’un accès en lecture et en écriture aux répertoires de données.
 
-## Dependencies
+## Dépendances
 
-- **Time Synchronization**: Synchronize time across all nodes using `ntp` or `chrony`.
-- **Hostname and DNS**: Configure persistent hostnames and ensure proper DNS resolution.
-- **Network Connectivity**: Ensure all nodes can communicate on the RustFS port (default 9000).
-- **TLS/Certificates**: Install root certificates and prepare server certificates if using HTTPS.
-- **Packages**: Ensure standard tools (`bash`, `glibc`, `openssl`) are installed.
+- **Synchronisation de l’heure** : synchronisez l’heure de tous les nœuds avec `ntp` ou `chrony`.
+- **Nom d’hôte et DNS** : configurez des noms d’hôte persistants et assurez une résolution DNS correcte.
+- **Connectivité réseau** : assurez-vous que tous les nœuds peuvent communiquer sur le port RustFS (9000 par défaut).
+- **TLS et certificats** : installez les certificats racine et préparez les certificats de serveur si vous utilisez HTTPS.
+- **Paquets** : assurez-vous que les outils habituels (`bash`, `glibc`, `openssl`) sont installés.
 
-## User & Security
+## Utilisateur et sécurité
 
-- **Dedicated User**: Run RustFS as a dedicated user (e.g., `rustfs-user`).
-- **File Permissions**: Restrict access to binaries and configuration files.
-- **SELinux/AppArmor**: Configure policies to allow RustFS operations, or disable if appropriate.
-- **Systemd**: Configure the systemd service file correctly (`User=`, `ExecStart=`, environment variables).
+- **Utilisateur dédié** : exécutez RustFS sous un utilisateur dédié (par exemple, `rustfs-user`).
+- **Permissions des fichiers** : restreignez l’accès aux binaires et aux fichiers de configuration.
+- **SELinux/AppArmor** : configurez des politiques qui autorisent les opérations RustFS, ou désactivez SELinux ou AppArmor si c’est approprié.
+- **systemd** : configurez correctement le fichier de service systemd (`User=`, `ExecStart=`, variables d’environnement).
 
-## Other
+## Autres points
 
-- **Monitoring**: Configure Prometheus and Grafana.
-- **Rollback Plan**: Prepare configuration backups and a rollback plan.
+- **Supervision** : configurez Prometheus et Grafana.
+- **Plan de retour arrière** : préparez des sauvegardes de la configuration et un plan de retour arrière.

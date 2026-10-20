@@ -1,17 +1,17 @@
 ---
-title: RustFS Single Node Single Disk Installation
-description: Install RustFS on a single disk of a single server, data will be stored on this one disk.
+title: Installation de RustFS en mode nœud unique, disque unique
+description: Installez RustFS sur un seul serveur qui stocke toutes les données sur un seul disque.
 ---
 
-In Single Node Single Disk (SNSD) mode, one server stores all data on a single data disk. It is the simplest deployment mode and the same topology that the [Linux Quick Start](./quick-start.md) script sets up.
+En mode nœud unique, disque unique (SNSD), un serveur stocke toutes les données sur un seul disque de données. C’est le mode de déploiement le plus simple, et la même topologie que celle mise en place par le script du [démarrage rapide Linux](./quick-start.md).
 
 :::warning
 
-A single disk offers no redundancy: if the disk fails, data is lost. SNSD is suitable for development, testing, and low-density non-critical business. For production use, maintain regular data backups or choose [SNMD](./single-node-multiple-disk.md) / [MNMD](./multiple-node-multiple-disk.md).
+Un seul disque n’offre aucune redondance : si le disque tombe en panne, les données sont perdues. Le mode SNSD convient au développement, aux tests et aux petites charges non critiques. Pour un usage en production, effectuez des sauvegardes régulières, ou choisissez le mode [SNMD](./single-node-multiple-disk.md) ou [MNMD](./multiple-node-multiple-disk.md).
 
 :::
 
-## Topology and Planning
+## Topologie et planification
 
 ```mermaid
 flowchart TD
@@ -23,17 +23,17 @@ flowchart TD
     class D1 disk
 ```
 
-- 1 server, 1 data disk (e.g., an XFS-formatted disk mounted at `/data/rustfs0`).
-- No erasure coding across disks — fault tolerance depends entirely on backups.
-- For production deployments, also review the [Pre-Installation Checklists](../requirement/checklists/index.md).
+- 1 serveur, 1 disque de données (par exemple un disque formaté en XFS monté sur `/data/rustfs0`).
+- Pas de codage d’effacement entre les disques : la tolérance aux pannes repose entièrement sur les sauvegardes.
+- Pour les déploiements de production, consultez aussi les [listes de contrôle préalables à l’installation](../requirement/checklists/index.md).
 
-## Prerequisites and Service Setup
+## Prérequis et configuration du service
 
-Complete the [common prerequisites and service setup](./prerequisites-and-service.md) — operating system, firewall, time synchronization, disk formatting, service user, binary download, and systemd unit — then continue below.
+Terminez les [prérequis communs et la configuration du service](./prerequisites-and-service.md) — système d’exploitation, pare-feu, synchronisation de l’heure, formatage des disques, utilisateur du service, téléchargement du binaire et unité systemd — puis poursuivez ci-dessous.
 
-## Configure Environment Variables
+## Configurer les variables d’environnement
 
-1. Create the configuration file with the single-disk volume path:
+1. Créez le fichier de configuration avec le chemin du volume à disque unique :
 
 ```ini title="/etc/default/rustfs"
 # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
@@ -47,44 +47,44 @@ RUSTFS_OBS_LOGGER_LEVEL=error
 RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
 ```
 
-2. Create the storage and log directories:
+2. Créez les répertoires de stockage et de journaux :
 
 ```bash
 sudo mkdir -p /data/rustfs0 /var/log/rustfs /opt/tls
 sudo chmod -R 750 /data/rustfs* /var/log/rustfs
 ```
 
-## Start Service and Verification
+## Démarrer et vérifier le service
 
-1. Start the service and enable auto-start on boot:
+1. Démarrez le service et activez son lancement au démarrage du système :
 
 ```bash
 sudo systemctl enable --now rustfs
 ```
 
-2. Verify the service status:
+2. Vérifiez l’état du service :
 
 ```bash
 systemctl status rustfs
 ```
 
-3. Check the service port:
+3. Vérifiez le port du service :
 
 ```bash
 netstat -ntpl
 ```
 
-4. View log files:
+4. Consultez les fichiers journaux :
 
 ```bash
 tail -f /var/log/rustfs/rustfs*.log
 ```
 
-5. Access the console: enter the server's IP address and the console port (default 9001) in a browser. You should see:
+5. Ouvrez la Console : dans un navigateur, accédez à `http://<server-ip>:9001`. Vous devriez voir :
 
 ![Console](./images/console.jpg)
 
-## Next Steps
+## Étapes suivantes
 
-- Need disk-level redundancy on one server? See [Single Node Multiple Disk Mode (SNMD)](./single-node-multiple-disk.md).
-- Need a production cluster? See [Multiple Node Multiple Disk Mode (MNMD)](./multiple-node-multiple-disk.md).
+- Vous avez besoin de redondance au niveau du disque sur un seul serveur ? Consultez le [mode nœud unique, disques multiples (SNMD)](./single-node-multiple-disk.md).
+- Vous avez besoin d’un cluster de production ? Consultez le [mode nœuds multiples, disques multiples (MNMD)](./multiple-node-multiple-disk.md).

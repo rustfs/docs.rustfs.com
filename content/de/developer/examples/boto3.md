@@ -1,19 +1,19 @@
 ---
 title: "boto3 (Python)"
-description: "Connect boto3 to RustFS and perform basic object operations from Python."
+description: "Verbinden Sie boto3 mit RustFS und führen Sie grundlegende Objektoperationen aus Python aus."
 ---
 
-[boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) is the AWS SDK for Python and connects to RustFS through a custom endpoint.
+[boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) ist das AWS SDK für Python und verbindet sich über einen benutzerdefinierten Endpunkt mit RustFS.
 
-## Install
+## Installation
 
 ```bash
 pip install boto3
 ```
 
-## Configure
+## Konfiguration
 
-Point the client at your RustFS endpoint. Replace `http://localhost:9000` with your server address, and use your own [access keys](../../security-compliance/iam/access-token.md). RustFS requires path-style addressing, set via botocore `Config`:
+Richten Sie den Client auf Ihren RustFS-Endpunkt aus. Ersetzen Sie `http://localhost:9000` durch Ihre Serveradresse und verwenden Sie Ihre eigenen [Zugriffsschlüssel](../../security-compliance/iam/access-token.md). RustFS erfordert pfadbasierte Adressierung (Path-Style). Setzen Sie sie über die botocore-`Config`:
 
 ```python
 import boto3
@@ -29,9 +29,9 @@ s3 = boto3.client(
 )
 ```
 
-## Verify
+## Überprüfung
 
-Create a bucket, upload a file, and list the bucket:
+Erstellen Sie einen Bucket, laden Sie eine Datei hoch und listen Sie den Bucket auf:
 
 ```python
 s3.create_bucket(Bucket="my-bucket")
@@ -42,12 +42,12 @@ for obj in s3.list_objects_v2(Bucket="my-bucket").get("Contents", []):
     print(obj["Key"], obj["Size"])
 ```
 
-Expected output:
+Erwartete Ausgabe:
 
 ```text
 hello.txt 12
 ```
 
-## Next steps
+## Nächste Schritte
 
-See the [S3 SDK overview](../sdk/index.md) for more languages, or manage objects with [`rc`](/operations/rc). If you prefer a community-driven SDK with native async support and full typing, see [capo (Python)](../integration/others/capo.md).
+Weitere Sprachen finden Sie in der [S3-SDK-Übersicht](../sdk/index.md). Objekte verwalten Sie mit [`rc`](/de/operations/rc). Wenn Sie ein von der Community entwickeltes SDK mit nativer asynchroner Unterstützung und vollständiger Typisierung bevorzugen, lesen Sie [capo (Python)](../integration/others/capo.md).

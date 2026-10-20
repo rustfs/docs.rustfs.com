@@ -1,13 +1,13 @@
 ---
 title: "VictoriaMetrics"
-description: "Back up VictoriaMetrics snapshots to RustFS with vmbackup."
+description: "Sauvegardez les instantanés VictoriaMetrics vers RustFS avec vmbackup."
 ---
 
-This guide connects [VictoriaMetrics](https://github.com/VictoriaMetrics/VictoriaMetrics) — the Prometheus-compatible time-series database — to **RustFS** through `vmbackup` and `vmrestore`. You will run a single-node instance, import metrics, create an instant snapshot, back it up to a RustFS bucket, and restore the data into a fresh directory. The workflow was verified with `victoria-metrics`, `vmbackup`, and `vmrestore` v1.x images against `rustfs/rustfs-x86-musl:v2.3.1`.
+Ce guide connecte [VictoriaMetrics](https://github.com/VictoriaMetrics/VictoriaMetrics) — la base de données de séries temporelles compatible avec Prometheus — à **RustFS** via `vmbackup` et `vmrestore`. Vous allez exécuter une instance à nœud unique, importer des métriques, créer un instantané immédiat, le sauvegarder vers un compartiment (bucket) RustFS, puis restaurer les données dans un répertoire neuf. Le flux a été validé avec les images `victoria-metrics`, `vmbackup` et `vmrestore` v1.x face à `rustfs/rustfs-x86-musl:v2.3.1`.
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Vous avez besoin de Docker. Ce déploiement est destiné aux tests d’intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -17,11 +17,11 @@ flowchart LR
 	RustFS -->|"restore"| Restore["vmrestore"]
 ```
 
-`vmbackup` uploads a consistent point-in-time snapshot of the storage directory to any S3-compatible endpoint. `vmrestore` reverses the process, producing a data directory a VictoriaMetrics instance can open directly.
+`vmbackup` charge (upload) un instantané cohérent à un instant donné du répertoire de stockage vers n’importe quel point de terminaison compatible avec S3. `vmrestore` inverse le processus et produit un répertoire de données qu’une instance VictoriaMetrics peut ouvrir directement.
 
-## 1. Run VictoriaMetrics
+## 1. Exécuter VictoriaMetrics
 
-Create the bucket and start a single-node instance:
+Créez le compartiment et démarrez une instance à nœud unique :
 
 ```bash
 rc mb rustfs/vm-backups
@@ -32,16 +32,16 @@ docker run -d --name vm --network oo-rustfs_default -p 8428:8428 \
   -storageDataPath=/storage -retentionPeriod=100y
 ```
 
-## 2. Import metrics
+## 2. Importer des métriques
 
-Write a couple of samples through the Prometheus import API:
+Écrivez quelques échantillons via l’API d’import Prometheus :
 
 ```bash
 echo "vm_demo_metric 123" | curl -s --data-binary @- http://localhost:8428/api/v1/import/prometheus
 echo "vm_demo_metric 456" | curl -s --data-binary @- http://localhost:8428/api/v1/import/prometheus
 ```
 
-The endpoint answers `204 No Content`. Confirm the data is queryable:
+Le point de terminaison répond `204 No Content`. Confirmez que les données sont interrogeables :
 
 ```bash
 curl -s "http://localhost:8428/api/v1/export?match[]=vm_demo_metric"
@@ -51,9 +51,9 @@ curl -s "http://localhost:8428/api/v1/export?match[]=vm_demo_metric"
 {"metric":{"__name__":"vm_demo_metric"},"values":[123,456],"timestamps":[1790680894604,1790680894619]}
 ```
 
-## 3. Create a snapshot
+## 3. Créer un instantané
 
-Ask VictoriaMetrics for a consistent snapshot:
+Demandez à VictoriaMetrics un instantané cohérent :
 
 ```bash
 curl -s http://localhost:8428/snapshot/create
@@ -63,9 +63,9 @@ curl -s http://localhost:8428/snapshot/create
 {"status":"ok","snapshot":"20260929112134-18D9C6C76704F913"}
 ```
 
-## 4. Back the snapshot up to RustFS
+## 4. Sauvegarder l’instantané vers RustFS
 
-Run `vmbackup` against the same storage volume, replacing the credential placeholders. The snapshot name comes from step 3:
+Exécutez `vmbackup` sur le même volume de stockage, en remplaçant les valeurs d’identifiants indicatives. Le nom de l’instantané provient de l’étape 3 :
 
 ```bash
 docker run --rm --network oo-rustfs_default \
@@ -83,11 +83,11 @@ docker run --rm --network oo-rustfs_default \
 backup ... to S3{bucket: "vm-backups", dir: "demo/"} is complete; uploaded 760 bytes
 ```
 
-`-customS3Endpoint` redirects the AWS SDK to RustFS; custom endpoints are addressed with path-style requests automatically. Set `AWS_EC2_METADATA_DISABLED=true` on hosts without an EC2 metadata service to skip credential lookup delays.
+`-customS3Endpoint` redirige le SDK AWS vers RustFS ; les points de terminaison personnalisés sont adressés automatiquement par des requêtes en adressage de type chemin (path-style). Définissez `AWS_EC2_METADATA_DISABLED=true` sur les hôtes sans service de métadonnées EC2 afin d’éviter les délais de recherche d’identifiants.
 
-## 5. Verify and restore
+## 5. Vérifier et restaurer
 
-List the bucket prefix:
+Listez le préfixe du compartiment :
 
 ```bash
 rc ls rustfs/vm-backups/demo/
@@ -100,7 +100,7 @@ data/
 metadata/
 ```
 
-`backup_complete.ignore` marks a complete backup. Restore it into a fresh directory:
+`backup_complete.ignore` marque une sauvegarde complète. Restaurez-la dans un répertoire neuf :
 
 ```bash
 docker run --rm --network oo-rustfs_default \
@@ -117,41 +117,41 @@ docker run --rm --network oo-rustfs_default \
 restored 760 bytes from backup in 0.055 seconds
 ```
 
-The restored directory contains `data/`, `metadata/`, and a lock file — exactly what a VictoriaMetrics instance expects at `-storageDataPath`.
+Le répertoire restauré contient `data/`, `metadata/` et un fichier de verrou — exactement ce qu’une instance VictoriaMetrics attend pour `-storageDataPath`.
 
-![VictoriaMetrics backup stored in the RustFS Console](./images/rustfs-vm-backups.png)
+![Sauvegarde VictoriaMetrics stockée dans la Console RustFS](./images/rustfs-vm-backups.png)
 
-## 6. Stop or reset
+## 6. Arrêter ou réinitialiser
 
-To tear down the demo while keeping the bucket objects:
+Pour arrêter la démonstration tout en conservant les objets du compartiment :
 
 ```bash
 docker rm -f vm
 docker volume rm vm-data
 ```
 
-To delete the stored backups:
+Pour supprimer les sauvegardes stockées :
 
 ```bash
 rc rm rustfs/vm-backups/ --recursive --force
 ```
 
-## Troubleshooting
+## Dépannage
 
-### `vmbackup` hangs at startup or fails to find credentials
+### `vmbackup` reste bloqué au démarrage ou ne trouve pas les identifiants
 
-The AWS SDK probes the EC2 metadata service when environment credentials are absent. On machines without IMDS, export `AWS_EC2_METADATA_DISABLED=true` next to the key variables.
+Le SDK AWS interroge le service de métadonnées EC2 lorsque les identifiants d’environnement sont absents. Sur les machines sans IMDS, exportez `AWS_EC2_METADATA_DISABLED=true` à côté des variables de clé.
 
-### Backup parts re-upload on every run
+### Les parties de la sauvegarde sont de nouveau chargées à chaque exécution
 
-`vmbackup` performs incremental backups by comparing local and remote file hashes. Restoring to a fresh directory and running `vmbackup` from there re-uploads everything; keep the original data directory for incremental runs.
+`vmbackup` effectue des sauvegardes incrémentales en comparant les hachages des fichiers locaux et distants. Restaurer vers un répertoire neuf, puis exécuter `vmbackup` depuis celui-ci, charge de nouveau l’ensemble des fichiers ; conservez le répertoire de données d’origine pour les exécutions incrémentales.
 
-### Query returns nothing right after import
+### La requête ne renvoie rien juste après l’import
 
-Imports are accepted asynchronously and the instant query endpoint can lag on a busy single node. Verify with `/api/v1/export` (or wait a few seconds) before creating the snapshot.
+Les imports sont acceptés de façon asynchrone et le point de terminaison de requête instantanée peut prendre du retard sur un nœud unique chargé. Vérifiez avec `/api/v1/export` (ou attendez quelques secondes) avant de créer l’instantané.
 
-## Next steps
+## Étapes suivantes
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional VictoriaMetrics components.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [vmbackup documentation](https://docs.victoriametrics.com/vmbackup/) to schedule backups and prune old snapshots.
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres composants VictoriaMetrics.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
+- Suivez la [documentation vmbackup](https://docs.victoriametrics.com/vmbackup/) pour planifier les sauvegardes et purger les anciens instantanés.

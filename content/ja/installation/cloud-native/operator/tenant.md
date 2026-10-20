@@ -1,13 +1,13 @@
 ---
-title: Multi-Tenant
-description: Create isolated RustFS Tenants and access their S3 API and Console services.
+title: マルチテナント
+description: 分離された RustFS の Tenant を作成し、その S3 API と Console の Service へアクセスします。
 ---
 
-A `Tenant` represents one independent RustFS cluster. Use a separate namespace, credentials Secret, and Tenant resource for each team or workload.
+`Tenant` は、独立した 1 つの RustFS クラスターを表します。チームまたはワークロードごとに、別々の名前空間、認証情報の Secret、Tenant リソースを使います。
 
-## 1. Create a namespace and credentials
+## 1. 名前空間と認証情報を作成する
 
-Create the Secret directly so credentials are not stored in a manifest:
+認証情報がマニフェストに残らないよう、Secret を直接作成します。
 
 ```bash
 kubectl create namespace storage-a
@@ -16,9 +16,9 @@ kubectl -n storage-a create secret generic rustfs-tenant-creds \
   --from-literal=secretkey='<your-secret-key>'
 ```
 
-## 2. Define the Tenant
+## 2. Tenant を定義する
 
-This development example creates one RustFS Pod and one `10Gi` PVC. Replace `standard` with a StorageClass in your cluster.
+この開発用の例は、RustFS の Pod を 1 つと `10Gi` の PVC を 1 つ作成します。`standard` は、クラスター内の StorageClass に置き換えます。
 
 ```yaml title="tenant.yaml"
 apiVersion: rustfs.com/v1alpha1
@@ -44,7 +44,7 @@ spec:
               storage: 10Gi
 ```
 
-## 3. Apply and verify
+## 3. 適用して確認する
 
 ```bash
 kubectl apply -f tenant.yaml
@@ -52,23 +52,23 @@ kubectl -n storage-a get tenant,pods,pvc,svc
 kubectl -n storage-a describe tenant tenant-a
 ```
 
-## 4. Access RustFS
+## 4. RustFS にアクセスする
 
 ```bash
 kubectl -n storage-a port-forward svc/tenant-a-io 9000:9000
 kubectl -n storage-a port-forward svc/tenant-a-console 9001:9001
 ```
 
-Run the commands in separate terminals. Use `http://localhost:9000` as the S3 endpoint and open `http://localhost:9001` for the Tenant Console.
+各コマンドは別々のターミナルで実行します。S3 エンドポイントには `http://localhost:9000` を使い、Tenant の Console は `http://localhost:9001` を開きます。
 
-To add another Tenant, repeat the process with a different namespace, Secret, and Tenant name. List all managed Tenants with:
+別の Tenant を追加するには、異なる名前空間、Secret、Tenant 名で同じ手順を繰り返します。管理している Tenant をすべて表示します。
 
 ```bash
 kubectl get tenants --all-namespaces
 ```
 
-:::warning[Production topology]
+:::warning[本番のトポロジー]
 
-The one-server example is for evaluation. Production Tenants need a distributed pool layout, resource requests, scheduling constraints, and an immutable image reference.
+サーバー 1 台の例は評価用です。本番の Tenant には、分散プールのレイアウト、リソース要求、スケジューリング制約、不変のイメージ参照が必要です。
 
 :::

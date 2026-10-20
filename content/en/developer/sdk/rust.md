@@ -1,14 +1,14 @@
 ---
 title: "Rust SDK Guide"
-description: "Operate RustFS instances through the AWS SDK for Rust, including creation and deletion of buckets and objects."
+description: "Use the AWS SDK for Rust to create and delete buckets and objects in RustFS."
 ---
 
-RustFS ships no first-party Rust client crate — it is fully S3-compatible, so you use the official AWS SDK for Rust (`aws-sdk-s3`) configured to point at your RustFS server. Through the SDK, you can operate RustFS, including creation and deletion of buckets/objects, file upload and download, etc.
+RustFS ships no first-party Rust client crate — it is S3-compatible, so you use the official AWS SDK for Rust (`aws-sdk-s3`) configured to point at your RustFS server. With the SDK, you can create and delete buckets and upload, download, and delete objects.
 
 ## Prerequisites
 
 - Rust 1.78 or later (install via [rustup](https://rustup.rs/))
-- An available RustFS instance (refer to [Installation Guide](../../installation/index.md)) — the S3 API listens on port `9000`, the Console on port `9001`
+- A running RustFS instance (see the [Installation Guide](../../installation/index.md)) — the S3 API listens on port `9000`, the Console on port `9001`
 - Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (refer to [Access Key Management](../../security-compliance/iam/access-token.md))
 
 :::tip[Local test]
@@ -35,7 +35,7 @@ aws-sdk-s3 = "1"
 tokio = { version = "1", features = ["full"] }
 ```
 
-## Initializing the Client
+## Initialize the client
 
 The following is a complete, runnable program. It loads the connection settings from environment variables, initializes the S3 client, and lists your buckets:
 
@@ -128,7 +128,7 @@ Bucket: Some("my-bucket")
 
 You can now use the client for the operations below. Each snippet runs inside `main`, reusing `rustfs_client`.
 
-## Create Bucket
+## Create a bucket
 
 ```rust
 match rustfs_client
@@ -151,7 +151,7 @@ match rustfs_client
 Bucket created successfully
 ```
 
-## Delete Bucket
+## Delete a bucket
 
 ```rust
 match rustfs_client
@@ -174,7 +174,7 @@ match rustfs_client
 Bucket deleted successfully
 ```
 
-## List Buckets
+## List buckets
 
 ```rust
 match rustfs_client.list_buckets().send().await {
@@ -196,7 +196,7 @@ Total buckets number is 1
 Bucket: Some("my-bucket")
 ```
 
-## List Objects
+## List objects
 
 ```rust
 match rustfs_client
@@ -223,7 +223,7 @@ Total objects number is 1
 Object: Some("hello.txt")
 ```
 
-## Upload File
+## Upload an object
 
 Add these imports at the top of `src/main.rs`:
 
@@ -259,7 +259,7 @@ match rustfs_client
 Object uploaded successfully, res: PutObjectOutput { e_tag: Some("\"...\""), ... }
 ```
 
-## Download Object
+## Download an object
 
 ```rust
 match rustfs_client
@@ -284,4 +284,4 @@ match rustfs_client
 Object content: hello rustfs
 ```
 
-For other operations (presigned URLs, multipart uploads, and more), see the [AWS SDK for Rust documentation](https://docs.aws.amazon.com/sdk-for-rust/latest/dg/) — every S3-compatible call works against RustFS the same way.
+For other operations (presigned URLs, multipart uploads, and more), see the [AWS SDK for Rust documentation](https://docs.aws.amazon.com/sdk-for-rust/latest/dg/) — most S3 operations work the same way against RustFS; see [S3 compatibility](/reference/s3-compatibility) for exceptions.

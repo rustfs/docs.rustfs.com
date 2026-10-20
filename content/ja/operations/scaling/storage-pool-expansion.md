@@ -1,104 +1,104 @@
 ---
-title: "Pool Expansion"
-description: "Add a storage pool to a RustFS cluster and verify the expanded topology through the Console or rc."
+title: "プールの拡張"
+description: "RustFS クラスターにストレージプールを追加し、Console または rc で拡張後のトポロジーを確認します。"
 ---
 
-## Overview
+## 概要
 
-### Requirements
+### 要件
 
-- Install [`rc`](/operations/rc) on the administration host before using the `rc` workflow in this guide.
-- Configure credentials with permission to read RustFS cluster and pool status.
+- このガイドで `rc` の手順を使う前に、管理用ホストに [`rc`](/ja/operations/rc) をインストールします。
+- RustFS のクラスター状態とプール状態を読み取る権限を持つ認証情報を設定します。
 
-RustFS expands capacity by appending a **server pool** to the cluster topology. Each pool is one space-separated volume expression in `RUSTFS_VOLUMES`. After the expanded topology is applied, new writes can use the added capacity; existing objects remain in their current pools until you run [Rebalancing](./data-rebalancing.md).
+RustFS は、クラスターのトポロジーへ **サーバープール** を追加して容量を拡張します。各プールは、`RUSTFS_VOLUMES` 内でスペース区切りになったボリューム式の 1 つです。拡張したトポロジーを適用すると、新しい書き込みは追加された容量を使えます。既存のオブジェクトは、[リバランス](./data-rebalancing.md) を実行するまで、現在のプールに残ります。
 
-This guide uses the following two-pool example:
+このガイドでは、次の 2 つのプールを例にします。
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_VOLUMES="http://rustfs-node1:9000/data/rustfs{1...4}/mnmd http://rustfs-node2:9000/data/rustfs{1...4}/mnmd"
 ```
 
-Before expanding:
+拡張の前に、次を行います。
 
-- Back up critical data and run the workflow during a maintenance window.
-- Use the same RustFS version, credentials, and complete `RUSTFS_VOLUMES` value on every node.
-- Verify name resolution, time synchronization, and port `9000` connectivity between all old and new nodes.
-- Prepare the new pool with the intended disk count and storage specification.
+- 重要なデータをバックアップし、メンテナンス時間帯に手順を実行します。
+- すべてのノードで、同じ RustFS のバージョン、同じ認証情報、完全な `RUSTFS_VOLUMES` の値を使います。
+- 既存のノードと新しいノードのすべてについて、名前解決、時刻同期、ポート `9000` の疎通を確認します。
+- 新しいプールは、意図したディスク数とストレージ仕様で準備します。
 
-:::warning[Append the pool; do not replace the topology]
+:::warning[プールは追加し、トポロジーは置き換えない]
 
-Every node must start with the complete ordered pool list. Omitting the existing pool or using a different expression on one node creates an inconsistent topology.
+すべてのノードは、順序を保った完全なプール一覧で起動する必要があります。既存のプールを省いたり、1 つのノードで別の式を使ったりすると、トポロジーが不整合になります。
 
 :::
 
-## Operation
+## 操作
 
-### Expand with Console assistance
+### Console を補助にして拡張する
 
-The Console displays storage pools but does not add a pool to the server startup topology. Use this Console-assisted workflow:
+Console はストレージプールを表示します。サーバー起動時のトポロジーへプールを追加する機能はありません。次の手順では、Console を補助に使います。
 
-1. Record the existing pools and their usage from **Rebalance** or **Pool Decommission**.
-2. Install the same RustFS version and service configuration on the new pool node or nodes.
-3. Append the new pool expression to `RUSTFS_VOLUMES` on every existing and new node. Keep the existing expressions unchanged and in the same order.
-4. Restart RustFS across all nodes so every process starts with the same expanded topology.
-5. Wait for all nodes to become ready, then refresh the pool list in the Console.
+1. **Rebalance**（リバランス）または **Pool Decommission**（プールのデコミッション）で、既存のプールと使用量を記録します。
+2. 新しいプールのノードへ、同じ RustFS のバージョンとサービス設定をインストールします。
+3. 既存ノードと新規ノードのすべての `RUSTFS_VOLUMES` へ、新しいプールの式を追加します。既存の式は変えず、順序も維持します。
+4. すべてのノードで RustFS を再起動し、各プロセスが同じ拡張後のトポロジーで起動するようにします。
+5. すべてのノードが準備完了になるまで待ち、Console のプール一覧を更新します。
 
-![RustFS Console showing the original and newly added storage pools](./images/pool-expansion-console.png)
+![元のストレージプールと、新しく追加されたストレージプールを示す RustFS Console](./images/pool-expansion-console.png)
 
-For a Helm deployment, append the new entry to `pools.list` and apply `helm upgrade`. Do not remove or reorder existing entries.
+Helm のデプロイでは、`pools.list` に新しいエントリを追加し、`helm upgrade` を適用します。既存のエントリは削除せず、順序も変えません。
 
-### Inspect the expansion with rc
+### rc で拡張結果を確認する
 
-Configure an alias with credentials that can read cluster and pool status:
+クラスターとプールの状態を読み取れる認証情報で、エイリアスを設定します。
 
 ```bash
 rc alias set rustfs http://<server-ip>:9000 <your-access-key> <your-secret-key>
 ```
 
-Record the current topology:
+現在のトポロジーを記録します。
 
 ```bash
 rc admin pool list rustfs
 ```
 
-Prepare the new nodes, append the new pool expression to the complete `RUSTFS_VOLUMES` value on every node, and restart RustFS across the cluster. `rc` does not mutate the server startup topology.
+新しいノードを準備し、すべてのノードで完全な `RUSTFS_VOLUMES` の値に新しいプールの式を追加して、クラスター全体の RustFS を再起動します。`rc` は、サーバー起動時のトポロジーを変更しません。
 
-After the cluster returns, list the pools again:
+クラスターが戻ったあと、プールを再度一覧表示します。
 
 ```bash
 rc admin pool list rustfs
 ```
 
-Use a zero-based pool ID to inspect the new pool in detail:
+0 始まりのプール ID で、新しいプールの詳細を確認します。
 
 ```bash
 rc admin pool status rustfs 1 --by-id
 ```
 
-:::note[Rebalance aliases]
+:::note[リバランスのエイリアス]
 
-`rc admin expand start`, `status`, and `stop` are aliases for the post-expansion rebalance workflow. They redistribute existing data; they do not append a pool to `RUSTFS_VOLUMES`.
+`rc admin expand start`、`status`、`stop` は、拡張後のリバランス手順のエイリアスです。既存のデータを再配置します。`RUSTFS_VOLUMES` へプールを追加する操作ではありません。
 
 :::
 
-## Verification
+## 検証
 
-### Verify the expansion in the Console
+### Console で拡張を検証する
 
-Confirm that:
+次を確認します。
 
-- The pool list shows the original pool and the new pool.
-- Every expected node and disk is online.
-- The new pool reports the expected total and available capacity.
-- The cluster reports no degraded nodes before you resume normal traffic.
+- プール一覧に、元のプールと新しいプールが表示されること。
+- 想定するすべてのノードとディスクがオンラインであること。
+- 新しいプールが、想定どおりの合計容量と空き容量を報告すること。
+- 通常のトラフィックを再開する前に、クラスターが縮退したノードを報告していないこと。
 
-### Verify the expansion with rc
+### rc で拡張を検証する
 
-Run:
+次を実行します。
 
 ```bash
 rc admin pool list rustfs
 rc admin pool status rustfs 1 --by-id
 ```
 
-Verify that the new pool has the expected command-line expression and an active state. Write and read a test object through the normal S3 endpoint before starting a rebalance.
+新しいプールが、想定したコマンドラインの式を持ち、稼働状態であることを確認します。リバランスを開始する前に、通常の S3 エンドポイント経由でテストオブジェクトを書き込み、読み取ります。

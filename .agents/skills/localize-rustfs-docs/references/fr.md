@@ -18,7 +18,7 @@ Treat RustFS source code, APIs, and exact Console labels as authoritative for pr
 - Address the reader with `vous`; use concise active instructions.
 - Prefer natural French clause order and avoid calques from English noun strings.
 - Use sentence-style capitalization for headings.
-- Apply French punctuation and non-breaking spacing where practical without damaging Markdown, URLs, code, or identifiers.
+- Apply French punctuation where practical: a narrow no-break space (U+202F) before `;` `:` `?` `!` in prose, and French guillemets « » for quotations. Do not insert that space into code fences, URLs, identifiers, or the `:::` admonition marker.
 - Keep grammatical gender and number consistent across headings, prose, tables, and navigation.
 - Retain established English ecosystem terms only when they are conventional in French technical writing.
 - Avoid casual slang, promotional wording, and unjustified claims of seamless replacement.
@@ -32,7 +32,7 @@ Treat RustFS source code, APIs, and exact Console labels as authoritative for pr
 | Amazon S3 / S3 | Amazon S3 / S3 | Keep the service and protocol name. |
 | S3-compatible | compatible avec S3 | Never strengthen to complete or 100% compatibility. |
 | object storage | stockage objet | Use for the storage model. |
-| Bucket | compartiment / compartiment S3 | Preserve `Bucket` in APIs, identifiers, and exact UI labels. |
+| Bucket | compartiment (bucket) | Use compartiment in prose. Add `(bucket)` on the first mention in a page when it helps. Do not mix bucket and compartiment in prose. Preserve `Bucket`, `bucket`, and `my-bucket` in APIs, code, identifiers, and exact UI labels. |
 | Object | objet / objet S3 | Distinguish it from a local `fichier`. |
 | object key | clé d’objet | Use `nom de clé` when specifically describing the key name; preserve `Key` in APIs. |
 | Bucket policy | politique de compartiment | Preserve policy JSON and API names. |
@@ -54,13 +54,26 @@ Treat RustFS source code, APIs, and exact Console labels as authoritative for pr
 | multipart upload | chargement partitionné | Preserve API actions such as `CreateMultipartUpload`. |
 | server-side encryption | chiffrement côté serveur | Keep SSE-S3, SSE-KMS, and SSE-C unchanged. |
 | presigned URL | URL présignée | Keep URL uppercase and preserve API names. |
-| path-style addressing | adressage de type chemin | Preserve SDK option names. |
+| path-style addressing | adressage de type chemin (path-style) | Add `(path-style)` on the first mention in a page. Preserve SDK option names. |
 | virtual-hosted-style addressing | adressage de type hôte virtuel | Relate it to `RUSTFS_SERVER_DOMAINS` when relevant. |
 | health check | contrôle d’intégrité | Preserve endpoint paths and probe names. |
 | readiness | état de préparation | Preserve `/health/ready` and Kubernetes field names. |
 | observability | observabilité | Keep OpenTelemetry and OTLP unchanged. |
 | rootless | sans privilèges root | Prefer this over a literal calque. |
-| root credentials | informations d’identification racine | Distinguish RustFS deployment credentials from the operating-system root account. |
+| credentials | identifiants | Use for access credentials in prose. In IAM detail, use clés d’accès and clé secrète. Preserve `AccessKeyId`, `SecretAccessKey`, and environment variables. |
+| root credentials | identifiants racine | Distinguish RustFS deployment credentials from the operating-system root account. |
+| upload | charger / chargement | Prefer this over téléverser. A first mention may add `(upload)`. |
+| download | télécharger | Use for retrieving an object or file. |
+| docker pull | tirer / récupérer | Never translate `docker pull` as retirer. retirer means remove. |
+| registry (prose) | registre | Product names such as Docker Registry and Harbor may stay. Keep `registry` inside commands, paths, and config keys. |
+| support matrix | matrice de prise en charge | Do not write matrice de support. |
+| table bucket | compartiment de tables (table bucket) | Never write un table bucket. Preserve API fields such as `table-bucket`. |
+| single-binary | binaire unique (single-binary) | Explain the English term on first use in a page. |
+| location (prose) | emplacement | Preserve configuration keys and API fields named `location`. |
+| file metastore | metastore fichier | Do not leave file as an English adjective. |
+| Next steps | Étapes suivantes | Use this heading, not Prochaines étapes. |
+| commit a .env file | N’ajoutez pas le fichier .env au dépôt | Do not calque commit as commettre. |
+| preview | préversion (preview) | Use on first mention of a pre-release feature. |
 
 ## Common review failures
 

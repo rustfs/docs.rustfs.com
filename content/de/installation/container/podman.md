@@ -1,27 +1,27 @@
 ---
 title: "Podman"
-description: "Run a single-node RustFS instance with Podman and persistent container storage."
+description: "Betreiben Sie mit Podman eine RustFS-Instanz auf einem Knoten mit persistentem Containerspeicher."
 ---
 
-Podman can run the official RustFS Open Container Initiative (OCI) image without a daemon. You need a working Podman installation and permission to create containers.
+Podman kann das offizielle Image der Open Container Initiative (OCI) von RustFS ohne Daemon ausführen. Sie benötigen eine funktionsfähige Podman-Installation und die Berechtigung, Container zu erstellen.
 
-## 1. Pull the image
+## 1. Image abrufen
 
 ```bash
 podman pull docker.io/rustfs/rustfs:latest
 ```
 
-## 2. Create persistent storage
+## 2. Persistenten Speicher anlegen
 
-Create a named volume so object data remains available when you replace the container:
+Legen Sie ein benanntes Volume an, damit die Objektdaten verfügbar bleiben, wenn Sie den Container ersetzen:
 
 ```bash
 podman volume create rustfs-data
 ```
 
-:::note[Bind-mounting a host directory]
+:::note[Host-Verzeichnis per Bind-Mount einbinden]
 
-The named volume above needs no extra setup. If you bind-mount a host directory instead, keep in mind that the container runs as non-root user `rustfs` with id `10001`. Make the host directory owned by `10001`, otherwise you will encounter permission denied errors:
+Das benannte Volume oben braucht keine weitere Vorbereitung. Wenn Sie stattdessen ein Host-Verzeichnis per Bind-Mount einhängen, läuft der Container als Benutzer `rustfs` ohne Root-Rechte mit der ID `10001`. Der Eigentümer des Host-Verzeichnisses muss `10001` sein, sonst treten Fehler `permission denied` auf:
 
 ```bash
 chown -R 10001:10001 /path/to/host_directory
@@ -29,9 +29,9 @@ chown -R 10001:10001 /path/to/host_directory
 
 :::
 
-## 3. Start RustFS
+## 3. RustFS starten
 
-Replace the credential placeholders before running the container:
+Ersetzen Sie die Platzhalter für die Zugangsdaten, bevor Sie den Container starten:
 
 ```bash
 podman run -d \
@@ -50,25 +50,25 @@ podman run -d \
   /data
 ```
 
-:::warning[Set credentials when creating the container]
+:::warning[Zugangsdaten beim Erstellen des Containers festlegen]
 
-Set unique `RUSTFS_ACCESS_KEY` and `RUSTFS_SECRET_KEY` environment variables before exposing RustFS to a network. Do not use the well-known `rustfsadmin` value for either credential. If the container was started without custom credentials, stop and recreate it with both `-e` options shown above; the `rustfs-data` volume remains intact.
+Legen Sie eindeutige Umgebungsvariablen `RUSTFS_ACCESS_KEY` und `RUSTFS_SECRET_KEY` fest, bevor Sie RustFS in einem Netzwerk erreichbar machen. Verwenden Sie den allgemein bekannten Wert `rustfsadmin` weder als Zugriffsschlüssel noch als geheimen Zugriffsschlüssel. Wenn der Container ohne eigene Zugangsdaten gestartet wurde, beenden Sie ihn und erstellen Sie ihn mit beiden oben gezeigten `-e`-Optionen neu. Das Volume `rustfs-data` bleibt dabei erhalten.
 
 :::
 
-## 4. Verify the deployment
+## 4. Bereitstellung prüfen
 
-Check the container and the S3 API health endpoint:
+Prüfen Sie den Container und den Integritätsendpunkt der S3-API:
 
 ```bash
 podman ps --filter name=rustfs
 curl --fail http://localhost:9000/health
 ```
 
-The S3 API is available at `http://localhost:9000`, and the Console is available at `http://localhost:9001`.
+Die S3-API ist unter `http://localhost:9000` erreichbar, die Console (Weboberfläche) unter `http://localhost:9001`.
 
-## Next steps
+## Nächste Schritte
 
-- [RustFS Console](/administration/console)
-- [Configure an S3 client](../../developer/examples/aws-cli.md)
-- [TLS configuration](../../integration/tls-configured.md)
+- [RustFS Console](/de/administration/console)
+- [S3-Client konfigurieren](../../developer/examples/aws-cli.md)
+- [TLS-Konfiguration](../../integration/tls-configured.md)

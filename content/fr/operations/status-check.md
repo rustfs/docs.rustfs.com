@@ -1,26 +1,26 @@
 ---
-title: "Status Check"
-description: "Check RustFS network access, health endpoints, cluster status, and storage capacity."
+title: "Contrôle d’état"
+description: "Vérifiez l’accès réseau de RustFS, les points de terminaison de contrôle d’intégrité, l’état du cluster et la capacité de stockage."
 ---
 
-Use network probes, the **Status** page in the RustFS Console, or the `rc` command line to review RustFS availability and storage consumption. Before using the command-line workflow, [install `rc`](/operations/rc) and configure an alias for the target cluster.
+Utilisez des sondes réseau, la page **Status** (état) de la Console RustFS, ou la ligne de commande `rc` pour examiner la disponibilité de RustFS et la consommation de stockage. Avant d’utiliser le flux en ligne de commande, [installez `rc`](/fr/operations/rc) et configurez un alias pour le cluster cible.
 
-## Network ports
+## Ports réseau
 
-RustFS uses two listeners by default. You can change both bind addresses through environment variables or command-line flags.
+RustFS utilise deux écouteurs par défaut. Vous pouvez modifier les deux adresses d’écoute par des variables d’environnement ou des indicateurs de ligne de commande.
 
-| Port | Listener | Configured by | Traffic |
+| Port | Écouteur | Configuré par | Trafic |
 | --- | --- | --- | --- |
-| `9000` | S3 API | `RUSTFS_ADDRESS` / `--address` | S3 object API, admin API, and internal node-to-node RPC under `/rustfs/rpc/` and `/rustfs/peer/` |
-| `9001` | Console | `RUSTFS_CONSOLE_ADDRESS` / `--console-address` | Embedded web console under `/rustfs/console/`; disable it with `RUSTFS_CONSOLE_ENABLE=false` |
+| `9000` | API S3 | `RUSTFS_ADDRESS` / `--address` | API objet S3, API d’administration et RPC interne de nœud à nœud sous `/rustfs/rpc/` et `/rustfs/peer/` |
+| `9001` | Console | `RUSTFS_CONSOLE_ADDRESS` / `--console-address` | Console web intégrée sous `/rustfs/console/` ; désactivez-la avec `RUSTFS_CONSOLE_ENABLE=false` |
 
-:::note[Internode connectivity]
+:::note[Connectivité entre nœuds]
 
-Internode RPC shares port 9000. In a multi-node cluster, every node must be able to reach every other node on the S3 port; there is no separate cluster port.
+Le RPC entre nœuds partage le port 9000. Dans un cluster multi-nœuds, chaque nœud doit pouvoir joindre chaque autre nœud sur le port S3 ; il n’existe pas de port de cluster distinct.
 
 :::
 
-Open the default ports with `firewalld` when clients need to reach both listeners:
+Ouvrez les ports par défaut avec `firewalld` lorsque les clients doivent joindre les deux écouteurs :
 
 ```bash title="firewall-cmd"
 firewall-cmd --permanent --add-port=9000/tcp
@@ -28,25 +28,25 @@ firewall-cmd --permanent --add-port=9001/tcp
 firewall-cmd --reload
 ```
 
-:::warning[Restrict console access]
+:::warning[Limitez l’accès à la Console]
 
-Expose port 9001 only to trusted networks. If you do not need the console, set `RUSTFS_CONSOLE_ENABLE=false` and leave the port closed.
+N’exposez le port 9001 qu’à des réseaux de confiance. Si vous n’avez pas besoin de la Console, définissez `RUSTFS_CONSOLE_ENABLE=false` et laissez le port fermé.
 
 :::
 
-## Health endpoints
+## Points de terminaison de contrôle d’intégrité
 
-The S3 listener on port **9000** serves unauthenticated probe endpoints. Disable them with `RUSTFS_HEALTH_ENDPOINT_ENABLE=false`. The console on port **9001** has its own health path.
+L’écouteur S3 sur le port **9000** sert des points de terminaison de sonde non authentifiés. Désactivez-les avec `RUSTFS_HEALTH_ENDPOINT_ENABLE=false`. La Console sur le port **9001** a son propre chemin de contrôle d’intégrité.
 
-| Endpoint | Port | Meaning |
+| Point de terminaison | Port | Signification |
 | --- | --- | --- |
-| `GET /health`, `HEAD /health`, `GET /health/live`, `GET /minio/health/live` | 9000 | Liveness — returns `200` as long as the process is up |
-| `GET /health/ready` | 9000 | Readiness — `200` only when storage, IAM, and peer health are ready; `503` otherwise |
-| `GET /minio/health/ready` | 9000 | MinIO-compatible alias of the readiness probe |
-| `GET /minio/health/cluster`, `GET /minio/health/cluster/read` | 9000 | Cluster write/read health (additionally require lock quorum) |
-| `GET /rustfs/console/health` | 9001 | Console process health |
+| `GET /health`, `HEAD /health`, `GET /health/live`, `GET /minio/health/live` | 9000 | Vivacité — renvoie `200` tant que le processus est actif |
+| `GET /health/ready` | 9000 | État de préparation — `200` seulement lorsque le stockage, l’IAM et l’intégrité des pairs sont prêts ; `503` sinon |
+| `GET /minio/health/ready` | 9000 | Alias compatible avec MinIO de la sonde d’état de préparation |
+| `GET /minio/health/cluster`, `GET /minio/health/cluster/read` | 9000 | Intégrité d’écriture et de lecture du cluster (exige en plus le quorum de verrouillage) |
+| `GET /rustfs/console/health` | 9001 | Intégrité du processus Console |
 
-A ready node answers `200` with `"ready": true`. A degraded node answers `503` with per-dependency detail:
+Un nœud à l’état de préparation répond `200` avec `"ready": true`. Un nœud dégradé répond `503` avec le détail par dépendance :
 
 ```bash title="Probe examples"
 curl -fsS http://localhost:9000/health
@@ -54,60 +54,60 @@ curl -s http://<node>:9000/health/ready | jq
 curl -fsS http://localhost:9001/rustfs/console/health
 ```
 
-The `details` object reports `storage` / `iam` / `lock` (and `kms` when configured), and `degradedReasons` lists machine-readable causes such as `storage_quorum_unavailable`, `iam_not_ready`, or `lock_quorum_unavailable`.
+L’objet `details` indique `storage` / `iam` / `lock` (et `kms` lorsqu’il est configuré), et `degradedReasons` liste des causes lisibles par une machine telles que `storage_quorum_unavailable`, `iam_not_ready` ou `lock_quorum_unavailable`.
 
-## Cluster status
+## État du cluster
 
-### Check cluster status in the Console
+### Vérifier l’état du cluster dans la Console
 
-1. Sign in to the RustFS Console.
-2. Open **Status**.
-3. Confirm that the cluster is online and review the server, network, and drive status.
-4. Investigate any offline server, unavailable drive, or failed network connection before maintenance or capacity changes.
+1. Connectez-vous à la Console RustFS.
+2. Ouvrez **Status**.
+3. Vérifiez que le cluster est en ligne et examinez l’état des serveurs, du réseau et des disques.
+4. Analysez tout serveur hors ligne, tout disque indisponible ou toute connexion réseau en échec avant une maintenance ou un changement de capacité.
 
-### Check cluster status with rc
+### Vérifier l’état du cluster avec rc
 
-Run the cluster information command with your configured alias:
-
-```bash
-rc admin info cluster rustfs
-```
-
-The overview reports the cluster state, RustFS version, server and disk counts, backend type, and erasure-coding parity. The node list shows uptime, network connectivity, drive availability, and pool membership. The disk list shows each drive's state and pool, set, and disk location.
-
-For machine-readable output, request JSON:
-
-```bash
-rc admin info cluster rustfs --json
-```
-
-## Storage capacity
-
-### Check storage capacity in the Console
-
-1. Sign in to the RustFS Console and open **Status**.
-2. Review the cluster's used and total storage capacity.
-3. Review the capacity and available space for each disk.
-4. Compare usage over time and plan expansion before available capacity becomes insufficient for normal writes and maintenance.
-
-### Check storage capacity with rc
-
-Use the same cluster information command:
+Exécutez la commande d’information du cluster avec votre alias configuré :
 
 ```bash
 rc admin info cluster rustfs
 ```
 
-The **Storage** summary reports used capacity, total capacity, and the used percentage for the cluster. Each entry under **Disks** reports used, total, and available capacity for that drive.
+La vue d’ensemble indique l’état du cluster, la version de RustFS, le nombre de serveurs et de disques, le type de backend et la parité du codage d’effacement. La liste des nœuds montre la durée de fonctionnement, la connectivité réseau, la disponibilité des disques et l’appartenance aux pools. La liste des disques montre l’état de chaque disque ainsi que l’emplacement du pool, de l’ensemble et du disque.
 
-Use JSON output when collecting the values in a script or monitoring integration:
+Pour une sortie lisible par une machine, demandez le JSON :
 
 ```bash
 rc admin info cluster rustfs --json
 ```
 
-Administrative information commands require credentials with the corresponding RustFS Admin API permissions.
+## Capacité de stockage
 
-## Next steps
+### Vérifier la capacité de stockage dans la Console
 
-For continuous telemetry and alerting, continue with [Observability](./observability.md). To add storage, review [Pool Expansion](./scaling/storage-pool-expansion.md).
+1. Connectez-vous à la Console RustFS et ouvrez **Status**.
+2. Examinez la capacité de stockage utilisée et totale du cluster.
+3. Examinez la capacité et l’espace disponible de chaque disque.
+4. Comparez l’utilisation dans le temps et planifiez une extension avant que la capacité disponible ne devienne insuffisante pour les écritures normales et la maintenance.
+
+### Vérifier la capacité de stockage avec rc
+
+Utilisez la même commande d’information du cluster :
+
+```bash
+rc admin info cluster rustfs
+```
+
+Le résumé **Storage** (stockage) indique la capacité utilisée, la capacité totale et le pourcentage utilisé pour le cluster. Chaque entrée sous **Disks** (disques) indique la capacité utilisée, totale et disponible de ce disque.
+
+Utilisez la sortie JSON lorsque vous collectez les valeurs dans un script ou une intégration de supervision :
+
+```bash
+rc admin info cluster rustfs --json
+```
+
+Les commandes d’information d’administration exigent des identifiants disposant des permissions correspondantes de l’API d’administration RustFS.
+
+## Étapes suivantes
+
+Pour la télémétrie continue et l’alerte, poursuivez avec l’[Observabilité](./observability.md). Pour ajouter du stockage, consultez l’[Extension de pool](./scaling/storage-pool-expansion.md).

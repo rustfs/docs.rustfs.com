@@ -1,13 +1,13 @@
 ---
 title: "Velero"
-description: "Back up Kubernetes cluster resources to RustFS with Velero's AWS object store provider."
+description: "Sichern Sie Kubernetes-Cluster-Ressourcen mit dem AWS-Objektspeicher-Provider von Velero in RustFS."
 ---
 
-This guide connects [Velero](https://github.com/vmware-tanzu/velero) — the Kubernetes backup and restore tool — to **RustFS** as its object storage backend. You will install Velero into a Kubernetes cluster with a RustFS backup location, back up cluster resources, delete them, restore from the bucket, and verify the restored objects. The workflow was verified with Velero CLI 1.16.2, `velero-plugin-for-aws:v1.12.2` on k3s (Kubernetes 1.30), and `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [Velero](https://github.com/vmware-tanzu/velero) — das Werkzeug für Backup und Wiederherstellung in Kubernetes — mit **RustFS** als Objektspeicher-Backend. Sie installieren Velero in einem Kubernetes-Cluster mit einem RustFS-Backup-Speicherort, sichern Cluster-Ressourcen, löschen sie, stellen sie aus dem Bucket wieder her und prüfen die wiederhergestellten Objekte. Der Ablauf wurde mit Velero CLI 1.16.2, `velero-plugin-for-aws:v1.12.2` auf k3s (Kubernetes 1.30) und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need a Kubernetes cluster with `kubectl` access and the Velero CLI. This guide is intended for integration testing, not production.
+Sie benötigen einen Kubernetes-Cluster mit `kubectl`-Zugriff und die Velero-CLI. Diese Anleitung ist für Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -15,20 +15,20 @@ flowchart LR
 	V -->|"backups + logs"| RustFS["RustFS :9000"]
 ```
 
-Velero serializes Kubernetes resources and (optionally) pod volume data into gzip archives under `backups/<name>/` in the bucket. Restores download those archives and recreate the resources in the cluster.
+Velero serialisiert Kubernetes-Ressourcen und optional Pod-Volume-Daten in gzip-Archive unter `backups/<name>/` im Bucket. Die Wiederherstellung lädt diese Archive herunter und legt die Ressourcen im Cluster neu an.
 
-## 1. Create the backup bucket
+## 1. Backup-Bucket anlegen
 
-Create a dedicated bucket — Velero does not create buckets:
+Legen Sie einen eigenen Bucket an. Velero legt keine Buckets an:
 
 ```bash
 rc alias set rustfs http://<your-rustfs-endpoint>:9000 <your-access-key> <your-secret-key>
 rc mb rustfs/velero-backups
 ```
 
-## 2. Install Velero
+## 2. Velero installieren
 
-Write the credentials to a file and install the Velero server. The `s3Url` must be an endpoint reachable from the cluster pods themselves — use the node IP or an internal address, not a port forward from your workstation:
+Schreiben Sie die Zugangsdaten in eine Datei und installieren Sie den Velero-Server. Die `s3Url` muss ein Endpunkt sein, den die Cluster-Pods selbst erreichen können. Verwenden Sie die Knoten-IP oder eine interne Adresse, nicht eine Portweiterleitung von Ihrer Arbeitsstation:
 
 ```bash
 cat > velero-creds <<EOF
@@ -50,21 +50,22 @@ velero install \
   --use-volume-snapshots=false
 ```
 
-Wait for the deployment to become ready and the backup location to turn `Available`:
+Warten Sie, bis die Bereitstellung bereit ist und der Backup-Speicherort auf `Available` wechselt:
 
 ```bash
 kubectl -n velero get pods
 velero backup-location get
 ```
 
+
 ```text
 NAME      PROVIDER   BUCKET/PREFIX    PHASE      LAST VALIDATED   ACCESS MODE   DEFAULT
 default   aws        velero-backups   Available  2026-09-22 ...   ReadWrite     true
 ```
 
-## 3. Back up cluster resources
+## 3. Cluster-Ressourcen sichern
 
-Create two demo resources and back up the whole default namespace scope:
+Legen Sie zwei Demo-Ressourcen an und sichern Sie den gesamten Bereich des Default-Namespace:
 
 ```bash
 kubectl create configmap demo-cm --from-literal=key=rustfs-velero-demo
@@ -74,17 +75,17 @@ velero backup create demo-backup --wait
 velero backup get
 ```
 
-The backup uploads the resource archives and logs to RustFS.
+Das Backup lädt die Ressourcen-Archive und die Logs nach RustFS hoch.
 
-## 4. Verify the backup in RustFS
+## 4. Backup in RustFS prüfen
 
-List the bucket:
+Listen Sie den Bucket auf:
 
 ```bash
 rc ls rustfs/velero-backups/ -r
 ```
 
-The backup archive set is stored under the `backups/` prefix:
+Der Backup-Archivsatz liegt unter dem Präfix `backups/`:
 
 ```text
 backups/demo-backup/demo-backup-resources.json.gz
@@ -92,11 +93,11 @@ backups/demo-backup/demo-backup-logs.gz
 backups/demo-backup/demo-backup-itemoperations.json.gz
 ```
 
-![Velero backups stored in the RustFS Console](./images/rustfs-velero-backups.png)
+![In der RustFS Console gespeicherte Velero-Backups](./images/rustfs-velero-backups.png)
 
-## 5. Restore and verify
+## 5. Wiederherstellen und prüfen
 
-Delete the demo resources and restore them from the backup. The restore reads the archives from RustFS and recreates the resources:
+Löschen Sie die Demo-Ressourcen und stellen Sie sie aus dem Backup wieder her. Die Wiederherstellung liest die Archive aus RustFS und legt die Ressourcen neu an:
 
 ```bash
 kubectl delete configmap demo-cm
@@ -105,12 +106,13 @@ kubectl delete deployment nginx
 velero restore create --from-backup demo-backup --wait
 ```
 
-Confirm the resources are back with their original content:
+Prüfen Sie, dass die Ressourcen mit ihrem ursprünglichen Inhalt zurück sind:
 
 ```bash
 kubectl get configmap demo-cm -o jsonpath="{.data.key}"
 kubectl get deployment nginx
 ```
+
 
 ```text
 rustfs-velero-demo
@@ -118,36 +120,36 @@ NAME    READY   UP-TO-DATE   AVAILABLE   AGE
 nginx   1/1     1            1           10s
 ```
 
-## 6. Stop or reset
+## 6. Anhalten oder zurücksetzen
 
-The backups stay in the `velero-backups` bucket and restore into any cluster that runs Velero against the same bucket. To remove the demo backup from RustFS:
+Die Backups bleiben im Bucket `velero-backups` und lassen sich in jeden Cluster wiederherstellen, der Velero mit demselben Bucket betreibt. So entfernen Sie das Demo-Backup aus RustFS:
 
 ```bash
 velero backup delete demo-backup --confirm
 rc rm rustfs/velero-backups/backups/ --recursive --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
-### The backup location stays `Unavailable`
+### Der Backup-Speicherort bleibt `Unavailable`
 
-The Velero pod cannot reach the `s3Url`. Endpoints on a Docker custom bridge network are not routable from Kubernetes pods — use the Docker host bridge IP (for example `http://172.17.0.1:9000` on a single-host cluster) or a node address. Patch the location and let Velero revalidate:
+Der Velero-Pod erreicht die `s3Url` nicht. Endpunkte in einem eigenen Docker-Bridge-Netzwerk sind von Kubernetes-Pods aus nicht erreichbar. Verwenden Sie die Bridge-IP des Docker-Hosts (zum Beispiel `http://172.17.0.1:9000` auf einem Einzelhost-Cluster) oder eine Knotenadresse. Patchen Sie den Speicherort und lassen Sie Velero erneut prüfen:
 
 ```bash
 kubectl -n velero patch backupstoragelocation default --type merge -p \
   '{"spec":{"config":{"s3Url":"http://172.17.0.1:9000"}}}'
 ```
 
-### The backup ends `PartiallyFailed` with a daemonset error
+### Das Backup endet mit `PartiallyFailed` und einem DaemonSet-Fehler
 
-The error `daemonset pod not found in running state` means the node-agent pod (used for pod volume backups) was not running. It does not affect the cluster-resource archives. Wait for the agent or keep `--default-volumes-to-fs-backup` only when the agent is running.
+Der Fehler `daemonset pod not found in running state` bedeutet, dass der Node-Agent-Pod (für Pod-Volume-Backups) nicht lief. Die Archive der Cluster-Ressourcen sind davon nicht betroffen. Warten Sie auf den Agent, oder behalten Sie `--default-volumes-to-fs-backup` nur bei, wenn der Agent läuft.
 
-### `FailedValidation` right after install
+### `FailedValidation` direkt nach der Installation
 
-The first backup attempt runs against a location that has not validated yet. Wait for `velero backup-location get` to report `Available` before creating backups.
+Der erste Backup-Versuch trifft einen Speicherort, der noch nicht geprüft wurde. Warten Sie, bis `velero backup-location get` den Wert `Available` meldet, bevor Sie Backups anlegen.
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Velero operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Velero documentation](https://velero.io/docs/main/) to add schedules, volume snapshots, and cluster migration flows.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere Velero-Operationen verwenden.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [Velero-Dokumentation](https://velero.io/docs/main/), um Zeitpläne, Volume-Snapshots und Abläufe für die Cluster-Migration hinzuzufügen.

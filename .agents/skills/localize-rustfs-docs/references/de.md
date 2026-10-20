@@ -53,13 +53,25 @@ Treat RustFS source code, APIs, and exact Console labels as authoritative for pr
 | multipart upload | mehrteiliger Upload | Preserve API actions such as `CreateMultipartUpload`. |
 | server-side encryption | serverseitige Verschlüsselung | Keep SSE-S3, SSE-KMS, and SSE-C unchanged. |
 | presigned URL | vorsignierte URL | Keep URL uppercase and preserve API names. |
-| path-style addressing | pfadbasierte Adressierung | Preserve SDK option names. |
+| path-style addressing | pfadbasierte Adressierung (Path-Style) | Use the gloss on first mention in a page, then `pfadbasierte Adressierung`. Preserve SDK option names. Decline the adjective (`mit pfadbasierter Adressierung`). |
 | virtual-hosted-style addressing | Adressierung im Virtual-Hosted-Stil | Relate it to `RUSTFS_SERVER_DOMAINS` when relevant. |
 | health check | Integritätsprüfung | Preserve endpoint paths and probe names. |
 | readiness | Bereitschaft | Preserve `/health/ready` and Kubernetes field names. |
 | observability | Observability / Beobachtbarkeit | Prefer the established term used by the surrounding German ecosystem documentation and keep it consistent. |
 | rootless | ohne Root-Rechte | Prefer this over a literal calque. |
 | root credentials | Root-Anmeldedaten | Distinguish RustFS deployment credentials from the operating-system root account. |
+| access-key credentials | Zugangsdaten | Use for the access-key pair. Prefer `Zugriffsschlüssel` when naming the key itself. Do not use `Anmeldeinformationen`. |
+| deployment | Bereitstellung | Do not write `einer Deployment`. If the English loanword is kept, it is neuter: `das Deployment`. |
+| object-storage layer | Objektspeicher-Backend | Do not write `Objektspeicher-Layer`. |
+| infrastructure tooling | Infrastruktur-Tools | Do not write `Infrastructure-Tooling`. |
+| table bucket | Tabellen-Bucket | Do not alternate with `Table-Bucket`. |
+| warehouse | Warehouse | Genitive: `des Warehouses`, `innerhalb dieses Warehouses`. |
+| compatibility gate | Kompatibilitätsprüfung (Compatibility Gate) | Do not write `Kompatibilitäts-Gate`. |
+| inspect / HEAD | Metadaten abrufen (Head) | Do not use `untersuchen` for HEAD. |
+| verification (heading) | Überprüfung | Do not use `Verifikation` as a heading. |
+| await | mit `await` abwarten | Do not invent `Awaiten`. |
+| cargo build | bauen | Do not use `erstellen` for a compile. `Erstellen` means creating a resource. |
+| lifecycle operations | Lebenszyklusoperationen | Do not use `Lebenszyklusvorgänge`. |
 
 ## Common review failures
 

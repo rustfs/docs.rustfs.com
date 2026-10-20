@@ -1,17 +1,17 @@
 ---
 title: "RustFS Single Node Multiple Disk Installation"
-description: "Install RustFS on a single server with multiple disks, data will be stored on multiple disks."
+description: "Install RustFS on a single server and distribute data across multiple disks."
 ---
 
-In Single Node Multiple Disk (SNMD) mode, one server stores data in sharded form across multiple data disks. Each object is split into K data shards and M parity shards (erasure coding), so the loss of up to M disks does not cause data loss.
+In Single Node Multiple Disk (SNMD) mode, one server shards data across multiple data disks. Each object is split into K data shards and M parity shards (erasure coding), so the loss of up to M disks does not cause data loss.
 
-:::warning
+:::warning[Single server]
 
-SNMD is suitable for medium, non-critical business. Damage to at most M disks does not pose a data risk, but if the entire server fails or more than M disks are damaged, data will be lost. Keep backups of important data. For node-level fault tolerance, use [MNMD](./multiple-node-multiple-disk.md).
+SNMD is suitable for mid-sized, non-critical workloads. The deployment can lose up to M drives without losing data. If the entire server fails, or more than M drives fail, data is lost. Keep backups of important data. For node-level fault tolerance, use [MNMD](./multiple-node-multiple-disk.md).
 
 :::
 
-## Topology and Planning
+## Topology and planning
 
 ```mermaid
 flowchart TD
@@ -28,11 +28,11 @@ flowchart TD
 - Format each disk with XFS and mount it separately (e.g., labels `RUSTFS0` – `RUSTFS3`), as described in the prerequisites page.
 - For production deployments, also review the [Pre-Installation Checklists](../requirement/checklists/index.md).
 
-## Prerequisites and Service Setup
+## Prerequisites and service setup
 
 Complete the [common prerequisites and service setup](./prerequisites-and-service.md) — operating system, firewall, time synchronization, disk formatting, service user, binary download, and systemd unit — then continue below.
 
-## Configure Environment Variables
+## Configure environment variables
 
 1. Create the configuration file. `RUSTFS_VOLUMES` uses brace expansion to enumerate the four disk mount points:
 
@@ -55,9 +55,9 @@ sudo mkdir -p /data/rustfs{0..3} /var/log/rustfs /opt/tls
 sudo chmod -R 750 /data/rustfs* /var/log/rustfs
 ```
 
-## Start Service and Verification
+## Start and verify the service
 
-1. Start the service and enable auto-start on boot:
+1. Start the service and enable it to start at boot:
 
 ```bash
 sudo systemctl enable --now rustfs
@@ -81,11 +81,11 @@ netstat -ntpl
 tail -f /var/log/rustfs/rustfs*.log
 ```
 
-5. Access the console: enter the server's IP address and the console port (default 9001) in a browser. You should see:
+5. Open the Console: in a browser, go to `http://<server-ip>:9001`. You should see:
 
 ![Console](./images/console.jpg)
 
-## Next Steps
+## Next steps
 
 - Need node-level fault tolerance and horizontal scalability? See [Multiple Node Multiple Disk Mode (MNMD)](./multiple-node-multiple-disk.md).
 - Just experimenting? [Single Node Single Disk Mode (SNSD)](./single-node-single-disk.md) is simpler to set up.

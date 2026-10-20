@@ -1,66 +1,66 @@
 ---
 title: "WebDAV"
-description: "Configure the RustFS WebDAV gateway and access buckets and objects with WebDAV clients."
+description: "RustFS の WebDAV ゲートウェイを設定し、WebDAV クライアントでバケットとオブジェクトへアクセスする方法を説明します。"
 ---
 
-RustFS includes a Web Distributed Authoring and Versioning (WebDAV) gateway that exposes buckets and objects to WebDAV clients over HTTP or HTTPS. You can browse buckets, create collections, and upload, download, rename, or delete objects while RustFS enforces the permissions of the authenticated Identity and Access Management (IAM) user.
+RustFS には、HTTP または HTTPS でバケットとオブジェクトを WebDAV クライアントへ公開する Web Distributed Authoring and Versioning（WebDAV）ゲートウェイが含まれます。バケットの参照、コレクションの作成、オブジェクトのアップロード、ダウンロード、名前変更、削除ができます。RustFS は、認証されたアイデンティティとアクセス管理（IAM）ユーザーの権限を各操作に適用します。
 
-WebDAV support is compiled into the standard RustFS binary, but the gateway is disabled at runtime by default. You must enable and configure it before connecting a client.
+WebDAV のサポートは標準の RustFS バイナリにコンパイルされていますが、ゲートウェイは実行時に既定で無効です。クライアントを接続する前に、有効にして設定する必要があります。
 
-## Overview
+## 概要
 
-The gateway maps WebDAV paths to RustFS resources:
+ゲートウェイは、WebDAV のパスを RustFS のリソースへ対応付けます。
 
-| WebDAV path | RustFS resource |
+| WebDAV パス | RustFS のリソース |
 | --- | --- |
-| `/` | All buckets visible to the authenticated user |
-| `/my-bucket/` | The `my-bucket` bucket |
-| `/my-bucket/hello.txt` | The `hello.txt` object in `my-bucket` |
-| `/my-bucket/docs/hello.txt` | The `docs/hello.txt` object in `my-bucket` |
+| `/` | 認証されたユーザーから見えるすべてのバケット |
+| `/my-bucket/` | `my-bucket` バケット |
+| `/my-bucket/hello.txt` | `my-bucket` 内の `hello.txt` オブジェクト |
+| `/my-bucket/docs/hello.txt` | `my-bucket` 内の `docs/hello.txt` オブジェクト |
 
-RustFS supports the following operations through the gateway:
+RustFS は、ゲートウェイ経由で次の操作に対応しています。
 
-| Method | Operation |
+| メソッド | 操作 |
 | --- | --- |
-| `PROPFIND` | List buckets or objects and read metadata |
-| `MKCOL` | Create a bucket or a directory prefix |
-| `PUT` | Upload an object |
-| `GET` | Download an object |
-| `HEAD` | Read object metadata |
-| `MOVE` | Rename or move an object or directory |
-| `DELETE` | Delete an object, directory, or bucket |
+| `PROPFIND` | バケットまたはオブジェクトを一覧し、メタデータを読み取ります |
+| `MKCOL` | バケット、またはディレクトリのプレフィックスを作成します |
+| `PUT` | オブジェクトをアップロードします |
+| `GET` | オブジェクトをダウンロードします |
+| `HEAD` | オブジェクトのメタデータを読み取ります |
+| `MOVE` | オブジェクトまたはディレクトリの名前を変更するか、移動します |
+| `DELETE` | オブジェクト、ディレクトリ、またはバケットを削除します |
 
-Use `PROPFIND`, not `GET`, to list a collection. The current gateway returns `405 Method Not Allowed` for `GET` requests to directories.
+コレクションの一覧には、`GET` ではなく `PROPFIND` を使います。現在のゲートウェイは、ディレクトリへの `GET` リクエストに対して `405 Method Not Allowed` を返します。
 
-WebDAV uses HTTP Basic authentication. Enter a RustFS access key as the username and its secret key as the password. The gateway authenticates the credentials against RustFS IAM and applies the user's S3 policies to each operation.
+WebDAV は HTTP Basic 認証を使います。ユーザー名には RustFS のアクセスキーを、パスワードにはそのシークレットキーを入力します。ゲートウェイは認証情報を RustFS の IAM に対して認証し、各操作にそのユーザーの S3 ポリシーを適用します。
 
-:::warning[Protect credentials]
+:::warning[認証情報を保護する]
 
-Basic authentication does not encrypt credentials. Disable TLS only for isolated local testing. Use HTTPS for every remote or production connection.
+Basic 認証は、認証情報を暗号化しません。TLS を無効にするのは、隔離したローカルテストだけにします。リモート接続と本番接続では、すべて HTTPS を使います。
 
 :::
 
-## Configuration
+## 設定
 
-Configure the gateway with environment variables before starting RustFS:
+RustFS を起動する前に、環境変数でゲートウェイを設定します。
 
-| Variable | Description | Default |
+| 変数 | 説明 | 既定値 |
 | --- | --- | --- |
-| `RUSTFS_WEBDAV_ENABLE` | Enables the WebDAV gateway. | `false` |
-| `RUSTFS_WEBDAV_ADDRESS` | Bind address for WebDAV connections. | `0.0.0.0:8080` |
-| `RUSTFS_WEBDAV_TLS_ENABLED` | Enables TLS for the WebDAV listener. | `true` |
-| `RUSTFS_WEBDAV_CERTS_DIR` | Certificate directory used by the RustFS TLS runtime. Required when TLS is enabled. | Not set |
-| `RUSTFS_WEBDAV_MAX_BODY_SIZE` | Maximum request body size in bytes. Must be greater than zero. | `5368709120` (5 GiB) |
+| `RUSTFS_WEBDAV_ENABLE` | WebDAV ゲートウェイを有効にします。 | `false` |
+| `RUSTFS_WEBDAV_ADDRESS` | WebDAV 接続のバインドアドレスです。 | `0.0.0.0:8080` |
+| `RUSTFS_WEBDAV_TLS_ENABLED` | WebDAV リスナーの TLS を有効にします。 | `true` |
+| `RUSTFS_WEBDAV_CERTS_DIR` | RustFS の TLS ランタイムが使う証明書ディレクトリです。TLS を有効にする場合は必須です。 | 未設定 |
+| `RUSTFS_WEBDAV_MAX_BODY_SIZE` | リクエスト本文の最大サイズ（バイト）です。ゼロより大きい必要があります。 | `5368709120`（5 GiB） |
 
-The standard RustFS build enables the WebDAV compile-time feature. If you build RustFS with `--no-default-features`, include the feature explicitly:
+標準の RustFS ビルドでは、WebDAV のコンパイル時機能が有効です。`--no-default-features` で RustFS をビルドする場合は、この機能を明示的に含めます。
 
 ```bash
 cargo build --release --features webdav
 ```
 
-### Local testing without TLS
+### TLS なしのローカルテスト
 
-The following example starts RustFS with an HTTP WebDAV listener on port `8080`:
+次の例は、ポート `8080` で HTTP の WebDAV リスナーを付けて RustFS を起動します。
 
 ```bash
 export RUSTFS_WEBDAV_ENABLE=true
@@ -72,11 +72,11 @@ export RUSTFS_SECRET_KEY=<your-secret-key>
 rustfs /path/to/data
 ```
 
-Binding to `127.0.0.1` prevents other hosts from connecting to the unencrypted test endpoint.
+`127.0.0.1` にバインドすると、ほかのホストは暗号化されていないテストエンドポイントへ接続できません。
 
 ### HTTPS
 
-For a remote or production connection, enable TLS and provide a certificate directory:
+リモート接続または本番接続では、TLS を有効にし、証明書ディレクトリを指定します。
 
 ```bash
 export RUSTFS_WEBDAV_ENABLE=true
@@ -87,15 +87,15 @@ export RUSTFS_WEBDAV_CERTS_DIR=/path/to/certs
 rustfs /path/to/data
 ```
 
-If TLS is enabled without `RUSTFS_WEBDAV_CERTS_DIR`, or the directory does not exist, WebDAV initialization fails. See [Configure TLS](/integration/tls-configured) for certificate preparation guidance.
+TLS を有効にしているのに `RUSTFS_WEBDAV_CERTS_DIR` がない場合、またはディレクトリが存在しない場合、WebDAV の初期化は失敗します。証明書の準備は、[TLS を設定する](/ja/integration/tls-configured)を参照します。
 
-Allow inbound TCP traffic to the configured WebDAV port. This listener is separate from the S3 API and Console listeners.
+設定した WebDAV ポートへの受信 TCP トラフィックを許可します。このリスナーは、S3 API と Console のリスナーとは別です。
 
-## Usage
+## 使い方
 
-The following commands use an HTTP endpoint for local testing. Replace the endpoint and credentials with your HTTPS WebDAV endpoint and an IAM user that has the required bucket and object permissions.
+次のコマンドは、ローカルテスト用の HTTP エンドポイントを使います。エンドポイントと認証情報は、自分の HTTPS WebDAV エンドポイントと、必要なバケットおよびオブジェクトの権限を持つ IAM ユーザーに置き換えます。
 
-Set reusable shell variables without placing the secret directly in each command:
+シークレットを各コマンドへ直接書かずに、再利用できるシェル変数を設定します。
 
 ```bash
 export WEBDAV_URL=http://127.0.0.1:8080
@@ -104,9 +104,9 @@ read -s WEBDAV_PASSWORD
 export WEBDAV_PASSWORD
 ```
 
-### List buckets
+### バケットを一覧する
 
-Send `PROPFIND` with `Depth: 1` to list the buckets visible to the user:
+ユーザーから見えるバケットを一覧するには、`Depth: 1` を付けた `PROPFIND` を送ります。
 
 ```bash
 curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
@@ -115,7 +115,7 @@ curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
 	"$WEBDAV_URL/"
 ```
 
-### Create a bucket
+### バケットを作成する
 
 ```bash
 curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
@@ -123,11 +123,11 @@ curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
 	"$WEBDAV_URL/my-bucket/"
 ```
 
-Bucket names must follow the same naming rules as buckets created through the S3 API.
+バケット名は、S3 API で作成するバケットと同じ命名規則に従う必要があります。
 
-### Upload and download an object
+### オブジェクトをアップロードおよびダウンロードする
 
-Upload `/path/to/hello.txt`:
+`/path/to/hello.txt` をアップロードします。
 
 ```bash
 curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
@@ -135,7 +135,7 @@ curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
 	"$WEBDAV_URL/my-bucket/hello.txt"
 ```
 
-Download the object:
+オブジェクトをダウンロードします。
 
 ```bash
 curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
@@ -143,9 +143,9 @@ curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
 	"$WEBDAV_URL/my-bucket/hello.txt"
 ```
 
-### Create and list a directory
+### ディレクトリを作成して一覧する
 
-WebDAV directories below a bucket map to object key prefixes:
+バケットより下の WebDAV ディレクトリは、オブジェクトキーのプレフィックスに対応します。
 
 ```bash
 curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
@@ -158,9 +158,9 @@ curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
 	"$WEBDAV_URL/my-bucket/docs/"
 ```
 
-### Rename an object
+### オブジェクトの名前を変更する
 
-Use `MOVE` with a destination path on the same WebDAV endpoint:
+同じ WebDAV エンドポイント上の宛先パスを指定して、`MOVE` を使います。
 
 ```bash
 curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
@@ -169,11 +169,11 @@ curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
 	"$WEBDAV_URL/my-bucket/hello.txt"
 ```
 
-The IAM user needs permission to read and delete the source and to write the destination. If authorization fails, RustFS leaves the source unchanged.
+IAM ユーザーには、ソースの読み取りと削除、および宛先への書き込みの権限が必要です。認可に失敗した場合、RustFS はソースを変更せずに残します。
 
-### Delete an object or bucket
+### オブジェクトまたはバケットを削除する
 
-Delete an object:
+オブジェクトを削除します。
 
 ```bash
 curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
@@ -181,7 +181,7 @@ curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
 	"$WEBDAV_URL/my-bucket/greeting.txt"
 ```
 
-Delete the bucket after removing its contents:
+内容を削除したあと、バケットを削除します。
 
 ```bash
 curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
@@ -189,20 +189,20 @@ curl --user "$WEBDAV_USER:$WEBDAV_PASSWORD" \
 	"$WEBDAV_URL/my-bucket/"
 ```
 
-### Connect a desktop client
+### デスクトップクライアントから接続する
 
-Use the WebDAV endpoint in a client that supports Basic authentication:
+Basic 認証に対応したクライアントで、WebDAV エンドポイントを使います。
 
-| Client | Connection address |
+| クライアント | 接続アドレス |
 | --- | --- |
-| GNOME Files | `dav://<host>:8080/` for HTTP or `davs://<host>:8080/` for HTTPS |
-| macOS Finder | `http://<host>:8080/` or `https://<host>:8080/` |
+| GNOME Files | HTTP は `dav://<host>:8080/`、HTTPS は `davs://<host>:8080/` |
+| macOS Finder | `http://<host>:8080/` または `https://<host>:8080/` |
 | Windows File Explorer | `https://<host>:8080/` |
 
-Enter the RustFS access key and secret key when the client prompts for credentials. Client behavior and supported WebDAV methods vary; use `curl` to isolate server-side errors when troubleshooting.
+クライアントが認証情報を求めたら、RustFS のアクセスキーとシークレットキーを入力します。クライアントの動作と、対応する WebDAV メソッドは製品によって異なります。トラブルシューティングでサーバー側のエラーを切り分けるときは、`curl` を使います。
 
-## Next steps
+## 次のステップ
 
-- [Manage credentials](/operations/credentials)
-- [Configure TLS](/integration/tls-configured)
-- [Check service status](/operations/status-check)
+- [認証情報を管理する](/ja/operations/credentials)
+- [TLS を設定する](/ja/integration/tls-configured)
+- [サービスの状態を確認する](/ja/operations/status-check)

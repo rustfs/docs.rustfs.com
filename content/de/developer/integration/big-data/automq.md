@@ -1,13 +1,13 @@
 ---
 title: "AutoMQ"
-description: "Run AutoMQ with RustFS as the S3-backed log storage."
+description: "Betreiben Sie AutoMQ mit RustFS als S3-gestütztem Log-Speicher."
 ---
 
-This guide connects [AutoMQ](https://github.com/AutoMQ/automq) — the cloud-native Kafka distribution that keeps its log storage in object storage — to **RustFS**. You will start a single-node AutoMQ broker in KRaft mode with its S3 log buckets pointed at RustFS, then produce and consume messages. The workflow was verified with AutoMQ 1.3.0 (Kafka 3.9.0 API) against `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [AutoMQ](https://github.com/AutoMQ/automq) — die cloud-native Kafka-Distribution, die ihren Log-Speicher im Objektspeicher hält — mit **RustFS**. Sie starten einen AutoMQ-Broker mit einem Knoten im KRaft-Modus, dessen S3-Log-Buckets auf RustFS zeigen, und produzieren und konsumieren anschließend Nachrichten. Der Ablauf wurde mit AutoMQ 1.3.0 (Kafka-API 3.9.0) gegen `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Sie benötigen Docker. Diese Bereitstellung ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -17,11 +17,11 @@ flowchart LR
 	Consumer["Console consumer"] -->|"fetch"| Broker
 ```
 
-AutoMQ decouples storage from brokers: the write-ahead log is buffered locally, then uploaded as immutable stream objects into the bucket. The broker keeps no local data directory beyond the WAL.
+AutoMQ trennt den Speicher von den Brokern: das Write-Ahead-Log wird lokal gepuffert und danach als unveränderliche Stream-Objekte in den Bucket hochgeladen. Der Broker behält über das WAL hinaus kein lokales Datenverzeichnis.
 
-## 1. Run the broker
+## 1. Den Broker starten
 
-Start AutoMQ with the S3 buckets pointed at RustFS. Four details are mandatory: space-separated script arguments (`--key=value` makes the startup script loop forever), `JAVA_TOOL_OPTIONS` with `-XX:-UseContainerSupport` (the bundled JDK 17 crashes on cgroup v2 detection otherwise), the `server` combined role, and credentials via `KAFKA_S3_ACCESS_KEY`/`KAFKA_S3_SECRET_KEY` environment variables (the `--s3.access.key` script arguments are ignored):
+Starten Sie AutoMQ so, dass die S3-Buckets auf RustFS zeigen. Vier Angaben sind zwingend: durch Leerzeichen getrennte Skriptargumente (die Form `--key=value` lässt das Startskript endlos laufen), `JAVA_TOOL_OPTIONS` mit `-XX:-UseContainerSupport` (das mitgelieferte JDK 17 stürzt sonst bei der Erkennung von cgroup v2 ab), die kombinierte Rolle `server` und Zugangsdaten über die Umgebungsvariablen `KAFKA_S3_ACCESS_KEY` und `KAFKA_S3_SECRET_KEY` (die Skriptargumente `--s3.access.key` werden ignoriert):
 
 ```bash
 docker run -d --name automq --hostname automq --network oo-rustfs_default -p 9092:9092 \
@@ -39,9 +39,9 @@ docker run -d --name automq --hostname automq --network oo-rustfs_default -p 909
   --s3.endpoint http://rustfs:9000
 ```
 
-The broker binds its listener to the container IP. For the console tools, address it by that IP (the hostname `automq` also works from inside the container).
+Der Broker bindet seinen Listener an die Container-IP. Sprechen Sie ihn für die Kafka-Konsolenwerkzeuge über diese IP an. Der Hostname `automq` funktioniert ebenfalls von innerhalb des Containers.
 
-## 2. Create a topic and produce
+## 2. Ein Topic anlegen und produzieren
 
 ```bash
 AIP=<automq-container-ip>
@@ -53,7 +53,7 @@ docker exec automq sh -c "cd /opt/automq/kafka && \
   ./bin/kafka-console-producer.sh --bootstrap-server $AIP:9092 --topic rustfs-automq"
 ```
 
-## 3. Consume the messages
+## 3. Die Nachrichten konsumieren
 
 ```bash
 docker exec automq sh -c "cd /opt/automq/kafka && \
@@ -68,9 +68,9 @@ mq-msg-three
 Processed a total of 3 messages
 ```
 
-## 4. Verify objects in RustFS
+## 4. Objekte in RustFS prüfen
 
-List the bucket — AutoMQ writes its log streams and metrics as objects:
+Listen Sie den Bucket auf. AutoMQ schreibt seine Log-Streams und Metriken als Objekte:
 
 ```bash
 rc ls rustfs/automq-demo/ -r
@@ -82,41 +82,41 @@ automq/logs/rZdE0DjZSrqy96PXrMUZVw/0/2026100701/52877dc7-...
 automq/metrics/rZdE0DjZSrqy96PXrMUZVw/0/2026100701/4733e680-...
 ```
 
-The log stream objects hold the topic data — the broker keeps only the WAL locally, so scaling brokers up or down does not move data.
+Die Objekte der Log-Streams enthalten die Topic-Daten. Der Broker behält lokal nur das WAL, daher verschiebt das Hoch- oder Herunterskalieren von Brokern keine Daten.
 
-![AutoMQ log streams stored in the RustFS Console](./images/rustfs-automq-logs.png)
+![AutoMQ-Log-Streams in der RustFS-Console](./images/rustfs-automq-logs.png)
 
-## 5. Stop or reset
+## 5. Stoppen oder zurücksetzen
 
 ```bash
 docker rm -f automq
 rc rm rustfs/automq-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
-### Startup script prints `setup_value:` lines forever at 100% CPU
+### Das Startskript gibt endlos Zeilen `setup_value:` bei voller CPU-Last aus
 
-The argument parser only accepts the space-separated form (`--s3.bucket x`, not `--s3.bucket=x`). The `=` form makes the parser loop forever.
+Der Argumentparser akzeptiert nur die durch Leerzeichen getrennte Form (`--s3.bucket x`, nicht `--s3.bucket=x`). Die Form mit `=` lässt den Parser endlos laufen.
 
 ### `java.lang.NullPointerException ... CgroupInfo.getMountPoint()`
 
-The bundled JDK 17 fails cgroup v2 detection in this image. Set `JAVA_TOOL_OPTIONS="-XX:-UseContainerSupport"`.
+Das mitgelieferte JDK 17 scheitert in diesem Image an der Erkennung von cgroup v2. Setzen Sie `JAVA_TOOL_OPTIONS="-XX:-UseContainerSupport"`.
 
 ### `unknown process role broker,controller`
 
-AutoMQ 1.3.0's script expects the combined role to be spelled `server`.
+Das Skript von AutoMQ 1.3.0 erwartet, dass die kombinierte Rolle `server` heißt.
 
-### Broker starts but clients get `Connection to node -1 could not be established`
+### Der Broker startet, Clients erhalten aber `Connection to node -1 could not be established`
 
-The listener binds to the container IP (`hostname -I`). Address the broker by that IP or by the hostname `automq` from inside the same Docker network — `localhost` only works for tools running inside the broker container itself.
+Der Listener bindet sich an die Container-IP (`hostname -I`). Sprechen Sie den Broker über diese IP oder über den Hostnamen `automq` aus demselben Docker-Netzwerk an. `localhost` funktioniert nur für Werkzeuge, die im Broker-Container selbst laufen.
 
 ### `List objects failed, cost: 120000+ ms`
 
-AutoMQ uses virtual-host addressing by default and falls into a retry loop against IP endpoints. Force path-style buckets by overriding the bucket URLs with `KAFKA_CFG_S3_DATA_BUCKETS`/`KAFKA_CFG_S3_OPS_BUCKETS` set to `0@s3://<bucket>?region=us-east-1&endpoint=http://rustfs:9000&pathStyle=true&authType=static`, and pass credentials via `KAFKA_S3_ACCESS_KEY`/`KAFKA_S3_SECRET_KEY`.
+AutoMQ verwendet standardmäßig Adressierung im Virtual-Hosted-Stil und gerät gegenüber IP-Endpunkten in eine Wiederholungsschleife. Erzwingen Sie Buckets mit pfadbasierter Adressierung (Path-Style), indem Sie die Bucket-URLs über `KAFKA_CFG_S3_DATA_BUCKETS` und `KAFKA_CFG_S3_OPS_BUCKETS` auf `0@s3://<bucket>?region=us-east-1&endpoint=http://rustfs:9000&pathStyle=true&authType=static` setzen, und übergeben Sie die Zugangsdaten über `KAFKA_S3_ACCESS_KEY` und `KAFKA_S3_SECRET_KEY`.
 
-## Next steps
+## Nächste Schritte
 
-- Compare with the [Kafka](/developer/integration/big-data/kafka) guide when you prefer connect-based S3 integration on stock Kafka.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [AutoMQ documentation](https://docs.automq.com/) for multi-node clusters and WAL parameter tuning on the same bucket.
+- Vergleichen Sie die Anleitung mit [Kafka](/de/developer/integration/big-data/kafka), wenn Sie die S3-Anbindung über Connect auf unverändertem Kafka bevorzugen.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [AutoMQ-Dokumentation](https://docs.automq.com/) für Cluster mit mehreren Knoten und die Abstimmung der WAL-Parameter auf demselben Bucket.

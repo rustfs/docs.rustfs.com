@@ -1,13 +1,13 @@
 ---
 title: "Databend"
-description: "Run Databend with RustFS as the S3-compatible storage backend."
+description: "Exécutez Databend avec RustFS comme backend de stockage compatible avec S3."
 ---
 
-This guide connects [Databend](https://github.com/datafuselabs/databend) — the open-source cloud data warehouse — to **RustFS** as its object storage backend. You will start the meta service and query node, point the storage backend at a RustFS bucket, create a database and table, and verify the Parquet files in the bucket. The workflow was verified with Databend v1.2.925-patch-13 against `rustfs/rustfs-x86-musl:v2.3.1`.
+Ce guide connecte [Databend](https://github.com/datafuselabs/databend) — l’entrepôt de données cloud open source — à **RustFS** comme backend de stockage objet. Vous allez démarrer le service meta et le nœud de requête, diriger le backend de stockage vers un compartiment (bucket) RustFS, créer une base de données et une table, puis vérifier les fichiers Parquet dans le compartiment. Le flux a été validé avec Databend v1.2.925-patch-13 face à `rustfs/rustfs-x86-musl:v2.3.1`.
 
-You need the Databend release tarball on a Linux host (or Docker). This deployment is intended for local integration testing, not production.
+Vous avez besoin de l’archive de version Databend sur un hôte Linux (ou de Docker). Ce déploiement est destiné aux tests d’intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -16,11 +16,11 @@ flowchart LR
 	Query -->|"Parquet SSTs + indexes"| RustFS["RustFS :9000"]
 ```
 
-Databend stores table data as Parquet files with bloom-filter indexes in object storage, so the bucket holds the entire table dataset and the query node stays stateless.
+Databend stocke les données des tables en fichiers Parquet, avec des index de filtre de Bloom, dans le stockage objet, de sorte que le compartiment contient l’intégralité du jeu de données de la table et que le nœud de requête reste sans état.
 
-## 1. Download and install
+## 1. Télécharger et installer
 
-Grab a release tarball and unpack the binaries:
+Récupérez une archive de version et décompressez les binaires :
 
 ```bash
 curl -Lo /tmp/databend.tgz \
@@ -28,15 +28,15 @@ curl -Lo /tmp/databend.tgz \
 tar -xzf /tmp/databend.tgz -C /opt
 ```
 
-Create the data directories:
+Créez les répertoires de données :
 
 ```bash
 mkdir -p /opt/databend/data /opt/databend/logs /opt/databend/meta-logs
 ```
 
-## 2. Configure the meta service
+## 2. Configurer le service meta
 
-Create `databend-meta.toml` — note the top-level addresses and the `[raft_config]` section with `single = true`:
+Créez `databend-meta.toml` — notez les adresses de premier niveau et la section `[raft_config]` avec `single = true` :
 
 ```toml title="databend-meta.toml"
 admin_api_address = "0.0.0.0:28002"
@@ -57,9 +57,9 @@ raft_advertise_host = "127.0.0.1"
 single = true
 ```
 
-## 3. Configure the query node
+## 3. Configurer le nœud de requête
 
-Create `databend-query.toml`. The `tenant_id` and `cluster_id` keys must live inside the `[query]` section, and `[storage.s3]` points at RustFS:
+Créez `databend-query.toml`. Les clés `tenant_id` et `cluster_id` doivent se trouver dans la section `[query]`, et `[storage.s3]` pointe vers RustFS :
 
 ```toml title="databend-query.toml"
 [query]
@@ -96,9 +96,9 @@ secret_access_key = "<your-secret-key>"
 enable_virtual_host_style = false
 ```
 
-Keep all keys before the `[[query.users]]` array entry — TOML treats everything after it as part of that array element, and misplaced keys fail validation with confusing errors.
+Placez toutes les clés avant l’entrée de tableau `[[query.users]]` — TOML traite tout ce qui suit comme faisant partie de cet élément de tableau, et des clés mal placées échouent à la validation avec des erreurs peu claires.
 
-## 4. Start the services
+## 4. Démarrer les services
 
 ```bash
 nohup /opt/databend/bin/databend-meta -c /opt/databend/databend-meta.toml > /opt/databend/meta.out 2>&1 &
@@ -107,9 +107,9 @@ nohup /opt/databend/bin/databend-query -c /opt/databend/databend-query.toml > /o
 sleep 20
 ```
 
-## 5. Create a table and query
+## 5. Créer une table et l’interroger
 
-Databend serves an HTTP API on port 8000. Create a database and a table, insert rows, and read them back — quotes inside SQL must be single quotes (double quotes mean identifiers):
+Databend expose une API HTTP sur le port 8000. Créez une base de données et une table, insérez des lignes et relisez-les — les guillemets à l’intérieur du SQL doivent être des guillemets simples (les guillemets doubles désignent des identifiants) :
 
 ```bash
 curl -s -m 90 -u databend: http://127.0.0.1:8000/v1/query \
@@ -129,9 +129,9 @@ curl -s -m 120 -u databend: http://127.0.0.1:8000/v1/query \
 {"id":"...","state":"Succeeded",...,"data":[["1","alpha"],["2","beta"],["3","gamma"]],...}
 ```
 
-## 6. Verify objects in RustFS
+## 6. Vérifier les objets dans RustFS
 
-List the bucket — the table lives as Parquet blocks with index files under numeric prefixes:
+Listez le compartiment — la table y réside sous forme de blocs Parquet accompagnés de fichiers d’index, sous des préfixes numériques :
 
 ```bash
 rc ls rustfs/databend-demo/ -r | head -4
@@ -142,35 +142,35 @@ rc ls rustfs/databend-demo/ -r | head -4
 73/116/_i_b_v2/01a1192b11b07c38b9ae1178abc78882_v4.parquet
 ```
 
-![Databend Parquet files stored in the RustFS Console](./images/rustfs-databend-parquet.png)
+![Fichiers Parquet Databend stockés dans la Console RustFS](./images/rustfs-databend-parquet.png)
 
-## 7. Stop or reset
+## 7. Arrêter ou réinitialiser
 
 ```bash
 pkill -f databend-query; pkill -f databend-meta
 rc rm rustfs/databend-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## Dépannage
 
 ### `cluster_id is empty without resources management`
 
-`tenant_id` and `cluster_id` were placed outside the `[query]` section. In TOML, every key belongs to the most recent section header — move them back under `[query]`.
+`tenant_id` et `cluster_id` ont été placés en dehors de la section `[query]`. En TOML, chaque clé appartient à l’en-tête de section le plus récent — remettez-les sous `[query]`.
 
 ### `CannotListenerPort ... 127.0.0.1:9090`
 
-The flight API defaults to 9090, which other local services often occupy. Set `flight_api_address`, `metric_api_address`, and `admin_api_address` to free ports inside `[query]`.
+L’API Flight utilise le port 9090 par défaut, que d’autres services locaux occupent souvent. Définissez `flight_api_address`, `metric_api_address` et `admin_api_address` sur des ports libres, à l’intérieur de `[query]`.
 
-### Query returns `Authentication error: no authorization header provided`
+### La requête renvoie `Authentication error: no authorization header provided`
 
-The HTTP API requires basic auth matching the `[[query.users]]` entry, e.g. `-u databend:` with `auth_type = "no_password"`.
+L’API HTTP exige une authentification Basic correspondant à l’entrée `[[query.users]]`, par exemple `-u databend:` avec `auth_type = "no_password"`.
 
-### `Unknown table` right after CREATE succeeded
+### `Unknown table` juste après la réussite de CREATE
 
-Double-quoted strings in SQL are identifiers, not literals. Use single quotes for VALUES and for the CONNECTION/LOCATION options.
+Les chaînes entre guillemets doubles en SQL sont des identifiants, pas des littéraux. Utilisez des guillemets simples pour VALUES et pour les options CONNECTION/LOCATION.
 
-## Next steps
+## Étapes suivantes
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Databend storage options.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Databend documentation](https://docs.databend.com/) for multi-node clusters and share tables on top of the same bucket.
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres options de stockage Databend.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
+- Suivez la [documentation Databend](https://docs.databend.com/) pour les clusters multi-nœuds et les tables partagées au-dessus du même compartiment.

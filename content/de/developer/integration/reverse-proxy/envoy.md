@@ -1,33 +1,33 @@
 ---
 title: "Envoy"
-description: "Deploy RustFS behind Envoy with TLS-terminated routes for the S3 API and Console."
+description: "Stellen Sie RustFS hinter Envoy mit TLS-terminierten Routen für die S3-API und die Console bereit."
 ---
 
-Use **Envoy** to terminate TLS and route separate hostnames to the RustFS S3 API and Console. This deployment runs Envoy and a single-node RustFS instance on one Docker network. You need Docker Engine, two DNS records, and a TLS certificate that covers both hostnames (the guide uses a self-signed certificate for testing).
+Verwenden Sie **Envoy**, um TLS zu terminieren und getrennte Hostnamen zur RustFS-S3-API und zur Console (Weboberfläche) zu leiten. In dieser Bereitstellung betreiben Sie Envoy und eine RustFS-Instanz mit einem Knoten in einem Docker-Netzwerk. Sie benötigen Docker Engine, zwei DNS-Einträge und ein TLS-Zertifikat, das beide Hostnamen abdeckt (die Anleitung verwendet zum Testen ein selbst signiertes Zertifikat).
 
-This guide uses these example hostnames:
+Diese Anleitung verwendet diese Beispiel-Hostnamen:
 
-- `s3.example.com` for the S3 API
-- `console.example.com` for the Console
+- `s3.example.com` für die S3-API
+- `console.example.com` für die Console
 
-Replace them with hostnames that resolve to the Docker host.
+Ersetzen Sie sie durch Hostnamen, die auf den Docker-Host zeigen.
 
-:::warning[Serve S3 from the root path]
+:::warning[S3 vom Wurzelpfad bereitstellen]
 
-Do not publish the S3 API under a path such as `/s3/`. AWS Signature Version 4 includes the request path and host, so rewriting either value can invalidate signed requests. Envoy forwards the incoming `Host` header unchanged, which keeps signatures valid.
+Veröffentlichen Sie die S3-API nicht unter einem Pfad wie `/s3/`. AWS Signature Version 4 enthält den Anfragepfad und den Host, daher kann das Umschreiben eines der beiden Werte signierte Anfragen ungültig machen. Envoy leitet den eingehenden Header `Host` unverändert weiter, wodurch Signaturen gültig bleiben.
 
 :::
 
-## 1. Create the deployment directories
+## 1. Die Bereitstellungsverzeichnisse anlegen
 
-Create directories for the Envoy configuration and TLS certificate:
+Legen Sie Verzeichnisse für die Envoy-Konfiguration und das TLS-Zertifikat an:
 
 ```bash
 mkdir -p rustfs-envoy/certs
 cd rustfs-envoy
 ```
 
-For local testing, generate a self-signed certificate covering both hostnames:
+Erzeugen Sie für lokale Tests ein selbst signiertes Zertifikat, das beide Hostnamen abdeckt:
 
 ```bash
 openssl req -x509 -newkey rsa:2048 -nodes \
@@ -37,11 +37,11 @@ openssl req -x509 -newkey rsa:2048 -nodes \
 chmod 644 certs/privkey.pem
 ```
 
-Make the certificate readable by the non-root user the Envoy image runs as — a `600` private key produces a misleading `Failed to load incomplete private key` error.
+Machen Sie das Zertifikat für den Benutzer ohne Root-Rechte lesbar, unter dem das Envoy-Image läuft. Ein privater Schlüssel mit `600` erzeugt den irreführenden Fehler `Failed to load incomplete private key`.
 
-## 2. Configure Envoy
+## 2. Envoy konfigurieren
 
-Create the configuration with an HTTPS listener and two virtual hosts. Route timeouts are disabled (`timeout: 0s`) so long streaming S3 uploads are not cut off:
+Legen Sie die Konfiguration mit einem HTTPS-Listener und zwei virtuellen Hosts an. Route-Timeouts sind deaktiviert (`timeout: 0s`), damit lange Streaming-S3-Uploads nicht abgeschnitten werden:
 
 ```yaml title="envoy.yaml"
 static_resources:
@@ -99,11 +99,11 @@ static_resources:
         - endpoint: {address: {socket_address: {address: rustfs, port_value: 9001}}}
 ```
 
-The `host:*` domain entries matter: clients send `Host: s3.example.com:8443` on non-standard ports, and Envoy matches the authority including the port.
+Die Domäneneinträge `host:*` sind wichtig: Clients senden auf Nicht-Standard-Ports `Host: s3.example.com:8443`, und Envoy vergleicht die Authority einschließlich des Ports.
 
-## 3. Start Envoy
+## 3. Envoy starten
 
-Run Envoy on the same Docker network as RustFS, publishing only the proxy port:
+Starten Sie Envoy im selben Docker-Netzwerk wie RustFS und veröffentlichen Sie nur den Proxy-Port:
 
 ```bash
 docker run -d --name envoy --network oo-rustfs_default -p 8443:8443 \
@@ -112,9 +112,9 @@ docker run -d --name envoy --network oo-rustfs_default -p 8443:8443 \
   envoyproxy/envoy:v1.34-latest -c /envoy.yaml
 ```
 
-## 4. Verify both endpoints
+## 4. Beide Endpunkte prüfen
 
-Point the example hostnames at the proxy with `curl --resolve` (in production, DNS does this):
+Richten Sie die Beispiel-Hostnamen mit `curl --resolve` auf den Proxy (in der Produktion übernimmt das DNS):
 
 ```bash
 curl -sk --resolve s3.example.com:8443:127.0.0.1 \
@@ -129,11 +129,11 @@ s3 api: 200
 console: 200
 ```
 
-`-k` skips certificate validation because the certificate is self-signed; with a trusted certificate, drop it.
+`-k` überspringt die Zertifikatsprüfung, weil das Zertifikat selbst signiert ist. Bei einem vertrauenswürdigen Zertifikat lassen Sie es weg.
 
-## 5. Send signed S3 requests through Envoy
+## 5. Signierte S3-Anfragen über Envoy senden
 
-Point any S3 client at the proxy as if it were RustFS. Configure the client with `https://s3.example.com:8443` as the endpoint and path-style addressing; when the proxy certificate is trusted, signed AWS Signature Version 4 requests pass through unchanged. For a quick test over plain HTTP, add an HTTP listener on port 8080 with the same virtual-host routing as the HTTPS listener, then use the endpoint `http://s3.example.com:8080`:
+Richten Sie einen beliebigen S3-Client auf den Proxy aus, als wäre er RustFS. Konfigurieren Sie den Client mit `https://s3.example.com:8443` als Endpunkt und mit pfadbasierter Adressierung (Path-Style). Wenn dem Proxy-Zertifikat vertraut wird, laufen signierte Anfragen mit AWS Signature Version 4 unverändert durch. Fügen Sie für einen schnellen Test über unverschlüsseltes HTTP einen HTTP-Listener auf Port 8080 mit demselben Virtual-Host-Routing wie der HTTPS-Listener hinzu und verwenden Sie dann den Endpunkt `http://s3.example.com:8080`:
 
 ```bash
 rc alias set rustfs-envoy http://s3.example.com:8080 <your-access-key> <your-secret-key>
@@ -145,11 +145,11 @@ rc ls rustfs-envoy/rclone-demo/
 [2026-09-29 11:12:41]        5 B write-test.txt
 ```
 
-The signatures validate because Envoy forwards the original `Host` header to RustFS.
+Die Signaturen bleiben gültig, weil Envoy den ursprünglichen Header `Host` an RustFS weiterleitet.
 
-## Multi-node backends
+## Backends mit mehreren Knoten
 
-For a distributed RustFS deployment, add every node to the S3 cluster:
+Fügen Sie für eine verteilte RustFS-Bereitstellung jeden Knoten zum S3-Cluster hinzu:
 
 ```yaml title="envoy.yaml"
   - name: rustfs_s3
@@ -169,24 +169,24 @@ For a distributed RustFS deployment, add every node to the S3 cluster:
         - endpoint: {address: {socket_address: {address: node4, port_value: 9000}}}
 ```
 
-The Console cluster follows the same pattern on port `9001`.
+Der Console-Cluster folgt demselben Muster auf Port `9001`.
 
-## Troubleshooting
+## Fehlerbehebung
 
 ### `Failed to load incomplete private key from path`
 
-The Envoy container runs as a non-root user and cannot read a `600` root-owned key. `chmod 644` the key files (or chown them to the container user, UID `1001` in the official image).
+Der Envoy-Container läuft als Benutzer ohne Root-Rechte und kann einen root-eigenen Schlüssel mit `600` nicht lesen. Setzen Sie die Schlüsseldateien mit `chmod 644` (oder ändern Sie den Eigentümer auf den Container-Benutzer, UID `1001` im offiziellen Image).
 
-### Routes return `404` with the correct hostnames
+### Routen antworten mit `404` bei den richtigen Hostnamen
 
-Envoy matches the authority including the port. Add the `host:*` variants to each virtual host's `domains` list, as in the configuration above.
+Envoy vergleicht die Authority einschließlich des Ports. Fügen Sie die Varianten `host:*` zur Liste `domains` jedes virtuellen Hosts hinzu, wie in der Konfiguration oben.
 
-### `Access Denied` from RustFS on proxied requests
+### `Access Denied` von RustFS bei weitergeleiteten Anfragen
 
-Confirm the proxy is not rewriting the path or the `Host` header. Signed requests must reach RustFS with the host the client signed for.
+Prüfen Sie, dass der Proxy den Pfad und den Header `Host` nicht umschreibt. Signierte Anfragen müssen RustFS mit dem Host erreichen, für den der Client signiert hat.
 
-## Next steps
+## Nächste Schritte
 
-- [Configure an S3 client](/developer/examples/aws-cli)
-- [Enable virtual-hosted-style bucket URLs](/integration/virtual)
-- [Review health and readiness endpoints](/operations/status-check)
+- [Einen S3-Client konfigurieren](/de/developer/examples/aws-cli)
+- [Bucket-URLs mit Adressierung im Virtual-Hosted-Stil aktivieren](/de/integration/virtual)
+- [Endpunkte für Integritätsprüfung und Bereitschaft prüfen](/de/operations/status-check)

@@ -1,20 +1,20 @@
 ---
-title: "Container"
-description: "Run the official RustFS container image with Docker or Podman."
+title: "コンテナ"
+description: "公式の RustFS コンテナイメージを、Docker または Podman で実行します。"
 ---
 
-RustFS is a high-performance, S3-compatible open-source distributed object storage system. In single-node single-disk (SNSD) deployment mode, the backend uses zero erasure coding without additional data redundancy, which makes it suitable for local testing and small-scale scenarios. The official RustFS image packages the RustFS binary and its runtime environment into a container, so you can start a service with a single command and persistent storage.
+RustFS は、オープンソースの S3 互換分散オブジェクトストレージシステムです。シングルノード・シングルディスク（SNSD）モードでは、RustFS はイレイジャーコーディングを使わず、冗長データも保存しません。そのため、このモードはローカルでのテストと小さなワークロードにだけ適しています。公式の RustFS イメージは、RustFS のバイナリと実行環境をコンテナにまとめているため、1 つのコマンドで永続ストレージ付きの RustFS を起動できます。
 
-The container runs as non-root user `rustfs` with id `10001`, so a bind-mounted host directory must be owned by `10001` to avoid permission denied errors.
+コンテナは、id が `10001` の root 以外のユーザー `rustfs` として動作します。バインドマウントするホストディレクトリの所有者は `10001` である必要があります。そうしないと、permission denied（権限拒否）エラーが発生します。
 
-## Container runtimes
+## コンテナランタイム
 
-- [Docker](./docker.md): run a single-node instance with persistent storage, then extend it with Docker Compose, TLS, and multi-node networking.
-- [Podman](./podman.md): run the same image in a daemonless workflow.
+- [Docker](./docker.md): 永続ストレージを使ってシングルノードのインスタンスを実行し、Docker Compose、TLS、マルチノードのネットワークへ拡張します。
+- [Podman](./podman.md): デーモンなしのワークフローで、同じイメージを実行します。
 
-:::note[Directory permissions]
+:::note[ディレクトリの権限]
 
-If you mount a host directory into the container with `-v`, make sure the owner of the host directory is `10001`:
+`-v` でホストディレクトリをコンテナにマウントする場合は、ホストディレクトリの所有者が `10001` であることを確認します。
 
 ```bash
 chown -R 10001:10001 /path/to/host_directory
@@ -22,4 +22,4 @@ chown -R 10001:10001 /path/to/host_directory
 
 :::
 
-For Kubernetes deployments, see the [Helm chart](/installation/cloud-native/helm-chart) or the [Operator](/installation/cloud-native/operator) instead.
+Kubernetes へのデプロイは、[Helm チャート](/ja/installation/cloud-native/helm-chart)または [Operator](/ja/installation/cloud-native/operator) を参照してください。

@@ -1,15 +1,15 @@
 ---
 title: "Kafka"
-description: "Offload Kafka topic data to RustFS with the Kafka Connect S3 sink connector."
+description: "Déchargez les données de topics Kafka vers RustFS avec le connecteur sink S3 de Kafka Connect."
 ---
 
-This guide connects [Apache Kafka](https://github.com/apache/kafka) — the distributed event streaming platform — to **RustFS** through the Kafka Connect S3 sink connector. You will run a KRaft broker and a Connect worker, deploy the S3 sink for a topic, and produce records that land as objects in a RustFS bucket. The workflow was verified with `apache/kafka:4.0.0` and `confluentinc/kafka-connect-s3` v10.5.25 against `rustfs/rustfs-x86-musl:v2.3.1`.
+Ce guide connecte [Apache Kafka](https://github.com/apache/kafka) — la plateforme distribuée de streaming d’événements — à **RustFS** via le connecteur sink S3 de Kafka Connect. Vous allez exécuter un broker KRaft et un worker Connect, déployer le sink S3 pour un topic et produire des enregistrements qui arrivent sous forme d’objets dans un compartiment (bucket) RustFS. Le flux a été validé avec `apache/kafka:4.0.0` et `confluentinc/kafka-connect-s3` v10.5.25 face à `rustfs/rustfs-x86-musl:v2.3.1`.
 
-Kafka's KIP-405 tiered storage needs a `RemoteLogStorageManager` plugin, and the S3 implementations in the ecosystem are vendor-proprietary. The Connect S3 sink is the open, self-hosted way to move topic data to S3-compatible storage and is the approach documented here.
+Le stockage hiérarchisé KIP-405 de Kafka nécessite un plugin `RemoteLogStorageManager`, et les implémentations S3 de l’écosystème sont des solutions propriétaires d’éditeurs. Le sink S3 de Connect est le moyen ouvert et auto-hébergé de déplacer les données de topic vers un stockage compatible avec S3, et c’est l’approche documentée ici.
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Vous avez besoin de Docker. Ce déploiement est destiné aux tests d’intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -18,11 +18,11 @@ flowchart LR
 	Connect -->|"batched objects"| RustFS["RustFS :9000"]
 ```
 
-The sink task consumes a topic in a dedicated consumer group and writes record batches to the bucket, one object per `flush.size` records per partition.
+La tâche du sink consomme un topic dans un groupe de consommateurs dédié et écrit les lots d’enregistrements dans le compartiment, un objet par `flush.size` enregistrements et par partition.
 
-## 1. Run the broker
+## 1. Exécuter le broker
 
-Start a KRaft broker whose advertised listener is reachable from other containers:
+Démarrez un broker KRaft dont le listener annoncé est joignable depuis les autres conteneurs :
 
 ```bash
 docker run -d --name kafka --hostname kafka --network oo-rustfs_default \
@@ -46,20 +46,20 @@ docker exec kafka /opt/kafka/bin/kafka-topics.sh \
 rc mb rustfs/kafka-demo
 ```
 
-The image defaults to advertising `localhost:9092`, which only works from inside the broker container. The `KAFKA_ADVERTISED_LISTENERS` override is what makes Connect (and any remote client) able to reach the broker.
+Par défaut, l’image annonce `localhost:9092`, ce qui ne fonctionne que depuis l’intérieur du conteneur du broker. C’est le remplacement de `KAFKA_ADVERTISED_LISTENERS` qui permet à Connect (et à tout client distant) d’atteindre le broker.
 
-## 2. Install the connector
+## 2. Installer le connecteur
 
-Download the Confluent Hub archive, which bundles the connector and its dependencies, and unpack it where the worker can see it:
+Téléchargez l’archive Confluent Hub, qui regroupe le connecteur et ses dépendances, puis décompressez-la là où le worker peut la voir :
 
 ```bash
 curl -Lo kafka-connect-s3.zip "https://hub-downloads.confluent.io/api/plugins/confluentinc/kafka-connect-s3/versions/10.5.25/confluentinc-kafka-connect-s3-10.5.25.zip"
 unzip kafka-connect-s3.zip -d /opt/kafka-conn/plugins
 ```
 
-## 3. Configure the worker and the sink
+## 3. Configurer le worker et le sink
 
-Create the worker properties. The value converter must be `ByteArrayConverter` so records are written verbatim:
+Créez les propriétés du worker. Le convertisseur de valeurs doit être `ByteArrayConverter` afin que les enregistrements soient écrits tels quels :
 
 ```ini title="worker.properties"
 bootstrap.servers=kafka:9092
@@ -70,7 +70,7 @@ offset.flush.interval.ms=5000
 plugin.path=/opt/kafka-conn-plugins
 ```
 
-Create the sink connector configuration, replacing all connection placeholders:
+Créez la configuration du connecteur sink, en remplaçant tous les espaces réservés de connexion :
 
 ```ini title="rustfs-sink.properties"
 name=rustfs-sink
@@ -87,11 +87,11 @@ format.class=io.confluent.connect.s3.format.bytearray.ByteArrayFormat
 consumer.override.auto.offset.reset=earliest
 ```
 
-Kafka 4.0 moved the class to `org.apache.kafka.connect.converters.ByteArrayConverter` — the old `storage` package path no longer resolves.
+Kafka 4.0 a déplacé la classe vers `org.apache.kafka.connect.converters.ByteArrayConverter` — l’ancien chemin du paquet `storage` ne se résout plus.
 
-## 4. Run the worker
+## 4. Exécuter le worker
 
-Run `connect-standalone` in the foreground so its logs go to `docker logs`, with the bucket credentials in the environment:
+Exécutez `connect-standalone` au premier plan pour que ses journaux aillent dans `docker logs`, avec les identifiants du compartiment dans l’environnement :
 
 ```bash
 docker run -d --name kafka-connect --hostname kafka-connect \
@@ -105,22 +105,22 @@ docker run -d --name kafka-connect --hostname kafka-connect \
   /opt/kafka/bin/connect-standalone.sh /etc/kafka/worker.properties /etc/kafka/sink.properties
 ```
 
-The worker is ready when the sink task claims the partition:
+Le worker est prêt lorsque la tâche du sink revendique la partition :
 
 ```text
 INFO [rustfs-sink|task-0] Assigned topic partitions: [rustfs-topic-0]
 ```
 
-## 5. Produce records
+## 5. Produire des enregistrements
 
-Send at least `flush.size` records so the connector completes a batch:
+Envoyez au moins `flush.size` enregistrements pour que le connecteur termine un lot :
 
 ```bash
 docker exec kafka sh -c "printf 'msg-one\nmsg-two\nmsg-three\n' | \
   /opt/kafka/bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic rustfs-topic"
 ```
 
-After a few seconds the batch becomes an object in the bucket:
+Après quelques secondes, le lot devient un objet dans le compartiment :
 
 ```bash
 rc ls rustfs/kafka-demo/ -r
@@ -135,44 +135,44 @@ msg-two
 msg-three
 ```
 
-The object name encodes topic, partition, and starting offset. Each subsequent batch of three records lands in the next object (`+0000000003.bin` and so on).
+Le nom de l’objet encode le topic, la partition et l’offset de départ. Chaque lot suivant de trois enregistrements arrive dans l’objet suivant (`+0000000003.bin` et ainsi de suite).
 
-![Kafka sink objects stored in the RustFS Console](./images/rustfs-kafka-sink.png)
+![Objets du sink Kafka stockés dans la Console RustFS](./images/rustfs-kafka-sink.png)
 
-## 6. Stop or reset
+## 6. Arrêter ou réinitialiser
 
-To tear down the demo while keeping the bucket objects:
+Pour démonter la démonstration tout en conservant les objets du compartiment :
 
 ```bash
 docker rm -f kafka-connect kafka
 ```
 
-To delete the stored data:
+Pour supprimer les données stockées :
 
 ```bash
 rc rm rustfs/kafka-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## Dépannage
 
-### `AdminClient ... Rebootstrapping with Cluster (id: null)` loops forever
+### `AdminClient ... Rebootstrapping with Cluster (id: null)` boucle indéfiniment
 
-The broker advertises `localhost:9092`, so a remote client receives metadata pointing at itself. Set `KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092` (and matching listener variables) as in step 1.
+Le broker annonce `localhost:9092`, si bien qu’un client distant reçoit des métadonnées qui pointent vers lui-même. Définissez `KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092` (et les variables de listener correspondantes) comme à l’étape 1.
 
 ### `Invalid schema type for ByteArrayConverter: STRING`
 
-The `ByteArrayFormat` writer only accepts raw bytes. Either switch the worker's `value.converter` to the ByteArray converter or choose a format class that matches the converter you use.
+Le rédacteur `ByteArrayFormat` n’accepte que des octets bruts. Basculez le `value.converter` du worker vers le convertisseur ByteArray, ou choisissez une classe de format qui correspond au convertisseur que vous utilisez.
 
 ### `Class org.apache.kafka.connect.storage.ByteArrayConverter could not be found`
 
-Kafka 4.0 moved the class to `org.apache.kafka.connect.converters.ByteArrayConverter`. Use the new package path in `worker.properties`.
+Kafka 4.0 a déplacé la classe vers `org.apache.kafka.connect.converters.ByteArrayConverter`. Utilisez le nouveau chemin de paquet dans `worker.properties`.
 
-### The connector downloads but the plugin is not found
+### Le connecteur se télécharge, mais le plugin est introuvable
 
-The plain connector JAR from Maven lacks its dependencies. Use the Confluent Hub archive from step 2, which bundles the complete `lib/` directory, and make sure `plugin.path` points at the directory that contains the connector folder.
+Le JAR nu du connecteur issu de Maven n’a pas ses dépendances. Utilisez l’archive Confluent Hub de l’étape 2, qui regroupe le répertoire `lib/` complet, et assurez-vous que `plugin.path` pointe vers le répertoire qui contient le dossier du connecteur.
 
-## Next steps
+## Étapes suivantes
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional connectors.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Kafka Connect S3 sink documentation](https://docs.confluent.io/kafka-connect-s3/current/index.html) for Parquet and Avro formats, partitioning by time, and IAM-based credential chains.
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres connecteurs.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
+- Suivez la [documentation du sink S3 de Kafka Connect](https://docs.confluent.io/kafka-connect-s3/current/index.html) pour les formats Parquet et Avro, le partitionnement par le temps et les chaînes d’identifiants fondées sur IAM.

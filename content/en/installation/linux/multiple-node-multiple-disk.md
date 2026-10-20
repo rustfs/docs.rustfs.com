@@ -1,16 +1,16 @@
 ---
 title: "RustFS Multiple Node Multiple Disk Installation"
-description: "Install RustFS on multiple servers with multiple disks, data will be stored on multiple disks across multiple servers."
+description: "Install a distributed RustFS cluster across multiple servers, each with multiple disks."
 ---
 
-Multiple Node Multiple Disk (MNMD) mode is the deployment mode for production workloads, providing enterprise-grade performance, security, and scalability. A minimum of **4 servers** is required, each with at least 1 disk, to safely start a distributed object storage cluster.
+Multiple Node Multiple Disk (MNMD) mode is the production deployment for clusters that span multiple servers. A minimum of **4 servers** is required, each with at least 1 disk, to safely start a distributed object storage cluster.
 
-## Topology and Planning
+## Topology and planning
 
 In the following architecture, requests are distributed to the servers through load balancing. With the default 12 + 4 erasure coding layout, each object is split into 12 data shards and 4 parity shards stored on different disks across different servers:
 
-- Any single server failure or maintenance does not affect data security.
-- Corruption of up to 4 disks does not affect data security.
+- The cluster stays available and loses no data if any single server fails or is taken down for maintenance.
+- The cluster can tolerate the loss of up to 4 disks without data loss.
 
 ```mermaid
 flowchart TD
@@ -29,22 +29,21 @@ flowchart TD
     class N1D1,N1D2,N1D3,N1D4,N2D1,N2D2,N2D3,N2D4,N3D1,N3D2,N3D3,N3D4,N4D1,N4D2,N4D3,N4D4 disk
 ```
 
-Before installation, review the [Pre-Installation Checklists](../requirement/checklists/index.md) and ensure all items meet production guidance.
+Before installation, review the [Pre-Installation Checklists](../requirement/checklists/index.md) and make sure that every item meets production requirements.
 
 ## Hostnames
 
-Creating a RustFS cluster requires **identical, sequential** hostnames. There are two ways to achieve sequential hostnames:
+A RustFS cluster requires hostnames that follow a consistent, sequentially numbered pattern (for example, `node1` through `node4`). There are two ways to achieve sequential hostnames:
 
 **1. DNS Configuration:**
 
-Configure your DNS resolution server to ensure name continuity.
+Create DNS records so that each sequential hostname resolves to the correct node.
 
-**2. HOSTS Configuration:**
+**2. `/etc/hosts` configuration:**
 
-Modify the local alias settings in `/etc/hosts` as follows:
+Add the following entries to `/etc/hosts` on every node:
 
-```bash title="/etc/hosts"
-vim /etc/hosts
+```text title="/etc/hosts"
 127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1 localhost localhost.localdomain localhost6 localhost6.localdomain6
 192.168.1.1 node1
@@ -53,11 +52,11 @@ vim /etc/hosts
 192.168.1.4 node4
 ```
 
-## Prerequisites and Service Setup
+## Prerequisites and service setup
 
 On **every node**, complete the [common prerequisites and service setup](./prerequisites-and-service.md) — operating system, firewall, time synchronization, disk formatting, service user, binary download, and systemd unit — then continue below. Remember that all nodes must use the same listening port and must have synchronized clocks.
 
-## Configure Environment Variables
+## Configure environment variables
 
 1. Create the same configuration file on every node. `RUSTFS_VOLUMES` uses brace expansion to enumerate all nodes and all disk mount points (this example: 4 nodes × 4 disks):
 
@@ -73,9 +72,9 @@ RUSTFS_OBS_LOGGER_LEVEL=error
 RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
 ```
 
-:::note
+:::note[Keep the cluster configuration identical]
 
-The access key, secret key, and `RUSTFS_VOLUMES` value must be identical on all nodes. The hostnames (`node1` – `node4`) must match the DNS or `/etc/hosts` configuration above.
+The access key, secret key, and `RUSTFS_VOLUMES` value must be identical on all nodes. The hostnames (`node1` through `node4`) must match the DNS or `/etc/hosts` configuration above.
 
 :::
 
@@ -86,7 +85,7 @@ sudo mkdir -p /data/rustfs{0..3} /var/log/rustfs /opt/tls
 sudo chmod -R 750 /data/rustfs* /var/log/rustfs
 ```
 
-## Start Service and Verification
+## Start and verify the service
 
 1. Start the service on every node and enable auto-start on boot:
 
@@ -112,11 +111,11 @@ netstat -ntpl
 tail -f /var/log/rustfs/rustfs*.log
 ```
 
-5. Access the console: enter any node's IP address (or the load balancer address) and the console port (default 9001) in a browser. You should see:
+5. Open the Console: in a browser, go to `http://<server-ip>:9001` (or the load balancer address). You should see:
 
 ![Console](./images/console.jpg)
 
-## Next Steps
+## Next steps
 
 - Put a load balancer in front of the cluster — see the [Nginx integration guide](/developer/integration/reverse-proxy/nginx).
 - Enable TLS for production traffic — see [TLS configuration](../../integration/tls-configured.md).

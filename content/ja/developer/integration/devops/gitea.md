@@ -1,13 +1,13 @@
 ---
 title: "Gitea"
-description: "Run Gitea with RustFS as the S3 storage backend for LFS objects and attachments, deployed with Docker Compose."
+description: "Docker Compose でデプロイし、LFS オブジェクトと添付ファイルの S3 ストレージバックエンドとして RustFS を使って Gitea を実行します。"
 ---
 
-This guide connects [Gitea](https://github.com/go-gitea/gitea) — the self-hosted Git service — to **RustFS** through Gitea's `minio` storage type. You will start Gitea with Docker Compose, create a repository, push a Git LFS object, attach a file to an issue, and verify that both the LFS object and the attachment are stored in RustFS. The workflow was verified with `gitea/gitea:1.24.4` and `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、セルフホストの Git サービスである [Gitea](https://github.com/go-gitea/gitea) を、Gitea の `minio` ストレージタイプ経由で **RustFS** に接続します。Docker Compose で Gitea を起動し、リポジトリを作成し、Git LFS オブジェクトを push し、Issue にファイルを添付して、LFS オブジェクトと添付ファイルの両方が RustFS に保存されることを確認します。この流れは `gitea/gitea:1.24.4` と `rustfs/rustfs-x86-musl:v2.3.1` で検証済みです。
 
-You need Docker with the Compose plugin and the `git` and `git-lfs` clients on your workstation. This deployment is intended for local integration testing, not production.
+Docker と Compose プラグイン、およびワークステーション上の `git` と `git-lfs` クライアントが必要です。このデプロイはローカルでの統合テストを目的としており、本番環境向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -15,27 +15,27 @@ flowchart LR
 	Gitea -->|"LFS + attachments"| RustFS["RustFS :9000"]
 ```
 
-Gitea stores the Git repository itself on its local disk, while the `minio` storage type routes large files — LFS objects, issue attachments, avatars, repository archives, packages, and Actions artifacts — to the `gitea-data` bucket in RustFS. Gitea creates the bucket on startup if it does not exist.
+Gitea は Git リポジトリ自体をローカルディスクに保持し、`minio` ストレージタイプが大きなファイル（LFS オブジェクト、Issue の添付ファイル、アバター、リポジトリアーカイブ、パッケージ、Actions のアーティファクト）を RustFS の `gitea-data` バケットへ送ります。バケットが存在しない場合、Gitea は起動時に作成します。
 
-## 1. Create the project files
+## 1. プロジェクトファイルを作成する
 
-Create a working directory:
+作業ディレクトリを作成します。
 
 ```bash
 mkdir rustfs-gitea
 cd rustfs-gitea
 ```
 
-Create an environment file and replace both credential placeholders:
+環境変数ファイルを作成し、2 つの認証情報プレースホルダーを置き換えます。
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Use dedicated credentials for the `gitea-data` bucket. Do not commit `.env` to source control.
+`gitea-data` バケットには専用の認証情報を使用してください。`.env` をバージョン管理にコミットしないでください。
 
-Create the Gitea configuration and replace both credential placeholders with the same values you set in `.env` — the global `minio` storage type applies to LFS, attachments, avatars, repository archives, packages, and Actions artifacts:
+Gitea の設定を作成し、2 つの認証情報プレースホルダーを `.env` と同じ値に置き換えます。グローバルな `minio` ストレージタイプは、LFS、添付ファイル、アバター、リポジトリアーカイブ、パッケージ、Actions のアーティファクトに適用されます。
 
 ```ini title="app.ini"
 APP_NAME = RustFS Gitea
@@ -70,9 +70,9 @@ INSTALL_LOCK = true
 SECRET_KEY = change-me-to-a-random-string
 ```
 
-`LFS_START_SERVER` enables the Git LFS HTTP API. `MINIO_ENDPOINT` uses the Compose-internal hostname `rustfs`; the endpoint is reached with path-style requests by default.
+`LFS_START_SERVER` は Git LFS の HTTP API を有効にします。`MINIO_ENDPOINT` は Compose 内部のホスト名 `rustfs` を使います。エンドポイントへはデフォルトでパススタイルのリクエストが送られます。
 
-Create the Compose file:
+Compose ファイルを作成します。
 
 ```yaml title="compose.yaml"
 services:
@@ -123,36 +123,36 @@ volumes:
   gitea-data:
 ```
 
-The volume-backed `/data` directory keeps the SQLite database and the Git repositories across container restarts, while LFS objects and attachments live in RustFS.
+ボリューム上の `/data` ディレクトリは、コンテナを再起動しても SQLite データベースと Git リポジトリを保持します。LFS オブジェクトと添付ファイルは RustFS にあります。
 
-## 2. Validate and start the deployment
+## 2. デプロイを検証して開始する
 
-Resolve the Compose file before starting containers:
+コンテナを起動する前に Compose ファイルを解決します。
 
 ```bash
 docker compose config
 ```
 
-Start the services:
+サービスを起動します。
 
 ```bash
 docker compose up -d
 docker compose ps
 ```
 
-Watch the Gitea log until every storage backend reports the Minio type:
+すべてのストレージバックエンドが Minio タイプを報告するまで、Gitea のログを確認します。
 
 ```bash
 docker compose logs gitea | grep "Initialising"
 ```
 
-The output should list `Attachment`, `Avatar`, `LFS`, and the remaining storage sections, each followed by a `Creating Minio storage at rustfs:9000:gitea-data` line.
+出力には `Attachment`、`Avatar`、`LFS`、および残りのストレージセクションが並び、それぞれに `Creating Minio storage at rustfs:9000:gitea-data` の行が続くはずです。
 
-Open `http://localhost:3000` and create the administrator account, then open the RustFS Console at `http://localhost:9001` — the `gitea-data` bucket appears after the first storage operation.
+`http://localhost:3000` を開いて管理者アカウントを作成し、続けて `http://localhost:9001` の RustFS Console（管理画面）を開きます。`gitea-data` バケットは、最初のストレージ操作のあとに現れます。
 
-## 3. Push a Git LFS object
+## 3. Git LFS オブジェクトを push する
 
-Create a repository named `rustfs-demo` in the Gitea web UI, then push an LFS-tracked file from your workstation:
+Gitea の Web UI で `rustfs-demo` というリポジトリを作成し、ワークステーションから LFS で追跡するファイルを push します。
 
 ```bash
 mkdir lfs-demo && cd lfs-demo
@@ -169,68 +169,68 @@ git remote add origin http://localhost:3000/<your-username>/rustfs-demo.git
 git push origin main
 ```
 
-`git push` uploads the LFS object through the Gitea LFS API, which writes it to RustFS. Clone the repository into a second directory and run `git lfs pull` — the downloaded `dataset.bin` must be byte-identical to the original:
+`git push` は Gitea の LFS API 経由で LFS オブジェクトをアップロードし、API がそれを RustFS に書き込みます。リポジトリを別のディレクトリに clone し、`git lfs pull` を実行します。ダウンロードした `dataset.bin` は、元のファイルとバイト単位で同一である必要があります。
 
 ```bash
 sha256sum dataset.bin
 cd ../lfs-demo-clone && git lfs pull && sha256sum dataset.bin
 ```
 
-Both checksums match because both clients read the object from RustFS.
+どちらのクライアントも RustFS からオブジェクトを読み込むため、両方のチェックサムが一致します。
 
-## 4. Attach a file to an issue
+## 4. Issue にファイルを添付する
 
-Open the `rustfs-demo` repository, create an issue, and attach a small text file through the issue form. Gitea stores the upload as `attachments/<prefix>/<uuid>` in the `gitea-data` bucket and serves downloads through `/attachments/<uuid>`.
+`rustfs-demo` リポジトリを開き、Issue を作成し、Issue フォームから小さなテキストファイルを添付します。Gitea はアップロードを `gitea-data` バケット内の `attachments/<prefix>/<uuid>` として保存し、`/attachments/<uuid>` 経由でダウンロードを提供します。
 
-## 5. Verify objects in RustFS
+## 5. RustFS 内のオブジェクトを確認する
 
-List the bucket with the [`rc` client](https://github.com/rustfs/cli):
+[`rc` クライアント](https://github.com/rustfs/cli)でバケットを一覧します。
 
 ```bash
 docker compose exec rustfs /usr/bin/rc ls local/gitea-data/ -r
 ```
 
-The output should include the LFS object under `lfs/` and the attachment under `attachments/`:
+出力には `lfs/` 配下の LFS オブジェクトと、`attachments/` 配下の添付ファイルが含まれるはずです。
 
 ```text
 attachments/9/2/92fdd48d-531c-4cba-8b3f-4e2004a10fc7
 lfs/37/76/6ddfc07e803de58a69328db9a58a07cf7080ddde55c155a7531bc650a000
 ```
 
-The LFS object key is the SHA-256 content hash used by the Git LFS protocol.
+LFS オブジェクトキーは、Git LFS プロトコルで使われる SHA-256 コンテンツハッシュです。
 
-![Gitea LFS and attachment objects in the RustFS Console](./images/rustfs-gitea-objects.png)
+![RustFS Console 内の Gitea の LFS オブジェクトと添付ファイル](./images/rustfs-gitea-objects.png)
 
-## 6. Stop or reset the deployment
+## 6. デプロイを停止またはリセットする
 
-Stop the containers while keeping all data:
+データを残したままコンテナを停止します。
 
 ```bash
 docker compose down
 ```
 
-The RustFS volume keeps the `gitea-data` bucket, so LFS objects and attachments survive a restart. To delete everything, including the objects in RustFS, add `--volumes`.
+RustFS のボリュームは `gitea-data` バケットを保持するため、LFS オブジェクトと添付ファイルは再起動後も残ります。RustFS 内のオブジェクトを含めてすべて削除するには、`--volumes` を追加します。
 
-## Troubleshooting
+## トラブルシューティング
 
-### The Gitea install page appears instead of the login page
+### ログインページではなく Gitea のインストールページが表示される
 
-The configuration file must exist at `/data/gitea/conf/app.ini` inside the container. If the mount path is wrong, Gitea starts with defaults and shows the installation wizard. Mount the file as shown in the Compose example and restart.
+設定ファイルはコンテナ内の `/data/gitea/conf/app.ini` に存在する必要があります。マウントパスが誤っていると、Gitea はデフォルト設定で起動し、インストールウィザードを表示します。Compose の例のとおりにファイルをマウントして再起動します。
 
-### Push fails with an LFS or 403 error
+### push が LFS エラーまたは 403 で失敗する
 
-Confirm the credentials in `app.ini` match the RustFS credentials and that the `rustfs` hostname resolves inside the Compose network:
+`app.ini` の認証情報が RustFS の認証情報と一致していること、および `rustfs` ホスト名が Compose ネットワーク内で解決できることを確認します。
 
 ```bash
 docker compose logs gitea | grep -i minio
 ```
 
-### Objects land in local storage instead of RustFS
+### オブジェクトが RustFS ではなくローカルストレージに入る
 
-The `GITEA__storage__STORAGE_TYPE: minio` environment variable and the `[storage]` section of `app.ini` must agree. After changing either, restart Gitea and check the `Initialising` log lines again.
+環境変数 `GITEA__storage__STORAGE_TYPE: minio` と `app.ini` の `[storage]` セクションは一致している必要があります。どちらかを変更したら Gitea を再起動し、`Initialising` のログ行を再度確認します。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Gitea storage targets.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Gitea storage documentation](https://docs.gitea.com/administration/storage-configurations) to move packages, Actions artifacts, or individual storage sections to separate buckets.
+- 追加の Gitea ストレージターゲットを採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認してください。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
+- [Gitea のストレージドキュメント](https://docs.gitea.com/administration/storage-configurations)に従い、パッケージ、Actions のアーティファクト、または個別のストレージセクションを別々のバケットへ移してください。

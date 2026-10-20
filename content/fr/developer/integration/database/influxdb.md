@@ -1,13 +1,13 @@
 ---
 title: "InfluxDB"
-description: "Exécutez InfluxDB 3 Core avec RustFS comme magasin d'objets S3, déployé avec Docker Compose."
+description: "Exécutez InfluxDB 3 Core avec RustFS comme magasin d’objets S3, déployé avec Docker Compose."
 ---
 
-Ce guide exécute [InfluxDB](https://github.com/influxdata/influxdb) — plus précisément **InfluxDB 3 Core**, la base de données temporelle écrite en Rust avec un moteur de stockage Parquet — avec **RustFS** comme magasin d'objets. Vous allez démarrer InfluxDB avec Docker Compose, écrire du line protocol via l'API HTTP, l'interroger en SQL, vérifier les objets persistés dans RustFS et confirmer que les données survivent à un redémarrage d'InfluxDB. Le flux a été validé avec `influxdb:3-core` (v3.11.5) et `rustfs/rustfs-x86-musl:v2.3.1`.
+Ce guide exécute [InfluxDB](https://github.com/influxdata/influxdb) — plus précisément **InfluxDB 3 Core**, la base de données temporelle écrite en Rust avec un moteur de stockage Parquet — avec **RustFS** comme magasin d’objets. Vous allez démarrer InfluxDB avec Docker Compose, écrire du line protocol via l’API HTTP, l’interroger en SQL, vérifier les objets persistés dans RustFS et confirmer que les données survivent à un redémarrage d’InfluxDB. Le flux a été validé avec `influxdb:3-core` (v3.11.5) et `rustfs/rustfs-x86-musl:v2.3.1`.
 
-Vous avez besoin de Docker avec le plugin Compose. Ce déploiement est destiné aux tests d'intégration locaux, pas à la production.
+Vous avez besoin de Docker avec le plugin Compose. Ce déploiement est destiné aux tests d’intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -16,27 +16,27 @@ flowchart LR
 	Init["init-bucket job"] -->|"create my-bucket"| RustFS
 ```
 
-InfluxDB 3 Core conserve son catalogue, son journal d'écriture anticipée (WAL) et ses fichiers de données Parquet dans le magasin d'objets configuré. Les écritures arrivent d'abord dans le WAL et sont persistées vers RustFS, de sorte que chaque écriture survit à un redémarrage avant même que la compaction ne produise des fichiers Parquet. Le serveur utilise par défaut un adressage path-style vers le point de terminaison configuré.
+InfluxDB 3 Core conserve son catalogue, son journal d’écriture anticipée (WAL) et ses fichiers de données Parquet dans le magasin d’objets configuré. Les écritures arrivent d’abord dans le WAL et sont persistées vers RustFS, de sorte que chaque écriture survit à un redémarrage avant même que la compaction ne produise des fichiers Parquet. Le serveur utilise par défaut un adressage de type chemin (path-style) vers le point de terminaison configuré.
 
 ## 1. Créer les fichiers du projet
 
-Créez un répertoire de travail :
+Créez un répertoire de travail :
 
 ```bash
 mkdir rustfs-influxdb
 cd rustfs-influxdb
 ```
 
-Créez un fichier d'environnement et remplacez les deux espaces réservés d'identifiants :
+Créez un fichier d’environnement et remplacez les deux valeurs d’identifiants indicatives :
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Utilisez des identifiants dédiés pour le bucket. Ne commettez pas `.env` dans le contrôle de version.
+Utilisez des identifiants dédiés pour le compartiment. N’ajoutez pas le fichier `.env` au dépôt (ne le versionnez pas).
 
-Créez le fichier Compose :
+Créez le fichier Compose :
 
 ```yaml title="compose.yaml"
 services:
@@ -115,26 +115,26 @@ volumes:
   rustfs-data:
 ```
 
-`--object-store s3` avec `--aws-endpoint` route toutes les écritures de catalogue, de WAL et de Parquet vers RustFS. InfluxDB utilise par défaut un adressage path-style vers le point de terminaison, et `--aws-allow-http` autorise HTTP simple à l'intérieur du réseau Compose.
+`--object-store s3` avec `--aws-endpoint` route toutes les écritures de catalogue, de WAL et de Parquet vers RustFS. InfluxDB utilise par défaut un adressage de type chemin (path-style) vers le point de terminaison, et `--aws-allow-http` autorise HTTP non chiffré à l’intérieur du réseau Compose.
 
 ## 2. Démarrer le déploiement
 
-Vérifiez le fichier Compose avant de démarrer les conteneurs :
+Vérifiez le fichier Compose avant de démarrer les conteneurs :
 
 ```bash
 docker compose config
 ```
 
-Démarrez les services et attendez la fin de l'initialisation du bucket :
+Démarrez les services et attendez la fin de l’initialisation du compartiment :
 
 ```bash
 docker compose up -d
 docker compose ps -a
 ```
 
-## 3. Créer le token d'administration
+## 3. Créer le token d’administration
 
-InfluxDB 3 Core protège chaque requête API avec un token porteur. Créez le token d'administration une fois après le premier démarrage et conservez la valeur affichée :
+InfluxDB 3 Core protège chaque requête API avec un token porteur. Créez le token d’administration une fois après le premier démarrage et conservez la valeur affichée :
 
 ```bash
 docker compose exec influxdb3 influxdb3 create token --admin
@@ -146,13 +146,13 @@ Token: <your-admin-token>
 
 :::note[Création du token]
 
-La valeur du token n'est affichée qu'une seule fois et ne peut pas être récupérée ultérieurement. Si le nom du token existe déjà (HTTP 409), le nœud possède des métadonnées — repartez d'un préfixe de bucket neuf ou supprimez le préfixe du nœud dans le bucket avant de réessayer.
+La valeur du token n’est affichée qu’une seule fois et ne peut pas être récupérée ultérieurement. Si le nom du token existe déjà (HTTP 409), le nœud possède des métadonnées — repartez d’un préfixe de compartiment neuf ou supprimez le préfixe du nœud dans le compartiment avant de réessayer.
 
 :::
 
 ## 4. Écrire du line protocol
 
-Envoyez un lot de mesures CPU en line protocol vers la base `rustfs_demo` :
+Envoyez un lot de mesures CPU en line protocol vers la base `rustfs_demo` :
 
 ```bash
 python3 - <<'PY'
@@ -182,7 +182,7 @@ write: 204
 
 ## 5. Interroger en SQL
 
-Interrogez la mesure via l'API SQL :
+Interrogez la mesure via l’API SQL :
 
 ```bash
 curl -sG "http://localhost:8181/api/v3/query_sql" \
@@ -198,14 +198,14 @@ curl -sG "http://localhost:8181/api/v3/query_sql" \
 
 ## 6. Vérifier les objets dans RustFS
 
-Listez le préfixe du nœud via l'image d'initialisation du bucket :
+Listez le préfixe du nœud via l’image d’initialisation du compartiment :
 
 ```bash
 docker compose run --rm --entrypoint /bin/sh create-bucket -c \
   '/usr/bin/rc alias set rustfs http://rustfs:9000 "$RUSTFS_ACCESS_KEY" "$RUSTFS_SECRET_KEY" >/dev/null && /usr/bin/rc ls rustfs/my-bucket/influxdb-demo --recursive'
 ```
 
-Le catalogue, le WAL et ensuite les fichiers de données Parquet résident sous le préfixe identifiant le nœud :
+Le catalogue, le WAL et ensuite les fichiers de données Parquet résident sous le préfixe identifiant le nœud :
 
 ```text
 [2026-09-20 23:18:28]      105 B influxdb-demo/catalog/v3/snapshot
@@ -213,13 +213,13 @@ Le catalogue, le WAL et ensuite les fichiers de données Parquet résident sous 
 [2026-09-20 23:20:19]       31 B influxdb-demo/table-index-conversion-completed
 ```
 
-Vous pouvez également parcourir le préfixe dans la console RustFS :
+Vous pouvez également parcourir le préfixe dans la Console RustFS :
 
-![Le préfixe du nœud InfluxDB stocké dans la console RustFS](./images/rustfs-influxdb-objects.png)
+![Le préfixe du nœud InfluxDB stocké dans la Console RustFS](./images/rustfs-influxdb-objects.png)
 
 ## 7. Confirmer la persistance après un redémarrage
 
-Redémarrez InfluxDB et répétez la requête SQL :
+Redémarrez InfluxDB et répétez la requête SQL :
 
 ```bash
 docker compose restart influxdb
@@ -234,17 +234,17 @@ curl -sG "http://localhost:8181/api/v3/query_sql" \
 [{"cnt":30}]
 ```
 
-Le compteur est inchangé car le catalogue et le WAL ont été rejoués depuis RustFS — le magasin d'objets est la couche de persistance, exactement comme dans les topologies de production.
+Le compteur est inchangé car le catalogue et le WAL ont été rejoués depuis RustFS — le magasin d’objets est la couche de persistance, exactement comme dans les topologies de production.
 
 ## 8. Arrêter ou réinitialiser la pile
 
-Arrêtez les conteneurs en conservant le volume de données RustFS :
+Arrêtez les conteneurs en conservant le volume de données RustFS :
 
 ```bash
 docker compose down
 ```
 
-Pour supprimer les données stockées et repartir d'un volume RustFS vide, ajoutez explicitement `--volumes` :
+Pour supprimer les données stockées et repartir d’un volume RustFS vide, ajoutez explicitement `--volumes` :
 
 ```bash
 docker compose down --volumes
@@ -252,17 +252,17 @@ docker compose down --volumes
 
 ## Dépannage
 
-### "the request was not authenticated" sur chaque requête
+### « the request was not authenticated » sur chaque requête
 
-InfluxDB 3 Core exige le token porteur d'administration sur les requêtes API. Créez-le une fois avec `influxdb3 create token --admin` et envoyez-le sous la forme `Authorization: Bearer <token>`.
+InfluxDB 3 Core exige le token porteur d’administration sur les requêtes API. Créez-le une fois avec `influxdb3 create token --admin` et envoyez-le sous la forme `Authorization: Bearer <token>`.
 
-### "token name already exists" lors de la création du token d'administration
+### « token name already exists » lors de la création du token d’administration
 
-Le nœud possède déjà un token d'administration, et la valeur ne peut pas être récupérée. Supprimez le préfixe du nœud dans le bucket (par exemple `influxdb-demo/`) pendant que le conteneur est arrêté, redémarrez-le, puis créez un nouveau token.
+Le nœud possède déjà un token d’administration, et la valeur ne peut pas être récupérée. Supprimez le préfixe du nœud dans le compartiment (par exemple `influxdb-demo/`) pendant que le conteneur est arrêté, redémarrez-le, puis créez un nouveau token.
 
 ### Réponses AccessDenied ou 403
 
-Vérifiez que les identifiants du fichier Compose correspondent aux identifiants RustFS et que la tâche `create-bucket` s'est terminée avec succès :
+Vérifiez que les identifiants du fichier Compose correspondent aux identifiants RustFS et que la tâche `create-bucket` s’est terminée avec succès :
 
 ```bash
 docker compose logs create-bucket
@@ -270,10 +270,10 @@ docker compose logs create-bucket
 
 ### Erreurs de connexion ou de certificat
 
-`--aws-endpoint` prend une URL complète ; `--aws-allow-http` autorise HTTP simple pour le point de terminaison du réseau de conteneurs. À l'intérieur du réseau Compose, utilisez `http://rustfs:9000` ; depuis l'hôte, `http://localhost:9000`.
+`--aws-endpoint` prend une URL complète ; `--aws-allow-http` autorise HTTP non chiffré pour le point de terminaison du réseau de conteneurs. À l’intérieur du réseau Compose, utilisez `http://rustfs:9000` ; depuis l’hôte, `http://localhost:9000`.
 
-## Prochaines étapes
+## Étapes suivantes
 
-- Consultez les [notes de compatibilité S3](/administration/protocols/s3) avant d'adopter d'autres opérations S3.
-- Créez des identifiants de production dédiés avec la [gestion des clés d'accès](/security-compliance/iam/access-token).
-- Suivez la [documentation InfluxDB 3 Core](https://docs.influxdata.com/influxdb3/core/) pour connecter telegraf ou les API d'écriture comme producteurs de données.
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres opérations S3.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
+- Suivez la [documentation InfluxDB 3 Core](https://docs.influxdata.com/influxdb3/core/) pour connecter telegraf ou les API d’écriture comme producteurs de données.

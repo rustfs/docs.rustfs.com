@@ -1,13 +1,13 @@
 ---
 title: "LanceDB"
-description: "Store and query LanceDB vector tables directly on RustFS."
+description: "LanceDB のベクトルテーブルを RustFS 上に直接保存し、クエリします。"
 ---
 
-This guide connects [LanceDB](https://github.com/lancedb/lancedb) — the open-source vector database built on the Lance columnar format — to **RustFS** as its storage backend. You will create a vector table directly at an `s3://` location, add rows, run a vector search, and confirm the Lance table files in the bucket. The workflow was verified with the `lancedb` Python package against `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、Lance カラムナ形式で構築されたオープンソースのベクトルデータベースである [LanceDB](https://github.com/lancedb/lancedb) を、ストレージのバックエンドとして **RustFS** に接続します。`s3://` ロケーションにベクトルテーブルを直接作成し、行を追加してベクトル検索を実行し、バケット内の Lance テーブルファイルを確認します。この流れは `lancedb` Python パッケージと `rustfs/rustfs-x86-musl:v2.3.1` で検証済みです。
 
-You need Python 3.9 or newer. This deployment is intended for local integration testing, not production.
+Python 3.9 以降が必要です。このデプロイはローカルでの統合テストを目的としており、本番環境向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -15,17 +15,17 @@ flowchart LR
 	LanceDB -->|"Lance fragments + manifests"| RustFS["RustFS :9000"]
 ```
 
-LanceDB is embedded: there is no server to run. The Python (or Rust, or JavaScript) client talks to the bucket directly, storing each table as a `*.lance` directory with data fragments, version manifests, and transaction logs.
+LanceDB は組み込みです。起動するサーバーはありません。Python（または Rust、JavaScript）クライアントがバケットと直接通信し、各テーブルをデータフラグメント、バージョンマニフェスト、トランザクションログを持つ `*.lance` ディレクトリとして保存します。
 
-## 1. Install the client
+## 1. クライアントをインストールする
 
 ```bash
 pip install lancedb
 ```
 
-## 2. Create a table on RustFS
+## 2. RustFS 上にテーブルを作成する
 
-Connect straight to the bucket and create a table, replacing all connection placeholders. The `storage_options` keys follow Lance's object-store conventions; custom endpoints use path-style addressing:
+バケットへ直接接続してテーブルを作成します。接続用のプレースホルダーはすべて置き換えます。`storage_options` のキーは Lance の object-store の規約に従います。カスタムエンドポイントではパススタイルアクセスを使います。
 
 ```python title="lance_s3.py"
 import lancedb
@@ -54,9 +54,9 @@ created: 5 rows
 after add: 6 rows
 ```
 
-The table URI uses the `s3://bucket/prefix` form; every write and read goes to RustFS over its S3 API.
+テーブル URI は `s3://bucket/prefix` 形式です。すべての書き込みと読み取りは S3 API 経由で RustFS へ向かいます。
 
-## 3. Run a vector search
+## 3. ベクトル検索を実行する
 
 ```python title="lance_search.py"
 import lancedb
@@ -74,17 +74,17 @@ top3: [(99, 'query-target'), (4, 'row-4'), (3, 'row-3')]
 version: 2
 ```
 
-The nearest neighbor is the row added in the previous step, and the version counter reflects the two commits (create and add).
+最近傍は前の手順で追加した行であり、バージョンカウンタは 2 つのコミット（作成と追加）を反映します。
 
-## 4. Verify objects in RustFS
+## 4. RustFS 内のオブジェクトを確認する
 
-List the table prefix:
+テーブルのプレフィックスを一覧します。
 
 ```bash
 rc ls rustfs/<your-bucket>/ -r
 ```
 
-Each table is a `.lance` directory holding data fragments, version manifests, and transaction records:
+各テーブルは、データフラグメント、バージョンマニフェスト、トランザクションレコードを持つ `.lance` ディレクトリです。
 
 ```text
 tables/events.lance/_transactions/0-b93cf795-fc3d-4bc9-88c8-e37baeefdd46.txn
@@ -92,34 +92,34 @@ tables/events.lance/_versions/18446744073709551613.manifest
 tables/events.lance/data/101101011110110010000100e7a149411b847dbad6ebc7d47e.lance
 ```
 
-Multiple tables share the bucket under the `tables/` prefix, so one bucket can back an entire LanceDB workspace.
+複数のテーブルは `tables/` プレフィックス配下でバケットを共有するため、1 つのバケットで LanceDB ワークスペース全体を支えられます。
 
-![LanceDB table files stored in the RustFS Console](./images/rustfs-lancedb-table.png)
+![RustFS Console に保存された LanceDB のテーブルファイル](./images/rustfs-lancedb-table.png)
 
-## 5. Stop or reset
+## 5. 停止またはリセットする
 
-LanceDB holds no server state. To delete the table:
+LanceDB はサーバー状態を持ちません。テーブルを削除します。
 
 ```bash
 rc rm rustfs/<your-bucket>/tables/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### Connection or signature errors on first use
+### 初回利用時の接続エラーまたは署名エラー
 
-Confirm `endpoint` includes the scheme, `allow_http` is `"true"` for plain-HTTP endpoints, and the bucket exists. The `region` value is required by the S3 signer even though RustFS ignores it.
+`endpoint` にスキームが含まれること、平文 HTTP のエンドポイントでは `allow_http` が `"true"` であること、バケットが存在することを確認します。`region` の値は、RustFS が無視しても S3 署名に必須です。
 
-### `Table not found` after creating it
+### 作成後に `Table not found` が出る
 
-LanceDB lists the bucket prefix to discover tables. A stale client cache or a wrong `tables/` prefix in the URI makes new tables invisible; reconnect with the same URI used at creation time.
+LanceDB はバケットのプレフィックスを一覧してテーブルを検出します。クライアントキャッシュが古い場合や、URI の `tables/` プレフィックスが誤っている場合、新しいテーブルは見えません。作成時と同じ URI で再接続します。
 
-### Slow bulk loads over the network
+### ネットワーク越しの一括ロードが遅い
 
-Lance writes one fragment per commit. For large imports, batch rows into fewer `table.add` calls — each call produces a new data file in the bucket.
+Lance はコミットごとに 1 つのフラグメントを書き込みます。大規模な取り込みでは、行をまとめて `table.add` の呼び出し回数を減らします。呼び出しのたびにバケットへ新しいデータファイルが作られます。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional LanceDB storage options.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [LanceDB documentation](https://lancedb.github.io/lancedb/) for ANN indexes, hybrid search, and multi-tenant bucket layouts on top of the same backend.
+- 追加の LanceDB ストレージオプションを採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認します。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- 同じバックエンド上で ANN インデックス、ハイブリッド検索、マルチテナントのバケットレイアウトを使うには、[LanceDB ドキュメント](https://lancedb.github.io/lancedb/)に従います。

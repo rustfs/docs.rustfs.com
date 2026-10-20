@@ -1,14 +1,14 @@
 ---
-title: RustFS Open Source License
-description: RustFS is released under the Apache 2.0 license.
+title: Open-Source-Lizenz von RustFS
+description: RustFS wird unter der Apache-2.0-Lizenz veröffentlicht.
 ---
 
-## Open Source License
+## Open-Source-Lizenz
 
-- RustFS is released under the Apache 2.0 license.
+- RustFS wird unter der Apache-2.0-Lizenz veröffentlicht.
 - [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0)
 
-## License Terms
+## Lizenzbedingungen
 
 _Version 2.0, January 2004_
 http://www.apache.org/licenses/

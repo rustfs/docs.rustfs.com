@@ -16,6 +16,8 @@ description: "Installieren Sie RustFS unter Linux, in Containern, auf Kubernetes
     </a>
   </div>
 
+  <h2 className="rustfs-install-heading">Selbst betreiben</h2>
+
   <div className="rustfs-install-grid">
     <a className="rustfs-install-card" href="/de/installation/linux/quick-start">
       <span className="rustfs-install-icon rustfs-install-icon--linux"><BrandLogo name="linux" /></span>
@@ -30,7 +32,7 @@ description: "Installieren Sie RustFS unter Linux, in Containern, auf Kubernetes
       <span className="rustfs-install-icon rustfs-install-icon--docker"><BrandLogo name="docker" /></span>
       <span className="rustfs-install-copy">
         <strong>Mit Docker installieren</strong>
-        <span>Führen Sie RustFS zur lokalen Evaluierung oder für verwaltete Bereitstellungen als Container aus.</span>
+        <span>Führen Sie RustFS als Container aus — zur lokalen Evaluierung oder für verwaltete Bereitstellungen.</span>
       </span>
       <ArrowRight className="rustfs-install-arrow" aria-hidden="true" />
     </a>
@@ -39,7 +41,7 @@ description: "Installieren Sie RustFS unter Linux, in Containern, auf Kubernetes
       <span className="rustfs-install-icon rustfs-install-icon--podman"><BrandLogo name="podman" /></span>
       <span className="rustfs-install-copy">
         <strong>Mit Podman installieren</strong>
-        <span>Stellen Sie mit Podman einen RustFS-Container ohne Root-Rechte oder Daemon bereit.</span>
+        <span>Stellen Sie mit Podman einen RustFS-Container ohne Root-Rechte und ohne Daemon bereit.</span>
       </span>
       <ArrowRight className="rustfs-install-arrow" aria-hidden="true" />
     </a>
@@ -57,7 +59,7 @@ description: "Installieren Sie RustFS unter Linux, in Containern, auf Kubernetes
       <span className="rustfs-install-icon rustfs-install-icon--kubernetes"><BrandLogo name="kubernetes" /></span>
       <span className="rustfs-install-copy">
         <strong>Mit dem Operator installieren</strong>
-        <span>Verwalten Sie Kubernetes-native RustFS-Tenants, Speicherpools und Lebenszyklusvorgänge.</span>
+        <span>Verwalten Sie Kubernetes-native RustFS-Tenants, Speicherpools und Lebenszyklusoperationen.</span>
       </span>
       <ArrowRight className="rustfs-install-arrow" aria-hidden="true" />
     </a>
@@ -75,7 +77,7 @@ description: "Installieren Sie RustFS unter Linux, in Containern, auf Kubernetes
       <span className="rustfs-install-icon rustfs-install-icon--windows"><BrandLogo name="windows" /></span>
       <span className="rustfs-install-copy">
         <strong>Unter Windows installieren</strong>
-        <span>Installieren und betreiben Sie RustFS in einer unterstützten Windows-Umgebung.</span>
+        <span>Führen Sie RustFS unter Windows ausschließlich zur lokalen Entwicklung und zum Debugging aus.</span>
       </span>
       <ArrowRight className="rustfs-install-arrow" aria-hidden="true" />
     </a>
@@ -87,6 +89,38 @@ description: "Installieren Sie RustFS unter Linux, in Containern, auf Kubernetes
         <span>Stellen Sie RustFS mit dem rustfs-Chart von SwarmCLI auf einem einzelnen Knoten oder verteilt in Docker Swarm bereit.</span>
       </span>
       <ArrowRight className="rustfs-install-arrow" aria-hidden="true" />
+    </a>
+  </div>
+
+  <h2 className="rustfs-install-heading">Cloud-Anbieter</h2>
+
+  <div className="rustfs-install-grid">
+    <a
+      className="rustfs-install-card rustfs-install-card--external"
+      href="https://sealos.io/products/app-store/rustfs"
+      target="_blank"
+      rel="noreferrer"
+    >
+      <span className="rustfs-install-icon rustfs-install-icon--sealos"><BrandLogo name="sealos" /></span>
+      <span className="rustfs-install-copy">
+        <strong>Auf Sealos bereitstellen</strong>
+        <span>RustFS mit einem Klick aus dem Sealos App Store bereitstellen, inklusive verwaltetem HTTPS und persistentem Speicher.</span>
+      </span>
+      <ArrowUpRight className="rustfs-install-arrow" aria-hidden="true" />
+    </a>
+
+    <a
+      className="rustfs-install-card rustfs-install-card--external"
+      href="https://elest.io/open-source/rustfs"
+      target="_blank"
+      rel="noreferrer"
+    >
+      <span className="rustfs-install-icon rustfs-install-icon--elestio"><BrandLogo name="elestio" /></span>
+      <span className="rustfs-install-copy">
+        <strong>Auf Elestio bereitstellen</strong>
+        <span>Vollständig verwaltetes RustFS auf dedizierten VMs mit automatischen Backups, SSL und Monitoring.</span>
+      </span>
+      <ArrowUpRight className="rustfs-install-arrow" aria-hidden="true" />
     </a>
   </div>
 </div>

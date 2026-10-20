@@ -1,21 +1,21 @@
 ---
-title: "Lifecycle Management"
-description: "Configure, inspect, and maintain RustFS object lifecycle rules with the rc command-line client."
+title: "ライフサイクル管理"
+description: "rc コマンドラインクライアントを使い、RustFS のオブジェクトライフサイクルルールを設定、確認、維持します。"
 ---
 
-RustFS lifecycle management applies expiration and transition rules to objects in a bucket. This page shows how to manage those rules with `rc`, verify a transition, and restore a temporary local copy of transitioned data.
+RustFS のライフサイクル管理は、バケット内のオブジェクトに有効期限と移行のルールを適用します。このページでは、`rc` でそれらのルールを管理し、移行を確認し、移行済みデータの一時的なローカルコピーを復元する方法を示します。
 
-Before you begin, [install `rc`](/operations/rc), configure an alias named `local`, and create `my-bucket`. To transition objects, first register the target in [Tiered Storage](/administration/data/tiered-storage) and note its uppercase tier name.
+始める前に、[`rc` をインストール](/ja/operations/rc)し、`local` という名前のエイリアスを設定し、`my-bucket` を作成します。オブジェクトを移行するには、先に [階層化ストレージ](/ja/administration/data/tiered-storage) でターゲットを登録し、大文字の階層名を控えます。
 
-:::note[Asynchronous evaluation]
+:::note[非同期の評価]
 
-Lifecycle rules do not process every eligible object immediately. The [Object Scanner](/administration/data/object/scanner) evaluates lifecycle work in the background.
+ライフサイクルルールは、対象となるすべてのオブジェクトを直ちに処理するわけではありません。[オブジェクトスキャナー](/ja/administration/data/object/scanner) が、バックグラウンドでライフサイクル処理を評価します。
 
 :::
 
-## Add an expiration rule
+## 有効期限のルールを追加する
 
-Expire objects under the `logs/` prefix 30 days after creation:
+作成から 30 日後に、`logs/` プレフィックス配下のオブジェクトを期限切れにします。
 
 ```bash
 rc bucket lifecycle rule add local/my-bucket \
@@ -23,11 +23,11 @@ rc bucket lifecycle rule add local/my-bucket \
 	--expiry-days 30
 ```
 
-The command creates an enabled rule and returns its generated rule ID. Record that ID when you need to edit or remove this specific rule.
+このコマンドは、有効なルールを作成し、生成されたルール ID を返します。このルールを編集または削除する必要がある場合は、その ID を記録します。
 
-## Add a transition rule
+## 移行ルールを追加する
 
-Move object data to the registered `COLDTIER` tier after 90 days:
+90 日後に、オブジェクトデータを登録済みの `COLDTIER` 階層へ移します。
 
 ```bash
 rc bucket lifecycle rule add local/my-bucket \
@@ -35,9 +35,9 @@ rc bucket lifecycle rule add local/my-bucket \
 	--storage-class COLDTIER
 ```
 
-`--storage-class` must match a registered tier name. Adding the rule does not create the tier or validate an AWS storage-class label as a RustFS tier.
+`--storage-class` は、登録済みの階層名と一致する必要があります。ルールを追加しても階層は作成されず、AWS のストレージクラス名が RustFS の階層として有効かどうかも検証されません。
 
-You can combine expiration and transition options in one rule. Use the noncurrent-version options only for a versioned bucket:
+有効期限と移行のオプションは、1 つのルールに組み合わせられます。非現行バージョンのオプションは、バージョニングを有効にしたバケットにだけ使います。
 
 ```bash
 rc bucket lifecycle rule add local/my-bucket \
@@ -46,15 +46,15 @@ rc bucket lifecycle rule add local/my-bucket \
 	--noncurrent-expiry-days 365
 ```
 
-## Inspect and update rules
+## ルールの確認と更新
 
-List the current rules and note the ID of the rule you want to change:
+現在のルールを一覧し、変更するルールの ID を控えます。
 
 ```bash
 rc bucket lifecycle rule list local/my-bucket
 ```
 
-Change a rule's expiration period or disable it without deleting it:
+ルールを削除せずに、有効期限を変更するか、ルールを無効にします。
 
 ```bash
 rc bucket lifecycle rule edit local/my-bucket \
@@ -65,30 +65,30 @@ rc bucket lifecycle rule edit local/my-bucket \
 	--disable true
 ```
 
-Remove one rule by ID. Use `--all` only when you intend to remove the bucket's complete lifecycle configuration:
+ID を指定して、1 つのルールを削除します。バケットのライフサイクル設定全体を削除する意図がある場合にだけ、`--all` を使います。
 
 ```bash
 rc bucket lifecycle rule remove local/my-bucket --id <rule-id>
 rc bucket lifecycle rule remove local/my-bucket --all
 ```
 
-## Export and import rules
+## ルールのエクスポートとインポート
 
-Export the bucket's lifecycle configuration before a bulk change:
+一括変更の前に、バケットのライフサイクル設定をエクスポートします。
 
 ```bash
 rc bucket lifecycle rule export local/my-bucket > lifecycle.json
 ```
 
-Importing a file replaces the lifecycle configuration sent to the bucket. Review the JSON before applying it:
+ファイルをインポートすると、バケットへ送信するライフサイクル設定が置き換わります。適用する前に JSON を確認します。
 
 ```bash
 rc bucket lifecycle rule import local/my-bucket lifecycle.json
 ```
 
-## Confirm a lifecycle transition
+## ライフサイクル移行を確認する
 
-After an object becomes eligible under its lifecycle rule, inspect it on the source cluster:
+オブジェクトがライフサイクルルールの対象になったあと、ソースクラスター上でそのオブジェクトを調べます。
 
 ```bash
 aws s3api head-object \
@@ -97,7 +97,7 @@ aws s3api head-object \
 	--endpoint-url http://localhost:9000
 ```
 
-After the transition completes, the response reports the registered tier name as the storage class:
+移行が完了すると、応答は登録済みの階層名をストレージクラスとして報告します。
 
 ```json
 {
@@ -105,9 +105,9 @@ After the transition completes, the response reports the registered tier name as
 }
 ```
 
-The response can contain additional object metadata. Before the transition completes, `StorageClass` may be absent or may not yet report `COLDTIER`.
+応答には、追加のオブジェクトメタデータが含まれることがあります。移行が完了する前は、`StorageClass` が存在しないことや、まだ `COLDTIER` を報告しないことがあります。
 
-Read the object through the source RustFS endpoint as usual:
+通常どおり、ソースの RustFS エンドポイントを通してオブジェクトを読み取ります。
 
 ```bash
 aws s3 cp \
@@ -116,23 +116,23 @@ aws s3 cp \
 	--endpoint-url http://localhost:9000
 ```
 
-RustFS reads transitioned data through the source bucket and object key. Applications do not need to address the target bucket directly.
+RustFS は、ソースのバケットとオブジェクトキーを通して、移行済みのデータを読み取ります。アプリケーションが、ターゲットバケットを直接指定する必要はありません。
 
-## Restore a local copy
+## ローカルコピーを復元する
 
-Request a temporary local copy of a transitioned object and retain it for seven days:
+移行済みオブジェクトの一時的なローカルコピーを要求し、7 日間保持します。
 
 ```bash
 rc bucket lifecycle restore local/my-bucket/hello.txt --days 7
 ```
 
-While the copy-back is running, `HEAD` reports `x-amz-restore: ongoing-request="true"`. After completion, it reports `ongoing-request="false"` with an expiry date. A second restore submitted while one is running returns `RestoreAlreadyInProgress`.
+ローカルへの書き戻しの実行中、`HEAD` は `x-amz-restore: ongoing-request="true"` を報告します。完了後は、`ongoing-request="false"` と有効期限を報告します。実行中にもう一度復元を要求すると、`RestoreAlreadyInProgress` が返されます。
 
-When the restore period expires, RustFS removes the local restored copy and its restore metadata. The transitioned object remains available from the remote tier.
+復元期間が終了すると、RustFS は復元されたローカルコピーと、その復元メタデータを削除します。移行済みオブジェクトは、リモート階層から引き続き利用できます。
 
-## Command compatibility
+## コマンドの互換性
 
-The latest `rc` also accepts `rc ilm` as a compatibility alias. We recommend the noun-first `rc bucket lifecycle` form for new commands and scripts:
+最新の `rc` は、互換性のためのエイリアスとして `rc ilm` も受け付けます。新しいコマンドとスクリプトでは、名詞を先頭にした `rc bucket lifecycle` 形式を推奨します。
 
 ```bash
 rc bucket lifecycle --help
@@ -140,6 +140,6 @@ rc bucket lifecycle rule --help
 rc bucket lifecycle tier --help
 ```
 
-## Next steps
+## 次のステップ
 
-Review [Tiered Storage](/administration/data/tiered-storage) to monitor or maintain remote tiers, and use [object creation](/administration/data/object/creation) to create test objects for a lifecycle rule.
+リモート階層の監視と保守は [階層化ストレージ](/ja/administration/data/tiered-storage) を参照します。ライフサイクルルールのテスト用オブジェクトを作るには、[オブジェクトの作成](/ja/administration/data/object/creation) を使います。

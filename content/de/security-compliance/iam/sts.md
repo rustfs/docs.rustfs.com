@@ -1,34 +1,34 @@
 ---
-title: "Service Accounts and STS"
-description: "RustFS service accounts (derived access keys) and temporary credentials via the STS AssumeRole API."
+title: "Dienstkonten und STS"
+description: "Dienstkonten in RustFS (abgeleitete Zugriffsschlüssel) und temporäre Zugangsdaten über die STS-API AssumeRole."
 ---
 
-RustFS provides two mechanisms for issuing credentials that are derived from an existing identity: **service accounts** (long-lived access keys owned by a parent user) and **STS temporary credentials** (short-lived keys with a session token).
+RustFS bietet zwei Mechanismen, um Zugangsdaten auszustellen, die von einer vorhandenen Identität abgeleitet sind: **Dienstkonten** (langlebige Zugriffsschlüssel eines übergeordneten Benutzers) und **temporäre STS-Zugangsdaten** (kurzlebige Schlüssel mit einem Sitzungstoken).
 
-## Service Accounts
+## Dienstkonten
 
-A service account is an access key/secret key pair that belongs to a parent IAM user (or to the root account). It authenticates like a normal key but is authorized as its parent:
+Ein Dienstkonto ist ein Paar aus Zugriffsschlüssel und geheimem Zugriffsschlüssel, das einem übergeordneten IAM-Benutzer gehört (oder dem Root-Konto). Es authentifiziert sich wie ein normaler Schlüssel, wird aber als sein übergeordnetes Konto autorisiert:
 
-- **Inherited policy (default).** If the service account is created without a policy, it inherits whatever the parent user's combined policies allow at request time.
-- **Session-bound policy.** If a policy document is supplied at creation, it is embedded into the service account. Requests must then be allowed by *both* the parent's policies and the embedded policy.
-- **Expiration.** An optional expiration timestamp (RFC 3339) can be set; the credential stops working after that time.
+- **Geerbte Richtlinie (Standard).** Wird das Dienstkonto ohne Richtlinie angelegt, erbt es das, was die zusammengefassten Richtlinien des übergeordneten Benutzers zum Zeitpunkt der Anfrage erlauben.
+- **An die Sitzung gebundene Richtlinie.** Wird beim Anlegen ein Richtliniendokument übergeben, wird es in das Dienstkonto eingebettet. Anfragen müssen dann sowohl von den Richtlinien des übergeordneten Kontos als auch von der eingebetteten Richtlinie erlaubt sein.
+- **Ablauf.** Optional lässt sich ein Ablaufzeitpunkt (RFC 3339) setzen; die Zugangsdaten funktionieren nach diesem Zeitpunkt nicht mehr.
 
-Service accounts cannot call `AssumeRole`, and a service account access key cannot be turned into a regular IAM user.
+Dienstkonten können `AssumeRole` nicht aufrufen, und ein Zugriffsschlüssel eines Dienstkontos lässt sich nicht in einen regulären IAM-Benutzer umwandeln.
 
-In the Console, service accounts are managed on the **Access Keys** page — see [Access Key Management](./access-token.md). The admin API exposes:
+In der Console verwalten Sie Dienstkonten auf der Seite **Access Keys** (Zugriffsschlüssel); siehe [Zugriffsschlüssel-Verwaltung](./access-token.md). Die Admin-API stellt bereit:
 
-| Operation | Method and path | Notes |
+| Operation | Methode und Pfad | Hinweise |
 | --- | --- | --- |
-| Create service account | `PUT /rustfs/admin/v3/add-service-account` | Body below. Also served at `/add-service-accounts`. Requires `admin:CreateServiceAccount` when creating for another user (`targetUser`). |
-| List service accounts | `GET /rustfs/admin/v3/list-service-accounts?user=<name>` | Requires `admin:ListServiceAccounts` to list another user's accounts. |
-| List access keys (bulk) | `GET /rustfs/admin/v3/list-access-keys-bulk` | Supports filtering to users only, service accounts only, or STS keys only. |
-| Service account details | `GET /rustfs/admin/v3/info-service-account?accessKey=<key>` | Returns name, description, parent, expiration, and the session policy (or `impliedPolicy: true` when inherited). |
-| Temporary account details | `GET /rustfs/admin/v3/temporary-account-info?accessKey=<key>` | For STS-issued keys. |
-| Access key details | `GET /rustfs/admin/v3/info-access-key?accessKey=<key>` | Unified lookup across users, service accounts, and STS keys. |
-| Update service account | `POST /rustfs/admin/v3/update-service-account?accessKey=<key>` | Can rotate the secret, change status, name, description, expiration, or replace the policy. |
-| Delete service account | `DELETE /rustfs/admin/v3/delete-service-account?accessKey=<key>` | Also served at `/delete-service-accounts`. Non-admin callers can delete only their own service accounts. |
+| Dienstkonto anlegen | `PUT /rustfs/admin/v3/add-service-account` | JSON-Body siehe unten. Wird auch unter `/add-service-accounts` bereitgestellt. Erfordert `admin:CreateServiceAccount`, wenn das Konto für einen anderen Benutzer (`targetUser`) angelegt wird. |
+| Dienstkonten auflisten | `GET /rustfs/admin/v3/list-service-accounts?user=<name>` | Erfordert `admin:ListServiceAccounts`, um die Konten eines anderen Benutzers aufzulisten. |
+| Zugriffsschlüssel gesammelt auflisten | `GET /rustfs/admin/v3/list-access-keys-bulk` | Unterstützt die Filterung auf nur Benutzer, nur Dienstkonten oder nur STS-Schlüssel. |
+| Details eines Dienstkontos | `GET /rustfs/admin/v3/info-service-account?accessKey=<key>` | Liefert Name, Beschreibung, übergeordnetes Konto, Ablauf und die Sitzungsrichtlinie (oder `impliedPolicy: true`, wenn sie geerbt wird). |
+| Details eines temporären Kontos | `GET /rustfs/admin/v3/temporary-account-info?accessKey=<key>` | Für von STS ausgestellte Schlüssel. |
+| Details eines Zugriffsschlüssels | `GET /rustfs/admin/v3/info-access-key?accessKey=<key>` | Einheitliche Abfrage über Benutzer, Dienstkonten und STS-Schlüssel. |
+| Dienstkonto aktualisieren | `POST /rustfs/admin/v3/update-service-account?accessKey=<key>` | Kann den geheimen Zugriffsschlüssel rotieren sowie Status, Name, Beschreibung und Ablauf ändern oder die Richtlinie ersetzen. |
+| Dienstkonto löschen | `DELETE /rustfs/admin/v3/delete-service-account?accessKey=<key>` | Wird auch unter `/delete-service-accounts` bereitgestellt. Aufrufer ohne Admin-Rechte können nur ihre eigenen Dienstkonten löschen. |
 
-Creation body (all fields optional unless noted):
+JSON-Body beim Anlegen (alle Felder optional, sofern nicht anders angegeben):
 
 ```json
 {
@@ -44,32 +44,32 @@ Creation body (all fields optional unless noted):
 
 :::note
 
-Omit `accessKey`/`secretKey` to have RustFS generate a random pair. Omit `policy` to create an inherited-policy service account. `targetUser` requires admin privileges; regular users create service accounts for themselves.
+Lassen Sie `accessKey` und `secretKey` weg, damit RustFS ein zufälliges Paar erzeugt. Lassen Sie `policy` weg, um ein Dienstkonto mit geerbter Richtlinie anzulegen. `targetUser` erfordert Admin-Rechte; reguläre Benutzer legen Dienstkonten für sich selbst an.
 
 :::
 
-## STS Temporary Credentials
+## Temporäre STS-Zugangsdaten
 
-RustFS implements an AWS-compatible STS endpoint at the server root (`POST /` with form-encoded parameters). Two actions are supported:
+RustFS stellt einen AWS-kompatiblen STS-Endpunkt an der Serverwurzel bereit (`POST /` mit formularcodierten Parametern). Zwei Aktionen werden unterstützt:
 
-- `AssumeRole` — for existing IAM identities, signed with SigV4.
-- `AssumeRoleWithWebIdentity` — for OIDC identities, authenticated by the JWT itself (see [External Identity (OIDC)](../oidc/index.md)).
+- `AssumeRole` — für vorhandene IAM-Identitäten, signiert mit SigV4.
+- `AssumeRoleWithWebIdentity` — für OIDC-Identitäten, authentifiziert durch das JWT selbst (siehe [Externe Identität (OIDC)](../oidc/index.md)).
 
 ### AssumeRole
 
-The request must be signed (AWS Signature V4) by a long-term IAM credential — temporary credentials and service accounts cannot call `AssumeRole`. With built-in IAM authorization, RustFS evaluates `sts:AssumeRole` for regular IAM users in deny-only mode: a matching explicit `Deny` rejects the request, but a separate `Allow` is not required. The user must have at least one applicable user or group policy binding, and all bound policy names must resolve.
+Die Anfrage muss mit AWS Signature V4 von langfristigen IAM-Zugangsdaten signiert sein. Temporäre Zugangsdaten und Dienstkonten können `AssumeRole` nicht aufrufen. Bei der eingebauten IAM-Autorisierung wertet RustFS `sts:AssumeRole` für reguläre IAM-Benutzer im Nur-Deny-Modus aus: Ein passendes ausdrückliches `Deny` lehnt die Anfrage ab, ein separates `Allow` ist nicht erforderlich. Der Benutzer muss mindestens eine anwendbare Benutzer- oder Gruppenrichtlinienzuordnung haben, und alle zugeordneten Richtliniennamen müssen auflösbar sein.
 
-Form parameters:
+Formularparameter:
 
-| Parameter | Required | Description |
+| Parameter | Erforderlich | Beschreibung |
 | --- | --- | --- |
-| `Action` | Yes | `AssumeRole`. |
-| `Version` | Yes | Must be `2011-06-15`. |
-| `DurationSeconds` | No | Credential lifetime in seconds. Default 3600 (1 hour); values are clamped to the range 900 (15 minutes) to 43200 (12 hours). |
-| `Policy` | No | An inline session policy (JSON) that further restricts the temporary credentials. |
-| `RoleArn`, `RoleSessionName`, `ExternalId` | No | Accepted for AWS compatibility. |
+| `Action` | Ja | `AssumeRole`. |
+| `Version` | Ja | Muss `2011-06-15` sein. |
+| `DurationSeconds` | Nein | Lebensdauer der Zugangsdaten in Sekunden. Standard 3600 (1 Stunde); Werte werden auf den Bereich 900 (15 Minuten) bis 43200 (12 Stunden) begrenzt. |
+| `Policy` | Nein | Eine eingebettete Sitzungsrichtlinie (JSON), die die temporären Zugangsdaten weiter einschränkt. |
+| `RoleArn`, `RoleSessionName`, `ExternalId` | Nein | Werden aus Kompatibilitätsgründen mit AWS akzeptiert. |
 
-Example:
+Beispiel:
 
 ```bash
 curl -s -X POST "https://rustfs.example.com/" \
@@ -80,26 +80,26 @@ curl -s -X POST "https://rustfs.example.com/" \
   -d "DurationSeconds=3600"
 ```
 
-The response is an XML `AssumeRoleResponse` containing `AccessKeyId`, `SecretAccessKey`, `SessionToken`, and `Expiration`. Use all three values on subsequent S3 requests (the session token goes in `X-Amz-Security-Token`).
+Die Antwort ist ein XML-Dokument `AssumeRoleResponse` mit `AccessKeyId`, `SecretAccessKey`, `SessionToken` und `Expiration`. Verwenden Sie alle drei Werte bei nachfolgenden S3-Anfragen (das Sitzungstoken steht in `X-Amz-Security-Token`).
 
-The temporary credential inherits the caller's policies; the `parent` of the credential is the calling access key. If a `Policy` parameter was supplied, it is stored in the session and applied as an additional restriction.
+Die temporären Zugangsdaten erben die Richtlinien des Aufrufers; das Feld `parent` der Zugangsdaten ist der aufrufende Zugriffsschlüssel. Wurde ein Parameter `Policy` übergeben, wird er in der Sitzung gespeichert und als zusätzliche Einschränkung angewendet.
 
 ### AssumeRoleWithWebIdentity
 
-Used by the OIDC flow; no SigV4 signature is needed because the identity provider's JWT is the authentication:
+Wird vom OIDC-Ablauf verwendet. Eine SigV4-Signatur ist nicht erforderlich, weil das JWT des Identitätsanbieters die Authentifizierung ist:
 
-| Parameter | Required | Description |
+| Parameter | Erforderlich | Beschreibung |
 | --- | --- | --- |
-| `Action` | Yes | `AssumeRoleWithWebIdentity`. |
-| `Version` | Yes | Must be `2011-06-15`. |
-| `WebIdentityToken` | Yes | The OIDC ID token issued by a configured provider. |
-| `DurationSeconds` | No | Same default and 900–43200 clamping as `AssumeRole`. |
-| `Policy` | No | Optional inline session policy. |
+| `Action` | Ja | `AssumeRoleWithWebIdentity`. |
+| `Version` | Ja | Muss `2011-06-15` sein. |
+| `WebIdentityToken` | Ja | Das OIDC-ID-Token, das ein konfigurierter Anbieter ausgestellt hat. |
+| `DurationSeconds` | Nein | Derselbe Standard und dieselbe Begrenzung auf 900–43200 wie bei `AssumeRole`. |
+| `Policy` | Nein | Optionale eingebettete Sitzungsrichtlinie. |
 
-RustFS verifies the token against the configured provider (signature, issuer, audience, expiry), maps its `groups`/`roles` claims to RustFS policy names, and rejects the request if no policies or groups can be mapped. The response is an XML `AssumeRoleWithWebIdentityResponse` with the same credential fields plus `SubjectFromWebIdentityToken`.
+RustFS prüft das Token gegen den konfigurierten Anbieter (Signatur, Aussteller, Zielgruppe, Ablauf), ordnet die Claims `groups` und `roles` Namen von RustFS-Richtlinien zu und lehnt die Anfrage ab, wenn keine Richtlinien oder Gruppen zugeordnet werden können. Die Antwort ist ein XML-Dokument `AssumeRoleWithWebIdentityResponse` mit denselben Zugangsdatenfeldern plus `SubjectFromWebIdentityToken`.
 
 :::warning
 
-Keep `DurationSeconds` as short as your workload allows; a leaked temporary credential remains valid until its expiration.
+Halten Sie `DurationSeconds` so kurz, wie es Ihre Arbeitslast zulässt. Abgeflossene temporäre Zugangsdaten bleiben bis zu ihrem Ablauf gültig.
 
 :::

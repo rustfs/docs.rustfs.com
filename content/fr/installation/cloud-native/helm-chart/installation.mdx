@@ -1,22 +1,22 @@
 ---
-title: Install
-description: Install standalone or distributed RustFS on Kubernetes with the official Helm chart.
+title: Installation
+description: Installez RustFS en mode autonome ou distribué sur Kubernetes avec le chart Helm officiel.
 ---
 
-This guide gets the official RustFS chart from source or the Helm repository, installs it, and verifies access to the S3 API and Console.
+Ce guide récupère le chart RustFS officiel depuis les sources ou le dépôt Helm, l’installe et vérifie l’accès à l’API S3 et à la Console.
 
-## Requirements
+## Prérequis
 
-| Component | Requirement |
+| Composant | Exigence |
 |-----------|-------------|
 | Helm | Version 3 |
-| Kubernetes | A cluster reachable with `kubectl` |
-| StorageClass | Dynamic PVC provisioning for RustFS data |
-| RustFS | `1.0.0-alpha.69` or later |
+| Kubernetes | Un cluster accessible avec `kubectl` |
+| StorageClass | Provisionnement dynamique de PVC pour les données RustFS |
+| RustFS | `1.0.0-alpha.69` ou ultérieur |
 
-An Ingress controller is optional. If you enable Ingress, set `ingress.className` to the controller in your cluster, such as `nginx` or `traefik`.
+Un contrôleur Ingress est facultatif. Si vous activez l’Ingress, définissez `ingress.className` sur le contrôleur présent dans votre cluster, par exemple `nginx` ou `traefik`.
 
-Check the active cluster and available StorageClasses:
+Vérifiez le cluster actif et les StorageClasses disponibles :
 
 ```bash
 kubectl config current-context
@@ -24,14 +24,14 @@ kubectl get storageclass
 helm version --short
 ```
 
-## 1. Get the chart
+## 1. Obtenir le chart
 
-Choose how Helm should access the chart. Both options set `RUSTFS_CHART`, which the installation commands below use.
+Choisissez comment Helm doit accéder au chart. Les deux options définissent `RUSTFS_CHART`, que les commandes d’installation ci-dessous utilisent.
 
-<Tabs items={["Clone the repository", "Helm repository"]} updateAnchor={false}>
-  <Tab value="Clone the repository" id="helm-chart-clone">
+<Tabs items={["Cloner le dépôt", "Dépôt Helm"]} updateAnchor={false}>
+  <Tab value="Cloner le dépôt" id="helm-chart-clone">
 
-Clone the RustFS source repository to use the chart at `helm/rustfs`:
+Clonez le dépôt source de RustFS afin d’utiliser le chart situé dans `helm/rustfs` :
 
 ```bash
 git clone https://github.com/rustfs/rustfs.git
@@ -40,9 +40,9 @@ export RUSTFS_CHART=./helm/rustfs
 ```
 
   </Tab>
-  <Tab value="Helm repository" id="helm-chart-repository">
+  <Tab value="Dépôt Helm" id="helm-chart-repository">
 
-Add the RustFS repository listed on [Artifact Hub](https://artifacthub.io/packages/helm/rustfs/rustfs), then update the local repository index:
+Ajoutez le dépôt RustFS indiqué sur [Artifact Hub](https://artifacthub.io/packages/helm/rustfs/rustfs), puis mettez à jour l’index du dépôt local :
 
 ```bash
 helm repo add rustfs https://charts.rustfs.com
@@ -53,9 +53,9 @@ export RUSTFS_CHART=rustfs/rustfs
   </Tab>
 </Tabs>
 
-## 2. Install standalone mode
+## 2. Installer le mode autonome
 
-Create a values file for a one-Pod development deployment:
+Créez un fichier de valeurs pour un déploiement de développement à un seul pod :
 
 ```yaml title="standalone-values.yaml"
 mode:
@@ -78,7 +78,7 @@ ingress:
   enabled: false
 ```
 
-Replace `standard` with a StorageClass in your cluster, then install:
+Remplacez `standard` par une StorageClass de votre cluster, puis installez :
 
 ```bash
 helm upgrade --install rustfs "$RUSTFS_CHART" \
@@ -87,9 +87,9 @@ helm upgrade --install rustfs "$RUSTFS_CHART" \
   -f standalone-values.yaml
 ```
 
-## 3. Install distributed mode
+## 3. Installer le mode distribué
 
-For a distributed cluster, set the Pod and drive counts explicitly. Total data drives equal `replicaCount * drivesPerNode`.
+Pour un cluster distribué, définissez explicitement le nombre de pods et le nombre de disques. Le nombre total de disques de données est égal à `replicaCount * drivesPerNode`.
 
 ```yaml title="distributed-values.yaml"
 mode:
@@ -115,7 +115,7 @@ ingress:
   enabled: false
 ```
 
-The example creates four Pods and eight data PVCs. Ensure the cluster can schedule all Pods and provision all PVCs, then install:
+L’exemple crée quatre pods et huit PVC de données. Assurez-vous que le cluster peut planifier tous les pods et provisionner tous les PVC, puis installez :
 
 ```bash
 helm upgrade --install rustfs "$RUSTFS_CHART" \
@@ -124,45 +124,45 @@ helm upgrade --install rustfs "$RUSTFS_CHART" \
   -f distributed-values.yaml
 ```
 
-:::warning[Choose the topology before installation]
+:::warning[Choisissez la topologie avant l’installation]
 
-Kubernetes does not allow updates to StatefulSet `volumeClaimTemplates`. Changing `drivesPerNode` later requires StatefulSet recreation or a new installation.
+Kubernetes n’autorise pas la modification des `volumeClaimTemplates` d’un StatefulSet. Modifier `drivesPerNode` ultérieurement exige de recréer le StatefulSet ou de procéder à une nouvelle installation.
 
 :::
 
-## 4. Verify and access RustFS
+## 4. Vérifier RustFS et y accéder
 
 ```bash
 kubectl -n rustfs get pods,pvc,services
 kubectl -n rustfs rollout status statefulset/rustfs
 ```
 
-Standalone mode creates a Deployment instead of a StatefulSet. Check it with:
+Le mode autonome crée un Deployment à la place d’un StatefulSet. Vérifiez-le avec :
 
 ```bash
 kubectl -n rustfs rollout status deployment/rustfs
 ```
 
-Forward the S3 API and Console to your workstation:
+Redirigez l’API S3 et la Console vers votre poste de travail :
 
 ```bash
 kubectl -n rustfs port-forward svc/rustfs 9000:9000 9001:9001
 ```
 
-Use `http://localhost:9000` as the S3 endpoint and open `http://localhost:9001` for the Console.
+Utilisez `http://localhost:9000` comme point de terminaison S3 et ouvrez `http://localhost:9001` pour la Console.
 
-## Key values
+## Valeurs principales
 
-| Value | Purpose | Chart default |
+| Valeur | Rôle | Valeur par défaut du chart |
 |-------|---------|---------------|
-| `mode.standalone.enabled` | Enable one-Pod standalone mode | `false` |
-| `mode.distributed.enabled` | Enable distributed mode | `true` |
-| `replicaCount` | Distributed Pod count | `4` |
-| `drivesPerNode` | Data PVCs per Pod | Inferred from `replicaCount` |
-| `storageclass.name` | StorageClass for PVCs | `local-path` |
-| `storageclass.dataStorageSize` | Size of each data PVC | `256Mi` |
-| `storageclass.logStorageSize` | Size of each log PVC | `256Mi` |
-| `service.endpoint.port` | S3 API port | `9000` |
-| `service.console.port` | Console port | `9001` |
+| `mode.standalone.enabled` | Active le mode autonome à un seul pod | `false` |
+| `mode.distributed.enabled` | Active le mode distribué | `true` |
+| `replicaCount` | Nombre de pods en mode distribué | `4` |
+| `drivesPerNode` | PVC de données par pod | Déduit de `replicaCount` |
+| `storageclass.name` | StorageClass des PVC | `local-path` |
+| `storageclass.dataStorageSize` | Taille de chaque PVC de données | `256Mi` |
+| `storageclass.logStorageSize` | Taille de chaque PVC de journaux | `256Mi` |
+| `service.endpoint.port` | Port de l’API S3 | `9000` |
+| `service.console.port` | Port de la Console | `9001` |
 
-We recommend setting storage sizes explicitly; the chart defaults are intended only for basic evaluation.
+Nous recommandons de définir explicitement les tailles de stockage ; les valeurs par défaut du chart sont destinées uniquement à une évaluation de base.

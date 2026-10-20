@@ -1,49 +1,49 @@
 ---
-title: "Network Checklist"
-description: "Network checklist for enterprise deployments."
+title: "Liste de contrôle réseau"
+description: "Cette page fournit la liste de contrôle réseau pour les déploiements d’entreprise."
 ---
 
-## Network Architecture
+## Architecture réseau
 
-### Planning
+### Planification
 
-- **Topology**
- Verify the architecture (star/ring/mesh) meets high availability requirements.
-- **Redundancy**
- Ensure at least two independent physical links between nodes.
-- **Bandwidth**
- Calculate estimated traffic: object storage read/write bandwidth × node count × replica count + 20% redundancy.
+- **Topologie**
+ Vérifiez que l’architecture en étoile, en anneau ou en maillage satisfait les exigences de haute disponibilité.
+- **Redondance**
+ Prévoyez au moins deux liaisons physiques indépendantes entre les nœuds.
+- **Bande passante**
+ Estimez le trafic ainsi : bande passante de lecture et d’écriture × nombre de nœuds × nombre de répliques, plus 20 % de marge.
 
-### IP Allocation
+### Allocation des adresses IP
 
-- [ ] Separate management network from data network.
-- [ ] Allocate continuous IP segments for storage nodes (recommend /24 subnet).
-- [ ] Reserve at least 15% of IP addresses for expansion.
+- [ ] Séparez le réseau d’administration du réseau de données.
+- [ ] Attribuez une plage d’adresses IP contiguë aux nœuds de stockage. Nous recommandons un sous-réseau /24.
+- [ ] Réservez au moins 15 % des adresses IP pour l’extension.
 
 ---
 
-## Hardware Requirements
+## Exigences matérielles
 
-### Switches
+### Commutateurs
 
-| Check Item | Requirements |
+| Élément | Exigence |
 |--------|---------|
-| Backplane Bandwidth | ≥ Full port line rate forwarding capability × 1.2 |
-| Port Type | 10G/25G/100G SFP+/QSFP+ fiber ports |
-| Flow Table Capacity | ≥ Node count × 5 |
-| Spanning Tree | Enable RSTP/MSTP fast convergence |
+| Bande passante du fond de panier | ≥ 1.2 × le débit ligne agrégé de tous les ports |
+| Type de port | Ports fibre 10G/25G/100G SFP+/QSFP+ |
+| Capacité de la table de flux | ≥ nombre de nœuds × 5 |
+| Spanning Tree | Activez RSTP ou MSTP pour une convergence rapide |
 
-### Cabling
+### Câblage
 
-- [ ] Fiber attenuation test (single mode ≤0.35dB/km).
-- [ ] Port misalignment check (Node A eth0 ↔ Node B eth0).
-- [ ] Cable labeling (including source/destination IP + port number).
+- [ ] Test d’atténuation de la fibre (monomode ≤0.35dB/km).
+- [ ] Vérifiez la correspondance des ports (nœud A eth0 ↔ nœud B eth0).
+- [ ] Étiquetage des câbles (adresses IP source et destination, plus le numéro de port).
 
 ---
 
-## OS Configuration
+## Configuration du système d’exploitation
 
-### Kernel Tuning
+### Réglage du noyau
 
 ```bash
 # Check the following parameter settings
@@ -53,17 +53,17 @@ net.ipv4.tcp_keepalive_time = 600
 net.ipv4.tcp_slow_start_after_idle = 0
 ```
 
-### NIC Configuration
+### Configuration des cartes réseau
 
-- [ ] Enable jumbo frames (MTU=9000, requires full path support).
-- [ ] Verify bonding mode (recommend LACP mode4).
-- [ ] Disable IPv6 (if not needed).
+- [ ] Activez les trames jumbo (MTU=9000, prise en charge requise sur l’ensemble du chemin).
+- [ ] Vérifiez le mode de bonding (LACP mode4 recommandé).
+- [ ] Désactivez IPv6 (s’il n’est pas nécessaire).
 
 ---
 
-## Security
+## Sécurité
 
-### Firewall
+### Pare-feu
 
 ```text
 # Necessary open ports
@@ -72,43 +72,43 @@ net.ipv4.tcp_slow_start_after_idle = 0
 - TCP 443 (only if you terminate HTTPS on a reverse proxy / load balancer)
 ```
 
-### Access Control
+### Contrôle d’accès
 
-- Switch port security MAC restrictions.
-- IPSec tunnel encryption between storage nodes.
-- Enable TLS 1.3 for management interfaces.
+- Activez la sécurité de port (limitation des adresses MAC) sur les commutateurs.
+- Chiffrez le trafic entre les nœuds de stockage avec IPsec.
+- Activez TLS 1.3 sur les interfaces d’administration.
 
 ---
 
-## Performance Testing
+## Tests de performance
 
-### Benchmarks
+### Mesures
 
-1. Inter-node latency: `ping -c 20 <target IP>` (run `iperf3 -s` on the target first for throughput tests)
-2. Cross-rack bandwidth: `iperf3 -c <target IP> -P 8 -t 30`
-3. Failover: Randomly disconnect core links to observe recovery time.
+1. Latence entre nœuds : `ping -c 20 <target IP>` (exécutez d’abord `iperf3 -s` sur la cible pour les tests de débit)
+2. Bande passante entre racks : `iperf3 -c <target IP> -P 8 -t 30`
+3. Basculement : déconnectez de façon aléatoire des liaisons principales pour observer le temps de reprise.
 
-### Criteria
+### Critères
 
-| Metric | Requirements |
+| Indicateur | Exigences |
 |------|------|
-| Node Latency | ≤1ms (same room) / ≤5ms (cross AZ) |
-| Bandwidth Utilization | Peak ≤70% of design capacity |
-| Failover | < 500ms BPDU convergence |
+| Latence des nœuds | ≤ 1 ms (même centre de données) / ≤ 5 ms (entre zones de disponibilité) |
+| Utilisation de la bande passante | Pic ≤ 70 % de la capacité prévue |
+| Basculement | Convergence BPDU < 500ms |
 
 ---
 
-## Documentation Requirements
+## Exigences documentaires
 
-1. Network topology diagram (including physical connections and logical IPs)
-2. Switch configuration backup files (with timestamps)
-3. Baseline test reports (including raw data)
-4. Change record table (including maintenance window information)
+1. Schéma de topologie réseau (connexions physiques et adresses IP logiques)
+2. Fichiers de sauvegarde de configuration des commutateurs (avec horodatage)
+3. Rapports des tests de référence (données brutes incluses)
+4. Journal des modifications (fenêtres de maintenance incluses)
 
 :::tip
 
-Recommend conducting 72-hour stress testing before formal deployment, simulating 110% peak traffic load scenarios
+Nous recommandons d’exécuter un test de charge de 72 heures à 110 % du trafic de pointe attendu avant le déploiement en production.
 
 :::
 
-This checklist covers key checkpoints for enterprise storage system network deployment, specifically optimized parameter requirements for distributed object storage characteristics. You can contact RustFS for official technical support.
+Cette liste de contrôle couvre les principales exigences réseau pour déployer un stockage objet distribué en environnement d’entreprise. Pour une assistance technique, contactez RustFS.

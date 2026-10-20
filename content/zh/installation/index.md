@@ -5,6 +5,12 @@ description: "根据本地试用、单节点或多节点生产环境、容器及
 
 RustFS 是使用 Rust 编写并采用 Apache 2.0 许可证发布的分布式对象存储系统。它可在 Linux、Windows、macOS、FreeBSD 和容器中运行，支持 x86、ARM、RISC-V 等 CPU 架构。
 
+:::warning[仅用于开发和调试]
+
+Windows 版本的 RustFS 仅适用于开发和调试，**不建议用于生产环境**。生产部署建议使用 [Linux](/zh/installation/linux)。
+
+:::
+
 :::warning[立即更改默认凭证]
 
 安装后，在将 RustFS 接入网络前，请为 `RUSTFS_ACCESS_KEY` 和 `RUSTFS_SECRET_KEY` 设置唯一值。任一凭证都不要使用众所周知的 `rustfsadmin` 值。

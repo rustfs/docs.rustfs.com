@@ -1,34 +1,34 @@
 ---
-title: "Service Accounts and STS"
-description: "RustFS service accounts (derived access keys) and temporary credentials via the STS AssumeRole API."
+title: "サービスアカウントと STS"
+description: "RustFS のサービスアカウント（派生したアクセスキー）と、STS の AssumeRole API による一時認証情報を説明します。"
 ---
 
-RustFS provides two mechanisms for issuing credentials that are derived from an existing identity: **service accounts** (long-lived access keys owned by a parent user) and **STS temporary credentials** (short-lived keys with a session token).
+RustFS には、既存のアイデンティティから派生した認証情報を発行する仕組みが 2 つあります。**サービスアカウント**（親ユーザーが所有する長期のアクセスキー）と、**STS の一時認証情報**（セッショントークンを持つ短期間のキー）です。
 
-## Service Accounts
+## サービスアカウント
 
-A service account is an access key/secret key pair that belongs to a parent IAM user (or to the root account). It authenticates like a normal key but is authorized as its parent:
+サービスアカウントは、親の IAM ユーザー（またはルートアカウント）に属するアクセスキーとシークレットキーの組です。通常のキーと同じように認証しますが、認可は親として行われます。
 
-- **Inherited policy (default).** If the service account is created without a policy, it inherits whatever the parent user's combined policies allow at request time.
-- **Session-bound policy.** If a policy document is supplied at creation, it is embedded into the service account. Requests must then be allowed by *both* the parent's policies and the embedded policy.
-- **Expiration.** An optional expiration timestamp (RFC 3339) can be set; the credential stops working after that time.
+- **継承ポリシー（既定）。** ポリシーなしでサービスアカウントを作成すると、リクエスト時点で親ユーザーのポリシーを組み合わせた結果が許可する範囲を継承します。
+- **セッションに結び付くポリシー。** 作成時にポリシードキュメントを指定すると、それがサービスアカウントに埋め込まれます。リクエストは、親のポリシーと埋め込まれたポリシーの両方で許可される必要があります。
+- **有効期限。** 任意の有効期限タイムスタンプ（RFC 3339）を設定できます。その時刻を過ぎると、認証情報は動作しなくなります。
 
-Service accounts cannot call `AssumeRole`, and a service account access key cannot be turned into a regular IAM user.
+サービスアカウントは `AssumeRole` を呼び出せず、サービスアカウントのアクセスキーを通常の IAM ユーザーに変換することもできません。
 
-In the Console, service accounts are managed on the **Access Keys** page — see [Access Key Management](./access-token.md). The admin API exposes:
+Console では、サービスアカウントを **Access Keys**（アクセスキー）のページで管理します。[アクセスキーの管理](./access-token.md)を参照します。管理 API は次を提供します。
 
-| Operation | Method and path | Notes |
+| 操作 | メソッドとパス | 備考 |
 | --- | --- | --- |
-| Create service account | `PUT /rustfs/admin/v3/add-service-account` | Body below. Also served at `/add-service-accounts`. Requires `admin:CreateServiceAccount` when creating for another user (`targetUser`). |
-| List service accounts | `GET /rustfs/admin/v3/list-service-accounts?user=<name>` | Requires `admin:ListServiceAccounts` to list another user's accounts. |
-| List access keys (bulk) | `GET /rustfs/admin/v3/list-access-keys-bulk` | Supports filtering to users only, service accounts only, or STS keys only. |
-| Service account details | `GET /rustfs/admin/v3/info-service-account?accessKey=<key>` | Returns name, description, parent, expiration, and the session policy (or `impliedPolicy: true` when inherited). |
-| Temporary account details | `GET /rustfs/admin/v3/temporary-account-info?accessKey=<key>` | For STS-issued keys. |
-| Access key details | `GET /rustfs/admin/v3/info-access-key?accessKey=<key>` | Unified lookup across users, service accounts, and STS keys. |
-| Update service account | `POST /rustfs/admin/v3/update-service-account?accessKey=<key>` | Can rotate the secret, change status, name, description, expiration, or replace the policy. |
-| Delete service account | `DELETE /rustfs/admin/v3/delete-service-account?accessKey=<key>` | Also served at `/delete-service-accounts`. Non-admin callers can delete only their own service accounts. |
+| サービスアカウントの作成 | `PUT /rustfs/admin/v3/add-service-account` | 本文は下記のとおりです。`/add-service-accounts` でも提供されます。別のユーザー（`targetUser`）向けに作成する場合は `admin:CreateServiceAccount` が必要です。 |
+| サービスアカウントの一覧 | `GET /rustfs/admin/v3/list-service-accounts?user=<name>` | 別のユーザーのアカウントを一覧する場合は `admin:ListServiceAccounts` が必要です。 |
+| アクセスキーの一括一覧 | `GET /rustfs/admin/v3/list-access-keys-bulk` | ユーザーのみ、サービスアカウントのみ、または STS キーのみへの絞り込みに対応します。 |
+| サービスアカウントの詳細 | `GET /rustfs/admin/v3/info-service-account?accessKey=<key>` | 名前、説明、親、有効期限、セッションポリシーを返します（継承時は `impliedPolicy: true`）。 |
+| 一時アカウントの詳細 | `GET /rustfs/admin/v3/temporary-account-info?accessKey=<key>` | STS が発行したキー向けです。 |
+| アクセスキーの詳細 | `GET /rustfs/admin/v3/info-access-key?accessKey=<key>` | ユーザー、サービスアカウント、STS キーを横断して検索します。 |
+| サービスアカウントの更新 | `POST /rustfs/admin/v3/update-service-account?accessKey=<key>` | シークレットのローテーション、状態、名前、説明、有効期限の変更、またはポリシーの置き換えができます。 |
+| サービスアカウントの削除 | `DELETE /rustfs/admin/v3/delete-service-account?accessKey=<key>` | `/delete-service-accounts` でも提供されます。管理者以外の呼び出し元は、自分のサービスアカウントだけを削除できます。 |
 
-Creation body (all fields optional unless noted):
+作成時の本文（注記がない限り、すべてのフィールドは任意です）。
 
 ```json
 {
@@ -44,32 +44,32 @@ Creation body (all fields optional unless noted):
 
 :::note
 
-Omit `accessKey`/`secretKey` to have RustFS generate a random pair. Omit `policy` to create an inherited-policy service account. `targetUser` requires admin privileges; regular users create service accounts for themselves.
+`accessKey` と `secretKey` を省略すると、RustFS がランダムな組を生成します。`policy` を省略すると、継承ポリシーのサービスアカウントが作成されます。`targetUser` には管理者権限が必要です。一般ユーザーは、自分自身のサービスアカウントを作成します。
 
 :::
 
-## STS Temporary Credentials
+## STS の一時認証情報
 
-RustFS implements an AWS-compatible STS endpoint at the server root (`POST /` with form-encoded parameters). Two actions are supported:
+RustFS は、サーバールートに AWS 互換の STS エンドポイントを実装しています（フォームエンコードされたパラメータによる `POST /`）。対応するアクションは 2 つです。
 
-- `AssumeRole` — for existing IAM identities, signed with SigV4.
-- `AssumeRoleWithWebIdentity` — for OIDC identities, authenticated by the JWT itself (see [External Identity (OIDC)](../oidc/index.md)).
+- `AssumeRole` — 既存の IAM アイデンティティ向けです。SigV4 で署名します。
+- `AssumeRoleWithWebIdentity` — OIDC アイデンティティ向けです。JWT 自体で認証します（[外部アイデンティティ（OIDC）](../oidc/index.md)を参照）。
 
 ### AssumeRole
 
-The request must be signed (AWS Signature V4) by a long-term IAM credential — temporary credentials and service accounts cannot call `AssumeRole`. With built-in IAM authorization, RustFS evaluates `sts:AssumeRole` for regular IAM users in deny-only mode: a matching explicit `Deny` rejects the request, but a separate `Allow` is not required. The user must have at least one applicable user or group policy binding, and all bound policy names must resolve.
+リクエストは、長期の IAM 認証情報で署名する必要があります（AWS Signature V4）。一時認証情報とサービスアカウントは `AssumeRole` を呼び出せません。組み込みの IAM 認可では、RustFS は通常の IAM ユーザーに対する `sts:AssumeRole` を拒否のみのモードで評価します。一致する明示的な `Deny` はリクエストを拒否しますが、別途 `Allow` は必須ではありません。ユーザーには、適用可能なユーザーまたはグループのポリシー割り当てが少なくとも 1 つ必要であり、割り当てられたポリシー名はすべて解決される必要があります。
 
-Form parameters:
+フォームパラメータは次のとおりです。
 
-| Parameter | Required | Description |
+| パラメータ | 必須 | 説明 |
 | --- | --- | --- |
-| `Action` | Yes | `AssumeRole`. |
-| `Version` | Yes | Must be `2011-06-15`. |
-| `DurationSeconds` | No | Credential lifetime in seconds. Default 3600 (1 hour); values are clamped to the range 900 (15 minutes) to 43200 (12 hours). |
-| `Policy` | No | An inline session policy (JSON) that further restricts the temporary credentials. |
-| `RoleArn`, `RoleSessionName`, `ExternalId` | No | Accepted for AWS compatibility. |
+| `Action` | はい | `AssumeRole`。 |
+| `Version` | はい | `2011-06-15` である必要があります。 |
+| `DurationSeconds` | いいえ | 認証情報の有効期間（秒）です。既定値は 3600（1 時間）です。値は 900（15 分）から 43200（12 時間）の範囲に収められます。 |
+| `Policy` | いいえ | 一時認証情報をさらに制限する、インラインのセッションポリシー（JSON）です。 |
+| `RoleArn`、`RoleSessionName`、`ExternalId` | いいえ | AWS との互換のために受け付けます。 |
 
-Example:
+例は次のとおりです。
 
 ```bash
 curl -s -X POST "https://rustfs.example.com/" \
@@ -80,26 +80,26 @@ curl -s -X POST "https://rustfs.example.com/" \
   -d "DurationSeconds=3600"
 ```
 
-The response is an XML `AssumeRoleResponse` containing `AccessKeyId`, `SecretAccessKey`, `SessionToken`, and `Expiration`. Use all three values on subsequent S3 requests (the session token goes in `X-Amz-Security-Token`).
+レスポンスは XML の `AssumeRoleResponse` で、`AccessKeyId`、`SecretAccessKey`、`SessionToken`、`Expiration` を含みます。後続の S3 リクエストでは、3 つの値をすべて使います（セッショントークンは `X-Amz-Security-Token` に入れます）。
 
-The temporary credential inherits the caller's policies; the `parent` of the credential is the calling access key. If a `Policy` parameter was supplied, it is stored in the session and applied as an additional restriction.
+一時認証情報は呼び出し元のポリシーを継承します。認証情報の `parent` は、呼び出しに使ったアクセスキーです。`Policy` パラメータを指定した場合、それはセッションに保存され、追加の制限として適用されます。
 
 ### AssumeRoleWithWebIdentity
 
-Used by the OIDC flow; no SigV4 signature is needed because the identity provider's JWT is the authentication:
+OIDC フローで使います。アイデンティティプロバイダーの JWT が認証になるため、SigV4 署名は不要です。
 
-| Parameter | Required | Description |
+| パラメータ | 必須 | 説明 |
 | --- | --- | --- |
-| `Action` | Yes | `AssumeRoleWithWebIdentity`. |
-| `Version` | Yes | Must be `2011-06-15`. |
-| `WebIdentityToken` | Yes | The OIDC ID token issued by a configured provider. |
-| `DurationSeconds` | No | Same default and 900–43200 clamping as `AssumeRole`. |
-| `Policy` | No | Optional inline session policy. |
+| `Action` | はい | `AssumeRoleWithWebIdentity`。 |
+| `Version` | はい | `2011-06-15` である必要があります。 |
+| `WebIdentityToken` | はい | 設定済みプロバイダーが発行した OIDC の ID トークンです。 |
+| `DurationSeconds` | いいえ | `AssumeRole` と同じ既定値であり、900 から 43200 の範囲に収められます。 |
+| `Policy` | いいえ | 任意のインラインセッションポリシーです。 |
 
-RustFS verifies the token against the configured provider (signature, issuer, audience, expiry), maps its `groups`/`roles` claims to RustFS policy names, and rejects the request if no policies or groups can be mapped. The response is an XML `AssumeRoleWithWebIdentityResponse` with the same credential fields plus `SubjectFromWebIdentityToken`.
+RustFS は、設定されたプロバイダーに対してトークンを検証し（署名、発行者、オーディエンス、有効期限）、`groups` と `roles` のクレームを RustFS のポリシー名に対応付けます。ポリシーまたはグループを対応付けできない場合、リクエストは拒否されます。レスポンスは XML の `AssumeRoleWithWebIdentityResponse` で、同じ認証情報フィールドに加えて `SubjectFromWebIdentityToken` を含みます。
 
 :::warning
 
-Keep `DurationSeconds` as short as your workload allows; a leaked temporary credential remains valid until its expiration.
+ワークロードが許す限り、`DurationSeconds` を短くすることを推奨します。漏えいした一時認証情報は、有効期限まで有効なままです。
 
 :::

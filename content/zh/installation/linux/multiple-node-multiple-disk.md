@@ -43,8 +43,7 @@ flowchart TD
 
 按如下方式修改 `/etc/hosts` 中的本地别名设置：
 
-```bash title="/etc/hosts"
-vim /etc/hosts
+```text title="/etc/hosts"
 127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1 localhost localhost.localdomain localhost6 localhost6.localdomain6
 192.168.1.1 node1

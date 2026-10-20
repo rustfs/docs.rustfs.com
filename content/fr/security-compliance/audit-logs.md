@@ -1,28 +1,28 @@
 ---
-title: "Audit Targets"
-description: "Configure RustFS audit targets and deliver request-level audit records to external systems."
+title: "Cibles d’audit"
+description: "Configurez les cibles d’audit RustFS et transmettez les enregistrements d’audit au niveau de la requête vers des systèmes externes."
 ---
 
-RustFS Audit Targets send request-level activity records to external systems for security monitoring, compliance, and incident investigation. This guide configures a webhook target and verifies audit delivery with an S3 request.
+Les cibles d’audit RustFS envoient des enregistrements d’activité au niveau de la requête vers des systèmes externes, pour la supervision de sécurité, la conformité et l’investigation d’incidents. Ce guide configure une cible webhook et vérifie la livraison d’audit avec une requête S3.
 
-## Overview
+## Vue d’ensemble
 
-Audit Targets and Event Notifications serve different purposes:
+Les cibles d’audit et les notifications d’événements ont des rôles distincts :
 
-| Feature | Audit Targets | Event Notifications |
+| Caractéristique | Cibles d’audit | Notifications d’événements |
 | --- | --- | --- |
-| Scope | Request and API activity across RustFS | Events selected by each bucket configuration |
-| Routing | Every enabled audit target receives audit records | Each bucket rule selects a target |
-| Filtering | No per-target event filter | Event, prefix, and suffix filters |
-| Typical use | Security information and event management (SIEM), compliance, investigation | Application workflows and data pipelines |
+| Portée | Activité des requêtes et de l’API dans l’ensemble de RustFS | Événements sélectionnés par la configuration de chaque compartiment (bucket) |
+| Routage | Chaque cible d’audit activée reçoit les enregistrements d’audit | Chaque règle de compartiment sélectionne une cible |
+| Filtrage | Aucun filtre d’événement par cible | Filtres par événement, préfixe et suffixe |
+| Usage typique | Gestion des informations et des événements de sécurité (SIEM), conformité, investigation | Flux applicatifs et pipelines de données |
 
-RustFS supports webhook, Kafka, MQTT, MySQL, PostgreSQL, NATS, Redis, AMQP, and Pulsar audit target families. Each enabled target receives the audit stream independently.
+RustFS prend en charge les familles de cibles d’audit webhook, Kafka, MQTT, MySQL, PostgreSQL, NATS, Redis, AMQP et Pulsar. Chaque cible activée reçoit le flux d’audit de façon indépendante.
 
-Audit records can contain request paths, query parameters, selected headers, identity claims, access-key identifiers, remote hosts, user agents, response status, and errors. Protect the destination and restrict access according to your retention and compliance requirements.
+Les enregistrements d’audit peuvent contenir les chemins de requête, les paramètres de requête, certains en-têtes, les claims d’identité, les identifiants de clé d’accès, les hôtes distants, les agents utilisateur, le statut de réponse et les erreurs. Protégez la destination et restreignez l’accès selon vos exigences de conservation et de conformité.
 
 ## Configuration
 
-Audit delivery is disabled by default. The following environment variables enable the module and create a webhook target named `primary`:
+La livraison d’audit est désactivée par défaut. Les variables d’environnement suivantes activent le module et créent une cible webhook nommée `primary` :
 
 ```bash
 export RUSTFS_AUDIT_ENABLE="true"
@@ -33,69 +33,69 @@ export RUSTFS_AUDIT_WEBHOOK_QUEUE_DIR_PRIMARY="/var/lib/rustfs/audit-primary"
 export RUSTFS_OUTBOUND_ALLOW_ORIGINS="https://audit.example.com"
 ```
 
-Restart RustFS after changing environment-managed targets. The target name is the lowercase form of the environment-variable suffix, so `_PRIMARY` creates `primary`.
+Redémarrez RustFS après avoir modifié des cibles gérées par l’environnement. Le nom de la cible est la forme en minuscules du suffixe de la variable d’environnement : `_PRIMARY` crée donc `primary`.
 
-RustFS sends a `HEAD` health check to the endpoint origin's root path, such as `https://audit.example.com/`, and sends JSON `POST` requests to the complete configured endpoint. The origin must respond to `HEAD`, while delivery requests must return a successful HTTP status. Allow the RustFS service account to write to the queue directory.
+RustFS envoie un contrôle d’intégrité `HEAD` vers le chemin racine de l’origine du point de terminaison, par exemple `https://audit.example.com/`, et envoie des requêtes `POST` JSON vers le point de terminaison configuré complet. L’origine doit répondre à `HEAD`, tandis que les requêtes de livraison doivent renvoyer un statut HTTP de succès. Autorisez le compte de service RustFS à écrire dans le répertoire de file d’attente.
 
-### Webhook settings
+### Réglages du webhook
 
-Use the same `_PRIMARY` suffix on all settings for this target:
+Utilisez le même suffixe `_PRIMARY` pour tous les réglages de cette cible :
 
-| Variable | Purpose |
+| Variable | Rôle |
 | --- | --- |
-| `RUSTFS_AUDIT_WEBHOOK_ENDPOINT_PRIMARY` | HTTP or HTTPS delivery endpoint |
-| `RUSTFS_AUDIT_WEBHOOK_AUTH_TOKEN_PRIMARY` | Bearer token sent in the `Authorization` header |
-| `RUSTFS_AUDIT_WEBHOOK_QUEUE_DIR_PRIMARY` | Directory for queued audit records |
-| `RUSTFS_AUDIT_WEBHOOK_QUEUE_LIMIT_PRIMARY` | Maximum number of queued records |
-| `RUSTFS_AUDIT_WEBHOOK_CLIENT_CERT_PRIMARY` | Client certificate for mutual TLS (mTLS) |
-| `RUSTFS_AUDIT_WEBHOOK_CLIENT_KEY_PRIMARY` | Private key paired with the client certificate |
-| `RUSTFS_AUDIT_WEBHOOK_CLIENT_CA_PRIMARY` | Certificate authority used to verify the receiver |
-| `RUSTFS_AUDIT_WEBHOOK_SKIP_TLS_VERIFY_PRIMARY` | Disable server certificate verification |
+| `RUSTFS_AUDIT_WEBHOOK_ENDPOINT_PRIMARY` | Point de terminaison de livraison HTTP ou HTTPS |
+| `RUSTFS_AUDIT_WEBHOOK_AUTH_TOKEN_PRIMARY` | Jeton Bearer envoyé dans l’en-tête `Authorization` |
+| `RUSTFS_AUDIT_WEBHOOK_QUEUE_DIR_PRIMARY` | Répertoire des enregistrements d’audit en file d’attente |
+| `RUSTFS_AUDIT_WEBHOOK_QUEUE_LIMIT_PRIMARY` | Nombre maximal d’enregistrements en file d’attente |
+| `RUSTFS_AUDIT_WEBHOOK_CLIENT_CERT_PRIMARY` | Certificat client pour le TLS mutuel (mTLS) |
+| `RUSTFS_AUDIT_WEBHOOK_CLIENT_KEY_PRIMARY` | Clé privée associée au certificat client |
+| `RUSTFS_AUDIT_WEBHOOK_CLIENT_CA_PRIMARY` | Autorité de certification utilisée pour vérifier le récepteur |
+| `RUSTFS_AUDIT_WEBHOOK_SKIP_TLS_VERIFY_PRIMARY` | Désactive la vérification du certificat serveur |
 
-:::warning[Protect audit data]
+:::warning[Protégez les données d’audit]
 
-Use HTTPS for remote collectors. Keep certificate verification enabled, store bearer tokens outside source control, and provide both the client certificate and key when using mTLS. Audit payloads may contain security-sensitive request and identity metadata.
-
-:::
-
-For all target families and target-specific keys, see [Environment Variables](/reference/environment-variables#event--audit-targets).
-
-### Multiple targets
-
-Add a distinct uppercase suffix to define another instance. For example, use `RUSTFS_AUDIT_WEBHOOK_ENABLE_ARCHIVE` and the corresponding `_ARCHIVE` settings to create an `archive` webhook alongside `primary`.
-
-RustFS fans each audit record out to all enabled targets. A failure in one target does not prevent delivery attempts to the others.
-
-:::note[Environment-managed targets]
-
-A target defined by environment variables cannot be edited or removed through the Console or admin API. Change its environment variables and restart RustFS instead. Do not define the same target through both environment variables and persisted configuration.
+Utilisez HTTPS pour les collecteurs distants. Laissez la vérification des certificats activée, stockez les jetons Bearer hors du dépôt de code source et fournissez à la fois le certificat client et la clé lorsque vous utilisez mTLS. Les charges utiles d’audit peuvent contenir des métadonnées de requête et d’identité sensibles pour la sécurité.
 
 :::
 
-## Usage
+Pour toutes les familles de cibles et les clés propres à chaque cible, consultez les [variables d’environnement](/fr/reference/environment-variables#cibles-dévénements-et-daudit).
 
-:::note[rc command-line support]
+### Plusieurs cibles
 
-The current `rc` client does not provide commands for creating, listing, or removing Audit Targets. Configure them through environment variables or the Console. The `rc bucket event` commands manage bucket notification rules only; they do not manage audit delivery.
+Ajoutez un suffixe distinct en majuscules pour définir une autre instance. Par exemple, utilisez `RUSTFS_AUDIT_WEBHOOK_ENABLE_ARCHIVE` et les réglages `_ARCHIVE` correspondants pour créer un webhook `archive` à côté de `primary`.
+
+RustFS diffuse chaque enregistrement d’audit vers toutes les cibles activées. L’échec d’une cible n’empêche pas les tentatives de livraison vers les autres.
+
+:::note[Cibles gérées par l’environnement]
+
+Une cible définie par des variables d’environnement ne peut être ni modifiée ni supprimée via la Console ou l’API d’administration. Modifiez ses variables d’environnement, puis redémarrez RustFS. Ne définissez pas la même cible à la fois par des variables d’environnement et par une configuration persistée.
 
 :::
 
-### Verify the receiver
+## Utilisation
 
-Before generating traffic, verify that the collector is reachable from the RustFS host and accepts the configured bearer token:
+:::note[Prise en charge de la ligne de commande rc]
+
+Le client `rc` actuel ne fournit pas de commandes pour créer, lister ou supprimer les cibles d’audit. Configurez-les par des variables d’environnement ou dans la Console. Les commandes `rc bucket event` gèrent uniquement les règles de notification des compartiments ; elles ne gèrent pas la livraison d’audit.
+
+:::
+
+### Vérifier le récepteur
+
+Avant de générer du trafic, vérifiez que le collecteur est accessible depuis l’hôte RustFS et qu’il accepte le jeton Bearer configuré :
 
 ```bash
 curl --fail --head \
 	https://audit.example.com/
 ```
 
-The health check measures origin reachability and does not include the webhook authorization token. Separately confirm that the configured `/rustfs` delivery path accepts `Authorization: Bearer <your-webhook-token>` on `POST` requests.
+Le contrôle d’intégrité mesure l’accessibilité de l’origine et n’inclut pas le jeton d’autorisation du webhook. Confirmez séparément que le chemin de livraison `/rustfs` configuré accepte `Authorization: Bearer <your-webhook-token>` sur les requêtes `POST`.
 
-If the target remains offline, check DNS, firewall policy, `RUSTFS_OUTBOUND_ALLOW_ORIGINS`, certificate trust, and the origin's response to `HEAD /`.
+Si la cible reste hors ligne, vérifiez le DNS, la politique de pare-feu, `RUSTFS_OUTBOUND_ALLOW_ORIGINS`, la confiance accordée aux certificats et la réponse de l’origine à `HEAD /`.
 
-### Generate an audit record
+### Générer un enregistrement d’audit
 
-Perform an authenticated S3 operation against RustFS:
+Effectuez une opération S3 authentifiée sur RustFS :
 
 ```bash
 printf 'hello from RustFS\n' > hello.txt
@@ -105,7 +105,7 @@ aws --endpoint-url http://localhost:9000 \
 	s3 cp hello.txt s3://my-bucket/hello.txt
 ```
 
-The webhook receives a JSON audit entry. Fields vary by operation and empty optional fields may be omitted. A representative subset is:
+Le webhook reçoit une entrée d’audit JSON. Les champs varient selon l’opération et les champs facultatifs vides peuvent être omis. Un sous-ensemble représentatif est le suivant :
 
 ```json
 {
@@ -128,16 +128,16 @@ The webhook receives a JSON audit entry. Fields vary by operation and empty opti
 }
 ```
 
-Treat the payload schema as additive. Parse the fields you need and tolerate unknown or absent fields so collectors remain compatible with later RustFS releases.
+Considérez le schéma de la charge utile comme additif. Analysez les champs dont vous avez besoin et tolérez les champs inconnus ou absents, afin que les collecteurs restent compatibles avec les versions ultérieures de RustFS.
 
-### Delivery behavior
+### Comportement de livraison
 
-When `RUSTFS_AUDIT_WEBHOOK_QUEUE_DIR_PRIMARY` is configured, RustFS stores pending records on disk and replays them after transient delivery failures. Size the queue directory and `RUSTFS_AUDIT_WEBHOOK_QUEUE_LIMIT_PRIMARY` for the expected outage window, then monitor both disk usage and target health.
+Lorsque `RUSTFS_AUDIT_WEBHOOK_QUEUE_DIR_PRIMARY` est configuré, RustFS stocke les enregistrements en attente sur disque et les rejoue après des échecs de livraison transitoires. Dimensionnez le répertoire de file d’attente et `RUSTFS_AUDIT_WEBHOOK_QUEUE_LIMIT_PRIMARY` pour la fenêtre d’indisponibilité attendue, puis surveillez à la fois l’utilisation du disque et l’état de la cible.
 
-Webhook delivery is at least once. A timeout can occur after the receiver processes a request but before RustFS observes the response, so use `requestID` and other stable fields to deduplicate records where required.
+La livraison webhook est au moins une fois. Un délai d’expiration peut survenir après que le récepteur a traité une requête, mais avant que RustFS n’observe la réponse : utilisez `requestID` et d’autres champs stables pour dédupliquer les enregistrements lorsque c’est nécessaire.
 
-The receiver should acknowledge a record only after it has durably accepted it. Returning a non-success status keeps failures visible to the delivery path; silently accepting and discarding a record cannot be recovered by RustFS.
+Le récepteur ne devrait accuser réception d’un enregistrement qu’après l’avoir accepté de façon durable. Renvoyer un statut autre que le succès maintient les échecs visibles pour le chemin de livraison ; un enregistrement accepté puis ignoré en silence ne peut pas être récupéré par RustFS.
 
-## Next steps
+## Étapes suivantes
 
-Configure [Event Notifications](/operations/event-notifications) for bucket-scoped application workflows. Review [Observability](/operations/observability) to monitor service health and [Credentials](/operations/credentials) to limit administrative access.
+Configurez les [notifications d’événements](/fr/operations/event-notifications) pour les flux applicatifs limités à un compartiment. Consultez l’[observabilité](/fr/operations/observability) pour surveiller l’état du service et les [identifiants](/fr/operations/credentials) pour limiter l’accès administratif.

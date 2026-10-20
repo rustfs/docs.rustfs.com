@@ -1,26 +1,26 @@
 ---
 title: "SSE-C"
-description: "Use customer-provided AES-256 keys for RustFS object encryption and decryption."
+description: "顧客が提供する AES-256 鍵を使い、RustFS のオブジェクトを暗号化および復号します。"
 ---
 
-SSE-C encrypts an object with a 256-bit key supplied by the client on every write and read request. RustFS validates and uses the key for the request but does not persist the plaintext customer key. SSE-C does not use the RustFS KMS backend.
+SSE-C は、書き込みと読み取りのリクエストごとにクライアントが提供する 256 ビット鍵でオブジェクトを暗号化します。RustFS はリクエストのために鍵を検証して使いますが、平文の顧客鍵は永続化しません。SSE-C は RustFS の KMS バックエンドを使いません。
 
-## Requirements
+## 要件
 
-- Install and configure [`rc`](/operations/rc).
-- Install OpenSSL for the key-generation example.
-- Use HTTPS so customer keys are encrypted in transit.
-- Store the customer key in a secret manager and maintain a mapping between each object and its key.
+- [`rc`](/ja/operations/rc) をインストールして設定します。
+- 鍵生成の例のために OpenSSL をインストールします。
+- 顧客鍵が転送中に暗号化されるよう、HTTPS を使います。
+- 顧客鍵はシークレットマネージャーに保管し、各オブジェクトと鍵の対応関係を維持します。
 
-:::warning[The same key is required for every read]
+:::warning[読み取りのたびに同じ鍵が必要です]
 
-If you lose an SSE-C key, RustFS cannot recover it and the object becomes unreadable. Never log, commit, or send the key over an unencrypted connection.
+SSE-C 鍵を失うと、RustFS は回復できず、オブジェクトは読めなくなります。鍵をログに記録したり、コミットしたり、暗号化されていない接続で送ったりしないでください。
 
 :::
 
-## Prepare a customer key
+## 顧客鍵を用意する
 
-Generate 32 random bytes through a hexadecimal intermediate, then derive the Base64 key and its Base64-encoded MD5 checksum:
+16 進数の中間表現を経由して 32 バイトの乱数を生成し、Base64 鍵とその Base64 エンコードされた MD5 チェックサムを導出します。
 
 ```bash
 SSE_C_KEY_HEX=$(openssl rand -hex 32)
@@ -29,11 +29,11 @@ SSE_C_KEY_MD5=$(printf '%s' "$SSE_C_KEY_HEX" | xxd -r -p \
 	| openssl dgst -md5 -binary | openssl base64 -A)
 ```
 
-Move these values into your approved secret-management workflow. Do not print them to the terminal or shell history.
+これらの値は、承認されたシークレット管理の手順へ移します。端末やシェル履歴には出力しないでください。
 
-## Upload an encrypted object
+## 暗号化したオブジェクトをアップロードする
 
-`rc 0.1.29` has no dedicated SSE-C option. Its signed custom-header option can send the three S3 SSE-C headers:
+`rc 0.1.29` には専用の SSE-C オプションがありません。署名付きカスタムヘッダーを送るオプションで、3 つの S3 SSE-C ヘッダーを送れます。
 
 ```bash
 rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt \
@@ -42,17 +42,17 @@ rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt \
 	-H "x-amz-server-side-encryption-customer-key-md5:$SSE_C_KEY_MD5"
 ```
 
-The required request headers are:
+必要なリクエストヘッダーは次のとおりです。
 
-| Header | Value |
+| ヘッダー | 値 |
 | --- | --- |
 | `x-amz-server-side-encryption-customer-algorithm` | `AES256` |
-| `x-amz-server-side-encryption-customer-key` | Base64-encoded 32-byte key |
-| `x-amz-server-side-encryption-customer-key-md5` | Base64-encoded MD5 digest of the raw key |
+| `x-amz-server-side-encryption-customer-key` | Base64 エンコードされた 32 バイトの鍵 |
+| `x-amz-server-side-encryption-customer-key-md5` | 生の鍵の MD5 ダイジェストを Base64 エンコードした値 |
 
-## Read the encrypted object
+## 暗号化したオブジェクトを読み取る
 
-Supply the same three headers on reads and metadata requests:
+読み取りとメタデータのリクエストには、同じ 3 つのヘッダーを指定します。
 
 ```bash
 rc object show rustfs/my-bucket/hello.txt \
@@ -61,24 +61,24 @@ rc object show rustfs/my-bucket/hello.txt \
 	-H "x-amz-server-side-encryption-customer-key-md5:$SSE_C_KEY_MD5"
 ```
 
-The same workflow was validated with `rc 0.1.29` against RustFS by uploading an object, reading it with the original key, and comparing the returned bytes with the source.
+同じ手順は、`rc 0.1.29` を使って RustFS に対して検証済みです。オブジェクトをアップロードし、元の鍵で読み取り、返されたバイト列をソースと比較しています。
 
-:::warning[Protect command arguments]
+:::warning[コマンド引数を保護する]
 
-The generic `-H` method places expanded header values in the `rc` process arguments, which may be visible to other processes on the host. For production automation, prefer an S3 SDK that accepts SSE-C key material through protected memory or a credential provider instead of command-line arguments.
+汎用の `-H` 方式は、展開されたヘッダー値を `rc` プロセスの引数に置くため、ホスト上の他のプロセスから見えることがあります。本番の自動化では、コマンドライン引数ではなく、保護されたメモリまたは認証情報プロバイダーを通じて SSE-C の鍵材料を受け取る S3 SDK を使うことを推奨します。
 
 :::
 
-## Clear shell variables
+## シェル変数を消去する
 
-After the operation, remove key material from the shell environment:
+操作のあと、シェル環境から鍵材料を削除します。
 
 ```bash
 unset SSE_C_KEY_HEX SSE_C_KEY_B64 SSE_C_KEY_MD5
 ```
 
-Changing a bucket's SSE-S3 or SSE-KMS default does not alter SSE-C objects. SSE-C is selected by the customer-key headers on each individual request and takes precedence for that request.
+バケットの SSE-S3 または SSE-KMS のデフォルトを変更しても、SSE-C オブジェクトは変わりません。SSE-C は、個々のリクエストの顧客鍵ヘッダーによって選択され、そのリクエストでは優先されます。
 
-## Next steps
+## 次のステップ
 
-Compare [SSE-S3](./sse-s.md) for server-managed encryption and [KMS](./kms.md) for explicit KMS-backed key management.
+サーバー管理の暗号化については [SSE-S3](./sse-s.md) を、明示的な KMS による鍵管理については [KMS](./kms.md) を比較します。

@@ -1,11 +1,11 @@
 ---
 title: "s3cmd"
-description: "Connect s3cmd to RustFS and perform basic object operations from the command line."
+description: "s3cmd を RustFS に接続し、コマンドラインから基本的なオブジェクト操作を行います。"
 ---
 
-[s3cmd](https://s3tools.org/s3cmd) is a command-line client for S3-compatible storage. Point it at your RustFS endpoint with a small config file.
+[s3cmd](https://s3tools.org/s3cmd) は、S3 互換ストレージ向けのコマンドラインクライアントです。小さな設定ファイルで、RustFS のエンドポイントを指定します。
 
-## Install
+## インストール
 
 ```bash
 # macOS
@@ -16,9 +16,9 @@ sudo apt install s3cmd
 pip install s3cmd
 ```
 
-## Configure
+## 設定
 
-Create `~/.s3cfg`. Replace `localhost:9000` with your server address and use your own [access keys](../../security-compliance/iam/access-token.md). RustFS uses path-style addressing, so set the bucket host to the same endpoint:
+`~/.s3cfg` を作成します。`localhost:9000` を実際のサーバーアドレスに置き換え、独自の[アクセスキー](../../security-compliance/iam/access-token.md)を使います。RustFS はパススタイルアクセスを使うため、バケットのホストを同じエンドポイントに設定します。
 
 ```ini title="~/.s3cfg"
 [default]
@@ -32,13 +32,13 @@ signature_v2 = False
 
 :::note
 
-Set `use_https = True` and point at port `9000` if you have [configured TLS](../../integration/tls-configured.md).
+[TLS を設定している](../../integration/tls-configured.md)場合は、`use_https = True` にし、ポート `9000` を指定します。
 
 :::
 
-## Verify
+## 検証
 
-Create a bucket, upload a file, and list it:
+バケットを作成し、ファイルをアップロードして、一覧表示します。
 
 ```bash
 s3cmd mb s3://my-bucket
@@ -51,6 +51,6 @@ upload: '/path/to/hello.txt' -> 's3://my-bucket/hello.txt'  [1 of 1]
 2026-07-16 10:00        12   s3://my-bucket/hello.txt
 ```
 
-## Next steps
+## 次のステップ
 
-See the [SDK overview](../sdk/index.md) to connect an application, or manage objects with [`rc`](/operations/rc).
+アプリケーションを接続するには [SDK の概要](../sdk/index.md)を参照するか、[`rc`](/ja/operations/rc) でオブジェクトを管理します。

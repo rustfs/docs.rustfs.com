@@ -1,23 +1,27 @@
 ---
-title: "RustFS Bucket Deletion"
-description: "Delete buckets using the RustFS UI, rc, or the S3 API."
+title: "Delete a bucket"
+description: "Delete a bucket on the Console, with rc, or with the S3 API."
 ---
 
-This guide explains how to delete buckets using the RustFS UI, `rc`, or the S3 API.
+This guide explains how to delete a bucket on the Console, with `rc`, or with the S3 API.
 
 ## Requirements
 
 - Install and configure [`rc`](/operations/rc) before using the command-line workflow.
 - Empty the target bucket before deleting it, or use `--force` only after reviewing the objects that will be removed.
 
-**Warning**: Deleting a bucket is irreversible and may break applications relying on it. Ensure you have backed up any necessary data before proceeding.
+:::warning[Deletion is permanent]
 
-## Using the RustFS UI
+Deleting a bucket is irreversible and can break applications that depend on it. Back up any data you need before you continue.
 
-1. Log in to the RustFS Console.
+:::
+
+## Use the RustFS Console
+
+1. Sign in to the RustFS Console.
 2. On the homepage, select the bucket you want to delete.
 3. On the far right, select the **Delete** button.
-4. In the popup dialog, click **Confirm** to complete bucket deletion.
+4. In the confirmation dialog, select **Confirm**.
 
 ![bucket deletion](images/bucket-deletion-on-ui.png)
 

@@ -1,13 +1,13 @@
 ---
 title: "Alluxio"
-description: "Cache RustFS buckets with Alluxio for faster reads."
+description: "Alluxio で RustFS のバケットをキャッシュし、読み取りを高速化します。"
 ---
 
-This guide connects [Alluxio](https://github.com/Alluxio/alluxio) — the distributed data orchestration layer — to **RustFS** as an under filesystem (UFS). You will run a standalone Alluxio cluster in Docker, mount a RustFS bucket, read an object through the cache, and write a file back to the bucket through Alluxio. The workflow was verified with Alluxio 2.9.4 against `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、分散データオーケストレーション層である [Alluxio](https://github.com/Alluxio/alluxio) を、アンダーファイルシステム（UFS）として **RustFS** に接続します。Docker 上でスタンドアロンの Alluxio クラスターを起動し、RustFS のバケットをマウントし、キャッシュ経由でオブジェクトを読み取り、Alluxio 経由でファイルをバケットへ書き戻します。手順は Alluxio 2.9.4 と `rustfs/rustfs-x86-musl:v2.3.1` の組み合わせで確認済みです。
 
-You need Docker with `--shm-size 2g` capacity (the worker uses a tmpfs ramdisk).
+ワーカーは tmpfs の RAM ディスクを使うため、Docker には `--shm-size 2g` の共有メモリが必要です。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -17,11 +17,11 @@ flowchart LR
 	Writer["Alluxio writes"] -->|"persist"| RustFS
 ```
 
-Objects read once are cached in the worker's ramdisk; repeated reads are served from memory. Writes through Alluxio land in the bucket as regular objects.
+一度読み取ったオブジェクトはワーカーの RAM ディスクにキャッシュされ、繰り返しの読み取りはメモリから応答されます。Alluxio 経由の書き込みは、通常のオブジェクトとしてバケットに保存されます。
 
-## 1. Run the master and worker
+## 1. マスターとワーカーを起動する
 
-The standalone image starts one process per invocation. Run the master first, then the worker:
+スタンドアロンイメージは、1 回の起動につき 1 プロセスを開始します。先にマスターを起動し、続けてワーカーを起動します。
 
 ```bash
 docker run -d --name alluxio-master --hostname alluxio --network oo-rustfs_default \
@@ -37,11 +37,11 @@ Capacity information for all workers:
     Total Capacity: 1024.00MB
 ```
 
-If the worker exits immediately with `tmpfs is smaller than the configured size`, the container was started without `--shm-size`.
+ワーカーが `tmpfs is smaller than the configured size` ですぐに終了する場合、コンテナは `--shm-size` なしで起動されています。
 
-## 2. Mount the RustFS bucket
+## 2. RustFS のバケットをマウントする
 
-The credential options must use the full `alluxio.underfs.s3.*` key names — short `s3a.*` or `aws.*` keys are accepted by the CLI but ignored by the UFS client:
+認証情報のオプションには、完全なキー名 `alluxio.underfs.s3.*` を使う必要があります。短い `s3a.*` や `aws.*` のキーは CLI では受け付けられますが、UFS クライアントは無視します。
 
 ```bash
 docker exec alluxio alluxio fs mount \
@@ -57,11 +57,11 @@ docker exec alluxio alluxio fs mount \
 Mounted s3://alluxio-demo/ at /rustfs
 ```
 
-`disable.dns.buckets` forces path-style addressing, which the IP-style endpoint requires.
+`disable.dns.buckets` はパススタイルアクセスを強制します。IP 形式のエンドポイントではこれが必要です。
 
-## 3. Read through the cache
+## 3. キャッシュ経由で読み取る
 
-List the mount and read a seeded object:
+マウントを一覧し、あらかじめ配置したオブジェクトを読み取ります。
 
 ```bash
 docker exec alluxio alluxio fs ls /rustfs
@@ -73,11 +73,11 @@ docker exec alluxio alluxio fs cat /rustfs/rustfs-test.txt
 hello from s3fs
 ```
 
-`PERSISTED` means the source of truth is in RustFS; the worker caches blocks after the first read.
+`PERSISTED` は、正本が RustFS にあることを示します。ワーカーは初回の読み取り後にブロックをキャッシュします。
 
-## 4. Write through Alluxio
+## 4. Alluxio 経由で書き込む
 
-Copy a local file into the mount:
+ローカルファイルをマウントへコピーします。
 
 ```bash
 echo "written via alluxio cache to rustfs" > /tmp/rt.txt
@@ -89,7 +89,7 @@ docker exec alluxio alluxio fs copyFromLocal /tmp/rt.txt /rustfs/alluxio-write.t
 Copied 'file:///tmp/rt.txt' to '/rustfs/alluxio-write.txt'
 ```
 
-Verify the object in RustFS:
+RustFS でオブジェクトを確認します。
 
 ```bash
 rc ls rustfs/alluxio-demo/
@@ -102,9 +102,9 @@ rc cat rustfs/alluxio-demo/alluxio-write.txt
 written via alluxio cache to rustfs
 ```
 
-![Alluxio-managed files stored in the RustFS Console](./images/rustfs-alluxio-mount.png)
+![RustFS Console に保存された Alluxio 管理下のファイル](./images/rustfs-alluxio-mount.png)
 
-## 5. Stop or reset
+## 5. 停止またはリセットする
 
 ```bash
 docker exec alluxio alluxio fs unmount /rustfs
@@ -112,22 +112,22 @@ docker rm -f alluxio
 rc rm rustfs/alluxio-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### Worker exits with `tmpfs is smaller than the configured size`
+### `tmpfs is smaller than the configured size` でワーカーが終了する
 
-The worker places its ramdisk in `/dev/shm`, which Docker caps at 64 MB by default. Start the container with `--shm-size 2g` or lower `alluxio.worker.ramdisk.size`.
+ワーカーは RAM ディスクを `/dev/shm` に置きます。Docker の既定では、ここは 64 MB に制限されます。コンテナを `--shm-size 2g` で起動するか、`alluxio.worker.ramdisk.size` を下げます。
 
-### Mount succeeds but `fs ls` returns `InvalidAccessKeyId`
+### マウントは成功するが `fs ls` が `InvalidAccessKeyId` を返す
 
-The mount options used short key names (`s3a.*`, `aws.*`). Alluxio's UFS client only honors the full `alluxio.underfs.s3.*` keys shown in step 2.
+マウントオプションに短いキー名（`s3a.*`、`aws.*`）が使われています。Alluxio の UFS クライアントが受け付けるのは、手順 2 に示した完全な `alluxio.underfs.s3.*` のキーだけです。
 
 ### `S3 client v2 does not support global bucket access`
 
-Path-style addressing is off. Add `--option alluxio.underfs.s3.disable.dns.buckets=true` — the IP-style RustFS endpoint requires it.
+パススタイルアクセスが無効です。`--option alluxio.underfs.s3.disable.dns.buckets=true` を追加します。IP 形式の RustFS エンドポイントでは必須です。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Alluxio UFS types.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Alluxio documentation](https://docs.alluxio.io/os/user/stable/ufs/S3.html) for cache policies, TTLs, and multi-tier storage on top of the same bucket.
+- ほかの Alluxio UFS タイプを採用する前に、[S3 互換性に関する注意](/ja/administration/protocols/s3)を確認します。
+- [アクセスキーの管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- 同じバケット上のキャッシュポリシー、TTL、多層ストレージについては、[Alluxio のドキュメント](https://docs.alluxio.io/os/user/stable/ufs/S3.html)に従います。

@@ -1,13 +1,13 @@
 ---
 title: "Kopia"
-description: "Back up files to RustFS with Kopia's S3 repository backend."
+description: "Sauvegardez des fichiers vers RustFS avec le backend de dépôt S3 de Kopia."
 ---
 
-This guide connects [Kopia](https://github.com/kopia/kopia) — the open-source backup and restore tool — to **RustFS** as an S3 repository. You will create a repository in a RustFS bucket, take a snapshot of a directory, restore it into an empty directory, and compare checksums. The workflow was verified with `kopia/kopia:0.18.1` and `rustfs/rustfs-x86-musl:v2.3.1`.
+Ce guide connecte [Kopia](https://github.com/kopia/kopia) — l’outil open source de sauvegarde et de restauration — à **RustFS** comme dépôt S3. Vous allez créer un dépôt dans un compartiment (bucket) RustFS, prendre un instantané d’un répertoire, le restaurer dans un répertoire vide et comparer les sommes de contrôle. Le flux a été validé avec `kopia/kopia:0.18.1` et `rustfs/rustfs-x86-musl:v2.3.1`.
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Vous avez besoin de Docker. Ce déploiement est destiné aux tests d’intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -16,11 +16,11 @@ flowchart LR
 	Kopia -->|restore| Restore["Restored files"]
 ```
 
-Kopia stores the repository format files and deduplicated, encrypted content blocks in the bucket. Restores read the blocks back and reassemble the original files, so the checksum of every restored file must match the source.
+Kopia stocke les fichiers de format du dépôt ainsi que les blocs de contenu dédupliqués et chiffrés dans le compartiment. Les restaurations relisent les blocs et reconstituent les fichiers d’origine, si bien que la somme de contrôle de chaque fichier restauré doit correspondre à la source.
 
-## 1. Create the repository
+## 1. Créer le dépôt
 
-Create the bucket first, then initialize the Kopia repository inside it. The endpoint is a bare `host:port` (no scheme); `--disable-tls` switches the client to plain HTTP:
+Créez d’abord le compartiment, puis initialisez le dépôt Kopia à l’intérieur. Le point de terminaison est un `host:port` nu (sans schéma) ; `--disable-tls` fait passer le client en HTTP simple :
 
 ```bash
 rc alias set rustfs http://<your-rustfs-endpoint>:9000 <your-access-key> <your-secret-key>
@@ -37,11 +37,11 @@ docker run --rm --network oo-rustfs_default kopia/kopia:0.18.1 repository create
   --override-username demo --override-hostname workstation
 ```
 
-Kopia validates the provider by reading and writing through the S3 API before it reports success.
+Kopia valide le fournisseur en lisant et en écrivant via l’API S3 avant de signaler le succès.
 
-## 2. Connect, snapshot, and restore
+## 2. Se connecter, prendre un instantané et restaurer
 
-Run the following commands from the directory holding your `repository.config` (created by the previous step). Kopia reads the connection settings from that file, so the S3 flags are only needed once:
+Exécutez les commandes suivantes depuis le répertoire qui contient votre `repository.config` (créé à l’étape précédente). Kopia lit les réglages de connexion dans ce fichier, si bien que les indicateurs S3 ne sont nécessaires qu’une fois :
 
 ```bash
 export KOPIA_PASSWORD=<your-kopia-password>
@@ -65,7 +65,7 @@ kopia snapshot create /source
 kopia snapshot list
 ```
 
-Restore the snapshot into an empty directory and compare checksums with the source. The snapshot ID is the `ka...` identifier printed by `snapshot list`:
+Restaurez l’instantané dans un répertoire vide et comparez les sommes de contrôle avec la source. L’ID d’instantané est l’identifiant `ka...` affiché par `snapshot list` :
 
 ```bash
 kopia restore <snapshot-id> /restore
@@ -78,15 +78,15 @@ bec4530e2798465b...  source/blob.bin
 bec4530e2798465b...  restore/blob.bin
 ```
 
-## 3. Verify objects in RustFS
+## 3. Vérifier les objets dans RustFS
 
-List the bucket:
+Listez le compartiment :
 
 ```bash
 rc ls rustfs/kopia-backups/ -r
 ```
 
-The output shows the repository format files plus the packed content blocks written by the snapshot:
+La sortie montre les fichiers de format du dépôt ainsi que les blocs de contenu empaquetés écrits par l’instantané :
 
 ```text
 kopia.blobcfg
@@ -94,32 +94,32 @@ kopia.repository
 p0000.../...
 ```
 
-![Kopia repository blocks stored in the RustFS Console](./images/rustfs-kopia-repo.png)
+![Blocs du dépôt Kopia stockés dans la Console RustFS](./images/rustfs-kopia-repo.png)
 
-## 4. Stop or reset
+## 4. Arrêter ou réinitialiser
 
-Kopia is a client-side tool and holds no running state. To delete the repository and all snapshots, remove the bucket:
+Kopia est un outil côté client et ne conserve aucun état en cours d’exécution. Pour supprimer le dépôt et tous les instantanés, supprimez le compartiment :
 
 ```bash
 rc rb rustfs/kopia-backups --force
 ```
 
-## Troubleshooting
+## Dépannage
 
 ### `Endpoint url cannot have fully qualified paths`
 
-The endpoint must be a bare `host:port` value without a scheme or path — Kopia builds the object URLs itself.
+Le point de terminaison doit être une valeur `host:port` nue, sans schéma ni chemin — Kopia construit lui-même les URL des objets.
 
 ### `server gave HTTP response to HTTPS client`
 
-Without `--disable-tls`, Kopia speaks HTTPS. RustFS without TLS needs the `--disable-tls` flag on both `repository create s3` and `repository connect s3`.
+Sans `--disable-tls`, Kopia parle HTTPS. RustFS sans TLS a besoin de l’indicateur `--disable-tls` à la fois sur `repository create s3` et sur `repository connect s3`.
 
-### `can't connect to storage` with a DNS error
+### `can't connect to storage` avec une erreur DNS
 
-The S3 client is using virtual-hosted addressing. Keep the endpoint as a bare `host:port` value; Kopia uses path-style requests for endpoints given in that form.
+Le client S3 utilise l’adressage de type hôte virtuel. Conservez le point de terminaison sous la forme d’une valeur `host:port` nue ; Kopia utilise des requêtes en adressage de type chemin (path-style) pour les points de terminaison donnés sous cette forme.
 
-## Next steps
+## Étapes suivantes
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Kopia operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Kopia repository documentation](https://kopia.io/docs/repositories/) to add policies, retention, and scheduled snapshots.
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres opérations Kopia.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
+- Suivez la [documentation des dépôts Kopia](https://kopia.io/docs/repositories/) pour ajouter des politiques, une rétention et des instantanés planifiés.

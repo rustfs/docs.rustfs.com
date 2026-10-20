@@ -1,36 +1,36 @@
 ---
-title: "Event Notifications"
-description: "Configure RustFS bucket event notifications and deliver filtered object events to external targets."
+title: "Ereignisbenachrichtigungen"
+description: "Konfigurieren Sie Bucket-Ereignisbenachrichtigungen in RustFS und liefern Sie gefilterte Objektereignisse an externe Ziele."
 ---
 
-RustFS Event Notifications deliver S3 bucket activity to external systems. This guide configures a webhook target, associates it with a bucket, and verifies delivery with AWS CLI.
+RustFS-Ereignisbenachrichtigungen liefern S3-Bucket-Aktivität an externe Systeme. In dieser Anleitung konfigurieren Sie ein Webhook-Ziel, ordnen es einem Bucket zu und prüfen die Zustellung mit der AWS CLI.
 
-## Overview
+## Überblick
 
-An event notification has two independent parts:
+Eine Ereignisbenachrichtigung hat zwei unabhängige Teile:
 
-- A **notification target** defines where RustFS sends events.
-- A **bucket notification configuration** selects the target, event types, and optional object-key filters for one bucket.
+- Ein **Benachrichtigungsziel** legt fest, wohin RustFS Ereignisse sendet.
+- Eine **Bucket-Benachrichtigungskonfiguration** wählt das Ziel, die Ereignistypen und optionale Filter für Objektschlüssel für einen Bucket.
 
-RustFS supports webhook, Kafka, MQTT, MySQL, PostgreSQL, NATS, Redis, AMQP, and Pulsar target families. The webhook workflow below is useful for HTTP services, serverless functions, and integration platforms.
+RustFS unterstützt die Zielfamilien Webhook, Kafka, MQTT, MySQL, PostgreSQL, NATS, Redis, AMQP und Pulsar. Der folgende Webhook-Ablauf eignet sich für HTTP-Dienste, serverlose Funktionen und Integrationsplattformen.
 
-Bucket rules use the S3 `PutBucketNotificationConfiguration` and `GetBucketNotificationConfiguration` APIs. RustFS currently accepts queue configurations; AWS SNS topic and Lambda function configurations are not supported.
+Bucket-Regeln verwenden die S3-APIs `PutBucketNotificationConfiguration` und `GetBucketNotificationConfiguration`. RustFS akzeptiert derzeit Warteschlangenkonfigurationen. Konfigurationen für AWS-SNS-Themen und Lambda-Funktionen werden nicht unterstützt.
 
-Common event families include:
+Übliche Ereignisfamilien sind:
 
-| Event family | Example events |
+| Ereignisfamilie | Beispielereignisse |
 | --- | --- |
-| Object creation | `s3:ObjectCreated:Put`, `s3:ObjectCreated:Copy`, `s3:ObjectCreated:CompleteMultipartUpload` |
-| Object removal | `s3:ObjectRemoved:Delete`, `s3:ObjectRemoved:DeleteMarkerCreated` |
-| Object access | `s3:ObjectAccessed:Get`, `s3:ObjectAccessed:Head` |
-| Object tagging | `s3:ObjectTagging:Put`, `s3:ObjectTagging:Delete` |
-| Lifecycle and tiering | Expiration, restore, replication, and transition events |
+| Objekterstellung | `s3:ObjectCreated:Put`, `s3:ObjectCreated:Copy`, `s3:ObjectCreated:CompleteMultipartUpload` |
+| Objektentfernung | `s3:ObjectRemoved:Delete`, `s3:ObjectRemoved:DeleteMarkerCreated` |
+| Objektzugriff | `s3:ObjectAccessed:Get`, `s3:ObjectAccessed:Head` |
+| Objekt-Tagging | `s3:ObjectTagging:Put`, `s3:ObjectTagging:Delete` |
+| Lebenszyklus und Stufung | Ereignisse für Ablauf, Wiederherstellung, Replikation und Übergang |
 
-Use a wildcard such as `s3:ObjectCreated:*` to subscribe to every event in a family.
+Verwenden Sie einen Platzhalter wie `s3:ObjectCreated:*`, um jedes Ereignis einer Familie zu abonnieren.
 
-## Configuration
+## Konfiguration
 
-Event Notifications are disabled by default. The following environment variables enable the module and create a webhook target named `primary`:
+Ereignisbenachrichtigungen sind standardmäßig deaktiviert. Die folgenden Umgebungsvariablen aktivieren das Modul und legen ein Webhook-Ziel namens `primary` an:
 
 ```bash
 export RUSTFS_NOTIFY_ENABLE="true"
@@ -41,40 +41,40 @@ export RUSTFS_NOTIFY_WEBHOOK_QUEUE_DIR_PRIMARY="/var/lib/rustfs/notify-primary"
 export RUSTFS_OUTBOUND_ALLOW_ORIGINS="https://events.example.com"
 ```
 
-Restart RustFS after changing environment-managed targets. The target name is the lowercase form of the environment-variable suffix, so `_PRIMARY` creates `primary`. Use the target ARN `arn:rustfs:sqs:us-east-1:primary:webhook` in the bucket configuration.
+Starten Sie RustFS neu, nachdem Sie Ziele geändert haben, die über die Umgebung verwaltet werden. Der Zielname ist die Kleinschreibung des Suffixes der Umgebungsvariablen. `_PRIMARY` erzeugt also `primary`. Verwenden Sie in der Bucket-Konfiguration den Ziel-ARN `arn:rustfs:sqs:us-east-1:primary:webhook`.
 
-RustFS sends a `HEAD` health check to the endpoint origin's root path, such as `https://events.example.com/`, and sends JSON `POST` requests to the complete configured endpoint. The origin must respond to `HEAD`, while delivery requests must return a successful HTTP status. Allow the RustFS service account to write to the queue directory.
+RustFS sendet eine `HEAD`-Integritätsprüfung an den Wurzelpfad des Endpunkt-Ursprungs, etwa `https://events.example.com/`, und sendet JSON-`POST`-Anfragen an den vollständig konfigurierten Endpunkt. Der Ursprung muss auf `HEAD` antworten, und Zustellanfragen müssen einen erfolgreichen HTTP-Status liefern. Erlauben Sie dem RustFS-Dienstkonto, in das Warteschlangenverzeichnis zu schreiben.
 
-### Webhook settings
+### Webhook-Einstellungen
 
-Use the same `_PRIMARY` suffix on all settings for this target:
+Verwenden Sie für alle Einstellungen dieses Ziels dasselbe Suffix `_PRIMARY`:
 
-| Variable | Purpose |
+| Variable | Zweck |
 | --- | --- |
-| `RUSTFS_NOTIFY_WEBHOOK_ENDPOINT_PRIMARY` | HTTP or HTTPS delivery endpoint |
-| `RUSTFS_NOTIFY_WEBHOOK_AUTH_TOKEN_PRIMARY` | Bearer token sent in the `Authorization` header |
-| `RUSTFS_NOTIFY_WEBHOOK_QUEUE_DIR_PRIMARY` | Directory for queued deliveries |
-| `RUSTFS_NOTIFY_WEBHOOK_QUEUE_LIMIT_PRIMARY` | Maximum number of queued events |
-| `RUSTFS_NOTIFY_WEBHOOK_CLIENT_CERT_PRIMARY` | Client certificate for mutual TLS (mTLS) |
-| `RUSTFS_NOTIFY_WEBHOOK_CLIENT_KEY_PRIMARY` | Private key paired with the client certificate |
-| `RUSTFS_NOTIFY_WEBHOOK_CLIENT_CA_PRIMARY` | Certificate authority used to verify the receiver |
-| `RUSTFS_NOTIFY_WEBHOOK_SKIP_TLS_VERIFY_PRIMARY` | Disable server certificate verification |
+| `RUSTFS_NOTIFY_WEBHOOK_ENDPOINT_PRIMARY` | HTTP- oder HTTPS-Zustellendpunkt |
+| `RUSTFS_NOTIFY_WEBHOOK_AUTH_TOKEN_PRIMARY` | Bearer-Token, das im Header `Authorization` gesendet wird |
+| `RUSTFS_NOTIFY_WEBHOOK_QUEUE_DIR_PRIMARY` | Verzeichnis für eingereihte Zustellungen |
+| `RUSTFS_NOTIFY_WEBHOOK_QUEUE_LIMIT_PRIMARY` | Höchstzahl eingereihter Ereignisse |
+| `RUSTFS_NOTIFY_WEBHOOK_CLIENT_CERT_PRIMARY` | Client-Zertifikat für gegenseitiges TLS (mTLS) |
+| `RUSTFS_NOTIFY_WEBHOOK_CLIENT_KEY_PRIMARY` | Privater Schlüssel zum Client-Zertifikat |
+| `RUSTFS_NOTIFY_WEBHOOK_CLIENT_CA_PRIMARY` | Zertifizierungsstelle, mit der der Empfänger geprüft wird |
+| `RUSTFS_NOTIFY_WEBHOOK_SKIP_TLS_VERIFY_PRIMARY` | Prüfung des Serverzertifikats deaktivieren |
 
-:::warning[Keep certificate verification enabled]
+:::warning[Zertifikatsprüfung aktiviert lassen]
 
-Do not enable `RUSTFS_NOTIFY_WEBHOOK_SKIP_TLS_VERIFY_PRIMARY` in production. Configure `RUSTFS_NOTIFY_WEBHOOK_CLIENT_CA_PRIMARY` when the receiver uses a private certificate authority. If you use mTLS, provide both the client certificate and private key.
+Aktivieren Sie `RUSTFS_NOTIFY_WEBHOOK_SKIP_TLS_VERIFY_PRIMARY` in der Produktion nicht. Konfigurieren Sie `RUSTFS_NOTIFY_WEBHOOK_CLIENT_CA_PRIMARY`, wenn der Empfänger eine private Zertifizierungsstelle verwendet. Wenn Sie mTLS verwenden, geben Sie sowohl das Client-Zertifikat als auch den privaten Schlüssel an.
 
 :::
 
-For all target families and target-specific keys, see [Environment Variables](/reference/environment-variables#event--audit-targets).
+Alle Zielfamilien und zielspezifischen Schlüssel stehen unter [Umgebungsvariablen](/de/reference/environment-variables#event--audit-targets).
 
-## Usage
+## Verwendung
 
-The following example sends creation and removal events for `.dat` objects under `uploads/` to the `primary` webhook.
+Das folgende Beispiel sendet Erstellungs- und Entfernungsereignisse für `.dat`-Objekte unter `uploads/` an den Webhook `primary`.
 
-### Configure the bucket rule
+### Bucket-Regel konfigurieren
 
-Create the notification configuration:
+Legen Sie die Benachrichtigungskonfiguration an:
 
 ```json title="notification.json"
 {
@@ -99,7 +99,7 @@ Create the notification configuration:
 }
 ```
 
-Apply it to `my-bucket` with [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html):
+Wenden Sie sie mit der [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) auf `my-bucket` an:
 
 ```bash
 aws --endpoint-url http://localhost:9000 \
@@ -109,9 +109,9 @@ aws --endpoint-url http://localhost:9000 \
 	--notification-configuration file://notification.json
 ```
 
-Saving a bucket rule does not prove that its target exists or is online. Confirm that the module and target are enabled, the receiver answers health checks, and a test object operation produces a delivery.
+Das Speichern einer Bucket-Regel belegt nicht, dass ihr Ziel existiert oder online ist. Bestätigen Sie, dass Modul und Ziel aktiviert sind, der Empfänger auf Integritätsprüfungen antwortet und eine Testoperation an einem Objekt eine Zustellung erzeugt.
 
-Read the active configuration:
+Lesen Sie die aktive Konfiguration:
 
 ```bash
 aws --endpoint-url http://localhost:9000 \
@@ -120,13 +120,13 @@ aws --endpoint-url http://localhost:9000 \
 	--bucket my-bucket
 ```
 
-Prefix and suffix filters are case-sensitive and are combined with AND logic. A rule can contain at most one prefix and one suffix filter.
+Präfix- und Suffixfilter unterscheiden Groß- und Kleinschreibung und werden mit UND-Logik kombiniert. Eine Regel kann höchstens einen Präfix- und einen Suffixfilter enthalten.
 
-### Manage rules with rc
+### Regeln mit rc verwalten
 
-The `rc` client can add, list, and remove bucket notification rules. It does not configure the notification module or create the underlying webhook, broker, or database target; configure those first through environment variables or the Console.
+Der Client `rc` kann Bucket-Benachrichtigungsregeln hinzufügen, auflisten und entfernen. Er konfiguriert das Benachrichtigungsmodul nicht und legt das zugrunde liegende Webhook-, Broker- oder Datenbankziel nicht an. Konfigurieren Sie diese zuerst über Umgebungsvariablen oder die Console.
 
-Add creation and removal events for the `primary` target:
+Fügen Sie Erstellungs- und Entfernungsereignisse für das Ziel `primary` hinzu:
 
 ```bash
 rc bucket event add \
@@ -135,13 +135,13 @@ rc bucket event add \
 	--event put,delete
 ```
 
-List the active rules:
+Listen Sie die aktiven Regeln auf:
 
 ```bash
 rc --json bucket event list rustfs/my-bucket
 ```
 
-Remove every rule associated with that target ARN:
+Entfernen Sie jede Regel, die mit diesem Ziel-ARN verknüpft ist:
 
 ```bash
 rc bucket event remove \
@@ -149,11 +149,11 @@ rc bucket event remove \
 	arn:rustfs:sqs:us-east-1:primary:webhook
 ```
 
-The current `rc bucket event add` command does not expose prefix or suffix filter options. Use AWS CLI when the rule must filter object keys.
+Der aktuelle Befehl `rc bucket event add` stellt keine Optionen für Präfix- oder Suffixfilter bereit. Verwenden Sie die AWS CLI, wenn die Regel Objektschlüssel filtern muss.
 
-### Trigger and inspect events
+### Ereignisse auslösen und prüfen
 
-Upload and remove a matching object:
+Laden Sie ein passendes Objekt hoch und entfernen Sie es:
 
 ```bash
 printf 'hello from RustFS\n' > hello.txt
@@ -167,7 +167,7 @@ aws --endpoint-url http://localhost:9000 \
 	s3 rm s3://my-bucket/uploads/hello.dat
 ```
 
-The webhook receives an S3-compatible JSON envelope. Important fields include the event name, bucket, object key, size, ETag, and request identifiers:
+Der Webhook empfängt eine S3-kompatible JSON-Hülle. Wichtige Felder sind der Ereignisname, der Bucket, der Objektschlüssel, die Größe, das ETag und die Anfragekennungen:
 
 ```json
 {
@@ -184,13 +184,13 @@ The webhook receives an S3-compatible JSON envelope. Important fields include th
 }
 ```
 
-Decode the object key as URL-encoded data before using it. Consumers should also be idempotent: queued delivery provides store-and-forward recovery, but a receiver can observe the same event more than once.
+Decodieren Sie den Objektschlüssel als URL-codierte Daten, bevor Sie ihn verwenden. Verbraucher sollten außerdem idempotent sein: Die eingereihte Zustellung kann Ereignisse zwischenspeichern und später weiterleiten, ein Empfänger kann dasselbe Ereignis aber mehr als einmal sehen.
 
-### Replace or remove rules
+### Regeln ersetzen oder entfernen
 
-`PutBucketNotificationConfiguration` replaces the complete notification configuration for the bucket. Include every rule that you want to retain when updating it.
+`PutBucketNotificationConfiguration` ersetzt die vollständige Benachrichtigungskonfiguration des Buckets. Nehmen Sie beim Aktualisieren jede Regel auf, die Sie behalten wollen.
 
-Remove all rules by applying an empty configuration:
+Entfernen Sie alle Regeln, indem Sie eine leere Konfiguration anwenden:
 
 ```bash
 aws --endpoint-url http://localhost:9000 \
@@ -200,6 +200,6 @@ aws --endpoint-url http://localhost:9000 \
 	--notification-configuration '{}'
 ```
 
-## Next steps
+## Nächste Schritte
 
-Configure [Audit Targets](/security-compliance/audit-logs) when you need request-level security and compliance records instead of bucket-scoped object events. Review [Observability](/operations/observability) to monitor the RustFS service.
+Konfigurieren Sie [Audit-Ziele](/de/security-compliance/audit-logs), wenn Sie Sicherheits- und Compliance-Nachweise auf Anfrageebene brauchen statt bucketbezogener Objektereignisse. Lesen Sie [Observability](/de/operations/observability), um den RustFS-Dienst zu überwachen.

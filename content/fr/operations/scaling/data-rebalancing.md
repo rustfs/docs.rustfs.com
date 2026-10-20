@@ -1,84 +1,84 @@
 ---
-title: "Rebalancing"
-description: "Redistribute existing objects across active RustFS storage pools through the Console or rc."
+title: "Rééquilibrage"
+description: "Redistribuez les objets existants entre les pools de stockage RustFS actifs, depuis la Console ou avec rc."
 ---
 
-## Overview
+## Vue d’ensemble
 
-### Requirements
+### Prérequis
 
-- Install [`rc`](/operations/rc) on the administration host before using the `rc` workflow in this guide.
-- Configure credentials with rebalance administration permission.
+- Installez [`rc`](/fr/operations/rc) sur l’hôte d’administration avant d’utiliser le flux `rc` de ce guide.
+- Configurez des identifiants disposant de l’autorisation d’administration du rééquilibrage.
 
-After [Pool Expansion](./storage-pool-expansion.md), new writes can use the added capacity, but existing objects remain in their original pools. **Rebalancing** moves existing objects across all active pools so their used-capacity ratios converge.
+Après une [extension de pool](./storage-pool-expansion.md), les nouvelles écritures peuvent utiliser la capacité ajoutée, mais les objets existants restent dans leurs pools d’origine. Le **rééquilibrage** déplace les objets existants sur l’ensemble des pools actifs afin que leurs ratios de capacité utilisée convergent.
 
-Rebalancing requires at least two active pools. RustFS rejects a new rebalance while another rebalance or a pool decommission is running. Stopping a rebalance does not move already relocated objects back to their original pools.
+Le rééquilibrage exige au moins deux pools actifs. RustFS refuse un nouveau rééquilibrage tant qu’un autre rééquilibrage ou une mise hors service de pool est en cours. L’arrêt d’un rééquilibrage ne ramène pas les objets déjà déplacés vers leurs pools d’origine.
 
-Before starting, verify that all nodes and disks are healthy, no decommission is active, and the cluster has enough free capacity for normal writes during the operation. Schedule the operation during a lower-traffic period because object movement consumes disk, network, and CPU resources.
+Avant de commencer, vérifiez que tous les nœuds et tous les disques sont sains, qu’aucune mise hors service n’est active et que le cluster dispose d’assez de capacité libre pour les écritures normales pendant l’opération. Planifiez l’opération pendant une période de plus faible trafic, car le déplacement des objets consomme des ressources disque, réseau et processeur.
 
-## Operation
+## Opération
 
-### Start rebalancing in the Console
+### Démarrer le rééquilibrage dans la Console
 
-1. Sign in to the RustFS Console with an account that has rebalance administration permission.
-2. Open **Rebalance**.
-3. Review the active pools and their used-capacity ratios.
-4. Select **Start Rebalance** and confirm the operation.
-5. Keep the page open or return to it periodically to review per-pool progress.
-6. Use **Stop Rebalance** only when you need to halt the operation. Data already moved remains in its new pool.
+1. Connectez-vous à la Console RustFS avec un compte disposant de l’autorisation d’administration du rééquilibrage.
+2. Ouvrez **Rebalance** (rééquilibrage).
+3. Examinez les pools actifs et leurs ratios de capacité utilisée.
+4. Sélectionnez **Start Rebalance** (démarrer le rééquilibrage) et confirmez l’opération.
+5. Laissez la page ouverte, ou revenez-y périodiquement, pour suivre la progression de chaque pool.
+6. Utilisez **Stop Rebalance** (arrêter le rééquilibrage) uniquement lorsque vous devez interrompre l’opération. Les données déjà déplacées restent dans leur nouveau pool.
 
-![RustFS Console showing a rebalance in progress with moved bytes and objects](./images/rebalance-running-console.png)
+![Console RustFS affichant un rééquilibrage en cours, avec les octets et les objets déplacés](./images/rebalance-running-console.png)
 
-### Start rebalancing with rc
+### Démarrer le rééquilibrage avec rc
 
-Configure the cluster alias if it does not already exist:
+Configurez l’alias du cluster s’il n’existe pas déjà :
 
 ```bash
 rc alias set rustfs http://<server-ip>:9000 <your-access-key> <your-secret-key>
 ```
 
-Start the rebalance:
+Démarrez le rééquilibrage :
 
 ```bash
 rc admin rebalance start rustfs
 ```
 
-Check progress:
+Contrôlez la progression :
 
 ```bash
 rc admin rebalance status rustfs
 ```
 
-The status includes the operation ID and per-pool usage, moved bytes, object and version counts, remaining buckets, elapsed time, and estimated completion time when available.
+Le statut comprend l’ID de l’opération et, pour chaque pool, l’utilisation, les octets déplacés, le nombre d’objets et de versions, les compartiments (bucket) restants, le temps écoulé et, lorsqu’elle est disponible, l’heure de fin estimée.
 
-To stop a running rebalance:
+Pour arrêter un rééquilibrage en cours :
 
 ```bash
 rc admin rebalance stop rustfs
 ```
 
-`rc admin expand start|status|stop` and the `scale` alias expose the same post-expansion rebalance workflow.
+`rc admin expand start|status|stop` et l’alias `scale` exposent le même flux de rééquilibrage après une extension.
 
-## Verification
+## Vérification
 
-### Verify rebalancing in the Console
+### Vérifier le rééquilibrage dans la Console
 
-Wait until the Rebalance page reports `Completed`. Confirm that:
+Attendez que la page **Rebalance** indique `Completed`. Confirmez que :
 
-![RustFS Console showing a completed rebalance and balanced pool usage](./images/rebalance-completed-console.png)
+![Console RustFS affichant un rééquilibrage terminé et une utilisation équilibrée des pools](./images/rebalance-completed-console.png)
 
-- No pool reports a failed or stopped state.
-- Used-capacity ratios are closer across the active pools.
-- All nodes and disks remain online.
-- Normal object reads and writes succeed.
+- Aucun pool ne signale un état d’échec ou d’arrêt.
+- Les ratios de capacité utilisée se rapprochent entre les pools actifs.
+- Tous les nœuds et tous les disques restent en ligne.
+- Les lectures et les écritures d’objets habituelles réussissent.
 
-### Verify rebalancing with rc
+### Vérifier le rééquilibrage avec rc
 
-Run:
+Exécutez :
 
 ```bash
 rc admin rebalance status rustfs
 rc admin pool list rustfs
 ```
 
-Verify that the rebalance status is `Completed`, remaining bucket counts are zero, and no failure is reported. Compare the per-pool usage ratios with the values recorded before the operation, then read an existing object and write a new test object through the S3 endpoint.
+Vérifiez que le statut du rééquilibrage est `Completed`, que les nombres de compartiments restants sont nuls et qu’aucun échec n’est signalé. Comparez les ratios d’utilisation de chaque pool aux valeurs relevées avant l’opération, puis lisez un objet existant et écrivez un nouvel objet de test par le point de terminaison S3.

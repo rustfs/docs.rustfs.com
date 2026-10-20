@@ -1,26 +1,26 @@
 ---
-title: "Kubernetes Upgrade"
-description: "Upgrade RustFS deployments managed by the Helm chart or RustFS Operator and verify each rollout."
+title: "Kubernetes"
+description: "Helm チャートまたは RustFS Operator で管理する RustFS デプロイをアップグレードし、各ロールアウトを確認します。"
 ---
 
-Upgrade a Kubernetes deployment through the tool that owns its resources. Use Helm for a direct RustFS Helm chart installation. For an Operator installation, upgrade the Operator release and each Tenant through their respective declarative configurations.
+リソースを所有するツールを通じて、Kubernetes のデプロイをアップグレードします。RustFS の Helm チャートを直接インストールしている場合は、Helm を使います。Operator でインストールしている場合は、Operator のリリースと各テナントを、それぞれの宣言的な設定を通じてアップグレードします。
 
-## Before you upgrade
+## アップグレードの前に
 
-Read the RustFS, chart, and Operator release notes that apply to your deployment. Confirm that the cluster has enough capacity to replace pods and that all current workloads are ready:
+そのデプロイに関係する RustFS、チャート、Operator のリリースノートを読みます。Pod の置き換えに足りる容量がクラスターにあり、現在のワークロードがすべて準備完了であることを確認します。
 
 ```bash
 kubectl get nodes
 kubectl -n <namespace> get pods,pvc
 ```
 
-Do not delete PersistentVolumeClaims (PVCs) during an upgrade or rollback. Keep the existing deployment values and manifests under version control, including any image tags, storage topology, scheduling rules, and Secret references.
+アップグレード中とロールバック中は、PersistentVolumeClaim（PVC）を削除してはいけません。イメージタグ、ストレージのトポロジー、スケジューリングルール、Secret の参照を含め、既存のデプロイの値とマニフェストはバージョン管理に残します。
 
-## Upgrade a Helm chart deployment
+## Helm チャートのデプロイをアップグレードする
 
-This workflow applies to RustFS installed directly with the [RustFS Helm chart](/installation/cloud-native/helm-chart/installation). It does not apply to a Tenant created by RustFS Operator.
+この手順は、[RustFS Helm チャート](/ja/installation/cloud-native/helm-chart/installation) で直接インストールした RustFS に適用します。RustFS Operator が作成したテナントには適用しません。
 
-Record the current release revision, chart version, application version, and effective user-supplied values:
+現在のリリースリビジョン、チャートのバージョン、アプリケーションのバージョン、現在有効なユーザー指定値を記録します。
 
 ```bash
 helm status rustfs --namespace rustfs
@@ -28,20 +28,20 @@ helm history rustfs --namespace rustfs
 helm get values rustfs --namespace rustfs -o yaml > rustfs-values.previous.yaml
 ```
 
-Prepare the target chart in the same way as the installation. If you use the chart repository, update its index and set the chart reference:
+対象チャートは、インストール時と同じ方法で準備します。チャートリポジトリを使う場合は、インデックスを更新し、チャートの参照先を設定します。
 
 ```bash
 helm repo update rustfs
 export RUSTFS_CHART=rustfs/rustfs
 ```
 
-If you use a source checkout, check out the target RustFS release and point `RUSTFS_CHART` at its chart directory:
+ソースのチェックアウトを使う場合は、対象の RustFS リリースをチェックアウトし、`RUSTFS_CHART` をそのチャートディレクトリに向けます。
 
 ```bash
 export RUSTFS_CHART=./helm/rustfs
 ```
 
-Update your maintained values file for any release-specific changes. Set `image.rustfs.tag` to the explicit RustFS version you intend to run, then apply the upgrade:
+リリース固有の変更があれば、管理している値ファイルを更新します。`image.rustfs.tag` を、実行する RustFS の明示的なバージョンに設定し、アップグレードを適用します。
 
 ```bash
 helm upgrade rustfs "$RUSTFS_CHART" \
@@ -52,34 +52,34 @@ helm upgrade rustfs "$RUSTFS_CHART" \
 	--timeout 10m
 ```
 
-Helm performs a rolling update. Monitor the release and pods until the rollout completes:
+Helm はローリングアップデートを実行します。ロールアウトが完了するまで、リリースと Pod を監視します。
 
 ```bash
 helm status rustfs --namespace rustfs
 kubectl -n rustfs get pods,pvc,services
 ```
 
-Distributed mode creates a StatefulSet:
+分散モードでは、StatefulSet が作成されます。
 
 ```bash
 kubectl -n rustfs rollout status statefulset/rustfs --timeout=10m
 ```
 
-Standalone mode creates a Deployment:
+スタンドアロンモードでは、Deployment が作成されます。
 
 ```bash
 kubectl -n rustfs rollout status deployment/rustfs --timeout=10m
 ```
 
-Verify the S3 API after the rollout. If it is not exposed outside the cluster, start the port forward documented in the installation guide first:
+ロールアウトのあと、S3 API を確認します。S3 API をクラスターの外部へ公開していない場合は、先にインストールガイドに記載されたポートフォワードを開始します。
 
 ```bash
 curl -fsS http://localhost:9000/health/ready
 ```
 
-### Roll back a Helm release
+### Helm リリースをロールバックする
 
-List the release history, identify the last working revision, and let Helm restore its chart, values, and image configuration:
+リリース履歴を一覧し、最後に正常だったリビジョンを特定します。チャート、値、イメージ設定は Helm に復元させます。
 
 ```bash
 helm history rustfs --namespace rustfs
@@ -89,20 +89,20 @@ helm rollback rustfs <previous-revision> \
 	--timeout 10m
 ```
 
-Check the workload and readiness endpoint again after rollback. Do not uninstall the release or delete its PVCs.
+ロールバックのあと、ワークロードと準備完了エンドポイントを再度確認します。リリースをアンインストールしたり、その PVC を削除したりしてはいけません。
 
-## Upgrade an Operator deployment
+## Operator のデプロイをアップグレードする
 
-An Operator deployment has two independent upgrade surfaces:
+Operator のデプロイには、互いに独立した 2 つのアップグレード対象があります。
 
-- The RustFS Operator and Operator Console run from the `rustfs-operator` Helm release.
-- Each Tenant runs the RustFS image declared in that Tenant's `spec.image` field.
+- RustFS Operator と Operator Console は、`rustfs-operator` の Helm リリースで動作します。
+- 各テナントは、そのテナントの `spec.image` フィールドで宣言された RustFS イメージを実行します。
 
-Upgrade and validate the Operator control plane before changing Tenant images. Do not combine an Operator upgrade with multiple Tenant upgrades in one maintenance step.
+テナントのイメージを変える前に、Operator のコントロールプレーンをアップグレードし、検証します。1 回のメンテナンス作業で、Operator のアップグレードと複数のテナントのアップグレードを同時に行ってはいけません。
 
-### Upgrade the Operator release
+### Operator のリリースをアップグレードする
 
-Record the current release and save its values:
+現在のリリースを記録し、その値を保存します。
 
 ```bash
 helm status rustfs-operator --namespace rustfs-system
@@ -111,7 +111,7 @@ helm get values rustfs-operator --namespace rustfs-system -o yaml \
 	> rustfs-operator-values.previous.yaml
 ```
 
-Update the Operator source checkout to the target release and review changes to its chart values and CustomResourceDefinitions (CRDs). Helm does not upgrade CRDs stored in a chart's `crds/` directory, so apply both target CRDs before upgrading the controller:
+Operator のソースチェックアウトを対象リリースへ更新し、チャートの値と CustomResourceDefinition（CRD）の変更点を確認します。Helm は、チャートの `crds/` ディレクトリに置かれた CRD をアップグレードしません。コントローラーをアップグレードする前に、対象の 2 つの CRD をどちらも適用します。
 
 ```bash
 kubectl apply --server-side --force-conflicts \
@@ -122,7 +122,7 @@ kubectl apply --server-side --force-conflicts \
 	-f deploy/rustfs-operator/crds/policybinding-crd.yaml
 ```
 
-The CRDs are cluster-scoped and shared by every Tenant namespace. Applying them first allows the Kubernetes API server to accept fields introduced by the new controller. After both commands succeed, upgrade the Operator with your maintained values file:
+これらの CRD はクラスタースコープであり、すべてのテナントの Namespace で共有されます。先に適用すると、Kubernetes API サーバーは、新しいコントローラーが導入するフィールドを受け付けられるようになります。両方のコマンドが成功したら、管理している値ファイルで Operator をアップグレードします。
 
 ```bash
 helm upgrade rustfs-operator deploy/rustfs-operator/ \
@@ -134,7 +134,7 @@ helm upgrade rustfs-operator deploy/rustfs-operator/ \
 	--timeout 10m
 ```
 
-Verify the CRDs and all control-plane components before upgrading a Tenant:
+テナントをアップグレードする前に、CRD とコントロールプレーンの全コンポーネントを確認します。
 
 ```bash
 kubectl get crd tenants.rustfs.com
@@ -143,7 +143,7 @@ kubectl -n rustfs-system rollout status deployment/rustfs-operator-console --tim
 kubectl get tenants --all-namespaces
 ```
 
-CRD changes are not part of Helm release history and `helm rollback` does not restore them. Review the target release's compatibility and migration notes before considering a controller rollback. If that release explicitly supports downgrading, restore the previous Helm revision without applying older CRD files:
+CRD の変更は Helm のリリース履歴に含まれません。`helm rollback` でも復元されません。コントローラーのロールバックを検討する前に、対象リリースの互換性と移行に関する注記を確認します。そのリリースがダウングレードを明示的にサポートしている場合は、古い CRD ファイルは適用せず、以前の Helm リビジョンを復元します。
 
 ```bash
 helm history rustfs-operator --namespace rustfs-system
@@ -153,13 +153,13 @@ helm rollback rustfs-operator <previous-revision> \
 	--timeout 10m
 ```
 
-Do not downgrade across a documented one-way workload or security migration. Roll forward to a fixed Operator release instead.
+文書で一方向とされているワークロード移行、またはセキュリティ移行を越えてダウングレードしてはいけません。修正を含む Operator リリースへロールフォワードします。
 
-### Upgrade a Tenant
+### テナントをアップグレードする
 
-The Operator owns each Tenant's StatefulSets. Do not change their container images directly because reconciliation restores the image declared by the Tenant.
+各テナントの StatefulSet は、Operator が所有します。コンテナのイメージを直接変更しません。調整処理が、テナントで宣言されたイメージを復元します。
 
-Record the current Tenant image and confirm its `Ready` condition:
+現在のテナントイメージを記録し、`Ready` 条件を確認します。
 
 ```bash
 kubectl -n storage-a get tenant tenant-a \
@@ -168,7 +168,7 @@ kubectl -n storage-a get tenant tenant-a
 kubectl -n storage-a get pods,pvc -l rustfs.tenant=tenant-a
 ```
 
-In the complete `tenant.yaml` used to install the Tenant, change only `spec.image` to `rustfs/rustfs:<target-version>`. Leave its pools, PVC templates, credentials, and other settings unchanged. Apply the complete manifest and wait for the Operator to reconcile the new generation:
+テナントのインストールに使った完全な `tenant.yaml` では、`spec.image` だけを `rustfs/rustfs:<target-version>` に変更します。プール、PVC テンプレート、認証情報、その他の設定は変更しません。完全なマニフェストを適用し、Operator が新しい世代を調整するまで待ちます。
 
 ```bash
 kubectl apply -f tenant.yaml
@@ -178,11 +178,11 @@ kubectl -n storage-a wait tenant/tenant-a \
 kubectl -n storage-a get pods -l rustfs.tenant=tenant-a
 ```
 
-Upgrade one Tenant at a time. Confirm its S3 API and [cluster status](/operations/status-check) before updating another Tenant.
+テナントは 1 つずつアップグレードします。別のテナントを更新する前に、その S3 API と [クラスターの状態](/ja/operations/status-check) を確認します。
 
-### Roll back a Tenant
+### テナントをロールバックする
 
-Restore the previously recorded image in `spec.image`, apply the complete Tenant manifest, and wait for `Ready` again:
+以前に記録したイメージを `spec.image` に戻し、完全なテナントのマニフェストを適用して、再び `Ready` になるまで待ちます。
 
 ```bash
 kubectl apply -f tenant.yaml
@@ -191,8 +191,8 @@ kubectl -n storage-a wait tenant/tenant-a \
 	--timeout=10m
 ```
 
-The Operator reuses the Tenant's existing PVCs. Do not delete the Tenant, its StatefulSets, or its PVCs during rollback.
+Operator は、テナントの既存 PVC を再利用します。ロールバック中に、テナント、その StatefulSet、その PVC を削除してはいけません。
 
-## Next steps
+## 次のステップ
 
-Review [Status Check](/operations/status-check) and [Observability](/operations/observability) to validate the deployment after the rollout.
+ロールアウト後にデプロイを検証するには、[状態の確認](/ja/operations/status-check) と [オブザーバビリティ](/ja/operations/observability) を参照します。

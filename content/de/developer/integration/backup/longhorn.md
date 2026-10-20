@@ -1,13 +1,13 @@
 ---
 title: "Longhorn"
-description: "Configure Longhorn to store Kubernetes volume backups in RustFS through its S3 backup target."
+description: "Konfigurieren Sie Longhorn so, dass Kubernetes-Volume-Backups über das S3-Backup-Ziel in RustFS gespeichert werden."
 ---
 
-This guide connects [Longhorn](https://github.com/longhorn/longhorn) — the distributed block storage system for Kubernetes — to **RustFS** as its S3 backup target. You will configure the backup target, back up a volume that contains data, delete the volume, restore it from RustFS, and verify the data. The workflow was verified with Longhorn 1.9.0 on k3s (Kubernetes 1.30) and `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [Longhorn](https://github.com/longhorn/longhorn) — das verteilte Blockspeichersystem für Kubernetes — mit **RustFS** als S3-Backup-Ziel. Sie konfigurieren das Backup-Ziel, sichern ein Volume mit Daten, löschen das Volume, stellen es aus RustFS wieder her und prüfen die Daten. Der Ablauf wurde mit Longhorn 1.9.0 auf k3s (Kubernetes 1.30) und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need a Kubernetes cluster with Longhorn installed and `kubectl` access to it. This guide is intended for integration testing, not production.
+Sie benötigen einen Kubernetes-Cluster mit installiertem Longhorn und `kubectl`-Zugriff darauf. Diese Anleitung ist für Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -16,22 +16,22 @@ flowchart LR
 	Backup -->|"blocks + config"| RustFS["RustFS :9000"]
 ```
 
-Longhorn stores backups in the `backupstore/volumes/` prefix of the target bucket as content-addressed blocks plus a small volume configuration file. Restores read those objects back into a new volume on any node that can reach RustFS.
+Longhorn speichert Backups im Präfix `backupstore/volumes/` des Ziel-Buckets als inhaltsadressierte Blöcke plus eine kleine Volume-Konfigurationsdatei. Die Wiederherstellung liest diese Objekte in ein neues Volume auf jedem Knoten zurück, der RustFS erreichen kann.
 
-## 1. Create the backup bucket
+## 1. Backup-Bucket anlegen
 
-Create a dedicated bucket with the [`rc` client](https://github.com/rustfs/cli), using your own endpoint and credentials:
+Legen Sie mit dem [`rc`-Client](https://github.com/rustfs/cli) einen eigenen Bucket an. Verwenden Sie Ihren eigenen Endpunkt und Ihre eigenen Zugangsdaten:
 
 ```bash
 rc alias set rustfs http://<your-rustfs-endpoint>:9000 <your-access-key> <your-secret-key>
 rc mb rustfs/longhorn-backups
 ```
 
-Longhorn does not create the bucket, so this step must complete before the first backup.
+Longhorn legt den Bucket nicht an. Dieser Schritt muss abgeschlossen sein, bevor das erste Backup startet.
 
-## 2. Configure the backup target
+## 2. Backup-Ziel konfigurieren
 
-Store the RustFS credentials in a secret in the `longhorn-system` namespace. `AWS_ENDPOINTS` must be an endpoint every node can reach — use the node IP or an internal load balancer address, not a port forward from your workstation:
+Speichern Sie die RustFS-Zugangsdaten in einem Secret im Namespace `longhorn-system`. `AWS_ENDPOINTS` muss ein Endpunkt sein, den jeder Knoten erreichen kann. Verwenden Sie die Knoten-IP oder die Adresse eines internen Load Balancers, nicht eine Portweiterleitung von Ihrer Arbeitsstation:
 
 ```bash
 kubectl -n longhorn-system create secret generic rustfs-s3-secret \
@@ -40,7 +40,7 @@ kubectl -n longhorn-system create secret generic rustfs-s3-secret \
   --from-literal=AWS_ENDPOINTS=http://<your-rustfs-endpoint>:9000
 ```
 
-Longhorn 1.9 manages backup targets through the `BackupTarget` resource. Patch the `default` target with the RustFS bucket:
+Longhorn 1.9 verwaltet Backup-Ziele über die Ressource `BackupTarget`. Patchen Sie das Ziel `default` mit dem RustFS-Bucket:
 
 ```bash
 kubectl -n longhorn-system patch backupTarget default --type merge -p '
@@ -50,22 +50,23 @@ spec:
   pollInterval: 5m'
 ```
 
-The `@us-east-1` segment is the region annotation in the S3 URL format; it does not need to match a real deployment region.
+Der Abschnitt `@us-east-1` ist die Regionsangabe im S3-URL-Format. Er muss nicht zu einer echten Bereitstellungsregion passen.
 
-Wait for the target to become available — it confirms that Longhorn reached the bucket through the secret:
+Warten Sie, bis das Ziel verfügbar ist. Damit ist bestätigt, dass Longhorn den Bucket über das Secret erreicht hat:
 
 ```bash
 kubectl -n longhorn-system get backupTarget default
 ```
+
 
 ```text
 NAME      URL                                CREDENTIAL         AVAILABLE   LASTSYNCEDAT
 default   s3://longhorn-backups@us-east-1/   rustfs-s3-secret   true        2026-09-21T08:36:55Z
 ```
 
-## 3. Write data and create a backup
+## 3. Daten schreiben und ein Backup erstellen
 
-Create a test volume with data in it. The following manifest creates a 1 GiB PVC and a pod that writes a marker file:
+Legen Sie ein Test-Volume mit Daten an. Das folgende Manifest erzeugt eine PVC mit 1 GiB und einen Pod, der eine Marker-Datei schreibt:
 
 ```yaml title="demo.yaml"
 apiVersion: v1
@@ -97,14 +98,14 @@ spec:
       mountPath: /data
 ```
 
-Apply it and wait for the pod to run:
+Wenden Sie es an und warten Sie, bis der Pod läuft:
 
 ```bash
 kubectl apply -f demo.yaml
 kubectl get pod demo-app
 ```
 
-Create a snapshot and back it up. You can do this in the Longhorn UI (Volume → Snapshot → Backup) or declaratively:
+Erstellen Sie einen Snapshot und sichern Sie ihn. Das geht in der Longhorn-Oberfläche (**Volume → Snapshot → Backup**) oder deklarativ:
 
 ```bash
 VOLUME=$(kubectl get pvc demo-vol -o jsonpath='{.spec.volumeName}')
@@ -119,7 +120,7 @@ spec:
 EOF
 ```
 
-Then create the `Backup` resource for that snapshot:
+Legen Sie anschließend die Ressource `Backup` für diesen Snapshot an:
 
 ```bash
 kubectl -n longhorn-system apply -f - <<EOF
@@ -133,33 +134,33 @@ spec:
 EOF
 ```
 
-Wait for the backup to complete:
+Warten Sie, bis das Backup abgeschlossen ist:
 
 ```bash
 kubectl -n longhorn-system wait --for=jsonpath='{.status.state}'=Completed backup/demo-backup --timeout=300s
 kubectl -n longhorn-system get backup demo-backup -o jsonpath='{.status.backupURL}'
 ```
 
-## 4. Verify the backup in RustFS
+## 4. Backup in RustFS prüfen
 
-List the bucket:
+Listen Sie den Bucket auf:
 
 ```bash
 rc ls rustfs/longhorn-backups/ -r
 ```
 
-The output should include the volume configuration and the content-addressed blocks:
+Die Ausgabe sollte die Volume-Konfiguration und die inhaltsadressierten Blöcke enthalten:
 
 ```text
 backupstore/volumes/08/62/pvc-b73aeb3a-1482-4146-a8c9-749954c5dd7d/backups/backup_backup-f52accbdf3984e3d.cfg
 backupstore/volumes/08/62/pvc-b73aeb3a-1482-4146-a8c9-749954c5dd7d/blocks/15/22/15220b19...blk
 ```
 
-![Longhorn backup blocks stored in the RustFS Console](./images/rustfs-longhorn-backups.png)
+![In der RustFS Console gespeicherte Longhorn-Backup-Blöcke](./images/rustfs-longhorn-backups.png)
 
-## 5. Restore and verify the data
+## 5. Daten wiederherstellen und prüfen
 
-Create a new volume that restores from the backup, using the `backupURL` from step 3:
+Legen Sie ein neues Volume an, das aus dem Backup wiederhergestellt wird. Verwenden Sie die `backupURL` aus Schritt 3:
 
 ```bash
 kubectl -n longhorn-system apply -f - <<EOF
@@ -175,7 +176,7 @@ spec:
 EOF
 ```
 
-The restore runs when the volume is first attached. Create a PVC bound to the restored volume through a static PV, then mount it:
+Die Wiederherstellung läuft, wenn das Volume zum ersten Mal angehängt wird. Legen Sie eine PVC an, die über ein statisches PV an das wiederhergestellte Volume gebunden ist, und hängen Sie sie ein:
 
 ```bash
 kubectl apply -f - <<EOF
@@ -210,7 +211,7 @@ spec:
 EOF
 ```
 
-Mount the restored volume in a verification pod:
+Hängen Sie das wiederhergestellte Volume in einem Prüf-Pod ein:
 
 ```bash
 kubectl apply -f - <<EOF
@@ -235,15 +236,15 @@ sleep 40
 kubectl logs restore-verify
 ```
 
-The output prints the marker file from step 3, proving that the data round-tripped through RustFS:
+Die Ausgabe zeigt die Marker-Datei aus Schritt 3. Damit ist nachgewiesen, dass die Daten über RustFS und zurück übertragen wurden:
 
 ```text
 longhorn rustfs demo
 ```
 
-## 6. Clean up
+## 6. Aufräumen
 
-Delete the test workloads and the restored volume:
+Löschen Sie die Test-Workloads und das wiederhergestellte Volume:
 
 ```bash
 kubectl delete pod restore-verify demo-app
@@ -251,19 +252,19 @@ kubectl delete pvc demo-restored demo-vol
 kubectl -n longhorn-system delete volume/demo-restored
 ```
 
-The backup in RustFS stays in place until you remove it from the Longhorn UI or the bucket.
+Das Backup in RustFS bleibt bestehen, bis Sie es in der Longhorn-Oberfläche oder im Bucket entfernen.
 
-## Troubleshooting
+## Fehlerbehebung
 
 ### `No available disk candidates to create a new replica`
 
-Longhorn has no schedulable disk on the node. Verify that the node registered its default disk:
+Longhorn hat auf dem Knoten keine Disk, auf der Replicas eingeplant werden können. Prüfen Sie, dass der Knoten seine Standardfestplatte registriert hat:
 
 ```bash
 kubectl -n longhorn-system get nodes.longhorn.io -o jsonpath='{.items[0].status.diskStatus}'
 ```
 
-If the map is empty, create `/var/lib/longhorn` on the node and register the disk:
+Wenn die Map leer ist, legen Sie `/var/lib/longhorn` auf dem Knoten an und registrieren Sie die Festplatte:
 
 ```bash
 kubectl -n longhorn-system patch nodes.longhorn.io <node-name> --type merge -p '
@@ -276,18 +277,18 @@ spec:
 
 ### `failed to create backup ... missing input parameter`
 
-The backup ran before the default backup target was configured. Complete step 2, confirm `AVAILABLE` is `true`, and create the backup again.
+Das Backup lief, bevor das Standard-Backup-Ziel konfiguriert war. Schließen Sie Schritt 2 ab, stellen Sie sicher, dass `AVAILABLE` den Wert `true` hat, und erstellen Sie das Backup erneut.
 
-### The backup target never becomes available
+### Das Backup-Ziel wird nie verfügbar
 
-The secret must exist before the target syncs, and `AWS_ENDPOINTS` must be reachable from the nodes themselves. Check the `longhorn-manager` logs for S3 errors:
+Das Secret muss existieren, bevor das Ziel synchronisiert, und `AWS_ENDPOINTS` muss von den Knoten selbst erreichbar sein. Prüfen Sie die Logs von `longhorn-manager` auf S3-Fehler:
 
 ```bash
 kubectl -n longhorn-system logs -l app=longhorn-manager | grep -i s3 | tail
 ```
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional backup targets.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Longhorn backup documentation](https://longhorn.io/docs/1.9.0/backups-and-restore/) to configure recurring backup jobs and scheduled snapshots.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere Backup-Ziele verwenden.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [Longhorn-Backup-Dokumentation](https://longhorn.io/docs/1.9.0/backups-and-restore/), um wiederkehrende Backup-Jobs und geplante Snapshots zu konfigurieren.

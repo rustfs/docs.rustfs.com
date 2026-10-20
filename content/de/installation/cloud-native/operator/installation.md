@@ -1,29 +1,29 @@
 ---
-title: Install
-description: Prepare Kubernetes, install RustFS Operator, and access its Console securely.
+title: Installation
+description: Bereiten Sie Kubernetes vor, installieren Sie den RustFS Operator und greifen Sie sicher auf seine Console zu.
 ---
 
-This guide installs the Operator with Helm, verifies the deployment, and exposes the Operator Console locally or through HTTPS.
+Diese Anleitung installiert den Operator mit Helm, prüft die Bereitstellung und macht die Operator-Console (Weboberfläche) lokal oder über HTTPS erreichbar.
 
-## Requirements
+## Anforderungen
 
-| Component | Requirement |
+| Komponente | Anforderung |
 |-----------|-------------|
-| Kubernetes | `v1.30` or later |
-| Helm | `v3.0` or later |
-| kubectl | Compatible with the Kubernetes cluster |
-| StorageClass | Dynamic PVC provisioning for Tenant storage |
+| Kubernetes | `v1.30` oder neuer |
+| Helm | `v3.0` oder neuer |
+| kubectl | Kompatibel mit dem Kubernetes-Cluster |
+| StorageClass | Dynamische PVC-Bereitstellung für Tenant-Speicher |
 
-Your account must be able to create CRDs, cluster RBAC, Deployments, and Services. Confirm the target cluster before installation:
+Ihr Konto muss CRDs, Cluster-RBAC, Deployments und Services anlegen können. Bestätigen Sie den Zielcluster vor der Installation:
 
 ```bash
 kubectl config current-context
 kubectl get storageclass
 ```
 
-## 1. Install the Operator
+## 1. Operator installieren
 
-The Helm chart is stored in the Operator repository:
+Das Helm-Chart liegt im Operator-Repository:
 
 ```bash
 git clone https://github.com/rustfs/operator.git
@@ -34,7 +34,7 @@ helm upgrade --install rustfs-operator deploy/rustfs-operator/ \
   --create-namespace
 ```
 
-Common settings belong in a values file:
+Übliche Einstellungen gehören in eine Values-Datei:
 
 ```yaml title="values.yaml"
 operator:
@@ -50,9 +50,9 @@ console:
     type: ClusterIP
 ```
 
-Apply the file with `-f values.yaml`. The chart generates `OPERATOR_*` variables from these values; do not duplicate them under `operator.env`.
+Wenden Sie die Datei mit `-f values.yaml` an. Das Chart erzeugt aus diesen Werten die Variablen `OPERATOR_*`. Duplizieren Sie sie nicht unter `operator.env`.
 
-## 2. Verify the installation
+## 2. Installation prüfen
 
 ```bash
 kubectl -n rustfs-system get pods,services
@@ -61,32 +61,32 @@ kubectl -n rustfs-system rollout status deployment/rustfs-operator
 kubectl -n rustfs-system rollout status deployment/rustfs-operator-console
 ```
 
-## 3. Access the Operator Console
+## 3. Auf die Operator-Console zugreifen
 
-The Console listens on port `9090`. Generate a short-lived login token:
+Die Console lauscht auf Port `9090`. Erzeugen Sie ein kurzlebiges Anmelde-Token:
 
 ```bash
 kubectl -n rustfs-system create token rustfs-operator-console --duration=24h
 ```
 
-Forward the Console service to your workstation:
+Leiten Sie den Console-Service auf Ihre Arbeitsstation weiter:
 
 ```bash
 kubectl -n rustfs-system port-forward \
   svc/rustfs-operator-console 19090:9090
 ```
 
-Open `http://127.0.0.1:19090` and paste the token into the login form. The Helm installation notes print the exact ServiceAccount and Service names when release names or namespaces differ.
+Öffnen Sie `http://127.0.0.1:19090` und fügen Sie das Token in das Anmeldeformular ein. Die Helm-Installationshinweise geben die genauen Namen von ServiceAccount und Service aus, wenn Release-Namen oder Namespaces abweichen.
 
-:::note[Local HTTP access]
+:::note[Lokaler HTTP-Zugriff]
 
-If your browser does not retain the login over HTTP, set `CONSOLE_COOKIE_SECURE=false` under `console.env` for local testing only. Keep secure cookies enabled for HTTPS.
+Wenn Ihr Browser die Anmeldung über HTTP nicht beibehält, setzen Sie `CONSOLE_COOKIE_SECURE=false` unter `console.env` ausschließlich für lokale Tests. Lassen Sie sichere Cookies für HTTPS aktiviert.
 
 :::
 
-## 4. Configure Console TLS
+## 4. TLS der Console konfigurieren
 
-Use one HTTPS hostname for both the Console UI and `/api/v1`. Create a TLS Secret, or let cert-manager create it, then enable Ingress:
+Verwenden Sie einen HTTPS-Hostnamen sowohl für die Console-Oberfläche als auch für `/api/v1`. Legen Sie ein TLS-Secret an oder lassen Sie es von cert-manager anlegen und aktivieren Sie anschließend Ingress:
 
 ```yaml title="values.yaml"
 console:
@@ -106,7 +106,7 @@ console:
           - console.example.com
 ```
 
-Upgrade the release with the values file:
+Aktualisieren Sie das Release mit der Values-Datei:
 
 ```bash
 helm upgrade rustfs-operator deploy/rustfs-operator/ \
@@ -114,6 +114,6 @@ helm upgrade rustfs-operator deploy/rustfs-operator/ \
   -f values.yaml
 ```
 
-Replace the Ingress class, issuer, and hostname for your environment. If cert-manager is not installed, create the `console-tls` Secret with your certificate and private key before the upgrade.
+Ersetzen Sie Ingress-Klasse, Issuer und Hostname für Ihre Umgebung. Wenn cert-manager nicht installiert ist, legen Sie das Secret `console-tls` mit Ihrem Zertifikat und Ihrem privaten Schlüssel an, bevor Sie das Upgrade ausführen.
 
-Next, [create a Tenant](./tenant.md).
+Als Nächstes [legen Sie einen Tenant an](./tenant.md).

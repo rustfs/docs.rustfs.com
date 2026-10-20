@@ -1,11 +1,11 @@
 ---
-title: "Storage"
-description: "Use RustFS as the S3 backend for storage systems and storage gateways."
+title: "ストレージ"
+description: "ストレージシステムとストレージゲートウェイの S3 バックエンドとして RustFS を使います。"
 ---
 
-Use **RustFS** as the backend for storage systems and gateways built on top of object storage.
+**RustFS** を、オブジェクトストレージの上に構築されたストレージシステムとゲートウェイのバックエンドとして使います。
 
-## Systems
+## システム
 
 - [lakeFS](./lakefs.md)
 - [OpenDAL](./opendal.md)
@@ -14,4 +14,4 @@ Use **RustFS** as the backend for storage systems and gateways built on top of o
 - [SFTPGo](./sftpgo.md)
 - [Alluxio](./alluxio.md)
 
-Use a dedicated bucket and prefix per system, and scope credentials to the required bucket operations.
+システムごとに専用のバケットとプレフィックスを使い、認証情報は必要なバケット操作に限定します。

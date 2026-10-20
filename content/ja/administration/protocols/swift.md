@@ -39,7 +39,7 @@ RustFS のデフォルト機能セットには Swift が含まれません。`ru
 cargo build --release --features swift
 ```
 
-生成されたバイナリは、設定済みの S3 API アドレスで Swift パスを提供します。Swift 専用のリスナーやポートはありません。
+ビルドしたバイナリは、設定済みの S3 API アドレス上で Swift のパスを受け付けます。Swift 専用のリスナーやポートはありません。
 
 ## Keystone を設定する
 

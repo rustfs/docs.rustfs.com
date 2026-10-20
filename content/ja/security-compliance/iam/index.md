@@ -1,54 +1,56 @@
 ---
-title: "RustFS IAM Management"
-description: "Overview of RustFS Identity and Access Management (IAM): identity types, policy attachment, and policy evaluation semantics."
+title: "アイデンティティとアクセス管理（IAM）"
+description: "RustFS のアイデンティティとアクセス管理（IAM）について、アイデンティティの種類、ポリシーの割り当て、ポリシー評価の意味を説明します。"
 ---
 
-RustFS ships a built-in Identity and Access Management (IAM) system modeled on the AWS IAM policy language. Every request — S3 data access, Console operation, or admin API call — is authenticated against a credential and then authorized against the policies attached to that identity.
+RustFS には、AWS IAM のポリシー言語をモデルにした、組み込みのアイデンティティとアクセス管理（IAM）があります。S3 のデータアクセス、Console の操作、管理 API の呼び出しを問わず、すべてのリクエストは認証情報で認証されたあと、そのアイデンティティに割り当てられたポリシーで認可されます。
 
-## Identity Types
+## アイデンティティの種類
 
-RustFS distinguishes the following identity types:
+RustFS では、次のアイデンティティの種類を区別します。
 
-| Identity | Created by | Typical use |
+| アイデンティティ | 作成方法 | 主な用途 |
 | --- | --- | --- |
-| Root credentials | `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables at server start | Initial setup and break-glass administration. The root account bypasses IAM identity-policy evaluation (owner semantics). |
-| IAM users | Console or admin API (`add-user`) | Long-term named accounts for people or applications. |
-| Groups | Console or admin API (`update-group-members`) | Attach one policy set to many users at once. Users inherit the policies of every group they belong to. |
-| Service accounts (access keys) | Console or admin API (`add-service-account`) | Derived credentials that belong to a parent user. They inherit the parent's permissions, optionally restricted further by an embedded session policy, and can carry an expiration time. |
-| STS temporary credentials | `AssumeRole` / `AssumeRoleWithWebIdentity` STS calls | Short-lived credentials (15 minutes to 12 hours) with an access key, secret key, and session token. |
-| External OIDC identities | OpenID Connect providers (Keycloak, Authing, and other standard OIDC IdPs) | Console SSO. ID token claims are mapped to RustFS policy names, and RustFS issues STS credentials. |
+| ルート認証情報 | サーバー起動時の環境変数 `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` | 初期設定と緊急時の管理。ルートアカウントは IAM のアイデンティティポリシー評価を迂回します（所有者としての扱い）。 |
+| IAM ユーザー | Console または管理 API（`add-user`） | 人またはアプリケーション向けの、長期の名前付きアカウント。 |
+| グループ | Console または管理 API（`update-group-members`） | 1 組のポリシーを多数のユーザーに一度に割り当てます。ユーザーは、所属するすべてのグループのポリシーを継承します。 |
+| サービスアカウント（アクセスキー） | Console または管理 API（`add-service-account`） | 親ユーザーに属する派生認証情報です。親の権限を継承し、任意で埋め込まれたセッションポリシーによってさらに制限でき、有効期限を持てます。 |
+| STS の一時認証情報 | `AssumeRole` / `AssumeRoleWithWebIdentity` の STS 呼び出し | アクセスキー、シークレットキー、セッショントークンを持つ短期間の認証情報（15 分から 12 時間）。 |
+| 外部 OIDC アイデンティティ | OpenID Connect プロバイダー（Keycloak、Authing、その他の標準 OIDC IdP） | Console のシングルサインオン。ID トークンのクレームは RustFS のポリシー名に対応付けられ、RustFS は STS の一時認証情報を発行します。 |
 
 :::warning
 
-Root credentials bypass IAM identity policies, but bucket policies can still deny root S3 requests. Only `GetBucketPolicy`, `PutBucketPolicy`, and `DeleteBucketPolicy` bypass a bucket-policy deny so the owner can recover access. Use root credentials only to bootstrap the deployment, then create IAM users and service accounts for day-to-day work.
+ルート認証情報は IAM のアイデンティティポリシーを迂回しますが、バケットポリシーはルートの S3 リクエストを拒否できます。バケットポリシーの拒否を迂回するのは `GetBucketPolicy`、`PutBucketPolicy`、`DeleteBucketPolicy` だけであり、これは所有者がアクセスを回復できるようにするためです。ルート認証情報はデプロイの初期設定にだけ使い、日常の作業には IAM ユーザーとサービスアカウントを作成します。
 
 :::
 
-## How Policies Attach to Identities
+## ポリシーとアイデンティティの対応
 
-Policies are named JSON documents stored in RustFS. Attachment works as follows:
+ポリシーは、RustFS に保存される名前付きの JSON ドキュメントです。割り当ては次のように機能します。
 
-- **User binding** — one or more policy names are attached to an IAM user (`set-user-or-group-policy`, or the `idp/builtin/policy/attach` endpoint which accepts a list of policies).
-- **Group binding** — the same mechanism with `isGroup=true`; every member of the group receives the group's policies in addition to their own.
-- **Service accounts** — do not get their own policy bindings. They evaluate under the parent user's combined policies. If the service account was created with an explicit policy document, that session policy is applied as an additional restriction (both must allow).
-- **STS sessions** — inherit the parent identity's policies. The `Policy` request parameter of `AssumeRole` can embed an additional session policy that further restricts the temporary credentials.
-- **OIDC identities** — the ID token's `groups`/`roles` claim values are matched against RustFS policy names; the matched policies govern the issued STS credentials.
+- **ユーザーへの割り当て** — 1 つ以上のポリシー名を IAM ユーザーに割り当てます（`set-user-or-group-policy`、またはポリシーのリストを受け付ける `idp/builtin/policy/attach` エンドポイント）。
+- **グループへの割り当て** — `isGroup=true` による同じ仕組みです。グループの各メンバーは、自身のポリシーに加えてグループのポリシーを受け取ります。
+- **サービスアカウント** — 独自のポリシー割り当ては持ちません。親ユーザーのポリシーを組み合わせた結果の下で評価されます。サービスアカウント作成時に明示的なポリシードキュメントを指定した場合、そのセッションポリシーは追加の制限として適用されます（両方で許可される必要があります）。
+- **STS セッション** — 親アイデンティティのポリシーを継承します。`AssumeRole` のリクエストパラメータ `Policy` で、一時認証情報をさらに制限する追加のセッションポリシーを埋め込めます。
+- **OIDC アイデンティティ** — ID トークンの `groups` と `roles` のクレーム値が RustFS のポリシー名と照合されます。一致したポリシーが、発行される STS の一時認証情報を制御します。
 
-RustFS ships these built-in (canned) policies: `readwrite`, `readonly`, `writeonly`, `diagnostics`, and `consoleAdmin`. See [Users, Groups, and Policies](./policies.md) for their contents and for writing custom policies.
+RustFS には、次の組み込み（canned）ポリシーがあります。`readwrite`、`readonly`、`writeonly`、`diagnostics`、`consoleAdmin` です。内容とカスタムポリシーの書き方は、[ユーザー、グループ、ポリシー](./policies.md)を参照します。
 
-## Policy Evaluation Semantics
+<a id="policy-evaluation-semantics"></a>
 
-When an identity has multiple attached policies, RustFS merges their statements (dropping duplicates) and evaluates the merged document:
+## ポリシー評価の意味
 
-1. **Explicit deny wins.** All `Deny` statements are checked first; if any matching `Deny` statement applies to the request, the request is rejected regardless of any `Allow`.
-2. **Owner shortcut.** The root account bypasses IAM identity-policy evaluation; the bucket-policy checks and exceptions described above still apply.
-3. **Explicit allow required.** Otherwise, at least one `Allow` statement must match the requested action and resource.
-4. **Default deny.** If no statement matches, the request is denied.
+アイデンティティに複数のポリシーが割り当てられている場合、RustFS はステートメントを統合し（重複は除く）、統合したドキュメントを評価します。
 
-For service accounts and STS sessions carrying a session policy, the effective permission is the intersection: the parent's policies and the session policy must both allow the request.
+1. **明示的な拒否が優先されます。** すべての `Deny` ステートメントを最初に確認します。リクエストに一致する `Deny` ステートメントがあれば、`Allow` の有無にかかわらずリクエストは拒否されます。
+2. **所有者の特例。** ルートアカウントは IAM のアイデンティティポリシー評価を迂回します。上記のバケットポリシーの確認と例外は、引き続き適用されます。
+3. **明示的な許可が必要です。** それ以外の場合、要求されたアクションとリソースに一致する `Allow` ステートメントが少なくとも 1 つ必要です。
+4. **既定は拒否です。** 一致するステートメントがなければ、リクエストは拒否されます。
 
-## In This Section
+セッションポリシーを持つサービスアカウントと STS セッションでは、有効な権限は積集合です。親のポリシーとセッションポリシーの両方が、リクエストを許可する必要があります。
 
-- [Users, Groups, and Policies](./policies.md) — managing users and groups, the policy document format, and built-in policies.
-- [Service Accounts and STS](./sts.md) — derived access keys and temporary credentials via `AssumeRole`.
-- [Access Keys](./access-token.md) — creating and deleting access keys from the Console.
+## このセクションの内容
+
+- [ユーザー、グループ、ポリシー](./policies.md) — ユーザーとグループの管理、ポリシードキュメントの形式、組み込みポリシー。
+- [サービスアカウントと STS](./sts.md) — `AssumeRole` による派生アクセスキーと一時認証情報。
+- [アクセスキー](./access-token.md) — Console からのアクセスキーの作成と削除。

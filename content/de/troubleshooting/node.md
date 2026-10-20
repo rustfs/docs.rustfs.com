@@ -1,83 +1,83 @@
 ---
-title: "Node Failures"
-description: "Complete steps for handling node failures in RustFS clusters. Mainly includes: replacement node hardware preparation, configuration updates, service deployment, rejoining the cluster, data healing, and subsequent checks and best practices."
+title: "Knotenausfälle"
+description: "Bereiten Sie einen Ersatzknoten vor, aktualisieren Sie seine Konfiguration, stellen Sie die Cluster-Mitgliedschaft wieder her und prüfen Sie die Datenwiederherstellung."
 ---
 
-In distributed RustFS clusters, erasure coding mechanisms are adopted to ensure read/write access can still be provided when some nodes fail, and automatic data healing occurs after nodes rejoin. This document will guide you through the following process:
+Ein verteiltes RustFS-Cluster verwendet Erasure Coding, um lesbar und schreibbar zu bleiben, wenn einzelne Knoten ausfallen, und stellt Daten automatisch wieder her (Healing), wenn ein Knoten wieder beitritt. In dieser Anleitung führen Sie die folgenden Schritte aus:
 
-1. Start replacement node and synchronize environment
-2. Update DNS/hostname to point old node identifiers to new nodes
-3. Download and deploy RustFS services consistent with the cluster
-4. Rejoin new nodes to the cluster and trigger data healing
-5. Monitor healing progress and perform subsequent checks and optimization
+1. Starten Sie den Ersatzknoten und gleichen Sie seine Softwareumgebung an das Cluster an.
+2. Aktualisieren Sie DNS oder `/etc/hosts`, damit der bisherige Hostname auf den neuen Knoten zeigt.
+3. Installieren Sie dieselbe RustFS-Version wie auf den anderen Knoten.
+4. Starten Sie die Ersatzknoten, damit sie dem Cluster wieder beitreten und die Datenwiederherstellung beginnt.
+5. Beobachten Sie den Fortschritt der Datenwiederherstellung und führen Sie anschließend weitere Prüfungen aus.
 
-## 1) Start Replacement Node
+## 1. Ersatzknoten vorbereiten
 
-* **Hardware and System Preparation**
-  Ensure the replacement node server hardware is roughly consistent with the failed node, including CPU, memory, network configuration, and disk type; even using higher configurations won't affect cluster performance.
-  Software environment needs to maintain version consistency with other nodes (operating system, kernel, dependency libraries, etc.) to avoid cluster abnormal behavior caused by environment differences.
+* **Hardware und System vorbereiten**
+  Stellen Sie sicher, dass die Hardware des Ersatzknotens (CPU, Arbeitsspeicher, Netzwerk und Laufwerkstyp) ungefähr dem ausgefallenen Knoten entspricht. Leistungsstärkere Hardware beeinträchtigt die Leistung des Clusters nicht.
+  Verwenden Sie Softwareversionen, die zu den anderen Knoten passen, darunter Betriebssystem, Kernel und Abhängigkeiten, damit abweichende Umgebungen keine Probleme verursachen.
 
-* **Drive Exclusive Access**
-  As with physical drive operations, RustFS requires exclusive access to storage volumes, prohibiting any other processes or scripts from directly modifying data within storage volumes, otherwise data corruption or redundancy loss can easily occur.
+* **Exklusiver Zugriff auf Laufwerke**
+  Wie bei Operationen an physischen Laufwerken benötigt RustFS exklusiven Zugriff auf seine Speicher-Volumes. Lassen Sie andere Prozesse oder Skripte die Daten auf diesen Volumes nicht direkt ändern. Das kann Daten beschädigen oder die Redundanz verringern.
 
-## 2) Update Hostname and Network Resolution
+## 2. Hostname und Namensauflösung aktualisieren
 
-* **DNS/Hosts Configuration**
-  If the replacement node's IP address differs from the failed node, you need to re-resolve the old node's hostname (such as `rustfs-node-2.example.net`) to the new node to ensure nodes within the cluster discover each other through the same address.
+* **DNS- und Hosts-Konfiguration**
+  Wenn die IP-Adresse des Ersatzknotens von der des ausgefallenen Knotens abweicht, lassen Sie den bisherigen Hostnamen (zum Beispiel `rustfs-node-2.example.net`) auf die IP-Adresse des neuen Knotens zeigen, damit die Knoten des Clusters einander weiterhin unter demselben Namen erreichen.
 
  ```bash
  # Example: Add or modify line in /etc/hosts
  192.168.1.12 rustfs-node-2.example.net
  ```
 
-  After correct resolution, you can verify the hostname points to the new node through `ping` or `nslookup`.
+  Prüfen Sie mit `ping` oder `nslookup`, dass der Hostname auf den neuen Knoten zeigt.
 
-## 3) Deploy and Configure RustFS Services
+## 3. RustFS-Dienste bereitstellen und konfigurieren
 
-* **Download and Installation**
-  Follow the same version deployment process as RustFS official, download binaries or installation packages consistent with existing nodes, and extract to a unified directory. Ensure startup scripts, environment variables, and configuration files (such as `/etc/default/rustfs`) are completely consistent with other nodes in the cluster.
+* **Herunterladen und Installation**
+  Installieren Sie dieselbe RustFS-Version wie auf den vorhandenen Knoten, mit derselben Installationsmethode und demselben Verzeichnis. Stellen Sie sicher, dass Startskripte, Umgebungsvariablen und Konfigurationsdateien (etwa `/etc/default/rustfs`) mit denen der anderen Knoten übereinstimmen.
 
-* **Configuration Verification**
+* **Konfiguration prüfen**
 
- * Check that `RUSTFS_VOLUMES` in `/etc/default/rustfs` is byte-for-byte identical to the other nodes, and that it covers the replacement node's hostname and port.
- * Ensure all nodes have the same access keys and permission configurations to avoid new nodes being unable to join due to authentication failures.
+ * Prüfen Sie, dass `RUSTFS_VOLUMES` in `/etc/default/rustfs` bytegenau mit den anderen Knoten übereinstimmt und Hostname sowie Port des Ersatzknotens abdeckt.
+ * Stellen Sie sicher, dass alle Knoten dieselben Zugriffsschlüssel und Berechtigungseinstellungen verwenden. Andernfalls schlägt die Authentifizierung des neuen Knotens fehl und er kann dem Cluster nicht beitreten.
 
-## 4) Rejoin Cluster and Trigger Data Healing
+## 4. Dem Cluster wieder beitreten und die Datenwiederherstellung auslösen
 
-* **Start Service**
+* **Dienst starten**
 
  ```bash
  systemctl start rustfs
  ```
 
-  Or use your custom startup script to start RustFS services, and view startup logs through `journalctl -u rustfs -f` to confirm the new node has detected other online nodes and started the data healing process.
+  Alternativ starten Sie RustFS mit Ihrem eigenen Startskript. Führen Sie anschließend `journalctl -u rustfs -f` aus, um zu bestätigen, dass der neue Knoten die anderen Knoten erkannt hat und die Datenwiederherstellung begonnen hat.
 
-* **Monitor Healing Status**
-  Healing runs in the background once the node rejoins; no manual command is required. Watch its progress through the service logs on the replacement node, and check node and disk status in the RustFS Console:
+* **Status der Datenwiederherstellung beobachten**
+  Die Datenwiederherstellung läuft im Hintergrund, sobald der Knoten wieder beitritt; ein manueller Befehl ist nicht erforderlich. Verfolgen Sie den Fortschritt in den Dienstprotokollen des Ersatzknotens und prüfen Sie Knoten- und Festplattenstatus in der RustFS Console:
 
  ```bash
  journalctl -u rustfs -f
  ```
 
-* **Community Experience Reference**
-  Community testing shows that when nodes go offline and rejoin, RustFS will only perform healing operations on new nodes, not fully rebalance the cluster, thus avoiding unnecessary network and I/O peaks.
+* **Beobachtungen aus der Community**
+  In Tests der Community stellt RustFS nach dem Offline-Gehen und Wiederbeitritt eines Knotens nur diesen Knoten wieder her, statt das gesamte Cluster neu zu verteilen (Rebalancing). Das vermeidet unnötige Spitzen bei Netzwerk und I/O.
 
-## 5) Subsequent Checks and Best Practices
+## 5. Anschlussprüfungen und bewährte Vorgehensweisen
 
-* **Monitoring and Alerts**
+* **Überwachung und Alarme**
 
- * During healing, monitor disk and network load to ensure the cluster meets read/write and network bandwidth requirements.
- * Set up alerts to notify operations teams when node healing fails or progress stalls beyond thresholds.
+ * Überwachen Sie während der Datenwiederherstellung die Last von Festplatte und Netzwerk, damit das Cluster seine Anforderungen an Lesezugriff, Schreibzugriff und Bandbreite weiterhin erfüllt.
+ * Richten Sie Alarme ein, die Betriebsteams benachrichtigen, wenn die Datenwiederherstellung eines Knotens fehlschlägt oder der Fortschritt über festgelegte Schwellen hinaus stockt.
 
-* **Repeated Failure Drills**
-  Regularly simulate node failures and drill the entire recovery process to ensure team familiarity with operation commands and emergency procedures.
+* **Regelmäßige Ausfalltests**
+  Führen Sie regelmäßig Übungen zum Knotenausfall durch und proben Sie das vollständige Wiederherstellungsverfahren, damit Ihr Team die Befehle und den Ablauf bei einem Vorfall kennt.
 
-* **Root Cause Analysis**
-  Conduct in-depth hardware health diagnostics (SMART, BIOS logs, etc.) on frequently failing nodes or disks, and implement preventive maintenance plans.
+* **Ursachenanalyse**
+  Führen Sie eine ausführliche Hardwarediagnose (zum Beispiel SMART-Daten und BIOS-Protokolle) an Knoten oder Festplatten durch, die wiederholt ausfallen, und setzen Sie einen Plan für vorbeugende Wartung um.
 
-* **Professional Support**
-  If deeper-level fault location and recovery guidance is needed, contact the RustFS development team or community for help.
+* **Professionelle Unterstützung**
+  Wenden Sie sich zur Ursachenklärung eines Ausfalls oder zur Wiederherstellung des Clusters an das RustFS-Entwicklungsteam oder die Community.
 
 ---
 
-**Summary**: Through the above process, RustFS can quickly and safely replace nodes and complete data healing after node hardware completely fails, minimizing cluster availability interruptions. Be sure to cross-reference with your own environment and specific command-line tools to ensure configuration consistency and correct operation sequence.
+Diese Schritte ersetzen einen ausgefallenen Knoten und stellen seine Daten wieder her. Passen Sie die Befehle an Ihre Umgebung an und halten Sie die Konfiguration auf allen Knoten identisch.

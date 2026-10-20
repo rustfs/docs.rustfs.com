@@ -1,13 +1,13 @@
 ---
 title: "Apache Zeppelin"
-description: "Store Apache Zeppelin notebooks in RustFS through the S3 notebook repository."
+description: "S3 ノートブックリポジトリを通じて、Apache Zeppelin のノートブックを RustFS に保存します。"
 ---
 
-This guide connects [Apache Zeppelin](https://github.com/apache/zeppelin) — the web-based notebook for data analytics — to **RustFS** through Zeppelin's S3 notebook storage. You will start Zeppelin pointed at a RustFS bucket, create a note, and verify that the notebook file is stored in RustFS and survives a restart. The workflow was verified with `apache/zeppelin:0.12.0` and `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、データ分析向けの Web ベースのノートブックである [Apache Zeppelin](https://github.com/apache/zeppelin) を、Zeppelin の S3 ノートブックストレージを通じて **RustFS** に接続します。RustFS バケットを指すように Zeppelin を起動し、ノートを作成して、ノートブックファイルが RustFS に保存され再起動後も残ることを確認します。この流れは `apache/zeppelin:0.12.0` と `rustfs/rustfs-x86-musl:v2.3.1` で検証済みです。
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Docker が必要です。このデプロイはローカルでの統合テストを目的としており、本番環境向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -15,18 +15,18 @@ flowchart LR
 	Z -->|".zpln files"| RustFS["RustFS :9000"]
 ```
 
-With the `S3NotebookRepo` storage class, every note is persisted as a `.zpln` JSON file under the `user/notebook/` prefix of the bucket. Zeppelin reads and writes the bucket directly, so notes survive container restarts and can be shared between instances.
+ストレージクラスが `S3NotebookRepo` の場合、各ノートはバケットの `user/notebook/` プレフィックス配下に `.zpln` JSON ファイルとして永続化されます。Zeppelin はバケットを直接読み書きするため、ノートはコンテナの再起動後も残り、インスタンス間で共有できます。
 
-## 1. Start Zeppelin
+## 1. Zeppelin を起動する
 
-Create an environment file and replace both credential placeholders:
+環境ファイルを作成し、両方の認証情報プレースホルダーを置き換えます。
 
 ```ini title=".env"
 AWS_ACCESS_KEY_ID=<your-access-key>
 AWS_SECRET_ACCESS_KEY=<your-secret-key>
 ```
 
-Start Zeppelin on the same Docker network as RustFS with the S3 storage settings:
+S3 ストレージの設定を付け、RustFS と同じ Docker ネットワーク上で Zeppelin を起動します。
 
 ```bash
 docker run -d --name zeppelin --network oo-rustfs_default \
@@ -40,11 +40,11 @@ docker run -d --name zeppelin --network oo-rustfs_default \
   apache/zeppelin:0.12.0
 ```
 
-Zeppelin reads `ZEPPELIN_*` environment variables as configuration properties, so no `zeppelin-site.xml` edit is needed. This guide uses the existing `my-bucket`; notes land under its `user/notebook/` prefix, which the S3 storage creates on demand.
+Zeppelin は `ZEPPELIN_*` 環境変数を設定プロパティとして読むため、`zeppelin-site.xml` の編集は不要です。このガイドでは既存の `my-bucket` を使います。ノートは `user/notebook/` プレフィックス配下に置かれ、このプレフィックスは S3 ストレージが必要に応じて作成します。
 
-## 2. Create a note
+## 2. ノートを作成する
 
-Wait for the UI on `http://localhost:8080`, then create a note named `rustfs-demo` in the notebook list and add a paragraph, or use the REST API:
+`http://localhost:8080` の UI を待ち、ノートブック一覧で `rustfs-demo` という名前のノートを作成してパラグラフを追加するか、REST API を使います。
 
 ```bash
 NOTE=$(curl -s -X POST "http://localhost:8080/api/notebook" \
@@ -53,57 +53,57 @@ NOTE=$(curl -s -X POST "http://localhost:8080/api/notebook" \
 echo "note id: $NOTE"
 ```
 
-## 3. Verify the notebook in RustFS
+## 3. RustFS 内のノートブックを確認する
 
-List the notebook prefix:
+ノートブックのプレフィックスを一覧します。
 
 ```bash
 rc ls rustfs/my-bucket/user/notebook/ -r
 ```
 
-The note is stored as a JSON file named after the note and its ID:
+ノートは、ノート名と ID からなる JSON ファイルとして保存されます。
 
 ```text
 user/notebook/rustfs-demo_2N4PY7UY5.zpln
 ```
 
-![Zeppelin notebooks stored in the RustFS Console](./images/rustfs-zeppelin-notebook.png)
+![RustFS Console に保存された Zeppelin ノートブック](./images/rustfs-zeppelin-notebook.png)
 
-Notes survive a restart because Zeppelin loads them from the bucket:
+Zeppelin はバケットからノートを読み込むため、再起動後もノートは残ります。
 
 ```bash
 docker restart zeppelin
 curl -s "http://localhost:8080/api/notebook" | head -c 200
 ```
 
-The note list contains `2N4PY7UY5` again after the restart.
+再起動後のノート一覧には、再び `2N4PY7UY5` が含まれます。
 
-## 4. Stop or reset the deployment
+## 4. デプロイを停止またはリセットする
 
-Stop Zeppelin while keeping the notes:
+ノートを残したまま Zeppelin を停止します。
 
 ```bash
 docker rm -f zeppelin
 ```
 
-The notes stay in the `user/notebook/` prefix of `my-bucket`. To delete them, remove the prefix:
+ノートは `my-bucket` の `user/notebook/` プレフィックスに残ります。削除する場合はプレフィックスを取り除きます。
 
 ```bash
 rc rm rustfs/my-bucket/user/notebook/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### Zeppelin starts but notes never appear in the bucket
+### Zeppelin は起動するがノートがバケットに現れない
 
-Confirm the three `ZEPPELIN_NOTEBOOK_S3_*` variables are set and that the credentials environment variables reach the container — the S3 repository is initialized at startup, so the container must be recreated after any change.
+3 つの `ZEPPELIN_NOTEBOOK_S3_*` 変数が設定され、認証情報の環境変数がコンテナに届いていることを確認します。S3 リポジトリは起動時に初期化されるため、変更後はコンテナを再作成する必要があります。
 
 ### `UnknownHostException: my-bucket.rustfs`
 
-The path-style flag was not picked up. Keep `ZEPPELIN_NOTEBOOK_S3_PATH_STYLE_ACCESS=true` exactly as shown; with path-style disabled Zeppelin treats the bucket as a hostname.
+パススタイルアクセスのフラグが反映されていません。`ZEPPELIN_NOTEBOOK_S3_PATH_STYLE_ACCESS=true` を表示どおり維持します。パススタイルアクセスを無効にすると、Zeppelin はバケットをホスト名として扱います。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Zeppelin operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Zeppelin storage documentation](https://zeppelin.apache.org/docs/latest/setup/storage/storage.html#notebook-storage-in-s3) to organize notes in per-user prefixes.
+- 追加の Zeppelin 操作を採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認します。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- ユーザーごとのプレフィックスでノートを整理するには、[Zeppelin ストレージのドキュメント](https://zeppelin.apache.org/docs/latest/setup/storage/storage.html#notebook-storage-in-s3)に従います。

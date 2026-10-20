@@ -1,13 +1,13 @@
 ---
 title: "tusd"
-description: "Receive resumable uploads into RustFS with the tusd server's S3 backend."
+description: "tusd サーバーの S3 バックエンドを使い、再開可能なアップロードを RustFS で受け付けます。"
 ---
 
-This guide connects [tusd](https://github.com/tus/tusd) — the official reference implementation of the tus resumable-upload protocol — to **RustFS** as its S3 storage backend. You will run tusd against a RustFS bucket, create an upload with the tus protocol, send the file in two chunks with an interruption in between, resume from the reported offset, and verify the assembled object in the bucket. The workflow was verified with `tusproject/tusd:v2.10.1` against `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、tus 再開可能アップロードプロトコルの公式リファレンス実装である [tusd](https://github.com/tus/tusd) を、S3 ストレージのバックエンドとして **RustFS** に接続します。RustFS のバケットに対して tusd を実行し、tus プロトコルでアップロードを作成し、途中で中断しながらファイルを 2 つのチャンクで送り、報告されたオフセットから再開して、組み立てられたオブジェクトをバケットで確認します。手順は `tusproject/tusd:v2.10.1` と `rustfs/rustfs-x86-musl:v2.3.1` の組み合わせで確認済みです。
 
-You need Docker, or a local tusd binary. This deployment is intended for local integration testing, not production.
+Docker、またはローカルの tusd バイナリが必要です。このデプロイはローカルでの連携テスト用であり、本番向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -15,11 +15,11 @@ flowchart LR
 	tusd -->|"multipart upload"| RustFS["RustFS :9000"]
 ```
 
-tusd stores each in-progress upload as S3 multipart parts in the bucket. A client that loses its connection asks the server for the last committed offset with `HEAD` and continues from there — the data already received is never sent twice.
+tusd は、進行中の各アップロードを、バケット内の S3 マルチパートアップロードのパートとして保存します。接続を失ったクライアントは、`HEAD` で最後にコミットされたオフセットをサーバーに問い合わせ、そこから続行します。すでに受信したデータが再送されることはありません。
 
-## 1. Run tusd
+## 1. tusd を実行する
 
-Create the bucket and start tusd with the S3 backend, replacing all connection placeholders. The AWS region must be set even though RustFS ignores it:
+接続用のプレースホルダーをすべて置き換えて、バケットを作成し、S3 バックエンドを指定して tusd を起動します。RustFS はリージョンを無視しますが、AWS リージョンの設定は必須です。
 
 ```bash
 rc mb rustfs/tus-uploads
@@ -33,7 +33,7 @@ docker run -d --name tusd --network oo-rustfs_default -p 8080:8080 \
   -s3-endpoint http://<your-rustfs-endpoint>:9000
 ```
 
-Check that the server is healthy:
+サーバーが正常であることを確認します。
 
 ```bash
 curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8080/health
@@ -43,9 +43,9 @@ curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8080/health
 200
 ```
 
-## 2. Create the upload
+## 2. アップロードを作成する
 
-Create a 6 MiB upload and read the `Location` header:
+6 MiB のアップロードを作成し、`Location` ヘッダーを読み取ります。
 
 ```bash
 curl -s -D - -o /dev/null -X POST http://localhost:8080/files/ \
@@ -57,11 +57,11 @@ curl -s -D - -o /dev/null -X POST http://localhost:8080/files/ \
 Location: http://localhost:8080/files/b7338250daa9...+NGVmNDRhZjEt...
 ```
 
-The upload URL contains the file ID and a message-authentication tag. Strip the scheme and host before re-sending it (the server echoes whatever `Host` it received, which may not be reachable from your next client).
+アップロード URL には、ファイル ID とメッセージ認証タグが含まれます。再送する前にスキームとホストを取り除きます。サーバーは受信した `Host` をそのまま返すため、次のクライアントから到達できないことがあります。
 
-## 3. Upload in chunks with an interruption
+## 3. 中断を挟んでチャンクでアップロードする
 
-Send the first 2.5 MB, then stop — this is the point where a mobile client would lose its connection:
+最初の 2.5 MB を送ってから停止します。モバイルクライアントが接続を失う地点に相当します。
 
 ```bash
 head -c 2500000 demo.bin > part1.bin
@@ -76,7 +76,7 @@ curl -s -o /dev/null -w "%{http_code}\n" -X PATCH "http://localhost:8080${LOC}" 
 204
 ```
 
-Ask the server how much it actually has — this is the resumable-upload core:
+サーバーが実際に保持している量を問い合わせます。これが再開可能アップロードの中核です。
 
 ```bash
 curl -s -X HEAD "http://localhost:8080${LOC}" \
@@ -87,9 +87,9 @@ curl -s -X HEAD "http://localhost:8080${LOC}" \
 Upload-Offset: 2500000
 ```
 
-## 4. Resume and finish
+## 4. 再開して完了する
 
-Continue from offset 2500000 with the remaining bytes:
+残りのバイト列を、オフセット 2500000 から続行します。
 
 ```bash
 tail -c 3791456 demo.bin > part2.bin
@@ -104,7 +104,7 @@ curl -s -o /dev/null -w "%{http_code}\n" -X PATCH "http://localhost:8080${LOC}" 
 204
 ```
 
-Download the finished upload through tusd and compare checksums with the source:
+完了したアップロードを tusd 経由でダウンロードし、ソースとチェックサムを比較します。
 
 ```bash
 curl -s -o download.bin "http://localhost:8080${LOC}"
@@ -116,55 +116,55 @@ d9016032ced6c7515b67a0c556e006c4b25a5858  demo.bin
 d9016032ced6c7515b67a0c556e006c4b25a5858  download.bin
 ```
 
-## 5. Verify objects in RustFS
+## 5. RustFS でオブジェクトを確認する
 
-List the bucket:
+バケットを一覧します。
 
 ```bash
 rc ls rustfs/tus-uploads/ -r
 ```
 
-The bucket holds the assembled object plus one `.info` metadata file per upload — both live and finished:
+バケットには、組み立てられたオブジェクトと、アップロードごとの `.info` メタデータファイルが入ります。進行中と完了済みの両方が対象です。
 
 ```text
 b7338250daa9a1a79c1343502b57b28f       6 MiB
 b7338250daa9a1a79c1343502b57b28f.info  378 B
 ```
 
-The object key is the upload ID, and the object body is the uploaded file byte-for-byte — so any S3 client can read completed uploads directly from the bucket.
+オブジェクトキーはアップロード ID で、オブジェクト本体はアップロードされたファイルとバイト単位で一致します。完了したアップロードは、任意の S3 クライアントからバケットを直接読み取れます。
 
-![tus uploads stored in the RustFS Console](./images/rustfs-tus-uploads.png)
+![RustFS Console に保存された tus のアップロード](./images/rustfs-tus-uploads.png)
 
-## 6. Stop or reset
+## 6. 停止またはリセットする
 
-To tear down the server while keeping the bucket objects:
+バケット内のオブジェクトを残したまま、サーバーを解体します。
 
 ```bash
 docker rm -f tusd
 ```
 
-To delete the stored uploads:
+保存されたアップロードを削除します。
 
 ```bash
 rc rm rustfs/tus-uploads/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
 ### `CreateMultipartUpload ... A region must be set when sending requests to S3`
 
-tusd builds its S3 client from the AWS environment, and the region is mandatory for endpoint resolution. Export `AWS_REGION=us-east-1` next to the credentials, as in step 1.
+tusd は AWS の環境変数から S3 クライアントを構築します。エンドポイント解決にはリージョンが必須です。手順 1 のように、認証情報と並べて `AWS_REGION=us-east-1` をエクスポートします。
 
-### `PATCH` returns `404` or connects to the wrong host
+### `PATCH` が `404` を返す、または誤ったホストに接続する
 
-The `Location` URL echoes the `Host` header of the creation request. When your client and the server use different hostnames (container name versus published port), strip the scheme and host from the URL and send the path to the address the client can reach.
+`Location` の URL は、作成リクエストの `Host` ヘッダーをそのまま返します。クライアントとサーバーでホスト名が異なる場合（コンテナ名と公開ポート）は、URL からスキームとホストを取り除き、クライアントが到達できるアドレスへパスを送ります。
 
-### Upload disappears after server restart
+### サーバー再起動後にアップロードが消える
 
-The S3 backend keeps `.info` files in the bucket, so uploads survive restarts. If you run tusd against an empty bucket that another process prunes, the metadata is lost — protect the `tus-uploads` prefix from cleanup jobs.
+S3 バックエンドは `.info` ファイルをバケットに保持するため、アップロードは再起動後も残ります。別のプロセスが整理する空のバケットに対して tusd を実行すると、メタデータは失われます。`tus-uploads` プレフィックスをクリーンアップジョブから保護します。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional tusd backends.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [tus protocol documentation](https://tus.io/protocols/resumable-upload) for creation-with-upload, termination, and checksum extensions that tusd supports on top of the core protocol.
+- ほかの tusd バックエンドを採用する前に、[S3 互換性に関する注意](/ja/administration/protocols/s3)を確認します。
+- [アクセスキーの管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- tusd がコアプロトコルの上で対応する creation-with-upload、termination、チェックサム拡張については、[tus プロトコルのドキュメント](https://tus.io/protocols/resumable-upload)に従います。

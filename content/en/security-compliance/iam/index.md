@@ -1,5 +1,5 @@
 ---
-title: "RustFS IAM Management"
+title: "Identity and Access Management"
 description: "Overview of RustFS Identity and Access Management (IAM): identity types, policy attachment, and policy evaluation semantics."
 ---
 

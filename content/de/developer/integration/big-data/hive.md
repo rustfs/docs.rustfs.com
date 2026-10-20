@@ -1,13 +1,13 @@
 ---
 title: "Hive"
-description: "Store Hive table data on RustFS over S3A."
+description: "Speichern Sie Hive-Tabellendaten über S3A auf RustFS."
 ---
 
-This guide connects [Apache Hive](https://github.com/apache/hive) — the classic data warehouse — to **RustFS** through the S3A filesystem. You will run the Hive 4.0.1 Docker image with a metastore and HiveServer2, configure S3A in three configuration layers, create an external table over a RustFS location, and load and query data. The workflow was verified with Hive 4.0.1 against `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [Apache Hive](https://github.com/apache/hive) — das klassische Data Warehouse — über das Dateisystem S3A mit **RustFS**. Sie betreiben das Docker-Image von Hive 4.0.1 mit einem Metastore und HiveServer2, konfigurieren S3A in drei Konfigurationsschichten, legen eine externe Tabelle über einem RustFS-Speicherort an und laden Daten und fragen sie ab. Der Ablauf wurde mit Hive 4.0.1 gegen `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker (two containers: metastore and hiveserver2).
+Sie benötigen Docker (zwei Container: Metastore und HiveServer2).
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -16,9 +16,9 @@ flowchart LR
 	HS2 -->|"Tez tasks: S3A"| RustFS["RustFS :9000"]
 ```
 
-Hive stores table metadata in the metastore (Derby in this test) and table data in the table's S3A location. Query execution runs on Tez inside the hiveserver2 container.
+Hive speichert Tabellenmetadaten im Metastore (in diesem Test Derby) und Tabellendaten am S3A-Speicherort der Tabelle. Die Abfrageausführung läuft auf Tez im Container hiveserver2.
 
-## 1. Run the metastore and HiveServer2
+## 1. Metastore und HiveServer2 starten
 
 ```bash
 docker run -d --name hive-metastore --hostname hive-meta --network oo-rustfs_default \
@@ -28,11 +28,11 @@ docker run -d --name hive-server --hostname hive-server --network oo-rustfs_defa
   -e SERVICE_NAME=hiveserver2 -e DB_DRIVER=derby apache/hive:4.0.1
 ```
 
-The metastore takes 1-2 minutes to initialize its Derby schema; HiveServer2 listens on 10000, the metastore on 9083.
+Der Metastore braucht 1–2 Minuten, um sein Derby-Schema zu initialisieren. HiveServer2 lauscht auf 10000, der Metastore auf 9083.
 
-## 2. Configure S3A in three places
+## 2. S3A an drei Stellen konfigurieren
 
-Tez tasks read the Hadoop configuration directory, HiveServer2 reads the Hive configuration, and the metastore needs the endpoint too. Create one properties file and copy it to all three paths:
+Tez-Tasks lesen das Hadoop-Konfigurationsverzeichnis, HiveServer2 liest die Hive-Konfiguration, und der Metastore braucht den Endpunkt ebenfalls. Legen Sie eine Properties-Datei an und kopieren Sie sie an alle drei Pfade:
 
 ```xml title="s3a-core-site.xml"
 <?xml version="1.0"?>
@@ -61,9 +61,9 @@ docker exec hive-server bash -c \
 docker restart hive-server
 ```
 
-The `hadoop-aws` jar ships in `/opt/hadoop/share/hadoop/tools/lib` — the `HADOOP_CLASSPATH` export puts it on the query classpath. `mkdir /home/hive/.beeline` silences a harmless beeline home-directory error.
+Das JAR `hadoop-aws` liegt in `/opt/hadoop/share/hadoop/tools/lib`. Der Export `HADOOP_CLASSPATH` setzt es auf den Abfrage-Classpath. `mkdir /home/hive/.beeline` unterdrückt einen harmlosen Fehler zum Home-Verzeichnis von Beeline.
 
-## 3. Create an external table
+## 3. Eine externe Tabelle anlegen
 
 ```bash
 docker exec hive-server bash -c "cd /opt/hive && beeline -u 'jdbc:hive2://localhost:10000' \
@@ -72,11 +72,11 @@ docker exec hive-server bash -c "cd /opt/hive && beeline -u 'jdbc:hive2://localh
   LOCATION 's3a://hive-demo/warehouse/events';\""
 ```
 
-An `EXTERNAL` table with an S3A `LOCATION` keeps all data in RustFS. (A managed `CREATE TABLE ... LOCATION` on a non-default database path is rejected by Hive 4 managed-table rules — use external tables for S3A locations.)
+Eine Tabelle `EXTERNAL` mit einer S3A-`LOCATION` hält alle Daten in RustFS. Ein verwaltetes `CREATE TABLE ... LOCATION` auf einem Pfad außerhalb der Standarddatenbank lehnt Hive 4 nach den Regeln für verwaltete Tabellen ab. Verwenden Sie für S3A-Speicherorte externe Tabellen.
 
-## 4. Load and query data
+## 4. Daten laden und abfragen
 
-`LOAD DATA INPATH` moves a local file into the table's S3A location (the rename is executed by HiveServer2, which has the credentials):
+`LOAD DATA INPATH` verschiebt eine lokale Datei an den S3A-Speicherort der Tabelle. Das Umbenennen führt HiveServer2 aus, das die Zugangsdaten besitzt:
 
 ```bash
 docker exec hive-server bash -c "printf '1,alpha\n2,beta\n3,gamma\n' > /tmp/hive-load.txt"
@@ -88,7 +88,7 @@ docker exec hive-server bash -c "cd /opt/hive && beeline -u 'jdbc:hive2://localh
 INFO  : Loading data to table default.events from file:/tmp/hive-load.txt
 ```
 
-## 5. Query and verify in RustFS
+## 5. Abfragen und in RustFS prüfen
 
 ```bash
 docker exec hive-server bash -c "cd /opt/hive && beeline -u 'jdbc:hive2://localhost:10000' \
@@ -101,7 +101,7 @@ docker exec hive-server bash -c "cd /opt/hive && beeline -u 'jdbc:hive2://localh
 3	gamma
 ```
 
-List the table directory — the loaded file is an ordinary object:
+Listen Sie das Tabellenverzeichnis auf. Die geladene Datei ist ein gewöhnliches Objekt:
 
 ```bash
 rc ls rustfs/hive-demo/warehouse/events/
@@ -113,35 +113,35 @@ warehouse/events/hive-load_copy_1.txt
 warehouse/events/hive-load_copy_2.txt
 ```
 
-![Hive warehouse files stored in the RustFS Console](./images/rustfs-hive-warehouse.png)
+![In der RustFS-Console gespeicherte Dateien des Hive-Warehouses](./images/rustfs-hive-warehouse.png)
 
-## 6. Stop or reset
+## 6. Stoppen oder zurücksetzen
 
 ```bash
 docker rm -f hive-server hive-metastore
 rc rm rustfs/hive-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
-### `NoClassDefFoundError: org.apache.tez.mapreduce.hadoop.InputSplitInfo` on INSERT
+### `NoClassDefFoundError: org.apache.tez.mapreduce.hadoop.InputSplitInfo` bei INSERT
 
-The Tez jars are missing from the query classpath. Add the `HADOOP_CLASSPATH` export from step 2 (tools lib + tez + tez lib) to `/opt/hive/conf/hive-env.sh`.
+Die Tez-JARs fehlen auf dem Abfrage-Classpath. Fügen Sie den Export `HADOOP_CLASSPATH` aus Schritt 2 (tools lib, tez und tez lib) in `/opt/hive/conf/hive-env.sh` ein.
 
 ### `NoAwsCredentialsException: SimpleAWSCredentialsProvider: No AWS credentials in the Hadoop configuration`
 
-Tez task processes read `/opt/hadoop/etc/hadoop/core-site.xml`, not only the Hive conf directory. Copy the S3A properties to all three paths from step 2.
+Tez-Task-Prozesse lesen `/opt/hadoop/etc/hadoop/core-site.xml`, nicht nur das Hive-Konfigurationsverzeichnis. Kopieren Sie die S3A-Properties an alle drei Pfade aus Schritt 2.
 
-### `Permission denied` printed after every beeline command
+### Nach jedem Beeline-Befehl erscheint `Permission denied`
 
-beeline tries to create `/home/hive/.beeline`. Run `mkdir -p /home/hive/.beeline && chmod 777` once (as root in the container).
+Beeline versucht, `/home/hive/.beeline` anzulegen. Führen Sie einmal `mkdir -p /home/hive/.beeline && chmod 777` aus (als root im Container).
 
 ### `Unable to create database managed path file:/user/hive/warehouse/...`
 
-Hive 4 keeps managed databases inside the managed warehouse root. Use `CREATE EXTERNAL TABLE ... LOCATION 's3a://...'` for S3A locations.
+Hive 4 hält verwaltete Datenbanken im Wurzelverzeichnis des verwalteten Warehouses. Verwenden Sie `CREATE EXTERNAL TABLE ... LOCATION 's3a://...'` für S3A-Speicherorte.
 
-## Next steps
+## Nächste Schritte
 
-- Compare with the [Trino](/developer/integration/database/trino) guide when you want interactive SQL over the same objects without a metastore.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Hive documentation](https://hive.apache.org/) to attach a MySQL-backed metastore and share the same warehouse across Hive and Spark on the same bucket.
+- Vergleichen Sie die Anleitung mit [Trino](/de/developer/integration/database/trino), wenn Sie interaktives SQL über dieselben Objekte ohne Metastore möchten.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [Hive-Dokumentation](https://hive.apache.org/), um einen Metastore auf MySQL-Basis anzubinden und dasselbe Warehouse zwischen Hive und Spark auf demselben Bucket zu teilen.

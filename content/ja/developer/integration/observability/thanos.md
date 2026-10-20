@@ -1,13 +1,13 @@
 ---
 title: "Thanos"
-description: "Run Thanos with RustFS as the S3 object storage backend for Prometheus blocks, deployed with Docker Compose."
+description: "Docker Compose でデプロイし、Prometheus ブロックの S3 オブジェクトストレージバックエンドとして RustFS を使って Thanos を実行します。"
 ---
 
-This guide connects [Thanos](https://github.com/thanos-io/thanos) — the highly available Prometheus setup with long-term storage — to **RustFS** as its object store. You will run Prometheus with a Thanos sidecar that uploads TSDB blocks to RustFS, then query the historical data back through a Store Gateway and a Query frontend. The workflow was verified with `thanosio/thanos:v0.37.2`, `prom/prometheus:v2.53.1`, and `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、長期保存を備えた高可用性 Prometheus 構成である [Thanos](https://github.com/thanos-io/thanos) を、オブジェクトストアとして **RustFS** に接続します。TSDB ブロックを RustFS へアップロードする Thanos サイドカー付きの Prometheus を実行し、Store Gateway と Query フロントエンドを通じて過去データをクエリします。この流れは `thanosio/thanos:v0.37.2`、`prom/prometheus:v2.53.1`、`rustfs/rustfs-x86-musl:v2.3.1` で検証済みです。
 
-You need Docker with the Compose plugin. This deployment is intended for local integration testing, not production.
+Docker と Compose プラグインが必要です。このデプロイはローカルでの統合テストを目的としており、本番環境向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -18,27 +18,27 @@ flowchart LR
 	Query -->|gRPC| Store
 ```
 
-The sidecar watches the Prometheus TSDB directory and uploads every two-hour block to the `thanos-data` bucket in RustFS. The Store Gateway reads the same bucket and answers queries about historical blocks, so Query resolves both live data through the sidecar and old data through the Store Gateway.
+サイドカーは Prometheus の TSDB ディレクトリを監視し、2 時間ごとのブロックを RustFS の `thanos-data` バケットへアップロードします。Store Gateway は同じバケットを読み、過去のブロックに関するクエリに応答します。そのため Query は、ライブデータをサイドカー経由で、古いデータを Store Gateway 経由で解決します。
 
-## 1. Create the project files
+## 1. プロジェクトファイルを作成する
 
-Create a working directory:
+作業ディレクトリを作成します。
 
 ```bash
 mkdir rustfs-thanos
 cd rustfs-thanos
 ```
 
-Create an environment file and replace both credential placeholders:
+環境変数ファイルを作成し、2 つの認証情報プレースホルダーを置き換えます。
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Use dedicated credentials for the `thanos-data` bucket. Do not commit `.env` to source control.
+`thanos-data` バケットには専用の認証情報を使用してください。`.env` をバージョン管理にコミットしないでください。
 
-Create the Prometheus configuration with an external label — Thanos requires it to deduplicate blocks:
+外部ラベル付きの Prometheus 設定を作成します。Thanos はブロックの重複排除に外部ラベルを必要とします。
 
 ```yaml title="prometheus.yml"
 global:
@@ -56,7 +56,7 @@ scrape_configs:
       - targets: ["rustfs:9000"]
 ```
 
-Create the Thanos object store configuration:
+Thanos のオブジェクトストア設定を作成します。
 
 ```yaml title="bucket.yml"
 type: S3
@@ -68,13 +68,13 @@ config:
   insecure: true
 ```
 
-Thanos does not interpolate `.env` files itself. Before starting the stack, replace the placeholders with the same values you set in `.env`:
+Thanos 自身は `.env` ファイルを展開しません。スタックを起動する前に、プレースホルダーを `.env` で設定した同じ値に置き換えます。
 
 ```bash
 sed -i.bak "s|\${RUSTFS_ACCESS_KEY}|$(grep RUSTFS_ACCESS_KEY .env | cut -d= -f2)|;s|\${RUSTFS_SECRET_KEY}|$(grep RUSTFS_SECRET_KEY .env | cut -d= -f2)|" bucket.yml
 ```
 
-Create the Compose file:
+Compose ファイルを作成します。
 
 ```yaml title="compose.yaml"
 services:
@@ -189,47 +189,47 @@ volumes:
   store-data:
 ```
 
-The `--storage.tsdb.min-block-duration` and `--storage.tsdb.max-block-duration` flags disable Prometheus compaction. The sidecar refuses to ship blocks from a compacting TSDB because the local blocks would no longer match the uploaded ones.
+`--storage.tsdb.min-block-duration` と `--storage.tsdb.max-block-duration` は Prometheus のコンパクションを無効にします。コンパクション中の TSDB からブロックを送出すると、ローカルのブロックがアップロード済みのものと一致しなくなるため、サイドカーは送出を拒否します。
 
-## 2. Validate and start the deployment
+## 2. デプロイを検証して開始する
 
-Resolve the Compose file before starting containers:
+コンテナを起動する前に Compose ファイルを解決します。
 
 ```bash
 docker compose config
 ```
 
-Start the stack and wait until the sidecar reports itself ready:
+スタックを起動し、サイドカーが ready を報告するまで待ちます。
 
 ```bash
 docker compose up -d
 docker compose logs sidecar | grep -m1 "status=ready"
 ```
 
-Check that the sidecar picked up the Prometheus external labels:
+サイドカーが Prometheus の外部ラベルを取り込んだことを確認します。
 
 ```bash
 docker compose logs sidecar | grep "external labels"
 ```
 
-The Thanos Query UI answers on `http://localhost:9091`, and the RustFS Console runs at `http://localhost:9001`.
+Thanos Query の UI は `http://localhost:9091` で応答し、RustFS Console（管理画面）は `http://localhost:9001` で動作します。
 
-## 3. Upload a block to RustFS
+## 3. ブロックを RustFS へアップロードする
 
-The sidecar uploads a block when Prometheus compacts one, which happens at a two-hour block boundary. To produce a block immediately, snapshot the TSDB through the admin API — with compaction disabled, the sidecar ships the head-block snapshot directly:
+サイドカーは Prometheus がブロックをコンパクトしたときにアップロードします。これは 2 時間のブロック境界で起きます。すぐにブロックを作るには、管理 API で TSDB のスナップショットを取得します。コンパクションが無効な場合、サイドカーはヘッドブロックのスナップショットをそのまま送出します。
 
 ```bash
 curl -s -XPOST http://localhost:9090/api/v1/admin/tsdb/snapshot | head -c 200
 ```
 
-Wait for the upload, then check the shipper state inside Prometheus:
+アップロードを待ち、Prometheus 内のシッパーの状態を確認します。
 
 ```bash
 sleep 60
 docker compose exec prometheus cat /prometheus/thanos.shipper.json
 ```
 
-The `uploaded` list should contain a block ID:
+`uploaded` の一覧にブロック ID が入るはずです。
 
 ```json
 {
@@ -240,15 +240,15 @@ The `uploaded` list should contain a block ID:
 }
 ```
 
-## 4. Query historical data from RustFS
+## 4. RustFS から過去データをクエリする
 
-The Store Gateway periodically syncs the bucket. Confirm it downloaded the uploaded block:
+Store Gateway はバケットを定期的に同期します。アップロードされたブロックをダウンロードしたことを確認します。
 
 ```bash
 docker compose logs store | grep "loaded new block"
 ```
 
-Query a series through the Query frontend over the block's time range:
+ブロックの時間範囲について、Query フロントエンド経由で系列をクエリします。
 
 ```bash
 START=$(date -u -d '2 hours ago' +%s)
@@ -256,17 +256,17 @@ END=$(date -u +%s)
 curl -s "http://localhost:9091/api/v1/query_range?query=up%7Bjob%3D%22prometheus%22%7D&start=$START&end=$END&step=30" | head -c 300
 ```
 
-The Store Gateway serves the response from the blocks it downloaded from RustFS, while the sidecar answers for the live head — both paths resolve through the same Query endpoint.
+Store Gateway は RustFS からダウンロードしたブロックで応答し、サイドカーはライブのヘッドに応答します。どちらの経路も同じ Query エンドポイントで解決されます。
 
-## 5. Verify objects in RustFS
+## 5. RustFS 内のオブジェクトを確認する
 
-List the bucket:
+バケットを一覧します。
 
 ```bash
 docker compose exec rustfs /usr/bin/rc ls local/thanos-data/ -r
 ```
 
-Each block is stored as three objects — the chunk files, the index, and `meta.json`:
+各ブロックは 3 つのオブジェクトとして保存されます。チャンクファイル、インデックス、`meta.json` です。
 
 ```text
 01M31EPTZC5E0SETZTP0SPFY79/chunks/000001
@@ -274,38 +274,38 @@ Each block is stored as three objects — the chunk files, the index, and `meta.
 01M31EPTZC5E0SETZTP0SPFY79/meta.json
 ```
 
-![Thanos blocks stored in the RustFS Console](./images/rustfs-thanos-blocks.png)
+![RustFS Console に保存された Thanos のブロック](./images/rustfs-thanos-blocks.png)
 
-## 6. Stop or reset the deployment
+## 6. デプロイを停止またはリセットする
 
-Stop the containers while keeping all data:
+データを残したままコンテナを停止します。
 
 ```bash
 docker compose down
 ```
 
-The RustFS volume keeps the uploaded blocks, so the Store Gateway serves historical queries again after a restart. To delete everything, including the blocks in RustFS, add `--volumes`.
+RustFS のボリュームはアップロード済みブロックを保持するため、再起動後も Store Gateway は過去のクエリに応答します。RustFS 内のブロックを含めてすべて削除するには、`--volumes` を追加します。
 
-## Troubleshooting
+## トラブルシューティング
 
-### The sidecar logs `Compaction needs to be disabled`
+### サイドカーが `Compaction needs to be disabled` を記録する
 
-Prometheus must run with `--storage.tsdb.min-block-duration` equal to `--storage.tsdb.max-block-duration` — set both to `2h` as shown in the Compose file. Otherwise the sidecar cannot guarantee that local blocks stay unchanged and refuses to upload.
+Prometheus は `--storage.tsdb.min-block-duration` と `--storage.tsdb.max-block-duration` を同じ値で実行する必要があります。Compose ファイルのとおり両方を `2h` に設定します。そうしないと、サイドカーはローカルブロックが変化しないことを保証できず、アップロードを拒否します。
 
 ### `The specified bucket does not exist`
 
-Thanos does not create buckets. Check that the `create-bucket` service completed successfully:
+Thanos はバケットを作成しません。`create-bucket` サービスが正常に完了したことを確認します。
 
 ```bash
 docker compose logs create-bucket
 ```
 
-### Queries return no historical data
+### クエリが過去データを返さない
 
-Confirm that the Store Gateway has loaded at least one block (`docker compose logs store | grep "loaded new block"`) and that your query time range falls inside the uploaded block's window — check the block's `meta.json` in the RustFS Console for `minTime` and `maxTime`.
+Store Gateway が少なくとも 1 つのブロックを読み込んでいること（`docker compose logs store | grep "loaded new block"`）、およびクエリの時間範囲がアップロード済みブロックの範囲内であることを確認します。ブロックの `minTime` と `maxTime` は、RustFS Console の `meta.json` で確認できます。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Thanos components.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Thanos documentation](https://thanos.io/tip/thanos/getting-started.md) to add Compactor, Ruler, or Receive for a production topology.
+- 追加の Thanos コンポーネントを採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認してください。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
+- [Thanos のドキュメント](https://thanos.io/tip/thanos/getting-started.md)に従い、本番トポロジ向けに Compactor、Ruler、Receive を追加してください。

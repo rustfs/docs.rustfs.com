@@ -1,39 +1,39 @@
 ---
-title: "JavaScript SDK Guide"
-description: "Use the official AWS SDK for JavaScript v3 with RustFS."
+title: "Guide du SDK JavaScript"
+description: "Utilisez le SDK AWS officiel pour JavaScript v3 avec RustFS."
 ---
 
-## I. Overview
+## Présentation
 
-RustFS ships no first-party JavaScript SDK — it is S3-compatible, so you use the official AWS SDK for JavaScript (v3) configured to point at your RustFS server. This guide shows how to connect to RustFS and perform common object storage operations.
+RustFS ne fournit pas de SDK JavaScript propre. Il est compatible avec S3 : vous utilisez donc le SDK AWS officiel pour JavaScript (v3), configuré pour pointer vers votre serveur RustFS. Ce guide montre comment se connecter à RustFS et effectuer les opérations courantes de stockage objet.
 
-## II. Prerequisites
+## Prérequis
 
-* Node.js 18 or later
-* A running RustFS instance (see the [Installation Guide](../../installation/index.md)) — the S3 API listens on port `9000`, the Console on port `9001`
-* Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (see [Access Key Management](../../security-compliance/iam/access-token.md))
+* Node.js 18 ou ultérieur
+* Une instance RustFS en cours d’exécution (consultez le [guide d’installation](../../installation/index.md)) : l’API S3 écoute sur le port `9000`, la Console sur le port `9001`
+* Des clés d’accès, définies à l’installation par les variables d’environnement `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` (consultez la [gestion des clés d’accès](../../security-compliance/iam/access-token.md))
 
-:::tip[Local test]
+:::tip[Essai local]
 
-If you did not set credentials at install time, the server defaults to `rustfsadmin` / `rustfsadmin` — fine for a throwaway local trial, never for anything reachable by others.
+Si vous n’avez pas défini d’identifiants à l’installation, le serveur utilise par défaut `rustfsadmin` / `rustfsadmin`. Cela convient à un essai local jetable, jamais à une instance accessible à d’autres personnes.
 
 :::
 
-### 2.1 SDK Installation
+### Installer le SDK
 
-Install the required AWS SDK v3 modules with NPM:
+Installez les modules requis du SDK AWS v3 avec npm :
 
 ```bash
 npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
 ```
 
-The examples below use ES modules (`import`). Set `"type": "module"` in your `package.json`, or save the files with the `.mjs` extension.
+Les exemples ci-dessous utilisent les modules ES (`import`). Définissez `"type": "module"` dans votre `package.json`, ou enregistrez les fichiers avec l’extension `.mjs`.
 
 ---
 
-## III. Initializing the Client
+## Initialiser le client
 
-The following is a complete, runnable script. Replace `localhost` with your server's IP address if RustFS runs on another machine, and fill in your own access keys:
+Le script suivant est complet et exécutable. Remplacez `localhost` par l’adresse IP de votre serveur si RustFS s’exécute sur une autre machine, et renseignez vos propres clés d’accès :
 
 ```js title="main.mjs"
 import { S3Client, ListBucketsCommand } from "@aws-sdk/client-s3";
@@ -53,7 +53,7 @@ const { Buckets } = await s3.send(new ListBucketsCommand({}));
 console.log(Buckets?.map((b) => b.Name) ?? []);
 ```
 
-Run it:
+Exécutez-le :
 
 ```bash
 node main.mjs
@@ -63,13 +63,13 @@ node main.mjs
 [ 'my-bucket' ]
 ```
 
-All snippets below reuse this `s3` client.
+Tous les extraits ci-dessous réutilisent ce client `s3`.
 
 ---
 
-## IV. Basic Operations
+## Opérations de base
 
-### 4.1 Create Bucket
+### 4.1 Créer un compartiment
 
 ```js
 import { CreateBucketCommand } from "@aws-sdk/client-s3";
@@ -84,7 +84,7 @@ Bucket created
 
 ---
 
-### 4.2 Upload Object
+### 4.2 Charger un objet
 
 ```js
 import { PutObjectCommand } from "@aws-sdk/client-s3";
@@ -109,7 +109,7 @@ File uploaded
 
 ---
 
-### 4.3 Download Object
+### 4.3 Télécharger un objet
 
 ```js
 import { GetObjectCommand } from "@aws-sdk/client-s3";
@@ -137,7 +137,7 @@ File downloaded
 
 ---
 
-### 4.4 List Objects
+### 4.4 Lister les objets
 
 ```js
 import { ListObjectsV2Command } from "@aws-sdk/client-s3";
@@ -152,7 +152,7 @@ hello.txt (12 bytes)
 
 ---
 
-### 4.5 Delete Object
+### 4.5 Supprimer un objet
 
 ```js
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
@@ -167,13 +167,13 @@ File deleted
 
 ---
 
-## V. Advanced Features
+## Fonctionnalités avancées
 
-### 5.1 Generate Presigned URLs
+### 5.1 Générer des URL présignées
 
-> Allows frontend or third parties to use temporary links for uploading/downloading files
+Les URL présignées permettent à des clients navigateur ou à des tiers de charger ou de télécharger des objets au moyen de liens temporaires.
 
-#### Download (GET)
+#### Téléchargement (GET)
 
 ```js
 import { GetObjectCommand } from "@aws-sdk/client-s3";
@@ -192,7 +192,7 @@ console.log("Presigned GET URL:", url);
 Presigned GET URL: http://localhost:9000/my-bucket/hello.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&...
 ```
 
-#### Upload (PUT)
+#### Chargement (PUT)
 
 ```js
 import { PutObjectCommand } from "@aws-sdk/client-s3";
@@ -209,7 +209,7 @@ console.log("Presigned PUT URL:", url);
 
 ---
 
-### 5.2 Multipart Upload
+### 5.2 Chargement partitionné
 
 ```js
 import {
@@ -275,23 +275,23 @@ Multipart upload completed
 
 ---
 
-## VI. Common Issues and Notes
+## Dépannage
 
-| Problem | Cause | Solution |
+| Problème | Cause | Solution |
 | --------------------------- | -------------------- | --------------------------------------- |
-| SignatureDoesNotMatch | Wrong signature version | JS SDK v3 uses v4 by default, ensure RustFS supports v4 |
-| EndpointConnectionError | Endpoint address misconfigured or not started | Check if RustFS address is accessible |
-| NoSuchKey | File does not exist | Check if `Key` is spelled correctly |
-| InvalidAccessKeyId / Secret | Credentials misconfigured | Check `accessKeyId` / `secretAccessKey` configuration |
-| Upload failure (path issue) | Path-style not enabled | Set `forcePathStyle: true` |
+| SignatureDoesNotMatch | Incohérence de signature | Le SDK v3 signe par défaut avec SigV4 ; vérifiez les identifiants, la région et le point de terminaison |
+| EndpointConnectionError | Adresse du point de terminaison mal configurée, ou service non démarré | Vérifiez que l’adresse RustFS est accessible |
+| NoSuchKey | L’objet n’existe pas | Vérifiez l’orthographe de `Key` |
+| InvalidAccessKeyId / Secret | Identifiants mal configurés | Vérifiez la configuration de `accessKeyId` et de `secretAccessKey` |
+| Échec de chargement (problème de chemin) | Adressage de type chemin (path-style) non activé | Définissez `forcePathStyle: true` |
 
 ---
 
-## VII. Appendix: Frontend Upload Adaptation
+## Annexe : chargements depuis le navigateur
 
-Using presigned URLs allows browsers to upload files directly without passing AccessKey.
+Avec les URL présignées, les navigateurs peuvent charger des objets directement, sans accès à vos identifiants.
 
-Frontend (HTML+JS) upload example:
+Exemple de chargement côté frontal (HTML+JS) :
 
 ```html
 <input type="file" id="fileInput" />
@@ -312,4 +312,4 @@ Frontend (HTML+JS) upload example:
 </script>
 ```
 
-For other operations (object tagging, bucket policies, and more), see the [AWS SDK for JavaScript v3 documentation](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/) — every S3-compatible call works against RustFS the same way.
+Pour les autres opérations (étiquetage d’objets, politiques de compartiment, etc.), consultez la [documentation de l’AWS SDK pour JavaScript v3](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/). La plupart des opérations S3 fonctionnent de la même manière avec RustFS ; les exceptions sont décrites dans la [compatibilité S3](/fr/reference/s3-compatibility).

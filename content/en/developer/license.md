@@ -13,7 +13,7 @@ description: RustFS is released under the Apache 2.0 license.
 _Version 2.0, January 2004_
 http://www.apache.org/licenses/
 
-### Terms and Conditions for use, reproduction, and distribution
+### Terms and Conditions for Use, Reproduction, and Distribution
 
 #### Definitions
 

@@ -1,77 +1,77 @@
 ---
 title: "SSE-S3"
-description: "Configure server-managed SSE-S3 encryption for RustFS buckets and object writes."
+description: "Configurez le chiffrement SSE-S3 géré par le serveur pour les compartiments RustFS et les écritures d’objets."
 ---
 
-SSE-S3 uses the S3 `AES256` encryption mode. RustFS generates a unique data encryption key for each encrypted object and uses the configured KMS service to wrap that key. Clients do not provide or retain the encryption key.
+SSE-S3 utilise le mode de chiffrement S3 `AES256`. RustFS génère une clé de chiffrement des données unique pour chaque objet chiffré et utilise le service KMS configuré pour envelopper cette clé. Les clients ne fournissent ni ne conservent la clé de chiffrement.
 
-## Requirements
+## Prérequis
 
-- Configure and start [KMS](./kms.md), create its default key, and verify the key is available before enabling SSE-S3.
-- Install and configure [`rc`](/operations/rc).
-- Create the target bucket and verify that normal object writes succeed.
+- Configurez et démarrez [KMS](./kms.md), créez sa clé par défaut et vérifiez que la clé est disponible avant d’activer SSE-S3.
+- Installez et configurez [`rc`](/fr/operations/rc).
+- Créez le compartiment (bucket) cible et vérifiez que les écritures d’objets ordinaires réussissent.
 
-:::warning[KMS availability is required]
+:::warning[La disponibilité du KMS est exigée]
 
-RustFS accepts an SSE-S3 bucket default even when KMS is unavailable, but encrypted object writes then fail. Verify an encrypted write and read before using the bucket for production data.
+RustFS accepte une valeur par défaut SSE-S3 sur le compartiment même lorsque le KMS est indisponible, mais les écritures d’objets chiffrés échouent alors. Vérifiez une écriture et une lecture chiffrées avant d’utiliser le compartiment pour des données de production.
 
 :::
 
-## Set bucket default encryption
+## Définir le chiffrement par défaut du compartiment
 
-Apply SSE-S3 to new writes that do not specify an object-level encryption mode:
+Appliquez SSE-S3 aux nouvelles écritures qui ne précisent pas de mode de chiffrement au niveau de l’objet :
 
 ```bash
 rc bucket encryption set rustfs/my-bucket --mode sse-s3
 rc bucket encryption info rustfs/my-bucket
 ```
 
-The reported mode should be `SSE-S3`.
+Le mode indiqué devrait être `SSE-S3`.
 
-Upload and read a test object:
+Chargez (upload) et lisez un objet de test :
 
 ```bash
 rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt
 rc object show rustfs/my-bucket/hello.txt
 ```
 
-## Encrypt one object explicitly
+## Chiffrer un objet explicitement
 
-Apply SSE-S3 to a single destination without changing the bucket default:
+Appliquez SSE-S3 à une seule destination sans modifier la valeur par défaut du compartiment :
 
 ```bash
 rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt \
 	--enc-s3 rustfs/my-bucket/hello.txt
 ```
 
-For recursive writes, the encryption selector must exactly match the destination prefix:
+Pour les écritures récursives, le sélecteur de chiffrement doit correspondre exactement au préfixe de destination :
 
 ```bash
 rc object copy ./reports/ rustfs/my-bucket/reports/ --recursive \
 	--enc-s3 rustfs/my-bucket/reports/
 ```
 
-## Clear the bucket default
+## Effacer la valeur par défaut du compartiment
 
-Remove the default rule:
+Supprimez la règle par défaut :
 
 ```bash
 rc bucket encryption clear rustfs/my-bucket
 rc bucket encryption info rustfs/my-bucket
 ```
 
-Clearing or changing the bucket default affects only later writes. It does not decrypt or rewrite existing objects.
+Effacer ou modifier la valeur par défaut du compartiment n’affecte que les écritures ultérieures. Cela ne déchiffre ni ne réécrit les objets existants.
 
-## Request contract
+## En-têtes de requête
 
-S3 clients request SSE-S3 with:
+Les clients S3 demandent SSE-S3 avec :
 
 ```http
 x-amz-server-side-encryption: AES256
 ```
 
-An object-level request overrides the bucket default for that write. If no object-level mode is supplied, RustFS resolves the effective mode from the bucket encryption configuration.
+Une requête au niveau de l’objet remplace la valeur par défaut du compartiment pour cette écriture. Si aucun mode au niveau de l’objet n’est fourni, RustFS détermine le mode effectif à partir de la configuration de chiffrement du compartiment.
 
-## Next steps
+## Étapes suivantes
 
-Use [SSE-KMS](./kms.md#verify-kms-backed-encryption) when you need an explicit KMS key ID, or compare [SSE-C](./sse-c.md) for client-held keys.
+Utilisez [SSE-KMS](./kms.md#vérifier-le-chiffrement-reposant-sur-le-kms) lorsque vous avez besoin d’un ID de clé KMS explicite, ou comparez [SSE-C](./sse-c.md) pour des clés détenues par le client.

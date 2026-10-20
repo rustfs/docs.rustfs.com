@@ -1,61 +1,64 @@
 ---
-title: "Virtual Host Style"
-description: "RustFS S3 Virtual Host Style and Path Style configuration."
+title: "Anfragen im Virtual-Hosted-Stil"
+description: "Konfigurieren Sie die pfadbasierte Adressierung (Path-Style) und die Adressierung im Virtual-Hosted-Stil für S3-URLs in RustFS."
 ---
 
-RustFS complies with S3 protocols. S3 supports two request modes:
+RustFS unterstützt beide Adressierungsarten für S3-URLs:
 
-1. Virtual Host Style
-2. Path Style
+1. Adressierung im Virtual-Hosted-Stil
+2. Pfadbasierte Adressierung
 
-The difference lies in the bucket name placement.
+Die beiden Arten unterscheiden sich darin, wo der Bucket-Name in der URL steht.
 
-## Path Style
+## Pfadbasierte Adressierung
 
-Path Style is the default. In Path Style, the bucket name follows the endpoint.
+Die pfadbasierte Adressierung ist der Standard. In einer pfadbasierten URL folgt der Bucket-Name auf den Endpunkt.
 
-Example (Bucket: `test`, Host: `rustfs.yourdomain.com`):
-
-```text
-http://rustfs.yourdomain.com/test
-```
-
-**Note**: No configuration is required for Path Style.
-
-## Virtual Host Style
-
-In Virtual Host Style, the bucket name is part of the domain.
-
-Example (Bucket: `test`, Host: `rustfs.yourdomain.com`):
+Beispiel (Bucket: `test`, Host: `rustfs.yourdomain.com`):
 
 ```text
-http://test.rustfs.yourdomain.com/
+http://rustfs.example.com/my-bucket
 ```
 
-### Configuration
+**Hinweis**: Für die pfadbasierte Adressierung ist keine Konfiguration erforderlich.
 
-1. **DNS**: Configure wildcard DNS resolution (e.g., `*.rustfs.yourdomain.com` -> Server IP).
-2. **Configuration**: Modify the configuration file (Linux: `/etc/default/rustfs`, Docker/K8s: env vars).
-3. **Set Domain**: Set `RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com"`.
-4. **Restart**: Restart the service (`systemctl restart rustfs`).
+## Adressierung im Virtual-Hosted-Stil
 
-### Port in Domain (Optional)
+Bei der Adressierung im Virtual-Hosted-Stil ist der Bucket-Name Teil der Domain.
 
-Virtual-host routing applies to the S3 API listener (port 9000 by default); RustFS automatically matches `Host` headers that carry the S3 listener's own port. Only when clients reach RustFS through a **different** port (for example via a proxy) do you need to include that port in `RUSTFS_SERVER_DOMAINS`.
-
-Example (`rustfs.yourdomain.com:8000`):
-
-```ini
-RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com:8000"
-```
-
-This ensures that requests like:
+Beispiel (Bucket: `test`, Host: `rustfs.yourdomain.com`):
 
 ```text
-http://my-bucket.rustfs.yourdomain.com:8000/
+http://my-bucket.rustfs.example.com/
 ```
 
-can be correctly resolved in Virtual Host Style mode.
+### Konfiguration
 
-> ⚠️ Note: The value of `RUSTFS_SERVER_DOMAINS` must exactly match the **Host header** (including the port, if present) used by the client request
+1. **DNS**: Legen Sie einen Wildcard-DNS-Eintrag an (zum Beispiel `*.rustfs.yourdomain.com` → IP-Adresse Ihres Servers).
+2. **Konfiguration**: Ändern Sie die Konfigurationsdatei (Linux: `/etc/default/rustfs`, Docker/Kubernetes: Umgebungsvariablen).
+3. **Domain setzen**: Setzen Sie `RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com"`.
+4. **Neustart**: Starten Sie den Dienst neu (`systemctl restart rustfs`).
 
+### Port in der Domain (optional)
+
+Das Routing im Virtual-Hosted-Stil gilt für den Listener der S3-API (standardmäßig Port 9000). RustFS erkennt `Host`-Header automatisch, die den eigenen Port dieses Listeners enthalten. Nur wenn Clients RustFS über einen **anderen** Port erreichen (zum Beispiel über einen Proxy), müssen Sie diesen Port in `RUSTFS_SERVER_DOMAINS` angeben.
+
+Beispiel (`rustfs.yourdomain.com:8000`):
+
+```ini title="/etc/default/rustfs"
+RUSTFS_SERVER_DOMAINS=rustfs.example.com:8000
+```
+
+Damit werden Anfragen wie diese korrekt weitergeleitet:
+
+```text
+http://my-bucket.rustfs.example.com:8000/
+```
+
+Die Weiterleitung verwendet die Adressierung im Virtual-Hosted-Stil.
+
+:::warning[Host-Header angleichen]
+
+Der Wert von `RUSTFS_SERVER_DOMAINS` muss exakt dem `Host`-Header entsprechen (einschließlich des Ports, falls vorhanden), den Clients senden.
+
+:::

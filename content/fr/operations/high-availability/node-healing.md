@@ -1,52 +1,52 @@
 ---
-title: "Node Healing"
-description: "Recover failed RustFS nodes and disks, monitor automatic healing, and run bounded manual heal tasks with rc."
+title: "Réparation des données des nœuds"
+description: "Récupérez les nœuds et les disques RustFS en panne, surveillez la réparation automatique des données et exécutez avec rc des tâches manuelles de réparation bornées."
 ---
 
-RustFS healing reconstructs missing or inconsistent erasure-coded data from the healthy shards that remain in a storage set. Use this workflow after restoring an unavailable node, replacing a failed disk, or investigating scanner and heal alerts.
+La réparation des données RustFS reconstitue les données à codage d’effacement manquantes ou incohérentes à partir des shards sains qui restent dans un ensemble de stockage. Utilisez ce flux après avoir restauré un nœud indisponible, remplacé un disque en panne ou examiné des alertes du scanner et de la réparation des données.
 
-Healing is a cluster storage operation. It is different from [site replication](/operations/high-availability/site-replication), which copies data and identity configuration between independent RustFS deployments.
+La réparation des données est une opération de stockage du cluster. Elle diffère de la [réplication de site](/fr/operations/high-availability/site-replication), qui copie les données et la configuration d’identité entre des déploiements RustFS indépendants.
 
-:::warning[Healing is not a backup]
+:::warning[La réparation des données n’est pas une sauvegarde]
 
-RustFS can reconstruct data only while enough healthy shards remain in the affected erasure set. Healing cannot recover an object after failures exceed the set's available redundancy, and it does not protect against intentional deletion or application-level corruption. Maintain independent backups or replication according to your recovery requirements.
-
-:::
-
-## How healing works
-
-RustFS coordinates several healing sources through the cluster heal queue:
-
-- `autoHeal`: The automatic disk scanner detects disks that are unformatted or have returned after an outage and queues erasure-set healing.
-- `scanner`: The background data scanner can queue object and bucket healing when it finds inconsistent storage state.
-- `readRepair`: Read-repair paths can submit work discovered while serving requests.
-- `internal`: Internal recovery paths can submit system-initiated work.
-- `admin`: Administrators can submit a recursive, bucket, or prefix heal with `rc admin heal start`.
-
-Automatic disk healing runs at low priority. The `healOperations` status object uses these source names to separate queued, active, and retrying work.
-
-:::note[Reconstruction consumes cluster resources]
-
-Healing reads healthy shards and writes reconstructed data. Deep scans add read and checksum work. Monitor client latency, disk utilization, available capacity, and the heal queue while recovery is active.
+RustFS ne peut reconstituer des données que tant qu’il reste assez de shards sains dans l’ensemble d’effacement concerné. La réparation des données ne peut pas récupérer un objet lorsque les défaillances dépassent la redondance disponible de l’ensemble, et elle ne protège ni contre une suppression intentionnelle ni contre une corruption au niveau de l’application. Conservez des sauvegardes ou une réplication indépendantes, selon vos exigences de reprise.
 
 :::
 
-## Requirements
+## Fonctionnement de la réparation des données
 
-Before recovering a node or disk, prepare:
+RustFS coordonne plusieurs sources de réparation des données par la file de réparation du cluster :
 
-- A RustFS deployment that still has enough healthy shards to reconstruct the affected data.
-- Stable node addresses and the original configured storage mount paths.
-- Replacement storage with capacity appropriate for the affected erasure set.
-- The RustFS [`rc`](/operations/rc) client on a secured administration host.
-- Administrative credentials that permit cluster information, scanner, and heal operations.
-- A maintenance window when replacing hardware or running a deep recursive scan.
+- `autoHeal` : le scanner automatique de disques détecte les disques non formatés ou revenus après une interruption et met en file la réparation des données de l’ensemble d’effacement.
+- `scanner` : le scanner de données en arrière-plan peut mettre en file la réparation des données d’un objet ou d’un compartiment (bucket) lorsqu’il trouve un état de stockage incohérent.
+- `readRepair` : les chemins de réparation à la lecture peuvent soumettre du travail découvert pendant le service des requêtes.
+- `internal` : les chemins de reprise internes peuvent soumettre du travail initié par le système.
+- `admin` : les administrateurs peuvent soumettre une réparation des données récursive, de compartiment ou de préfixe avec `rc admin heal start`.
 
-Record the failed node, pool, set, disk endpoint, mount path, and file-system UUID before changing hardware. Do not remove additional disks from the same erasure set while recovery is incomplete.
+La réparation automatique des disques s’exécute à faible priorité. L’objet d’état `healOperations` utilise ces noms de source pour séparer le travail en file, actif et en nouvel essai.
 
-## 1. Identify the failed component
+:::note[La reconstitution consomme des ressources du cluster]
 
-Configure an `rc` alias if you do not already have one:
+La réparation des données lit les shards sains et écrit les données reconstituées. Les analyses approfondies ajoutent des lectures et des calculs d’empreinte. Surveillez la latence des clients, l’utilisation des disques, la capacité disponible et la file de réparation des données pendant que la reprise est active.
+
+:::
+
+## Conditions requises
+
+Avant de récupérer un nœud ou un disque, préparez :
+
+- Un déploiement RustFS qui dispose encore d’assez de shards sains pour reconstituer les données concernées.
+- Des adresses de nœud stables et les chemins de montage de stockage configurés à l’origine.
+- Un stockage de remplacement dont la capacité convient à l’ensemble d’effacement concerné.
+- Le client RustFS [`rc`](/fr/operations/rc) sur un hôte d’administration sécurisé.
+- Des identifiants d’administration qui autorisent les opérations d’information de cluster, de scanner et de réparation des données.
+- Une fenêtre de maintenance lorsque vous remplacez du matériel ou exécutez une analyse récursive approfondie.
+
+Notez le nœud en panne, le pool, l’ensemble, le point de terminaison du disque, le chemin de montage et l’UUID du système de fichiers avant de modifier le matériel. Ne retirez pas d’autres disques du même ensemble d’effacement tant que la reprise n’est pas terminée.
+
+## 1. Identifier le composant en panne
+
+Configurez un alias `rc` si vous n’en avez pas déjà un :
 
 ```bash
 rc alias set rustfs https://rustfs.example.com:9000 \
@@ -54,7 +54,7 @@ rc alias set rustfs https://rustfs.example.com:9000 \
 	--region us-east-1 --bucket-lookup path
 ```
 
-Check cluster readiness, topology, storage health, and heal activity:
+Vérifiez l’état de préparation du cluster, la topologie, l’intégrité du stockage et l’activité de réparation des données :
 
 ```bash
 rc ready rustfs
@@ -64,35 +64,35 @@ rc admin scanner status rustfs
 rc admin heal status rustfs
 ```
 
-Readiness can fail while the cluster is degraded. Use the administrative information commands to identify which node or disk is unavailable and note its pool and erasure-set location.
+L’état de préparation peut échouer alors que le cluster est dégradé. Utilisez les commandes d’information d’administration pour identifier le nœud ou le disque indisponible et notez son pool ainsi que l’emplacement de son ensemble d’effacement.
 
-For machine-readable output, request JSON:
+Pour une sortie lisible par une machine, demandez le JSON :
 
 ```bash
 rc --json admin info storage rustfs
 rc --json admin heal status rustfs
 ```
 
-The aggregate heal status reports runtime state, queued and active tasks, retrying work, request sources, priorities, and available progress counters. A zero-length queue does not prove that an offline disk has been replaced or that every object is recoverable; correlate it with storage topology and readiness.
+L’état agrégé de réparation des données indique l’état d’exécution, les tâches en file et actives, le travail en nouvel essai, les sources de requête, les priorités et les compteurs de progression disponibles. Une file de longueur nulle ne prouve pas qu’un disque hors ligne a été remplacé ni que chaque objet est récupérable ; corrélez-la avec la topologie de stockage et l’état de préparation.
 
-## 2. Restore the node or disk
+## 2. Restaurer le nœud ou le disque
 
-Correct the underlying failure before starting a manual heal.
+Corrigez la défaillance sous-jacente avant de lancer une réparation manuelle des données.
 
-For a node outage:
+Pour une interruption de nœud :
 
-1. Restore the node's configured network identity and connectivity to every other RustFS node on the S3 API port, normally `9000`.
-2. Mount the original data disks at their configured paths.
-3. Confirm that the RustFS process uses the same storage endpoint configuration as the rest of the cluster.
-4. Start RustFS and verify that the node rejoins the cluster.
+1. Restaurez l’identité réseau configurée du nœud et sa connectivité vers chaque autre nœud RustFS sur le port de l’API S3, normalement `9000`.
+2. Montez les disques de données d’origine à leurs chemins configurés.
+3. Vérifiez que le processus RustFS utilise la même configuration de points de terminaison de stockage que le reste du cluster.
+4. Démarrez RustFS et vérifiez que le nœud rejoint le cluster.
 
-For a failed disk:
+Pour un disque en panne :
 
-1. Stop the RustFS process on the affected node before removing or remounting storage.
-2. Replace the failed device and prepare its file system according to [Disk Preparation](/installation/requirement/disk-preparation).
-3. Mount the replacement at the exact path used by the failed disk and update `/etc/fstab` with its file-system UUID.
-4. Verify the mount, file-system type, ownership, and available capacity before starting RustFS.
-5. Start RustFS and confirm that the disk appears in the expected pool and erasure set.
+1. Arrêtez le processus RustFS sur le nœud concerné avant de retirer ou de remonter le stockage.
+2. Remplacez le périphérique en panne et préparez son système de fichiers selon [Préparation des disques](/fr/installation/requirement/disk-preparation).
+3. Montez le remplacement au chemin exact utilisé par le disque en panne et mettez à jour `/etc/fstab` avec l’UUID de son système de fichiers.
+4. Vérifiez le montage, le type de système de fichiers, le propriétaire et la capacité disponible avant de démarrer RustFS.
+5. Démarrez RustFS et vérifiez que le disque apparaît dans le pool et l’ensemble d’effacement attendus.
 
 ```bash
 findmnt /data/rustfs0
@@ -100,15 +100,15 @@ df -hT /data/rustfs0
 rc admin info storage rustfs
 ```
 
-:::warning[Do not reuse stale storage blindly]
+:::warning[Ne réutilisez pas à l’aveugle un stockage obsolète]
 
-Confirm the identity and contents of every device before mounting it at a RustFS data path. Do not copy internal metadata between disks, combine multiple configured endpoints on one replacement file system, or mount a replacement over a path that still contains required data.
+Confirmez l’identité et le contenu de chaque périphérique avant de le monter sur un chemin de données RustFS. Ne copiez pas les métadonnées internes d’un disque à l’autre, ne regroupez pas plusieurs points de terminaison configurés sur un seul système de fichiers de remplacement, et ne montez pas un remplacement sur un chemin qui contient encore des données requises.
 
 :::
 
-## 3. Monitor automatic healing
+## 3. Surveiller la réparation automatique des données
 
-After the node or replacement disk is online, RustFS can detect the recovery candidate and queue erasure-set healing. Check both storage state and aggregate heal activity:
+Une fois le nœud ou le disque de remplacement en ligne, RustFS peut détecter le candidat à la reprise et mettre en file la réparation des données de l’ensemble d’effacement. Vérifiez à la fois l’état du stockage et l’activité agrégée de réparation des données :
 
 ```bash
 rc admin info storage rustfs
@@ -116,24 +116,24 @@ rc admin heal status rustfs
 rc admin scanner status rustfs
 ```
 
-In JSON output, watch these groups:
+Dans la sortie JSON, surveillez ces groupes :
 
-| Field | Meaning |
+| Champ | Signification |
 | --- | --- |
-| `state` | Heal runtime state, such as `active` or `idle`. |
-| `healQueueLength` | Total work waiting in the heal queue. |
-| `healActiveTasks` | Total heal tasks currently running. |
-| `healOperations` | Queue, active, and retry counts grouped by source (`scanner`, `admin`, `autoHeal`, `internal`, and `readRepair`) and priority. |
-| `progress` | Available totals for objects scanned, healed, failed, and bytes processed. |
-| `clusterStatusComplete` | Whether the response includes every expected node. |
+| `state` | État d’exécution de la réparation des données, par exemple `active` ou `idle`. |
+| `healQueueLength` | Travail total en attente dans la file de réparation des données. |
+| `healActiveTasks` | Nombre total de tâches de réparation des données en cours d’exécution. |
+| `healOperations` | Comptes de file, d’activité et de nouvel essai, regroupés par source (`scanner`, `admin`, `autoHeal`, `internal` et `readRepair`) et par priorité. |
+| `progress` | Totaux disponibles pour les objets analysés, réparés, en échec et les octets traités. |
+| `clusterStatusComplete` | Indique si la réponse inclut chaque nœud attendu. |
 
-Do not treat `idle` as successful recovery by itself. Confirm that the replacement disk is online, no heal failures remain, the cluster is ready, and representative objects are readable.
+Ne considérez pas `idle` à lui seul comme une reprise réussie. Vérifiez que le disque de remplacement est en ligne, qu’il ne reste aucun échec de réparation des données, que le cluster est à l’état de préparation et que des objets représentatifs sont lisibles.
 
-## 4. Run a targeted manual heal
+## 4. Exécuter une réparation manuelle ciblée des données
 
-Use a manual task when automatic recovery does not cover the required path or when you need an explicit scan after an incident. Start with the narrowest bucket or prefix that contains affected data.
+Utilisez une tâche manuelle lorsque la reprise automatique ne couvre pas le chemin requis, ou lorsque vous avez besoin d’une analyse explicite après un incident. Commencez par le compartiment ou le préfixe le plus étroit qui contient les données concernées.
 
-Preview a bucket heal without applying changes:
+Prévisualisez une réparation de compartiment sans appliquer de modifications :
 
 ```bash
 rc admin heal start rustfs \
@@ -142,7 +142,7 @@ rc admin heal start rustfs \
 	--dry-run
 ```
 
-Run the targeted heal after reviewing the preview:
+Exécutez la réparation ciblée après avoir examiné la prévisualisation :
 
 ```bash
 rc admin heal start rustfs \
@@ -150,7 +150,7 @@ rc admin heal start rustfs \
 	--scan-mode normal
 ```
 
-Limit the task to an object prefix when the affected scope is known:
+Limitez la tâche à un préfixe d’objet lorsque le périmètre concerné est connu :
 
 ```bash
 rc admin heal start rustfs \
@@ -159,19 +159,19 @@ rc admin heal start rustfs \
 	--scan-mode deep
 ```
 
-`normal` is the default scan mode. Use `deep` when you need deeper data verification and have planned for the additional disk I/O. Omit `--bucket` only when a recursive scan of all buckets is necessary.
+`normal` est le mode d’analyse par défaut. Utilisez `deep` lorsque vous avez besoin d’une vérification plus approfondie des données et que vous avez prévu les E/S disque supplémentaires. N’omettez `--bucket` que lorsqu’une analyse récursive de tous les compartiments est nécessaire.
 
-:::warning[Review mutation options separately]
+:::warning[Examinez séparément les options de mutation]
 
-The `--remove` option removes dangling objects or parts, and `--recreate` requests recreation of missing data. Do not add either option to an incident command until you have inspected the affected storage state, tested with `--dry-run`, and confirmed the intended result.
+L’option `--remove` retire les objets ou parties orphelins, et `--recreate` demande la recréation des données manquantes. N’ajoutez aucune de ces options à une commande d’incident tant que vous n’avez pas inspecté l’état du stockage concerné, testé avec `--dry-run` et confirmé le résultat attendu.
 
 :::
 
-## 5. Track the manual task
+## 5. Suivre la tâche manuelle
 
-Every manual heal returns a `clientToken`. Save it with the incident record because status and stop operations for that task require the token.
+Chaque réparation manuelle des données renvoie un `clientToken`. Conservez-le avec le dossier d’incident, car les opérations d’état et d’arrêt de cette tâche exigent le jeton.
 
-For a bucket or prefix task, pass the original target and token:
+Pour une tâche de compartiment ou de préfixe, transmettez la cible d’origine et le jeton :
 
 ```bash
 rc admin heal status rustfs \
@@ -180,23 +180,23 @@ rc admin heal status rustfs \
 	--client-token <client-token>
 ```
 
-For a recursive task started without `--bucket`, use the token alone:
+Pour une tâche récursive démarrée sans `--bucket`, utilisez le jeton seul :
 
 ```bash
 rc admin heal status rustfs --client-token <client-token>
 ```
 
-The tokenless command remains the cluster-wide background summary:
+La commande sans jeton reste le résumé d’arrière-plan à l’échelle du cluster :
 
 ```bash
 rc admin heal status rustfs
 ```
 
-Task status can include scanned, healed, and failed item totals, bytes processed, the current item, scan mode, start time, and last update. Investigate failed items rather than relying only on the task's aggregate state.
+L’état de la tâche peut inclure les totaux d’éléments analysés, réparés et en échec, les octets traités, l’élément courant, le mode d’analyse, l’heure de début et la dernière mise à jour. Examinez les éléments en échec plutôt que de vous fier seulement à l’état agrégé de la tâche.
 
-## 6. Validate recovery
+## 6. Valider la reprise
 
-After the heal queue drains, verify the cluster and the recovered data path:
+Une fois la file de réparation des données vidée, vérifiez le cluster et le chemin de données récupéré :
 
 ```bash
 rc ready rustfs
@@ -205,20 +205,20 @@ rc admin info storage rustfs
 rc admin heal status rustfs
 ```
 
-Read representative objects from affected buckets and versions. For a known test object:
+Lisez des objets représentatifs dans les compartiments et versions concernés. Pour un objet de test connu :
 
 ```bash
 rc object stat rustfs/my-bucket/hello.txt
 rc object copy rustfs/my-bucket/hello.txt ./hello-recovered.txt
 ```
 
-Compare the downloaded object with an independent checksum or trusted source when one is available. A successful object read validates that request, not every object or every shard in the cluster.
+Comparez l’objet téléchargé à une empreinte indépendante ou à une source de confiance lorsqu’il en existe une. Une lecture d’objet réussie valide cette requête, et non chaque objet ni chaque shard du cluster.
 
-Continue monitoring storage health and heal failures after the cluster becomes ready. Preserve the incident timeline, failed-device information, task token, and final status output for review.
+Continuez à surveiller l’intégrité du stockage et les échecs de réparation des données une fois que le cluster a atteint l’état de préparation. Conservez la chronologie de l’incident, les informations sur le périphérique en panne, le jeton de tâche et la sortie d’état finale pour la revue.
 
-## 7. Stop a manual heal
+## 7. Arrêter une réparation manuelle des données
 
-Stop only the task you have identified. For a bucket or prefix task, include the original target and token:
+N’arrêtez que la tâche que vous avez identifiée. Pour une tâche de compartiment ou de préfixe, incluez la cible d’origine et le jeton :
 
 ```bash
 rc admin heal stop rustfs \
@@ -227,44 +227,44 @@ rc admin heal stop rustfs \
 	--client-token <client-token>
 ```
 
-Stop a recursive token-scoped task with:
+Arrêtez une tâche récursive limitée à un jeton avec :
 
 ```bash
 rc admin heal stop rustfs --client-token <client-token>
 ```
 
-The tokenless stop command targets the global background heal operation:
+La commande d’arrêt sans jeton vise l’opération globale de réparation des données en arrière-plan :
 
 ```bash
 rc admin heal stop rustfs
 ```
 
-Use the global stop only when continued background work creates a larger operational risk. Stopping healing leaves recovery incomplete; record the reason and confirm how healing will resume before closing the incident.
+N’utilisez l’arrêt global que lorsque la poursuite du travail en arrière-plan crée un risque opérationnel plus important. Arrêter la réparation des données laisse la reprise incomplète ; notez la raison et confirmez comment la réparation des données reprendra avant de clore l’incident.
 
-## Troubleshooting
+## Dépannage
 
-### The replacement disk is not healing
+### Le disque de remplacement ne fait pas l’objet d’une réparation des données
 
-Confirm that the replacement is mounted at the configured endpoint and appears in `rc admin info storage`. Check the RustFS logs for disk identification, formatting, permission, or queue-admission failures. Also confirm that healing services are initialized with `rc admin heal status`.
+Vérifiez que le remplacement est monté au point de terminaison configuré et qu’il apparaît dans `rc admin info storage`. Consultez les journaux RustFS pour les échecs d’identification de disque, de formatage, de permission ou d’admission dans la file. Vérifiez aussi que les services de réparation des données sont initialisés avec `rc admin heal status`.
 
-### Heal status is partial
+### L’état de réparation des données est partiel
 
-If `clusterStatusComplete` is false, one or more expected nodes did not contribute to the aggregate response. Restore node-to-node connectivity and check each node's storage and process health before trusting cluster totals.
+Si `clusterStatusComplete` vaut false, un ou plusieurs nœuds attendus n’ont pas contribué à la réponse agrégée. Restaurez la connectivité de nœud à nœud et vérifiez l’intégrité du stockage et du processus de chaque nœud avant de faire confiance aux totaux du cluster.
 
-### The queue remains active
+### La file reste active
 
-Compare queued, active, and retrying work by source. A growing `autoHeal` count points to disk or erasure-set recovery; scanner work points to background discovery; admin work belongs to manually submitted tasks. Check disk latency, free capacity, node connectivity, and repeated item failures before starting another task.
+Comparez le travail en file, actif et en nouvel essai par source. Un compte `autoHeal` qui augmente indique une reprise de disque ou d’ensemble d’effacement ; le travail du scanner indique une découverte en arrière-plan ; le travail admin appartient aux tâches soumises manuellement. Vérifiez la latence des disques, la capacité libre, la connectivité des nœuds et les échecs répétés d’éléments avant de lancer une autre tâche.
 
-### Objects cannot be reconstructed
+### Les objets ne peuvent pas être reconstitués
 
-Stop additional maintenance on the affected erasure set. Preserve the remaining disks and logs, then determine whether enough healthy shards survive. Repeated deep scans cannot reconstruct data when the available redundancy has already been exceeded.
+Arrêtez toute maintenance supplémentaire sur l’ensemble d’effacement concerné. Préservez les disques restants et les journaux, puis déterminez si assez de shards sains subsistent. Des analyses approfondies répétées ne peuvent pas reconstituer des données lorsque la redondance disponible a déjà été dépassée.
 
-### A manual task cannot be queried
+### Une tâche manuelle ne peut pas être interrogée
 
-Use the `clientToken` returned by `heal start`. Bucket and prefix tasks must be queried with the same `--bucket` and `--prefix` target used at start; a recursive root task uses the token without a bucket.
+Utilisez le `clientToken` renvoyé par `heal start`. Les tâches de compartiment et de préfixe doivent être interrogées avec les mêmes cibles `--bucket` et `--prefix` que celles utilisées au démarrage ; une tâche racine récursive utilise le jeton sans compartiment.
 
-## Next steps
+## Étapes suivantes
 
-- Review [Status Check](/operations/status-check) for readiness, cluster, and capacity checks.
-- Configure [Observability](/operations/observability) to alert on disk health and sustained recovery work.
-- Review [Site Replication](/operations/high-availability/site-replication) when recovery requires an independent RustFS deployment.
+- Consultez [Contrôle d’état](/fr/operations/status-check) pour les contrôles d’état de préparation, de cluster et de capacité.
+- Configurez l’[Observabilité](/fr/operations/observability) pour alerter sur l’intégrité des disques et un travail de reprise prolongé.
+- Consultez la [Réplication de site](/fr/operations/high-availability/site-replication) lorsque la reprise exige un déploiement RustFS indépendant.

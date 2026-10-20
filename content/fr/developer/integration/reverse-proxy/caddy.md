@@ -1,35 +1,35 @@
 ---
 title: "Caddy"
-description: "Deploy RustFS behind Caddy with automatic HTTPS for separate S3 API and Console hostnames."
+description: "Déployez RustFS derrière Caddy avec un HTTPS automatique pour des noms d’hôte distincts de l’API S3 et de la Console."
 ---
 
-Use **Caddy** to obtain and renew TLS certificates automatically and route separate hostnames to the RustFS S3 API and Console. This deployment runs Caddy and a single-node RustFS instance with Docker Compose. You need Docker Engine, Docker Compose, a public server, and two DNS records that resolve to that server.
+Utilisez **Caddy** pour obtenir et renouveler automatiquement les certificats TLS, et pour acheminer des noms d’hôte distincts vers l’API S3 et la Console de RustFS. Ce déploiement exécute Caddy et une instance RustFS à nœud unique avec Docker Compose. Vous avez besoin de Docker Engine, de Docker Compose, d’un serveur public et de deux enregistrements DNS qui pointent vers ce serveur.
 
-This guide uses these example hostnames:
+Ce guide utilise ces noms d’hôte d’exemple :
 
-- `s3.example.com` for the S3 API
-- `console.example.com` for the Console
+- `s3.example.com` pour l’API S3
+- `console.example.com` pour la Console
 
-Replace them with your public hostnames. Caddy's default ACME challenges require inbound access to ports `80` and `443`.
+Remplacez-les par vos noms d’hôte publics. Les défis ACME par défaut de Caddy exigent un accès entrant sur les ports `80` et `443`.
 
-:::warning[Serve S3 from the root path]
+:::warning[Servir l’API S3 depuis le chemin racine]
 
-Do not publish the S3 API under a path such as `/s3/`. AWS Signature Version 4 includes the request path and host, so rewriting either value can invalidate signed requests.
+Ne publiez pas l’API S3 sous un chemin tel que `/s3/`. AWS Signature Version 4 inclut le chemin et l’hôte de la requête, de sorte que la réécriture de l’une ou l’autre de ces valeurs peut invalider les requêtes signées.
 
 :::
 
-## 1. Create the deployment directory
+## 1. Créer le répertoire de déploiement
 
-Create a directory for the deployment:
+Créez un répertoire pour le déploiement :
 
 ```bash
 mkdir rustfs-caddy
 cd rustfs-caddy
 ```
 
-## 2. Set deployment variables
+## 2. Définir les variables de déploiement
 
-Create an environment file and replace each value:
+Créez un fichier d’environnement et remplacez chaque valeur :
 
 ```ini title=".env"
 S3_HOSTNAME=s3.example.com
@@ -39,11 +39,11 @@ RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Use an email address that receives certificate notices. Do not commit `.env` to source control.
+Utilisez une adresse e-mail qui reçoit les notifications de certificat. N’ajoutez pas le fichier `.env` au dépôt.
 
-## 3. Configure Caddy
+## 3. Configurer Caddy
 
-Create a Caddyfile with one site block for each RustFS endpoint:
+Créez un Caddyfile avec un bloc de site pour chaque point de terminaison RustFS :
 
 ```text title="Caddyfile"
 {
@@ -73,11 +73,11 @@ Create a Caddyfile with one site block for each RustFS endpoint:
 }
 ```
 
-Caddy preserves the incoming `Host` header, HTTP method, and request URI by default. It also forwards client information through `X-Forwarded-*` headers and handles Console WebSocket upgrades without additional header rules.
+Caddy conserve par défaut l’en-tête `Host` entrant, la méthode HTTP et l’URI de la requête. Il transmet aussi les informations du client au moyen des en-têtes `X-Forwarded-*` et gère les mises à niveau WebSocket de la Console sans règles d’en-tête supplémentaires.
 
-## 4. Create the Compose file
+## 4. Créer le fichier Compose
 
-Create the Caddy and RustFS services:
+Créez les services Caddy et RustFS :
 
 ```yaml title="compose.yaml"
 services:
@@ -136,24 +136,24 @@ networks:
   rustfs:
 ```
 
-The persistent `caddy-data` volume stores certificates, private keys, and ACME account state. Back up this volume and do not share its contents. Only Caddy publishes host ports; RustFS remains reachable inside the Compose network.
+Le volume persistant `caddy-data` stocke les certificats, les clés privées et l’état du compte ACME. Sauvegardez ce volume et n’en partagez pas le contenu. Seul Caddy publie des ports sur l’hôte ; RustFS reste accessible à l’intérieur du réseau Compose.
 
-## 5. Validate and start the deployment
+## 5. Valider et démarrer le déploiement
 
-Render the Compose configuration and start RustFS:
+Affichez la configuration Compose résolue et démarrez RustFS :
 
 ```bash
 docker compose config
 docker compose up -d rustfs
 ```
 
-Validate the Caddyfile with the same image used by the deployment:
+Validez le Caddyfile avec la même image que celle utilisée par le déploiement :
 
 ```bash
 docker compose run --rm --no-deps caddy caddy validate --config /etc/caddy/Caddyfile
 ```
 
-Start Caddy and check both services:
+Démarrez Caddy et vérifiez les deux services :
 
 ```bash
 docker compose up -d caddy
@@ -161,22 +161,22 @@ docker compose ps
 docker compose logs --follow caddy
 ```
 
-Caddy obtains certificates in the background and redirects HTTP requests to HTTPS. If issuance fails, confirm that both DNS records resolve to this host, ports `80` and `443` are reachable, and the `caddy-data` volume is writable.
+Caddy obtient les certificats en arrière-plan et redirige les requêtes HTTP vers HTTPS. Si l’émission échoue, vérifiez que les deux enregistrements DNS pointent vers cet hôte, que les ports `80` et `443` sont accessibles et que le volume `caddy-data` est accessible en écriture.
 
-## 6. Verify both endpoints
+## 6. Vérifier les deux points de terminaison
 
-Verify the API and Console through their public HTTPS hostnames:
+Vérifiez l’API et la Console au moyen de leurs noms d’hôte HTTPS publics :
 
 ```bash
 curl --fail https://s3.example.com/health/ready
 curl --fail https://console.example.com/rustfs/console/health
 ```
 
-Configure S3 clients with `https://s3.example.com` as the endpoint and enable path-style addressing. Open `https://console.example.com/rustfs/console/` to sign in to the Console.
+Configurez les clients S3 avec `https://s3.example.com` comme point de terminaison et activez l’adressage de type chemin (path-style). Ouvrez `https://console.example.com/rustfs/console/` pour vous connecter à la Console.
 
-## Multi-node upstreams
+## Upstreams multi-nœuds
 
-For a distributed RustFS deployment, list every node in the corresponding site block:
+Pour un déploiement RustFS distribué, listez chaque nœud dans le bloc de site correspondant :
 
 ```text title="Caddyfile"
 {$S3_HOSTNAME} {
@@ -200,10 +200,10 @@ For a distributed RustFS deployment, list every node in the corresponding site b
 }
 ```
 
-Replace `<your-cookie-secret>` with a random secret shared by all Caddy instances. Console affinity keeps an in-progress OpenID Connect login on the RustFS node that created its `state`. Keep port `9000` open directly between RustFS nodes because internal node RPC uses the same listener.
+Remplacez `<your-cookie-secret>` par un secret aléatoire partagé par toutes les instances Caddy. L’affinité de la Console maintient une connexion OpenID Connect en cours sur le nœud RustFS qui a créé son `state`. Laissez le port `9000` ouvert directement entre les nœuds RustFS, car le RPC interne des nœuds utilise le même écouteur.
 
-## Next steps
+## Étapes suivantes
 
-- [Configure an S3 client](/developer/examples/aws-cli)
-- [Enable virtual-hosted-style bucket URLs](/integration/virtual)
-- [Review health and readiness endpoints](/operations/status-check)
+- [Configurer un client S3](/fr/developer/examples/aws-cli)
+- [Activer les URL de compartiment (bucket) en adressage de type hôte virtuel](/fr/integration/virtual)
+- [Consulter les points de terminaison de contrôle d’intégrité et d’état de préparation](/fr/operations/status-check)

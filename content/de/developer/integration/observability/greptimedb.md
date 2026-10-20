@@ -1,13 +1,13 @@
 ---
 title: "GreptimeDB"
-description: "Run GreptimeDB with RustFS as the S3-compatible object storage backend."
+description: "Betreiben Sie GreptimeDB mit RustFS als S3-kompatiblem Objektspeicher-Backend."
 ---
 
-This guide connects [GreptimeDB](https://github.com/GreptimeTeam/greptimedb) — the open-source, cloud-native time-series database — to **RustFS** as its object storage backend. You will start a standalone instance with its `[storage]` section pointed at a RustFS bucket, write time-series rows through the SQL API, and confirm the Parquet files and manifests in the bucket. The workflow was verified with `greptime/greptimedb` (main, commit `179ff8e5`) against `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [GreptimeDB](https://github.com/GreptimeTeam/greptimedb) — die quelloffene, cloud-native Zeitreihendatenbank — mit **RustFS** als Objektspeicher-Backend. Sie starten eine Standalone-Instanz, deren Abschnitt `[storage]` auf einen RustFS-Bucket zeigt, schreiben Zeitreihenzeilen über die SQL-API und prüfen die Parquet-Dateien und Manifeste im Bucket. Der Ablauf wurde mit `greptime/greptimedb` (main, Commit `179ff8e5`) gegen `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker, or a local GreptimeDB binary. This deployment is intended for local integration testing, not production.
+Sie benötigen Docker oder eine lokale GreptimeDB-Binärdatei. Dieses Setup ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -15,11 +15,11 @@ flowchart LR
 	DB -->|"SST + manifests"| RustFS["RustFS :9000"]
 ```
 
-GreptimeDB keeps its write-ahead log and recent data locally, then persists SSTables (Parquet) and table manifests to object storage. Pointing the storage backend at RustFS makes the bucket the durable home of all table data.
+GreptimeDB hält das Write-Ahead-Log und die jüngsten Daten lokal und persistiert anschließend SSTables (Parquet) und Tabellen-Manifeste im Objektspeicher. Wenn das Speicher-Backend auf RustFS zeigt, ist der Bucket der dauerhafte Speicherort aller Tabellendaten.
 
-## 1. Configure the storage backend
+## 1. Speicher-Backend konfigurieren
 
-Create the bucket and a config file with an S3 storage section, replacing all connection placeholders:
+Legen Sie den Bucket und eine Konfigurationsdatei mit einem S3-Speicherabschnitt an. Ersetzen Sie alle Verbindungsplatzhalter:
 
 ```toml title="greptimedb.toml"
 [storage]
@@ -32,11 +32,11 @@ endpoint = "http://<your-rustfs-endpoint>:9000"
 region = "us-east-1"
 ```
 
-GreptimeDB uses path-style requests for custom endpoints by default; virtual-hosted style must be opted into explicitly with `enable_virtual_host_style`, so no extra flag is needed for RustFS.
+GreptimeDB verwendet für eigene Endpunkte standardmäßig Anfragen mit pfadbasierter Adressierung (Path-Style). Die Adressierung im Virtual-Hosted-Stil müssen Sie mit `enable_virtual_host_style` ausdrücklich aktivieren. Für RustFS ist daher kein zusätzliches Flag nötig.
 
-## 2. Run GreptimeDB
+## 2. GreptimeDB ausführen
 
-Start a standalone instance with the config file:
+Starten Sie eine Standalone-Instanz mit der Konfigurationsdatei:
 
 ```bash
 docker run -d --name greptimedb --network oo-rustfs_default -p 4000:4000 -p 4002:4002 \
@@ -47,11 +47,11 @@ docker run -d --name greptimedb --network oo-rustfs_default -p 4000:4000 -p 4002
   --config-file /etc/greptimedb/greptimedb.toml
 ```
 
-Port `4000` serves the HTTP SQL endpoint and `4002` the MySQL protocol.
+Port `4000` stellt den HTTP-SQL-Endpunkt bereit, Port `4002` das MySQL-Protokoll.
 
-## 3. Write and query time series
+## 3. Zeitreihen schreiben und abfragen
 
-Create a table, insert rows, and read them back. The HTTP SQL endpoint takes form-encoded requests:
+Legen Sie eine Tabelle an, fügen Sie Zeilen ein und lesen Sie sie zurück. Der HTTP-SQL-Endpunkt erwartet formularcodierte Anfragen:
 
 ```bash
 curl -s -X POST "http://localhost:4000/v1/sql" \
@@ -61,28 +61,31 @@ curl -s -X POST "http://localhost:4000/v1/sql" \
   --data-urlencode "sql=INSERT INTO rustfs_demo VALUES (\"node-1\", 0.31, 0.62, 1790681000000), (\"node-1\", 0.35, 0.63, 1790681060000), (\"node-2\", 0.51, 0.71, 1790681000000)"
 ```
 
+
 ```text
 {"output":[{"affectedrows":3}],"execution_time_ms":2}
 ```
 
-Query the rows back:
+Fragen Sie die Zeilen wieder ab:
 
 ```bash
 curl -s -X POST "http://localhost:4000/v1/sql" \
   --data-urlencode "sql=SELECT * FROM rustfs_demo ORDER BY ts"
 ```
 
+
 ```text
 {"output":[{"records":{"rows":[["node-2",0.51,0.71,1790681000000],["node-1",0.35,0.63,1790681060000]],"total_rows":2}}]}
 ```
 
-## 4. Verify objects in RustFS
+## 4. Objekte in RustFS prüfen
 
-List the bucket — after the memtable flushes, the bucket holds Parquet SSTables and JSON manifests:
+Listen Sie den Bucket auf. Nach dem Leeren der Memtable enthält der Bucket Parquet-SSTables und JSON-Manifeste:
 
 ```bash
 rc ls rustfs/<your-bucket>/ -r
 ```
+
 
 ```text
 greptimedb/data/greptime/public/1024/1024_0000000000/manifest/00000000000000000000.json
@@ -90,40 +93,40 @@ greptimedb/data/greptime/greptime_private/1025/1025_0000000000/b11e8b25-5763-4f0
 greptimedb/data/greptime/greptime_private/1025/1025_0000000000/manifest/00000000000000000001.json
 ```
 
-Each database gets a directory under `data/`, and per-region `manifest/*.json` files describe the SSTables GreptimeDB reads back during queries.
+Jede Datenbank erhält ein Verzeichnis unter `data/`, und die Dateien `manifest/*.json` je Region beschreiben die SSTables, die GreptimeDB bei Abfragen wieder liest.
 
-![GreptimeDB data stored in the RustFS Console](./images/rustfs-greptimedb-data.png)
+![In der RustFS Console gespeicherte GreptimeDB-Daten](./images/rustfs-greptimedb-data.png)
 
-## 5. Stop or reset
+## 5. Anhalten oder zurücksetzen
 
-To tear down the demo while keeping the bucket objects:
+So bauen Sie die Demo ab und behalten die Objekte im Bucket:
 
 ```bash
 docker rm -f greptimedb
 ```
 
-To delete the stored data:
+So löschen Sie die gespeicherten Daten:
 
 ```bash
 rc rm rustfs/<your-bucket>/ --recursive --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
 ### `Form requests must have Content-Type: application/x-www-form-urlencoded`
 
-The `/v1/sql` HTTP endpoint only accepts form-encoded bodies. Pass SQL with `curl --data-urlencode "sql=..."` (or `application/x-www-form-urlencoded`), not as a JSON body.
+Der HTTP-Endpunkt `/v1/sql` akzeptiert nur formularcodierte Inhalte. Übergeben Sie SQL mit `curl --data-urlencode "sql=..."` (oder `application/x-www-form-urlencoded`), nicht als JSON-Body.
 
-### Bucket stays empty
+### Der Bucket bleibt leer
 
-GreptimeDB flushes memtables to object storage asynchronously. Run a few more inserts and wait a few seconds, or trigger a manual flush, then list the bucket again.
+GreptimeDB schreibt Memtables asynchron in den Objektspeicher. Führen Sie einige weitere Inserts aus und warten Sie einige Sekunden, oder lösen Sie einen manuellen Flush aus, und listen Sie den Bucket danach erneut auf.
 
-### Startup fails with an S3 error
+### Der Start schlägt mit einem S3-Fehler fehl
 
-Confirm `endpoint` includes the scheme, the bucket exists, and `access_key_id`/`secret_access_key` match a RustFS access key. The `root` value is optional but keeps the table tree under a known prefix.
+Stellen Sie sicher, dass `endpoint` das Schema enthält, der Bucket existiert und `access_key_id` sowie `secret_access_key` mit einem RustFS-Zugriffsschlüsselpaar übereinstimmen. Der Wert `root` ist optional, hält den Tabellenbaum aber unter einem bekannten Präfix.
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional GreptimeDB storage options.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [GreptimeDB configuration reference](https://docs.greptime.com/operational-guide/configure/configure-datanode/) to tune flush intervals and cache layers for production workloads.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere GreptimeDB-Speicheroptionen verwenden.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [GreptimeDB-Konfigurationsreferenz](https://docs.greptime.com/operational-guide/configure/configure-datanode/), um Flush-Intervalle und Cache-Schichten für Produktivlasten abzustimmen.

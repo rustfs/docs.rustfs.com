@@ -1,6 +1,6 @@
 ---
 title: "TLS Configuration"
-description: "Configure TLS for secure access."
+description: "Enable TLS for the RustFS S3 API and Console on Linux and Docker."
 ---
 
 Configure TLS for secure access. Set the `RUSTFS_TLS_PATH` environment variable.
@@ -10,7 +10,7 @@ Configure TLS for secure access. Set the `RUSTFS_TLS_PATH` environment variable.
 ### Prerequisites
 
 - A running RustFS instance (see [Installation Guide](../installation/index.md)).
-- Certificate pair (cert and key).
+- A TLS certificate and its matching private key.
 
 **Note**: Certificates must be named `rustfs_cert.pem` and `rustfs_key.pem` and placed in the specified path.
 
@@ -54,4 +54,8 @@ TLS now applies to both listeners: the S3 API at `https://rustfs.example.com:900
 
 2. Restart the RustFS instance container, then access the S3 API at `https://rustfs.example.com:9000` and the Console at `https://rustfs.example.com:9001`.
 
-**Note**: Since the RustFS instance container runs as `rustfs` user by default, you need to ensure that the certificate files (`rustfs_key.pem` and `rustfs_cert.pem`) belong to the `rustfs` user, otherwise the RustFS instance will fail to read the certificate files due to permission issues, causing TLS configuration to fail.
+:::note[Certificate file ownership]
+
+The RustFS container runs as the `rustfs` user (UID `10001`) by default. Make sure that user owns `rustfs_key.pem` and `rustfs_cert.pem`. Otherwise, RustFS cannot read the certificates and TLS fails to start.
+
+:::

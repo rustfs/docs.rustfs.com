@@ -1,48 +1,48 @@
 ---
-title: "Versioning"
-description: "Enable bucket versioning, recover earlier object versions, and manage delete markers with rc and the Console."
+title: "Gestion des versions"
+description: "Activez la gestion des versions d’un compartiment, récupérez d’anciennes versions d’objet et gérez les marqueurs de suppression avec rc et la Console."
 ---
 
-RustFS bucket versioning preserves multiple versions of the same object key. Use it to recover from accidental overwrites and deletes and to satisfy prerequisites for Object Lock and bucket replication.
+La gestion des versions d’un compartiment (bucket) dans RustFS conserve plusieurs versions de la même clé d’objet. Utilisez-la pour revenir d’un écrasement accidentel ou d’une suppression accidentelle, et pour satisfaire les prérequis du verrouillage d’objet et de la réplication de compartiment.
 
-## Overview
+## Vue d’ensemble
 
-When versioning is enabled:
+Lorsque la gestion des versions est activée :
 
-- Each upload or copy to an existing key creates a new version ID.
-- A normal delete creates a delete marker instead of removing older versions.
-- Reading the key without a version ID returns the latest visible version, or `NotFound` when the latest entry is a delete marker.
-- Reading or deleting a specific version requires its version ID.
+- Chaque chargement (upload) ou copie vers une clé existante crée un nouvel ID de version.
+- Une suppression normale crée un marqueur de suppression au lieu de retirer les versions antérieures.
+- La lecture de la clé sans ID de version renvoie la dernière version visible, ou `NotFound` lorsque la dernière entrée est un marqueur de suppression.
+- La lecture ou la suppression d’une version précise exige son ID de version.
 
-Suspending versioning stops normal creation of new version IDs but preserves existing versions and delete markers. Suspension is not the same as disabling or removing version history.
+La suspension de la gestion des versions interrompt la création normale de nouveaux ID de version, mais conserve les versions existantes et les marqueurs de suppression. Suspendre n’équivaut pas à désactiver ni à supprimer l’historique des versions.
 
-## Configure in the Console
+## Configurer dans la Console
 
-### Enable at bucket creation
+### Activer à la création du compartiment
 
-1. Open **Buckets** and select **Create Bucket**.
-2. Enter the bucket name.
-3. Enable **Version**.
-4. Select **Create**.
+1. Ouvrez **Buckets** et sélectionnez **Create Bucket**.
+2. Saisissez le nom du compartiment.
+3. Activez **Version**.
+4. Sélectionnez **Create**.
 
-### Enable or suspend an existing bucket
+### Activer ou suspendre la gestion des versions d’un compartiment existant
 
-1. Open **Buckets**, locate the bucket, and select **Settings**.
-2. Under **Data Protection**, locate **Versioning**.
-3. Enable versioning or suspend it as required.
+1. Ouvrez **Buckets**, localisez le compartiment et sélectionnez **Settings**.
+2. Sous **Data Protection**, repérez **Versioning**.
+3. Activez la gestion des versions, ou suspendez-la selon le besoin.
 
-The settings page reports `Enabled`, `Suspended`, or `Disabled`. It also notes that suspension preserves existing versions.
+La page de paramètres indique `Enabled`, `Suspended` ou `Disabled`. Elle précise aussi que la suspension conserve les versions existantes.
 
-### Browse and recover versions
+### Parcourir et récupérer les versions
 
-1. Open the bucket and enable **Show Deleted Objects** when you need to see keys hidden by delete markers.
-2. Select an object name to open **Object Details**.
-3. Select **Versions** to inspect available versions and delete markers.
-4. Download the required version and upload it again to make its content the latest version.
+1. Ouvrez le compartiment et activez **Show Deleted Objects** lorsque vous devez voir les clés masquées par des marqueurs de suppression.
+2. Sélectionnez le nom d’un objet pour ouvrir **Object Details**.
+3. Sélectionnez **Versions** pour inspecter les versions disponibles et les marqueurs de suppression.
+4. Téléchargez la version voulue et chargez-la de nouveau afin que son contenu devienne la dernière version.
 
-## Use rc
+## Utiliser rc
 
-Create a bucket and enable versioning:
+Créez un compartiment et activez la gestion des versions :
 
 ```bash
 rc bucket create rustfs/my-bucket
@@ -50,7 +50,7 @@ rc bucket version enable rustfs/my-bucket
 rc bucket version info rustfs/my-bucket
 ```
 
-Upload two versions of the same key:
+Chargez deux versions de la même clé :
 
 ```bash
 printf 'version one\n' > /tmp/hello.txt
@@ -60,7 +60,7 @@ printf 'version two\n' > /tmp/hello.txt
 rc object copy /tmp/hello.txt rustfs/my-bucket/hello.txt --overwrite
 ```
 
-List versions and record the version ID you want to recover:
+Répertoriez les versions et notez l’ID de version à récupérer :
 
 ```bash
 rc bucket version list rustfs/my-bucket/hello.txt --json
@@ -68,7 +68,7 @@ rc object stat rustfs/my-bucket/hello.txt \
 	--version-id <version-id> --json
 ```
 
-Restore an earlier version by downloading its body and uploading it as a new latest version:
+Restaurez une version antérieure en téléchargeant son contenu et en le chargeant comme nouvelle dernière version :
 
 ```bash
 rc object show rustfs/my-bucket/hello.txt \
@@ -78,48 +78,48 @@ rc object copy /tmp/hello-restored.txt \
 	rustfs/my-bucket/hello.txt --overwrite
 ```
 
-Delete the current key to create a delete marker, then inspect it:
+Supprimez la clé actuelle pour créer un marqueur de suppression, puis inspectez-le :
 
 ```bash
 rc object remove rustfs/my-bucket/hello.txt --force
 rc bucket version list rustfs/my-bucket/hello.txt --json
 ```
 
-The latest entry should show `is_delete_marker: true`. The earlier versions remain available by version ID.
+La dernière entrée devrait afficher `is_delete_marker: true`. Les versions antérieures restent disponibles par ID de version.
 
-Suspend versioning when you no longer want normal writes to create new numbered versions:
+Suspendez la gestion des versions lorsque vous ne souhaitez plus que les écritures normales créent de nouvelles versions numérotées :
 
 ```bash
 rc bucket version suspend rustfs/my-bucket
 rc bucket version info rustfs/my-bucket
 ```
 
-:::warning[rc 0.1.29 version deletion boundary]
+:::warning[Limite de suppression de version dans rc 0.1.29]
 
-`rc object remove --versions` is listed in the `rc 0.1.29` help output but returns `not implemented`. Use the Console or an S3 SDK to permanently delete selected version IDs. Do not remove an entire version history unless you have verified retention, replication, and recovery requirements.
+`rc object remove --versions` figure dans l’aide de `rc 0.1.29`, mais renvoie `not implemented`. Utilisez la Console ou un SDK S3 pour supprimer définitivement les ID de version choisis. Ne supprimez pas un historique de versions complet, sauf si vous avez vérifié les exigences de rétention, de réplication et de récupération.
 
 :::
 
-## Verification
+## Vérification
 
-After enabling versioning:
+Après avoir activé la gestion des versions :
 
-1. Upload the same key twice with different content.
-2. Run `rc bucket version list` and confirm that both entries have distinct version IDs.
-3. Retrieve each version with `rc object show --version-id` and compare its content.
-4. Delete the key without a version ID and confirm that a delete marker appears.
-5. Retrieve an older version by version ID to confirm it remains recoverable.
+1. Chargez deux fois la même clé avec des contenus différents.
+2. Exécutez `rc bucket version list` et confirmez que les deux entrées ont des ID de version distincts.
+3. Récupérez chaque version avec `rc object show --version-id` et comparez son contenu.
+4. Supprimez la clé sans ID de version et confirmez qu’un marqueur de suppression apparaît.
+5. Récupérez une version antérieure par son ID de version pour confirmer qu’elle reste récupérable.
 
-## Operational considerations
+## Considérations d’exploitation
 
-- Versioning increases storage use because overwrites and deletes retain older data.
-- Configure lifecycle rules for noncurrent versions only after defining recovery and retention periods.
-- Bucket replication requires versioning on both source and destination buckets.
-- Object Lock depends on versioning and protects individual versions.
-- Multipart completion creates one new object version in a versioned bucket.
+- La gestion des versions augmente l’usage du stockage, car les écrasements et les suppressions conservent les données antérieures.
+- Ne configurez les règles de cycle de vie des versions non actuelles qu’après avoir défini les périodes de récupération et de rétention.
+- La réplication de compartiment exige la gestion des versions sur le compartiment source et sur le compartiment de destination.
+- Le verrouillage d’objet dépend de la gestion des versions et protège chaque version.
+- La finalisation d’un chargement partitionné crée une nouvelle version d’objet dans un compartiment avec gestion des versions.
 
-## Next steps
+## Étapes suivantes
 
-- [Protect versions with Object Lock](./object-lock.md)
-- [Upload large objects](./multipart-upload.md)
-- [Manage bucket lifecycle](../lifecycle-management.md)
+- [Protéger les versions avec le verrouillage d’objet](./object-lock.md)
+- [Charger des objets volumineux](./multipart-upload.md)
+- [Gérer le cycle de vie du compartiment](../lifecycle-management.md)

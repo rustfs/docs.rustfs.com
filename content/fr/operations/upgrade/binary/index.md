@@ -1,28 +1,28 @@
 ---
-title: "Binary Upgrade"
-description: "Upgrade RustFS binary deployments one node at a time while preserving cluster availability."
+title: "Mise à niveau du binaire"
+description: "Mettez à niveau les déploiements binaires de RustFS un nœud à la fois, tout en préservant la disponibilité du cluster."
 ---
 
-Use a rolling upgrade to replace the RustFS executable on each node without taking the entire cluster offline. Before you begin, read the target release notes and confirm every node is healthy.
+Utilisez une mise à niveau progressive pour remplacer l’exécutable RustFS sur chaque nœud sans mettre l’ensemble du cluster hors ligne. Avant de commencer, lisez les notes de la version cible et confirmez que chaque nœud est sain.
 
-## Before you upgrade
+## Avant la mise à niveau
 
-Check readiness on every node:
+Vérifiez l’état de préparation sur chaque nœud :
 
 ```bash
 curl -fsS http://<node-hostname>:9000/health/ready
 ```
 
-Back up the service configuration and retain the currently running executable for rollback:
+Sauvegardez la configuration du service et conservez l’exécutable en cours d’exécution pour le retour arrière :
 
 ```bash
 sudo cp /etc/default/rustfs /etc/default/rustfs.bak
 sudo cp /usr/local/bin/rustfs /usr/local/bin/rustfs.previous
 ```
 
-## Upgrade each node
+## Mettre à niveau chaque nœud
 
-Upgrade one node at a time. Do not continue until the restarted node reports ready.
+Mettez à niveau un nœud à la fois. Ne continuez pas tant que le nœud redémarré ne se déclare pas prêt.
 
 ```bash
 sudo systemctl stop rustfs
@@ -32,11 +32,11 @@ sudo systemctl start rustfs
 curl -fsS http://<node-hostname>:9000/health/ready
 ```
 
-Repeat the procedure for each remaining node.
+Répétez la procédure pour chaque nœud restant.
 
-## Roll back
+## Revenir en arrière
 
-If the new version fails validation, restore the previous executable on one node at a time and wait for readiness before continuing:
+Si la nouvelle version échoue à la validation, restaurez l’exécutable précédent un nœud à la fois et attendez l’état de préparation avant de continuer :
 
 ```bash
 sudo systemctl stop rustfs
@@ -45,6 +45,6 @@ sudo systemctl start rustfs
 curl -fsS http://<node-hostname>:9000/health/ready
 ```
 
-## Next steps
+## Étapes suivantes
 
-Review [Status Check](/operations/status-check) for additional post-upgrade validation.
+Consultez [Contrôle de l’état](/fr/operations/status-check) pour une validation supplémentaire après la mise à niveau.

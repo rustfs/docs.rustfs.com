@@ -1,11 +1,11 @@
 ---
-title: "Reference"
-description: "Look up RustFS configuration variables and command-line options."
+title: "リファレンス"
+description: "RustFS の設定変数とコマンドラインオプションを参照します。"
 ---
 
-Use this section for concise technical references while configuring, operating, or integrating RustFS.
+RustFS の設定、運用、連携では、このセクションの簡潔な技術リファレンスを使います。
 
-## References
+## 参照先
 
-- [Environment Variables](./environment-variables.md)
+- [環境変数](./environment-variables.md)
 - [CLI](./cli.md)

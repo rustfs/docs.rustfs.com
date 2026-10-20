@@ -1,32 +1,32 @@
 ---
-title: "RustFS TypeScript SDK Usage Guide"
-description: "Operate RustFS from TypeScript with the AWS SDK for JavaScript v3, including creation and deletion of buckets and objects."
+title: "Guide du SDK TypeScript"
+description: "Pilotez RustFS depuis TypeScript avec le SDK AWS pour JavaScript v3, y compris la création et la suppression de compartiments et d’objets."
 ---
 
-RustFS ships no first-party TypeScript SDK — it is fully S3-compatible, so you use the official AWS SDK for JavaScript v3 (which ships its own TypeScript type definitions) configured to point at your RustFS server. Through the SDK, you can operate RustFS, including creation and deletion of buckets/objects, file upload and download, etc.
+RustFS ne fournit pas de SDK TypeScript propre. Il est compatible avec S3 : vous utilisez donc le SDK AWS officiel pour JavaScript v3 (qui inclut les définitions de types TypeScript), configuré pour pointer vers votre serveur RustFS. Avec ce SDK, vous pouvez créer et supprimer des compartiments (buckets), charger (upload) et télécharger des objets, ainsi que les supprimer.
 
-## Prerequisites
+## Prérequis
 
-- Node.js 18 or later (the examples use ES modules — set `"type": "module"` in your `package.json`)
-- An available RustFS instance (refer to [Installation Guide](../../installation/index.md) for installation) — the S3 API listens on port `9000`, the Console on port `9001`
-- Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (refer to [Access Key Management](../../security-compliance/iam/access-token.md) for creation)
+- Node.js 18 ou ultérieur (les exemples utilisent les modules ES : définissez `"type": "module"` dans votre `package.json`)
+- Une instance RustFS en cours d’exécution (consultez le [guide d’installation](../../installation/index.md)) : l’API S3 écoute sur le port `9000`, la Console sur le port `9001`
+- Des clés d’accès, définies à l’installation par les variables d’environnement `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` (reportez-vous à la [gestion des clés d’accès](../../security-compliance/iam/access-token.md) pour les créer)
 
-:::tip[Local test]
+:::tip[Essai local]
 
-If you did not set credentials at install time, the server defaults to `rustfsadmin` / `rustfsadmin` — fine for a throwaway local trial, never for anything reachable by others.
+Si vous n’avez pas défini d’identifiants à l’installation, le serveur utilise par défaut `rustfsadmin` / `rustfsadmin`. Cela convient à un essai local jetable, jamais à une instance accessible à d’autres personnes.
 
 :::
 
-Install the dependencies:
+Installez les dépendances :
 
 ```bash
 npm install @aws-sdk/client-s3
 npm install --save-dev typescript tsx @types/node
 ```
 
-## Initializing the Client
+## Initialisation du client
 
-The following is a complete, runnable example. Replace `localhost` with your server's IP address if RustFS runs on another machine, and fill in your own access keys:
+L’exemple suivant est complet et exécutable. Remplacez `localhost` par l’adresse IP de votre serveur si RustFS s’exécute sur une autre machine, et renseignez vos propres clés d’accès :
 
 ```typescript title="main.ts"
 import {
@@ -55,7 +55,7 @@ const response = await rustfs_client.send(new ListBucketsCommand({}));
 console.log(response.Buckets?.map((bucket) => bucket.Name) ?? []);
 ```
 
-Run it:
+Exécutez-le :
 
 ```bash
 npx tsx main.ts
@@ -65,9 +65,9 @@ npx tsx main.ts
 [ 'my-bucket' ]
 ```
 
-Then use the constructed `rustfs_client` for the operations below.
+Utilisez ensuite le `rustfs_client` construit pour les opérations ci-dessous.
 
-## Create Bucket
+## Créer un compartiment
 
 ```typescript
 async function createBucket() {
@@ -88,7 +88,7 @@ async function createBucket() {
 Bucket created: /my-bucket
 ```
 
-## Delete Bucket
+## Supprimer un compartiment
 
 ```typescript
 async function deleteBucket() {
@@ -109,7 +109,7 @@ async function deleteBucket() {
 Bucket deleted
 ```
 
-## List Buckets
+## Lister les compartiments
 
 ```typescript
 async function listBuckets() {
@@ -126,7 +126,7 @@ async function listBuckets() {
 my-bucket
 ```
 
-## List Objects
+## Lister les objets
 
 ```typescript
 async function listObjects() {
@@ -147,7 +147,7 @@ async function listObjects() {
 test/hello.txt (12 bytes)
 ```
 
-## Upload File
+## Charger un fichier
 
 ```typescript
 async function uploadFile() {
@@ -170,7 +170,7 @@ async function uploadFile() {
 Object uploaded
 ```
 
-## Download Object
+## Télécharger un objet
 
 ```typescript
 async function getObject() {
@@ -201,4 +201,4 @@ async function getObject() {
 Object content: hello rustfs
 ```
 
-For other operations (presigned URLs, multipart uploads, and more), see the [AWS SDK for JavaScript v3 documentation](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/) — every S3-compatible call works against RustFS the same way.
+Pour les autres opérations (URL présignées, chargements partitionnés, etc.), consultez la [documentation de l’AWS SDK pour JavaScript v3](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/). La plupart des opérations S3 fonctionnent de la même manière avec RustFS ; les exceptions sont décrites dans la [compatibilité S3](/fr/reference/s3-compatibility).

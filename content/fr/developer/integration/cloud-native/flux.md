@@ -1,13 +1,13 @@
 ---
 title: "Flux"
-description: "Deliver Kubernetes manifests to Flux CD from RustFS through the Bucket source API."
+description: "Livrez des manifestes Kubernetes à Flux CD depuis RustFS via l’API source Bucket."
 ---
 
-This guide connects [Flux CD](https://github.com/fluxcd/flux2) — the GitOps toolkit for Kubernetes — to **RustFS** through the source-controller Bucket API. You will seed a RustFS bucket with Kubernetes manifests, register the bucket as a Flux `Bucket` source with the `generic` provider, and let a Kustomization apply everything it contains. The workflow was verified with `flux v2.9.5` (source-controller) on `k3s v1.36.4+k3s1` against `rustfs/rustfs-x86-musl:v2.3.1`.
+Ce guide connecte [Flux CD](https://github.com/fluxcd/flux2) — le kit d’outils GitOps pour Kubernetes — à **RustFS** via l’API Bucket du source-controller. Vous allez amorcer un compartiment (bucket) RustFS avec des manifestes Kubernetes, enregistrer ce compartiment comme source Flux `Bucket` avec le fournisseur `generic`, et laisser une Kustomization appliquer tout ce qu’il contient. Le flux a été validé avec `flux v2.9.5` (source-controller) sur `k3s v1.36.4+k3s1` face à `rustfs/rustfs-x86-musl:v2.3.1`.
 
-You need a Kubernetes cluster with Flux installed (`flux install`) and the `rc` client. This deployment is intended for local integration testing, not production.
+Vous avez besoin d’un cluster Kubernetes avec Flux installé (`flux install`) et du client `rc`. Ce déploiement est destiné aux tests d’intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -17,11 +17,11 @@ flowchart LR
 	kustomize-controller -->|"apply"| Cluster["Kubernetes cluster"]
 ```
 
-The source-controller lists and downloads objects from the bucket over the S3 API, packs them into an artifact, and the kustomize-controller applies the manifests from that artifact. RustFS acts as the pull-based source of truth for the cluster.
+Le source-controller répertorie et télécharge les objets du compartiment via l’API S3, les emballe dans un artefact, et le kustomize-controller applique les manifestes de cet artefact. RustFS sert de source de vérité du cluster, consommée par tirage (pull).
 
-## 1. Seed the bucket
+## 1. Amorcer le compartiment
 
-Store a Kustomize overlay in the bucket, replacing all connection placeholders:
+Déposez un overlay Kustomize dans le compartiment, en remplaçant toutes les valeurs de connexion indicatives :
 
 ```yaml title="clusters/staging/kustomization.yaml"
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -41,7 +41,7 @@ data:
   source: s3-bucket
 ```
 
-Upload the files:
+Chargez (upload) les fichiers :
 
 ```bash
 rc mb rustfs/flux-src
@@ -54,9 +54,9 @@ staging/kustomization.yaml
 staging/rustfs-demo-configmap.yaml
 ```
 
-## 2. Create the credentials secret
+## 2. Créer le secret d’identifiants
 
-Flux reads the credentials from a secret in the same namespace as the source, using lowercase keys:
+Flux lit les identifiants dans un secret du même espace de noms que la source, avec des clés en minuscules :
 
 ```bash
 kubectl -n flux-system create secret generic rustfs-creds \
@@ -64,11 +64,11 @@ kubectl -n flux-system create secret generic rustfs-creds \
   --from-literal=secretkey=<your-secret-key>
 ```
 
-The field names must be `accesskey` and `secretkey` — capitalization such as `accessKey` fails with an `AuthenticationFailed` status.
+Les noms de champs doivent être `accesskey` et `secretkey` — une capitalisation telle que `accessKey` échoue avec un statut `AuthenticationFailed`.
 
-## 3. Register the Bucket source
+## 3. Enregistrer la source Bucket
 
-Create the Bucket source with the `generic` provider:
+Créez la source Bucket avec le fournisseur `generic` :
 
 ```bash
 flux create source bucket rustfs-demo \
@@ -85,18 +85,18 @@ flux create source bucket rustfs-demo \
 ✔ Bucket source reconciliation completed
 ```
 
-If reconciliation is still running, check the status with `flux get sources bucket`:
+Si la réconciliation est encore en cours, vérifiez l’état avec `flux get sources bucket` :
 
 ```text
 NAME        REVISION       SUSPENDED READY MESSAGE
 rustfs-demo sha256:481816d1 False     True  stored artifact: revision 'sha256:481816d1'
 ```
 
-The `generic` provider uses path-style requests and plain HTTP with `--insecure`, so the endpoint is the bare `host:port`.
+Le fournisseur `generic` utilise des requêtes en adressage de type chemin (path-style) et le HTTP non chiffré avec `--insecure`, si bien que le point de terminaison se limite à `host:port`.
 
-## 4. Apply the manifests
+## 4. Appliquer les manifestes
 
-Create a Kustomization that consumes the artifact:
+Créez une Kustomization qui consomme l’artefact :
 
 ```bash
 flux create kustomization rustfs-demo \
@@ -111,7 +111,7 @@ flux create kustomization rustfs-demo \
 ✔ applied revision sha256:481816d1
 ```
 
-Confirm the manifest landed on the cluster:
+Confirmez que le manifeste est arrivé sur le cluster :
 
 ```bash
 kubectl -n default get configmap rustfs-flux-demo -o jsonpath="{.data}"
@@ -121,37 +121,37 @@ kubectl -n default get configmap rustfs-flux-demo -o jsonpath="{.data}"
 {"source":"s3-bucket","storage":"rustfs"}
 ```
 
-## 5. Stop or reset
+## 5. Arrêter ou réinitialiser
 
-Suspend or delete the Flux resources without touching the bucket:
+Suspendez ou supprimez les ressources Flux sans toucher au compartiment :
 
 ```bash
 flux suspend source bucket rustfs-demo --namespace=flux-system
 flux delete kustomization rustfs-demo --namespace=flux-system
 ```
 
-To delete the bucket contents:
+Pour supprimer le contenu du compartiment :
 
 ```bash
 rc rm rustfs/flux-src/ --recursive --force
 ```
 
-## Troubleshooting
+## Dépannage
 
 ### `invalid 'rustfs-creds' secret data: required fields 'accesskey' and 'secretkey'`
 
-The secret keys are lowercase. Recreate the secret with `accesskey` and `secretkey` as literal key names.
+Les clés du secret sont en minuscules. Recréez le secret avec `accesskey` et `secretkey` comme noms de clés littéraux.
 
-### Reconciliation never becomes ready
+### La réconciliation ne passe jamais à l’état prêt
 
-Confirm the endpoint is reachable from inside the cluster — pods cannot use `localhost`, so point the source at the host IP or the Docker bridge gateway (commonly `172.17.0.1`) that publishes the RustFS port. `--insecure` is required for plain HTTP.
+Vérifiez que le point de terminaison est joignable depuis l’intérieur du cluster — les pods ne peuvent pas utiliser `localhost`, donc pointez la source vers l’adresse IP de l’hôte ou la passerelle du pont Docker (souvent `172.17.0.1`) qui publie le port RustFS. `--insecure` est requis pour le HTTP non chiffré.
 
-### `AuthenticationFailed` despite valid credentials
+### `AuthenticationFailed` malgré des identifiants valides
 
-Check that the secret lives in the same namespace as the Bucket source and that the keys have no trailing whitespace or quoting.
+Vérifiez que le secret se trouve dans le même espace de noms que la source Bucket et que les clés ne comportent ni espace final ni guillemets.
 
-## Next steps
+## Étapes suivantes
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional source types.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Flux Bucket source documentation](https://fluxcd.io/flux/components/source/buckets/) to combine bucket sources with Helm releases and image automation.
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres types de sources.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
+- Suivez la [documentation des sources Bucket de Flux](https://fluxcd.io/flux/components/source/buckets/) pour combiner les sources Bucket avec les releases Helm et l’automatisation d’images.

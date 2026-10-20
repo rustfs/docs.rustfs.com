@@ -1,34 +1,34 @@
 ---
-title: "Installing RustFS on Linux"
-description: "Choose a Linux deployment mode — SNSD, SNMD, or MNMD — and install RustFS on one or more servers."
+title: "RustFS unter Linux installieren"
+description: "Wählen Sie einen Linux-Bereitstellungsmodus — SNSD, SNMD oder MNMD — und installieren Sie RustFS auf einem oder mehreren Servern."
 ---
 
-This section covers installing RustFS on Linux servers. For a one-command trial installation, use the [Quick Start](./quick-start.md). For a manual installation, pick one of the three deployment modes below — all three share the same [prerequisites and service setup](./prerequisites-and-service.md), and differ only in topology and volume configuration.
+Dieser Abschnitt beschreibt die Installation von RustFS auf Linux-Servern. Für eine Testinstallation mit einem Befehl verwenden Sie den [Schnellstart](./quick-start.md). Für eine manuelle Installation wählen Sie einen der drei Bereitstellungsmodi unten. Alle drei verwenden dieselben [Voraussetzungen und die Diensteinrichtung](./prerequisites-and-service.md) und unterscheiden sich nur in der Topologie und der Konfiguration der Volumes.
 
-:::warning[Change the default credentials immediately]
+:::warning[Standardzugangsdaten sofort ändern]
 
-After installation, set unique `RUSTFS_ACCESS_KEY` and `RUSTFS_SECRET_KEY` values in `/etc/default/rustfs`. Do not use the well-known `rustfsadmin` value for either credential. Restart the service with `sudo systemctl restart rustfs` after changing the file.
+Tragen Sie nach der Installation eindeutige Werte für `RUSTFS_ACCESS_KEY` und `RUSTFS_SECRET_KEY` in `/etc/default/rustfs` ein. Verwenden Sie den allgemein bekannten Wert `rustfsadmin` weder als Zugriffsschlüssel noch als geheimen Zugriffsschlüssel. Starten Sie den Dienst nach der Änderung der Datei mit `sudo systemctl restart rustfs` neu.
 
 :::
 
-## Single Node Single Disk (SNSD)
+## Einzelner Knoten mit einem Datenträger (SNSD)
 
-One server, one data disk. The simplest mode, with no redundancy — a disk failure means data loss, so rely on backups. Suitable for development, testing, and low-density non-critical business.
+Ein Server, ein Datenträger. Der einfachste Modus, ohne Redundanz: Ein Datenträgerausfall bedeutet Datenverlust. Verlassen Sie sich daher auf Sicherungen. Geeignet für Entwicklung, Tests und kleine, nicht kritische Arbeitslasten.
 
-→ [Single Node Single Disk installation](./single-node-single-disk.md)
+→ [Installation mit einem Knoten und einem Datenträger](./single-node-single-disk.md)
 
-## Single Node Multiple Disk (SNMD)
+## Einzelner Knoten mit mehreren Datenträgern (SNMD)
 
-One server, multiple data disks. Erasure coding shards data across the disks, so the node tolerates a limited number of disk failures, but a whole-server failure still means data loss. Suitable for medium, non-critical business on a single machine.
+Ein Server, mehrere Datenträger. Erasure Coding verteilt die Daten als Shards auf die Datenträger. Der Knoten toleriert dadurch eine begrenzte Zahl von Datenträgerausfällen, der Ausfall des gesamten Servers bedeutet jedoch weiterhin Datenverlust. Geeignet für mittlere, nicht kritische Arbeitslasten auf einem Rechner.
 
-→ [Single Node Multiple Disk installation](./single-node-multiple-disk.md)
+→ [Installation mit einem Knoten und mehreren Datenträgern](./single-node-multiple-disk.md)
 
-## Multiple Node Multiple Disk (MNMD)
+## Mehrere Knoten mit mehreren Datenträgern (MNMD)
 
-Four or more servers, each with one or more disks. Erasure coding spans servers, providing disk- and node-level fault tolerance plus horizontal scalability. This is the mode for production workloads.
+Vier oder mehr Server mit jeweils einem oder mehreren Datenträgern. Erasure Coding erstreckt sich über die Server und bietet Fehlertoleranz auf Datenträger- und Knotenebene sowie horizontale Skalierbarkeit. Das ist der Modus für Produktionsarbeitslasten.
 
-→ [Multiple Node Multiple Disk installation](./multiple-node-multiple-disk.md)
+→ [Installation mit mehreren Knoten und mehreren Datenträgern](./multiple-node-multiple-disk.md)
 
-## Before Production
+## Vor dem Produktivbetrieb
 
-Work through the [Pre-Installation Checklists](../requirement/checklists/index.md) — hardware, network, software, and security — before deploying to production. If you don't need production standards, you can skip them.
+Arbeiten Sie die [Checklisten vor der Installation](../requirement/checklists/index.md) durch — Hardware, Netzwerk, Software und Sicherheit —, bevor Sie in der Produktion bereitstellen. Für Bereitstellungen außerhalb der Produktion können Sie sie überspringen.

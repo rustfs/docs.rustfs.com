@@ -1,13 +1,13 @@
 ---
 title: "LanceDB"
-description: "Store and query LanceDB vector tables directly on RustFS."
+description: "Speichern und fragen Sie LanceDB-Vektortabellen direkt auf RustFS ab."
 ---
 
-This guide connects [LanceDB](https://github.com/lancedb/lancedb) — the open-source vector database built on the Lance columnar format — to **RustFS** as its storage backend. You will create a vector table directly at an `s3://` location, add rows, run a vector search, and confirm the Lance table files in the bucket. The workflow was verified with the `lancedb` Python package against `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [LanceDB](https://github.com/lancedb/lancedb) — die quelloffene Vektordatenbank auf dem spaltenorientierten Format Lance — mit **RustFS** als Speicher-Backend. Sie legen eine Vektortabelle direkt an einem Speicherort `s3://` an, fügen Zeilen hinzu, führen eine Vektorsuche aus und prüfen die Lance-Tabellendateien im Bucket. Der Ablauf wurde mit dem Python-Paket `lancedb` gegen `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Python 3.9 or newer. This deployment is intended for local integration testing, not production.
+Sie benötigen Python 3.9 oder neuer. Diese Bereitstellung ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -15,17 +15,17 @@ flowchart LR
 	LanceDB -->|"Lance fragments + manifests"| RustFS["RustFS :9000"]
 ```
 
-LanceDB is embedded: there is no server to run. The Python (or Rust, or JavaScript) client talks to the bucket directly, storing each table as a `*.lance` directory with data fragments, version manifests, and transaction logs.
+LanceDB ist eingebettet: es gibt keinen Server, den Sie starten müssten. Der Client in Python, Rust oder JavaScript spricht den Bucket direkt an und speichert jede Tabelle als Verzeichnis `*.lance` mit Datenfragmenten, Versionsmanifesten und Transaktionsprotokollen.
 
-## 1. Install the client
+## 1. Den Client installieren
 
 ```bash
 pip install lancedb
 ```
 
-## 2. Create a table on RustFS
+## 2. Eine Tabelle auf RustFS anlegen
 
-Connect straight to the bucket and create a table, replacing all connection placeholders. The `storage_options` keys follow Lance's object-store conventions; custom endpoints use path-style addressing:
+Verbinden Sie sich direkt mit dem Bucket und legen Sie eine Tabelle an. Ersetzen Sie alle Verbindungsplatzhalter. Die Schlüssel in `storage_options` folgen den Object-Store-Konventionen von Lance. Eigene Endpunkte verwenden pfadbasierte Adressierung (Path-Style):
 
 ```python title="lance_s3.py"
 import lancedb
@@ -54,9 +54,9 @@ created: 5 rows
 after add: 6 rows
 ```
 
-The table URI uses the `s3://bucket/prefix` form; every write and read goes to RustFS over its S3 API.
+Die Tabellen-URI verwendet die Form `s3://bucket/prefix`. Jeder Schreib- und Lesevorgang geht über die S3-API nach RustFS.
 
-## 3. Run a vector search
+## 3. Eine Vektorsuche ausführen
 
 ```python title="lance_search.py"
 import lancedb
@@ -74,17 +74,17 @@ top3: [(99, 'query-target'), (4, 'row-4'), (3, 'row-3')]
 version: 2
 ```
 
-The nearest neighbor is the row added in the previous step, and the version counter reflects the two commits (create and add).
+Der nächste Nachbar ist die Zeile aus dem vorherigen Schritt, und der Versionszähler spiegelt die beiden Commits (Anlegen und Hinzufügen).
 
-## 4. Verify objects in RustFS
+## 4. Objekte in RustFS prüfen
 
-List the table prefix:
+Listen Sie das Tabellenpräfix auf:
 
 ```bash
 rc ls rustfs/<your-bucket>/ -r
 ```
 
-Each table is a `.lance` directory holding data fragments, version manifests, and transaction records:
+Jede Tabelle ist ein Verzeichnis `.lance` mit Datenfragmenten, Versionsmanifesten und Transaktionsdatensätzen:
 
 ```text
 tables/events.lance/_transactions/0-b93cf795-fc3d-4bc9-88c8-e37baeefdd46.txn
@@ -92,34 +92,34 @@ tables/events.lance/_versions/18446744073709551613.manifest
 tables/events.lance/data/101101011110110010000100e7a149411b847dbad6ebc7d47e.lance
 ```
 
-Multiple tables share the bucket under the `tables/` prefix, so one bucket can back an entire LanceDB workspace.
+Mehrere Tabellen teilen sich den Bucket unter dem Präfix `tables/`, daher kann ein Bucket einen gesamten LanceDB-Workspace tragen.
 
-![LanceDB table files stored in the RustFS Console](./images/rustfs-lancedb-table.png)
+![In der RustFS-Console gespeicherte LanceDB-Tabellendateien](./images/rustfs-lancedb-table.png)
 
-## 5. Stop or reset
+## 5. Stoppen oder zurücksetzen
 
-LanceDB holds no server state. To delete the table:
+LanceDB hält keinen Serverzustand. So löschen Sie die Tabelle:
 
 ```bash
 rc rm rustfs/<your-bucket>/tables/ --recursive --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
-### Connection or signature errors on first use
+### Verbindungs- oder Signaturfehler bei der ersten Verwendung
 
-Confirm `endpoint` includes the scheme, `allow_http` is `"true"` for plain-HTTP endpoints, and the bucket exists. The `region` value is required by the S3 signer even though RustFS ignores it.
+Prüfen Sie, dass `endpoint` das Schema enthält, dass `allow_http` für Endpunkte mit unverschlüsseltem HTTP auf `"true"` steht und dass der Bucket existiert. Der Wert `region` ist für den S3-Signer erforderlich, auch wenn RustFS ihn ignoriert.
 
-### `Table not found` after creating it
+### `Table not found` nach dem Anlegen
 
-LanceDB lists the bucket prefix to discover tables. A stale client cache or a wrong `tables/` prefix in the URI makes new tables invisible; reconnect with the same URI used at creation time.
+LanceDB listet das Bucket-Präfix auf, um Tabellen zu finden. Ein veralteter Client-Cache oder ein falsches Präfix `tables/` in der URI macht neue Tabellen unsichtbar. Verbinden Sie sich erneut mit derselben URI, die Sie beim Anlegen verwendet haben.
 
-### Slow bulk loads over the network
+### Langsame Massenladungen über das Netzwerk
 
-Lance writes one fragment per commit. For large imports, batch rows into fewer `table.add` calls — each call produces a new data file in the bucket.
+Lance schreibt ein Fragment je Commit. Fassen Sie bei großen Importen Zeilen in weniger Aufrufen von `table.add` zusammen. Jeder Aufruf erzeugt eine neue Datendatei im Bucket.
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional LanceDB storage options.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [LanceDB documentation](https://lancedb.github.io/lancedb/) for ANN indexes, hybrid search, and multi-tenant bucket layouts on top of the same backend.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere LanceDB-Speicheroptionen einsetzen.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [LanceDB-Dokumentation](https://lancedb.github.io/lancedb/) für ANN-Indizes, hybride Suche und Bucket-Layouts für mehrere Tenants auf demselben Backend.

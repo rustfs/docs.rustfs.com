@@ -1,78 +1,78 @@
 ---
-title: "Security Checklist"
-description: "Security checklist for enterprise deployments."
+title: "Sicherheits-Checkliste"
+description: "Diese Checkliste fasst die Sicherheitsanforderungen für Unternehmensbereitstellungen zusammen."
 ---
 
-> Security best practices for RustFS. Review this checklist during deployment to ensure system security and reliability.
+> Bewährte Sicherheitspraktiken für RustFS. Prüfen Sie diese Checkliste während der Bereitstellung, damit das System sicher und zuverlässig bleibt.
 
-## Authentication & Access Control
+## Authentifizierung und Zugriffskontrolle
 
-- **Use S3-Compatible Key Authentication**
- RustFS uses AWS Signature V4. Ensure all requests are authenticated with valid Access Keys and Secret Keys.
+- **S3-kompatible Schlüsselauthentifizierung verwenden**
+  RustFS verwendet AWS Signature V4. Stellen Sie sicher, dass alle Anfragen mit einem gültigen Zugriffsschlüssel und einem gültigen geheimen Zugriffsschlüssel signiert sind.
 
-- **Policy-Based Access Control**
- Define access policies based on the principle of least privilege. Explicitly define allowed operations; deny all others by default.
+- **Richtlinienbasierte Zugriffskontrolle**
+  Definieren Sie Zugriffsrichtlinien nach dem Prinzip der geringsten Berechtigung. Legen Sie erlaubte Operationen ausdrücklich fest und verweigern Sie alle übrigen standardmäßig.
 
-## Encryption (TLS/SSL)
+## Verschlüsselung (TLS/SSL)
 
-- **Enable TLS/SSL**
- Configure valid SSL certificates. We recommend using different certificates for external and internal access, and enforcing TLS 1.2+.
+- **TLS/SSL aktivieren**
+  Konfigurieren Sie gültige TLS-Zertifikate. Wir empfehlen, für den externen und den internen Zugriff unterschiedliche Zertifikate zu verwenden und TLS 1.2+ zu erzwingen.
 
-- **Certificate Management**
- Use certificates from trusted CAs. Protect private keys with strict file permissions.
+- **Zertifikatsverwaltung**
+  Verwenden Sie Zertifikate vertrauenswürdiger CAs. Schützen Sie die privaten Schlüssel durch strikte Dateiberechtigungen.
 
-- **Multi-Domain and Cipher Suites**
- Configure independent certificates for multiple domains. Use strong encryption algorithms (e.g., 2048-bit RSA or 256-bit ECC).
+- **Mehrere Domänen und Verschlüsselungssuiten**
+  Verwenden Sie für jede Domäne ein eigenes Zertifikat. Verwenden Sie starke Schlüsselalgorithmen (zum Beispiel RSA mit 2048 Bit oder ECDSA P-256).
 
-## Credential Protection
+## Schutz der Zugangsdaten
 
-- **Change Default Credentials**
- Never keep the example placeholders (`<your-access-key>` / `<your-secret-key>`) in production. Set a unique access key and a strong, random secret — e.g. generate one with `openssl rand -base64 24` — immediately after initialization.
+- **Standardzugangsdaten ändern**
+  Belassen Sie die Beispielplatzhalter (`<your-access-key>` / `<your-secret-key>`) niemals in der Produktion. Legen Sie unmittelbar nach der Initialisierung einen eindeutigen Zugriffsschlüssel und einen starken, zufälligen geheimen Zugriffsschlüssel fest — erzeugen Sie einen zum Beispiel mit `openssl rand -base64 24`.
 
-- **Secure Storage**
- Do not hardcode credentials. Use environment variables or secrets management systems (e.g., Kubernetes Secrets).
+- **Sichere Ablage**
+  Hinterlegen Sie Zugangsdaten nicht fest im Code. Verwenden Sie Umgebungsvariablen oder eine Geheimnisverwaltung (zum Beispiel Kubernetes Secrets).
 
-## Logging & Auditing
+## Protokollierung und Audit
 
-- **Enable Audit Logs**
- Export audit logs to external systems (HTTP Webhook, Kafka, ELK, Splunk).
+- **Audit-Protokolle aktivieren**
+  Exportieren Sie Audit-Protokolle in externe Systeme (HTTP-Webhook, Kafka, ELK, Splunk).
 
-- **Log Collection**
- Collect logs using standard tools (systemd, Docker, K8s) and analyze with ELK or Grafana Loki.
+- **Protokollerfassung**
+  Erfassen Sie Protokolle mit Standardwerkzeugen (journald, Docker, Kubernetes) und werten Sie sie mit ELK oder Grafana Loki aus.
 
-- **Monitoring and Alerts**
- Set alerts for abnormal behavior (login failures, unusual access patterns, mass deletions).
+- **Überwachung und Alarme**
+  Richten Sie Alarme für auffälliges Verhalten ein (fehlgeschlagene Anmeldungen, ungewöhnliche Zugriffsmuster, Massenlöschungen).
 
 - **Observability**
- Monitor function execution times to optimize performance.
+  Überwachen Sie die Anfragelatenz, um Leistungsprobleme zu erkennen.
 
-## API Security
+## API-Sicherheit
 
-- **Restrict Network Access**
- Restrict access to the S3 API (port 9000) and Console (port 9001) using firewalls or security groups.
+- **Netzwerkzugriff einschränken**
+  Schränken Sie den Zugriff auf die S3-API (Port 9000) und die Console (Weboberfläche, Port 9001) mit Firewalls oder Sicherheitsgruppen ein.
 
-- **Network Isolation**
- Use reverse proxies (e.g., Nginx) instead of exposing storage nodes directly.
+- **Netzwerkisolierung**
+  Verwenden Sie Reverse-Proxys (zum Beispiel Nginx), statt die Speicherknoten direkt offenzulegen.
 
-- **Close Unnecessary Ports**
- Disable unused ports and do not expose management interfaces to the public internet.
+- **Unnötige Ports schließen**
+  Deaktivieren Sie ungenutzte Ports und legen Sie Verwaltungsschnittstellen nicht im öffentlichen Internet offen.
 
-## WORM Compliance
+## WORM-Konformität
 
-- **Version Control and Object Locking**
- Enable versioning and object locking to meet regulatory requirements.
+- **Versionierung und Object Lock**
+  Aktivieren Sie die Versionierung und Object Lock, um aufsichtsrechtliche Anforderungen zu erfüllen.
 
-## Updates
+## Aktualisierungen
 
-- **Apply Patches**
- Regularly check for and apply RustFS updates.
+- **Patches einspielen**
+  Prüfen Sie regelmäßig auf Aktualisierungen von RustFS und spielen Sie sie ein.
 
-- **Non-Disruptive Upgrades**
- Use the rolling restart process for zero-downtime upgrades.
+- **Unterbrechungsfreie Upgrades**
+  Verwenden Sie den fortlaufenden Neustart (Rolling Restart) für Upgrades ohne Ausfallzeit.
 
-- **OS and Dependencies**
- Keep the operating system and dependencies (e.g., OpenSSL) updated.
+- **Betriebssystem und Abhängigkeiten**
+  Halten Sie das Betriebssystem und die Abhängigkeiten (zum Beispiel OpenSSL) aktuell.
 
 ---
 
-Review this checklist regularly to maintain a secure RustFS deployment.
+Prüfen Sie diese Checkliste regelmäßig, um eine sichere RustFS-Bereitstellung aufrechtzuerhalten.

@@ -13,7 +13,7 @@ La prise en charge de Swift est facultative et ne couvre pas tous les comporteme
 
 ## Correspondance entre Swift et RustFS
 
-Les requêtes Swift utilisent le chemin `/v1/AUTH_<project-id>/...` sur le point de terminaison de l’API S3 de RustFS :
+Les requêtes Swift utilisent le chemin `/v1/AUTH_<project-id>/...` sur le point de terminaison de l’API S3 de RustFS :
 
 | Ressource Swift | Chemin de requête | Correspondance RustFS |
 | --- | --- | --- |
@@ -23,17 +23,17 @@ Les requêtes Swift utilisent le chemin `/v1/AUTH_<project-id>/...` sur le point
 
 L’ID de projet dans l’URL doit correspondre à celui du jeton Keystone validé. RustFS accepte le jeton dans `X-Auth-Token` ou `X-Storage-Token`.
 
-Les opérations principales confirmées sont les suivantes :
+Les opérations principales confirmées sont les suivantes :
 
 | Portée | Opérations |
 | --- | --- |
 | Compte | Répertorier les conteneurs, mettre à jour les métadonnées du compte |
 | Conteneur | Créer, répertorier, inspecter, mettre à jour les métadonnées, supprimer |
-| Objet | Charger, télécharger, télécharger une plage, inspecter, mettre à jour les métadonnées, copier, supprimer |
+| Objet | Charger (upload), télécharger, télécharger une plage, inspecter, mettre à jour les métadonnées, copier, supprimer |
 
 ## Compiler avec la prise en charge de Swift
 
-Swift ne fait pas partie des fonctionnalités RustFS activées par défaut. Compilez-la explicitement depuis le dépôt `rustfs/rustfs` :
+Swift ne fait pas partie des fonctionnalités RustFS activées par défaut. Compilez-la explicitement depuis le dépôt `rustfs/rustfs` :
 
 ```bash
 cargo build --release --features swift
@@ -43,7 +43,7 @@ Le binaire obtenu sert les chemins Swift sur l’adresse configurée pour l’AP
 
 ## Configurer Keystone
 
-Activez Keystone et définissez son point de terminaison d’authentification avant de démarrer RustFS :
+Activez Keystone et définissez son point de terminaison d’authentification avant de démarrer RustFS :
 
 ```bash
 export RUSTFS_KEYSTONE_ENABLE=true
@@ -55,18 +55,18 @@ export RUSTFS_KEYSTONE_VERIFY_SSL=true
 | Variable | Rôle | Valeur par défaut |
 | --- | --- | --- |
 | `RUSTFS_KEYSTONE_ENABLE` | Active la validation des jetons Keystone. | `false` |
-| `RUSTFS_KEYSTONE_AUTH_URL` | Définit le point de terminaison d’authentification Keystone ; obligatoire lorsque Keystone est activé. | Non définie |
+| `RUSTFS_KEYSTONE_AUTH_URL` | Définit le point de terminaison d’authentification Keystone ; obligatoire lorsque Keystone est activé. | Non définie |
 | `RUSTFS_KEYSTONE_VERSION` | Sélectionne la version de l’API Keystone. | `v3` |
 | `RUSTFS_KEYSTONE_VERIFY_SSL` | Vérifie le certificat TLS de Keystone. | `true` |
 | `RUSTFS_KEYSTONE_CACHE_SIZE` | Définit le nombre maximal d’entrées du cache de jetons. | `10000` |
 | `RUSTFS_KEYSTONE_CACHE_TTL` | Définit la durée de vie du cache de jetons en secondes. | `300` |
 | `RUSTFS_KEYSTONE_TIMEOUT` | Définit le délai d’expiration des requêtes Keystone en secondes. | `30` |
 
-Nous recommandons de conserver la vérification TLS. Lorsque Keystone rejette un jeton fourni, RustFS renvoie `401 Unauthorized` et n’utilise pas les informations d’identification locales pour cette requête.
+Nous recommandons de conserver la vérification TLS. Lorsque Keystone rejette un jeton fourni, RustFS renvoie `401 Unauthorized` et n’utilise pas les identifiants locaux pour cette requête.
 
 ## Vérifier l’API
 
-Obtenez auprès de Keystone un jeton limité à un projet et l’ID de ce projet, puis définissez les variables shell suivantes :
+Obtenez auprès de Keystone un jeton limité à un projet et l’ID de ce projet, puis définissez les variables shell suivantes :
 
 ```bash
 export SWIFT_TOKEN='<your-keystone-token>'
@@ -74,7 +74,7 @@ export SWIFT_ACCOUNT='AUTH_<your-project-id>'
 export SWIFT_URL="http://localhost:9000/v1/${SWIFT_ACCOUNT}"
 ```
 
-Répertoriez les conteneurs visibles par le projet :
+Répertoriez les conteneurs visibles par le projet :
 
 ```bash
 curl --fail-with-body \
@@ -82,7 +82,7 @@ curl --fail-with-body \
 	"${SWIFT_URL}"
 ```
 
-Créez `my-bucket`, chargez `hello.txt`, puis téléchargez l’objet :
+Créez `my-bucket`, chargez `hello.txt`, puis téléchargez l’objet :
 
 ```bash
 curl --fail-with-body --request PUT \
@@ -104,5 +104,5 @@ Une requête vers un compte `AUTH_<project-id>` qui ne correspond pas au projet 
 ## Étapes suivantes
 
 - [Consulter la matrice de compatibilité S3](/fr/reference/s3-compatibility)
-- [Gérer les informations d’identification RustFS](/fr/operations/credentials)
+- [Gérer les identifiants RustFS](/fr/operations/credentials)
 - [Configurer TLS pour RustFS](/fr/integration/tls-configured)

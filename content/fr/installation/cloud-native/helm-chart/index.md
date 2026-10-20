@@ -1,21 +1,21 @@
 ---
-title: Overview
-description: Understand how the RustFS Helm chart deploys standalone and distributed clusters on Kubernetes.
+title: Vue d’ensemble
+description: Comprenez comment le chart Helm RustFS déploie des clusters autonomes et distribués sur Kubernetes.
 ---
 
-The official **RustFS Helm chart** deploys one RustFS cluster directly into Kubernetes. Helm renders the workload, Services, credentials, configuration, PersistentVolumeClaims (PVCs), Ingress, and optional certificate resources from a single values file.
+Le **chart Helm RustFS** officiel déploie directement un cluster RustFS dans Kubernetes. Helm génère la charge de travail, les Services, les identifiants, la configuration, les PersistentVolumeClaims (PVC), l’Ingress et les ressources de certificats facultatives à partir d’un seul fichier de valeurs.
 
-The chart supports two deployment modes:
+Le chart prend en charge deux modes de déploiement :
 
-- **Standalone** creates one Pod with one data PVC. Use it for evaluation and development.
-- **Distributed** creates a StatefulSet with multiple Pods and data PVCs. `replicaCount` controls the number of Pods and `drivesPerNode` controls the number of data PVCs mounted by each Pod.
+- **Autonome** crée un pod avec un PVC de données. Utilisez-le pour l’évaluation et le développement.
+- **Distribué** crée un StatefulSet avec plusieurs pods et plusieurs PVC de données. `replicaCount` contrôle le nombre de pods et `drivesPerNode` contrôle le nombre de PVC de données montés par chaque pod.
 
-Distributed mode is enabled by default. The chart also supports multiple append-only server pools, but a single explicit topology is easier to operate for an initial deployment. Credentials must be supplied through chart values or an existing Secret; the chart rejects empty and well-known default credentials unless insecure development defaults are explicitly enabled.
+Le mode distribué est activé par défaut. Le chart prend aussi en charge plusieurs pools de serveurs que l’on ne peut qu’ajouter, mais une topologie explicite unique est plus simple à exploiter pour un premier déploiement. Les identifiants doivent être fournis par les valeurs du chart ou par un Secret existant ; le chart rejette les identifiants vides et les identifiants par défaut bien connus, sauf si les valeurs par défaut non sécurisées de développement sont explicitement activées.
 
-Use the Helm chart when you want Helm to manage one RustFS cluster. Use the [RustFS Operator](../operator/index.md) when you need Kubernetes custom resources, multiple Tenants, or Operator-driven pool management.
+Utilisez le chart Helm lorsque vous voulez que Helm gère un seul cluster RustFS. Utilisez l’[Operator RustFS](../operator/index.md) lorsque vous avez besoin de ressources personnalisées Kubernetes, de plusieurs Tenants ou d’une gestion des pools pilotée par l’Operator.
 
-## Helm chart workflows
+## Flux de travail du chart Helm
 
-- [Install](./installation.mdx) covers requirements and standalone or distributed deployment.
-- [mTLS](./mtls.md) encrypts and authenticates traffic between RustFS Pods.
-- [cert-manager](./cert-manager.md) issues and renews certificates for RustFS Ingress and mTLS.
+- [Installation](./installation.mdx) couvre les prérequis et le déploiement autonome ou distribué.
+- [mTLS](./mtls.md) chiffre et authentifie le trafic entre les pods RustFS.
+- [cert-manager](./cert-manager.md) émet et renouvelle les certificats de l’Ingress RustFS et du mTLS.

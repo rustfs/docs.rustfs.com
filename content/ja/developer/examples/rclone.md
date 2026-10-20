@@ -1,21 +1,21 @@
 ---
 title: "rclone"
-description: "Connect rclone to RustFS and perform basic object operations."
+description: "rclone を RustFS に接続し、基本的なオブジェクト操作を行います。"
 ---
 
-[rclone](https://rclone.org/) is a command-line program for syncing files with cloud storage and speaks the S3 protocol that RustFS implements.
+[rclone](https://rclone.org/) は、クラウドストレージとの間でファイルを同期するコマンドラインプログラムです。RustFS が実装する S3 プロトコルで通信します。
 
-## Install
+## インストール
 
 ```bash
 curl https://rclone.org/install.sh | sudo bash
 ```
 
-Or see the [official install guide](https://rclone.org/install/).
+または、[公式のインストールガイド](https://rclone.org/install/)を参照します。
 
-## Configure
+## 設定
 
-Add a remote to `~/.config/rclone/rclone.conf`. Replace `http://localhost:9000` with your server address, and use your own [access keys](../../security-compliance/iam/access-token.md). `force_path_style = true` is required because RustFS uses path-style addressing:
+`~/.config/rclone/rclone.conf` にリモートを追加します。`http://localhost:9000` を実際のサーバーアドレスに置き換え、独自の[アクセスキー](../../security-compliance/iam/access-token.md)を使います。RustFS はパススタイルアクセスを使うため、`force_path_style = true` が必要です。
 
 ```ini title="~/.config/rclone/rclone.conf"
 [rustfs]
@@ -28,21 +28,21 @@ region = us-east-1
 force_path_style = true
 ```
 
-## Verify
+## 検証
 
-Create a bucket:
+バケットを作成します。
 
 ```bash
 rclone mkdir rustfs:my-bucket
 ```
 
-Upload a file:
+ファイルをアップロードします。
 
 ```bash
 rclone copy /path/to/hello.txt rustfs:my-bucket
 ```
 
-List buckets and contents:
+バケットと内容を一覧表示します。
 
 ```bash
 rclone lsd rustfs:
@@ -54,6 +54,6 @@ rclone ls rustfs:my-bucket
        12 hello.txt
 ```
 
-## Next steps
+## 次のステップ
 
-Build applications against RustFS with an [S3 SDK](../sdk/index.md), or manage objects with [`rc`](/operations/rc).
+[S3 SDK](../sdk/index.md) を使って RustFS 向けのアプリケーションを作成するか、[`rc`](/ja/operations/rc) でオブジェクトを管理します。

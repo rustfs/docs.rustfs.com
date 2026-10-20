@@ -1,13 +1,13 @@
 ---
 title: "s3fs"
-description: "Mount a RustFS bucket as a local filesystem with s3fs-fuse."
+description: "s3fs-fuse で RustFS のバケットをローカルファイルシステムとしてマウントします。"
 ---
 
-This guide connects [s3fs-fuse](https://github.com/s3fs-fuse/s3fs-fuse) — the FUSE-based S3 filesystem — to **RustFS**. You will mount a bucket as a local directory, write files through the mount, unmount, and confirm the objects persist in the bucket. The workflow was verified with s3fs v1.93 against `rustfs/rustfs-x86-musl:v2.3.1` on Ubuntu 24.04.
+このガイドでは、FUSE ベースの S3 ファイルシステムである [s3fs-fuse](https://github.com/s3fs-fuse/s3fs-fuse) を **RustFS** に接続します。バケットをローカルディレクトリとしてマウントし、マウント経由でファイルを書き込み、アンマウントしたうえで、オブジェクトがバケットに残ることを確認します。手順は Ubuntu 24.04 上の s3fs v1.93 と `rustfs/rustfs-x86-musl:v2.3.1` の組み合わせで確認済みです。
 
-You need a Linux host with FUSE (`fuse3` package) and the `s3fs` binary.
+FUSE（`fuse3` パッケージ）と `s3fs` バイナリを備えた Linux ホストが必要です。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -15,9 +15,9 @@ flowchart LR
 	Mount -->|"S3 API"| RustFS["RustFS :9000"]
 ```
 
-Every file created under the mount point becomes an object in the bucket, keyed by its relative path — a plain 1:1 mapping with no caching layer.
+マウントポイント配下に作成した各ファイルは、相対パスをキーとするバケット内のオブジェクトになります。キャッシュ層のない、単純な 1 対 1 の対応です。
 
-## 1. Install
+## 1. インストールする
 
 ```bash
 apt-get install -y s3fs
@@ -28,16 +28,16 @@ s3fs --version
 Amazon Simple Storage Service File System V1.93 ...
 ```
 
-## 2. Store the credentials
+## 2. 認証情報を保存する
 
-Write the access key and secret key to the password file s3fs expects:
+s3fs が想定するパスワードファイルに、アクセスキーとシークレットキーを書き込みます。
 
 ```bash
 echo "<your-access-key>:<your-secret-key>" > ~/.passwd-s3fs
 chmod 600 ~/.passwd-s3fs
 ```
 
-## 3. Mount the bucket
+## 3. バケットをマウントする
 
 ```bash
 mkdir -p /mnt/s3fs-demo
@@ -49,9 +49,9 @@ s3fs s3fs-demo /mnt/s3fs-demo \
   -o allow_other -o umask=000
 ```
 
-`use_path_request_style` selects path-style addressing, which is what RustFS serves. `allow_other` lets non-root users read the mount.
+`use_path_request_style` は、RustFS が提供するパススタイルアクセスを選択します。`allow_other` を付けると、root 以外のユーザーもマウントを読み取れます。
 
-## 4. Write and read files
+## 4. ファイルを書き込み、読み取る
 
 ```bash
 echo "hello from s3fs" > /mnt/s3fs-demo/s3fs-test.txt
@@ -63,9 +63,9 @@ cat /mnt/s3fs-demo/s3fs-test.txt
 hello from s3fs
 ```
 
-## 5. Verify objects and persistence
+## 5. オブジェクトと永続化を確認する
 
-Unmount and remount — the objects persist in the bucket:
+アンマウントして再マウントします。オブジェクトはバケットに残ります。
 
 ```bash
 fusermount -u /mnt/s3fs-demo
@@ -79,7 +79,7 @@ ls /mnt/s3fs-demo/
 blob.bin  s3fs-test.txt
 ```
 
-List the bucket to see the same objects from the S3 side:
+バケットを一覧し、S3 側から同じオブジェクトを確認します。
 
 ```bash
 rc ls rustfs/s3fs-demo/
@@ -90,31 +90,31 @@ rc ls rustfs/s3fs-demo/
 [2026-10-06 12:09:26]       16 B s3fs-test.txt
 ```
 
-![s3fs files stored in the RustFS Console](./images/rustfs-s3fs-files.png)
+![RustFS Console に保存された s3fs のファイル](./images/rustfs-s3fs-files.png)
 
-## 6. Stop or reset
+## 6. 停止またはリセットする
 
 ```bash
 fusermount -u /mnt/s3fs-demo
 rc rm rustfs/s3fs-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### `fuse: device not found` inside a container
+### コンテナ内で `fuse: device not found` になる
 
-Pass `--device /dev/fuse --cap-add SYS_ADMIN` to `docker run`, or `--privileged` if the mount helper still fails.
+`docker run` に `--device /dev/fuse --cap-add SYS_ADMIN` を渡します。マウントヘルパーがそれでも失敗する場合は、`--privileged` を使います。
 
-### `Permission denied` reading the mount as another user
+### 別のユーザーがマウントを読むと `Permission denied` になる
 
-s3fs mounts are private to the mounting user by default. Add `-o allow_other -o umask=000` (or a tighter umask) at mount time.
+s3fs のマウントは、既定ではマウントしたユーザー専用です。マウント時に `-o allow_other -o umask=000`（またはより厳しい umask）を追加します。
 
-### Mount succeeds but listing is empty on another client
+### マウントは成功するが、別のクライアントでは一覧が空になる
 
-s3fs has no metadata cache shared across mounts, but clients and list operations are eventually consistent. Remount or re-list after a few seconds.
+s3fs には、マウント間で共有されるメタデータキャッシュはありません。クライアントと一覧操作には結果整合性があります。数秒待ってから再マウントするか、一覧を再実行します。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional FUSE options.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [s3fs-fuse documentation](https://github.com/s3fs-fuse/s3fs-fuse/wiki/Fuse-Over-https) for performance tuning options such as `-o multipart` and `-o parallel_count`.
+- ほかの FUSE オプションを採用する前に、[S3 互換性に関する注意](/ja/administration/protocols/s3)を確認します。
+- [アクセスキーの管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- `-o multipart` や `-o parallel_count` などの性能調整オプションについては、[s3fs-fuse のドキュメント](https://github.com/s3fs-fuse/s3fs-fuse/wiki/Fuse-Over-https)に従います。

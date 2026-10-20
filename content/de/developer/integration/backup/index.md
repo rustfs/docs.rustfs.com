@@ -12,4 +12,4 @@ Verwenden Sie **RustFS** als Objektspeicher-Backend für Backup-Tools, die Repos
 - [Kopia](./kopia.md)
 - [Longhorn](./longhorn.md)
 
-Halten Sie Backup-Jobs in einem eigenen Bucket und Präfix und verwenden Sie Anmeldedaten, die auf die erforderlichen Bucket-Operationen beschränkt sind.
+Halten Sie Backup-Jobs in einem eigenen Bucket und Präfix und verwenden Sie Zugangsdaten, die auf die erforderlichen Bucket-Operationen beschränkt sind.

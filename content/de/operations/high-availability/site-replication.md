@@ -1,51 +1,51 @@
 ---
-title: "Site Replication"
-description: "Configure and operate multi-site RustFS replication with the rc command-line client."
+title: "Site-Replikation"
+description: "Konfigurieren und betreiben Sie die RustFS-Replikation über mehrere Standorte mit dem Kommandozeilenclient rc."
 ---
 
-Site replication links two or more independent **RustFS** deployments. It synchronizes buckets, object versions, and supported identity and access management (IAM) data across the linked sites. Use this workflow when applications need to write to separate RustFS sites while keeping their storage and identity configuration aligned.
+Die Site-Replikation verknüpft zwei oder mehr unabhängige **RustFS**-Bereitstellungen. Sie synchronisiert Buckets, Objektversionen und unterstützte Daten der Identitäts- und Zugriffsverwaltung (IAM) über die verknüpften Standorte. Verwenden Sie diesen Ablauf, wenn Anwendungen auf getrennte RustFS-Standorte schreiben müssen und dabei Speicher und Identitätskonfiguration abgeglichen bleiben sollen.
 
-Site replication is different from [bucket replication](/administration/data/bucket/replication). Bucket replication is a directional rule between selected buckets; site replication establishes a broader relationship between complete RustFS deployments.
+Die Site-Replikation unterscheidet sich von der [Bucket-Replikation](/de/administration/data/bucket/replication). Die Bucket-Replikation ist eine gerichtete Regel zwischen ausgewählten Buckets. Die Site-Replikation stellt eine breitere Beziehung zwischen vollständigen RustFS-Bereitstellungen her.
 
-:::warning[Plan recovery separately]
+:::warning[Planen Sie die Wiederherstellung getrennt]
 
-Site replication is asynchronous. A successful write at one site does not confirm that another site already has the replicated version. Site replication also does not provide DNS failover, traffic routing, or application recovery orchestration.
-
-:::
-
-## Replicated resources
-
-RustFS site replication synchronizes these resource families across linked sites:
-
-- Buckets and object versions, including delete markers.
-- Bucket metadata required by the site replication workflow.
-- IAM users, groups, policies, policy mappings, and service accounts.
-
-Bucket versioning support is required at every participating site. RustFS configures the site relationship and the underlying replication targets when you add the sites.
-
-## Requirements
-
-Before linking sites, prepare:
-
-- Two or more independent RustFS deployments running a release that exposes the site replication Admin API.
-- A unique, stable S3 API endpoint for each deployment.
-- Bidirectional network connectivity between every site endpoint on the S3 API port, normally `9000`.
-- Trusted TLS certificates for production endpoints.
-- The RustFS [`rc`](/operations/rc) client on a secured administration host.
-- Root administrative credentials for every participating site.
-- Compatible bucket-versioning support on every site.
-
-Use empty test sites when first validating the workflow. Before linking existing sites, inventory bucket names, object-lock settings, IAM identities, and policies for conflicts.
-
-:::warning[Protect administrative credentials]
-
-The `add` operation resolves every peer endpoint and root credential from your local `rc` alias store. Run it only from a trusted administration host, restrict access to the local `rc` configuration, and do not place credentials in shell history, logs, or screenshots.
+Die Site-Replikation ist asynchron. Ein erfolgreicher Schreibvorgang an einem Standort bestätigt nicht, dass ein anderer Standort die replizierte Version bereits hat. Die Site-Replikation bietet außerdem kein DNS-Failover, keine Verkehrslenkung und keine Orchestrierung der Anwendungswiederherstellung.
 
 :::
 
-## 1. Configure site aliases
+## Replizierte Ressourcen
 
-Configure one alias for each site. Replace the endpoint and credentials for both deployments:
+Die RustFS-Site-Replikation synchronisiert diese Ressourcenfamilien über verknüpfte Standorte:
+
+- Buckets und Objektversionen, einschließlich Löschmarkierungen.
+- Bucket-Metadaten, die der Ablauf der Site-Replikation benötigt.
+- IAM-Benutzer, Gruppen, Richtlinien, Richtlinienzuordnungen und Servicekonten.
+
+Die Unterstützung der Bucket-Versionierung ist an jedem beteiligten Standort erforderlich. RustFS konfiguriert die Standortbeziehung und die zugrunde liegenden Replikationsziele, wenn Sie die Standorte hinzufügen.
+
+## Voraussetzungen
+
+Bereiten Sie vor dem Verknüpfen der Standorte Folgendes vor:
+
+- Zwei oder mehr unabhängige RustFS-Bereitstellungen, die ein Release ausführen, das die Admin-API der Site-Replikation bereitstellt.
+- Einen eindeutigen, stabilen S3-API-Endpunkt für jede Bereitstellung.
+- Bidirektionale Netzwerkkonnektivität zwischen jedem Standort-Endpunkt auf dem S3-API-Port, normalerweise `9000`.
+- Vertrauenswürdige TLS-Zertifikate für Produktionsendpunkte.
+- Den RustFS-Client [`rc`](/de/operations/rc) auf einem abgesicherten Administrationshost.
+- Root-Anmeldedaten für die Verwaltung jedes beteiligten Standorts.
+- Kompatible Unterstützung der Bucket-Versionierung an jedem Standort.
+
+Verwenden Sie leere Teststandorte, wenn Sie den Ablauf zum ersten Mal prüfen. Inventarisieren Sie vor dem Verknüpfen vorhandener Standorte Bucket-Namen, Einstellungen von Object Lock, IAM-Identitäten und Richtlinien auf Konflikte.
+
+:::warning[Schützen Sie administrative Anmeldedaten]
+
+Die Operation `add` löst jeden Peer-Endpunkt und die Root-Anmeldedaten aus Ihrem lokalen Alias-Speicher von `rc` auf. Führen Sie sie nur von einem vertrauenswürdigen Administrationshost aus, beschränken Sie den Zugriff auf die lokale `rc`-Konfiguration und legen Sie Anmeldedaten nicht in der Shell-Historie, in Protokollen oder in Bildschirmfotos ab.
+
+:::
+
+## 1. Standort-Aliase konfigurieren
+
+Konfigurieren Sie einen Alias je Standort. Ersetzen Sie Endpunkt und Anmeldedaten für beide Bereitstellungen:
 
 ```bash
 rc alias set site1 https://site1.example.com:9000 \
@@ -57,7 +57,7 @@ rc alias set site2 https://site2.example.com:9000 \
 	--region us-east-1 --bucket-lookup path
 ```
 
-Check that both sites are reachable and ready:
+Prüfen Sie, dass beide Standorte erreichbar und bereit sind:
 
 ```bash
 rc ready site1
@@ -66,48 +66,48 @@ rc admin info cluster site1
 rc admin info cluster site2
 ```
 
-Use HTTPS endpoints in production. If a site uses a private certificate authority, install that authority in the administration host's trust store before continuing.
+Verwenden Sie in der Produktion HTTPS-Endpunkte. Wenn ein Standort eine private Zertifizierungsstelle verwendet, installieren Sie diese Zertifizierungsstelle im Vertrauensspeicher des Administrationshosts, bevor Sie fortfahren.
 
-:::warning[Loopback endpoints are for tests only]
+:::warning[Loopback-Endpunkte sind nur für Tests]
 
-RustFS rejects loopback replication targets by default as an outbound-request security control. The server option `RUSTFS_REPLICATION_ALLOW_LOOPBACK_TARGET=true` exists only for single-host development and automated tests. Never enable it in production.
+RustFS lehnt Loopback-Replikationsziele standardmäßig ab, als Schutz für ausgehende Anfragen. Die Serveroption `RUSTFS_REPLICATION_ALLOW_LOOPBACK_TARGET=true` existiert nur für die Entwicklung auf einem einzelnen Host und für automatisierte Tests. Aktivieren Sie sie in der Produktion niemals.
 
 :::
 
-## 2. Link the sites
+## 2. Standorte verknüpfen
 
-Submit all participating aliases in one command. The first alias receives the administration request:
+Übergeben Sie alle beteiligten Aliase in einem Befehl. Der erste Alias empfängt die Verwaltungsanfrage:
 
 ```bash
 rc admin replicate add site1 site2
 ```
 
-To create a relationship with more than two sites, include every alias in the initial command:
+Um eine Beziehung mit mehr als zwei Standorten anzulegen, nehmen Sie jeden Alias in den ersten Befehl auf:
 
 ```bash
 rc admin replicate add site1 site2 site3
 ```
 
-Do not run separate pairwise `add` commands to build the same multi-site relationship.
+Führen Sie keine getrennten paarweisen `add`-Befehle aus, um dieselbe Beziehung über mehrere Standorte aufzubauen.
 
-Inspect the resulting configuration from at least two sites:
+Prüfen Sie die entstandene Konfiguration von mindestens zwei Standorten:
 
 ```bash
 rc admin replicate info site1
 rc admin replicate info site2
 ```
 
-The output identifies each linked deployment by its deployment ID, site name, and endpoint. Save the deployment IDs because edit and resync operations can select a site by exact deployment ID or exact unique name.
+Die Ausgabe identifiziert jede verknüpfte Bereitstellung über ihre Bereitstellungs-ID, den Standortnamen und den Endpunkt. Speichern Sie die Bereitstellungs-IDs, weil Bearbeitung und Resynchronisation einen Standort über die genaue Bereitstellungs-ID oder den genauen eindeutigen Namen auswählen können.
 
-## 3. Check replication status
+## 3. Replikationsstatus prüfen
 
-Request the default bucket and IAM summaries:
+Fordern Sie die Standardzusammenfassungen für Buckets und IAM an:
 
 ```bash
 rc admin replicate status site1
 ```
 
-Select specific status sections when investigating an issue:
+Wählen Sie bestimmte Statusabschnitte, wenn Sie ein Problem eingrenzen:
 
 ```bash
 rc admin replicate status site1 --buckets
@@ -115,11 +115,11 @@ rc admin replicate status site1 --users --groups --policies
 rc admin replicate status site1 --metrics
 ```
 
-Check status from each site. A healthy response from `site1` confirms that site's view of the relationship; it does not replace checking the other deployments.
+Prüfen Sie den Status von jedem Standort. Eine intakte Antwort von `site1` bestätigt die Sicht dieses Standorts auf die Beziehung. Sie ersetzt die Prüfung der anderen Bereitstellungen nicht.
 
-## 4. Validate data and IAM replication
+## 4. Daten- und IAM-Replikation prüfen
 
-Create a test bucket and object at the first site:
+Legen Sie am ersten Standort einen Test-Bucket und ein Testobjekt an:
 
 ```bash
 rc bucket create site1/my-bucket
@@ -127,20 +127,20 @@ printf 'hello rustfs\n' > hello.txt
 rc object copy hello.txt site1/my-bucket/hello.txt
 ```
 
-Poll the second site until the object appears:
+Fragen Sie den zweiten Standort ab, bis das Objekt erscheint:
 
 ```bash
 rc object stat site2/my-bucket/hello.txt
 rc object copy site2/my-bucket/hello.txt ./hello-from-site2.txt
 ```
 
-Compare the downloaded content before treating the data path as validated:
+Vergleichen Sie den heruntergeladenen Inhalt, bevor Sie den Datenpfad als geprüft behandeln:
 
 ```bash
 cmp hello.txt hello-from-site2.txt
 ```
 
-For IAM validation, create a temporary user and attach a test policy at one site, then inspect the user and policy mapping at another site. Remove the temporary identity after validation:
+Legen Sie für die IAM-Prüfung an einem Standort einen temporären Benutzer an und hängen Sie eine Testrichtlinie an. Sehen Sie danach Benutzer und Richtlinienzuordnung an einem anderen Standort ein. Entfernen Sie die temporäre Identität nach der Prüfung:
 
 ```bash
 rc admin user add site1 replication-test <temporary-secret-key>
@@ -152,17 +152,17 @@ rc admin policy entities site2 --user replication-test
 rc admin user rm site1 replication-test
 ```
 
-Use a randomly generated temporary secret and do not reuse an application or administrator credential.
+Verwenden Sie ein zufällig erzeugtes temporäres Geheimnis und verwenden Sie keine Anmeldedaten einer Anwendung oder eines Administrators wieder.
 
-## 5. Edit a site
+## 5. Einen Standort bearbeiten
 
-Use `edit` when a linked site's name, endpoint, or TLS trust settings change. First inspect the current deployment IDs and names:
+Verwenden Sie `edit`, wenn sich Name, Endpunkt oder TLS-Vertrauenseinstellungen eines verknüpften Standorts ändern. Sehen Sie zuerst die aktuellen Bereitstellungs-IDs und Namen ein:
 
 ```bash
 rc admin replicate info site1
 ```
 
-Rename a site:
+Benennen Sie einen Standort um:
 
 ```bash
 rc admin replicate edit site1 \
@@ -171,7 +171,7 @@ rc admin replicate edit site1 \
 	--yes
 ```
 
-Replace an endpoint and keep TLS verification enabled:
+Ersetzen Sie einen Endpunkt und lassen Sie die TLS-Prüfung aktiviert:
 
 ```bash
 rc admin replicate edit site1 \
@@ -181,7 +181,7 @@ rc admin replicate edit site1 \
 	--yes
 ```
 
-For a private certificate authority, provide a certificate-only PEM bundle:
+Geben Sie für eine private Zertifizierungsstelle ein PEM-Bündel an, das nur Zertifikate enthält:
 
 ```bash
 rc admin replicate edit site1 \
@@ -190,7 +190,7 @@ rc admin replicate edit site1 \
 	--yes
 ```
 
-Clear a previously configured custom CA when the endpoint moves to a certificate trusted by the system trust store:
+Löschen Sie eine zuvor konfigurierte eigene Zertifizierungsstelle, wenn der Endpunkt zu einem Zertifikat wechselt, dem der Systemvertrauensspeicher vertraut:
 
 ```bash
 rc admin replicate edit site1 \
@@ -200,11 +200,11 @@ rc admin replicate edit site1 \
 	--yes
 ```
 
-The endpoint must be an HTTP or HTTPS origin without a path, query, fragment, or embedded credentials. Prefer a trusted certificate over `--skip-tls-verify`.
+Der Endpunkt muss ein HTTP- oder HTTPS-Ursprung ohne Pfad, Abfrage, Fragment oder eingebettete Anmeldedaten sein. Bevorzugen Sie ein vertrauenswürdiges Zertifikat gegenüber `--skip-tls-verify`.
 
-## 6. Resynchronize a site
+## 6. Einen Standort neu synchronisieren
 
-Use resynchronization after repairing a site that was unavailable or when status checks show missing replicated state. Start a resync for one exact peer:
+Verwenden Sie die Resynchronisation, nachdem Sie einen Standort repariert haben, der nicht verfügbar war, oder wenn Statusprüfungen fehlenden replizierten Zustand zeigen. Starten Sie eine Resynchronisation für genau einen Peer:
 
 ```bash
 rc admin replicate resync start site1 \
@@ -212,14 +212,14 @@ rc admin replicate resync start site1 \
 	--yes
 ```
 
-Read the last persisted resync snapshot:
+Lesen Sie den zuletzt persistierten Resynchronisations-Snapshot:
 
 ```bash
 rc admin replicate resync status site1 \
 	--site <deployment-id>
 ```
 
-Cancel the selected resync only when you have confirmed it should stop:
+Brechen Sie die ausgewählte Resynchronisation nur ab, wenn Sie bestätigt haben, dass sie stoppen soll:
 
 ```bash
 rc admin replicate resync cancel site1 \
@@ -227,23 +227,23 @@ rc admin replicate resync cancel site1 \
 	--yes
 ```
 
-:::warning[Resync status is not live progress]
+:::warning[Der Status der Resynchronisation zeigt keinen laufenden Fortschritt]
 
-The current RustFS resync status endpoint returns the persisted result of the most recent start or cancel request. It does not inspect live workers, and its lifecycle state is reported as unknown. Start operations can overlap, cancellation is not idempotent, and a network timeout can leave the mutation outcome unknown. After an ambiguous result, inspect `replicate info`, `replicate status`, and the target data before issuing another mutation.
+Der aktuelle Statusendpunkt der RustFS-Resynchronisation liefert das persistierte Ergebnis der letzten Start- oder Abbruchanfrage. Er sieht keine laufenden Worker, und sein Lebenszykluszustand wird als unbekannt gemeldet. Startvorgänge können sich überlappen, der Abbruch ist nicht idempotent, und ein Netzwerk-Zeitlimit kann das Ergebnis der Änderung unbekannt lassen. Sehen Sie nach einem mehrdeutigen Ergebnis `replicate info`, `replicate status` und die Zieldaten ein, bevor Sie eine weitere Änderung auslösen.
 
 :::
 
-## 7. Remove site replication
+## 7. Site-Replikation entfernen
 
-Removing a site changes the replication relationship. It does not provide an application cutover or prove that every queued object has arrived. Check status and preserve any required data before proceeding.
+Das Entfernen eines Standorts ändert die Replikationsbeziehung. Es bietet keine Anwendungsumschaltung und belegt nicht, dass jedes eingereihte Objekt angekommen ist. Prüfen Sie den Status und bewahren Sie alle benötigten Daten auf, bevor Sie fortfahren.
 
-Remove one named site:
+Entfernen Sie einen benannten Standort:
 
 ```bash
 rc admin replicate remove site1 --site site2-dr
 ```
 
-Repeat `--site` to remove multiple named sites in one request:
+Wiederholen Sie `--site`, um mehrere benannte Standorte in einer Anfrage zu entfernen:
 
 ```bash
 rc admin replicate remove site1 \
@@ -251,41 +251,41 @@ rc admin replicate remove site1 \
 	--site site3
 ```
 
-Dissolve the complete site replication relationship:
+Lösen Sie die vollständige Beziehung der Site-Replikation auf:
 
 ```bash
 rc admin replicate remove site1 --all
 ```
 
-Verify the result from the remaining deployments:
+Prüfen Sie das Ergebnis von den verbleibenden Bereitstellungen:
 
 ```bash
 rc admin replicate info site1
 rc admin replicate status site1
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
-### A peer endpoint is rejected
+### Ein Peer-Endpunkt wird abgelehnt
 
-Confirm that the endpoint is a reachable HTTP or HTTPS origin and does not resolve to loopback. For production, make every site reachable through its stable network address and keep the loopback override disabled.
+Bestätigen Sie, dass der Endpunkt ein erreichbarer HTTP- oder HTTPS-Ursprung ist und nicht auf Loopback auflöst. Machen Sie in der Produktion jeden Standort über seine stabile Netzwerkadresse erreichbar und lassen Sie die Loopback-Überschreibung deaktiviert.
 
-### TLS validation fails
+### Die TLS-Prüfung schlägt fehl
 
-Confirm that the endpoint certificate contains the peer hostname and that the issuing certificate authority is trusted. Use `replicate edit --ca-cert` for a private CA bundle. Do not make `--skip-tls-verify` the permanent fix.
+Bestätigen Sie, dass das Endpunktzertifikat den Hostnamen des Peers enthält und dass der Zertifizierungsstelle, die es ausgestellt hat, vertraut wird. Verwenden Sie `replicate edit --ca-cert` für ein Bündel einer privaten Zertifizierungsstelle. Machen Sie `--skip-tls-verify` nicht zur dauerhaften Abhilfe.
 
-### A mutation times out
+### Eine Änderung läuft in ein Zeitlimit
 
-Do not immediately repeat `add`, `edit`, `resync start`, `resync cancel`, or `remove`. The server may have applied the change before the client lost the response. Inspect the relationship and data first:
+Wiederholen Sie `add`, `edit`, `resync start`, `resync cancel` oder `remove` nicht sofort. Der Server kann die Änderung angewendet haben, bevor der Client die Antwort verloren hat. Sehen Sie zuerst die Beziehung und die Daten ein:
 
 ```bash
 rc admin replicate info site1
 rc admin replicate status site1
 ```
 
-### Replication falls behind
+### Die Replikation fällt zurück
 
-Check the site status and metrics from every deployment, then verify endpoint reachability and storage readiness:
+Prüfen Sie Standortstatus und Metriken von jeder Bereitstellung und prüfen Sie dann Erreichbarkeit der Endpunkte und Speicherbereitschaft:
 
 ```bash
 rc admin replicate status site1 --metrics
@@ -293,10 +293,10 @@ rc ready site1
 rc ready site2
 ```
 
-Application writes can outpace asynchronous replication. Do not infer a recovery point objective from a single status sample; measure lag under your workload and alert on sustained backlog.
+Schreibvorgänge der Anwendung können der asynchronen Replikation vorauseilen. Leiten Sie kein Wiederherstellungsziel (Recovery Point Objective) aus einer einzelnen Statusprobe ab. Messen Sie die Verzögerung unter Ihrer Last und alarmieren Sie bei anhaltendem Rückstand.
 
-## Next steps
+## Nächste Schritte
 
-- Review [Bucket Replication](/administration/data/bucket/replication) when you need directional replication for selected buckets instead of a complete site relationship.
-- Monitor [cluster status and readiness](/operations/status-check) at every site.
-- Review the [`rc` command guide](/operations/rc) and keep the client aligned with the RustFS server release.
+- Lesen Sie [Bucket-Replikation](/de/administration/data/bucket/replication), wenn Sie gerichtete Replikation für ausgewählte Buckets brauchen statt einer vollständigen Standortbeziehung.
+- Überwachen Sie an jedem Standort [Clusterstatus und Bereitschaft](/de/operations/status-check).
+- Lesen Sie die [`rc`-Befehlsanleitung](/de/operations/rc) und halten Sie den Client auf dem Release des RustFS-Servers.

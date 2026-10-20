@@ -26,7 +26,7 @@ The quota check reserves the full incoming object size against the bucket's curr
 
 :::
 
-## Configure in the Console
+## Configure on the Console
 
 1. Sign in to the RustFS Console and open **Browser**.
 2. Find the bucket and select **Settings**.

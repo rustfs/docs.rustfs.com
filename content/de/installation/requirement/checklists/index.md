@@ -1,24 +1,24 @@
 ---
-title: "Checklist"
-description: "Pre-installation checklists."
+title: "Checklisten vor der Installation"
+description: "Diese Seite enthält die Checklisten vor der Installation."
 ---
 
-These checklists cover the necessary preparations for a production environment.
+Diese Checklisten decken die notwendigen Vorbereitungen für eine Produktionsumgebung ab.
 
 :::note
 
-These are general guidelines. Adjust them based on your specific architecture and requirements.
+Dies sind allgemeine Richtlinien. Passen Sie sie an Ihre konkrete Architektur und Ihre Anforderungen an.
 
 :::
 
-For professional support, contact us at hello@rustfs.com.
+Für professionellen Support schreiben Sie an hello@rustfs.com.
 
-For community support, submit an issue on GitHub.
+Für Support aus der Community öffnen Sie auf GitHub ein Issue.
 
-## Checklist
+## Checkliste
 
-- [Hardware Checklist](./hardware-checklists.md)
-- [Hardware Selection](./hardware-selection.md)
-- [Security Checklist](./security-checklists.md)
-- [Software Checklist](./software-checklists.md)
-- [Network Checklist](./network-checklists.md)
+- [Hardware-Checkliste](./hardware-checklists.md)
+- [Hardwareauswahl](./hardware-selection.md)
+- [Sicherheits-Checkliste](./security-checklists.md)
+- [Software-Checkliste](./software-checklists.md)
+- [Netzwerk-Checkliste](./network-checklists.md)

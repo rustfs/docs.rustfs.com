@@ -1,28 +1,28 @@
 ---
-title: Pool Expansion
-description: Add storage capacity to a RustFS Tenant by appending a storage pool.
+title: ストレージプールの拡張
+description: ストレージプールを追加して、RustFS の Tenant のストレージ容量を増やします。
 ---
 
-All pools in a Tenant form one RustFS cluster. Add capacity by appending a new pool to `spec.pools`; do not change the shape of an existing pool.
+Tenant 内のすべてのプールは、1 つの RustFS クラスターを構成します。容量を増やすには `spec.pools` へ新しいプールを追加します。既存のプールの構成は変更しません。
 
-:::warning[Existing pools are immutable]
+:::warning[既存のプールは不変です]
 
-Do not change `servers` or `persistence.volumesPerServer` on an existing pool. The Operator creates an immutable StatefulSet for each pool.
+既存のプールの `servers` と `persistence.volumesPerServer` は変更してはなりません。Operator は、プールごとに不変の StatefulSet を作成します。
 
 :::
 
-## 1. Check the Tenant
+## 1. Tenant を確認する
 
 ```bash
 kubectl -n storage-a get tenant tenant-a
 kubectl -n storage-a get pods,pvc -l rustfs.tenant=tenant-a
 ```
 
-Confirm that the Tenant is `Ready` and the cluster has enough compute and storage capacity.
+Tenant が `Ready` であり、クラスターに十分な計算資源とストレージ容量があることを確認します。
 
-## 2. Add a pool
+## 2. プールを追加する
 
-Append the following entry to the existing `spec.pools` list in `tenant.yaml`. Keep all existing entries unchanged.
+`tenant.yaml` にある既存の `spec.pools` リストの末尾に、次のエントリを追加します。既存のエントリはすべてそのままにします。
 
 ```yaml title="tenant.yaml"
 - name: pool-1
@@ -38,13 +38,13 @@ Append the following entry to the existing `spec.pools` list in `tenant.yaml`. K
           storage: 100Gi
 ```
 
-This pool creates four PVCs: two servers multiplied by two volumes per server. Apply the complete Tenant manifest:
+このプールは PVC を 4 つ作成します。サーバー 2 台 × サーバーあたりのボリューム 2 つです。Tenant マニフェスト全体を適用します。
 
 ```bash
 kubectl apply -f tenant.yaml
 ```
 
-## 3. Watch the expansion
+## 3. 拡張を監視する
 
 ```bash
 kubectl -n storage-a get tenant tenant-a -w
@@ -52,4 +52,4 @@ kubectl -n storage-a get pods,pvc \
   -l rustfs.pool=pool-1
 ```
 
-Wait for the Tenant to return to `Ready` before making another topology change. Increasing an existing PVC size is a separate Kubernetes storage operation and depends on the StorageClass.
+次のトポロジー変更の前に、Tenant が `Ready` に戻るまで待ちます。既存 PVC のサイズを増やす操作は、これとは別の Kubernetes ストレージ操作であり、StorageClass に依存します。

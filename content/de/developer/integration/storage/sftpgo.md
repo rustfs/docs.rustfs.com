@@ -1,13 +1,13 @@
 ---
 title: "SFTPGo"
-description: "Serve RustFS buckets over SFTP with SFTPGo."
+description: "Stellen Sie RustFS-Buckets über SFTP mit SFTPGo bereit."
 ---
 
-This guide connects [SFTPGo](https://github.com/drakkan/sftpgo) — the full-featured SFTP/WebDAV/FTP server — to **RustFS** as a per-user S3 backend. You will create an SFTP user whose home directory is a RustFS bucket prefix, upload files over SFTP, and verify the objects in the bucket. The workflow was verified with SFTPGo 2.7.6 against `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [SFTPGo](https://github.com/drakkan/sftpgo) — den SFTP-/WebDAV-/FTP-Server — mit **RustFS** als S3-Backend je Benutzer. Sie legen einen SFTP-Benutzer an, dessen Home-Verzeichnis ein Präfix eines RustFS-Buckets ist, laden Dateien über SFTP hoch und prüfen die Objekte im Bucket. Der Ablauf wurde mit SFTPGo 2.7.6 gegen `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker and an SFTP client (`sftp` ships with OpenSSH).
+Sie benötigen Docker und einen SFTP-Client (`sftp` gehört zu OpenSSH).
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -15,9 +15,9 @@ flowchart LR
 	SFTPGo -->|"S3 API"| RustFS["RustFS :9000"]
 ```
 
-SFTPGo maps the user's virtual paths onto bucket prefixes. Files uploaded over SFTP become objects under the configured `key_prefix` — nothing is stored on the SFTPGo host itself.
+SFTPGo bildet die virtuellen Pfade des Benutzers auf Bucket-Präfixe ab. Über SFTP hochgeladene Dateien werden zu Objekten unter dem konfigurierten `key_prefix`. Auf dem SFTPGo-Host selbst wird nichts gespeichert.
 
-## 1. Run SFTPGo
+## 1. SFTPGo starten
 
 ```bash
 docker run -d --name sftpgo --hostname sftpgo --network oo-rustfs_default \
@@ -26,11 +26,11 @@ docker run -d --name sftpgo --hostname sftpgo --network oo-rustfs_default \
   drakkan/sftpgo:latest
 ```
 
-`SFTPGO_COMMON__TEMP_PATH` matters: for S3 backends SFTPGo streams uploads through a local pipe file, and the default temp path may not exist or be writable.
+`SFTPGO_COMMON__TEMP_PATH` ist wichtig: bei S3-Backends streamt SFTPGo Uploads über eine lokale Pipe-Datei, und der Standard-Temporärpfad existiert möglicherweise nicht oder ist nicht beschreibbar.
 
-## 2. Create the admin user
+## 2. Den Admin-Benutzer anlegen
 
-The image does not create the admin automatically. Open `http://localhost:8080/web/admin/setup` once and submit the form, or drive it with curl:
+Das Image legt den Admin nicht automatisch an. Öffnen Sie einmal `http://localhost:8080/web/admin/setup` und senden Sie das Formular ab, oder steuern Sie es mit curl:
 
 ```bash
 FORM=$(curl -s -c /tmp/sg-cookie.txt http://localhost:8080/web/admin/setup)
@@ -47,9 +47,9 @@ curl -s -b /tmp/sg-cookie.txt -X POST http://localhost:8080/web/admin/setup \
 setup: 302
 ```
 
-## 3. Create an S3-backed user
+## 3. Einen Benutzer mit S3-Backend anlegen
 
-Get an API token and create the user. Three details matter: `home_dir` must be an existing writable directory inside the container (`/tmp` works), `force_path_style` must be `true` for RustFS, and `access_secret` is a KMS object — pass the secret inside `{"status": "Plain", "payload": ...}`:
+Holen Sie ein API-Token und legen Sie den Benutzer an. Drei Angaben sind wichtig: `home_dir` muss ein vorhandenes beschreibbares Verzeichnis im Container sein (`/tmp` funktioniert), `force_path_style` muss für RustFS `true` sein, damit pfadbasierte Adressierung (Path-Style) verwendet wird, und `access_secret` ist ein KMS-Objekt. Übergeben Sie das Geheimnis in `{"status": "Plain", "payload": ...}`:
 
 ```json title="sftpgo-user.json"
 {
@@ -85,7 +85,7 @@ curl -s -X POST http://localhost:8080/api/v2/users \
 create-user: 201
 ```
 
-## 4. Upload and read files over SFTP
+## 4. Dateien über SFTP hochladen und lesen
 
 ```bash
 printf "uploaded via sftpgo to rustfs\n" > /tmp/sftp-test.txt
@@ -105,7 +105,7 @@ sftp> ls
 sftp-big.bin    sftp-test.txt
 ```
 
-## 5. Verify objects in RustFS
+## 5. Objekte in RustFS prüfen
 
 ```bash
 rc ls rustfs/sftpgo-demo/home/demo/ -r
@@ -118,33 +118,33 @@ rc cat rustfs/sftpgo-demo/home/demo/sftp-test.txt
 uploaded via sftpgo to rustfs
 ```
 
-The object key is the user's virtual path under `key_prefix` — a plain mapping.
+Der Objektschlüssel ist der virtuelle Pfad des Benutzers unter `key_prefix`. Das ist eine einfache Abbildung.
 
-![SFTPGo files stored in the RustFS Console](./images/rustfs-sftpgo-home.png)
+![In der RustFS-Console gespeicherte SFTPGo-Dateien](./images/rustfs-sftpgo-home.png)
 
-## 6. Stop or reset
+## 6. Stoppen oder zurücksetzen
 
 ```bash
 docker rm -f sftpgo
 rc rm rustfs/sftpgo-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
-### `create resource error` / `InvalidAccessKeyId` on upload
+### `create resource error` oder `InvalidAccessKeyId` beim Upload
 
-Check three things in order: `force_path_style` must be `true` (SFTPGo's AWS SDK defaults to virtual-host addressing, which breaks IP endpoints), `access_secret` must use the KMS-object form, and `home_dir` must point at a writable directory (SFTPGo pipes S3 uploads through it).
+Prüfen Sie drei Punkte der Reihe nach: `force_path_style` muss `true` sein (das AWS-SDK von SFTPGo verwendet standardmäßig Adressierung im Virtual-Hosted-Stil, die an IP-Endpunkten scheitert), `access_secret` muss die KMS-Objektform verwenden, und `home_dir` muss auf ein beschreibbares Verzeichnis zeigen (SFTPGo leitet S3-Uploads darüber).
 
-### `unknown command init` / admin login rejected
+### `unknown command init` oder die Admin-Anmeldung wird abgelehnt
 
-The admin account only exists after the web setup form is submitted once. Repeat step 2; do not reuse an old browser cookie jar.
+Das Admin-Konto existiert erst, nachdem das Web-Setup-Formular einmal abgesendet wurde. Wiederholen Sie Schritt 2. Verwenden Sie kein altes Browser-Cookie-Archiv wieder.
 
-### API returns `405 Method Not allowed` for the token
+### Die API antwortet mit `405 Method Not allowed` auf das Token
 
-The token endpoint only accepts `GET` with basic auth: `GET /api/v2/token`.
+Der Token-Endpunkt akzeptiert nur `GET` mit Basic Auth: `GET /api/v2/token`.
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional SFTPGo backends.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [SFTPGo documentation](https://github.com/drakkan/sftpgo/blob/main/README.md) to add WebDAV/FTP listeners, per-user quotas, and two-factor auth on top of the same bucket.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere SFTPGo-Backends einsetzen.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [SFTPGo-Dokumentation](https://github.com/drakkan/sftpgo/blob/main/README.md), um WebDAV- und FTP-Listener, Kontingente je Benutzer und Zwei-Faktor-Authentifizierung auf demselben Bucket hinzuzufügen.

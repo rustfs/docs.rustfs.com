@@ -69,6 +69,30 @@ npm start          # serve the production build
 npm run types:check
 ```
 
+## Local search
+
+Search uses FumaPress's native `oramaSearchPlugin` (powered by ZBSearch in the
+locked Fumadocs version). `npm run build` exports the Markdown/MDX titles,
+headings, and content to static `/api/search/<locale>.json` assets in
+`dist/public/`. A small plugin wrapper scopes the native indexer to each locale
+so visitors do not download all five languages. Deploy those files with the
+rest of the site; search does not require a running API server, an external
+search service, or search credentials.
+
+The browser downloads only the current locale’s index (`en`, `zh`, `de`, `fr`,
+or `ja`) on the first search, then reuses it for later queries. Results are
+also filtered by locale. English fallback content remains searchable within
+its locale's routes. The standard FumaPress search dialog and keyboard shortcuts
+are preserved.
+
+Run `npm run build && npm run test:search` to check the generated index using the
+same static client as the UI. The tests cover Chinese and other localized text,
+API/environment-variable queries, locale isolation, section anchors, index
+reuse, and retry after a failed download. Each index is checked against the Cloudflare 25 MiB static-asset limit.
+The search PR check also builds the entire static site without search
+credentials. For UI smoke testing, serve `dist/public/` with `npm start`, then
+check first search on mobile, Ctrl/Cmd+K, Escape, reopening, and a result's anchor.
+
 ## Authoring Guidelines
 
 - Every page needs frontmatter with a `title` (rendered as the page heading and sidebar/tab label) and ideally a `description`. Do **not** repeat the title as a top-level `#` heading in the body — FumaPress renders the title automatically.

@@ -1,83 +1,83 @@
 ---
-title: "Disk Preparation"
-description: "Identify, format, mount, and verify dedicated data disks before installing RustFS on Linux."
+title: "Préparation des disques"
+description: "Identifiez, formatez, montez et vérifiez les disques de données dédiés avant d’installer RustFS sur Linux."
 ---
 
-Prepare each RustFS data disk as an independent XFS file system with a stable label and mount point. Complete these steps on every Linux node before configuring `RUSTFS_VOLUMES`.
+Préparez chaque disque de données RustFS comme un système de fichiers XFS indépendant, avec un libellé et un point de montage stables. Effectuez ces étapes sur chaque nœud Linux avant de configurer `RUSTFS_VOLUMES`.
 
-:::warning[Formatting destroys data]
+:::warning[Le formatage détruit les données]
 
-The `mkfs.xfs` command erases the selected device. Confirm the device name, back up any required data, and ensure the disk is not used by the operating system before continuing.
+La commande `mkfs.xfs` efface le périphérique sélectionné. Confirmez le nom du périphérique, sauvegardez les données nécessaires et assurez-vous que le disque n’est pas utilisé par le système d’exploitation avant de continuer.
 
 :::
 
-## 1. Identify the data disks
+## 1. Identifier les disques de données
 
-List block devices, file systems, labels, and current mount points:
+Répertoriez les périphériques bloc, les systèmes de fichiers, les libellés et les points de montage actuels :
 
 ```bash
 sudo lsblk -o NAME,SIZE,TYPE,FSTYPE,LABEL,UUID,MOUNTPOINTS
 ```
 
-Choose only dedicated data disks. Do not format the operating-system disk or a device that contains data you need to retain.
+Ne choisissez que des disques de données dédiés. Ne formatez pas le disque du système d’exploitation, ni un périphérique qui contient des données à conserver.
 
-## 2. Format a disk with XFS
+## 2. Formater un disque en XFS
 
-The following example prepares `/dev/sdb` and assigns the label `RUSTFS0`. Replace the device name for your environment and use a unique label for each disk.
+L’exemple suivant prépare `/dev/sdb` et lui attribue le libellé `RUSTFS0`. Remplacez le nom de périphérique selon votre environnement et utilisez un libellé unique pour chaque disque.
 
 ```bash
 sudo mkfs.xfs -f -i size=512 -n ftype=1 -L RUSTFS0 /dev/sdb
 ```
 
-Repeat the command for additional disks with labels such as `RUSTFS1`, `RUSTFS2`, and `RUSTFS3`.
+Répétez la commande pour les disques supplémentaires, avec des libellés tels que `RUSTFS1`, `RUSTFS2` et `RUSTFS3`.
 
-## 3. Create a persistent mount
+## 3. Créer un montage persistant
 
-Create the mount point:
+Créez le point de montage :
 
 ```bash
 sudo mkdir -p /data/rustfs0
 ```
 
-Add an entry to `/etc/fstab` so the disk is mounted by its stable file-system label after a restart:
+Ajoutez une entrée à `/etc/fstab` afin que le disque soit monté, après un redémarrage, par son libellé de système de fichiers stable :
 
 ```ini title="/etc/fstab"
 LABEL=RUSTFS0 /data/rustfs0 xfs defaults,noatime,nodiratime 0 0
 ```
 
-For more reliable device selection, we recommend mounting by file-system UUID. A UUID uniquely identifies the file system and avoids mounting the wrong disk if labels are duplicated or Linux device names change. Retrieve the UUID after formatting:
+Pour sélectionner le périphérique de façon plus fiable, nous recommandons le montage par UUID de système de fichiers. Un UUID identifie le système de fichiers de manière unique et évite de monter le mauvais disque si des libellés sont dupliqués ou si les noms de périphériques Linux changent. Récupérez l’UUID après le formatage :
 
 ```bash
 sudo blkid -s UUID -o value /dev/sdb
 ```
 
-Replace `<filesystem-uuid>` with the returned value, and use this entry instead of the `LABEL` entry above:
+Remplacez `<filesystem-uuid>` par la valeur renvoyée, et utilisez cette entrée à la place de l’entrée `LABEL` ci-dessus :
 
 ```ini title="/etc/fstab"
 UUID=<filesystem-uuid> /data/rustfs0 xfs defaults,noatime,nodiratime 0 0
 ```
 
-Mount all entries and confirm the result:
+Montez toutes les entrées et confirmez le résultat :
 
 ```bash
 sudo mount -a
 findmnt /data/rustfs0
 ```
 
-For multiple disks, create one mount point and one `/etc/fstab` entry per file-system UUID.
+Pour plusieurs disques, créez un point de montage et une entrée `/etc/fstab` par UUID de système de fichiers.
 
-## 4. Verify the prepared disks
+## 4. Vérifier les disques préparés
 
-Confirm that every expected mount uses XFS and has sufficient free space:
+Confirmez que chaque montage attendu utilise XFS et dispose d’un espace libre suffisant :
 
 ```bash
 df -hT /data/rustfs0
 sudo xfs_info /data/rustfs0
 ```
 
-Use the verified mount paths when you configure `RUSTFS_VOLUMES`. Keep disk labels and mount paths consistent across nodes in a distributed deployment.
+Utilisez les chemins de montage vérifiés lorsque vous configurez `RUSTFS_VOLUMES`. Dans un déploiement distribué, conservez des libellés de disque et des chemins de montage identiques sur tous les nœuds.
 
-## Next steps
+## Étapes suivantes
 
-- [Choose a deployment topology](/installation#deployment-mode-comparison)
-- [Continue with Linux prerequisites and service setup](/installation/linux/prerequisites-and-service)
+- [Choisir une topologie de déploiement](/fr/installation#comparaison-des-modes-de-déploiement)
+- [Poursuivre avec les prérequis Linux et la configuration du service](/fr/installation/linux/prerequisites-and-service)

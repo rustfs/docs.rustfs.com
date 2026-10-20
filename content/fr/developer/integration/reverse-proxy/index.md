@@ -1,13 +1,13 @@
 ---
-title: "Reverse Proxy"
-description: "Choose and configure a reverse proxy for the RustFS S3 API and Console."
+title: "Proxy inverse"
+description: "Choisissez et configurez un proxy inverse pour l’API S3 et la Console de RustFS."
 ---
 
-Use a reverse proxy to expose the **RustFS** S3 API and Console through managed hostnames and TLS endpoints.
+Utilisez un proxy inverse pour exposer l’API S3 et la Console de **RustFS** au moyen de noms d’hôte gérés et de points de terminaison TLS.
 
-We recommend using separate hostnames for the S3 API on port `9000` and the Console on port `9001`. Serve the S3 API from the root of its hostname because S3 clients sign the request path.
+Nous recommandons d’utiliser des noms d’hôte distincts pour l’API S3 sur le port `9000` et pour la Console sur le port `9001`. Servez l’API S3 depuis la racine de son nom d’hôte, car les clients S3 signent le chemin de la requête.
 
-## Supported guides
+## Guides pris en charge
 
 - [Nginx](./nginx.md)
 - [Traefik](./traefik.md)
@@ -16,6 +16,6 @@ We recommend using separate hostnames for the S3 API on port `9000` and the Cons
 - [Envoy](./envoy.md)
 - [Apache HTTP Server](./httpd.md)
 
-## Related configuration
+## Configuration associée
 
-See [Virtual-Host Access](/integration/virtual) when clients access buckets through virtual-hosted-style URLs.
+Consultez [Accès par hôte virtuel](/fr/integration/virtual) lorsque les clients accèdent aux compartiments (buckets) par des URL en adressage de type hôte virtuel.

@@ -1,46 +1,46 @@
 ---
-title: "Object Lock"
-description: "Protect versioned objects from deletion with retention periods and legal holds."
+title: "オブジェクトロック"
+description: "保持期間とリーガルホールドで、バージョニングされたオブジェクトを削除から保護する方法を説明します。"
 ---
 
-RustFS Object Lock applies write-once, read-many protection to individual object versions. Use retention periods for time-bound protection and Legal Hold for protection without a predefined expiration date.
+RustFS のオブジェクトロックは、個々のオブジェクトバージョンに、書き込みは 1 回・読み取りは複数回（WORM）の保護を適用します。期限のある保護には保持期間を、あらかじめ有効期限を定めない保護にはリーガルホールドを使います。
 
-## Overview
+## 概要
 
-Object Lock requires bucket versioning. You can enable it when creating a bucket or use the S3 `PutObjectLockConfiguration` API on an existing bucket whose versioning is enabled. Each overwrite creates a new version; retention and Legal Hold protect a specific version rather than the object key as a whole.
+オブジェクトロックには、バケットのバージョニングが必要です。バケットの作成時に有効にするか、バージョニングが有効な既存バケットに対して S3 の `PutObjectLockConfiguration` API を使います。上書きのたびに新しいバージョンが作成されます。保持とリーガルホールドが保護するのは、オブジェクトキー全体ではなく、特定のバージョンです。
 
-| Protection | Behavior |
+| 保護 | 動作 |
 | --- | --- |
-| `GOVERNANCE` retention | Blocks deletion and retention shortening unless the caller has bypass permission and explicitly requests a bypass. Retention can be extended without bypass. |
-| `COMPLIANCE` retention | Blocks deletion even with governance bypass. The date can be extended but not shortened. |
-| Legal Hold | Blocks deletion until the hold is set to `OFF`. It has no expiration date and governance bypass does not override it. |
+| `GOVERNANCE` 保持 | 呼び出し元がバイパス権限を持ち、バイパスを明示的に要求した場合を除き、削除と保持期間の短縮を拒否します。保持期間は、バイパスなしで延長できます。 |
+| `COMPLIANCE` 保持 | ガバナンスバイパスがあっても削除を拒否します。日付は延長できますが、短縮はできません。 |
+| リーガルホールド | ホールドが `OFF` に設定されるまで削除を拒否します。有効期限はなく、ガバナンスバイパスでは解除されません。 |
 
-Deleting a key without a version ID creates a delete marker. The protected version remains stored and can still be retrieved by version ID.
+バージョン ID を指定せずにキーを削除すると、削除マーカーが作成されます。保護されたバージョンは保存されたままで、バージョン ID を指定すれば引き続き取得できます。
 
-:::danger[Plan retention before enabling it]
+:::danger[有効にする前に保持を計画する]
 
-COMPLIANCE retention cannot be bypassed or shortened before its retain-until date. Test policies in a non-production bucket and verify time synchronization, permissions, lifecycle rules, replication, and backup procedures before protecting production data.
+COMPLIANCE 保持は、保持期限（retain-until）の日時より前にバイパスすることも、短縮することもできません。本番データを保護する前に、非本番のバケットでポリシーを試し、時刻同期、権限、ライフサイクルルール、レプリケーション、バックアップ手順を確認します。
 
 :::
 
-## Configure in the Console
+## Console で設定する
 
-1. Sign in to the RustFS Console and open **Buckets**.
-2. Select **Create Bucket** and enter the bucket name.
-3. Enable **Object Lock**. The Console also enables **Version** because Object Lock requires versioning.
-4. To apply retention automatically to new object versions, enable **Retention**.
-5. Select **COMPLIANCE** or **GOVERNANCE**, enter the validity, and select **Day** or **Year**.
-6. Select **Create**.
+1. RustFS Console にサインインし、**Buckets**（バケット）を開きます。
+2. **Create Bucket**（バケットの作成）を選択し、バケット名を入力します。
+3. **Object Lock**（オブジェクトロック）を有効にします。オブジェクトロックにはバージョニングが必要なため、Console は **Version**（バージョン）も有効にします。
+4. 新しいオブジェクトバージョンへ保持を自動適用する場合は、**Retention**（保持）を有効にします。
+5. **COMPLIANCE**（コンプライアンス）または **GOVERNANCE**（ガバナンス）を選択し、保持期間を入力して、**Day**（日）または **Year**（年）を選択します。
+6. **Create**（作成）を選択します。
 
-![Create Bucket dialog with versioning, Object Lock, and default retention enabled](./images/object-lock-create-bucket.png)
+![バージョニング、オブジェクトロック、既定の保持を有効にしたバケット作成ダイアログ](./images/object-lock-create-bucket.png)
 
-The Console initially displays `180` days when default retention is enabled. Replace it with the period required by your retention policy; it is a UI initial value, not a general recommendation.
+既定の保持を有効にすると、Console は最初に `180` 日を表示します。保持ポリシーで必要な期間に置き換えます。これは UI の初期値であり、一般的な推奨値ではありません。
 
-To inspect a protected object, open the bucket, select the object name, and use the **Versions** and **Info** tabs. The Info tab exposes **Legal Hold** and **RetentionPolicy** fields.
+保護されたオブジェクトを確認するには、バケットを開き、オブジェクト名を選択して、**Versions**（バージョン）タブと **Info**（情報）タブを使います。Info タブには、**Legal Hold**（リーガルホールド）と **RetentionPolicy**（保持ポリシー）のフィールドがあります。
 
-## Use rc
+## rc を使う
 
-Configure an alias before running these examples:
+これらの例を実行する前に、エイリアスを設定します。
 
 ```bash
 rc alias set rustfs http://localhost:9000 \
@@ -48,13 +48,13 @@ rc alias set rustfs http://localhost:9000 \
 	--region us-east-1 --bucket-lookup path
 ```
 
-:::note[rc 0.1.29 bucket creation boundary]
+:::note[rc 0.1.29 におけるバケット作成の制限]
 
-`rc bucket create --with-lock` and `--with-versioning` appear in the `rc 0.1.29` help output but return `not implemented` when executed. Create the Object Lock bucket in the Console. The upload headers shown below are supported and were validated against RustFS.
+`rc bucket create --with-lock` と `--with-versioning` は `rc 0.1.29` のヘルプ出力に表示されますが、実行すると `not implemented` を返します。オブジェクトロックのバケットは Console で作成します。以下に示すアップロードヘッダーはサポートされており、RustFS に対して検証済みです。
 
 :::
 
-Upload an object version with GOVERNANCE retention. Supply both retention headers together and use an RFC 3339 UTC timestamp in the future:
+GOVERNANCE 保持付きのオブジェクトバージョンをアップロードします。保持ヘッダーは 2 つとも同時に指定し、未来の RFC 3339 UTC タイムスタンプを使います。
 
 ```bash
 rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt \
@@ -62,14 +62,14 @@ rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt \
 	-H "x-amz-object-lock-retain-until-date:2027-01-01T00:00:00Z"
 ```
 
-Upload an object version with Legal Hold enabled:
+リーガルホールドを有効にしたオブジェクトバージョンをアップロードします。
 
 ```bash
 rc object copy /path/to/hello.txt rustfs/my-bucket/legal-hold.txt \
 	-H "x-amz-object-lock-legal-hold:ON"
 ```
 
-List the protected versions and inspect a specific version:
+保護されたバージョンを一覧し、特定のバージョンを確認します。
 
 ```bash
 rc bucket version list rustfs/my-bucket --json
@@ -77,27 +77,27 @@ rc object stat rustfs/my-bucket/hello.txt \
 	--version-id <version-id> --json
 ```
 
-`rc 0.1.29` does not provide commands to change retention or switch an existing Legal Hold between `ON` and `OFF`. Use the Console or an S3 SDK for those operations.
+`rc 0.1.29` には、保持を変更するコマンドや、既存のリーガルホールドを `ON` と `OFF` の間で切り替えるコマンドはありません。これらの操作には、Console または S3 SDK を使います。
 
-## Verify protection
+## 保護を検証する
 
-1. Upload a test object with GOVERNANCE retention or Legal Hold.
-2. Record its version ID with `rc bucket version list`.
-3. Attempt to delete that exact version through an S3 client without bypass. RustFS must return `AccessDenied` while protection is active.
-4. Confirm the version remains visible in the Console and through `rc object stat --version-id`.
+1. GOVERNANCE 保持またはリーガルホールドを付けて、テストオブジェクトをアップロードします。
+2. `rc bucket version list` で、そのバージョン ID を記録します。
+3. バイパスなしで、そのバージョンを S3 クライアントから削除しようとします。保護が有効な間、RustFS は `AccessDenied` を返す必要があります。
+4. Console と `rc object stat --version-id` で、そのバージョンが引き続き表示されることを確認します。
 
-For GOVERNANCE retention, test bypass only with a dedicated administrative identity that has `s3:BypassGovernanceRetention`. COMPLIANCE retention and Legal Hold remain protected from governance bypass.
+GOVERNANCE 保持のバイパスは、`s3:BypassGovernanceRetention` を持つ専用の管理アイデンティティだけで試します。COMPLIANCE 保持とリーガルホールドは、ガバナンスバイパスからは保護されたままです。
 
-## Operational considerations
+## 運用上の考慮事項
 
-- Default bucket retention is calculated when a new object version or multipart upload is initiated.
-- Copying an object creates a new destination version; destination retention policy applies independently.
-- Suspending versioning is not appropriate for an Object Lock bucket.
-- Lifecycle expiration cannot remove a version while retention or Legal Hold blocks deletion.
-- Replication targets for locked objects must support compatible Object Lock behavior.
+- バケットの既定保持は、新しいオブジェクトバージョン、またはマルチパートアップロードを開始した時点で計算されます。
+- オブジェクトをコピーすると、宛先に新しいバージョンが作成されます。宛先の保持ポリシーは、独立して適用されます。
+- オブジェクトロックのバケットでバージョニングを一時停止するのは、適切ではありません。
+- 保持またはリーガルホールドが削除を拒否している間、ライフサイクルの有効期限ではそのバージョンを削除できません。
+- ロックされたオブジェクトのレプリケーション先は、互換性のあるオブジェクトロックの動作に対応している必要があります。
 
-## Next steps
+## 次のステップ
 
-- [Manage object versions](./versioning.md)
-- [Configure bucket replication](../bucket/replication.md)
-- [Review the security checklist](/installation/requirement/checklists/security-checklists)
+- [オブジェクトのバージョンを管理する](./versioning.md)
+- [バケットレプリケーションを設定する](../bucket/replication.md)
+- [セキュリティチェックリストを確認する](/ja/installation/requirement/checklists/security-checklists)

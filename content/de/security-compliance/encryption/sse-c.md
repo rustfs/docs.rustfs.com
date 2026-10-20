@@ -1,26 +1,26 @@
 ---
 title: "SSE-C"
-description: "Use customer-provided AES-256 keys for RustFS object encryption and decryption."
+description: "Verwenden Sie vom Kunden bereitgestellte AES-256-Schlüssel für die Ver- und Entschlüsselung von Objekten in RustFS."
 ---
 
-SSE-C encrypts an object with a 256-bit key supplied by the client on every write and read request. RustFS validates and uses the key for the request but does not persist the plaintext customer key. SSE-C does not use the RustFS KMS backend.
+SSE-C verschlüsselt ein Objekt mit einem 256-Bit-Schlüssel, den der Client bei jeder Schreib- und Leseanfrage übergibt. RustFS prüft den Schlüssel und verwendet ihn für die Anfrage, speichert den Kundenschlüssel im Klartext jedoch nicht. SSE-C verwendet das KMS-Backend von RustFS nicht.
 
-## Requirements
+## Anforderungen
 
-- Install and configure [`rc`](/operations/rc).
-- Install OpenSSL for the key-generation example.
-- Use HTTPS so customer keys are encrypted in transit.
-- Store the customer key in a secret manager and maintain a mapping between each object and its key.
+- Installieren und konfigurieren Sie [`rc`](/de/operations/rc).
+- Installieren Sie OpenSSL für das Beispiel zur Schlüsselerzeugung.
+- Verwenden Sie HTTPS, damit Kundenschlüssel während der Übertragung verschlüsselt sind.
+- Speichern Sie den Kundenschlüssel in einem Secret-Manager und pflegen Sie eine Zuordnung zwischen jedem Objekt und seinem Schlüssel.
 
-:::warning[The same key is required for every read]
+:::warning[Für jeden Lesezugriff ist derselbe Schlüssel erforderlich]
 
-If you lose an SSE-C key, RustFS cannot recover it and the object becomes unreadable. Never log, commit, or send the key over an unencrypted connection.
+Wenn Sie einen SSE-C-Schlüssel verlieren, kann RustFS ihn nicht wiederherstellen und das Objekt wird unlesbar. Protokollieren Sie den Schlüssel nicht, übernehmen Sie ihn nicht in die Versionsverwaltung und senden Sie ihn nicht über eine unverschlüsselte Verbindung.
 
 :::
 
-## Prepare a customer key
+## Kundenschlüssel vorbereiten
 
-Generate 32 random bytes through a hexadecimal intermediate, then derive the Base64 key and its Base64-encoded MD5 checksum:
+Erzeugen Sie 32 zufällige Bytes über eine hexadezimale Zwischenform und leiten Sie daraus den Base64-Schlüssel und seine Base64-kodierte MD5-Prüfsumme ab:
 
 ```bash
 SSE_C_KEY_HEX=$(openssl rand -hex 32)
@@ -29,11 +29,11 @@ SSE_C_KEY_MD5=$(printf '%s' "$SSE_C_KEY_HEX" | xxd -r -p \
 	| openssl dgst -md5 -binary | openssl base64 -A)
 ```
 
-Move these values into your approved secret-management workflow. Do not print them to the terminal or shell history.
+Übernehmen Sie diese Werte in Ihren freigegebenen Ablauf zur Geheimnisverwaltung. Geben Sie sie nicht im Terminal oder in der Shell-Historie aus.
 
-## Upload an encrypted object
+## Verschlüsseltes Objekt hochladen
 
-`rc 0.1.29` has no dedicated SSE-C option. Its signed custom-header option can send the three S3 SSE-C headers:
+`rc 0.1.29` hat keine eigene SSE-C-Option. Die signierte Option für eigene Header kann die drei S3-SSE-C-Header senden:
 
 ```bash
 rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt \
@@ -42,17 +42,17 @@ rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt \
 	-H "x-amz-server-side-encryption-customer-key-md5:$SSE_C_KEY_MD5"
 ```
 
-The required request headers are:
+Die erforderlichen Anfrage-Header sind:
 
-| Header | Value |
+| Header | Wert |
 | --- | --- |
 | `x-amz-server-side-encryption-customer-algorithm` | `AES256` |
-| `x-amz-server-side-encryption-customer-key` | Base64-encoded 32-byte key |
-| `x-amz-server-side-encryption-customer-key-md5` | Base64-encoded MD5 digest of the raw key |
+| `x-amz-server-side-encryption-customer-key` | Base64-kodierter Schlüssel mit 32 Bytes |
+| `x-amz-server-side-encryption-customer-key-md5` | Base64-kodierter MD5-Digest des Rohschlüssels |
 
-## Read the encrypted object
+## Verschlüsseltes Objekt lesen
 
-Supply the same three headers on reads and metadata requests:
+Übergeben Sie dieselben drei Header bei Lesezugriffen und Metadatenanfragen:
 
 ```bash
 rc object show rustfs/my-bucket/hello.txt \
@@ -61,24 +61,24 @@ rc object show rustfs/my-bucket/hello.txt \
 	-H "x-amz-server-side-encryption-customer-key-md5:$SSE_C_KEY_MD5"
 ```
 
-The same workflow was validated with `rc 0.1.29` against RustFS by uploading an object, reading it with the original key, and comparing the returned bytes with the source.
+Derselbe Ablauf wurde mit `rc 0.1.29` gegen RustFS geprüft: Ein Objekt wurde hochgeladen, mit dem ursprünglichen Schlüssel gelesen und die zurückgegebenen Bytes wurden mit der Quelle verglichen.
 
-:::warning[Protect command arguments]
+:::warning[Befehlsargumente schützen]
 
-The generic `-H` method places expanded header values in the `rc` process arguments, which may be visible to other processes on the host. For production automation, prefer an S3 SDK that accepts SSE-C key material through protected memory or a credential provider instead of command-line arguments.
+Die allgemeine Methode `-H` schreibt expandierte Header-Werte in die Prozessargumente von `rc`. Andere Prozesse auf dem Host können sie dadurch sehen. Bevorzugen Sie für die Automatisierung in der Produktion ein S3-SDK, das SSE-C-Schlüsselmaterial über geschützten Speicher oder einen Anbieter für Zugangsdaten entgegennimmt und nicht über Befehlszeilenargumente.
 
 :::
 
-## Clear shell variables
+## Shell-Variablen löschen
 
-After the operation, remove key material from the shell environment:
+Entfernen Sie das Schlüsselmaterial nach dem Vorgang aus der Shell-Umgebung:
 
 ```bash
 unset SSE_C_KEY_HEX SSE_C_KEY_B64 SSE_C_KEY_MD5
 ```
 
-Changing a bucket's SSE-S3 or SSE-KMS default does not alter SSE-C objects. SSE-C is selected by the customer-key headers on each individual request and takes precedence for that request.
+Eine Änderung des SSE-S3- oder SSE-KMS-Standards eines Buckets ändert SSE-C-Objekte nicht. SSE-C wird durch die Kundenschlüssel-Header der einzelnen Anfrage gewählt und hat für diese Anfrage Vorrang.
 
-## Next steps
+## Nächste Schritte
 
-Compare [SSE-S3](./sse-s.md) for server-managed encryption and [KMS](./kms.md) for explicit KMS-backed key management.
+Vergleichen Sie [SSE-S3](./sse-s.md) für die vom Server verwaltete Verschlüsselung und [KMS](./kms.md) für die ausdrückliche Schlüsselverwaltung über KMS.

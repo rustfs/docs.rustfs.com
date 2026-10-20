@@ -1,26 +1,26 @@
 ---
 title: "Traefik"
-description: "Deploy RustFS behind Traefik with automatic TLS for separate S3 API and Console hostnames."
+description: "Stellen Sie RustFS hinter Traefik mit automatischem TLS für getrennte Hostnamen der S3-API und der Console bereit."
 ---
 
-Use **Traefik** and its Docker provider to discover RustFS, obtain TLS certificates from Let's Encrypt, and route separate hostnames to the S3 API and Console. You need Docker Engine, Docker Compose, a public server, and two DNS records that resolve to that server.
+Verwenden Sie **Traefik** und seinen Docker-Provider, um RustFS zu entdecken, TLS-Zertifikate von Let's Encrypt zu beziehen und getrennte Hostnamen zur S3-API und zur Console (Weboberfläche) zu leiten. Sie benötigen Docker Engine, Docker Compose, einen öffentlichen Server und zwei DNS-Einträge, die auf diesen Server zeigen.
 
-This guide uses these example hostnames:
+Diese Anleitung verwendet diese Beispiel-Hostnamen:
 
-- `s3.example.com` for the S3 API
-- `console.example.com` for the Console
+- `s3.example.com` für die S3-API
+- `console.example.com` für die Console
 
-Replace them with your public hostnames. The ACME HTTP-01 challenge requires inbound access to ports `80` and `443`.
+Ersetzen Sie sie durch Ihre öffentlichen Hostnamen. Die ACME-Challenge HTTP-01 verlangt eingehenden Zugriff auf die Ports `80` und `443`.
 
-:::warning[Serve S3 from the root path]
+:::warning[S3 vom Wurzelpfad bereitstellen]
 
-Do not publish the S3 API under a path such as `/s3/`. AWS Signature Version 4 includes the request path and host, so rewriting either value can invalidate signed requests.
+Veröffentlichen Sie die S3-API nicht unter einem Pfad wie `/s3/`. AWS Signature Version 4 enthält den Anfragepfad und den Host, daher kann das Umschreiben eines der beiden Werte signierte Anfragen ungültig machen.
 
 :::
 
-## 1. Create the deployment directory
+## 1. Das Bereitstellungsverzeichnis anlegen
 
-Create a directory and an empty ACME storage file. Traefik requires restrictive permissions on this file:
+Legen Sie ein Verzeichnis und eine leere ACME-Speicherdatei an. Traefik verlangt restriktive Berechtigungen für diese Datei:
 
 ```bash
 mkdir rustfs-traefik
@@ -29,9 +29,9 @@ touch acme.json
 chmod 600 acme.json
 ```
 
-## 2. Set deployment variables
+## 2. Bereitstellungsvariablen setzen
 
-Create an environment file and replace each value:
+Legen Sie eine Umgebungsdatei an und ersetzen Sie jeden Wert:
 
 ```ini title=".env"
 S3_HOSTNAME=s3.example.com
@@ -41,11 +41,11 @@ RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Use an email address that receives certificate expiration notices. Do not commit `.env` or `acme.json` to source control.
+Verwenden Sie eine E-Mail-Adresse, die Hinweise zum Ablauf von Zertifikaten empfängt. Nehmen Sie `.env` und `acme.json` nicht in die Versionsverwaltung auf.
 
-## 3. Create the Compose file
+## 3. Die Compose-Datei anlegen
 
-Create the Traefik and RustFS services:
+Legen Sie die Dienste Traefik und RustFS an:
 
 ```yaml title="compose.yaml"
 services:
@@ -126,51 +126,51 @@ networks:
     name: rustfs
 ```
 
-The two routers use different host rules and backend ports. RustFS does not publish ports `9000` or `9001` on the Docker host, and the Traefik Dashboard is not exposed.
+Die beiden Router verwenden unterschiedliche Host-Regeln und Backend-Ports. RustFS veröffentlicht die Ports `9000` und `9001` nicht auf dem Docker-Host, und das Traefik-Dashboard wird nicht bereitgestellt.
 
-:::note[Docker socket access]
+:::note[Zugriff auf den Docker-Socket]
 
-Traefik reads container labels through the read-only Docker socket mount. Anyone who can modify Docker workloads can influence routes discovered by the Docker provider. Restrict Docker access on the proxy host.
+Traefik liest Container-Labels über den schreibgeschützten Mount des Docker-Sockets. Wer Docker-Workloads ändern kann, kann Routen beeinflussen, die der Docker-Provider entdeckt. Schränken Sie den Docker-Zugriff auf dem Proxy-Host ein.
 
 :::
 
-## 4. Validate and start the deployment
+## 4. Die Bereitstellung prüfen und starten
 
-Render the Compose configuration and check that all variables resolve:
+Rendern Sie die Compose-Konfiguration und prüfen Sie, dass alle Variablen aufgelöst werden:
 
 ```bash
 docker compose config
 ```
 
-Start both services:
+Starten Sie beide Dienste:
 
 ```bash
 docker compose up -d
 docker compose ps
 ```
 
-Follow the Traefik logs while it completes the ACME challenge and creates both certificates:
+Folgen Sie den Traefik-Logs, während die ACME-Challenge abgeschlossen und beide Zertifikate erzeugt werden:
 
 ```bash
 docker compose logs --follow traefik
 ```
 
-If certificate issuance fails, confirm that both DNS records resolve to this host and that ports `80` and `443` are reachable from the internet. Let's Encrypt rate limits apply, so correct DNS and firewall problems before repeatedly recreating the deployment.
+Wenn die Zertifikatsausstellung scheitert, prüfen Sie, dass beide DNS-Einträge auf diesen Host zeigen und dass die Ports `80` und `443` aus dem Internet erreichbar sind. Let's Encrypt wendet Ratenbegrenzungen an, beheben Sie daher DNS- und Firewall-Probleme, bevor Sie die Bereitstellung wiederholt neu erstellen.
 
-## 5. Verify both endpoints
+## 5. Beide Endpunkte prüfen
 
-Verify the S3 API readiness endpoint and Console health endpoint through Traefik:
+Prüfen Sie den Bereitschaftsendpunkt der S3-API und den Integritätsendpunkt der Console über Traefik:
 
 ```bash
 curl --fail https://s3.example.com/health/ready
 curl --fail https://console.example.com/rustfs/console/health
 ```
 
-Configure S3 clients with `https://s3.example.com` as the endpoint and enable path-style addressing. Open `https://console.example.com/rustfs/console/` to sign in to the Console.
+Konfigurieren Sie S3-Clients mit `https://s3.example.com` als Endpunkt und aktivieren Sie pfadbasierte Adressierung (Path-Style). Öffnen Sie `https://console.example.com/rustfs/console/`, um sich an der Console anzumelden.
 
-## Multi-node services
+## Dienste mit mehreren Knoten
 
-For an external multi-node RustFS cluster, enable Traefik's file provider in the `traefik` service:
+Aktivieren Sie für einen externen RustFS-Cluster mit mehreren Knoten den File-Provider von Traefik im Dienst `traefik`:
 
 ```yaml title="compose.yaml"
 services:
@@ -182,7 +182,7 @@ services:
       - ./dynamic.yaml:/etc/traefik/dynamic.yaml:ro
 ```
 
-Create the dynamic configuration with every RustFS node:
+Legen Sie die dynamische Konfiguration mit jedem RustFS-Knoten an:
 
 ```yaml title="dynamic.yaml"
 http:
@@ -234,10 +234,10 @@ http:
           - url: http://node4.example.net:9001
 ```
 
-Configure sticky sessions for the Console service when you use OpenID Connect. An in-progress login stores its `state` on one RustFS node and the callback must return to that node. Keep port `9000` open directly between RustFS nodes because internal node RPC uses the same listener.
+Konfigurieren Sie Sticky Sessions für den Console-Dienst, wenn Sie OpenID Connect verwenden. Eine laufende Anmeldung speichert ihren `state` auf einem RustFS-Knoten, und der Callback muss zu diesem Knoten zurückkehren. Halten Sie Port `9000` direkt zwischen den RustFS-Knoten offen, weil der interne Knoten-RPC denselben Listener verwendet.
 
-## Next steps
+## Nächste Schritte
 
-- [Configure an S3 client](/developer/examples/aws-cli)
-- [Enable virtual-hosted-style bucket URLs](/integration/virtual)
-- [Review health and readiness endpoints](/operations/status-check)
+- [Einen S3-Client konfigurieren](/de/developer/examples/aws-cli)
+- [Bucket-URLs mit Adressierung im Virtual-Hosted-Stil aktivieren](/de/integration/virtual)
+- [Endpunkte für Integritätsprüfung und Bereitschaft prüfen](/de/operations/status-check)

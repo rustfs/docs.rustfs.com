@@ -26,7 +26,7 @@ Canceling a decommission does not roll back completed moves. Objects already rel
 
 ## Operation
 
-### Start decommissioning in the Console
+### Start decommissioning on the Console
 
 1. Sign in to the RustFS Console with an account that has decommission administration permission.
 2. Open **Pool Decommission**.
@@ -81,7 +81,7 @@ To cancel a running operation, use:
 rc admin decommission cancel rustfs 0 --by-id
 ```
 
-If a decommission is failed or canceled, clear its metadata before retrying:
+If a decommission failed or was canceled, clear its metadata before you retry:
 
 ```bash
 rc admin decommission clear rustfs 0 --by-id
@@ -91,7 +91,7 @@ After the target reports `complete`, remove its expression from `RUSTFS_VOLUMES`
 
 ## Verification
 
-### Verify decommissioning in the Console
+### Verify decommissioning on the Console
 
 Confirm that the target pool reports `Completed`, with zero failed objects and zero failed bytes. After removing the pool from the startup topology and restarting RustFS, verify that:
 

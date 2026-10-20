@@ -172,7 +172,7 @@ Bucket deleted.
 url = s3.generate_presigned_url(
     ClientMethod='get_object',
     Params={'Bucket': bucket_name, 'Key': 'hello.txt'},
-    ExpiresIn=600,  # 10 minutes validity
+    ExpiresIn=600,  # expires in 10 minutes
 )
 
 print('Presigned GET URL:', url)

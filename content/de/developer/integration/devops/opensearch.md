@@ -1,13 +1,13 @@
 ---
 title: "OpenSearch"
-description: "Snapshot OpenSearch indices to RustFS with the repository-s3 plugin."
+description: "Sichern Sie OpenSearch-Indizes mit dem Plugin repository-s3 als Snapshots in RustFS."
 ---
 
-This guide connects [OpenSearch](https://github.com/opensearch-project/OpenSearch) — the open-source search and analytics suite derived from Elasticsearch — to **RustFS** through the `repository-s3` plugin. You will register an S3 snapshot repository backed by a RustFS bucket, take a snapshot of an index, and restore it. The workflow was verified with `opensearchproject/opensearch:3.8.0` and the bundled `repository-s3` plugin against `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [OpenSearch](https://github.com/opensearch-project/OpenSearch) — die quelloffene Such- und Analyse-Suite, die von Elasticsearch abgeleitet ist — über das Plugin `repository-s3` mit **RustFS**. Sie registrieren ein S3-Snapshot-Repository auf einem RustFS-Bucket, erstellen einen Snapshot eines Index und stellen ihn wieder her. Der Ablauf wurde mit `opensearchproject/opensearch:3.8.0` und dem mitgelieferten Plugin `repository-s3` gegen `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker, or an OpenSearch node where you can install plugins and edit configuration. This deployment is intended for local integration testing, not production.
+Sie benötigen Docker oder einen OpenSearch-Knoten, auf dem Sie Plugins installieren und die Konfiguration bearbeiten können. Dieses Setup ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -16,11 +16,11 @@ flowchart LR
 	RustFS -->|"restore"| OS
 ```
 
-The `repository-s3` plugin writes snapshots as shard archives plus metadata blobs in the bucket. Registration is cluster-wide, so every node needs the plugin and the same client configuration.
+Das Plugin `repository-s3` schreibt Snapshots als Shard-Archive plus Metadaten-Blobs in den Bucket. Die Registrierung gilt clusterweit, daher benötigt jeder Knoten das Plugin und dieselbe Client-Konfiguration.
 
-## 1. Run OpenSearch
+## 1. OpenSearch ausführen
 
-Start a single node with security disabled and a small heap:
+Starten Sie einen einzelnen Knoten mit deaktiviertem Security-Plugin und einem kleinen Heap:
 
 ```bash
 docker run -d --name opensearch --network oo-rustfs_default -p 9200:9200 \
@@ -30,20 +30,20 @@ docker run -d --name opensearch --network oo-rustfs_default -p 9200:9200 \
   opensearchproject/opensearch:3.8.0
 ```
 
-The node is ready when `curl http://localhost:9200` returns the cluster header (allow one to two minutes).
+Der Knoten ist bereit, wenn `curl http://localhost:9200` den Cluster-Header zurückgibt. Rechnen Sie mit ein bis zwei Minuten.
 
-## 2. Install the repository-s3 plugin
+## 2. Plugin repository-s3 installieren
 
-The S3 repository plugin is not preloaded. Install it and restart the node:
+Das S3-Repository-Plugin ist nicht vorgeladen. Installieren Sie es und starten Sie den Knoten neu:
 
 ```bash
 docker exec opensearch bin/opensearch-plugin install --batch repository-s3
 docker restart opensearch
 ```
 
-## 3. Configure the S3 client
+## 3. S3-Client konfigurieren
 
-Credentials are secure settings: they belong in the OpenSearch keystore, not in the repository request or `opensearch.yml`. Create the keystore entries, replacing all connection placeholders:
+Zugangsdaten sind sichere Einstellungen. Sie gehören in den OpenSearch-Keystore, nicht in die Repository-Anfrage oder in `opensearch.yml`. Legen Sie die Keystore-Einträge an und ersetzen Sie alle Verbindungsplatzhalter:
 
 ```bash
 docker exec opensearch sh -c \
@@ -52,7 +52,7 @@ docker exec opensearch sh -c \
    printf '<your-secret-key>' | bin/opensearch-keystore add -f -x s3.client.default.secret_key"
 ```
 
-Add the non-secure client settings to `config/opensearch.yml`:
+Fügen Sie die nicht geheimen Client-Einstellungen zu `config/opensearch.yml` hinzu:
 
 ```yaml title="opensearch.yml"
 network.host: 0.0.0.0
@@ -62,21 +62,21 @@ s3.client.default.protocol: http
 s3.client.default.path_style_access: "true"
 ```
 
-Restart the node once more so it reads both the keystore and the new settings:
+Starten Sie den Knoten ein weiteres Mal neu, damit er sowohl den Keystore als auch die neuen Einstellungen liest:
 
 ```bash
 docker restart opensearch
 ```
 
-Create the bucket while the node boots:
+Legen Sie den Bucket an, während der Knoten startet:
 
 ```bash
 rc mb rustfs/opensearch-snapshots
 ```
 
-## 4. Register the repository and snapshot
+## 4. Repository registrieren und Snapshot erstellen
 
-Create a test index with a document, then register the repository:
+Legen Sie einen Testindex mit einem Dokument an und registrieren Sie anschließend das Repository:
 
 ```bash
 curl -sX PUT http://localhost:9200/rustfs-demo -H "Content-Type: application/json" \
@@ -89,26 +89,28 @@ curl -sX PUT "http://localhost:9200/_snapshot/rustfs-repo" -H "Content-Type: app
   -d '{"type":"s3","settings":{"bucket":"opensearch-snapshots","region":"us-east-1","server_side_encryption_type":"bucket_default"}}'
 ```
 
-The `server_side_encryption_type: bucket_default` setting matters: without it the plugin requests SSE-S3, which a self-hosted RustFS without a server-side encryption master key rejects.
+Die Einstellung `server_side_encryption_type: bucket_default` ist wichtig. Ohne sie fordert das Plugin SSE-S3 an. Eine selbst betriebene RustFS-Instanz ohne Master-Schlüssel für die serverseitige Verschlüsselung lehnt das ab.
 
-Take a snapshot and wait for completion:
+Erstellen Sie einen Snapshot und warten Sie auf den Abschluss:
 
 ```bash
 curl -sX PUT "http://localhost:9200/_snapshot/rustfs-repo/snapshot-1?wait_for_completion=true" \
   -H "Content-Type: application/json" -d '{"indices":"rustfs-demo"}'
 ```
 
+
 ```text
 {"snapshot":{"snapshot":"snapshot-1","state":"SUCCESS","indices":["rustfs-demo"],...}}
 ```
 
-## 5. Verify objects and restore
+## 5. Objekte prüfen und wiederherstellen
 
-List the bucket:
+Listen Sie den Bucket auf:
 
 ```bash
 rc ls rustfs/opensearch-snapshots/ -r
 ```
+
 
 ```text
 index-0
@@ -119,7 +121,7 @@ meta-kRgFBiuyQIyPo3_-CMp7Hw.dat
 snap-kRgFBiuyQIyPo3_-CMp7Hw.dat
 ```
 
-Delete the index and restore it from the snapshot:
+Löschen Sie den Index und stellen Sie ihn aus dem Snapshot wieder her:
 
 ```bash
 curl -sX DELETE http://localhost:9200/rustfs-demo
@@ -127,46 +129,47 @@ curl -sX POST "http://localhost:9200/_snapshot/rustfs-repo/snapshot-1/_restore?w
 curl -s http://localhost:9200/rustfs-demo/_doc/1
 ```
 
+
 ```text
 {"_index":"rustfs-demo","_id":"1","found":true,"_source":{"product":"rustfs","via":"opensearch-snapshot"}}
 ```
 
-![OpenSearch snapshot stored in the RustFS Console](./images/rustfs-opensearch-snapshot.png)
+![In der RustFS Console gespeicherter OpenSearch-Snapshot](./images/rustfs-opensearch-snapshot.png)
 
-## 6. Stop or reset
+## 6. Anhalten oder zurücksetzen
 
-To tear down the demo while keeping the bucket objects:
+So bauen Sie die Demo ab und behalten die Objekte im Bucket:
 
 ```bash
 docker rm -f opensearch
 ```
 
-To delete the stored snapshots:
+So löschen Sie die gespeicherten Snapshots:
 
 ```bash
 rc rm rustfs/opensearch-snapshots/ --recursive --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
 ### `Setting [access_key] is insecure, but property [allow_insecure_settings] is not set`
 
-Inline credentials in the repository request are rejected. Store them in the keystore as shown in step 3 — `access_key` and `secret_key` are secure settings in OpenSearch.
+Zugangsdaten direkt in der Repository-Anfrage werden abgelehnt. Speichern Sie sie wie in Schritt 3 im Keystore. `access_key` und `secret_key` sind in OpenSearch sichere Einstellungen.
 
 ### `SSE-S3 requires RUSTFS_SSE_S3_MASTER_KEY ... (Status Code: 400)`
 
-The plugin encrypts uploads with SSE-S3 by default. Register the repository with `"server_side_encryption_type": "bucket_default"` so no encryption header is sent, as in step 4.
+Das Plugin verschlüsselt Uploads standardmäßig mit SSE-S3. Registrieren Sie das Repository mit `"server_side_encryption_type": "bucket_default"`, damit kein Verschlüsselungs-Header gesendet wird, wie in Schritt 4.
 
-### `unknown setting [s3.client.default.access_key]` at startup
+### `unknown setting [s3.client.default.access_key]` beim Start
 
-The settings reference the repository-s3 plugin. If the node fails to start with them present, the plugin is not installed in that container — repeat step 2 (a fresh container loses plugins installed with `docker exec`).
+Die Einstellungen verweisen auf das Plugin repository-s3. Wenn der Knoten mit diesen Einstellungen nicht startet, ist das Plugin in diesem Container nicht installiert. Wiederholen Sie Schritt 2. Ein neuer Container verliert Plugins, die mit `docker exec` installiert wurden.
 
-### Repository verification fails with `path is not accessible`
+### Die Repository-Prüfung schlägt mit `path is not accessible` fehl
 
-The node cannot reach the bucket: check that `s3.client.default.endpoint` is reachable from the container, `path_style_access` is `"true"`, and the keystore credentials were loaded (they are read at startup — restart after adding them).
+Der Knoten erreicht den Bucket nicht. Prüfen Sie, dass `s3.client.default.endpoint` vom Container aus erreichbar ist, `path_style_access` den Wert `"true"` hat und die Keystore-Zugangsdaten geladen wurden. Sie werden beim Start gelesen. Starten Sie neu, nachdem Sie sie hinzugefügt haben.
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional OpenSearch repositories.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [OpenSearch snapshots documentation](https://docs.opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/index/) to automate snapshots with Snapshot Management (SM) policies.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere OpenSearch-Repositories verwenden.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [OpenSearch-Snapshot-Dokumentation](https://docs.opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/index/), um Snapshots mit Richtlinien der Snapshot-Verwaltung (SM) zu automatisieren.

@@ -1,15 +1,15 @@
 ---
-title: "Security & Compliance"
-description: "Configure identity, encryption, transport security, audit logging, and credentials for RustFS."
+title: "Sécurité et conformité"
+description: "Configurez l’identité, le chiffrement, la sécurité du transport, la journalisation d’audit et les identifiants pour RustFS."
 ---
 
-Use this section to secure access to RustFS and configure the controls required by your environment.
+Utilisez cette section pour sécuriser l’accès à RustFS et configurer les contrôles exigés par votre environnement.
 
-## Security areas
+## Domaines de sécurité
 
-- [IAM Management](./iam/index.md) covers users, groups, policies, and access keys.
-- [Data Encryption](./encryption/index.md) covers server-side encryption options and key management.
-- [OIDC](./oidc/index.md) covers external identity providers.
-- [TLS Configuration](/integration/tls-configured) covers encrypted client and node connections.
-- [Audit Logs](./audit-logs.md) covers audit target configuration.
-- [Credential Management](/operations/credentials) covers root credentials and secret injection.
+- [Gestion IAM](./iam/index.md) décrit les utilisateurs, les groupes, les politiques et les clés d’accès.
+- [Chiffrement des données](./encryption/index.md) décrit les options de chiffrement côté serveur et la gestion des clés.
+- [OIDC](./oidc/index.md) décrit les fournisseurs d’identité externes.
+- [Configuration TLS](/fr/integration/tls-configured) décrit les connexions chiffrées des clients et des nœuds.
+- [Journaux d’audit](./audit-logs.md) décrit la configuration des cibles d’audit.
+- [Gestion des identifiants](/fr/operations/credentials) décrit les identifiants racine et l’injection des secrets.

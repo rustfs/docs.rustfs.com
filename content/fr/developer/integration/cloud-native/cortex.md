@@ -1,13 +1,13 @@
 ---
 title: "Cortex"
-description: "Run Cortex with RustFS as the S3-compatible blocks, ruler, and alertmanager storage backend."
+description: "Exécutez Cortex avec RustFS comme backend de stockage compatible avec S3 pour les blocs, le ruler et l’alertmanager."
 ---
 
-This guide connects [Cortex](https://github.com/cortexproject/cortex) — the horizontally scalable Prometheus-compatible metrics backend — to **RustFS** through Cortex's native S3 bucket storage. You will run Cortex in single-binary mode with blocks, ruler, and alertmanager storage pointed at a RustFS bucket, push metrics with remote write, store a rule group, and verify the objects. The workflow was verified with `cortexproject/cortex:v1.21.1` and `rustfs/rustfs-x86-musl:v2.3.1`.
+Ce guide connecte [Cortex](https://github.com/cortexproject/cortex) — le backend de métriques compatible avec Prometheus et extensible horizontalement — à **RustFS** via le stockage S3 natif de Cortex. Vous allez exécuter Cortex en mode binaire unique (single-binary), diriger le stockage des blocs, du ruler et de l’alertmanager vers un compartiment (bucket) RustFS, envoyer des métriques par remote write, enregistrer un groupe de règles et vérifier les objets. Le flux a été validé avec `cortexproject/cortex:v1.21.1` et `rustfs/rustfs-x86-musl:v2.3.1`.
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Vous avez besoin de Docker. Ce déploiement est destiné aux tests d’intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -15,11 +15,11 @@ flowchart LR
 	Cortex -->|"blocks, rules, configs"| RustFS["RustFS :9000"]
 ```
 
-Cortex stores every TSDB block, ruler rule group, and alertmanager configuration in object storage. Pointing the `s3` backend at RustFS makes the bucket the single source of truth for all tenant data.
+Cortex stocke chaque bloc TSDB, chaque groupe de règles du ruler et chaque configuration d’alertmanager dans le stockage objet. Diriger le backend `s3` vers RustFS fait du compartiment la source de vérité unique pour toutes les données de tenant.
 
-## 1. Create the Cortex config
+## 1. Créer la configuration Cortex
 
-Create the config file, replacing all connection placeholders:
+Créez le fichier de configuration en remplaçant toutes les valeurs de connexion indicatives :
 
 ```yaml title="cortex.yaml"
 target: all
@@ -88,11 +88,11 @@ alertmanager_storage:
     <<: *s3
 ```
 
-Cortex names the bucket field `bucket_name` and controls addressing with `bucket_lookup_type: path`. `insecure: true` allows the plain-HTTP endpoint. The `block_ranges_period` and `ship_interval` values shorten the block cycle so the test produces objects quickly; keep the defaults in production.
+Cortex nomme le champ du compartiment `bucket_name` et contrôle l’adressage avec `bucket_lookup_type: path`. `insecure: true` autorise le point de terminaison en HTTP non chiffré. Les valeurs `block_ranges_period` et `ship_interval` raccourcissent le cycle des blocs afin que le test produise des objets rapidement ; conservez les valeurs par défaut en production.
 
-## 2. Run Cortex
+## 2. Exécuter Cortex
 
-Create the bucket and start Cortex on the same Docker network as RustFS:
+Créez le compartiment et démarrez Cortex sur le même réseau Docker que RustFS :
 
 ```bash
 rc mb rustfs/cortex
@@ -107,9 +107,9 @@ docker run -d --name cortex --network oo-rustfs_default -p 9009:9009 \
 ts=... caller=cortex.go:469 level=info msg="Cortex started"
 ```
 
-## 3. Push metrics and rules
+## 3. Envoyer des métriques et des règles
 
-Start a Prometheus that scrapes itself and remote-writes into Cortex:
+Démarrez un Prometheus qui se collecte lui-même et envoie les métriques en remote write vers Cortex :
 
 ```yaml title="prometheus.yml"
 global:
@@ -128,7 +128,7 @@ docker run -d --name prom-writer --network oo-rustfs_default \
   prom/prometheus:latest --config.file=/etc/prometheus/prometheus.yml
 ```
 
-Store a rule group through the ruler API:
+Enregistrez un groupe de règles via l’API du ruler :
 
 ```bash
 cat > rules.yaml << "EOF"
@@ -151,7 +151,7 @@ curl -s -o /dev/null -w "%{http_code}\n" \
 202
 ```
 
-Query the ingested series back:
+Réinterrogez les séries ingérées :
 
 ```bash
 curl -s "http://localhost:9009/prometheus/api/v1/query?query=up"
@@ -161,15 +161,15 @@ curl -s "http://localhost:9009/prometheus/api/v1/query?query=up"
 {"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"up",...},"value":[...,"1"]}]}}
 ```
 
-## 4. Verify objects in RustFS
+## 4. Vérifier les objets dans RustFS
 
-List the bucket prefixes:
+Listez les préfixes du compartiment :
 
 ```bash
 rc ls rustfs/cortex/ -r
 ```
 
-The ruler config landed immediately, and the ingester shipped two TSDB blocks (each with `chunks`, `index`, and `meta.json`):
+La configuration du ruler est arrivée immédiatement, et l’ingester a expédié deux blocs TSDB (chacun avec `chunks`, `index` et `meta.json`) :
 
 ```text
 fake/01M35WE4B1G6RRKHRV0HSGADY1/chunks/000001
@@ -181,38 +181,38 @@ fake/01M35WWS2YCC7FBK1JSBKFQGRP/meta.json
 rules/fake/cnVzdGZzLWRlbW8=/cnVzdGZzLWRlbW8=
 ```
 
-![Cortex blocks and rules stored in the RustFS Console](./images/rustfs-cortex-blocks.png)
+![Blocs et règles Cortex stockés dans la Console RustFS](./images/rustfs-cortex-blocks.png)
 
-## 5. Stop or reset
+## 5. Arrêter ou réinitialiser
 
-To tear down the demo while keeping the bucket objects:
+Pour arrêter la démonstration tout en conservant les objets du compartiment :
 
 ```bash
 docker rm -f cortex prom-writer
 ```
 
-To delete the stored data:
+Pour supprimer les données stockées :
 
 ```bash
 rc rm rustfs/cortex/ --recursive --force
 ```
 
-## Troubleshooting
+## Dépannage
 
 ### `field bucket not found in type s3.Config`
 
-Cortex uses `bucket_name`, not `bucket`. Path-style addressing is set with `bucket_lookup_type: path` — the `force_path_style` key used by Thanos does not exist in Cortex.
+Cortex utilise `bucket_name`, et non `bucket`. L’adressage de type chemin (path-style) se définit avec `bucket_lookup_type: path` — la clé `force_path_style` utilisée par Thanos n’existe pas dans Cortex.
 
-### Blocks never appear in the bucket
+### Les blocs n’apparaissent jamais dans le compartiment
 
-The ingester only ships a block after the head is compacted at a `block_ranges_period` boundary (default 2h). For tests, set a small range such as `[15m]` together with `ship_interval: 30s` and wait for one period.
+L’ingester n’expédie un bloc qu’après compactage du head à une frontière de `block_ranges_period` (2 h par défaut). Pour les tests, définissez une petite plage telle que `[15m]` avec `ship_interval: 30s` et attendez une période.
 
-### `Unauthorized` or empty bucket listings
+### `Unauthorized` ou listes de compartiment vides
 
-Confirm `access_key_id` and `secret_access_key` are present in every `s3` block that uses the bucket, and that `insecure: true` matches the plain-HTTP endpoint.
+Vérifiez que `access_key_id` et `secret_access_key` sont présents dans chaque bloc `s3` qui utilise le compartiment, et que `insecure: true` correspond au point de terminaison en HTTP non chiffré.
 
-## Next steps
+## Étapes suivantes
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Cortex storage options.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Combine Cortex with [Thanos](/developer/integration/observability/thanos) when you need block storage for long-term Prometheus data as well.
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres options de stockage Cortex.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
+- Combinez Cortex avec [Thanos](/fr/developer/integration/observability/thanos) lorsque vous avez aussi besoin d’un stockage de blocs pour les données Prometheus à long terme.

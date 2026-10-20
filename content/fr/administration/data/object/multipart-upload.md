@@ -1,79 +1,79 @@
 ---
-title: "Multipart Upload"
-description: "Upload large objects in parts, monitor Console upload tasks, and verify completed objects with rc."
+title: "Chargement partitionné"
+description: "Chargez les objets volumineux par parties, suivez les tâches de chargement dans la Console et vérifiez les objets terminés avec rc."
 ---
 
-Multipart upload splits one object into independently uploaded parts and assembles them on the server. Use it for large objects, retryable transfers, and browser uploads that need progress and cancellation controls.
+Le chargement partitionné (multipart upload) découpe un objet en parties, les charge (upload) indépendamment, puis les assemble sur le serveur. Utilisez-le pour les objets volumineux, les transferts qu’il est possible de réessayer, et les chargements depuis le navigateur qui nécessitent un suivi de progression et une annulation.
 
-## Overview
+## Vue d’ensemble
 
-The S3 multipart workflow has three required phases:
+Le flux S3 de chargement partitionné comporte trois phases obligatoires :
 
-1. **CreateMultipartUpload** returns an upload ID.
-2. **UploadPart** uploads numbered parts and returns an ETag for each part.
-3. **CompleteMultipartUpload** submits the ordered part numbers and ETags to create the final object.
+1. **CreateMultipartUpload** renvoie un ID de chargement.
+2. **UploadPart** charge des parties numérotées et renvoie un ETag pour chaque partie.
+3. **CompleteMultipartUpload** soumet les numéros de partie ordonnés et les ETag afin de créer l’objet final.
 
-Abort an unfinished upload with **AbortMultipartUpload** so temporary parts do not continue consuming storage.
+Interrompez un chargement inachevé avec **AbortMultipartUpload** afin que les parties temporaires ne continuent pas de consommer du stockage.
 
-RustFS accepts part numbers from `1` through `10000`. `ListParts` and `ListMultipartUploads` return at most 1,000 entries per response and use markers for pagination. The completed object appears only after the completion request succeeds.
+RustFS accepte les numéros de partie de `1` à `10000`. `ListParts` et `ListMultipartUploads` renvoient au plus 1 000 entrées par réponse et utilisent des marqueurs pour la pagination. L’objet terminé n’apparaît qu’une fois la requête de finalisation réussie.
 
-## Upload in the Console
+## Charger dans la Console
 
-1. Sign in to the RustFS Console and open the destination bucket.
-2. Select **Upload File/Folder**.
-3. Optionally enter a **Current Prefix**.
-4. Select **Select File** or **Select Folder**, then choose the content to upload.
-5. Review the selected names and sizes, then select **Start Upload**.
+1. Connectez-vous à la Console RustFS et ouvrez le compartiment (bucket) de destination.
+2. Sélectionnez **Upload File/Folder**.
+3. Saisissez éventuellement un **Current Prefix**.
+4. Sélectionnez **Select File** ou **Select Folder**, puis choisissez le contenu à charger.
+5. Vérifiez les noms et les tailles sélectionnés, puis sélectionnez **Start Upload**.
 
-![Console upload dialog with a selected large file](./images/multipart-upload-console.png)
+![boîte de dialogue de chargement de la Console avec un fichier volumineux sélectionné](./images/multipart-upload-console.png)
 
-The observed Console upload dialog supports up to 10,000 selected files and reports a 512 GB maximum for a single file. These are Console upload limits; S3 clients can have different local limits.
+La boîte de dialogue de chargement de la Console accepte jusqu’à 10 000 fichiers et indique un maximum de 512 GB pour un seul fichier. Il s’agit de limites de chargement de la Console ; les clients S3 peuvent avoir des limites locales différentes.
 
-After upload starts, **Task Management** groups tasks into Pending, Processing, Completed, Failed, and Canceled states. Each processing task shows progress and a **Cancel** action. Canceling an active multipart task aborts the current part request and marks the task as canceled.
+Une fois le chargement démarré, **Task Management** regroupe les tâches selon les états Pending, Processing, Completed, Failed et Canceled. Chaque tâche en cours de traitement affiche la progression et une action **Cancel**. L’annulation d’une tâche de chargement partitionné active interrompt la requête de partie en cours et marque la tâche comme annulée.
 
-Refresh the bucket after completion and confirm the object size and modification time.
+Actualisez le compartiment une fois le chargement terminé, et confirmez la taille de l’objet ainsi que sa date de modification.
 
-## Use rc
+## Utiliser rc
 
-Upload and verify an object with `rc`:
+Chargez un objet et vérifiez-le avec `rc` :
 
 ```bash
 rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt
 rc object stat rustfs/my-bucket/hello.txt --json
 ```
 
-:::note[rc 0.1.29 multipart boundary]
+:::note[Limites du chargement partitionné dans rc 0.1.29]
 
-`rc 0.1.29` does not expose create, upload-part, complete, list-parts, or abort multipart commands. A validated 20 MiB `rc object copy` used a single `PutObject` request rather than multipart upload. Use the Console or an S3 SDK when explicit multipart behavior is required; use `rc object stat` to verify the completed object.
+`rc 0.1.29` n’expose pas de commandes pour créer un chargement, charger une partie, le finaliser, lister les parties ou l’interrompre. Un `rc object copy` de 20 MiB, validé, a utilisé une seule requête `PutObject` plutôt qu’un chargement partitionné. Utilisez la Console ou un SDK S3 lorsqu’un comportement explicite de chargement partitionné est requis ; utilisez `rc object stat` pour vérifier l’objet terminé.
 
 :::
 
-For a versioned bucket, list the version created by a completed multipart upload:
+Pour un compartiment avec gestion des versions, répertoriez la version créée par un chargement partitionné terminé :
 
 ```bash
 rc bucket version list rustfs/my-bucket/hello.txt --json
 ```
 
-RustFS returns a version ID when multipart completion succeeds in a versioned bucket.
+RustFS renvoie un ID de version lorsque la finalisation du chargement partitionné réussit dans un compartiment avec gestion des versions.
 
-## S3 multipart operations
+## Opérations S3 de chargement partitionné
 
-Use an S3 SDK that supports these standard operations:
+Utilisez un SDK S3 qui prend en charge ces opérations standard :
 
-| Phase | S3 operation | Required values |
+| Phase | Opération S3 | Valeurs requises |
 | --- | --- | --- |
-| Initiate | `CreateMultipartUpload` | Bucket, key, metadata, encryption, and optional Object Lock settings. |
-| Upload | `UploadPart` | Bucket, key, upload ID, part number, and body. Save the returned ETag. |
-| Inspect | `ListParts` | Bucket, key, and upload ID. Paginate when needed. |
-| Complete | `CompleteMultipartUpload` | Ordered part numbers and their exact ETags. |
-| Cancel | `AbortMultipartUpload` | Bucket, key, and upload ID. |
-| Discover | `ListMultipartUploads` | Bucket and optional prefix. Paginate when needed. |
+| Lancement | `CreateMultipartUpload` | Compartiment, clé, métadonnées, chiffrement et paramètres facultatifs de verrouillage d’objet. |
+| Chargement | `UploadPart` | Compartiment, clé, ID de chargement, numéro de partie et corps. Conservez l’ETag renvoyé. |
+| Inspection | `ListParts` | Compartiment, clé et ID de chargement. Paginez si nécessaire. |
+| Finalisation | `CompleteMultipartUpload` | Numéros de partie ordonnés et leurs ETag exacts. |
+| Annulation | `AbortMultipartUpload` | Compartiment, clé et ID de chargement. |
+| Découverte | `ListMultipartUploads` | Compartiment et préfixe facultatif. Paginez si nécessaire. |
 
-Do not reuse an upload ID for a different key. Submit completed parts in ascending part-number order and preserve each ETag exactly as returned.
+Ne réutilisez pas un ID de chargement pour une autre clé. Soumettez les parties terminées dans l’ordre croissant des numéros de partie et conservez chaque ETag exactement tel qu’il a été renvoyé.
 
-## Verification
+## Vérification
 
-After completion:
+Après la finalisation :
 
 ```bash
 rc object stat rustfs/my-bucket/hello.txt --json
@@ -81,21 +81,21 @@ rc object show rustfs/my-bucket/hello.txt > /tmp/hello-downloaded.txt
 cmp /path/to/hello.txt /tmp/hello-downloaded.txt
 ```
 
-Confirm that `size_bytes` matches the local file and that `cmp` exits successfully. For a versioned bucket, also confirm that `rc bucket version list` returns a version ID.
+Confirmez que `size_bytes` correspond au fichier local et que `cmp` se termine avec succès. Pour un compartiment avec gestion des versions, confirmez aussi que `rc bucket version list` renvoie un ID de version.
 
-## Troubleshooting
+## Dépannage
 
-| Symptom | Check |
+| Symptôme | Vérification |
 | --- | --- |
-| Upload remains in Processing | Check browser connectivity and keep the Console tab open; cancel and retry when the connection is interrupted. |
-| A part request fails | Retry that part with the same upload ID and part number, then use the latest returned ETag. |
-| Completion reports an invalid part | Verify the submitted part numbers, ordering, and ETags against `ListParts`. |
-| Object is absent after uploading parts | Send `CompleteMultipartUpload`; uploaded parts alone do not create the object. |
-| Temporary storage continues growing | List incomplete uploads and abort those that are no longer needed. |
-| Completion fails on a locked key | Check Object Lock retention or Legal Hold on the current destination version. |
+| Le chargement reste à l’état Processing | Vérifiez la connectivité du navigateur et laissez l’onglet de la Console ouvert ; annulez puis réessayez lorsque la connexion est interrompue. |
+| Une requête de partie échoue | Réessayez cette partie avec le même ID de chargement et le même numéro de partie, puis utilisez le dernier ETag renvoyé. |
+| La finalisation signale une partie non valide | Vérifiez les numéros de partie soumis, leur ordre et les ETag par rapport à `ListParts`. |
+| L’objet est absent après le chargement des parties | Envoyez `CompleteMultipartUpload` ; les parties chargées, à elles seules, ne créent pas l’objet. |
+| Le stockage temporaire continue d’augmenter | Répertoriez les chargements incomplets et interrompez ceux qui ne sont plus nécessaires. |
+| La finalisation échoue sur une clé verrouillée | Vérifiez la rétention de verrouillage d’objet ou la conservation légale (Legal Hold) sur la version de destination actuelle. |
 
-## Next steps
+## Étapes suivantes
 
-- [Create and inspect objects](./creation.md)
-- [Manage object versions](./versioning.md)
-- [Protect objects with Object Lock](./object-lock.md)
+- [Créer et inspecter des objets](./creation.md)
+- [Gérer les versions d’objet](./versioning.md)
+- [Protéger les objets avec le verrouillage d’objet](./object-lock.md)

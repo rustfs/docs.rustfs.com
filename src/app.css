@@ -76,6 +76,17 @@ article:has(.rustfs-install-home) > h1 + p + div {
   margin-bottom: 2.75rem;
 }
 
+.rustfs-install-heading {
+  margin: 0 0 1.25rem;
+  font-size: 1.375rem;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.rustfs-install-grid + .rustfs-install-heading {
+  margin-top: 2.75rem;
+}
+
 .rustfs-install-lede {
   margin: 0;
   color: var(--color-fd-muted-foreground);
@@ -187,6 +198,14 @@ article:has(.rustfs-install-home) > h1 + p + div {
   --rustfs-brand-color: #0078d4;
 }
 
+.rustfs-install-icon--sealos {
+  --rustfs-brand-color: #6378ff;
+}
+
+.rustfs-install-icon--elestio {
+  --rustfs-brand-color: #f28e1e;
+}
+
 .rustfs-install-icon--swarmcli {
   --rustfs-brand-color: #3b82f6;
 }
@@ -220,6 +239,14 @@ article:has(.rustfs-install-home) > h1 + p + div {
 .rustfs-install-card:hover .rustfs-install-arrow {
   color: var(--rustfs-install-accent);
   transform: translateX(0.2rem);
+}
+
+.rustfs-install-card--external .rustfs-install-arrow {
+  margin-top: 0.25rem;
+}
+
+.rustfs-install-card--external:hover .rustfs-install-arrow {
+  transform: translate(0.15rem, -0.15rem);
 }
 
 @media (max-width: 48rem) {

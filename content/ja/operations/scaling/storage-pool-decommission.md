@@ -1,119 +1,119 @@
 ---
-title: "Pool Decommission"
-description: "Drain and retire a RustFS storage pool through the Console or rc, then verify that its data was relocated."
+title: "プールのデコミッション"
+description: "Console または rc で RustFS のストレージプールをデコミッションし、データが移動したことを確認します。"
 ---
 
-## Overview
+## 概要
 
-### Requirements
+### 要件
 
-- Install [`rc`](/operations/rc) on the administration host before using the `rc` workflow in this guide.
-- Configure credentials with decommission administration permission.
+- このガイドで `rc` の手順を使う前に、管理用ホストに [`rc`](/ja/operations/rc) をインストールします。
+- デコミッションを管理する権限を持つ認証情報を設定します。
 
-**Pool decommission** moves objects from a selected pool to the remaining active pools so the target pool can be removed from the deployment. Use it when retiring hardware, replacing a pool, or consolidating capacity.
+**プールのデコミッション**は、選択したプールのオブジェクトを残りの稼働中プールへ移動し、対象プールをデプロイから外せるようにします。データを排出してプールを停止する操作であり、ハードウェアを退役するとき、プールを置き換えるとき、または容量を集約するときに使います。
 
-Decommission is different from [Rebalancing](./data-rebalancing.md): rebalance keeps every pool active, while decommission drains and retires the selected pool. The two operations cannot run at the same time.
+デコミッションは [リバランス](./data-rebalancing.md) とは別の操作です。リバランスはすべてのプールを稼働したままにします。デコミッションは、選択したプールのデータを排出して停止します。この 2 つの操作は同時には実行できません。
 
-Before starting:
+開始前の条件と作業は、次のとおりです。
 
-- Keep at least one active pool after the operation.
-- Verify that the remaining pools have enough free capacity. RustFS requires their free space to cover the used bytes being drained plus a 30% overhead.
-- Confirm that every node and disk is healthy and no rebalance is running.
-- Back up critical data and schedule the operation during a lower-traffic period.
-- Record the exact pool ID and volume expression before selecting the target.
+- 操作後も、稼働中のプールを 1 つ以上残す必要があります。
+- 残りのプールに十分な空き容量があることを確認します。RustFS では、排出する使用バイト数に 30% のオーバーヘッドを加えた容量を、残りのプールの空き領域でまかなう必要があります。
+- すべてのノードとディスクが正常であり、リバランスが実行中でないことを確認します。
+- 重要なデータをバックアップし、トラフィックの少ない時間帯に操作を予定します。
+- 対象を選ぶ前に、正確なプール ID とボリューム式を記録します。
 
-Canceling a decommission does not roll back completed moves. Objects already relocated remain in the destination pools.
+デコミッションを取り消しても、完了した移動は元に戻りません。すでに移動したオブジェクトは、移動先のプールに残ります。
 
-## Operation
+## 操作
 
-### Start decommissioning in the Console
+### Console でデコミッションを開始する
 
-1. Sign in to the RustFS Console with an account that has decommission administration permission.
-2. Open **Pool Decommission**.
-3. Locate the pool to retire and verify its ID, volume expression, used capacity, and status.
+1. デコミッションを管理する権限を持つアカウントで、RustFS Console にサインインします。
+2. **Pool Decommission**（プールのデコミッション）を開きます。
+3. 停止するプールを特定し、ID、ボリューム式、使用容量、ステータスを確認します。
 
-   ![RustFS Console showing the selected storage pool before decommissioning](./images/pool-decommission-selection-console.png)
+   ![デコミッション前に選択されたストレージプールを示す RustFS Console](./images/pool-decommission-selection-console.png)
 
-4. Select **Start Decommission** for that pool.
-5. Review the confirmation dialog carefully, then select **Start Decommission**.
+4. そのプールの **Start Decommission**（デコミッションを開始）を選択します。
+5. 確認ダイアログをよく読み、**Start Decommission** を選択します。
 
-   ![RustFS Console showing the pool decommission confirmation dialog](./images/pool-decommission-confirmation-console.png)
+   ![プールのデコミッション確認ダイアログを示す RustFS Console](./images/pool-decommission-confirmation-console.png)
 
-6. Use **Sync** to refresh the pool state and movement counters until the operation completes.
+6. 操作が完了するまで、**Sync**（同期）でプールの状態と移動カウンターを更新します。
 
-   ![RustFS Console showing pool decommission progress and movement counters](./images/pool-decommission-running-console.png)
+   ![プールのデコミッションの進捗と移動カウンターを示す RustFS Console](./images/pool-decommission-running-console.png)
 
-After completion, remove the drained pool expression from `RUSTFS_VOLUMES` on every remaining node and restart RustFS with the same ordered topology. For Helm, decommission the pool before removing its entry from `pools.list`; never remove or reorder a live pool entry.
+完了後、残っているすべてのノードの `RUSTFS_VOLUMES` から、排出済みプールの式を削除し、同じ順序のトポロジーで RustFS を再起動します。Helm では、`pools.list` からエントリを外す前に、そのプールをデコミッションします。稼働中のプールエントリを削除したり、順序を変えたりしてはいけません。
 
-![RustFS Console showing the selected pool with a completed decommission status](./images/pool-decommission-completed-console.png)
+![デコミッション完了のステータスが付いた、選択中のプールを示す RustFS Console](./images/pool-decommission-completed-console.png)
 
-### Start decommissioning with rc
+### rc でデコミッションを開始する
 
-Configure the cluster alias if needed, then list the pools:
+必要に応じてクラスターのエイリアスを設定し、プールを一覧表示します。
 
 ```bash
 rc alias set rustfs http://<server-ip>:9000 <your-access-key> <your-secret-key>
 rc admin pool list rustfs
 ```
 
-Start decommissioning pool `0` by its zero-based ID:
+0 始まりの ID を指定して、プール `0` のデコミッションを開始します。
 
 ```bash
 rc admin decommission start rustfs 0 --by-id
 ```
 
-You can instead pass the exact pool volume expression without `--by-id`:
+`--by-id` を付けず、プールのボリューム式そのものを渡すこともできます。
 
 ```bash
 rc admin decommission start rustfs 'http://rustfs-node1:9000/data/rustfs{1...4}/mnmd'
 ```
 
-Monitor all pools or only the target pool:
+すべてのプール、または対象プールだけを監視します。
 
 ```bash
 rc admin decommission status rustfs
 rc admin decommission status rustfs 0 --by-id
 ```
 
-To cancel a running operation, use:
+実行中の操作を取り消すには、次を実行します。
 
 ```bash
 rc admin decommission cancel rustfs 0 --by-id
 ```
 
-If a decommission is failed or canceled, clear its metadata before retrying:
+デコミッションが失敗した、または取り消された場合は、再試行の前にメタデータを消去します。
 
 ```bash
 rc admin decommission clear rustfs 0 --by-id
 ```
 
-After the target reports `complete`, remove its expression from `RUSTFS_VOLUMES` on every remaining node and restart RustFS with the reduced topology.
+対象が `complete` を報告したら、残っているすべてのノードの `RUSTFS_VOLUMES` からその式を削除し、縮小したトポロジーで RustFS を再起動します。
 
-## Verification
+## 検証
 
-### Verify decommissioning in the Console
+### Console でデコミッションを検証する
 
-Confirm that the target pool reports `Completed`, with zero failed objects and zero failed bytes. After removing the pool from the startup topology and restarting RustFS, verify that:
+対象プールが `Completed` を報告し、失敗したオブジェクト数と失敗したバイト数が 0 であることを確認します。起動時のトポロジーからプールを外して RustFS を再起動したあと、次を確認します。
 
-![RustFS Console showing only the remaining pool after the retired pool was removed](./images/pool-decommission-final-topology-console.png)
+![停止したプールを削除したあとに残ったプールだけを示す RustFS Console](./images/pool-decommission-final-topology-console.png)
 
-- The retired pool no longer appears as an active pool.
-- Every remaining node and disk is online.
-- Remaining pools show the relocated data and have adequate free capacity.
-- Existing objects can still be listed, read, and downloaded.
+- 停止したプールが、稼働中のプールとして表示されていないこと。
+- 残っているすべてのノードとディスクがオンラインであること。
+- 残りのプールに移動したデータが表示され、空き容量が十分であること。
+- 既存のオブジェクトを、引き続き一覧表示、読み取り、ダウンロードできること。
 
-### Verify decommissioning with rc
+### rc でデコミッションを検証する
 
-Before removing the pool from the topology, run:
+トポロジーからプールを外す前に、次を実行します。
 
 ```bash
 rc admin decommission status rustfs 0 --by-id
 ```
 
-Confirm that the status is `complete` and the failed object and byte counters are zero. After updating `RUSTFS_VOLUMES` and restarting RustFS, run:
+ステータスが `complete` であり、失敗したオブジェクトとバイトのカウンターが 0 であることを確認します。`RUSTFS_VOLUMES` を更新して RustFS を再起動したあと、次を実行します。
 
 ```bash
 rc admin pool list rustfs
 ```
 
-Verify that only the intended active pools remain. Read objects that previously resided on the retired pool and write a new test object through the S3 endpoint.
+意図した稼働中のプールだけが残っていることを確認します。以前は停止したプールに置かれていたオブジェクトを読み取り、S3 エンドポイント経由で新しいテストオブジェクトを書き込みます。

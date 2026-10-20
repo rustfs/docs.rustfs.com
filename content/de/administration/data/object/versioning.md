@@ -1,48 +1,48 @@
 ---
-title: "Versioning"
-description: "Enable bucket versioning, recover earlier object versions, and manage delete markers with rc and the Console."
+title: "Versionierung"
+description: "Aktivieren Sie die Bucket-Versionierung, stellen Sie frühere Objektversionen wieder her und verwalten Sie Löschmarker mit rc und der Console."
 ---
 
-RustFS bucket versioning preserves multiple versions of the same object key. Use it to recover from accidental overwrites and deletes and to satisfy prerequisites for Object Lock and bucket replication.
+Die Bucket-Versionierung von RustFS bewahrt mehrere Versionen desselben Objektschlüssels auf. Damit stellen Sie versehentliche Überschreibungen und Löschungen wieder her und erfüllen Voraussetzungen für Object Lock und die Bucket-Replikation.
 
-## Overview
+## Überblick
 
-When versioning is enabled:
+Wenn die Versionierung aktiviert ist:
 
-- Each upload or copy to an existing key creates a new version ID.
-- A normal delete creates a delete marker instead of removing older versions.
-- Reading the key without a version ID returns the latest visible version, or `NotFound` when the latest entry is a delete marker.
-- Reading or deleting a specific version requires its version ID.
+- Jeder Upload oder jede Kopie auf einen vorhandenen Objektschlüssel erzeugt eine neue Versions-ID.
+- Ein normales Löschen erzeugt einen Löschmarker, anstatt ältere Versionen zu entfernen.
+- Das Lesen des Objektschlüssels ohne Versions-ID gibt die letzte sichtbare Version zurück oder `NotFound`, wenn der letzte Eintrag ein Löschmarker ist.
+- Das Lesen oder Löschen einer bestimmten Version erfordert ihre Versions-ID.
 
-Suspending versioning stops normal creation of new version IDs but preserves existing versions and delete markers. Suspension is not the same as disabling or removing version history.
+Das Aussetzen der Versionierung beendet das normale Erzeugen neuer Versions-IDs, bewahrt aber vorhandene Versionen und Löschmarker. Aussetzen ist nicht dasselbe wie das Deaktivieren oder Entfernen der Versionshistorie.
 
-## Configure in the Console
+## In der Console konfigurieren
 
-### Enable at bucket creation
+### Beim Erstellen des Buckets aktivieren
 
-1. Open **Buckets** and select **Create Bucket**.
-2. Enter the bucket name.
-3. Enable **Version**.
-4. Select **Create**.
+1. Öffnen Sie **Buckets** und wählen Sie **Create Bucket** (Bucket erstellen).
+2. Geben Sie den Bucket-Namen ein.
+3. Aktivieren Sie **Version** (Versionierung).
+4. Wählen Sie **Create** (Erstellen).
 
-### Enable or suspend an existing bucket
+### Versionierung eines vorhandenen Buckets aktivieren oder aussetzen
 
-1. Open **Buckets**, locate the bucket, and select **Settings**.
-2. Under **Data Protection**, locate **Versioning**.
-3. Enable versioning or suspend it as required.
+1. Öffnen Sie **Buckets**, suchen Sie den Bucket und wählen Sie **Settings** (Einstellungen).
+2. Suchen Sie unter **Data Protection** (Datenschutz) den Eintrag **Versioning** (Versionierung).
+3. Aktivieren Sie die Versionierung oder setzen Sie sie nach Bedarf aus.
 
-The settings page reports `Enabled`, `Suspended`, or `Disabled`. It also notes that suspension preserves existing versions.
+Die Einstellungsseite meldet `Enabled`, `Suspended` oder `Disabled`. Sie weist außerdem darauf hin, dass das Aussetzen vorhandene Versionen bewahrt.
 
-### Browse and recover versions
+### Versionen durchsuchen und wiederherstellen
 
-1. Open the bucket and enable **Show Deleted Objects** when you need to see keys hidden by delete markers.
-2. Select an object name to open **Object Details**.
-3. Select **Versions** to inspect available versions and delete markers.
-4. Download the required version and upload it again to make its content the latest version.
+1. Öffnen Sie den Bucket und aktivieren Sie **Show Deleted Objects** (Gelöschte Objekte anzeigen), wenn Sie Objektschlüssel sehen müssen, die durch Löschmarker verborgen sind.
+2. Wählen Sie einen Objektnamen, um **Object Details** (Objektdetails) zu öffnen.
+3. Wählen Sie **Versions** (Versionen), um verfügbare Versionen und Löschmarker anzuzeigen.
+4. Laden Sie die benötigte Version herunter und laden Sie sie erneut hoch, damit ihr Inhalt die neueste Version wird.
 
-## Use rc
+## `rc` verwenden
 
-Create a bucket and enable versioning:
+Erstellen Sie einen Bucket und aktivieren Sie die Versionierung:
 
 ```bash
 rc bucket create rustfs/my-bucket
@@ -50,7 +50,7 @@ rc bucket version enable rustfs/my-bucket
 rc bucket version info rustfs/my-bucket
 ```
 
-Upload two versions of the same key:
+Laden Sie zwei Versionen desselben Objektschlüssels hoch:
 
 ```bash
 printf 'version one\n' > /tmp/hello.txt
@@ -60,7 +60,7 @@ printf 'version two\n' > /tmp/hello.txt
 rc object copy /tmp/hello.txt rustfs/my-bucket/hello.txt --overwrite
 ```
 
-List versions and record the version ID you want to recover:
+Listen Sie die Versionen auf und notieren Sie die Versions-ID, die Sie wiederherstellen möchten:
 
 ```bash
 rc bucket version list rustfs/my-bucket/hello.txt --json
@@ -68,7 +68,7 @@ rc object stat rustfs/my-bucket/hello.txt \
 	--version-id <version-id> --json
 ```
 
-Restore an earlier version by downloading its body and uploading it as a new latest version:
+Stellen Sie eine frühere Version wieder her, indem Sie ihren Inhalt herunterladen und als neue neueste Version hochladen:
 
 ```bash
 rc object show rustfs/my-bucket/hello.txt \
@@ -78,48 +78,48 @@ rc object copy /tmp/hello-restored.txt \
 	rustfs/my-bucket/hello.txt --overwrite
 ```
 
-Delete the current key to create a delete marker, then inspect it:
+Löschen Sie den aktuellen Objektschlüssel, um einen Löschmarker zu erzeugen, und zeigen Sie ihn anschließend an:
 
 ```bash
 rc object remove rustfs/my-bucket/hello.txt --force
 rc bucket version list rustfs/my-bucket/hello.txt --json
 ```
 
-The latest entry should show `is_delete_marker: true`. The earlier versions remain available by version ID.
+Der neueste Eintrag sollte `is_delete_marker: true` anzeigen. Die früheren Versionen bleiben über die Versions-ID verfügbar.
 
-Suspend versioning when you no longer want normal writes to create new numbered versions:
+Setzen Sie die Versionierung aus, wenn normale Schreibvorgänge keine neuen nummerierten Versionen mehr erzeugen sollen:
 
 ```bash
 rc bucket version suspend rustfs/my-bucket
 rc bucket version info rustfs/my-bucket
 ```
 
-:::warning[rc 0.1.29 version deletion boundary]
+:::warning[Grenze beim Löschen von Versionen in rc 0.1.29]
 
-`rc object remove --versions` is listed in the `rc 0.1.29` help output but returns `not implemented`. Use the Console or an S3 SDK to permanently delete selected version IDs. Do not remove an entire version history unless you have verified retention, replication, and recovery requirements.
+`rc object remove --versions` steht in der Hilfe von `rc 0.1.29`, gibt bei der Ausführung aber `not implemented` zurück. Verwenden Sie die Console oder ein S3-SDK, um ausgewählte Versions-IDs dauerhaft zu löschen. Entfernen Sie eine vollständige Versionshistorie nur, wenn Sie Aufbewahrung, Replikation und Wiederherstellungsanforderungen geprüft haben.
 
 :::
 
-## Verification
+## Überprüfung
 
-After enabling versioning:
+Nachdem Sie die Versionierung aktiviert haben:
 
-1. Upload the same key twice with different content.
-2. Run `rc bucket version list` and confirm that both entries have distinct version IDs.
-3. Retrieve each version with `rc object show --version-id` and compare its content.
-4. Delete the key without a version ID and confirm that a delete marker appears.
-5. Retrieve an older version by version ID to confirm it remains recoverable.
+1. Laden Sie denselben Objektschlüssel zweimal mit unterschiedlichem Inhalt hoch.
+2. Führen Sie `rc bucket version list` aus und prüfen Sie, dass beide Einträge unterschiedliche Versions-IDs haben.
+3. Rufen Sie jede Version mit `rc object show --version-id` ab und vergleichen Sie den Inhalt.
+4. Löschen Sie den Objektschlüssel ohne Versions-ID und prüfen Sie, dass ein Löschmarker erscheint.
+5. Rufen Sie eine ältere Version über die Versions-ID ab, um zu bestätigen, dass sie wiederherstellbar bleibt.
 
-## Operational considerations
+## Betriebliche Hinweise
 
-- Versioning increases storage use because overwrites and deletes retain older data.
-- Configure lifecycle rules for noncurrent versions only after defining recovery and retention periods.
-- Bucket replication requires versioning on both source and destination buckets.
-- Object Lock depends on versioning and protects individual versions.
-- Multipart completion creates one new object version in a versioned bucket.
+- Die Versionierung erhöht den Speicherverbrauch, weil Überschreibungen und Löschungen ältere Daten behalten.
+- Konfigurieren Sie Lebenszyklusregeln für nicht aktuelle Versionen erst, nachdem Sie Wiederherstellungs- und Aufbewahrungszeiträume festgelegt haben.
+- Die Bucket-Replikation erfordert Versionierung auf dem Quell- und auf dem Ziel-Bucket.
+- Object Lock setzt Versionierung voraus und schützt einzelne Versionen.
+- Der Abschluss eines mehrteiligen Uploads erzeugt in einem versionierten Bucket eine neue Objektversion.
 
-## Next steps
+## Nächste Schritte
 
-- [Protect versions with Object Lock](./object-lock.md)
-- [Upload large objects](./multipart-upload.md)
-- [Manage bucket lifecycle](../lifecycle-management.md)
+- [Versionen mit Object Lock schützen](./object-lock.md)
+- [Große Objekte hochladen](./multipart-upload.md)
+- [Bucket-Lebenszyklus verwalten](../lifecycle-management.md)

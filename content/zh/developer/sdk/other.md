@@ -30,7 +30,7 @@ S3 协议是一套标准 RESTful API。你可以使用任何支持 HTTP 请求�
 例如，通过 Shell 调用：
 
 ```bash
-aws s3 cp local.txt s3://mybucket/myfile.txt --endpoint-url http://rustfs.local:9000
+aws s3 cp /path/to/hello.txt s3://my-bucket/hello.txt --endpoint-url http://localhost:9000
 ```
 
 或者使用 Node.js/Python SDK 编写简单的中继服务，让你的语言通过调用该服务上传或下载文件。

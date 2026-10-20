@@ -1,16 +1,16 @@
 ---
-title: "Operations & Observability"
-description: "Operate, monitor, scale, upgrade, and troubleshoot RustFS deployments."
+title: "運用"
+description: "RustFS のデプロイに対する運用、監視、スケーリング、アップグレード、トラブルシューティングを説明します。"
 ---
 
-Use this section to keep RustFS deployments healthy through upgrades, scaling, availability planning, monitoring, and incident response.
+このセクションでは、アップグレード、スケーリング、可用性の計画、監視、インシデント対応を通じて、RustFS のデプロイを健全な状態に保ちます。
 
-## Operational areas
+## 運用領域
 
-- [Upgrade](./upgrade/index.md) covers binary, container, and Kubernetes upgrades.
-- [Scaling](./scaling/index.md) covers storage expansion, rebalancing, and decommissioning.
-- [High Availability](./high-availability/index.md) covers node healing and site replication.
-- [Cluster Lifecycle Operations](./cluster-lifecycle.md) covers layout boundaries, quorum, expansion, rebalancing, decommissioning, healing, and restarts in one runbook.
-- [Observability](./observability.md) covers metrics, logs, traces, monitoring integrations, and alert signals.
-- [Status Check](./status-check.md) covers network ports, health probes, cluster status, and storage capacity checks.
-- [Event Notifications](./event-notifications.md) covers bucket event targets.
+- [アップグレード](./upgrade/index.md)では、バイナリ、コンテナ、Kubernetes のアップグレードを扱います。
+- [スケーリング](./scaling/index.md)では、ストレージの拡張、リバランス、デコミッションを扱います。
+- [高可用性](./high-availability/index.md)では、ノードのデータ修復とサイトレプリケーションを扱います。
+- [クラスターのライフサイクル運用](./cluster-lifecycle.md)では、レイアウトの境界、クォーラム、拡張、リバランス、デコミッション、データ修復、再起動を 1 つの手順書にまとめています。
+- [オブザーバビリティ](./observability.md)では、メトリクス、ログ、トレース、監視連携、アラートのシグナルを扱います。
+- [ステータス確認](./status-check.md)では、ネットワークポート、ヘルスチェックのプローブ、クラスターの状態、ストレージ容量の確認を扱います。
+- [イベント通知](./event-notifications.md)では、バケットイベントのターゲットを扱います。

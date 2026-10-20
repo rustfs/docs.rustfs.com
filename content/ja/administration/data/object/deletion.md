@@ -1,27 +1,27 @@
 ---
-title: "Object Deletion"
-description: "Delete objects using the RustFS UI, rc, or the S3 API."
+title: "オブジェクトの削除"
+description: "RustFS UI、rc、または S3 API を使ってオブジェクトを削除する方法を説明します。"
 ---
 
-This guide covers object deletion.
+このガイドでは、オブジェクトの削除を扱います。
 
-## Requirements
+## 要件
 
-- Install and configure [`rc`](/operations/rc) before using the command-line workflow.
-- Confirm the alias, bucket, and object key before deleting an object.
+- コマンドラインの手順を使う前に、[`rc`](/ja/operations/rc) をインストールして設定します。
+- オブジェクトを削除する前に、エイリアス、バケット、オブジェクトキーを確認します。
 
-## Using the RustFS UI
+## RustFS UI を使う
 
-1. Log in to the RustFS Console.
-2. Select the bucket containing the file to be deleted.
-3. On the bucket page, select the file to be deleted.
-4. Click **Delete Selected Items** in the upper right corner, then click **Confirm** in the popup dialog.
+1. RustFS Console にログインします。
+2. 削除するオブジェクトが含まれるバケットを選択します。
+3. バケットページで、削除するオブジェクトを選択します。
+4. 右上の **Delete Selected Items**（選択項目の削除）を選び、続けて **Confirm**（確認）を選択します。
 
-![object deletion from ui](images/delete_file_from_ui.png)
+![Console からのオブジェクト削除](images/delete_file_from_ui.png)
 
-## Using `rc`
+## `rc` を使う
 
-Delete a file:
+オブジェクトを削除します。
 
 ```bash
 rc object remove rustfs/my-bucket/hello.txt
@@ -33,17 +33,17 @@ Removed: rustfs/my-bucket/hello.txt
 ✓ Removed 1 object(s).
 ```
 
-Verify the deletion in the RustFS Console.
+RustFS Console で削除を確認します。
 
-## Using the API
+## API を使う
 
-Delete a file via API:
+API でオブジェクトを削除します。
 
 ```http
 DELETE /{bucketName}/{objectName} HTTP/1.1
 ```
 
-S3 requests must be signed with AWS Signature V4, so use an S3 client rather than hand-crafting headers. With the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) configured for your access keys:
+S3 リクエストは AWS Signature V4 で署名する必要があります。ヘッダーを手作業で組み立てず、S3 クライアントを使います。アクセスキーを設定した [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) では、次のように実行します。
 
 ```bash
 aws s3api delete-object \
@@ -52,4 +52,4 @@ aws s3api delete-object \
   --endpoint-url http://localhost:9000
 ```
 
-Verify the deletion in the RustFS Console.
+RustFS Console で削除を確認します。

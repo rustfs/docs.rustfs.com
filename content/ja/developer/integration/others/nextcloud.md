@@ -1,13 +1,13 @@
 ---
 title: "Nextcloud"
-description: "Use RustFS as S3 external storage for Nextcloud files."
+description: "Nextcloud のファイル向け S3 外部ストレージとして RustFS を使います。"
 ---
 
-This guide connects [Nextcloud](https://github.com/nextcloud/server) — the self-hosted content collaboration platform — to **RustFS** through its External Storage app with the S3 backend. You will enable `files_external`, mount a RustFS bucket into every user's files view, and upload a file through WebDAV that lands directly in the bucket. The workflow was verified with `nextcloud:32.0.15` (SQLite, single container) against `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、セルフホスト型のコンテンツ共同作業プラットフォームである [Nextcloud](https://github.com/nextcloud/server) を、External Storage アプリの S3 バックエンド経由で **RustFS** に接続します。`files_external` を有効にし、各ユーザーのファイルビューに RustFS のバケットをマウントして、WebDAV 経由でアップロードしたファイルがバケットへ直接保存されることを確認します。手順は `nextcloud:32.0.15`（SQLite、単一コンテナ）と `rustfs/rustfs-x86-musl:v2.3.1` の組み合わせで確認済みです。
 
-You need Docker, or an existing Nextcloud instance with `occ` access. This deployment is intended for local integration testing, not production.
+Docker、または `occ` にアクセスできる既存の Nextcloud インスタンスが必要です。このデプロイはローカルでの連携テスト用であり、本番向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -15,11 +15,11 @@ flowchart LR
 	Nextcloud -->|"files_external (S3)"| RustFS["RustFS :9000"]
 ```
 
-Nextcloud proxies file operations on the mount point to the S3 backend. Objects are stored under their mount-relative paths, so the bucket mirrors the names users see.
+Nextcloud は、マウントポイント上のファイル操作を S3 バックエンドへ中継します。オブジェクトはマウントからの相対パスの下に保存されるため、バケットにはユーザーが見る名前がそのまま反映されます。
 
-## 1. Install Nextcloud
+## 1. Nextcloud をインストールする
 
-Run Nextcloud with an admin account, replacing all connection placeholders. SQLite keeps the test self-contained; use MariaDB or PostgreSQL in production:
+接続用のプレースホルダーをすべて置き換えて、管理者アカウント付きで Nextcloud を実行します。SQLite にすると、テストを自己完結にできます。本番では MariaDB または PostgreSQL を使います。
 
 ```bash
 docker run -d --name nextcloud --network oo-rustfs_default -p 8080:80 \
@@ -28,16 +28,16 @@ docker run -d --name nextcloud --network oo-rustfs_default -p 8080:80 \
   nextcloud:32.0.15
 ```
 
-If the web UI still shows the installer after startup, finish it manually:
+起動後も Web UI にインストーラーが表示される場合は、手動で完了します。
 
 ```bash
 docker exec -u www-data nextcloud php occ maintenance:install \
   --admin-user <admin-user> --admin-password <admin-password>
 ```
 
-## 2. Enable the External Storage app
+## 2. External Storage アプリを有効にする
 
-The `files_external` app ships with Nextcloud but starts disabled, and its `occ` commands only exist once the app is enabled:
+`files_external` アプリは Nextcloud に同梱されていますが、初期状態では無効です。このアプリの `occ` コマンドは、有効にした後にだけ存在します。
 
 ```bash
 docker exec -u www-data nextcloud php occ app:enable files_external
@@ -47,9 +47,9 @@ docker exec -u www-data nextcloud php occ app:enable files_external
 files_external 1.24.1 enabled
 ```
 
-## 3. Mount the RustFS bucket
+## 3. RustFS のバケットをマウントする
 
-Create an external storage of backend type `amazons3` with the `amazons3::accesskey` authentication backend. Replace all connection placeholders:
+バックエンド種別 `amazons3` と、認証バックエンド `amazons3::accesskey` で外部ストレージを作成します。接続用のプレースホルダーをすべて置き換えます。
 
 ```bash
 docker exec -u www-data nextcloud php occ files_external:create \
@@ -68,7 +68,7 @@ docker exec -u www-data nextcloud php occ files_external:create \
 Storage created with id 1
 ```
 
-The mount point `/rustfs` appears in the files view of the given user. `use_path_style=true` is required for a non-AWS endpoint. Check the connection before using it:
+マウントポイント `/rustfs` は、指定したユーザーのファイルビューに表示されます。AWS 以外のエンドポイントでは `use_path_style=true` が必要です。使う前に接続を確認します。
 
 ```bash
 docker exec -u www-data nextcloud php occ files_external:verify 1
@@ -79,9 +79,9 @@ docker exec -u www-data nextcloud php occ files_external:verify 1
   - code: 0
 ```
 
-## 4. Upload a file and verify
+## 4. ファイルをアップロードして確認する
 
-Upload through the WebDAV endpoint, which writes through the external storage:
+外部ストレージ経由で書き込まれる WebDAV エンドポイントからアップロードします。
 
 ```bash
 echo "nextcloud writes to rustfs" > /tmp/nc-demo.txt
@@ -96,7 +96,7 @@ curl -u <admin-user>:<admin-password> \
 201
 ```
 
-Read it back through the same path, then confirm the object in RustFS:
+同じパスから読み戻し、RustFS でオブジェクトを確認します。
 
 ```bash
 rc ls rustfs/<your-bucket>/ -r
@@ -106,40 +106,40 @@ rc ls rustfs/<your-bucket>/ -r
 [2026-09-29 13:42:48]       27 B nc-demo.txt
 ```
 
-The object key equals the path inside the mount, so files uploaded through Nextcloud can also be read directly with any S3 client.
+オブジェクトキーはマウント内のパスと一致するため、Nextcloud 経由でアップロードしたファイルは、任意の S3 クライアントから直接読み取れます。
 
-![Nextcloud file stored in the RustFS Console](./images/rustfs-nextcloud-file.png)
+![RustFS Console に保存された Nextcloud のファイル](./images/rustfs-nextcloud-file.png)
 
-## 5. Stop or reset
+## 5. 停止またはリセットする
 
-To remove the mount without touching the bucket:
+バケットには触れずにマウントを削除します。
 
 ```bash
 docker exec -u www-data nextcloud php occ files_external:delete 1
 ```
 
-To delete the bucket contents:
+バケットの内容を削除します。
 
 ```bash
 rc rm rustfs/<your-bucket>/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
 ### `There are no commands defined in the "files_external" namespace`
 
-The app is not enabled yet. Run `occ app:enable files_external` first; the `occ files_external:*` commands only register afterwards.
+アプリがまだ有効になっていません。先に `occ app:enable files_external` を実行します。`occ files_external:*` コマンドは、その後に登録されます。
 
 ### `Not enough arguments (missing: "authentication_backend")`
 
-`files_external:create` takes the storage backend and the authentication backend as two separate arguments: `amazons3 amazons3::accesskey`. The backend identifiers are listed by `occ files_external:backends`.
+`files_external:create` は、ストレージバックエンドと認証バックエンドを別々の引数として受け取ります。指定する値は `amazons3 amazons3::accesskey` です。バックエンド識別子は `occ files_external:backends` で一覧できます。
 
-### Mount shows but is empty, or uploads fail
+### マウントは表示されるが空である、またはアップロードが失敗する
 
-Confirm `hostname` is reachable from the Nextcloud container (use the container network name, not `localhost`), `use_path_style` is `true`, and the bucket exists. `occ files_external:verify <id>` reports the exact connection error.
+`hostname` が Nextcloud コンテナから到達できること（`localhost` ではなくコンテナのネットワーク名を使います）、`use_path_style` が `true` であること、バケットが存在することを確認します。`occ files_external:verify <id>` が、具体的な接続エラーを報告します。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional external storage backends.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Nextcloud external storage documentation](https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/external_storage_configuration_gui.html) to share the mount with groups and enable versioning.
+- ほかの外部ストレージバックエンドを採用する前に、[S3 互換性に関する注意](/ja/administration/protocols/s3)を確認します。
+- [アクセスキーの管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- マウントをグループと共有し、バージョニングを有効にするには、[Nextcloud の外部ストレージのドキュメント](https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/external_storage_configuration_gui.html)に従います。

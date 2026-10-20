@@ -1,23 +1,23 @@
 ---
-title: "Golang SDK Guide"
-description: "Use the AWS SDK for Go v2 to operate on RustFS instances, including creating and deleting buckets and objects."
+title: "Go-SDK-Anleitung"
+description: "Führen Sie mit dem AWS SDK für Go v2 Operationen auf RustFS-Instanzen aus, einschließlich des Erstellens und Löschens von Buckets und Objekten."
 ---
 
-RustFS ships no first-party Go SDK — it is fully S3-compatible, so you use the official AWS SDK for Go v2 configured to point at your RustFS server. Through the SDK, you can operate on RustFS, including creating and deleting buckets/objects, uploading and downloading files, etc.
+RustFS enthält kein eigenes Go-SDK. Der Dienst ist S3-kompatibel, daher verwenden Sie das offizielle AWS SDK für Go v2 und richten es auf Ihren RustFS-Server aus. Mit dem SDK erstellen und löschen Sie Buckets und laden Objekte hoch, herunter und löschen sie.
 
-## Prerequisites
+## Voraussetzungen
 
-- Go 1.21 or later
-- A working RustFS instance (refer to [Installation Guide](../../installation/index.md)) — the S3 API listens on port `9000`, the Console on port `9001`
-- Access keys, set at install time via the `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` environment variables (refer to [Access Key Management](../../security-compliance/iam/access-token.md))
+- Go 1.21 oder höher
+- Eine funktionsfähige RustFS-Instanz (siehe [Installationsanleitung](../../installation/index.md)). Die S3-API nimmt Verbindungen auf Port `9000` entgegen, die Console (Weboberfläche) auf Port `9001`
+- Zugriffsschlüssel, die Sie bei der Installation über die Umgebungsvariablen `RUSTFS_ACCESS_KEY` und `RUSTFS_SECRET_KEY` setzen (siehe [Zugriffsschlüssel-Verwaltung](../../security-compliance/iam/access-token.md))
 
-:::tip[Local test]
+:::tip[Lokaler Test]
 
-If you did not set credentials at install time, the server defaults to `rustfsadmin` / `rustfsadmin` — fine for a throwaway local trial, never for anything reachable by others.
+Wenn Sie bei der Installation keine Anmeldedaten gesetzt haben, verwendet der Server standardmäßig `rustfsadmin` / `rustfsadmin`. Das reicht für einen wegwerfbaren lokalen Test, niemals für eine Instanz, die andere erreichen können.
 
 :::
 
-Install the SDK modules:
+Installieren Sie die SDK-Module:
 
 ```bash
 go mod init rustfs-go-demo
@@ -26,9 +26,9 @@ go get github.com/aws/aws-sdk-go-v2/credentials
 go get github.com/aws/aws-sdk-go-v2/service/s3
 ```
 
-## Initializing the Client
+## Client initialisieren
 
-The following is a complete, runnable program. It reads its configuration from environment variables and initializes the client from an `aws.Config`:
+Das folgende Programm ist vollständig und ausführbar. Es liest seine Konfiguration aus Umgebungsvariablen und initialisiert den Client aus einer `aws.Config`:
 
 ```go title="main.go"
 package main
@@ -83,11 +83,11 @@ func main() {
 
 :::note
 
-These environment variable names (`RUSTFS_ENDPOINT_URL`, `RUSTFS_REGION`, `RUSTFS_ACCESS_KEY_ID`, `RUSTFS_SECRET_ACCESS_KEY`) are just this example's client-side conventions — they are read by your Go program, not by RustFS. They are distinct from the server-side `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` variables used when installing RustFS.
+Diese Namen von Umgebungsvariablen (`RUSTFS_ENDPOINT_URL`, `RUSTFS_REGION`, `RUSTFS_ACCESS_KEY_ID`, `RUSTFS_SECRET_ACCESS_KEY`) sind nur Konventionen auf der Client-Seite dieses Beispiels. Ihr Go-Programm liest sie, nicht RustFS. Sie unterscheiden sich von den serverseitigen Variablen `RUSTFS_ACCESS_KEY` und `RUSTFS_SECRET_KEY`, die bei der Installation von RustFS verwendet werden.
 
 :::
 
-Run it (replace `localhost` with your server's IP address if RustFS runs on another machine):
+Führen Sie das Programm aus (ersetzen Sie `localhost` durch die IP-Adresse Ihres Servers, wenn RustFS auf einem anderen Rechner läuft):
 
 ```bash
 export RUSTFS_ENDPOINT_URL="http://localhost:9000"
@@ -102,9 +102,9 @@ Buckets:
  - my-bucket
 ```
 
-You can now perform bucket and object operations. The snippets below run inside the `main` function above, reusing `client` and `ctx`.
+Sie können nun Bucket- und Objektoperationen ausführen. Die folgenden Ausschnitte laufen in der Funktion `main` oben und verwenden `client` und `ctx` weiter.
 
-## Create Bucket
+## Bucket erstellen
 
 ```go
 _, err = client.CreateBucket(ctx, &s3.CreateBucketInput{
@@ -120,7 +120,7 @@ fmt.Println("bucket created")
 bucket created
 ```
 
-## List Buckets
+## Buckets auflisten
 
 ```go
 resp, err := client.ListBuckets(ctx, &s3.ListBucketsInput{})
@@ -139,7 +139,7 @@ Buckets:
  - my-bucket
 ```
 
-## Delete Bucket
+## Bucket löschen
 
 ```go
 _, err = client.DeleteBucket(ctx, &s3.DeleteBucketInput{
@@ -155,7 +155,7 @@ fmt.Println("bucket deleted")
 bucket deleted
 ```
 
-## List Objects
+## Objekte auflisten
 
 ```go
 resp, err := client.ListObjectsV2(ctx, &s3.ListObjectsV2Input{
@@ -173,9 +173,9 @@ for _, obj := range resp.Contents {
  - hello.txt
 ```
 
-## Upload Object
+## Objekt hochladen
 
-Uploading a string body (add `"strings"` to your imports):
+Einen String-Body hochladen (fügen Sie `"strings"` zu Ihren Imports hinzu):
 
 ```go
 _, err = client.PutObject(ctx, &s3.PutObjectInput{
@@ -193,9 +193,9 @@ fmt.Println("object uploaded")
 object uploaded
 ```
 
-## Download Object
+## Objekt herunterladen
 
-Reading the object body (add `"io"` to your imports):
+Den Objekt-Body lesen (fügen Sie `"io"` zu Ihren Imports hinzu):
 
 ```go
 resp, err := client.GetObject(ctx, &s3.GetObjectInput{
@@ -219,4 +219,4 @@ fmt.Println("content is :", string(data))
 content is : hello rustfs
 ```
 
-For other operations (presigned URLs, multipart uploads, and more), see the [AWS SDK for Go v2 documentation](https://aws.github.io/aws-sdk-go-v2/docs/) — every S3-compatible call works against RustFS the same way.
+Weitere Operationen (vorsignierte URLs, mehrteilige Uploads und mehr) stehen in der [Dokumentation zum AWS SDK für Go v2](https://aws.github.io/aws-sdk-go-v2/docs/). Die meisten S3-Operationen funktionieren gegenüber RustFS auf dieselbe Weise. Ausnahmen stehen unter [S3-Kompatibilität](/de/reference/s3-compatibility).

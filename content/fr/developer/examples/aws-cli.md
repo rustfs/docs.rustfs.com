@@ -1,21 +1,21 @@
 ---
 title: "AWS CLI"
-description: "Connect the AWS CLI to RustFS and perform basic object operations."
+description: "Connectez l’AWS CLI à RustFS et effectuez des opérations objet de base."
 ---
 
-The [AWS CLI](https://docs.aws.amazon.com/cli/) is Amazon's official command-line tool for S3, and it works with RustFS via the `--endpoint-url` flag.
+L’[AWS CLI](https://docs.aws.amazon.com/cli/) est l’outil en ligne de commande officiel d’Amazon pour S3. Il fonctionne avec RustFS grâce à l’option `--endpoint-url`.
 
-## Install
+## Installation
 
-Follow the [official install guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html), or on macOS:
+Suivez le [guide d’installation officiel](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) ou, sous macOS :
 
 ```bash
 brew install awscli
 ```
 
-## Configure
+## Configuration
 
-Set your [access keys](../../security-compliance/iam/access-token.md) and region:
+Définissez vos [clés d’accès](../../security-compliance/iam/access-token.md) et la région :
 
 ```bash
 aws configure
@@ -28,17 +28,17 @@ Default region name [None]: us-east-1
 Default output format [None]: json
 ```
 
-Pass your RustFS address with `--endpoint-url` on every command. Replace `http://localhost:9000` with your server address. When `--endpoint-url` is set, the AWS CLI uses path-style addressing, which is what RustFS requires.
+Indiquez l’adresse de RustFS avec `--endpoint-url` dans chaque commande. Remplacez `http://localhost:9000` par l’adresse de votre serveur. Lorsque `--endpoint-url` est défini, l’AWS CLI utilise l’adressage de type chemin (path-style), ce que RustFS exige.
 
 :::note
 
-If you did not set credentials at install, the local-test default is `rustfsadmin` / `rustfsadmin` — never use it beyond a throwaway local trial.
+Si vous n’avez pas défini d’identifiants à l’installation, la valeur par défaut pour un essai local est `rustfsadmin` / `rustfsadmin`. Ne l’utilisez jamais au-delà d’un essai local jetable.
 
 :::
 
-## Verify
+## Vérification
 
-Create a bucket:
+Créez un compartiment (bucket) :
 
 ```bash
 aws s3 mb s3://my-bucket --endpoint-url http://localhost:9000
@@ -48,7 +48,7 @@ aws s3 mb s3://my-bucket --endpoint-url http://localhost:9000
 make_bucket: my-bucket
 ```
 
-Upload a file:
+Chargez (upload) un fichier :
 
 ```bash
 aws s3 cp /path/to/hello.txt s3://my-bucket/ --endpoint-url http://localhost:9000
@@ -58,7 +58,7 @@ aws s3 cp /path/to/hello.txt s3://my-bucket/ --endpoint-url http://localhost:900
 upload: ../path/to/hello.txt to s3://my-bucket/hello.txt
 ```
 
-List the bucket:
+Listez le compartiment :
 
 ```bash
 aws s3 ls s3://my-bucket --endpoint-url http://localhost:9000
@@ -68,6 +68,6 @@ aws s3 ls s3://my-bucket --endpoint-url http://localhost:9000
 2026-07-15 10:30:00         12 hello.txt
 ```
 
-## Next steps
+## Étapes suivantes
 
-Build applications against RustFS with an [S3 SDK](../sdk/index.md), or manage objects with [`rc`](/operations/rc).
+Développez des applications qui s’appuient sur RustFS avec un [SDK S3](../sdk/index.md), ou gérez les objets avec [`rc`](/fr/operations/rc).

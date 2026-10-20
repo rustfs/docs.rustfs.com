@@ -1,148 +1,95 @@
 ---
-title: "Hard Drive Failures"
-description: "RustFS ensures read/write access can still be provided when some disks fail through mechanisms similar to erasure coding, and automatically heals data after replacing disks."
+title: "Drive failures"
+description: "Replace a failed drive and let RustFS heal the missing data onto the replacement."
 ---
 
-RustFS ensures read/write access can still be provided when some disks fail through mechanisms similar to erasure coding, and automatically heals data after replacing disks.
+RustFS uses erasure coding to keep data readable and writable when some drives fail. After you replace a failed drive, RustFS heals the missing data onto it automatically. For heal status and manual heal tasks, see [Node healing](/operations/high-availability/node-healing).
 
-## Table of Contents
+Replace `/data/rustfs0` and `/dev/sdb` with the mount and device for the failed drive. Confirm the device name before you format it. `mkfs.xfs` erases the selected device.
 
-1. [Unmount Failed Disk](#unmount-failed-disk)
-2. [Replace Failed Disk](#replace-failed-disk)
-3. [Update `/etc/fstab` or RustFS Configuration](#update-etcfstab-or-rustfs-configuration)
-4. [Remount New Disk](#remount-new-disk)
-5. [Trigger and Monitor Data Healing](#trigger-and-monitor-data-healing)
-6. [Follow-up Checks and Notes](#follow-up-checks-and-notes)
+## 1. Stop RustFS and unmount the failed drive
 
-<a id="unmount-failed-disk"></a>
-
-### Unmount Failed Disk
-
-Before replacing the physical hard drive, you need to safely unmount the failed disk from the operating system level to avoid I/O errors in the file system or RustFS during the replacement process.
+Unmount the failed file system. If it has more than one mount point, unmount each one.
 
 ```bash
-# Assume the failed disk is /dev/sdb
-umount /dev/sdb
+sudo umount /data/rustfs0
 ```
 
-:::note[Notes]
+:::note[Device is busy]
 
-* If there are multiple mount points, execute `umount` separately.
-* If encountering "device is busy", you can first stop the RustFS service:
+If `umount` reports that the device is busy, stop RustFS and any other process that still has the mount open, then run `umount` again.
 
 ```bash
-systemctl stop rustfs
+sudo systemctl stop rustfs
 ```
 
 :::
 
-<a id="replace-failed-disk"></a>
+## 2. Replace and prepare the drive
 
-### Replace Failed Disk
-
-After physically replacing the failed disk, you need to partition and format the new disk, and apply the same label as the original disk.
+Install a replacement that is at least as large as the failed drive. Use XFS, the same file system as the other RustFS drives. [Disk preparation](/installation/requirement/disk-preparation) explains how to identify the device and choose a unique label.
 
 ```bash
-# Format as XFS and apply the same label as the original disk (RustFS requires XFS, like the other disks in the deployment)
-mkfs.xfs -L DISK1 /dev/sdb
+sudo mkfs.xfs -f -i size=512 -n ftype=1 -L RUSTFS0 /dev/sdb
 ```
 
-> **Requirements**
->
-> * New disk capacity ≥ original disk capacity;
-> * File system type consistent with other disks (XFS, per the [installation guide](../installation/linux/index.md));
-> * Recommend using labels (LABEL) or UUID for mounting to ensure disk order is not affected by system restarts.
+## 3. Mount the replacement at the original path
 
-<a id="update-etcfstab-or-rustfs-configuration"></a>
+The mount point must stay the path listed in `RUSTFS_VOLUMES` (in `/etc/default/rustfs`). Mount by file-system UUID so a reboot cannot attach the wrong drive if device names change.
 
-### Update `/etc/fstab` or RustFS Configuration
+```ini title="/etc/fstab"
+UUID=<filesystem-uuid> /data/rustfs0 xfs defaults,noatime,nodiratime 0 0
+```
 
-Confirm that the mount item labels or UUIDs in `/etc/fstab` point to the new disk. The mount point must stay identical to the one listed in `RUSTFS_VOLUMES` (in `/etc/default/rustfs`), so the healed disk rejoins the cluster at the same path.
+Read the UUID after formatting:
 
 ```bash
-# View current fstab
-cat /etc/fstab
-
-# Example fstab entry (no modification needed if labels are the same)
-LABEL=DISK1 /data/rustfs0 xfs defaults,noatime 0 2
+sudo blkid -s UUID -o value /dev/sdb
 ```
 
-:::tip[Tips]
-
-* If using UUID:
+Check `/etc/fstab`, then mount every entry and confirm the path:
 
 ```bash
-blkid /dev/sdb
-# Get the new partition's UUID, then replace the corresponding field in fstab
+sudo mount -a
+findmnt /data/rustfs0
 ```
 
-* After modifying fstab, be sure to validate syntax:
+Start RustFS after the replacement is mounted:
 
 ```bash
-mount -a # If no errors, configuration is correct
+sudo systemctl start rustfs
 ```
+
+Confirm the file system has free space:
+
+```bash
+df -hT /data/rustfs0
+```
+
+:::note[Mount failed]
+
+If the mount fails, check that the UUID in `/etc/fstab` matches the new file system.
 
 :::
 
-<a id="remount-new-disk"></a>
-
-### Remount New Disk
-
-Execute the following commands to batch mount all disks and start the RustFS service:
+## 4. Watch healing
 
 ```bash
-mount -a
-systemctl start rustfs
-```
-
-Confirm all disks are mounted normally:
-
-```bash
-df -h | grep /data/rustfs
-```
-
-:::note
-
-If some mounts fail, please check if fstab entries are consistent with disk labels/UUIDs.
-
-:::
-
-<a id="trigger-and-monitor-data-healing"></a>
-
-### Trigger and Monitor Data Healing
-
-Once RustFS detects a freshly formatted disk at a known mount point, its background scanner heals the missing data onto it automatically — no manual command is required. Confirm that recovery has started and track its progress through the service logs:
-
-```bash
-# For systemd-managed installations
 journalctl -u rustfs -f
-
-# Or view the log files under the directory set by RUSTFS_OBS_LOG_DIRECTORY
 tail -f /var/log/rustfs/rustfs.log
 ```
 
-You can also open the RustFS Console and check the disk status of the affected node.
+When RustFS sees a freshly formatted drive at a known mount point, it queues healing for the missing data. You can also check drive status on the Console, or follow the heal queue with `rc` as described in [Node healing](/operations/high-availability/node-healing).
 
-:::note[Notes]
+Healing reads healthy shards and writes reconstructed data, so disk and network utilization can rise while it runs. When the cycle finishes, the logs report success or list objects that failed to heal.
 
-* The healing process will complete in the background, usually with minimal impact on online access;
-* After healing is complete, the tool will report success or list failed objects.
+## 5. Follow-up checks
 
-:::
+- If several drives from the same manufacturing batch fail, inspect the remaining drives from that batch more often.
+- Rehearse this procedure so the team can follow it during an incident.
+- When several drives fail together, schedule a maintenance window so replacement and healing do not compete with peak traffic.
 
-<a id="follow-up-checks-and-notes"></a>
+## Next steps
 
-### Follow-up Checks and Notes
-
-1. **Performance Monitoring**
-
- * I/O may fluctuate slightly during healing, recommend monitoring disk and network load.
-2. **Batch Failures**
-
- * If multiple failures occur in the same batch of disks, consider more frequent hardware inspections.
-3. **Regular Drills**
-
- * Regularly simulate disk failure drills to ensure team familiarity with recovery processes.
-4. **Maintenance Windows**
-
- * When failure rates are high, arrange dedicated maintenance windows to speed up replacement and healing.
+- [Recover a failed node](/troubleshooting/node)
+- [Monitor healing](/operations/high-availability/node-healing)

@@ -1,13 +1,13 @@
 ---
 title: "MLflow"
-description: "Run MLflow with RustFS as the S3 artifact store for experiment tracking, deployed with Docker Compose."
+description: "Betreiben Sie MLflow mit RustFS als S3-Artefaktspeicher für das Experiment-Tracking, bereitgestellt mit Docker Compose."
 ---
 
-This guide connects [MLflow](https://github.com/mlflow/mlflow) — the experiment tracking and model registry platform — to **RustFS** as its S3 artifact store. You will start the MLflow tracking server with Docker Compose, log parameters, metrics, and artifacts from a training run, and verify that the artifacts are stored in RustFS. The workflow was verified with `ghcr.io/mlflow/mlflow:v2.22.1` and `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [MLflow](https://github.com/mlflow/mlflow) — die Plattform für Experiment-Tracking und die Model Registry — mit **RustFS** als S3-Artefaktspeicher. Sie starten den MLflow-Tracking-Server mit Docker Compose, protokollieren Parameter, Metriken und Artefakte eines Trainingslaufs und prüfen, dass die Artefakte in RustFS gespeichert werden. Der Ablauf wurde mit `ghcr.io/mlflow/mlflow:v2.22.1` und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker with the Compose plugin. This deployment is intended for local integration testing, not production.
+Sie benötigen Docker mit dem Compose-Plugin. Dieses Setup ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -16,18 +16,18 @@ flowchart LR
 	Server -->|"metadata"| DB["SQLite"]
 ```
 
-The tracking server keeps experiment and run metadata in SQLite and stores artifacts — model files, plots, reports — directly in RustFS through the `s3://` artifact root. The client needs the same RustFS credentials because it uploads artifacts itself, using boto3 and the `MLFLOW_S3_ENDPOINT_URL` setting.
+Der Tracking-Server hält Experiment- und Lauf-Metadaten in SQLite und speichert Artefakte — Modelldateien, Plots und Berichte — über die Artefakt-Wurzel `s3://` direkt in RustFS. Der Client benötigt dieselben RustFS-Zugangsdaten, weil er die Artefakte selbst mit boto3 und der Einstellung `MLFLOW_S3_ENDPOINT_URL` hochlädt.
 
-## 1. Create the project files
+## 1. Projektdateien anlegen
 
-Create a working directory:
+Erstellen Sie ein Arbeitsverzeichnis:
 
 ```bash
 mkdir rustfs-mlflow
 cd rustfs-mlflow
 ```
 
-Create an environment file and replace both credential placeholders:
+Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Zugangsdaten:
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
@@ -35,9 +35,9 @@ RUSTFS_SECRET_KEY=<your-secret-key>
 MLFLOW_BUCKET=my-bucket
 ```
 
-Use dedicated credentials for the artifact bucket. Do not commit `.env` to source control.
+Verwenden Sie dedizierte Zugangsdaten für den Artefakt-Bucket. Nehmen Sie `.env` nicht in die Versionsverwaltung auf.
 
-Create the Compose file:
+Erstellen Sie die Compose-Datei:
 
 ```yaml title="compose.yaml"
 services:
@@ -117,34 +117,34 @@ volumes:
   mlflow-db:
 ```
 
-The `create-bucket` service must run before the server starts because MLflow does not create the bucket. `MLFLOW_S3_ENDPOINT_URL` points the server's boto3 client at RustFS with path-style addressing. The SQLite database lives on a volume so experiment metadata survives restarts; production deployments should use a managed database backend instead.
+Der Dienst `create-bucket` muss abgeschlossen sein, bevor der Server startet, weil MLflow den Bucket nicht anlegt. `MLFLOW_S3_ENDPOINT_URL` richtet den boto3-Client des Servers mit pfadbasierter Adressierung (Path-Style) auf RustFS aus. Die SQLite-Datenbank liegt auf einem Volume, damit die Experiment-Metadaten einen Neustart überstehen. Produktivbereitstellungen sollten stattdessen ein verwaltetes Datenbank-Backend verwenden.
 
-## 2. Validate and start the deployment
+## 2. Bereitstellung prüfen und starten
 
-Resolve the Compose file before starting containers:
+Prüfen Sie die Compose-Datei, bevor Sie Container starten:
 
 ```bash
 docker compose config
 ```
 
-Start the services and wait for the tracking server:
+Starten Sie die Dienste und warten Sie auf den Tracking-Server:
 
 ```bash
 docker compose up -d
 docker compose ps
 ```
 
-The `create-bucket` service should exit with code `0`, and the MLflow UI should answer on `http://localhost:5000`:
+Der Dienst `create-bucket` sollte mit dem Code `0` enden, und die MLflow-Oberfläche sollte unter `http://localhost:5000` antworten:
 
 ```bash
 curl -sf http://localhost:5000/ >/dev/null && echo ready
 ```
 
-Open the RustFS Console at `http://localhost:9001` to watch artifacts land in `my-bucket` during the next step.
+Öffnen Sie die RustFS Console (Weboberfläche) unter `http://localhost:9001`, um im nächsten Schritt zu sehen, wie die Artefakte in `my-bucket` ankommen.
 
-## 3. Log a training run
+## 3. Trainingslauf protokollieren
 
-Create the client script — it runs inside the MLflow image, which ships every dependency:
+Erstellen Sie das Client-Skript. Es läuft im MLflow-Image, das alle Abhängigkeiten mitbringt:
 
 ```bash title="train_demo.py" {12}
 import mlflow
@@ -163,18 +163,18 @@ with mlflow.start_run(run_name="rustfs-verify") as run:
     print("artifact_uri:", run.info.artifact_uri)
 ```
 
-Copy the script into the running container and execute it with the service environment:
+Kopieren Sie das Skript in den laufenden Container und führen Sie es mit der Dienstumgebung aus:
 
 ```bash
 docker compose cp train_demo.py mlflow:/tmp/train_demo.py
 docker compose exec -w /tmp mlflow python train_demo.py
 ```
 
-The `artifact_uri` prints as `s3://my-bucket/mlflow-artifacts/<experiment-id>/<run-id>/artifacts` — the artifact is uploaded straight to RustFS by the client.
+Die Ausgabe von `artifact_uri` lautet `s3://my-bucket/mlflow-artifacts/<experiment-id>/<run-id>/artifacts`. Der Client lädt das Artefakt direkt nach RustFS hoch.
 
-## 4. Verify artifacts in RustFS
+## 4. Artefakte in RustFS prüfen
 
-Read the artifact back through the tracking server, then list the same object in RustFS. Save the following as `verify.py`, replace `<your-run-id>` with the identifier printed in step 3, and run it the same way:
+Lesen Sie das Artefakt über den Tracking-Server zurück und listen Sie dasselbe Objekt in RustFS auf. Speichern Sie das Folgende als `verify.py`, ersetzen Sie `<your-run-id>` durch die in Schritt 3 ausgegebene Kennung und führen Sie das Skript auf dieselbe Weise aus:
 
 ```bash title="verify.py" {5}
 import mlflow
@@ -186,59 +186,59 @@ path = client.download_artifacts("<your-run-id>", "reports/model-summary.txt")
 print(open(path).read())
 ```
 
-The download reads the object from RustFS through the tracking server. Then confirm the objects in the bucket:
+Der Download liest das Objekt über den Tracking-Server aus RustFS. Prüfen Sie anschließend die Objekte im Bucket:
 
 ```bash
 docker compose exec rustfs /usr/bin/rc ls local/my-bucket/mlflow-artifacts/ -r
 ```
 
-The output should include the artifact object:
+Die Ausgabe sollte das Artefakt-Objekt enthalten:
 
 ```text
 mlflow-artifacts/1/a1aece9243504f2680a52fba0c32765f/artifacts/reports/model-summary.txt
 ```
 
-![MLflow artifacts stored in the RustFS Console](./images/rustfs-mlflow-artifacts.png)
+![In der RustFS Console gespeicherte MLflow-Artefakte](./images/rustfs-mlflow-artifacts.png)
 
-Runs, parameters, and metrics survive a server restart because they are stored in SQLite, while the artifacts stay in RustFS:
+Läufe, Parameter und Metriken überstehen einen Neustart des Servers, weil sie in SQLite liegen, während die Artefakte in RustFS bleiben:
 
 ```bash
 docker compose restart mlflow
 docker compose exec -w /tmp mlflow python verify.py
 ```
 
-The `list_artifacts` call succeeds again against the restarted server, reading from the same objects in RustFS.
+Der Aufruf `list_artifacts` gelingt am neu gestarteten Server erneut und liest dieselben Objekte aus RustFS.
 
-## 5. Stop or reset the deployment
+## 5. Bereitstellung anhalten oder zurücksetzen
 
-Stop the containers while keeping all data:
+Stoppen Sie die Container und behalten Sie alle Daten:
 
 ```bash
 docker compose down
 ```
 
-The RustFS volume keeps the artifact objects and the MLflow volume keeps the metadata database. To delete everything, including the artifacts in RustFS, add `--volumes`.
+Das RustFS-Volume behält die Artefakt-Objekte, das MLflow-Volume die Metadaten-Datenbank. Um alles zu löschen, einschließlich der Artefakte in RustFS, fügen Sie `--volumes` hinzu.
 
-## Troubleshooting
+## Fehlerbehebung
 
-### `ModuleNotFoundError: No module named 'boto3'` when logging artifacts
+### `ModuleNotFoundError: No module named 'boto3'` beim Protokollieren von Artefakten
 
-The client performing `log_artifact` needs boto3 because it uploads directly to S3. Install it in the environment that runs the training script, or run the script inside the MLflow image as shown in step 3.
+Der Client, der `log_artifact` ausführt, benötigt boto3, weil er direkt nach S3 hochlädt. Installieren Sie boto3 in der Umgebung, die das Trainingsskript ausführt, oder führen Sie das Skript wie in Schritt 3 im MLflow-Image aus.
 
-### `AccessDenied` or connection errors during artifact upload
+### `AccessDenied` oder Verbindungsfehler beim Hochladen von Artefakten
 
-Confirm that `MLFLOW_S3_ENDPOINT_URL` is set in the client environment — without it, boto3 sends requests to real AWS S3. The endpoint must be reachable from the machine running the training script; use `http://localhost:9000` outside the Compose network and `http://rustfs:9000` inside it.
+Stellen Sie sicher, dass `MLFLOW_S3_ENDPOINT_URL` in der Client-Umgebung gesetzt ist. Ohne diese Variable sendet boto3 Anfragen an das echte AWS S3. Der Endpunkt muss von dem Rechner aus erreichbar sein, auf dem das Trainingsskript läuft. Verwenden Sie außerhalb des Compose-Netzwerks `http://localhost:9000` und innerhalb `http://rustfs:9000`.
 
-### The server fails to start with a bucket error
+### Der Server startet nicht und meldet einen Bucket-Fehler
 
-The artifact bucket must exist before the server starts. Check the `create-bucket` service logs:
+Der Artefakt-Bucket muss existieren, bevor der Server startet. Prüfen Sie die Logs des Dienstes `create-bucket`:
 
 ```bash
 docker compose logs create-bucket
 ```
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional MLflow operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [MLflow documentation](https://mlflow.org/docs/latest/) to add a model registry or move the metadata store to a managed database.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere MLflow-Operationen verwenden.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [MLflow-Dokumentation](https://mlflow.org/docs/latest/), um eine Model Registry hinzuzufügen oder den Metadatenspeicher auf eine verwaltete Datenbank zu verlagern.

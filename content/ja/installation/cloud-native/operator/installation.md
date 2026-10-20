@@ -1,29 +1,29 @@
 ---
-title: Install
-description: Prepare Kubernetes, install RustFS Operator, and access its Console securely.
+title: インストール
+description: Kubernetes を準備し、RustFS Operator をインストールして、Console へ安全にアクセスします。
 ---
 
-This guide installs the Operator with Helm, verifies the deployment, and exposes the Operator Console locally or through HTTPS.
+このガイドでは、Helm で Operator をインストールし、デプロイを確認し、Operator の Console をローカルまたは HTTPS で公開します。
 
-## Requirements
+## 要件
 
-| Component | Requirement |
+| コンポーネント | 要件 |
 |-----------|-------------|
-| Kubernetes | `v1.30` or later |
-| Helm | `v3.0` or later |
-| kubectl | Compatible with the Kubernetes cluster |
-| StorageClass | Dynamic PVC provisioning for Tenant storage |
+| Kubernetes | `v1.30` 以降 |
+| Helm | `v3.0` 以降 |
+| kubectl | Kubernetes クラスターと互換性があること |
+| StorageClass | Tenant のストレージ向け動的な PVC プロビジョニング |
 
-Your account must be able to create CRDs, cluster RBAC, Deployments, and Services. Confirm the target cluster before installation:
+アカウントは、CRD、クラスター RBAC、Deployment、Service を作成できる必要があります。インストール前に、対象クラスターを確認します。
 
 ```bash
 kubectl config current-context
 kubectl get storageclass
 ```
 
-## 1. Install the Operator
+## 1. Operator をインストールする
 
-The Helm chart is stored in the Operator repository:
+Helm チャートは、Operator のリポジトリにあります。
 
 ```bash
 git clone https://github.com/rustfs/operator.git
@@ -34,7 +34,7 @@ helm upgrade --install rustfs-operator deploy/rustfs-operator/ \
   --create-namespace
 ```
 
-Common settings belong in a values file:
+一般的な設定は values ファイルに記述します。
 
 ```yaml title="values.yaml"
 operator:
@@ -50,9 +50,9 @@ console:
     type: ClusterIP
 ```
 
-Apply the file with `-f values.yaml`. The chart generates `OPERATOR_*` variables from these values; do not duplicate them under `operator.env`.
+`-f values.yaml` でこのファイルを適用します。チャートはこれらの値から `OPERATOR_*` 変数を生成します。`operator.env` の下へ同じ内容を重複して定義してはなりません。
 
-## 2. Verify the installation
+## 2. インストールを確認する
 
 ```bash
 kubectl -n rustfs-system get pods,services
@@ -61,32 +61,32 @@ kubectl -n rustfs-system rollout status deployment/rustfs-operator
 kubectl -n rustfs-system rollout status deployment/rustfs-operator-console
 ```
 
-## 3. Access the Operator Console
+## 3. Operator の Console にアクセスする
 
-The Console listens on port `9090`. Generate a short-lived login token:
+Console はポート `9090` で待ち受けます。有効期間の短いログイントークンを生成します。
 
 ```bash
 kubectl -n rustfs-system create token rustfs-operator-console --duration=24h
 ```
 
-Forward the Console service to your workstation:
+Console の Service を作業用マシンへポートフォワードします。
 
 ```bash
 kubectl -n rustfs-system port-forward \
   svc/rustfs-operator-console 19090:9090
 ```
 
-Open `http://127.0.0.1:19090` and paste the token into the login form. The Helm installation notes print the exact ServiceAccount and Service names when release names or namespaces differ.
+`http://127.0.0.1:19090` を開き、ログインフォームへトークンを貼り付けます。リリース名や名前空間が異なる場合は、Helm のインストール時の注記に、ServiceAccount と Service の正確な名前が出力されます。
 
-:::note[Local HTTP access]
+:::note[ローカルの HTTP アクセス]
 
-If your browser does not retain the login over HTTP, set `CONSOLE_COOKIE_SECURE=false` under `console.env` for local testing only. Keep secure cookies enabled for HTTPS.
+ブラウザーが HTTP 上のログインを保持しない場合は、ローカルテストに限り `console.env` で `CONSOLE_COOKIE_SECURE=false` を設定します。HTTPS では、セキュア Cookie を有効のままにする必要があります。
 
 :::
 
-## 4. Configure Console TLS
+## 4. Console の TLS を設定する
 
-Use one HTTPS hostname for both the Console UI and `/api/v1`. Create a TLS Secret, or let cert-manager create it, then enable Ingress:
+Console の UI と `/api/v1` の両方に、同じ HTTPS ホスト名を使います。TLS 用の Secret を作成するか、cert-manager に作成させてから、Ingress を有効にします。
 
 ```yaml title="values.yaml"
 console:
@@ -106,7 +106,7 @@ console:
           - console.example.com
 ```
 
-Upgrade the release with the values file:
+values ファイルでリリースをアップグレードします。
 
 ```bash
 helm upgrade rustfs-operator deploy/rustfs-operator/ \
@@ -114,6 +114,6 @@ helm upgrade rustfs-operator deploy/rustfs-operator/ \
   -f values.yaml
 ```
 
-Replace the Ingress class, issuer, and hostname for your environment. If cert-manager is not installed, create the `console-tls` Secret with your certificate and private key before the upgrade.
+環境に合わせて、Ingress クラス、Issuer、ホスト名を置き換えます。cert-manager をインストールしていない場合は、アップグレードの前に、証明書と秘密鍵で `console-tls` Secret を作成します。
 
-Next, [create a Tenant](./tenant.md).
+次に、[Tenant を作成](./tenant.md)します。

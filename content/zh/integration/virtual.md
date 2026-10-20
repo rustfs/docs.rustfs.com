@@ -17,7 +17,7 @@ RustFS 遵循 S3 协议。S3 支持两种请求模式：
 示例（存储桶：`test`，主机：`rustfs.yourdomain.com`）：
 
 ```text
-http://rustfs.yourdomain.com/test
+http://rustfs.example.com/my-bucket
 ```
 
 **注意**：路径风格无需配置。
@@ -29,7 +29,7 @@ http://rustfs.yourdomain.com/test
 示例（存储桶：`test`，主机：`rustfs.yourdomain.com`）：
 
 ```text
-http://test.rustfs.yourdomain.com/
+http://my-bucket.rustfs.example.com/
 ```
 
 ### 配置
@@ -45,14 +45,14 @@ http://test.rustfs.yourdomain.com/
 
 示例（`rustfs.yourdomain.com:8000`）：
 
-```ini
-RUSTFS_SERVER_DOMAINS = "rustfs.yourdomain.com:8000"
+```ini title="/etc/default/rustfs"
+RUSTFS_SERVER_DOMAINS=rustfs.example.com:8000
 ```
 
 这样可确保以下请求：
 
 ```text
-http://my-bucket.rustfs.yourdomain.com:8000/
+http://my-bucket.rustfs.example.com:8000/
 ```
 
 能够在虚拟主机风格模式下正确解析。

@@ -1,13 +1,13 @@
 ---
 title: "Alluxio"
-description: "Cache RustFS buckets with Alluxio for faster reads."
+description: "Cachen Sie RustFS-Buckets mit Alluxio für schnellere Lesevorgänge."
 ---
 
-This guide connects [Alluxio](https://github.com/Alluxio/alluxio) — the distributed data orchestration layer — to **RustFS** as an under filesystem (UFS). You will run a standalone Alluxio cluster in Docker, mount a RustFS bucket, read an object through the cache, and write a file back to the bucket through Alluxio. The workflow was verified with Alluxio 2.9.4 against `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [Alluxio](https://github.com/Alluxio/alluxio) — die verteilte Datenorchestrierungsschicht — mit **RustFS** als Under Filesystem (UFS). Sie betreiben einen eigenständigen Alluxio-Cluster in Docker, hängen einen RustFS-Bucket ein, lesen ein Objekt über den Cache und schreiben eine Datei über Alluxio zurück in den Bucket. Der Ablauf wurde mit Alluxio 2.9.4 gegen `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker with `--shm-size 2g` capacity (the worker uses a tmpfs ramdisk).
+Sie benötigen Docker mit einer Kapazität von `--shm-size 2g` (der Worker verwendet eine tmpfs-Ramdisk).
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -17,11 +17,11 @@ flowchart LR
 	Writer["Alluxio writes"] -->|"persist"| RustFS
 ```
 
-Objects read once are cached in the worker's ramdisk; repeated reads are served from memory. Writes through Alluxio land in the bucket as regular objects.
+Einmal gelesene Objekte werden in der Ramdisk des Workers gecacht. Wiederholte Lesevorgänge werden aus dem Speicher bedient. Schreibvorgänge über Alluxio landen im Bucket als gewöhnliche Objekte.
 
-## 1. Run the master and worker
+## 1. Master und Worker starten
 
-The standalone image starts one process per invocation. Run the master first, then the worker:
+Das Standalone-Image startet einen Prozess je Aufruf. Starten Sie zuerst den Master, dann den Worker:
 
 ```bash
 docker run -d --name alluxio-master --hostname alluxio --network oo-rustfs_default \
@@ -37,11 +37,11 @@ Capacity information for all workers:
     Total Capacity: 1024.00MB
 ```
 
-If the worker exits immediately with `tmpfs is smaller than the configured size`, the container was started without `--shm-size`.
+Wenn der Worker sofort mit `tmpfs is smaller than the configured size` endet, wurde der Container ohne `--shm-size` gestartet.
 
-## 2. Mount the RustFS bucket
+## 2. Den RustFS-Bucket einhängen
 
-The credential options must use the full `alluxio.underfs.s3.*` key names — short `s3a.*` or `aws.*` keys are accepted by the CLI but ignored by the UFS client:
+Die Zugangsdatenoptionen müssen die vollständigen Schlüsselnamen `alluxio.underfs.s3.*` verwenden. Kurze Schlüssel `s3a.*` oder `aws.*` akzeptiert die CLI, der UFS-Client ignoriert sie aber:
 
 ```bash
 docker exec alluxio alluxio fs mount \
@@ -57,11 +57,11 @@ docker exec alluxio alluxio fs mount \
 Mounted s3://alluxio-demo/ at /rustfs
 ```
 
-`disable.dns.buckets` forces path-style addressing, which the IP-style endpoint requires.
+`disable.dns.buckets` erzwingt pfadbasierte Adressierung (Path-Style), die der Endpunkt im IP-Stil verlangt.
 
-## 3. Read through the cache
+## 3. Über den Cache lesen
 
-List the mount and read a seeded object:
+Listen Sie den Mount auf und lesen Sie ein vorbereitetes Objekt:
 
 ```bash
 docker exec alluxio alluxio fs ls /rustfs
@@ -73,11 +73,11 @@ docker exec alluxio alluxio fs cat /rustfs/rustfs-test.txt
 hello from s3fs
 ```
 
-`PERSISTED` means the source of truth is in RustFS; the worker caches blocks after the first read.
+`PERSISTED` bedeutet, dass die Quelle der Wahrheit in RustFS liegt. Der Worker cacht Blöcke nach dem ersten Lesevorgang.
 
-## 4. Write through Alluxio
+## 4. Über Alluxio schreiben
 
-Copy a local file into the mount:
+Kopieren Sie eine lokale Datei in den Mount:
 
 ```bash
 echo "written via alluxio cache to rustfs" > /tmp/rt.txt
@@ -89,7 +89,7 @@ docker exec alluxio alluxio fs copyFromLocal /tmp/rt.txt /rustfs/alluxio-write.t
 Copied 'file:///tmp/rt.txt' to '/rustfs/alluxio-write.txt'
 ```
 
-Verify the object in RustFS:
+Prüfen Sie das Objekt in RustFS:
 
 ```bash
 rc ls rustfs/alluxio-demo/
@@ -102,9 +102,9 @@ rc cat rustfs/alluxio-demo/alluxio-write.txt
 written via alluxio cache to rustfs
 ```
 
-![Alluxio-managed files stored in the RustFS Console](./images/rustfs-alluxio-mount.png)
+![In der RustFS-Console gespeicherte, von Alluxio verwaltete Dateien](./images/rustfs-alluxio-mount.png)
 
-## 5. Stop or reset
+## 5. Stoppen oder zurücksetzen
 
 ```bash
 docker exec alluxio alluxio fs unmount /rustfs
@@ -112,22 +112,22 @@ docker rm -f alluxio
 rc rm rustfs/alluxio-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
-### Worker exits with `tmpfs is smaller than the configured size`
+### Der Worker endet mit `tmpfs is smaller than the configured size`
 
-The worker places its ramdisk in `/dev/shm`, which Docker caps at 64 MB by default. Start the container with `--shm-size 2g` or lower `alluxio.worker.ramdisk.size`.
+Der Worker legt seine Ramdisk in `/dev/shm` ab, das Docker standardmäßig auf 64 MB begrenzt. Starten Sie den Container mit `--shm-size 2g` oder senken Sie `alluxio.worker.ramdisk.size`.
 
-### Mount succeeds but `fs ls` returns `InvalidAccessKeyId`
+### Der Mount gelingt, `fs ls` liefert aber `InvalidAccessKeyId`
 
-The mount options used short key names (`s3a.*`, `aws.*`). Alluxio's UFS client only honors the full `alluxio.underfs.s3.*` keys shown in step 2.
+Die Mount-Optionen verwendeten kurze Schlüsselnamen (`s3a.*`, `aws.*`). Der UFS-Client von Alluxio berücksichtigt nur die vollständigen Schlüssel `alluxio.underfs.s3.*` aus Schritt 2.
 
 ### `S3 client v2 does not support global bucket access`
 
-Path-style addressing is off. Add `--option alluxio.underfs.s3.disable.dns.buckets=true` — the IP-style RustFS endpoint requires it.
+Die pfadbasierte Adressierung ist aus. Fügen Sie `--option alluxio.underfs.s3.disable.dns.buckets=true` hinzu. Der RustFS-Endpunkt im IP-Stil verlangt das.
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Alluxio UFS types.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Alluxio documentation](https://docs.alluxio.io/os/user/stable/ufs/S3.html) for cache policies, TTLs, and multi-tier storage on top of the same bucket.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere Alluxio-UFS-Typen einsetzen.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [Alluxio-Dokumentation](https://docs.alluxio.io/os/user/stable/ufs/S3.html) für Cache-Policies, TTLs und mehrstufigen Speicher auf demselben Bucket.

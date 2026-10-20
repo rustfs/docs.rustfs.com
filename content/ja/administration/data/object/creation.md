@@ -1,53 +1,53 @@
 ---
-title: "Object Creation"
-description: "Create objects using the RustFS UI, rc, or the S3 API."
+title: "オブジェクトの作成"
+description: "RustFS UI、rc、または S3 API を使ってオブジェクトを作成する方法を説明します。"
 ---
 
-Objects are the fundamental storage units in RustFS, containing data, metadata, and a unique key. This guide covers object creation (upload).
+オブジェクトは RustFS の基本的な保存単位であり、データ、メタデータ、一意のキーを含みます。このガイドでは、オブジェクトの作成（アップロード）を扱います。
 
-## Requirements
+## 要件
 
-- A running RustFS instance (see [Installation Guide](../../../installation/index.md)).
-- [`rc`](/operations/rc) installed and configured with an alias for the command-line workflow.
-- A target bucket. Create one by following [Bucket Creation](../bucket/creation.md).
+- 稼働中の RustFS インスタンス（[インストールガイド](../../../installation/index.md)を参照）。
+- コマンドラインの手順を使う前に、[`rc`](/ja/operations/rc) をインストールし、エイリアスを設定します。
+- 保存先のバケット。[バケットの作成](../bucket/creation.md)に従って作成します。
 
-## Creating Objects
+## オブジェクトの作成
 
-### Using the RustFS UI
+### RustFS UI を使う
 
-1. Log in to the RustFS Console.
-2. Select the target bucket.
-3. On the bucket page, in the top right corner, select **New Directory**, **New File**, or **Upload File/Folder**.
-4. To upload from your local machine, click **Upload File/Folder**, select the files, and click **Start Upload**.
+1. RustFS Console にログインします。
+2. 対象のバケットを選択します。
+3. バケットページの右上で、**New Directory**（新しいディレクトリ）、**New File**（新しいファイル）、または **Upload File/Folder**（ファイルまたはフォルダーのアップロード）を選択します。
+4. ローカルマシンからアップロードする場合は、**Upload File/Folder** をクリックし、ファイルを選択して **Start Upload**（アップロード開始）をクリックします。
 
-![object creation from ui](images/upload_file_from_ui.png)
+![Console からのオブジェクト作成](images/upload_file_from_ui.png)
 
-Click on an object to view its details.
+オブジェクトを選択すると、詳細を表示できます。
 
-![object details info](images/object_details_info.png)
+![オブジェクトの詳細情報](images/object_details_info.png)
 
-### Using `rc`
+### `rc` を使う
 
-See the [`rc` guide](/operations/rc) for installation and alias configuration.
+インストールとエイリアスの設定は、[`rc` ガイド](/ja/operations/rc)を参照します。
 
-Upload a file:
+ファイルをアップロードします。
 
 ```bash
 rc object copy /path/to/hello.txt rustfs/my-bucket/hello.txt
 rc object list rustfs/my-bucket
 ```
 
-Verify the upload in the RustFS Console.
+RustFS Console でアップロードを確認します。
 
-### Using the API
+### API を使う
 
-Upload a file via API:
+API でファイルをアップロードします。
 
 ```http
 PUT /{bucketName}/{objectName} HTTP/1.1
 ```
 
-S3 requests must be signed with AWS Signature V4, so use an S3 client rather than hand-crafting headers. With the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) configured for your access keys:
+S3 リクエストは AWS Signature V4 で署名する必要があります。ヘッダーを手作業で組み立てず、S3 クライアントを使います。アクセスキーを設定した [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) では、次のように実行します。
 
 ```bash
 aws s3api put-object \
@@ -57,19 +57,19 @@ aws s3api put-object \
   --endpoint-url http://localhost:9000
 ```
 
-Verify the upload in the RustFS Console.
+RustFS Console でアップロードを確認します。
 
-## Deleting Objects
+## オブジェクトの削除
 
-See [Object Deletion](./deletion.md).
+[オブジェクトの削除](./deletion.md)を参照します。
 
-Use the following API for file deletion:
+S3 API でオブジェクトを削除するには、次を使います。
 
 ```http
 DELETE /{bucketName}/{objectName} HTTP/1.1
 ```
 
-Request example:
+リクエストの例です。
 
 ```bash
 aws s3api delete-object \
@@ -78,4 +78,4 @@ aws s3api delete-object \
   --endpoint-url http://localhost:9000
 ```
 
-You can confirm the file has been deleted on the RustFS UI.
+RustFS Console で、そのオブジェクトが表示されなくなったことを確認します。

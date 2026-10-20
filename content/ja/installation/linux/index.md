@@ -1,34 +1,34 @@
 ---
-title: "Installing RustFS on Linux"
-description: "Choose a Linux deployment mode — SNSD, SNMD, or MNMD — and install RustFS on one or more servers."
+title: "Linux に RustFS をインストールする"
+description: "Linux のデプロイ方式である SNSD、SNMD、MNMD から選び、1 台または複数のサーバーに RustFS をインストールします。"
 ---
 
-This section covers installing RustFS on Linux servers. For a one-command trial installation, use the [Quick Start](./quick-start.md). For a manual installation, pick one of the three deployment modes below — all three share the same [prerequisites and service setup](./prerequisites-and-service.md), and differ only in topology and volume configuration.
+このセクションでは、Linux サーバーへの RustFS のインストールを説明します。1 コマンドで試す場合は [クイックスタート](./quick-start.md) を使います。手動でインストールする場合は、次の 3 つのデプロイ方式から選びます。いずれも同じ [前提条件とサービスのセットアップ](./prerequisites-and-service.md) を使い、異なるのはトポロジーとボリュームの設定だけです。
 
-:::warning[Change the default credentials immediately]
+:::warning[既定の認証情報は直ちに変更する]
 
-After installation, set unique `RUSTFS_ACCESS_KEY` and `RUSTFS_SECRET_KEY` values in `/etc/default/rustfs`. Do not use the well-known `rustfsadmin` value for either credential. Restart the service with `sudo systemctl restart rustfs` after changing the file.
+インストール後、`/etc/default/rustfs` に一意の `RUSTFS_ACCESS_KEY` と `RUSTFS_SECRET_KEY` を設定します。よく知られた `rustfsadmin` をいずれの認証情報にも使わないでください。ファイルを変更したら、`sudo systemctl restart rustfs` でサービスを再起動します。
 
 :::
 
-## Single Node Single Disk (SNSD)
+## シングルノード・シングルディスク（SNSD）
 
-One server, one data disk. The simplest mode, with no redundancy — a disk failure means data loss, so rely on backups. Suitable for development, testing, and low-density non-critical business.
+サーバー 1 台、データディスク 1 台です。最も単純な方式で、冗長性はありません。ディスク障害はデータ損失になるため、バックアップに依存します。開発、テスト、および小規模で重要度の低いワークロードに適しています。
 
-→ [Single Node Single Disk installation](./single-node-single-disk.md)
+→ [シングルノード・シングルディスク（SNSD）のインストール](./single-node-single-disk.md)
 
-## Single Node Multiple Disk (SNMD)
+## シングルノード・マルチディスク（SNMD）
 
-One server, multiple data disks. Erasure coding shards data across the disks, so the node tolerates a limited number of disk failures, but a whole-server failure still means data loss. Suitable for medium, non-critical business on a single machine.
+サーバー 1 台、データディスク複数台です。イレイジャーコーディングでデータをディスク間に分散するため、ノードは限られた台数のディスク障害に耐えられます。ただし、サーバー全体の障害はデータ損失になります。単一マシン上の中規模で重要度の低いワークロードに適しています。
 
-→ [Single Node Multiple Disk installation](./single-node-multiple-disk.md)
+→ [シングルノード・マルチディスク（SNMD）のインストール](./single-node-multiple-disk.md)
 
-## Multiple Node Multiple Disk (MNMD)
+## マルチノード・マルチディスク（MNMD）
 
-Four or more servers, each with one or more disks. Erasure coding spans servers, providing disk- and node-level fault tolerance plus horizontal scalability. This is the mode for production workloads.
+4 台以上のサーバーで、各サーバーに 1 台以上のディスクがあります。イレイジャーコーディングがサーバー間にまたがり、ディスクおよびノード単位の耐障害性と水平スケーラビリティを提供します。本番ワークロード向けの方式です。
 
-→ [Multiple Node Multiple Disk installation](./multiple-node-multiple-disk.md)
+→ [マルチノード・マルチディスク（MNMD）のインストール](./multiple-node-multiple-disk.md)
 
-## Before Production
+## 本番の前に
 
-Work through the [Pre-Installation Checklists](../requirement/checklists/index.md) — hardware, network, software, and security — before deploying to production. If you don't need production standards, you can skip them.
+本番にデプロイする前に、[インストール前チェックリスト](../requirement/checklists/index.md)（ハードウェア、ネットワーク、ソフトウェア、セキュリティ）を確認します。本番以外のデプロイでは省略できます。

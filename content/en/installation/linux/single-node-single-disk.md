@@ -1,17 +1,17 @@
 ---
 title: RustFS Single Node Single Disk Installation
-description: Install RustFS on a single disk of a single server, data will be stored on this one disk.
+description: Install RustFS on a single server that stores all data on one disk.
 ---
 
 In Single Node Single Disk (SNSD) mode, one server stores all data on a single data disk. It is the simplest deployment mode and the same topology that the [Linux Quick Start](./quick-start.md) script sets up.
 
-:::warning
+:::warning[No redundancy]
 
-A single disk offers no redundancy: if the disk fails, data is lost. SNSD is suitable for development, testing, and low-density non-critical business. For production use, maintain regular data backups or choose [SNMD](./single-node-multiple-disk.md) / [MNMD](./multiple-node-multiple-disk.md).
+A single drive offers no redundancy. If the drive fails, data is lost. SNSD is suitable for development, testing, and small non-critical workloads. For production use, keep backups or choose [SNMD](./single-node-multiple-disk.md) or [MNMD](./multiple-node-multiple-disk.md).
 
 :::
 
-## Topology and Planning
+## Topology and planning
 
 ```mermaid
 flowchart TD
@@ -27,11 +27,11 @@ flowchart TD
 - No erasure coding across disks — fault tolerance depends entirely on backups.
 - For production deployments, also review the [Pre-Installation Checklists](../requirement/checklists/index.md).
 
-## Prerequisites and Service Setup
+## Prerequisites and service setup
 
 Complete the [common prerequisites and service setup](./prerequisites-and-service.md) — operating system, firewall, time synchronization, disk formatting, service user, binary download, and systemd unit — then continue below.
 
-## Configure Environment Variables
+## Configure environment variables
 
 1. Create the configuration file with the single-disk volume path:
 
@@ -54,9 +54,9 @@ sudo mkdir -p /data/rustfs0 /var/log/rustfs /opt/tls
 sudo chmod -R 750 /data/rustfs* /var/log/rustfs
 ```
 
-## Start Service and Verification
+## Start and verify the service
 
-1. Start the service and enable auto-start on boot:
+1. Start the service and enable it to start at boot:
 
 ```bash
 sudo systemctl enable --now rustfs
@@ -80,11 +80,11 @@ netstat -ntpl
 tail -f /var/log/rustfs/rustfs*.log
 ```
 
-5. Access the console: enter the server's IP address and the console port (default 9001) in a browser. You should see:
+5. Open the Console: in a browser, go to `http://<server-ip>:9001`. You should see:
 
 ![Console](./images/console.jpg)
 
-## Next Steps
+## Next steps
 
 - Need disk-level redundancy on one server? See [Single Node Multiple Disk Mode (SNMD)](./single-node-multiple-disk.md).
 - Need a production cluster? See [Multiple Node Multiple Disk Mode (MNMD)](./multiple-node-multiple-disk.md).

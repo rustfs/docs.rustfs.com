@@ -1,48 +1,48 @@
 ---
-title: "Versioning"
-description: "Enable bucket versioning, recover earlier object versions, and manage delete markers with rc and the Console."
+title: "バージョニング"
+description: "バケットのバージョニングを有効にし、以前のオブジェクトバージョンを復元し、削除マーカーを rc と Console で管理する方法を説明します。"
 ---
 
-RustFS bucket versioning preserves multiple versions of the same object key. Use it to recover from accidental overwrites and deletes and to satisfy prerequisites for Object Lock and bucket replication.
+RustFS のバケットバージョニングは、同じオブジェクトキーの複数のバージョンを保持します。誤った上書きや削除からの復元と、オブジェクトロックおよびバケットレプリケーションの前提を満たすために使います。
 
-## Overview
+## 概要
 
-When versioning is enabled:
+バージョニングが有効な場合の動作は、次のとおりです。
 
-- Each upload or copy to an existing key creates a new version ID.
-- A normal delete creates a delete marker instead of removing older versions.
-- Reading the key without a version ID returns the latest visible version, or `NotFound` when the latest entry is a delete marker.
-- Reading or deleting a specific version requires its version ID.
+- 既存のキーへのアップロードまたはコピーのたびに、新しいバージョン ID が作成されます。
+- 通常の削除では、古いバージョンを消さずに削除マーカーが作成されます。
+- バージョン ID を指定せずにキーを読み取ると、最新の可視バージョンが返されます。最新のエントリが削除マーカーの場合は、`NotFound` が返されます。
+- 特定のバージョンを読み取る、または削除するには、そのバージョン ID が必要です。
 
-Suspending versioning stops normal creation of new version IDs but preserves existing versions and delete markers. Suspension is not the same as disabling or removing version history.
+バージョニングを一時停止すると、新しいバージョン ID の通常の作成は止まりますが、既存のバージョンと削除マーカーは保持されます。一時停止は、無効化やバージョン履歴の削除とは異なります。
 
-## Configure in the Console
+## Console で設定する
 
-### Enable at bucket creation
+### バケット作成時に有効にする
 
-1. Open **Buckets** and select **Create Bucket**.
-2. Enter the bucket name.
-3. Enable **Version**.
-4. Select **Create**.
+1. **Buckets**（バケット）を開き、**Create Bucket**（バケットの作成）を選択します。
+2. バケット名を入力します。
+3. **Version**（バージョン）を有効にします。
+4. **Create**（作成）を選択します。
 
-### Enable or suspend an existing bucket
+### 既存バケットのバージョニングを有効または一時停止する
 
-1. Open **Buckets**, locate the bucket, and select **Settings**.
-2. Under **Data Protection**, locate **Versioning**.
-3. Enable versioning or suspend it as required.
+1. **Buckets** を開き、対象のバケットを見つけて **Settings**（設定）を選択します。
+2. **Data Protection**（データ保護）で **Versioning**（バージョニング）を見つけます。
+3. 必要に応じて、バージョニングを有効にするか、一時停止します。
 
-The settings page reports `Enabled`, `Suspended`, or `Disabled`. It also notes that suspension preserves existing versions.
+設定ページには `Enabled`、`Suspended`、または `Disabled` が表示されます。一時停止しても既存のバージョンは保持されることも示されます。
 
-### Browse and recover versions
+### バージョンを参照して復元する
 
-1. Open the bucket and enable **Show Deleted Objects** when you need to see keys hidden by delete markers.
-2. Select an object name to open **Object Details**.
-3. Select **Versions** to inspect available versions and delete markers.
-4. Download the required version and upload it again to make its content the latest version.
+1. バケットを開き、削除マーカーで隠れたキーを確認する必要がある場合は、**Show Deleted Objects**（削除済みオブジェクトを表示）を有効にします。
+2. オブジェクト名を選択して、**Object Details**（オブジェクトの詳細）を開きます。
+3. **Versions**（バージョン）を選択し、利用できるバージョンと削除マーカーを確認します。
+4. 必要なバージョンをダウンロードし、再度アップロードして、その内容を最新バージョンにします。
 
-## Use rc
+## rc を使う
 
-Create a bucket and enable versioning:
+バケットを作成し、バージョニングを有効にします。
 
 ```bash
 rc bucket create rustfs/my-bucket
@@ -50,7 +50,7 @@ rc bucket version enable rustfs/my-bucket
 rc bucket version info rustfs/my-bucket
 ```
 
-Upload two versions of the same key:
+同じキーの 2 つのバージョンをアップロードします。
 
 ```bash
 printf 'version one\n' > /tmp/hello.txt
@@ -60,7 +60,7 @@ printf 'version two\n' > /tmp/hello.txt
 rc object copy /tmp/hello.txt rustfs/my-bucket/hello.txt --overwrite
 ```
 
-List versions and record the version ID you want to recover:
+バージョンを一覧し、復元するバージョン ID を記録します。
 
 ```bash
 rc bucket version list rustfs/my-bucket/hello.txt --json
@@ -68,7 +68,7 @@ rc object stat rustfs/my-bucket/hello.txt \
 	--version-id <version-id> --json
 ```
 
-Restore an earlier version by downloading its body and uploading it as a new latest version:
+以前のバージョンの本文をダウンロードし、新しい最新バージョンとしてアップロードして復元します。
 
 ```bash
 rc object show rustfs/my-bucket/hello.txt \
@@ -78,48 +78,48 @@ rc object copy /tmp/hello-restored.txt \
 	rustfs/my-bucket/hello.txt --overwrite
 ```
 
-Delete the current key to create a delete marker, then inspect it:
+現在のキーを削除して削除マーカーを作成し、結果を確認します。
 
 ```bash
 rc object remove rustfs/my-bucket/hello.txt --force
 rc bucket version list rustfs/my-bucket/hello.txt --json
 ```
 
-The latest entry should show `is_delete_marker: true`. The earlier versions remain available by version ID.
+最新のエントリには `is_delete_marker: true` が表示されるはずです。それより前のバージョンは、バージョン ID を指定すれば引き続き利用できます。
 
-Suspend versioning when you no longer want normal writes to create new numbered versions:
+通常の書き込みで新しい番号付きバージョンを作成しないようにするには、バージョニングを一時停止します。
 
 ```bash
 rc bucket version suspend rustfs/my-bucket
 rc bucket version info rustfs/my-bucket
 ```
 
-:::warning[rc 0.1.29 version deletion boundary]
+:::warning[rc 0.1.29 におけるバージョン削除の制限]
 
-`rc object remove --versions` is listed in the `rc 0.1.29` help output but returns `not implemented`. Use the Console or an S3 SDK to permanently delete selected version IDs. Do not remove an entire version history unless you have verified retention, replication, and recovery requirements.
+`rc object remove --versions` は `rc 0.1.29` のヘルプ出力に記載されていますが、`not implemented` を返します。選択したバージョン ID を完全に削除するには、Console または S3 SDK を使います。保持、レプリケーション、復旧の要件を確認するまで、バージョン履歴全体は削除しないでください。
 
 :::
 
-## Verification
+## 検証
 
-After enabling versioning:
+バージョニングを有効にしたあと、次を確認します。
 
-1. Upload the same key twice with different content.
-2. Run `rc bucket version list` and confirm that both entries have distinct version IDs.
-3. Retrieve each version with `rc object show --version-id` and compare its content.
-4. Delete the key without a version ID and confirm that a delete marker appears.
-5. Retrieve an older version by version ID to confirm it remains recoverable.
+1. 内容の異なる同じキーを、2 回アップロードします。
+2. `rc bucket version list` を実行し、両方のエントリのバージョン ID が異なることを確認します。
+3. `rc object show --version-id` で各バージョンを取得し、内容を比較します。
+4. バージョン ID を指定せずにキーを削除し、削除マーカーが現れることを確認します。
+5. 古いバージョンをバージョン ID で取得し、復元できることを確認します。
 
-## Operational considerations
+## 運用上の考慮事項
 
-- Versioning increases storage use because overwrites and deletes retain older data.
-- Configure lifecycle rules for noncurrent versions only after defining recovery and retention periods.
-- Bucket replication requires versioning on both source and destination buckets.
-- Object Lock depends on versioning and protects individual versions.
-- Multipart completion creates one new object version in a versioned bucket.
+- 上書きと削除が古いデータを残すため、バージョニングによってストレージ使用量が増えます。
+- 非現行バージョンのライフサイクルルールは、復旧期間と保持期間を定義したあとにだけ設定します。
+- バケットレプリケーションには、ソースと宛先の両方のバケットでバージョニングが必要です。
+- オブジェクトロックはバージョニングに依存し、個々のバージョンを保護します。
+- マルチパートの完了は、バージョニングが有効なバケットに、新しいオブジェクトバージョンを 1 つ作成します。
 
-## Next steps
+## 次のステップ
 
-- [Protect versions with Object Lock](./object-lock.md)
-- [Upload large objects](./multipart-upload.md)
-- [Manage bucket lifecycle](../lifecycle-management.md)
+- [オブジェクトロックでバージョンを保護する](./object-lock.md)
+- [大きなオブジェクトをアップロードする](./multipart-upload.md)
+- [バケットのライフサイクルを管理する](../lifecycle-management.md)

@@ -1,13 +1,13 @@
 ---
 title: "Delta Lake"
-description: "Write and read Delta tables on RustFS with delta-rs."
+description: "delta-rs を使い、RustFS 上の Delta テーブルを書き込み、読み取ります。"
 ---
 
-This guide connects [Delta Lake](https://github.com/delta-io/delta) — the open-source lakehouse table format — to **RustFS** through delta-rs, the Rust-native Delta implementation. You will write a Delta table to a RustFS bucket from Python, read it back with ACID transaction history, and confirm the `_delta_log` and Parquet files in the bucket. The workflow was verified with the `deltalake` Python package (delta-rs) and pandas against `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、オープンソースのレイクハウステーブル形式である [Delta Lake](https://github.com/delta-io/delta) を、Rust ネイティブの Delta 実装である delta-rs を通じて **RustFS** に接続します。Python から RustFS のバケットへ Delta テーブルを書き込み、ACID のトランザクション履歴付きで読み戻し、バケット内の `_delta_log` と Parquet ファイルを確認します。この流れは、`deltalake` Python パッケージ（delta-rs）と pandas を `rustfs/rustfs-x86-musl:v2.3.1` に対して検証済みです。
 
-You need Python 3.9 or newer. This deployment is intended for local integration testing, not production.
+Python 3.9 以降が必要です。このデプロイはローカルでの統合テストを目的としており、本番向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -16,19 +16,19 @@ flowchart LR
 	Query["DeltaTable"] -->|"read / time travel"| RustFS
 ```
 
-delta-rs stores each table as Parquet files plus a transaction log (`_delta_log/`). All I/O goes through the `object_store` crate, configured with the same AWS environment variables as other S3 clients.
+delta-rs は、各テーブルを Parquet ファイルとトランザクションログ（`_delta_log/`）として保存します。すべての I/O は `object_store` クレートを経由し、他の S3 クライアントと同じ AWS 環境変数で構成します。
 
-## 1. Install the client
+## 1. クライアントをインストールする
 
 ```bash
 pip install deltalake pandas pyarrow
 ```
 
-`pyarrow` is required to convert pandas frames into Delta-compatible record batches.
+pandas のフレームを Delta 互換のレコードバッチへ変換するには、`pyarrow` が必要です。
 
-## 2. Write a Delta table
+## 2. Delta テーブルを書き込む
 
-Create the bucket and write a table, replacing all connection placeholders. `AWS_S3_ALLOW_UNSAFE_RENAME` is needed because RustFS does not provide copy-if-not-exists, which delta-rs otherwise uses for commit conflicts:
+接続用のプレースホルダーをすべて置き換え、バケットを作成してテーブルを書き込みます。`AWS_S3_ALLOW_UNSAFE_RENAME` が必要なのは、RustFS が copy-if-not-exists（存在しないときだけコピーする操作）を提供せず、delta-rs がコミット競合の処理にそれを使うためです。
 
 ```python title="delta_s3.py"
 import pandas as pd
@@ -53,9 +53,9 @@ print("written:", df.shape[0], "rows")
 written: 3 rows
 ```
 
-The `table` URI uses the standard `s3://bucket/prefix` form; the endpoint and credentials come from `storage_options`.
+`table` の URI は標準の `s3://bucket/prefix` 形式です。エンドポイントと認証情報は `storage_options` から渡します。
 
-## 3. Read the table back
+## 3. テーブルを読み戻す
 
 ```python title="delta_read.py"
 from deltalake import DeltaTable
@@ -75,51 +75,51 @@ read back: 3 rows
 version: 0
 ```
 
-Because the version is tracked in the transaction log, the same table supports time travel with `DeltaTable(..., version=N)` and appends that bump the version.
+バージョンはトランザクションログで追跡されるため、同じテーブルで `DeltaTable(..., version=N)` によるタイムトラベルと、バージョンを進める追記が使えます。
 
-## 4. Verify objects in RustFS
+## 4. RustFS でオブジェクトを確認する
 
-List the table prefix:
+テーブルのプレフィックスを一覧表示します。
 
 ```bash
 rc ls rustfs/<your-bucket>/ -r
 ```
 
-The first commit created the transaction log and one Parquet file:
+最初のコミットで、トランザクションログと Parquet ファイルが 1 つ作成されます。
 
 ```text
 events/_delta_log/00000000000000000000.json
 events/part-00000-3859855e-45e4-4ae5-94ff-2d8eab5e7ebb-c000.snappy.parquet
 ```
 
-Every new write adds a `NNNNNNNNNNNNNNNNNNNN.json` log entry and Parquet parts; readers replay the log to get a consistent snapshot.
+新しい書き込みのたびに、`NNNNNNNNNNNNNNNNNNNN.json` のログエントリと Parquet のパートが追加されます。読み取り側はログを再生して、一貫したスナップショットを得ます。
 
-![Delta table files stored in the RustFS Console](./images/rustfs-delta-table.png)
+![RustFS Console に保存された Delta テーブルのファイル](./images/rustfs-delta-table.png)
 
-## 5. Stop or reset
+## 5. 停止またはリセット
 
-delta-rs holds no state of its own. To delete the table:
+delta-rs 自身は状態を持ちません。テーブルを削除するには、次を実行します。
 
 ```bash
 rc rm rustfs/<your-bucket>/events/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### `Import pyarrow failed` when writing a pandas DataFrame
+### pandas の DataFrame 書き込み時の `Import pyarrow failed`
 
-`write_deltalake` converts frames through Arrow. Install `pyarrow` alongside `deltalake` and `pandas`.
+`write_deltalake` はフレームを Arrow 経由で変換します。`deltalake` と `pandas` に加えて `pyarrow` をインストールします。
 
-### `Generic DeltaTable error: commit conflict` or rename errors on commit
+### コミット時の `Generic DeltaTable error: commit conflict` またはリネームエラー
 
-delta-rs commits by copying and renaming temporary objects, which requires atomic rename on the backend. For S3-compatible stores without copy-if-not-exists, set `AWS_S3_ALLOW_UNSAFE_RENAME: "true"` in `storage_options` — acceptable for a single writer, not for concurrent writers.
+delta-rs は一時オブジェクトのコピーとリネームでコミットするため、バックエンドにアトミックなリネームが必要です。copy-if-not-exists を持たない S3 互換ストアでは、`storage_options` に `AWS_S3_ALLOW_UNSAFE_RENAME: "true"` を設定します。単一ライターでは許容できます。同時ライターには向きません。
 
 ### `Unknown lengthy error: AWS connectivity or endpoint errors`
 
-Confirm `AWS_ENDPOINT_URL` includes the scheme and that `AWS_ALLOW_HTTP` is `"true"` for plain-HTTP endpoints; without it the S3 client only speaks HTTPS.
+平文 HTTP のエンドポイントでは、`AWS_ENDPOINT_URL` にスキームが含まれることと、`AWS_ALLOW_HTTP` が `"true"` であることを確認します。設定しないと、S3 クライアントは HTTPS のみで通信します。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Delta clients.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [delta-rs usage documentation](https://delta-io.github.io/delta-rs/usage/writing/writing-to-s3/) for concurrent-writer setups with DynamoDB-backed commit coordination.
+- 追加の Delta クライアントを採用する前に、[S3 互換性に関する注意](/ja/administration/protocols/s3)を確認します。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- [delta-rs の利用ドキュメント](https://delta-io.github.io/delta-rs/usage/writing/writing-to-s3/)に従い、DynamoDB をバックエンドにしたコミット調整による同時ライター構成を確認します。

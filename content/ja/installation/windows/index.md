@@ -1,123 +1,125 @@
 ---
-title: "Install RustFS on Windows"
-description: "Install a local RustFS instance on Windows with RustFS Launcher or the standalone server binary."
+title: "Windows に RustFS をインストールする"
+description: "RustFS Launcher またはスタンドアロンのサーバーバイナリを使い、Windows にローカルの RustFS インスタンスをインストールします。"
 ---
 
-This guide provides two ways to run **RustFS** on Windows: use the graphical **RustFS Launcher**, or download and run the standalone server binary from PowerShell. Both methods create a local, single-node instance suitable for evaluation, development, and testing.
+このガイドでは、Windows で **RustFS** を実行する 2 つの方法を説明します。グラフィカルな **RustFS Launcher** を使う方法と、PowerShell からスタンドアロンのサーバーバイナリをダウンロードして実行する方法です。どちらも、評価、開発、テストに適したローカルのシングルノードインスタンスを作成します。
 
-:::note[Deployment scope]
+:::warning[開発とデバッグ専用]
 
-These procedures run RustFS as a desktop process, not as a Windows service. For a production or distributed deployment, use the [Linux installation guides](/installation/linux).
+Windows 版の RustFS は、開発とデバッグ専用であり、**本番デプロイには推奨しません**。本番ワークロードには [Linux](/ja/installation/linux) を推奨します。
 
-:::
-
-## 1. Check the prerequisites
-
-Before you begin, make sure that:
-
-- You are using 64-bit Windows on an x86-64 processor. Launcher currently bundles the Windows x86-64 RustFS binary.
-- You have permission to install or run applications and to write to the selected data directory.
-- TCP ports `9000` and `9001` are available, or you have selected two other unused ports.
-- You have created a dedicated data directory, such as `D:\rustfs\data`.
-
-:::warning[Protect the data directory]
-
-Use an empty directory on a disk with enough free space. Do not store unrelated files in this directory, and do not edit RustFS data files while the server is running.
+これらの手順では、RustFS を Windows サービスとしてではなく、デスクトッププロセスとして実行します。本番または分散デプロイには、[Linux のインストールガイド](/ja/installation/linux) を使います。
 
 :::
 
-## 2. Choose an installation method
+## 1. 前提条件を確認する
 
-| Method | Use it when | Management model |
+始める前に、次を確認します。
+
+- 使用しているのは、x86-64 プロセッサー上の 64 ビット Windows です。Launcher は現在、Windows x86-64 の RustFS バイナリを同梱しています。
+- アプリケーションのインストールまたは実行と、選択したデータディレクトリへの書き込みの権限があります。
+- TCP ポート `9000` と `9001` が空いているか、ほかの未使用ポートを 2 つ選んでいます。
+- `D:\rustfs\data` のような専用のデータディレクトリを作成しています。
+
+:::warning[データディレクトリを保護する]
+
+空き容量が十分なディスク上の空のディレクトリを使います。このディレクトリに無関係なファイルを置かず、サーバーの実行中に RustFS のデータファイルを編集しないでください。
+
+:::
+
+## 2. インストール方法を選ぶ
+
+| 方法 | 使う場面 | 管理モデル |
 | --- | --- | --- |
-| RustFS Launcher | You want a graphical setup and built-in log viewer. | Launcher starts and stops the bundled RustFS process. |
-| Standalone binary | You want explicit PowerShell commands or scripting. | The PowerShell session owns the RustFS process. |
+| RustFS Launcher | グラフィカルなセットアップと組み込みのログビューアーが必要な場合。 | Launcher が、同梱の RustFS プロセスを起動し、停止します。 |
+| スタンドアロンバイナリ | 明示的な PowerShell コマンドやスクリプトが必要な場合。 | RustFS プロセスは、その PowerShell セッションに属します。 |
 
-## Install with RustFS Launcher
+## RustFS Launcher でインストールする
 
-### 3. Download and install Launcher
+### 3. Launcher をダウンロードしてインストールする
 
-1. Open the [RustFS Launcher Releases page](https://github.com/rustfs/launcher/releases).
-2. Select the latest release and download its Windows x86-64 installer from **Assets**. Do not download **Source code**, which is for building Launcher from source.
-3. Double-click the installer and follow the prompts.
-4. Open **RustFS Launcher** from the Start menu if it does not open automatically.
+1. [RustFS Launcher の Releases ページ](https://github.com/rustfs/launcher/releases) を開きます。
+2. 最新のリリースを選び、**Assets**（アセット）から Windows x86-64 のインストーラーをダウンロードします。ソースから Launcher をビルドするための **Source code**（ソースコード）はダウンロードしないでください。
+3. インストーラーをダブルクリックし、画面の指示に従います。
+4. 自動で開かない場合は、スタートメニューから **RustFS Launcher** を開きます。
 
-If Microsoft Defender SmartScreen displays a warning, verify that the installer came from the official `rustfs/launcher` Releases page before allowing it to run. Do not disable Windows security features globally.
+Microsoft Defender SmartScreen が警告を表示した場合は、実行を許可する前に、インストーラーが公式の `rustfs/launcher` Releases ページから入手したものであることを確認します。Windows のセキュリティ機能をシステム全体で無効にしないでください。
 
-### 4. Configure Launcher
+### 4. Launcher を設定する
 
-Configure the fields in the Launcher window:
+Launcher ウィンドウの各フィールドを設定します。
 
-| Section | Field | Recommended value | Description |
+| セクション | フィールド | 推奨値 | 説明 |
 | --- | --- | --- | --- |
-| Dataset Mount | Data Path | `D:\rustfs\data` | Existing directory where RustFS stores object data. |
-| Ports & Access | API Port | `9000` | S3-compatible API port. |
-| Ports & Access | Host | `127.0.0.1` | Restricts access to this computer. |
-| Ports & Access | Console Endpoint | Enabled | Enables the web Console; Launcher disables it by default. |
-| Ports & Access | Console Port | `9001` | Console port, which must differ from the API port. |
-| Credentials | Access Key | `<your-access-key>` | Administrator access key for this instance. |
-| Credentials | Secret Key | `<your-secret-key>` | Administrator secret key for this instance. |
+| Dataset Mount（データセットのマウント） | Data Path（データパス） | `D:\rustfs\data` | RustFS がオブジェクトデータを保存する、既存のディレクトリ。 |
+| Ports & Access（ポートとアクセス） | API Port（API ポート） | `9000` | S3 互換 API のポート。 |
+| Ports & Access | Host（ホスト） | `127.0.0.1` | アクセスをこのコンピューターに制限します。 |
+| Ports & Access | Console Endpoint（Console エンドポイント） | Enabled（有効） | Web Console を有効にします。Launcher は既定で無効にしています。 |
+| Ports & Access | Console Port（Console ポート） | `9001` | Console のポート。API ポートとは異なる必要があります。 |
+| Credentials（認証情報） | Access Key（アクセスキー） | `<your-access-key>` | このインスタンスの管理者アクセスキー。 |
+| Credentials | Secret Key（シークレットキー） | `<your-secret-key>` | このインスタンスの管理者シークレットキー。 |
 
-Select the data directory with **Browse** or drag it into Launcher. Launcher requires the directory to exist before startup.
+**Browse**（参照）でデータディレクトリを選ぶか、Launcher にドラッグします。Launcher は、起動前にディレクトリが存在していることを要求します。
 
-Replace the credential placeholders with your own values. Launcher initially displays default local-test credentials; do not retain them on a computer accessible by other users.
+認証情報のプレースホルダーを独自の値に置き換えます。Launcher は最初、ローカルテスト用の既定の認証情報を表示します。ほかのユーザーがアクセスできるコンピューターでは、その値を残さないでください。
 
-:::warning[Network exposure]
+:::warning[ネットワークへの公開]
 
-Keep **Host** set to `127.0.0.1` unless another computer must connect to RustFS. A non-loopback address exposes the API and Console on the corresponding network interfaces. Configure Windows Defender Firewall and strong credentials before allowing remote access.
+別のコンピューターが RustFS に接続する必要がある場合を除き、**Host** は `127.0.0.1` のままにします。ループバック以外のアドレスは、対応するネットワークインターフェース上で API と Console を公開します。リモートアクセスを許可する前に、Windows Defender ファイアウォールと強力な認証情報を設定します。
 
 :::
 
-### 5. Start and verify RustFS
+### 5. RustFS を起動して確認する
 
-1. Select **Launch RustFS**.
-2. Wait for Launcher to report that the configured endpoint is online.
-3. Open `http://localhost:9001` and sign in with the access key and secret key that you configured.
-4. Use `http://localhost:9000` as the endpoint for S3-compatible clients.
+1. **Launch RustFS**（RustFS を起動）を選びます。
+2. 設定したエンドポイントがオンラインになったと Launcher が報告するまで待ちます。
+3. `http://localhost:9001` を開き、設定したアクセスキーとシークレットキーでサインインします。
+4. S3 互換クライアントのエンドポイントとして `http://localhost:9000` を使います。
 
-![RustFS Launcher showing the service online with API port 9000, Console port 9001, and successful startup logs](./images/windows-rustfs-launcher.jpg)
+![API ポート 9000、Console ポート 9001、起動成功のログとともに、サービスがオンラインであることを示す RustFS Launcher](./images/windows-rustfs-launcher.jpg)
 
-If you changed the host or ports, use those values instead. The Console URL is available only when **Console Endpoint** is enabled.
+ホストまたはポートを変更した場合は、その値を使います。Console の URL は、**Console Endpoint** が有効な場合にのみ使えます。
 
-Launcher locks its configuration while it manages a running process. It also creates a `logs` directory next to the data directory. For example, a data path of `D:\rustfs\data` places server log files under `D:\rustfs\logs`.
+Launcher は、実行中のプロセスを管理している間、設定をロックします。また、データディレクトリの隣に `logs` ディレクトリを作成します。たとえば、データパスが `D:\rustfs\data` の場合、サーバーのログファイルは `D:\rustfs\logs` に置かれます。
 
-### 6. Stop or exit Launcher
+### 6. Launcher を停止または終了する
 
-Select **Stop RustFS** before changing configuration, disconnecting the data disk, or shutting down Windows.
+設定を変更する前、データディスクを取り外す前、または Windows をシャットダウンする前に、**Stop RustFS**（RustFS を停止）を選びます。
 
-Closing the Launcher window hides it in the Windows system tray; it does not stop RustFS. To stop the managed process and exit Launcher, right-click the tray icon and select **Quit**. Select **Show**, or left-click the tray icon, to restore the window.
+Launcher ウィンドウを閉じると、Windows のシステムトレイに隠れるだけで、RustFS は停止しません。管理対象のプロセスを停止して Launcher を終了するには、トレイアイコンを右クリックして **Quit**（終了）を選びます。ウィンドウを戻すには、**Show**（表示）を選ぶか、トレイアイコンを左クリックします。
 
-## Install the standalone binary
+## スタンドアロンバイナリをインストールする
 
-### 7. Download and extract the binary
+### 7. バイナリをダウンロードして展開する
 
-1. Open the [RustFS Releases page](https://github.com/rustfs/rustfs/releases).
-2. Select the required release and download the Windows x86-64 ZIP archive from **Assets**. The asset name begins with `rustfs-windows-x86_64`.
-3. Open PowerShell and create directories for the program and its data:
+1. [RustFS の Releases ページ](https://github.com/rustfs/rustfs/releases) を開きます。
+2. 必要なリリースを選び、**Assets** から Windows x86-64 の ZIP アーカイブをダウンロードします。アセット名は `rustfs-windows-x86_64` で始まります。
+3. PowerShell を開き、プログラムとデータのディレクトリを作成します。
 
 ```powershell
 New-Item -ItemType Directory -Force -Path C:\rustfs\bin
 New-Item -ItemType Directory -Force -Path D:\rustfs\data
 ```
 
-4. Extract the downloaded archive. Replace `<version>` with the version in the downloaded filename:
+4. ダウンロードしたアーカイブを展開します。`<version>` は、ダウンロードしたファイル名のバージョンに置き換えます。
 
 ```powershell
 Expand-Archive -Path "$HOME\Downloads\rustfs-windows-x86_64-<version>.zip" -DestinationPath C:\rustfs\bin -Force
 ```
 
-5. Confirm that the extracted binary runs:
+5. 展開したバイナリが実行できることを確認します。
 
 ```powershell
 Set-Location C:\rustfs\bin
 .\rustfs.exe --help
 ```
 
-If the archive extracts `rustfs.exe` into a nested directory, change to that directory or move the executable into `C:\rustfs\bin` before continuing.
+アーカイブが `rustfs.exe` をネストしたディレクトリに展開した場合は、続ける前にそのディレクトリへ移動するか、実行ファイルを `C:\rustfs\bin` に移動します。
 
-### 8. Start the standalone server
+### 8. スタンドアロンサーバーを起動する
 
-Set credentials only for the current PowerShell session, then start RustFS with explicit addresses:
+現在の PowerShell セッションだけに認証情報を設定し、明示的なアドレスで RustFS を起動します。
 
 ```powershell
 $env:RUSTFS_ACCESS_KEY = "<your-access-key>"
@@ -131,61 +133,61 @@ Set-Location C:\rustfs\bin
 	"D:\rustfs\data"
 ```
 
-Keep the PowerShell window open while RustFS is running. Press `Ctrl+C` in that window to stop the server.
+RustFS の実行中は、PowerShell ウィンドウを開いたままにします。そのウィンドウで `Ctrl+C` を押すと、サーバーが停止します。
 
-:::tip[Credential handling]
+:::tip[認証情報の扱い]
 
-Session environment variables avoid placing credentials directly in the command line. For repeated or automated use, prefer the `RUSTFS_ACCESS_KEY_FILE` and `RUSTFS_SECRET_KEY_FILE` environment variables and protect those files with Windows access controls.
+セッションの環境変数を使うと、認証情報をコマンドラインに直接置かずに済みます。繰り返し使う場合や自動化する場合は、`RUSTFS_ACCESS_KEY_FILE` と `RUSTFS_SECRET_KEY_FILE` の環境変数を使い、それらのファイルを Windows のアクセス制御で保護することを推奨します。
 
 :::
 
-### 9. Verify the standalone server
+### 9. スタンドアロンサーバーを確認する
 
-Open `http://localhost:9001` and sign in with the configured credentials. Use `http://localhost:9000` as the endpoint for S3-compatible clients. RustFS defaults to path-style addressing, so configure clients accordingly.
+`http://localhost:9001` を開き、設定した認証情報でサインインします。S3 互換クライアントのエンドポイントとして `http://localhost:9000` を使います。RustFS は既定でパススタイルアクセスになるため、クライアントもそれに合わせて設定します。
 
-To perform an end-to-end check, create a bucket named `my-bucket`, upload `hello.txt`, and confirm that the object appears in the bucket.
+エンドツーエンドで確認するには、`my-bucket` という名前のバケットを作成し、`hello.txt` をアップロードして、オブジェクトがバケットに表示されることを確認します。
 
-## Confirm a successful installation
+## インストールの成功を確認する
 
-Whether you used Launcher or the standalone binary, a successful Console sign-in opens the **Buckets** page. From here, you can create `my-bucket` and begin storing objects.
+Launcher とスタンドアロンバイナリのどちらを使った場合でも、Console へのサインインが成功すると **Buckets**（バケット）ページが開きます。ここから `my-bucket` を作成し、オブジェクトの保存を始められます。
 
-![RustFS Console Buckets page after a successful sign-in](./images/rustfs-console-login.png)
+![サインイン成功後の RustFS Console の Buckets ページ](./images/rustfs-console-login.png)
 
-## Troubleshooting
+## トラブルシューティング
 
-### Windows blocks the installer or executable
+### Windows がインストーラーまたは実行ファイルをブロックする
 
-Confirm that the file came from the official RustFS GitHub organization. Inspect the file's **Properties** dialog and, when Windows provides the option, select **Unblock** only after verifying the source.
+ファイルが公式の RustFS GitHub 組織から入手したものであることを確認します。ファイルの **Properties**（プロパティ）ダイアログを確認し、Windows がその選択肢を出した場合に限り、入手元を確認したうえで **Unblock**（ブロックの解除）を選びます。
 
-### The data path is rejected
+### データパスが拒否される
 
-Confirm that the directory exists and that your Windows account has read and write access. Launcher does not create the selected data directory for you.
+ディレクトリが存在し、Windows アカウントに読み取りと書き込みの権限があることを確認します。Launcher は、選択したデータディレクトリを自動では作成しません。
 
-### The API or Console port is unavailable
+### API または Console のポートが使えない
 
-The ports must be numbers from `1` to `65535`, must differ from each other, and must not already be in use. Inspect the default ports in PowerShell:
+ポートは、`1` から `65535` の数値であり、互いに異なり、かつ未使用である必要があります。PowerShell で既定のポートを確認します。
 
 ```powershell
 Get-NetTCPConnection -LocalPort 9000,9001 -ErrorAction SilentlyContinue
 ```
 
-Stop the conflicting application or select unused ports, then start RustFS again.
+競合しているアプリケーションを停止するか、未使用のポートを選んでから、RustFS を再度起動します。
 
-### The Console does not open
+### Console が開かない
 
-For Launcher, confirm that **Console Endpoint** is enabled. For the standalone binary, confirm that the process is still running and that `--console-enable true` is present. The current Console default is port `9001`; port `7001` is not used by the current Launcher configuration.
+Launcher の場合は、**Console Endpoint** が有効であることを確認します。スタンドアロンバイナリの場合は、プロセスがまだ実行中であり、`--console-enable true` があることを確認します。現在の Console の既定ポートは `9001` です。現在の Launcher の設定では、ポート `7001` は使いません。
 
-### Launcher reports an external RustFS process
+### Launcher が外部の RustFS プロセスを報告する
 
-Another process is listening on the configured API address, but Launcher did not start it. Stop that process or choose another API port. Launcher cannot stop a process it does not manage.
+別のプロセスが、設定した API アドレスで待ち受けていますが、Launcher はそのプロセスを起動していません。そのプロセスを停止するか、別の API ポートを選びます。Launcher は、自身が管理していないプロセスを停止できません。
 
-### RustFS exits after launch
+### 起動後に RustFS が終了する
 
-In Launcher, inspect both the application and RustFS tabs in the built-in log viewer. For a standalone installation, inspect the PowerShell output. Common causes include a missing data directory, insufficient permissions, or a port conflict.
+Launcher では、組み込みログビューアーのアプリケーションタブと RustFS タブの両方を確認します。スタンドアロンインストールでは、PowerShell の出力を確認します。よくある原因は、データディレクトリがないこと、権限が不足していること、ポートの競合です。
 
-## Next steps
+## 次のステップ
 
-- Review the [S3 API guide](/administration/protocols/s3) before connecting a client.
-- Learn how to [create a bucket](/administration/data/bucket/creation).
-- See [status checks](/operations/status-check) for additional verification methods.
-- Use the [Linux installation guides](/installation/linux) for a production-oriented deployment.
+- クライアントを接続する前に、[S3 API ガイド](/ja/administration/protocols/s3) を確認します。
+- [バケットを作成する](/ja/administration/data/bucket/creation) 方法を確認します。
+- 追加の確認方法は、[ステータスチェック](/ja/operations/status-check) を参照します。
+- 本番向けのデプロイには、[Linux のインストールガイド](/ja/installation/linux) を使います。

@@ -1,13 +1,13 @@
 ---
 title: "OpenDAL"
-description: "Access RustFS objects from applications through the Apache OpenDAL data access layer."
+description: "Accédez aux objets RustFS depuis vos applications via la couche d’accès aux données Apache OpenDAL."
 ---
 
-This guide connects [Apache OpenDAL](https://github.com/apache/opendal) — the unified data access layer — to **RustFS** through its `s3` service. You will run the OpenDAL Python binding against RustFS, write and read an object, list a prefix, and delete it. The workflow was verified with the `opendal` Python package 0.46 on `python:3.12-slim` and `rustfs/rustfs-x86-musl:v2.3.1`.
+Ce guide connecte [Apache OpenDAL](https://github.com/apache/opendal) — la couche unifiée d’accès aux données — à **RustFS** via son service `s3`. Vous allez exécuter le binding Python d’OpenDAL face à RustFS, écrire un objet, le lire, lister un préfixe, puis le supprimer. Le flux a été validé avec le paquet Python `opendal` 0.46 sur `python:3.12-slim` et `rustfs/rustfs-x86-musl:v2.3.1`.
 
-You need Docker and Python 3.9 or later. OpenDAL supports the same `s3` service from Rust, Java, Node.js, and Go bindings with equivalent settings.
+Vous avez besoin de Docker et de Python 3.9 ou ultérieur. OpenDAL prend en charge le même service `s3` depuis les bindings Rust, Java, Node.js et Go, avec des réglages équivalents.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -15,17 +15,17 @@ flowchart LR
 	OpenDAL -->|"s3 service"| RustFS["RustFS :9000"]
 ```
 
-An OpenDAL `Operator` bound to the `s3` service exposes one uniform API — `write`, `read`, `stat`, `list`, `delete` — over the bucket, so the same code runs against S3, RustFS, or any other supported service by changing the connection settings.
+Un `Operator` OpenDAL lié au service `s3` expose une API uniforme — `write`, `read`, `stat`, `list`, `delete` — sur le compartiment (bucket). Le même code fonctionne ainsi face à S3, à RustFS ou à tout autre service pris en charge, en changeant les paramètres de connexion.
 
-## 1. Set up the project
+## 1. Préparer le projet
 
-Install the Python binding:
+Installez le binding Python :
 
 ```bash
 pip install opendal
 ```
 
-Create the script, replacing all connection placeholders:
+Créez le script, en remplaçant toutes les valeurs indicatives de connexion :
 
 ```python title="opendal_demo.py"
 import opendal
@@ -47,11 +47,11 @@ op.delete("opendal-demo/hello.txt")
 print("deleted:", not op.exists("opendal-demo/hello.txt"))
 ```
 
-The credential option names are `access_key_id` and `secret_access_key` — the shorter `access_key` names do not exist and fail with a signing error. Path-style addressing is the default for non-AWS endpoints.
+Les noms des options d’identifiants sont `access_key_id` et `secret_access_key` — les noms plus courts `access_key` n’existent pas et provoquent une erreur de signature. L’adressage de type chemin (path-style) est le comportement par défaut pour les points de terminaison autres qu’AWS.
 
-## 2. Run the demo
+## 2. Exécuter la démonstration
 
-Run the script from a machine that can reach RustFS:
+Exécutez le script depuis une machine qui peut joindre RustFS :
 
 ```bash
 python opendal_demo.py
@@ -64,11 +64,11 @@ listed: opendal-demo/hello.txt
 deleted: True
 ```
 
-The round trip exercises the full object lifecycle: write uploads the bytes, `read` fetches them back, `stat` returns the object size, `list` enumerates the prefix, and `delete` removes the object.
+L’aller-retour couvre le cycle complet des opérations sur l’objet : l’écriture charge les octets (upload), `read` les relit, `stat` renvoie la taille de l’objet, `list` énumère le préfixe et `delete` supprime l’objet.
 
-## 3. Verify objects in RustFS
+## 3. Vérifier les objets dans RustFS
 
-Comment out the final `op.delete` line, run the script again, and list the prefix in RustFS:
+Commentez la dernière ligne `op.delete`, exécutez de nouveau le script, puis listez le préfixe dans RustFS :
 
 ```bash
 rc ls rustfs/my-bucket/opendal-demo/ -r
@@ -79,30 +79,30 @@ hello.txt
 data/rows.csv
 ```
 
-![OpenDAL objects stored in the RustFS Console](./images/rustfs-opendal-objects.png)
+![Objets OpenDAL stockés dans la Console RustFS](./images/rustfs-opendal-objects.png)
 
-The objects visible in the RustFS Console are exactly the paths the OpenDAL API wrote.
+Les objets visibles dans la Console RustFS sont exactement les chemins écrits par l’API OpenDAL.
 
-## 4. Stop or reset
+## 4. Arrêter ou réinitialiser
 
-OpenDAL is a library and holds no state of its own. To clean up the demo objects:
+OpenDAL est une bibliothèque et ne conserve aucun état propre. Pour supprimer les objets de la démonstration :
 
 ```bash
 rc rm rustfs/my-bucket/opendal-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## Dépannage
 
 ### `failed to load signing credential`
 
-The operator received no usable credentials. Use the exact option names `access_key_id` and `secret_access_key`; other spellings are silently ignored and signing then fails.
+L’opérateur n’a reçu aucun identifiant utilisable. Utilisez les noms d’options exacts `access_key_id` et `secret_access_key` ; les autres orthographes sont ignorées en silence, puis la signature échoue.
 
-### Connection or DNS errors on write
+### Erreurs de connexion ou DNS à l’écriture
 
-Confirm the endpoint includes the scheme and port and is reachable from the application. Inside a Compose network the hostname is `rustfs`; from the host use `http://localhost:9000`.
+Vérifiez que le point de terminaison inclut le schéma et le port, et qu’il est joignable depuis l’application. À l’intérieur d’un réseau Compose, le nom d’hôte est `rustfs` ; depuis l’hôte, utilisez `http://localhost:9000`.
 
-## Next steps
+## Étapes suivantes
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional OpenDAL operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [OpenDAL documentation](https://opendal.apache.org/docs/) to use the same operator from Rust, Java, or Node.js.
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres opérations OpenDAL.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
+- Suivez la [documentation OpenDAL](https://opendal.apache.org/docs/) pour utiliser le même opérateur depuis Rust, Java ou Node.js.

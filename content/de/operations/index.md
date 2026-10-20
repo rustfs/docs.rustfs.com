@@ -1,16 +1,16 @@
 ---
-title: "Operations & Observability"
-description: "Operate, monitor, scale, upgrade, and troubleshoot RustFS deployments."
+title: "Betrieb und Observability"
+description: "Betreiben, überwachen und skalieren Sie RustFS-Bereitstellungen, führen Sie Upgrades aus und beheben Sie Störungen."
 ---
 
-Use this section to keep RustFS deployments healthy through upgrades, scaling, availability planning, monitoring, and incident response.
+Nutzen Sie diesen Abschnitt, um RustFS-Bereitstellungen durch Upgrades, Skalierung, Verfügbarkeitsplanung, Überwachung und Reaktion auf Störungen betriebsbereit zu halten.
 
-## Operational areas
+## Operative Bereiche
 
-- [Upgrade](./upgrade/index.md) covers binary, container, and Kubernetes upgrades.
-- [Scaling](./scaling/index.md) covers storage expansion, rebalancing, and decommissioning.
-- [High Availability](./high-availability/index.md) covers node healing and site replication.
-- [Cluster Lifecycle Operations](./cluster-lifecycle.md) covers layout boundaries, quorum, expansion, rebalancing, decommissioning, healing, and restarts in one runbook.
-- [Observability](./observability.md) covers metrics, logs, traces, monitoring integrations, and alert signals.
-- [Status Check](./status-check.md) covers network ports, health probes, cluster status, and storage capacity checks.
-- [Event Notifications](./event-notifications.md) covers bucket event targets.
+- [Upgrade](./upgrade/index.md) behandelt Upgrades für Binärdatei, Container und Kubernetes.
+- [Skalierung](./scaling/index.md) behandelt Speichererweiterung, Rebalancing und Außerbetriebnahme.
+- [Hochverfügbarkeit](./high-availability/index.md) behandelt die Datenwiederherstellung von Knoten und die Site-Replikation.
+- [Cluster-Lebenszyklusoperationen](./cluster-lifecycle.md) behandeln Layoutgrenzen, Quorum, Erweiterung, Rebalancing, Außerbetriebnahme, Datenwiederherstellung und Neustarts in einem Runbook.
+- [Observability](./observability.md) behandelt Metriken, Protokolle, Traces, Monitoring-Integrationen und Alarmsignale.
+- [Statusprüfung](./status-check.md) behandelt Netzwerkports, Integritätsprüfungen, den Clusterstatus und Prüfungen der Speicherkapazität.
+- [Ereignisbenachrichtigungen](./event-notifications.md) behandeln Ziele für Bucket-Ereignisse.

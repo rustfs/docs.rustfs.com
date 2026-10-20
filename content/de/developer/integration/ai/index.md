@@ -3,7 +3,7 @@ title: "AI"
 description: "Verbinden Sie KI-Plattformen über S3-kompatible Objektspeicher-Schnittstellen mit RustFS."
 ---
 
-Nutzen Sie **RustFS** als Objektspeicher-Layer für KI- und Machine-Learning-Plattformen, die einen S3-kompatiblen Endpunkt unterstützen.
+Nutzen Sie **RustFS** als Objektspeicher-Backend für KI- und Machine-Learning-Plattformen mit S3-kompatiblem Endpunkt.
 
 ## Plattformen
 
@@ -11,4 +11,4 @@ Nutzen Sie **RustFS** als Objektspeicher-Layer für KI- und Machine-Learning-Pla
 - [Ray](./ray.md)
 - [vLLM](./vllm.md)
 
-Speichern Sie Trainingsdaten und Checkpoints in dedizierten Buckets und beschränken Sie die Anmeldeinformationen auf die erforderlichen Bucket-Operationen.
+Speichern Sie Trainingsdaten und Checkpoints in dedizierten Buckets und beschränken Sie die Zugangsdaten auf die erforderlichen Bucket-Operationen.

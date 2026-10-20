@@ -1,13 +1,13 @@
 ---
 title: "rclone"
-description: "Sync, mount, and serve RustFS buckets with rclone over its S3-compatible API."
+description: "rclone の S3 互換 API 経由で、RustFS のバケットの同期、マウント、配信を行います。"
 ---
 
-This guide connects [rclone](https://github.com/rclone/rclone) — the command-line tool for syncing files to and from cloud storage — to **RustFS** through its S3 backend. You will configure an S3 remote for RustFS, copy and sync files, read objects back, publish a bucket over HTTP with `rclone serve`, and mount the bucket as a local filesystem with `rclone mount`. The workflow was verified with `rclone v1.75.1` against `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、クラウドストレージとの間でファイルを同期するコマンドラインツールである [rclone](https://github.com/rclone/rclone) を、S3 バックエンド経由で **RustFS** に接続します。RustFS 向けの S3 リモートを設定し、ファイルのコピーと同期、オブジェクトの読み戻し、`rclone serve` による HTTP でのバケット公開、`rclone mount` によるローカルファイルシステムとしてのマウントを行います。手順は `rclone v1.75.1` と `rustfs/rustfs-x86-musl:v2.3.1` の組み合わせで確認済みです。
 
-You need Docker, or a local rclone binary. This deployment is intended for local integration testing, not production.
+Docker、またはローカルの rclone バイナリが必要です。このデプロイはローカルでの連携テスト用であり、本番向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -16,11 +16,11 @@ flowchart LR
 	RustFS -->|"mount / serve"| Client["FUSE mount / HTTP clients"]
 ```
 
-One remote definition drives every rclone command: data transfer, mounting, and serving all use the same S3 connection.
+すべての rclone コマンドは、1 つのリモート定義を使います。データ転送、マウント、配信は、同じ S3 接続を使います。
 
-## 1. Configure the remote
+## 1. リモートを設定する
 
-Create an rclone config file with an S3 remote for RustFS, replacing all connection placeholders. The `Other` provider disables AWS-specific behavior, and path-style addressing is used automatically for custom endpoints:
+接続用のプレースホルダーをすべて置き換えて、RustFS 向けの S3 リモートを含む rclone の設定ファイルを作成します。`Other` プロバイダーは AWS 固有の動作を無効にします。カスタムエンドポイントでは、パススタイルアクセスが自動的に使われます。
 
 ```ini title="rclone.conf"
 [rustfs]
@@ -32,16 +32,16 @@ endpoint = http://<your-rustfs-endpoint>:9000
 region = us-east-1
 ```
 
-## 2. Copy and read objects
+## 2. オブジェクトをコピーして読み取る
 
-Create the bucket and upload a directory with `rclone copy`:
+バケットを作成し、`rclone copy` でディレクトリをアップロードします。
 
 ```bash
 rc mb rustfs/rclone-demo
 rclone copy /data rustfs:rclone-demo/seed
 ```
 
-List and read back:
+一覧して読み戻します。
 
 ```bash
 rclone ls rustfs:rclone-demo/seed
@@ -54,11 +54,11 @@ rclone cat rustfs:rclone-demo/seed/hello.txt
 hello from rclone
 ```
 
-`rclone lsd rustfs:` lists every bucket on the endpoint.
+`rclone lsd rustfs:` は、エンドポイント上のすべてのバケットを一覧します。
 
-## 3. Sync a directory
+## 3. ディレクトリを同期する
 
-`rclone sync` makes the destination identical to the source, including deletions. Remove a local file and sync:
+`rclone sync` は、削除を含めて宛先をソースと同一にします。ローカルファイルを削除して同期します。
 
 ```bash
 rm /data/hello.txt
@@ -70,17 +70,17 @@ rclone lsf rustfs:rclone-demo/seed
 blob.bin
 ```
 
-`hello.txt` disappears from the bucket. Add `--dry-run` first to preview the changes without touching the bucket.
+`hello.txt` はバケットから消えます。バケットを変更せずに変更内容を確認するには、先に `--dry-run` を付けます。
 
-## 4. Serve a bucket over HTTP
+## 4. HTTP でバケットを配信する
 
-Publish the bucket contents as an HTTP file server:
+バケットの内容を HTTP ファイルサーバーとして公開します。
 
 ```bash
 rclone serve http --addr 0.0.0.0:8080 rustfs:rclone-demo/seed
 ```
 
-Any HTTP client can now download objects:
+任意の HTTP クライアントからオブジェクトをダウンロードできます。
 
 ```bash
 curl -s http://localhost:8080/blob.bin -o /dev/null -w "%{http_code} %{size_download} bytes\n"
@@ -90,11 +90,11 @@ curl -s http://localhost:8080/blob.bin -o /dev/null -w "%{http_code} %{size_down
 200 3145728 bytes
 ```
 
-`rclone serve` also supports WebDAV, SFTP, and S3 endpoints over the same remote.
+`rclone serve` は、同じリモート上で WebDAV、SFTP、S3 のエンドポイントにも対応します。
 
-## 5. Mount the bucket as a filesystem
+## 5. バケットをファイルシステムとしてマウントする
 
-With FUSE available, mount the bucket locally and use it like a directory:
+FUSE が使える場合、バケットをローカルにマウントし、ディレクトリと同じように使います。
 
 ```bash
 rclone mount rustfs:rclone-demo /mnt/rclone --daemon
@@ -103,7 +103,7 @@ echo test > /mnt/rclone/write-test.txt
 cat /mnt/rclone/write-test.txt
 ```
 
-Files written through the mount appear in RustFS as regular objects:
+マウント経由で書き込んだファイルは、通常のオブジェクトとして RustFS に現れます。
 
 ```bash
 rc ls rustfs/rclone-demo/ -r
@@ -113,32 +113,32 @@ rc ls rustfs/rclone-demo/ -r
 [2026-09-29 11:12:41]        5 B write-test.txt
 ```
 
-Unmount with `fusermount -u /mnt/rclone` when finished.
+終わったら `fusermount -u /mnt/rclone` でアンマウントします。
 
-## 6. Stop or reset
+## 6. 停止またはリセットする
 
-rclone holds no server-side state. To delete the demo data:
+rclone はサーバー側の状態を持ちません。デモデータを削除するには、次を実行します。
 
 ```bash
 rclone purge rustfs:rclone-demo
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### `Access Denied` or empty listings
+### `Access Denied`、または一覧が空になる
 
-Confirm `endpoint` includes the scheme and that the key pair matches a RustFS access key. The `region` value is required by the S3 signer even though RustFS ignores it; keep `us-east-1`.
+`endpoint` にスキームが含まれ、キーの組が RustFS のアクセスキーと一致することを確認します。`region` の値は、RustFS が無視しても S3 の署名処理では必須です。`us-east-1` のままにします。
 
-### Mount fails with `fusermount3: mount failed: Permission denied`
+### `fusermount3: mount failed: Permission denied` でマウントが失敗する
 
-Mounting needs the FUSE device and elevated privileges. Inside a container, run with `--device /dev/fuse --cap-add SYS_ADMIN` — and use `--privileged` if the mount helper still fails. On a host, verify that `fuse3` is installed and `/dev/fuse` exists.
+マウントには FUSE デバイスと昇格した権限が必要です。コンテナ内では `--device /dev/fuse --cap-add SYS_ADMIN` を付けて実行します。マウントヘルパーがそれでも失敗する場合は、`--privileged` を使います。ホストでは、`fuse3` がインストールされ、`/dev/fuse` が存在することを確認します。
 
-### Sync deleted nothing on the destination
+### 同期しても宛先のオブジェクトが削除されない
 
-`rclone copy` never deletes. Only `rclone sync` (or `rclone delete`) removes destination objects, and `--dry-run` is the safe way to preview either.
+`rclone copy` は削除しません。宛先のオブジェクトを削除するのは `rclone sync`（または `rclone delete`）だけです。どちらも `--dry-run` で、変更前に確認できます。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional rclone backends.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [rclone S3 documentation](https://rclone.org/s3/) for flags such as `--transfers`, bandwidth limits, and crypt overlays.
+- ほかの rclone バックエンドを採用する前に、[S3 互換性に関する注意](/ja/administration/protocols/s3)を確認します。
+- [アクセスキーの管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- `--transfers`、帯域制限、crypt オーバーレイなどのフラグについては、[rclone の S3 ドキュメント](https://rclone.org/s3/)に従います。

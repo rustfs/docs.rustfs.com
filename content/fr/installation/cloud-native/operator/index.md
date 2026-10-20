@@ -1,28 +1,28 @@
 ---
-title: Overview
-description: Understand how RustFS Operator manages RustFS clusters on Kubernetes.
+title: Vue d’ensemble
+description: Comprenez comment l’Operator RustFS gère les clusters RustFS sur Kubernetes.
 ---
 
-**RustFS Operator** applies the Kubernetes Operator pattern to RustFS clusters. Instead of creating StatefulSets, Services, PersistentVolumeClaims (PVCs), and configuration by hand, you declare the required storage cluster as a Kubernetes custom resource. The controller watches that resource and continuously reconciles the running cluster with the declared state.
+L’**Operator RustFS** applique le modèle Operator de Kubernetes aux clusters RustFS. Au lieu de créer à la main les StatefulSets, les Services, les PersistentVolumeClaims (PVC) et la configuration, vous déclarez le cluster de stockage requis sous la forme d’une ressource personnalisée Kubernetes. Le contrôleur surveille cette ressource et réconcilie en continu le cluster en cours d’exécution avec l’état déclaré.
 
-The Operator installs two Custom Resource Definitions (CRDs):
+L’Operator installe deux définitions de ressources personnalisées (CRD) :
 
-- `Tenant` (`rustfs.com/v1alpha1`) represents one RustFS cluster. It defines storage pools, credentials, scheduling, Transport Layer Security (TLS), and Key Management Service (KMS) settings.
-- `PolicyBinding` (`sts.rustfs.com/v1alpha1`) maps a Kubernetes ServiceAccount to RustFS policies when workloads request temporary credentials from the Operator Security Token Service (STS).
+- `Tenant` (`rustfs.com/v1alpha1`) représente un cluster RustFS. Il définit les pools de stockage, les identifiants, l’ordonnancement, la sécurité de la couche de transport (TLS) et les réglages du service de gestion des clés (KMS).
+- `PolicyBinding` (`sts.rustfs.com/v1alpha1`) associe un ServiceAccount Kubernetes à des politiques RustFS lorsque les charges de travail demandent des identifiants temporaires au service de jetons de sécurité (STS) de l’Operator.
 
-One Operator can manage multiple Tenants across namespaces. Each Tenant has independent storage, credentials, S3 and Console services, and lifecycle. The Operator creates one StatefulSet for each pool, so you can add capacity by appending a pool without rebuilding the cluster. It also reports `Ready`, `Progressing`, or `Degraded` conditions and Kubernetes Events, and exposes health and metrics endpoints for cluster monitoring.
+Un même Operator peut gérer plusieurs Tenants répartis dans plusieurs espaces de noms. Chaque Tenant dispose de son propre stockage, de ses propres identifiants, de ses propres services S3 et Console, et de son propre cycle de vie. L’Operator crée un StatefulSet pour chaque pool : vous pouvez donc ajouter de la capacité en ajoutant un pool, sans reconstruire le cluster. Il signale aussi les conditions `Ready`, `Progressing` ou `Degraded`, ainsi que des événements Kubernetes, et expose des points de terminaison d’intégrité et de métriques pour la supervision du cluster.
 
-The same API covers small test clusters and distributed deployments. Sensitive credentials and KMS material stay in Kubernetes Secrets, while version-controlled Tenant manifests hold only Secret references. This makes deployments repeatable, supports GitOps workflows, and keeps routine operations such as multi-tenant management, pool expansion, TLS, and encryption within Kubernetes-native tools.
+La même API couvre les petits clusters de test et les déploiements distribués. Les identifiants sensibles et le matériel KMS restent dans des Secrets Kubernetes, tandis que les manifestes Tenant suivis en contrôle de versions ne contiennent que des références à des Secrets. Les déploiements sont ainsi reproductibles, les flux GitOps sont pris en charge, et les opérations courantes — gestion multi-tenant, extension de pool, TLS et chiffrement — restent dans des outils natifs de Kubernetes.
 
-## Operator workflows
+## Flux de travail de l’Operator
 
-- [Install](./installation.md) covers requirements, Helm installation, Console access, and TLS configuration.
-- [Multi-Tenant](./tenant.md) creates isolated RustFS clusters for different teams or workloads.
-- [Pool Expansion](./pool-expansion.md) adds storage capacity by appending a pool to an existing Tenant.
-- [KMS Integration](./kms.md) configures local or HashiCorp Vault key management for encrypted data.
+- [Installation](./installation.md) couvre les prérequis, l’installation Helm, l’accès à la Console et la configuration TLS.
+- [Multi-tenant](./tenant.md) crée des clusters RustFS isolés pour différentes équipes ou charges de travail.
+- [Extension de pool](./pool-expansion.md) ajoute de la capacité de stockage en ajoutant un pool à un Tenant existant.
+- [Intégration KMS](./kms.md) configure la gestion de clés locale ou HashiCorp Vault pour les données chiffrées.
 
-:::warning[Pre-release software]
+:::warning[Logiciel en préversion]
 
-RustFS Operator is currently `v0.1.0` pre-release software under active development. Validate upgrades and Tenant changes in a non-production cluster first.
+L’Operator RustFS est actuellement un logiciel en préversion (preview), en version `v0.1.0`, et son développement se poursuit. Validez d’abord les mises à niveau et les modifications de Tenant dans un cluster hors production.
 
 :::

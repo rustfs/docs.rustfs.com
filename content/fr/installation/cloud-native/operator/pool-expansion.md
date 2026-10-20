@@ -1,28 +1,28 @@
 ---
-title: Pool Expansion
-description: Add storage capacity to a RustFS Tenant by appending a storage pool.
+title: Extension de pool
+description: Ajoutez de la capacité de stockage à un Tenant RustFS en ajoutant un pool de stockage.
 ---
 
-All pools in a Tenant form one RustFS cluster. Add capacity by appending a new pool to `spec.pools`; do not change the shape of an existing pool.
+Tous les pools d’un Tenant forment un seul cluster RustFS. Ajoutez de la capacité en ajoutant un nouveau pool à `spec.pools` ; ne modifiez pas les dimensions d’un pool existant.
 
-:::warning[Existing pools are immutable]
+:::warning[Les pools existants sont immuables]
 
-Do not change `servers` or `persistence.volumesPerServer` on an existing pool. The Operator creates an immutable StatefulSet for each pool.
+Ne modifiez pas `servers` ni `persistence.volumesPerServer` sur un pool existant. L’Operator crée un StatefulSet immuable pour chaque pool.
 
 :::
 
-## 1. Check the Tenant
+## 1. Vérifier le Tenant
 
 ```bash
 kubectl -n storage-a get tenant tenant-a
 kubectl -n storage-a get pods,pvc -l rustfs.tenant=tenant-a
 ```
 
-Confirm that the Tenant is `Ready` and the cluster has enough compute and storage capacity.
+Confirmez que le Tenant est `Ready` et que le cluster dispose d’assez de capacité de calcul et de stockage.
 
-## 2. Add a pool
+## 2. Ajouter un pool
 
-Append the following entry to the existing `spec.pools` list in `tenant.yaml`. Keep all existing entries unchanged.
+Ajoutez l’entrée suivante à la liste `spec.pools` existante dans `tenant.yaml`. Conservez toutes les entrées existantes inchangées.
 
 ```yaml title="tenant.yaml"
 - name: pool-1
@@ -38,13 +38,13 @@ Append the following entry to the existing `spec.pools` list in `tenant.yaml`. K
           storage: 100Gi
 ```
 
-This pool creates four PVCs: two servers multiplied by two volumes per server. Apply the complete Tenant manifest:
+Ce pool crée quatre PVC : deux serveurs multipliés par deux volumes par serveur. Appliquez le manifeste Tenant complet :
 
 ```bash
 kubectl apply -f tenant.yaml
 ```
 
-## 3. Watch the expansion
+## 3. Observer l’extension
 
 ```bash
 kubectl -n storage-a get tenant tenant-a -w
@@ -52,4 +52,4 @@ kubectl -n storage-a get pods,pvc \
   -l rustfs.pool=pool-1
 ```
 
-Wait for the Tenant to return to `Ready` before making another topology change. Increasing an existing PVC size is a separate Kubernetes storage operation and depends on the StorageClass.
+Attendez que le Tenant revienne à `Ready` avant d’apporter une autre modification de topologie. Augmenter la taille d’un PVC existant est une opération de stockage Kubernetes distincte, qui dépend de la StorageClass.

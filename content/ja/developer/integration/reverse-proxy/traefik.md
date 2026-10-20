@@ -1,26 +1,26 @@
 ---
 title: "Traefik"
-description: "Deploy RustFS behind Traefik with automatic TLS for separate S3 API and Console hostnames."
+description: "S3 API と Console を別々のホスト名で公開し、TLS を自動取得する Traefik の背後に RustFS をデプロイします。"
 ---
 
-Use **Traefik** and its Docker provider to discover RustFS, obtain TLS certificates from Let's Encrypt, and route separate hostnames to the S3 API and Console. You need Docker Engine, Docker Compose, a public server, and two DNS records that resolve to that server.
+**Traefik** とその Docker プロバイダーで RustFS を検出し、Let's Encrypt から TLS 証明書を取得し、別々のホスト名を S3 API と Console へ振り分けます。Docker Engine、Docker Compose、公開サーバー、およびそのサーバーへ解決する DNS レコードが 2 件必要です。
 
-This guide uses these example hostnames:
+このガイドでは、次のホスト名を例に使います。
 
-- `s3.example.com` for the S3 API
-- `console.example.com` for the Console
+- S3 API 用の `s3.example.com`
+- Console 用の `console.example.com`
 
-Replace them with your public hostnames. The ACME HTTP-01 challenge requires inbound access to ports `80` and `443`.
+公開するホスト名に置き換えます。ACME の HTTP-01 チャレンジには、ポート `80` と `443` への着信アクセスが必要です。
 
-:::warning[Serve S3 from the root path]
+:::warning[S3 はルートパスから公開する]
 
-Do not publish the S3 API under a path such as `/s3/`. AWS Signature Version 4 includes the request path and host, so rewriting either value can invalidate signed requests.
+`/s3/` のようなパスの下に S3 API を公開しないでください。AWS Signature Version 4 はリクエストパスとホストを署名対象に含めるため、どちらかを書き換えると署名済みリクエストが無効になることがあります。
 
 :::
 
-## 1. Create the deployment directory
+## 1. デプロイ用ディレクトリを作成する
 
-Create a directory and an empty ACME storage file. Traefik requires restrictive permissions on this file:
+ディレクトリと空の ACME 保存ファイルを作成します。Traefik はこのファイルに、制限の強いパーミッションを要求します。
 
 ```bash
 mkdir rustfs-traefik
@@ -29,9 +29,9 @@ touch acme.json
 chmod 600 acme.json
 ```
 
-## 2. Set deployment variables
+## 2. デプロイ変数を設定する
 
-Create an environment file and replace each value:
+環境ファイルを作成し、各値を置き換えます。
 
 ```ini title=".env"
 S3_HOSTNAME=s3.example.com
@@ -41,11 +41,11 @@ RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Use an email address that receives certificate expiration notices. Do not commit `.env` or `acme.json` to source control.
+証明書の有効期限通知を受け取るメールアドレスを使います。`.env` と `acme.json` はソース管理にコミットしないでください。
 
-## 3. Create the Compose file
+## 3. Compose ファイルを作成する
 
-Create the Traefik and RustFS services:
+Traefik と RustFS のサービスを作成します。
 
 ```yaml title="compose.yaml"
 services:
@@ -126,51 +126,51 @@ networks:
     name: rustfs
 ```
 
-The two routers use different host rules and backend ports. RustFS does not publish ports `9000` or `9001` on the Docker host, and the Traefik Dashboard is not exposed.
+2 つのルーターは、異なるホスト規則とバックエンドのポートを使います。RustFS は Docker ホスト上でポート `9000` と `9001` を公開せず、Traefik Dashboard も公開しません。
 
-:::note[Docker socket access]
+:::note[Docker ソケットへのアクセス]
 
-Traefik reads container labels through the read-only Docker socket mount. Anyone who can modify Docker workloads can influence routes discovered by the Docker provider. Restrict Docker access on the proxy host.
+Traefik は、読み取り専用でマウントした Docker ソケット経由でコンテナラベルを読み取ります。Docker のワークロードを変更できる人は、Docker プロバイダーが検出するルートに影響を与えられます。プロキシホストでは、Docker へのアクセスを制限します。
 
 :::
 
-## 4. Validate and start the deployment
+## 4. デプロイを検証して起動する
 
-Render the Compose configuration and check that all variables resolve:
+Compose の設定を展開し、すべての変数が解決することを確認します。
 
 ```bash
 docker compose config
 ```
 
-Start both services:
+両方のサービスを起動します。
 
 ```bash
 docker compose up -d
 docker compose ps
 ```
 
-Follow the Traefik logs while it completes the ACME challenge and creates both certificates:
+ACME チャレンジが完了し、両方の証明書が作成されるまで、Traefik のログを追います。
 
 ```bash
 docker compose logs --follow traefik
 ```
 
-If certificate issuance fails, confirm that both DNS records resolve to this host and that ports `80` and `443` are reachable from the internet. Let's Encrypt rate limits apply, so correct DNS and firewall problems before repeatedly recreating the deployment.
+証明書の発行に失敗した場合は、両方の DNS レコードがこのホストへ解決すること、およびポート `80` と `443` がインターネットから到達できることを確認します。Let's Encrypt にはレート制限があるため、DNS とファイアウォールの問題を直してから、デプロイの再作成を繰り返します。
 
-## 5. Verify both endpoints
+## 5. 両方のエンドポイントを確認する
 
-Verify the S3 API readiness endpoint and Console health endpoint through Traefik:
+Traefik 経由で、S3 API の準備完了エンドポイントと Console のヘルスエンドポイントを確認します。
 
 ```bash
 curl --fail https://s3.example.com/health/ready
 curl --fail https://console.example.com/rustfs/console/health
 ```
 
-Configure S3 clients with `https://s3.example.com` as the endpoint and enable path-style addressing. Open `https://console.example.com/rustfs/console/` to sign in to the Console.
+S3 クライアントのエンドポイントを `https://s3.example.com` に設定し、パススタイルアクセスを有効にします。`https://console.example.com/rustfs/console/` を開いて Console にサインインします。
 
-## Multi-node services
+## マルチノードのサービス
 
-For an external multi-node RustFS cluster, enable Traefik's file provider in the `traefik` service:
+外部のマルチノード RustFS クラスターでは、`traefik` サービスで Traefik のファイルプロバイダーを有効にします。
 
 ```yaml title="compose.yaml"
 services:
@@ -182,7 +182,7 @@ services:
       - ./dynamic.yaml:/etc/traefik/dynamic.yaml:ro
 ```
 
-Create the dynamic configuration with every RustFS node:
+すべての RustFS ノードを含む動的設定を作成します。
 
 ```yaml title="dynamic.yaml"
 http:
@@ -234,10 +234,10 @@ http:
           - url: http://node4.example.net:9001
 ```
 
-Configure sticky sessions for the Console service when you use OpenID Connect. An in-progress login stores its `state` on one RustFS node and the callback must return to that node. Keep port `9000` open directly between RustFS nodes because internal node RPC uses the same listener.
+OpenID Connect を使う場合は、Console サービスにスティッキーセッションを設定します。進行中のログインは `state` を 1 台の RustFS ノードに保存するため、コールバックはそのノードへ戻る必要があります。ノード間の内部 RPC は同じリスナーを使うため、RustFS ノード間ではポート `9000` を直接開けたままにします。
 
-## Next steps
+## 次のステップ
 
-- [Configure an S3 client](/developer/examples/aws-cli)
-- [Enable virtual-hosted-style bucket URLs](/integration/virtual)
-- [Review health and readiness endpoints](/operations/status-check)
+- [S3 クライアントを設定する](/ja/developer/examples/aws-cli)
+- [仮想ホスト形式のバケット URL を有効にする](/ja/integration/virtual)
+- [ヘルスと準備完了のエンドポイントを確認する](/ja/operations/status-check)

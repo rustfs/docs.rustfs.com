@@ -1,22 +1,22 @@
 ---
 title: "Integration"
-description: "Integrieren Sie RustFS mit Reverse Proxies, Backup-Tools, Datenanalyse-Systemen, KI- und Cloud-Native-Plattformen, Observability-Plattformen, Container-Registries und DevOps-Tooling."
+description: "Integrieren Sie RustFS mit Reverse-Proxys, Backup-Tools, Datenbanken, Datenanalyse- und Speichersystemen, KI- und Cloud-Native-Plattformen, Observability-Plattformen, Container-Registries und DevOps-Tools."
 ---
 
-Use this section to connect **RustFS** to infrastructure and application platforms through its S3-compatible API.
+In diesem Abschnitt verbinden Sie **RustFS** über die S3-kompatible API mit Infrastruktur- und Anwendungsplattformen.
 
-## Integration categories
+## Integrationskategorien
 
-- [Reverse Proxy](./reverse-proxy/index.md) covers Nginx, Traefik, Caddy, HAProxy, and Envoy.
-- [Backup](./backup/index.md) covers Kopia, Longhorn, Restic, and Velero.
-- [AI](./ai/index.md) covers AI platforms including Ray and vLLM.
-- [Database](./database/index.md) covers ClickHouse, Databend, Doris, DuckDB, InfluxDB, LanceDB, Milvus, Trino, and Vitess.
-- [Big Data](./big-data/index.md) covers Airflow, AutoMQ, Delta Lake, DolphinScheduler, Flink, Hive, Hudi, Iceberg, Kafka, Paimon, PyIceberg, SeaTunnel, Spark, and Zeppelin.
-- [Storage](./storage/index.md) covers Alluxio, lakeFS, OpenDAL, SFTPGo, s3fs, and ZeroFS.
-- [Cloud Native](./cloud-native/index.md) covers Cortex, Flux, and celld.
-- [Observability](./observability/index.md) covers telemetry systems including Fluentd, GreptimeDB, Loki, OpenObserve, OpenTelemetry, Tempo, Thanos, and VictoriaMetrics.
-- [Others](./others/index.md) covers the capo SDK, rclone, JuiceFS, Nextcloud, and tusd.
-- [Registry](./registry/index.md) covers Docker Registry and Harbor.
-- [DevOps](./devops/index.md) covers Elasticsearch, Gitea, Jenkins, OpenSearch, and Terraform.
+- [Reverse-Proxy](./reverse-proxy/index.md) behandelt Nginx, Traefik, Caddy, HAProxy und Envoy.
+- [Backup](./backup/index.md) behandelt Kopia, Longhorn, Restic und Velero.
+- [AI](./ai/index.md) behandelt KI-Plattformen, darunter MLflow, Ray und vLLM.
+- [Datenbank](./database/index.md) behandelt ClickHouse, Databend, Doris, DuckDB, InfluxDB, LanceDB, Milvus, Trino und Vitess.
+- [Datenanalyse](./big-data/index.md) behandelt Airflow, AutoMQ, Delta Lake, DolphinScheduler, Flink, Hive, Hudi, Iceberg, Kafka, Paimon, PyIceberg, SeaTunnel, Spark und Zeppelin.
+- [Speicher](./storage/index.md) behandelt Alluxio, lakeFS, OpenDAL, SFTPGo, s3fs und ZeroFS.
+- [Cloud Native](./cloud-native/index.md) behandelt Cortex, Flux und celld.
+- [Observability](./observability/index.md) behandelt Telemetriesysteme, darunter Fluentd, GreptimeDB, Loki, OpenObserve, OpenTelemetry, Tempo, Thanos und VictoriaMetrics.
+- [Sonstige](./others/index.md) behandelt das SDK capo, rclone, JuiceFS, Nextcloud und tusd.
+- [Registry](./registry/index.md) behandelt Docker Registry und Harbor.
+- [DevOps](./devops/index.md) behandelt Elasticsearch, Gitea, Jenkins, OpenSearch und Terraform.
 
-Each guide identifies the RustFS endpoint and addressing requirements to use when configuring the integrating system.
+Jede Anleitung nennt den RustFS-Endpunkt und die Adressierungsanforderungen, die Sie beim Konfigurieren des angebundenen Systems verwenden.

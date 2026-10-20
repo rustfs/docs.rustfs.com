@@ -1,9 +1,9 @@
 ---
 title: "Harbor"
-description: "Speichern Sie über Harbor gepushte Container-Images in RustFS-Objektspeicher über den S3-Storage-Treiber der Registry, bereitgestellt mit Docker Compose."
+description: "Speichern Sie nach Harbor gepushte Container-Images über den S3-Storage-Treiber der Registry in RustFS, bereitgestellt mit Docker Compose."
 ---
 
-Diese Anleitung verbindet [Harbor](https://github.com/goharbor/harbor) — die CNCF-graduierte Cloud-native-Registry — mit **RustFS**. Harbor persistiert Image-Layer, Manifeste und andere OCI-Artefakte über seine eingebettete Registry-Komponente, die den S3-Storage-Treiber des [distribution](https://distribution.github.io/distribution/)-Projekts implementiert. Sie betreiben diese Registry-Komponente mit Docker Compose gegen RustFS, pushen ein Image, pullen es zurück und prüfen die Objekte in RustFS. Dasselbe Speicher-Setup gilt für eine vollständige Harbor-Bereitstellung. Der Ablauf wurde mit `goharbor/registry-photon:v2.12.2` und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
+Diese Anleitung verbindet [Harbor](https://github.com/goharbor/harbor) — die bei der CNCF graduierte, cloud-native Registry — mit **RustFS**. Harbor persistiert Image-Layer, Manifeste und andere OCI-Artefakte über seine eingebettete Registry-Komponente, die den S3-Storage-Treiber des [distribution](https://distribution.github.io/distribution/)-Projekts implementiert. Sie betreiben diese Registry-Komponente mit Docker Compose und RustFS als Speicher, pushen ein Image, pullen es zurück und prüfen die Objekte in RustFS. Dasselbe Speicher-Setup gilt für eine vollständige Harbor-Bereitstellung. Der Ablauf wurde mit `goharbor/registry-photon:v2.12.2` und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
 Sie benötigen Docker mit dem Compose-Plugin. Dieses Setup ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
@@ -16,7 +16,7 @@ flowchart LR
 	Init["init-bucket job"] -->|"create my-bucket"| RustFS
 ```
 
-Die Registry speichert alle Blobs, Manifeste und Repository-Links über den S3-Storage-Treiber unterhalb von `docker/registry/v2/` im Bucket. Die Treibereinstellungen `regionendpoint`, `secure: false` und `skipverify: true` richten den von der Registry verwendeten AWS-S3-Client auf den RustFS-Endpunkt mit Path-Style-Adressierung über Plain HTTP aus.
+Die Registry speichert alle Blobs, Manifeste und Repository-Links über den S3-Storage-Treiber unterhalb von `docker/registry/v2/` im Bucket. Die Treibereinstellungen `regionendpoint`, `secure: false` und `skipverify: true` richten den von der Registry verwendeten AWS-S3-Client auf den RustFS-Endpunkt mit pfadbasierter Adressierung (Path-Style) über unverschlüsseltes HTTP (Plain HTTP) aus.
 
 ## 1. Projektdateien anlegen
 
@@ -27,14 +27,14 @@ mkdir rustfs-harbor
 cd rustfs-harbor
 ```
 
-Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Anmeldeinformationen:
+Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Zugangsdaten:
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Verwenden Sie dedizierte Anmeldeinformationen für den Bucket. Committen Sie `.env` nicht in die Versionsverwaltung.
+Verwenden Sie dedizierte Zugangsdaten für den Bucket. Nehmen Sie `.env` nicht in die Versionsverwaltung auf.
 
 Erstellen Sie die Registry-Konfiguration, die Harbor für seine Registry-Komponente verwendet:
 
@@ -203,9 +203,9 @@ docker compose run --rm --entrypoint /bin/sh create-bucket -c \
 [2026-09-20 12:11:25]       71 B docker/registry/v2/repositories/demo/app/_manifests/tags/v1/index/sha256/1cfa4e2b09e127b9c4ed43578d3f3c18e7d44ea47b9ea98475c0cbe9086525f8/link
 ```
 
-Die Blob-Payloads selbst liegen unterhalb von `docker/registry/v2/blobs/`. Sie können das Präfix auch in der RustFS-Konsole unter `http://localhost:9001/rustfs/console/` anzeigen:
+Die Blob-Payloads selbst liegen unterhalb von `docker/registry/v2/blobs/`. Sie können das Präfix auch in der RustFS Console unter `http://localhost:9001/rustfs/console/` anzeigen:
 
-![Die Repository-Metadaten des gepushten Images in der RustFS-Konsole](./images/rustfs-harbor-objects.png)
+![Die Repository-Metadaten des gepushten Images in der RustFS Console](./images/rustfs-harbor-objects.png)
 
 ## 6. RustFS in einer vollständigen Harbor-Bereitstellung verwenden
 
@@ -262,7 +262,7 @@ docker compose logs registry
 
 ### AccessDenied- oder 403-Antworten
 
-Stellen Sie sicher, dass die Anmeldeinformationen in `config.yml` mit den RustFS-Anmeldeinformationen übereinstimmen und dass der Dienst `create-bucket` erfolgreich abgeschlossen wurde:
+Stellen Sie sicher, dass die Zugangsdaten in `config.yml` mit den RustFS-Zugangsdaten übereinstimmen und dass der Dienst `create-bucket` erfolgreich abgeschlossen wurde:
 
 ```bash
 docker compose logs create-bucket
@@ -274,6 +274,6 @@ Der Treiber schreibt unterhalb von `docker/registry/v2/` im Bucket. Listen Sie d
 
 ## Nächste Schritte
 
-- Lesen Sie die [S3-Kompatibilitätshinweise](/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
-- Erstellen Sie dedizierte Produktions-Anmeldeinformationen mit dem [Access Key Management](/security-compliance/iam/access-token).
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere S3-Operationen verwenden.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
 - Folgen Sie der [Harbor-Dokumentation](https://goharbor.io/docs/), um eine vollständige Harbor-Bereitstellung mit Replikation, Vulnerability-Scanning und RBAC zu konfigurieren.

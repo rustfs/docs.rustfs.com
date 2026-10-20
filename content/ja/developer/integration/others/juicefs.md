@@ -1,13 +1,13 @@
 ---
 title: "JuiceFS"
-description: "Build a POSIX filesystem on RustFS with JuiceFS S3 object storage."
+description: "JuiceFS の S3 オブジェクトストレージを使い、RustFS 上に POSIX ファイルシステムを構築します。"
 ---
 
-This guide connects [JuiceFS](https://github.com/juicedata/juicefs) — the cloud-native distributed POSIX filesystem — to **RustFS** as its object storage backend. You will format a volume whose data chunks live in a RustFS bucket, mount it locally, and read and write files through the mount. The workflow was verified with `juicefs v1.3.1` (community edition, SQLite metadata engine) against `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、クラウドネイティブな分散 POSIX ファイルシステムである [JuiceFS](https://github.com/juicedata/juicefs) を、オブジェクトストレージのバックエンドとして **RustFS** に接続します。データチャンクが RustFS のバケットに置かれるボリュームをフォーマットし、ローカルにマウントして、マウント経由でファイルを読み書きします。手順は `juicefs v1.3.1`（コミュニティ版、SQLite メタデータエンジン）と `rustfs/rustfs-x86-musl:v2.3.1` の組み合わせで確認済みです。
 
-You need the JuiceFS binary, a metadata engine, and FUSE (`fuse3` on Linux). This deployment is intended for local integration testing, not production.
+JuiceFS のバイナリ、メタデータエンジン、FUSE（Linux では `fuse3`）が必要です。このデプロイはローカルでの連携テスト用であり、本番向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -16,11 +16,11 @@ flowchart LR
 	JuiceFS -->|"data chunks"| RustFS["RustFS :9000"]
 ```
 
-JuiceFS splits every file into chunks and stores them as objects under `chunks/` in the bucket, while the metadata engine tracks names, inodes, and layout. The filesystem behaves like a local disk but holds no data locally.
+JuiceFS は各ファイルをチャンクに分割し、バケット内の `chunks/` 配下にオブジェクトとして保存します。名前、inode、レイアウトはメタデータエンジンが追跡します。ファイルシステムはローカルディスクのように振る舞いますが、データ自体はローカルに持ちません。
 
-## 1. Format the volume
+## 1. ボリュームをフォーマットする
 
-Create the bucket and format a JuiceFS volume backed by RustFS, replacing all connection placeholders. The bucket URL carries the endpoint, which selects path-style addressing:
+接続用のプレースホルダーをすべて置き換えて、バケットを作成し、RustFS をバックエンドとする JuiceFS ボリュームをフォーマットします。バケット URL にエンドポイントが含まれ、これによりパススタイルアクセスが選択されます。
 
 ```bash
 rc mb rustfs/jfs-demo
@@ -39,11 +39,11 @@ Data use s3://<your-rustfs-endpoint>:9000/jfs-demo/rustfs-jfs/
 <STATUS> OK, rustfs-jfs is ready
 ```
 
-`sqlite3:///opt/juicefs/jfs.db` is the metadata engine for this test. In production, use Redis, MySQL, or PostgreSQL instead so multiple clients can mount the same volume.
+このテストのメタデータエンジンは `sqlite3:///opt/juicefs/jfs.db` です。本番では、複数のクライアントが同じボリュームをマウントできるよう、Redis、MySQL、または PostgreSQL を使います。
 
-## 2. Mount the volume
+## 2. ボリュームをマウントする
 
-Mount the filesystem with the same metadata URL:
+同じメタデータ URL でファイルシステムをマウントします。
 
 ```bash
 mkdir -p /mnt/jfs
@@ -54,11 +54,11 @@ juicefs mount -d sqlite3:///opt/juicefs/jfs.db /mnt/jfs
 OK, rustfs-jfs is ready at /mnt/jfs
 ```
 
-The `-d` flag runs the mount in the background. The volume is now a POSIX filesystem.
+`-d` フラグはマウントをバックグラウンドで実行します。これでボリュームは POSIX ファイルシステムになります。
 
-## 3. Read and write files
+## 3. ファイルを読み書きする
 
-Use the mount like any other directory:
+ほかのディレクトリと同じようにマウントを使います。
 
 ```bash
 echo "hello rustfs jfs" > /mnt/jfs/hello.txt
@@ -71,7 +71,7 @@ cat /mnt/jfs/hello.txt
 hello rustfs jfs
 ```
 
-Inspect the volume with `juicefs info`:
+`juicefs info` でボリュームを確認します。
 
 ```text
 /mnt/jfs :
@@ -81,15 +81,15 @@ Inspect the volume with `juicefs info`:
  length: 3.00 MiB
 ```
 
-## 4. Verify chunks in RustFS
+## 4. RustFS でチャンクを確認する
 
-List the bucket prefixes:
+バケットのプレフィックスを一覧します。
 
 ```bash
 rc ls rustfs/jfs-demo/ -r
 ```
 
-Every file was split into content-addressed chunk objects:
+各ファイルは、コンテンツアドレス指定のチャンクオブジェクトに分割されています。
 
 ```text
 rustfs-jfs/chunks/0/0/1_0_17
@@ -97,13 +97,13 @@ rustfs-jfs/chunks/0/0/3_0_3145728
 rustfs-jfs/chunks/0/0/4_0_7
 ```
 
-The chunk name encodes the inode, chunk index, and size — for example `3_0_3145728` is the 3 MiB file written in step 3.
+チャンク名には inode、チャンクインデックス、サイズがエンコードされています。たとえば `3_0_3145728` は、手順 3 で書き込んだ 3 MiB のファイルです。
 
-![JuiceFS data chunks stored in the RustFS Console](./images/rustfs-juicefs-chunks.png)
+![RustFS Console に保存された JuiceFS のデータチャンク](./images/rustfs-juicefs-chunks.png)
 
-## 5. Stop or reset
+## 5. 停止またはリセットする
 
-Unmount the volume, then optionally wipe the volume metadata and bucket data:
+ボリュームをアンマウントし、必要に応じてボリュームのメタデータとバケットデータを消去します。
 
 ```bash
 juicefs umount /mnt/jfs
@@ -111,22 +111,22 @@ juicefs destroy --force sqlite3:///opt/juicefs/jfs.db rustfs-jfs
 rc rm rustfs/jfs-demo/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
 ### `unknown option: --daemon`
 
-The background flag is a single dash: `juicefs mount -d`. Running without it keeps the mount in the foreground (useful for debugging).
+バックグラウンド用フラグはハイフン 1 つです。`juicefs mount -d` を使います。付けないと、マウントはフォアグラウンドのままです（デバッグに便利です）。
 
 ### `fusermount3: mount failed: Permission denied`
 
-Mounting requires the FUSE device. Inside a container, add `--device /dev/fuse --cap-add SYS_ADMIN` (or `--privileged`); on a host, install `fuse3` and confirm `/dev/fuse` exists.
+マウントには FUSE デバイスが必要です。コンテナ内では `--device /dev/fuse --cap-add SYS_ADMIN`（または `--privileged`）を追加します。ホストでは `fuse3` をインストールし、`/dev/fuse` が存在することを確認します。
 
-### Mount hangs or fails to reach storage
+### マウントがハングする、またはストレージに到達できない
 
-The client must reach both the metadata engine and the bucket endpoint. Because the bucket URL embeds the endpoint, verify it from the mounting host with `curl` before formatting.
+クライアントは、メタデータエンジンとバケットのエンドポイントの両方に到達できる必要があります。バケット URL にはエンドポイントが埋め込まれているため、フォーマットの前にマウント元ホストから `curl` で確認します。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional JuiceFS storage backends.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [JuiceFS documentation](https://juicefs.com/docs/community/quick_start_guide/) to switch the metadata engine to Redis and mount the volume from multiple clients.
+- ほかの JuiceFS ストレージバックエンドを採用する前に、[S3 互換性に関する注意](/ja/administration/protocols/s3)を確認します。
+- [アクセスキーの管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- メタデータエンジンを Redis に切り替え、複数のクライアントからボリュームをマウントするには、[JuiceFS のドキュメント](https://juicefs.com/docs/community/quick_start_guide/)に従います。

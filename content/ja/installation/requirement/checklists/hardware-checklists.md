@@ -1,93 +1,93 @@
 ---
-title: "Production Environment Hardware Configuration Guide"
-description: "RustFS is a high-performance distributed object storage system developed in Rust, suitable for massive unstructured data storage scenarios. This document provides comprehensive hardware selection and configuration guidance for production environment deployment."
+title: "ハードウェアチェックリスト"
+description: "本番の RustFS デプロイに向けた、ハードウェアのサイジングと構成の指針を示します。"
 ---
 
-## Deployment Planning Factor Analysis
+## 計画時の考慮事項
 
-Before formally deploying RustFS, it's recommended to conduct 2-3 weeks of business research, focusing on evaluating the following dimensions:
+本番に RustFS をデプロイする前に、2 週間から 3 週間をかけてワークロードと容量の要件を評価します。次の点に注目します。
 
-1. **Data Scale Analysis**
+1. **データ量**
 
-- **Initial Data Volume**: Accurately calculate effective data volume at production startup (recommended in TiB units), considering hot/cold data ratios
-- **Growth Trend Prediction**: Estimate data increments for the next 24 months based on business development plans (recommended quarterly growth rate model)
-- **Object Scale**: Calculate total object count based on average object size (recommended 128 KB-1 MB range), note special optimization needed when exceeding 100 million objects
+   - **初期データ量**: 稼働開始時の使用可能なデータ量（TiB）と、ホットデータとコールドデータの比率を見積もります。
+   - **増加予測**: 事業計画に基づき、今後 24 か月のデータ増加を見積もります。増加は四半期ごとに見積もることを推奨します。
+   - **オブジェクト数**: 平均オブジェクトサイズ（理想的には 128 KB から 1 MB）から、オブジェクトの総数を見積もります。オブジェクト数が 1 億を超えるデプロイでは、追加の調整が必要です。
 
-2. **Business Characteristic Assessment**
+2. **ワークロードの特性**
 
-- **Access Patterns**: Distinguish read-intensive (such as content distribution) from write-intensive (such as log collection) scenarios
-- **Compliance Requirements**: Data retention cycles must comply with industry regulatory requirements (e.g., financial industry must retain for at least 5 years)
-- **Multi-site Deployment**: Cross-regional deployment requires network latency assessment (recommended controlled within 50ms) and bandwidth cost evaluation
+   - **アクセスパターン**: 読み取り中心のワークロード（コンテンツ配信など）と、書き込み中心のワークロード（ログ収集など）を区別します。
+   - **コンプライアンス要件**: 保持期間は、業界規制を満たす必要があります（例: 一部の金融規制では、少なくとも 5 年の保持が必要です）。
+   - **マルチサイトデプロイ**: リージョンをまたぐデプロイでは、ネットワークレイテンシ（理想的には 50 ms 未満）と帯域のコストを評価します。
 
-3. **Storage Architecture Design**
+3. **ストレージアーキテクチャ**
 
-- **Bucket Planning**: Divide storage buckets by business units, single cluster recommended not exceeding 500 active buckets
-- **Disaster Recovery Strategy**: Choose dual-active architecture (recommended) or asynchronous replication based on data importance
+   - **バケットの計画**: 事業部門ごとにバケットを整理します。クラスターあたりのアクティブなバケットは 500 個以下にすることを推奨します。
+   - **災害対策**: データの重要度に応じて、アクティブ-アクティブのレプリケーション（推奨）または非同期レプリケーションを選びます。
 
-## Hardware Configuration Matrix
+## ハードウェア構成マトリックス
 
-Baseline configuration solutions based on stress test results:
+負荷テストの結果に基づく基準構成は次のとおりです。
 
-| Component | Basic Environment | Production Standard Configuration | High-Performance Configuration |
+| コンポーネント | エントリー | 標準的な本番 | 高性能 |
 |--------------|---------------------------|--------------------------|--------------------------|
-| Node Count | 4 nodes | 8 nodes | 16+ nodes |
-| Storage Media | 4× NVMe SSD | 8×NVMe SSD | 12×NVMe SSD |
-| Network Architecture | Dual 25GbE (link aggregation) | Dual 100GbE | 200GbE |
-| CPU | 2×Intel Silver 4310 (16 cores) | 2×AMD EPYC 7313 (32 cores) | 2×Intel Platinum 8461Y (48 cores) |
-| Memory | 64 GB DDR4-3200 ECC | 256 GB DDR5-4800 ECC | 512 GB DDR5-5600 ECC |
-| Storage Controller | HBA 9500-8i | HBA 9600-16i | Dual controller redundant architecture |
+| ノード数 | 4 ノード | 8 ノード | 16 ノード以上 |
+| ストレージ媒体 | 4× NVMe SSD | 8×NVMe SSD | 12×NVMe SSD |
+| ネットワーク構成 | デュアル 25GbE（リンクアグリゲーション） | デュアル 100GbE | 200GbE |
+| CPU | 2×Intel Silver 4310（16 コア） | 2×AMD EPYC 7313（32 コア） | 2×Intel Platinum 8461Y（48 コア） |
+| メモリ | 64 GB DDR4-3200 ECC | 256 GB DDR5-4800 ECC | 512 GB DDR5-5600 ECC |
+| ストレージコントローラー | HBA 9500-8i | HBA 9600-16i | デュアルコントローラーの冗長構成 |
 
-**Important Deployment Principles:**
+**デプロイの指針:**
 
-1. Adopt "server farm" mode, ensuring all nodes use identical hardware batches and firmware versions
-2. Network architecture must meet: leaf-spine topology + physically isolated storage network + dual uplink paths
-3. Recommend using 2U server models, single node recommended configuration of 12+ disk bays (based on actual hard disk count)
+1. 同一構成のノードを使います。各ノードは、同一ロットの同一ハードウェアと、同一のファームウェアバージョンに揃えることを推奨します。
+2. ネットワークは、リーフスパイン構成、物理的に分離したストレージネットワーク、二重のアップリンクを使う必要があります。
+3. 必要なドライブ数に応じて、ノードあたり少なくとも 12 のドライブベイを備えた 2U サーバーを推奨します。
 
-## Performance Critical Path Optimization
+## 性能チューニング
 
-### Network Topology Optimization (Highest Priority)
+### ネットワークトポロジーの最適化（最優先）
 
-- **Bandwidth Calculation**: Reserve 0.5 Gbps bandwidth per TB of effective data (e.g., 100 TB data needs 50 Gbps dedicated bandwidth)
-- **Latency Requirements**:
-- Inter-node P99 latency ≤ 2ms
-- Cross-rack latency ≤ 5ms
+- **帯域のサイジング**: 使用可能なデータ 1 TB あたり 0.5 Gbps の帯域を用意します（例: データ 100 TB には、50 Gbps の専用帯域が必要です）。
+- **レイテンシの要件**:
+  - ノード間の P99 レイテンシは 2 ms 以下
+  - ラック間のレイテンシは 5 ms 以下
 
-### Storage Subsystem Tuning
+### ストレージサブシステムのチューニング
 
-- **Controller Configuration**:
-- Enable read-ahead cache (recommended 256 MB+)
-- Disable all RAID functions, use pass-through mode
-- Regularly check BBU battery health status
-- **SSD Parameters**:
-- Reserve 20% OP space to improve durability
-- Enable atomic write features (requires hardware support)
+- **コントローラーの設定**:
+  - 先読みキャッシュを有効にします（256 MB 以上を推奨）。
+  - すべての RAID 機能を無効にし、パススルー（HBA/JBOD）モードを使います。
+  - BBU の状態を定期的に確認します。
+- **SSD のパラメーター**:
+  - 耐久性を高めるため、20% のオーバープロビジョニング（OP）領域を確保します。
+  - アトミック書き込みを有効にします（ハードウェアの対応が必要です）。
 
-### Memory Management Strategy
+### メモリの割り当て
 
-- **Allocation Ratios**:
-- Metadata cache: 60% of total memory
-- Read/write buffers: 30%
-- System reserve: 10%
+- **配分比率**:
+  - メタデータキャッシュ: 総メモリの 60%
+  - 読み書きバッファー: 30%
+  - システム予約: 10%
 
-## Network Design Reference Model
+## ネットワーク設計の参照モデル
 
-### Bandwidth and Disk Ratio Relationship
+### ネットワーク帯域とディスク数
 
-| Network Type | Theoretical Throughput | Suitable Disk Types | Maximum Disk Support |
+| ネットワーク | 理論スループット | ディスクの種類 | ノードあたりの最大ディスク数 |
 |------------|------------|---------------------|----------------|
-| 10GbE | 1.25 GB/s | 7.2K HDD (180 MB/s) | 8 disks |
-| 25GbE | 3.125 GB/s | SATA SSD (550 MB/s) | 6 disks |
-| 100GbE | 12.5 GB/s | NVMe Gen4 (7 GB/s) | 2 disks full-speed read/write |
+| 10GbE | 1.25 GB/s | 7.2K HDD（180 MB/s） | 8 ディスク |
+| 25GbE | 3.125 GB/s | SATA SSD（550 MB/s） | 6 ディスク |
+| 100GbE | 12.5 GB/s | NVMe Gen4（7 GB/s） | 2（読み書きを最高速度で行う場合） |
 
-**Best Practice Case**: A video platform uses 16-node cluster, each node configured with:
+**例**: 動画プラットフォームが、16 ノードのクラスターを運用しています。各ノードの構成は次のとおりです。
 
 - 8×7.68 TB NVMe SSD
-- Dual 100GbE CX5 network cards
-- Achieves aggregate throughput of 38 GB/s
+- デュアル 100GbE の NVIDIA ConnectX-5 NIC
+- 合計スループットは 38 GB/s に達します
 
-## Memory Configuration Calculator
+## メモリ容量の見積もり
 
-Dynamic algorithm based on disk capacity and business characteristics:
+ディスク容量とワークロードの種類に基づいてメモリを見積もるには、次の式を使います。
 
 ```python
 # Memory calculation formula (unit: GB)
@@ -101,58 +101,58 @@ def calc_memory(data_tb, access_pattern):
  return base + data_tb * 1.0
 ```
 
-**Reference Configuration Table**:
+**参照サイズ**:
 
-| Data Scale | Read-Intensive | Write-Intensive | Mixed |
+| データサイズ | 読み取り中心 | 書き込み中心 | 混合 |
 |-----------|----------|----------|---------|
 | 10 TB | 40 GB | 44 GB | 42 GB |
 | 100 TB | 112 GB | 152 GB | 132 GB |
 | 500 TB | 432 GB | 632 GB | 532 GB |
 
-## Storage Deployment Standards
+## ストレージの指針
 
-### Media Selection Criteria
+### ストレージ媒体の選択
 
-| Metric | HDD Suitable Scenarios | SSD Suitable Scenarios | NVMe Mandatory Scenarios |
+| 指標 | HDD | SATA SSD | NVMe（必須） |
 |-------------|------------------|---------------------|----------------------|
-| Latency Requirements | >50ms | 1 to 10ms | < 1ms |
-| Throughput Requirements | < 500 MB/s | 500 MB-3 GB/s | > 3 GB/s |
-| Typical Use Cases | Archive storage | Hot data cache | Real-time analysis |
+| レイテンシの要件 | 50 ms 超 | 1〜10 ms | 1 ms 未満 |
+| スループットの要件 | 500 MB/s 未満 | 500 MB〜3 GB/s | 3 GB/s 超 |
+| 典型的な用途 | アーカイブストレージ | ホットデータのキャッシュ | リアルタイム分析 |
 
-### File System Configuration
+### ファイルシステムの設定
 
 ```bash
-# XFS formatting example
-mkfs.xfs -f -L rustfs_disk1 -d su=256k,sw=10 /dev/sdb
-
-# Recommended mount parameters
-UUID=xxxx /mnt/disk1 xfs defaults,noatime,nodiratime,logbsize=256k 0 0
+sudo mkfs.xfs -f -i size=512 -n ftype=1 -L RUSTFS0 /dev/sdb
 ```
 
-## High Availability Assurance Measures
+## 高可用性
 
-1. **Power Supply**:
+1. **電源**:
 
-- Adopt dual power supply architecture
-- Each PDU connects to different substations
-- Equip UPS (at least 30 minutes runtime)
+   - 二重化（冗長）電源を使います。
+   - 各 PDU を別々の電源系統に接続します。
+   - 少なくとも 30 分の稼働時間がある UPS を用意します。
 
-2. **Cooling Requirements**:
+2. **冷却の要件**:
 
-- Cabinet power density ≤ 15kW/cabinet
-- Inlet/outlet temperature difference controlled within 8℃
+   - ラックの電力密度は、1 ラックあたり 15 kW 以下にします。
+   - 吸気と排気の温度差（ΔT）を 8 °C 以内に保ちます。
 
-3. **Firmware Management**:
+3. **ファームウェアの管理**:
 
-- Establish hardware compatibility matrix
-- Use unified firmware versions
+   - ハードウェアの互換性マトリックスを維持します。
+   - ノード間でファームウェアのバージョンを統一します。
 
-> **Implementation Recommendations**: Recommend conducting 72-hour stress testing before formal deployment, simulating the following scenarios:
->
-> 1. Node failover testing
-> 2. Network partition drills
-> 3. Burst write pressure testing (recommended reaching 120% of theoretical value)
+:::tip[本番稼働の前に]
+
+本番稼働の前に、次のシナリオを含む 72 時間のストレステストを実施することを推奨します。
+
+1. ノードのフェイルオーバーテスト
+2. ネットワーク分断のテスト
+3. バースト書き込みの負荷テスト（理論上の最大値の 120% でテストすることを推奨します）
+
+:::
 
 ---
 
-This guide is based on the latest RustFS development version. For actual deployment, please combine with specific hardware vendor white papers for parameter fine-tuning. Or contact RustFS official recommendations for quarterly hardware health assessments to ensure continuous stable operation of storage clusters.
+このガイドは、最新の RustFS 開発バージョンに基づいています。本番デプロイでは、ハードウェアベンダーのドキュメントに従って、これらの設定を調整します。ハードウェアの健全性を四半期ごとに評価する場合は、RustFS に問い合わせてください。

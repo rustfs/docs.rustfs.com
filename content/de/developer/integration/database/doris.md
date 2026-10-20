@@ -1,13 +1,13 @@
 ---
 title: "Apache Doris"
-description: "Back up Apache Doris tables to RustFS through an S3 repository and restore them."
+description: "Sichern Sie Apache-Doris-Tabellen über ein S3-Repository nach RustFS und stellen Sie sie wieder her."
 ---
 
-This guide connects [Apache Doris](https://github.com/apache/doris) — the real-time analytical data warehouse — to **RustFS** through an S3 backup repository. You will start an all-in-one Doris container, create an S3 repository pointing at a RustFS bucket, back up a table, drop it, and restore it from RustFS. The workflow was verified with `apache/doris:all-in-one-4.1.3` and `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [Apache Doris](https://github.com/apache/doris) — das analytische Data Warehouse für Echtzeit — über ein S3-Backup-Repository mit **RustFS**. Sie starten einen All-in-one-Container von Doris, legen ein S3-Repository an, das auf einen RustFS-Bucket zeigt, sichern eine Tabelle, löschen sie und stellen sie aus RustFS wieder her. Der Ablauf wurde mit `apache/doris:all-in-one-4.1.3` und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Sie benötigen Docker. Diese Bereitstellung ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -15,27 +15,27 @@ flowchart LR
 	Doris -->|"BACKUP / RESTORE"| RustFS["RustFS :9000"]
 ```
 
-The repository is a named S3 location under the `doris-backups` bucket. `BACKUP SNAPSHOT` uploads table metadata and tablet data files; `RESTORE SNAPSHOT` downloads them into a new table.
+Das Repository ist ein benannter S3-Speicherort unter dem Bucket `doris-backups`. `BACKUP SNAPSHOT` lädt Tabellenmetadaten und Tablet-Datendateien hoch. `RESTORE SNAPSHOT` lädt sie in eine neue Tabelle herunter.
 
-## 1. Start Doris and create the repository
+## 1. Doris starten und das Repository anlegen
 
-Create the bucket first — Doris does not create buckets:
+Legen Sie zuerst den Bucket an. Doris legt keine Buckets an:
 
 ```bash
 rc alias set rustfs http://<your-rustfs-endpoint>:9000 <your-access-key> <your-secret-key>
 rc mb rustfs/doris-backups
 ```
 
-Start the all-in-one container on the same Docker network as RustFS:
+Starten Sie den All-in-one-Container im selben Docker-Netzwerk wie RustFS:
 
 ```bash
 docker run -d --name doris --network oo-rustfs_default \
   -p 8030:8030 -p 9030:9030 apache/doris:all-in-one-4.1.3
 ```
 
-Wait for the frontend to become healthy, then connect with the MySQL protocol (port 9030, user `root`, no password in the all-in-one image).
+Warten Sie, bis das Frontend gesund ist, und verbinden Sie sich dann über das MySQL-Protokoll (Port 9030, Benutzer `root`, im All-in-one-Image ohne Passwort).
 
-Create a test table with rows:
+Legen Sie eine Testtabelle mit Zeilen an:
 
 ```sql
 CREATE DATABASE rustfs_demo;
@@ -46,7 +46,7 @@ CREATE TABLE rustfs_demo.events
 INSERT INTO rustfs_demo.events VALUES (1, 'doris-on-rustfs'), (2, 'backup-test');
 ```
 
-Create the S3 repository, replacing the endpoint with the IP address of the RustFS container and both credential placeholders:
+Legen Sie das S3-Repository an, ersetzen Sie den Endpunkt durch die IP-Adresse des RustFS-Containers und beide Platzhalter für die Zugangsdaten:
 
 ```sql
 CREATE REPOSITORY `rustfs_repo`
@@ -61,11 +61,11 @@ CREATE REPOSITORY `rustfs_repo`
   );
 ```
 
-Doris 4.1 resolves the bucket into the endpoint hostname even with `AWS_PATH_STYLE_ACCESS` enabled, so a hostname endpoint fails with `UnknownHostException: doris-backups.rustfs`. Using the container IP address forces path-style requests and works; `SHOW REPOSITORIES` confirms the repository registered with an empty `ErrMsg`.
+Doris 4.1 setzt den Bucket auch bei aktiviertem `AWS_PATH_STYLE_ACCESS` in den Hostnamen des Endpunkts ein, daher scheitert ein Hostname-Endpunkt mit `UnknownHostException: doris-backups.rustfs`. Die IP-Adresse des Containers erzwingt Anfragen mit pfadbasierter Adressierung (Path-Style) und funktioniert. `SHOW REPOSITORIES` bestätigt, dass das Repository mit leerem `ErrMsg` registriert wurde.
 
-## 2. Back up a table to RustFS
+## 2. Eine Tabelle nach RustFS sichern
 
-Take a snapshot of the table:
+Erstellen Sie einen Snapshot der Tabelle:
 
 ```sql
 BACKUP SNAPSHOT rustfs_demo.demo_snapshot
@@ -73,23 +73,23 @@ BACKUP SNAPSHOT rustfs_demo.demo_snapshot
   ON (events);
 ```
 
-The statement returns immediately; the backup job runs in the background. Watch its state:
+Die Anweisung kehrt sofort zurück. Der Backup-Job läuft im Hintergrund. Beobachten Sie seinen Status:
 
 ```sql
 SHOW BACKUP;
 ```
 
-Wait until `State` reaches `FINISHED` — the snapshot metadata and tablet data files are now objects in the bucket.
+Warten Sie, bis `State` den Wert `FINISHED` erreicht. Die Snapshot-Metadaten und die Tablet-Datendateien sind dann Objekte im Bucket.
 
-## 3. Verify the backup in RustFS
+## 3. Das Backup in RustFS prüfen
 
-List the bucket:
+Listen Sie den Bucket auf:
 
 ```bash
 rc ls rustfs/doris-backups/ -r
 ```
 
-The repository stores a repository descriptor, the snapshot metadata, and the tablet files:
+Das Repository speichert einen Repository-Deskriptor, die Snapshot-Metadaten und die Tablet-Dateien:
 
 ```text
 rustfs-repo/__palo_repository_rustfs_repo/__repo_info
@@ -97,11 +97,11 @@ rustfs-repo/__palo_repository_rustfs_repo/__ss_demo_snapshot/__meta.d50ecf9b...
 rustfs-repo/__palo_repository_rustfs_repo/__ss_demo_snapshot/__ss_content/.../...dat...
 ```
 
-![Doris backup objects stored in the RustFS Console](./images/rustfs-doris-backup.png)
+![In der RustFS-Console gespeicherte Doris-Backup-Objekte](./images/rustfs-doris-backup.png)
 
-## 4. Restore the table from RustFS
+## 4. Die Tabelle aus RustFS wiederherstellen
 
-Drop the table and restore it from the snapshot. The timestamp comes from the snapshot name shown by `SHOW SNAPSHOT ON REPOSITORY rustfs_repo;`:
+Löschen Sie die Tabelle und stellen Sie sie aus dem Snapshot wieder her. Der Zeitstempel stammt aus dem Snapshot-Namen, den `SHOW SNAPSHOT ON REPOSITORY rustfs_repo;` anzeigt:
 
 ```sql
 DROP TABLE rustfs_demo.events;
@@ -115,7 +115,7 @@ RESTORE SNAPSHOT rustfs_demo.demo_snapshot
   );
 ```
 
-Wait for the restore job to finish and confirm the data:
+Warten Sie, bis der Restore-Job abgeschlossen ist, und bestätigen Sie die Daten:
 
 ```sql
 SHOW RESTORE;
@@ -126,36 +126,36 @@ SELECT count(*) FROM rustfs_demo.events;
 2
 ```
 
-## 5. Stop or reset the deployment
+## 5. Die Bereitstellung stoppen oder zurücksetzen
 
-Stop Doris while keeping the data:
+Stoppen Sie Doris und behalten Sie die Daten:
 
 ```bash
 docker rm -f doris
 ```
 
-The backup stays in the `doris-backups` bucket and can be restored into any Doris cluster that registers the same repository. To delete it, remove the bucket:
+Das Backup bleibt im Bucket `doris-backups` und lässt sich in jedem Doris-Cluster wiederherstellen, der dasselbe Repository registriert. Um es zu löschen, entfernen Sie den Bucket:
 
 ```bash
 rc rb rustfs/doris-backups --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
-### `UnknownHostException: doris-backups.rustfs` when creating the repository
+### `UnknownHostException: doris-backups.rustfs` beim Anlegen des Repositorys
 
-Doris is building a virtual-hosted hostname from the bucket and endpoint. Use the RustFS container IP address in `AWS_ENDPOINT` together with `AWS_PATH_STYLE_ACCESS = "true"`, as shown above.
+Doris baut aus Bucket und Endpunkt einen Hostnamen für die Adressierung im Virtual-Hosted-Stil. Verwenden Sie die IP-Adresse des RustFS-Containers in `AWS_ENDPOINT` zusammen mit `AWS_PATH_STYLE_ACCESS = "true"`, wie oben gezeigt.
 
-### The backup stays in `SNAPSHOTING` for a long time
+### Das Backup bleibt lange in `SNAPSHOTING`
 
-The backend uploads the tablet files. Confirm the backend is healthy (`SHOW BACKENDS;`) and can reach the endpoint; the all-in-one image needs a minute or two after start before both processes report ready.
+Das Backend lädt die Tablet-Dateien hoch. Prüfen Sie, dass das Backend gesund ist (`SHOW BACKENDS;`) und den Endpunkt erreichen kann. Das All-in-one-Image braucht nach dem Start ein bis zwei Minuten, bis beide Prozesse Bereitschaft melden.
 
 ### `Failed to create repository: ... file status`
 
-The bucket does not exist or the credentials are wrong. Create `doris-backups` with `rc mb` and re-check the access key pair.
+Der Bucket existiert nicht oder die Zugangsdaten sind falsch. Legen Sie `doris-backups` mit `rc mb` an und prüfen Sie das Zugriffsschlüssel-Paar erneut.
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Doris operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Doris backup and restore documentation](https://doris.apache.org/docs/data-operate/backup-restore/) to schedule periodic snapshots.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere Doris-Operationen einsetzen.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [Doris-Dokumentation zu Backup und Restore](https://doris.apache.org/docs/data-operate/backup-restore/), um periodische Snapshots zu planen.

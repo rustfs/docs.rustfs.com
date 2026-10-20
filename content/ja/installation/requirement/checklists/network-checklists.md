@@ -1,49 +1,49 @@
 ---
-title: "Network Checklist"
-description: "Network checklist for enterprise deployments."
+title: "ネットワークチェックリスト"
+description: "エンタープライズのデプロイに使う、ネットワークのチェックリストです。"
 ---
 
-## Network Architecture
+## ネットワークアーキテクチャ
 
-### Planning
+### 計画
 
-- **Topology**
- Verify the architecture (star/ring/mesh) meets high availability requirements.
-- **Redundancy**
- Ensure at least two independent physical links between nodes.
-- **Bandwidth**
- Calculate estimated traffic: object storage read/write bandwidth × node count × replica count + 20% redundancy.
+- **トポロジー**
+ アーキテクチャ（スター、リング、メッシュ）が高可用性の要件を満たしていることを確認します。
+- **冗長性**
+ ノード間に、独立した物理リンクを少なくとも 2 本確保します。
+- **帯域**
+ トラフィックは、読み書き帯域 × ノード数 × レプリカ数に、20% の余裕を加えた値として見積もります。
 
-### IP Allocation
+### IP の割り当て
 
-- [ ] Separate management network from data network.
-- [ ] Allocate continuous IP segments for storage nodes (recommend /24 subnet).
-- [ ] Reserve at least 15% of IP addresses for expansion.
+- [ ] 管理ネットワークとデータネットワークを分離します。
+- [ ] ストレージノード向けに、連続した IP アドレス範囲を割り当てます。/24 サブネットを推奨します。
+- [ ] 拡張用に、IP アドレスの少なくとも 15% を予約します。
 
 ---
 
-## Hardware Requirements
+## ハードウェア要件
 
-### Switches
+### スイッチ
 
-| Check Item | Requirements |
+| 項目 | 要件 |
 |--------|---------|
-| Backplane Bandwidth | ≥ Full port line rate forwarding capability × 1.2 |
-| Port Type | 10G/25G/100G SFP+/QSFP+ fiber ports |
-| Flow Table Capacity | ≥ Node count × 5 |
-| Spanning Tree | Enable RSTP/MSTP fast convergence |
+| バックプレーン帯域 | 全ポートの回線速度の合計 × 1.2 以上 |
+| ポートの種類 | 10G/25G/100G の SFP+/QSFP+ ファイバーポート |
+| フローテーブル容量 | ノード数 × 5 以上 |
+| スパニングツリー | 高速に収束するよう、RSTP または MSTP を有効にします |
 
-### Cabling
+### 配線
 
-- [ ] Fiber attenuation test (single mode ≤0.35dB/km).
-- [ ] Port misalignment check (Node A eth0 ↔ Node B eth0).
-- [ ] Cable labeling (including source/destination IP + port number).
+- [ ] ファイバーの減衰試験（シングルモードは 0.35 dB/km 以下）。
+- [ ] ポートの対応を確認します（ノード A の eth0 ↔ ノード B の eth0）。
+- [ ] ケーブルにラベルを付けます（送信元と宛先の IP、およびポート番号を含む）。
 
 ---
 
-## OS Configuration
+## OS の設定
 
-### Kernel Tuning
+### カーネルのチューニング
 
 ```bash
 # Check the following parameter settings
@@ -53,17 +53,17 @@ net.ipv4.tcp_keepalive_time = 600
 net.ipv4.tcp_slow_start_after_idle = 0
 ```
 
-### NIC Configuration
+### NIC の設定
 
-- [ ] Enable jumbo frames (MTU=9000, requires full path support).
-- [ ] Verify bonding mode (recommend LACP mode4).
-- [ ] Disable IPv6 (if not needed).
+- [ ] ジャンボフレームを有効にします（MTU=9000。経路全体の対応が必要です）。
+- [ ] ボンディングモードを確認します（LACP mode4 を推奨）。
+- [ ] IPv6 を無効にします（不要な場合）。
 
 ---
 
-## Security
+## セキュリティ
 
-### Firewall
+### ファイアウォール
 
 ```text
 # Necessary open ports
@@ -72,43 +72,43 @@ net.ipv4.tcp_slow_start_after_idle = 0
 - TCP 443 (only if you terminate HTTPS on a reverse proxy / load balancer)
 ```
 
-### Access Control
+### アクセス制御
 
-- Switch port security MAC restrictions.
-- IPSec tunnel encryption between storage nodes.
-- Enable TLS 1.3 for management interfaces.
+- スイッチでポートセキュリティ（MAC アドレス数の制限）を有効にします。
+- ストレージノード間の通信を IPsec で暗号化します。
+- 管理インターフェースでは TLS 1.3 を有効にします。
 
 ---
 
-## Performance Testing
+## 性能テスト
 
-### Benchmarks
+### ベンチマーク
 
-1. Inter-node latency: `ping -c 20 <target IP>` (run `iperf3 -s` on the target first for throughput tests)
-2. Cross-rack bandwidth: `iperf3 -c <target IP> -P 8 -t 30`
-3. Failover: Randomly disconnect core links to observe recovery time.
+1. ノード間のレイテンシ: `ping -c 20 <target IP>`（スループットのテストでは、先に対象で `iperf3 -s` を実行します）
+2. ラック間の帯域: `iperf3 -c <target IP> -P 8 -t 30`
+3. フェイルオーバー: 基幹リンクを無作為に切断し、復旧にかかる時間を確認します。
 
-### Criteria
+### 基準
 
-| Metric | Requirements |
+| 指標 | 要件 |
 |------|------|
-| Node Latency | ≤1ms (same room) / ≤5ms (cross AZ) |
-| Bandwidth Utilization | Peak ≤70% of design capacity |
-| Failover | < 500ms BPDU convergence |
+| ノードのレイテンシ | 1 ms 以下（同一データセンター）/ 5 ms 以下（AZ 間） |
+| 帯域使用率 | ピーク時は設計容量の 70% 以下 |
+| フェイルオーバー | BPDU の収束は 500 ms 未満 |
 
 ---
 
-## Documentation Requirements
+## ドキュメントの要件
 
-1. Network topology diagram (including physical connections and logical IPs)
-2. Switch configuration backup files (with timestamps)
-3. Baseline test reports (including raw data)
-4. Change record table (including maintenance window information)
+1. ネットワークトポロジー図（物理接続と論理 IP を含む）
+2. スイッチ設定のバックアップファイル（タイムスタンプ付き）
+3. ベースラインテストの報告書（生データを含む）
+4. 変更履歴（メンテナンス時間帯を含む）
 
 :::tip
 
-Recommend conducting 72-hour stress testing before formal deployment, simulating 110% peak traffic load scenarios
+本番へデプロイする前に、想定されるピークトラフィックの 110% で 72 時間のストレステストを実施することを推奨します。
 
 :::
 
-This checklist covers key checkpoints for enterprise storage system network deployment, specifically optimized parameter requirements for distributed object storage characteristics. You can contact RustFS for official technical support.
+このチェックリストは、エンタープライズ環境に分散オブジェクトストレージをデプロイするときの、主要なネットワーク要件をまとめたものです。技術サポートが必要な場合は、RustFS に問い合わせてください。

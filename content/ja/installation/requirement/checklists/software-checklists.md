@@ -1,50 +1,50 @@
 ---
-title: "Software Checklist"
-description: "Software requirements and considerations."
+title: "ソフトウェアチェックリスト"
+description: "デプロイ前に確認する、ソフトウェアの要件と考慮事項をまとめます。"
 ---
 
-Ensure the following requirements are met before deployment.
+デプロイの前に、次の要件を満たしていることを確認します。
 
-## OS Requirements
+## OS の要件
 
-- **Operating System**: Use LTS versions (Ubuntu 20.04+, RHEL 8/9).
-- **Kernel**: Linux 5.x+ is recommended.
-- **CPU & Memory**: x86_64 or ARM. Minimum 2 GB RAM for testing, 64 GB+ for production.
-- **Disable Interfering Services**: Disable file indexing and auditing services (e.g., `mlocate`, `auditd`, antivirus) to prevent I/O interference.
+- **オペレーティングシステム**: LTS バージョン（Ubuntu 20.04 以降、RHEL 8/9）を使います。
+- **カーネル**: Linux 5.x 以降を推奨します。
+- **CPU とメモリ**: x86_64 または ARM です。テストでは最低 2 GB の RAM、本番では 64 GB 以上が必要です。
+- **干渉するサービスを無効にする**: I/O への干渉を防ぐため、ファイルのインデックス作成や監査のサービス（例: `mlocate`、`auditd`、ウイルス対策）を無効にします。
 
-> **Why Linux 5.x+?**
-> Modern LTS kernels bring mature async I/O and filesystem improvements. RustFS also offers an optional `io_uring` read path (`RUSTFS_IO_URING_READ_ENABLE`, disabled by default), which requires Linux 5.10+ to be effective.
+> **Linux 5.x 以降を使う理由**
+> 近年の LTS カーネルには、十分に成熟した非同期 I/O と、ファイルシステムの改善が含まれています。RustFS には任意の `io_uring` 読み取りパス（`RUSTFS_IO_URING_READ_ENABLE`。デフォルトでは無効）もあり、効果を得るには Linux 5.10 以降が必要です。
 
-## Binary Deployment
+## バイナリのデプロイ
 
-- **Official Download**: Download binaries only from official RustFS channels.
-- **Integrity Verification**: Verify SHA256 checksums.
-- **Consistency**: Ensure all nodes run the same RustFS version.
-- **Installation Location**: Place binaries in `/usr/local/bin` and ensure they are executable (`chmod +x`).
+- **公式からのダウンロード**: バイナリは、RustFS の公式チャネルからのみダウンロードします。
+- **整合性の検証**: SHA256 チェックサムを検証します。
+- **一貫性**: すべてのノードで、同じ RustFS のバージョンを実行します。
+- **インストール先**: バイナリは `/usr/local/bin` に配置し、実行可能にします（`chmod +x`）。
 
-## File System & Disks
+## ファイルシステムとディスク
 
-- **Dedicated Data Disks**: Use dedicated disks for RustFS data. Do not share with the OS.
-- **File System**: Use XFS or Ext4 with performance options (e.g., `noatime`).
-- **Disk Configuration**: Use JBOD (independent volumes). Do not use hardware RAID.
-- **Permissions**: Ensure the RustFS user has read/write access to data directories.
+- **専用のデータディスク**: RustFS のデータには専用ディスクを使います。OS と同じディスクは共用しないでください。
+- **ファイルシステム**: XFS または ext4 を使い、`noatime` などの性能向けマウントオプションを指定します。
+- **ディスク構成**: JBOD（独立したボリューム）を使います。ハードウェア RAID は使わないでください。
+- **権限**: RustFS の実行ユーザーが、データディレクトリへの読み書き権限を持っていることを確認します。
 
-## Dependencies
+## 依存関係
 
-- **Time Synchronization**: Synchronize time across all nodes using `ntp` or `chrony`.
-- **Hostname and DNS**: Configure persistent hostnames and ensure proper DNS resolution.
-- **Network Connectivity**: Ensure all nodes can communicate on the RustFS port (default 9000).
-- **TLS/Certificates**: Install root certificates and prepare server certificates if using HTTPS.
-- **Packages**: Ensure standard tools (`bash`, `glibc`, `openssl`) are installed.
+- **時刻同期**: `ntp` または `chrony` を使い、すべてのノードの時刻を同期します。
+- **ホスト名と DNS**: 永続的なホスト名を設定し、DNS が正しく解決されることを確認します。
+- **ネットワーク接続**: すべてのノードが、RustFS のポート（デフォルトは 9000）で互いに通信できることを確認します。
+- **TLS と証明書**: HTTPS を使う場合は、ルート証明書をインストールし、サーバー証明書を準備します。
+- **パッケージ**: 標準ツール（`bash`、`glibc`、`openssl`）がインストールされていることを確認します。
 
-## User & Security
+## ユーザーとセキュリティ
 
-- **Dedicated User**: Run RustFS as a dedicated user (e.g., `rustfs-user`).
-- **File Permissions**: Restrict access to binaries and configuration files.
-- **SELinux/AppArmor**: Configure policies to allow RustFS operations, or disable if appropriate.
-- **Systemd**: Configure the systemd service file correctly (`User=`, `ExecStart=`, environment variables).
+- **専用ユーザー**: RustFS は専用ユーザー（例: `rustfs-user`）として実行します。
+- **ファイル権限**: バイナリと設定ファイルへのアクセスを制限します。
+- **SELinux/AppArmor**: RustFS の動作を許可するポリシーを設定します。適切な場合は、無効にすることもできます。
+- **systemd**: systemd のサービスファイルを正しく設定します（`User=`、`ExecStart=`、環境変数）。
 
-## Other
+## その他
 
-- **Monitoring**: Configure Prometheus and Grafana.
-- **Rollback Plan**: Prepare configuration backups and a rollback plan.
+- **監視**: Prometheus と Grafana を設定します。
+- **ロールバック計画**: 設定のバックアップと、ロールバックの計画を用意します。

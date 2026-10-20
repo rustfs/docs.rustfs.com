@@ -217,7 +217,7 @@ GetObjectRequest getObjectRequest = GetObjectRequest.builder()
 
 GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
     .getObjectRequest(getObjectRequest)
-    .signatureDuration(Duration.ofMinutes(15)) // 15 minutes validity
+    .signatureDuration(Duration.ofMinutes(15)) // expires in 15 minutes
     .build();
 
 PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);

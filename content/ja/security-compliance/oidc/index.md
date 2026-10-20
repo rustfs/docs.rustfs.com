@@ -1,40 +1,40 @@
 ---
 title: "OIDC"
-description: "Understand how RustFS uses OpenID Connect providers for Console single sign-on."
+description: "RustFS が Console のシングルサインオンに OpenID Connect プロバイダーを使う仕組みを説明します。"
 ---
 
-RustFS supports OpenID Connect (OIDC) for Console single sign-on. Use this overview to understand the authentication flow, prepare an identity provider, and choose a provider-specific configuration guide.
+RustFS は、Console のシングルサインオンで OpenID Connect（OIDC）に対応しています。この概要では、認証の流れを理解し、アイデンティティプロバイダーを準備し、プロバイダー別の設定ガイドを選びます。
 
-## How OIDC works
+## OIDC の仕組み
 
-RustFS uses the OIDC Authorization Code Flow with Proof Key for Code Exchange (PKCE):
+RustFS は、Proof Key for Code Exchange（PKCE）を伴う OIDC の Authorization Code Flow を使います。
 
-1. RustFS sends an authorization request with an S256 PKCE challenge.
-2. The identity provider authenticates you and returns an authorization code to the RustFS callback URL.
-3. RustFS exchanges the code at the provider's token endpoint.
-4. RustFS verifies the ID token signature, issuer, audience, expiry, and nonce.
-5. RustFS maps configured token claims to local Identity and Access Management (IAM) policies and creates a Console session with temporary credentials.
+1. RustFS は、S256 の PKCE チャレンジ付きで認可リクエストを送ります。
+2. アイデンティティプロバイダーがユーザーを認証し、認可コードを RustFS のコールバック URL へ返します。
+3. RustFS は、プロバイダーのトークンエンドポイントでコードを交換します。
+4. RustFS は、ID トークンの署名、発行者、オーディエンス、有効期限、nonce を検証します。
+5. RustFS は、設定されたトークンクレームをローカルのアイデンティティとアクセス管理（IAM）ポリシーに対応付け、一時認証情報を持つ Console セッションを作成します。
 
-The identity provider authenticates you, while RustFS policies authorize S3 and administration operations.
+アイデンティティプロバイダーがユーザーを認証し、RustFS のポリシーが S3 と管理操作を認可します。
 
-## Provider requirements
+## プロバイダーの要件
 
-Before configuring a provider, prepare:
+プロバイダーを設定する前に、次を準備します。
 
-- An OIDC discovery URL that exposes the authorization, token, and JSON Web Key Set (JWKS) endpoints.
-- A confidential client that supports the Authorization Code Flow, S256 PKCE, and client-secret authentication in the token request body.
-- An exact callback URL in the form `https://<rustfs-host>/rustfs/admin/v3/oidc/callback/<provider-id>`.
-- A public HTTPS origin for the RustFS Console.
-- A flat group or role claim whose values match existing RustFS policy names.
+- 認可、トークン、JSON Web Key Set（JWKS）の各エンドポイントを公開する OIDC ディスカバリー URL。
+- Authorization Code Flow、S256 PKCE、トークンリクエスト本文でのクライアントシークレット認証に対応する機密クライアント。
+- `https://<rustfs-host>/rustfs/admin/v3/oidc/callback/<provider-id>` 形式の、完全一致するコールバック URL。
+- RustFS Console の公開 HTTPS オリジン。
+- 値が既存の RustFS ポリシー名と一致する、フラットなグループまたはロールのクレーム。
 
-Use a dedicated client for RustFS and grant each identity only the policies it requires.
+RustFS 専用のクライアントを使い、各アイデンティティには必要なポリシーだけを付与します。
 
-## Provider guides
+## プロバイダー別のガイド
 
-- [Configure Keycloak](/security-compliance/oidc/keycloak) as an OIDC provider for the RustFS Console.
-- [Configure GitLab](/security-compliance/oidc/gitlab) as an OIDC provider for the RustFS Console.
+- [Keycloak の設定](/ja/security-compliance/oidc/keycloak)では、RustFS Console の OIDC プロバイダーとして Keycloak を設定します。
+- [GitLab の設定](/ja/security-compliance/oidc/gitlab)では、RustFS Console の OIDC プロバイダーとして GitLab を設定します。
 
-## Next steps
+## 次のステップ
 
-- Review [users, groups, and policies](/security-compliance/iam/policies) before mapping identity-provider claims.
-- Review the [Console security notes](/administration/console) before exposing the login endpoint publicly.
+- アイデンティティプロバイダーのクレームを対応付ける前に、[ユーザー、グループ、ポリシー](/ja/security-compliance/iam/policies)を確認します。
+- ログインエンドポイントを公開する前に、[Console のセキュリティに関する注意](/ja/administration/console)を確認します。

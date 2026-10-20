@@ -1,10 +1,10 @@
 ---
-title: "Scaling"
-description: "Expand, rebalance, and retire RustFS storage pools."
+title: "スケーリング"
+description: "RustFS のストレージプールを拡張し、リバランスし、デコミッションします。"
 ---
 
-Choose the workflow that matches the topology change:
+トポロジーの変更に合う手順を選びます。
 
-- [Pool Expansion](./storage-pool-expansion.md)
-- [Rebalancing](./data-rebalancing.md)
-- [Pool Decommission](./storage-pool-decommission.md)
+- [プールの拡張](./storage-pool-expansion.md)
+- [リバランス](./data-rebalancing.md)
+- [プールのデコミッション](./storage-pool-decommission.md)

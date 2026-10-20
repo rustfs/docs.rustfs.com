@@ -1,11 +1,11 @@
 ---
 title: "s3cmd"
-description: "Connect s3cmd to RustFS and perform basic object operations from the command line."
+description: "Verbinden Sie s3cmd mit RustFS und führen Sie grundlegende Objektoperationen über die Befehlszeile aus."
 ---
 
-[s3cmd](https://s3tools.org/s3cmd) is a command-line client for S3-compatible storage. Point it at your RustFS endpoint with a small config file.
+[s3cmd](https://s3tools.org/s3cmd) ist ein Befehlszeilenclient für S3-kompatiblen Speicher. Richten Sie s3cmd mit einer kleinen Konfigurationsdatei auf Ihren RustFS-Endpunkt aus.
 
-## Install
+## Installation
 
 ```bash
 # macOS
@@ -16,9 +16,9 @@ sudo apt install s3cmd
 pip install s3cmd
 ```
 
-## Configure
+## Konfiguration
 
-Create `~/.s3cfg`. Replace `localhost:9000` with your server address and use your own [access keys](../../security-compliance/iam/access-token.md). RustFS uses path-style addressing, so set the bucket host to the same endpoint:
+Legen Sie `~/.s3cfg` an. Ersetzen Sie `localhost:9000` durch Ihre Serveradresse und verwenden Sie Ihre eigenen [Zugriffsschlüssel](../../security-compliance/iam/access-token.md). RustFS verwendet pfadbasierte Adressierung (Path-Style). Setzen Sie den Bucket-Host daher auf denselben Endpunkt:
 
 ```ini title="~/.s3cfg"
 [default]
@@ -32,13 +32,13 @@ signature_v2 = False
 
 :::note
 
-Set `use_https = True` and point at port `9000` if you have [configured TLS](../../integration/tls-configured.md).
+Setzen Sie `use_https = True` und verwenden Sie Port `9000`, wenn Sie [TLS eingerichtet](../../integration/tls-configured.md) haben.
 
 :::
 
-## Verify
+## Überprüfung
 
-Create a bucket, upload a file, and list it:
+Erstellen Sie einen Bucket, laden Sie eine Datei hoch und listen Sie ihn auf:
 
 ```bash
 s3cmd mb s3://my-bucket
@@ -51,6 +51,6 @@ upload: '/path/to/hello.txt' -> 's3://my-bucket/hello.txt'  [1 of 1]
 2026-07-16 10:00        12   s3://my-bucket/hello.txt
 ```
 
-## Next steps
+## Nächste Schritte
 
-See the [SDK overview](../sdk/index.md) to connect an application, or manage objects with [`rc`](/operations/rc).
+Lesen Sie die [SDK-Übersicht](../sdk/index.md), um eine Anwendung anzubinden, oder verwalten Sie Objekte mit [`rc`](/de/operations/rc).

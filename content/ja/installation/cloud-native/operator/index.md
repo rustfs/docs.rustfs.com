@@ -1,28 +1,28 @@
 ---
-title: Overview
-description: Understand how RustFS Operator manages RustFS clusters on Kubernetes.
+title: 概要
+description: RustFS Operator が Kubernetes 上の RustFS クラスターをどのように管理するかを説明します。
 ---
 
-**RustFS Operator** applies the Kubernetes Operator pattern to RustFS clusters. Instead of creating StatefulSets, Services, PersistentVolumeClaims (PVCs), and configuration by hand, you declare the required storage cluster as a Kubernetes custom resource. The controller watches that resource and continuously reconciles the running cluster with the declared state.
+**RustFS Operator** は、Kubernetes の Operator パターンを RustFS クラスターに適用します。StatefulSet、Service、PersistentVolumeClaim（PVC）、設定を手作業で作成する代わりに、必要なストレージクラスターを Kubernetes のカスタムリソースとして宣言します。コントローラーはそのリソースを監視し、実行中のクラスターを宣言した状態へ継続的に調整します。
 
-The Operator installs two Custom Resource Definitions (CRDs):
+Operator は、2 つのカスタムリソース定義（CRD）をインストールします。
 
-- `Tenant` (`rustfs.com/v1alpha1`) represents one RustFS cluster. It defines storage pools, credentials, scheduling, Transport Layer Security (TLS), and Key Management Service (KMS) settings.
-- `PolicyBinding` (`sts.rustfs.com/v1alpha1`) maps a Kubernetes ServiceAccount to RustFS policies when workloads request temporary credentials from the Operator Security Token Service (STS).
+- `Tenant`（`rustfs.com/v1alpha1`）は 1 つの RustFS クラスターを表します。ストレージプール、認証情報、スケジューリング、トランスポート層セキュリティ（TLS）、キー管理サービス（KMS）の設定を定義します。
+- `PolicyBinding`（`sts.rustfs.com/v1alpha1`）は、ワークロードが Operator の Security Token Service（STS）へ一時認証情報を要求するとき、Kubernetes の ServiceAccount を RustFS のポリシーへ対応付けます。
 
-One Operator can manage multiple Tenants across namespaces. Each Tenant has independent storage, credentials, S3 and Console services, and lifecycle. The Operator creates one StatefulSet for each pool, so you can add capacity by appending a pool without rebuilding the cluster. It also reports `Ready`, `Progressing`, or `Degraded` conditions and Kubernetes Events, and exposes health and metrics endpoints for cluster monitoring.
+1 つの Operator で、名前空間をまたいで複数の Tenant を管理できます。各 Tenant は、ストレージ、認証情報、S3 と Console の Service、ライフサイクルを独立して持ちます。Operator はプールごとに StatefulSet を 1 つ作成するため、クラスターを作り直さずにプールを追加して容量を増やせます。また、`Ready`、`Progressing`、`Degraded` の Condition と Kubernetes Event を報告し、クラスター監視用にヘルスとメトリクスのエンドポイントを公開します。
 
-The same API covers small test clusters and distributed deployments. Sensitive credentials and KMS material stay in Kubernetes Secrets, while version-controlled Tenant manifests hold only Secret references. This makes deployments repeatable, supports GitOps workflows, and keeps routine operations such as multi-tenant management, pool expansion, TLS, and encryption within Kubernetes-native tools.
+同じ API で、小規模なテスト用クラスターと分散デプロイの両方を扱えます。機密の認証情報と KMS の鍵材料は Kubernetes の Secret に置き、バージョン管理する Tenant のマニフェストには Secret の参照だけを記述します。これによりデプロイを繰り返し行え、GitOps のワークフローにも対応できます。マルチテナントの管理、プールの拡張、TLS、暗号化といった日常の運用は、Kubernetes ネイティブのツールで行えます。
 
-## Operator workflows
+## Operator のワークフロー
 
-- [Install](./installation.md) covers requirements, Helm installation, Console access, and TLS configuration.
-- [Multi-Tenant](./tenant.md) creates isolated RustFS clusters for different teams or workloads.
-- [Pool Expansion](./pool-expansion.md) adds storage capacity by appending a pool to an existing Tenant.
-- [KMS Integration](./kms.md) configures local or HashiCorp Vault key management for encrypted data.
+- [インストール](./installation.md)では、要件、Helm によるインストール、Console へのアクセス、TLS の設定を扱います。
+- [マルチテナント](./tenant.md)では、チームやワークロードごとに分離した RustFS クラスターを作成します。
+- [ストレージプールの拡張](./pool-expansion.md)では、既存の Tenant にプールを追加してストレージ容量を増やします。
+- [KMS 連携](./kms.md)では、暗号化データ向けに、ローカルまたは HashiCorp Vault のキー管理を設定します。
 
-:::warning[Pre-release software]
+:::warning[プレリリースのソフトウェア]
 
-RustFS Operator is currently `v0.1.0` pre-release software under active development. Validate upgrades and Tenant changes in a non-production cluster first.
+RustFS Operator は、現在 `v0.1.0` のプレリリースであり、活発に開発されています。アップグレードと Tenant の変更は、まず本番以外のクラスターで検証します。
 
 :::

@@ -1,14 +1,14 @@
 ---
-title: "Data Encryption"
-description: "Find the verified RustFS server-side encryption and key management references."
+title: "データ暗号化"
+description: "検証済みの RustFS のサーバー側の暗号化と鍵管理に関するリファレンスを確認できます。"
 ---
 
-RustFS provides server-side encryption options for data stored in the object storage service. Use this section to choose the key-management model that matches your security requirements.
+RustFS は、オブジェクトストレージサービスに保存するデータ向けに、サーバー側の暗号化の選択肢を提供します。このセクションでは、セキュリティ要件に合う鍵管理モデルを選びます。
 
-## Encryption options
+## 暗号化の選択肢
 
-- [SSE-S3](./sse-s.md) covers server-managed server-side encryption with the S3 `AES256` mode.
-- [SSE-C](./sse-c.md) covers server-side encryption with customer-provided keys.
-- [SSE-KMS](./kms.md) covers Local, Vault KV2, and Vault Transit key-management backends.
+- [SSE-S3](./sse-s.md)では、S3 の `AES256` モードによる、サーバー管理のサーバー側の暗号化を扱います。
+- [SSE-C](./sse-c.md)では、顧客が提供する鍵によるサーバー側の暗号化を扱います。
+- [SSE-KMS](./kms.md)では、ローカル、Vault KV2、Vault Transit の鍵管理バックエンドを扱います。
 
-For the currently verified KMS configuration surface, see the [CLI reference](/reference/cli) and [environment variable reference](/reference/environment-variables).
+現在検証済みの KMS 設定の対象範囲については、[CLI リファレンス](/ja/reference/cli)と[環境変数リファレンス](/ja/reference/environment-variables)を参照します。

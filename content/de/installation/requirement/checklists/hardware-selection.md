@@ -1,39 +1,41 @@
 ---
-title: Hardware Selection
-description: Hardware requirements for RustFS.
+title: "Hardwareauswahl"
+description: "Diese Seite listet die minimale und die empfohlene Hardware für Test- und Produktionsumgebungen von RustFS auf."
 ---
 
-> RustFS is designed for efficiency with a low memory footprint.
+> RustFS ist auf Effizienz bei geringem Arbeitsspeicherbedarf ausgelegt.
 
-## Test Environment
+## Testumgebung
 
-> Minimal requirements for testing:
+Mindestanforderungen für Tests:
 
-| Component | Requirement |
+| Komponente | Anforderung |
 | - | - |
-| CPU | 1 core+ |
-| Architecture | x86, ARM |
-| Memory | 1 GB+ |
-| Storage | HDD or SSD |
-| Docker | Supported |
-| Network | Local or Offline |
-| OS | Windows, Linux, macOS |
-| Load Balancing | None |
-| Nodes | 1 |
+| CPU | mindestens 1 Kern |
+| Architektur | x86, ARM |
+| Arbeitsspeicher | mindestens 1 GB |
+| Speicher | HDD oder SSD |
+| Docker | Unterstützt |
+| Netzwerk | Lokal oder offline |
+| Betriebssystem | Windows, Linux, macOS |
+| Lastverteilung | Keine |
+| Knoten | 1 |
 
-## Production Environment
+## Produktionsumgebung
 
-| Component | Requirement |
+Die Windows-Version von RustFS ist ausschließlich für Entwicklung und Fehlersuche vorgesehen und wird **nicht für Produktionsbereitstellungen empfohlen**. Wir empfehlen [Linux](/de/installation/linux) für Produktionslasten.
+
+| Komponente | Anforderung |
 | - | - |
-| CPU | 2 x 12 cores+ |
-| Architecture | x86, ARM, etc. |
-| Memory | 64 GB+ |
-| Storage | SSD recommended |
-| Network | 10 Gbps+ |
-| OS | Linux (Recommended) |
-| Load Balancing | Recommended |
-| Nodes | 4+ |
+| CPU | 2 × 12 Kerne oder mehr |
+| Architektur | x86, ARM usw. |
+| Arbeitsspeicher | mindestens 64 GB |
+| Speicher | SSD empfohlen |
+| Netzwerk | mindestens 10 Gbps |
+| Betriebssystem | Linux (empfohlen) |
+| Lastverteilung | Empfohlen |
+| Knoten | mindestens 4 |
 
-## Expert Services
+## Professionelle Dienste
 
-For complex deployments, contact support at hello@rustfs.com.
+Wenden Sie sich bei komplexen Bereitstellungen an den Support unter hello@rustfs.com.

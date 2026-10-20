@@ -1,26 +1,26 @@
 ---
-title: "Status Check"
-description: "Check RustFS network access, health endpoints, cluster status, and storage capacity."
+title: "ステータス確認"
+description: "RustFS のネットワーク到達性、ヘルスチェックのエンドポイント、クラスターの状態、ストレージ容量を確認する方法を説明します。"
 ---
 
-Use network probes, the **Status** page in the RustFS Console, or the `rc` command line to review RustFS availability and storage consumption. Before using the command-line workflow, [install `rc`](/operations/rc) and configure an alias for the target cluster.
+ネットワークのプローブ、RustFS Console（管理画面）の **Status**（ステータス）ページ、または `rc` のコマンドラインで、RustFS の可用性とストレージ使用量を確認します。コマンドラインの手順を使う前に、[`rc` をインストール](/ja/operations/rc)し、対象クラスターのエイリアスを設定します。
 
-## Network ports
+## ネットワークポート
 
-RustFS uses two listeners by default. You can change both bind addresses through environment variables or command-line flags.
+RustFS は既定で 2 つのリスナーを使います。両方のバインドアドレスは、環境変数またはコマンドラインフラグで変更できます。
 
-| Port | Listener | Configured by | Traffic |
+| ポート | リスナー | 設定方法 | トラフィック |
 | --- | --- | --- | --- |
-| `9000` | S3 API | `RUSTFS_ADDRESS` / `--address` | S3 object API, admin API, and internal node-to-node RPC under `/rustfs/rpc/` and `/rustfs/peer/` |
-| `9001` | Console | `RUSTFS_CONSOLE_ADDRESS` / `--console-address` | Embedded web console under `/rustfs/console/`; disable it with `RUSTFS_CONSOLE_ENABLE=false` |
+| `9000` | S3 API | `RUSTFS_ADDRESS` / `--address` | S3 オブジェクト API、管理 API、および `/rustfs/rpc/` と `/rustfs/peer/` 配下のノード間内部 RPC |
+| `9001` | Console | `RUSTFS_CONSOLE_ADDRESS` / `--console-address` | `/rustfs/console/` 配下の組み込み Web Console。`RUSTFS_CONSOLE_ENABLE=false` で無効にします |
 
-:::note[Internode connectivity]
+:::note[ノード間の接続]
 
-Internode RPC shares port 9000. In a multi-node cluster, every node must be able to reach every other node on the S3 port; there is no separate cluster port.
+ノード間 RPC はポート 9000 を共有します。マルチノードのクラスターでは、すべてのノードが S3 ポートでほかのすべてのノードへ到達できる必要があります。専用のクラスターポートはありません。
 
 :::
 
-Open the default ports with `firewalld` when clients need to reach both listeners:
+クライアントが両方のリスナーへ到達する必要がある場合は、`firewalld` で既定のポートを開きます。
 
 ```bash title="firewall-cmd"
 firewall-cmd --permanent --add-port=9000/tcp
@@ -28,25 +28,25 @@ firewall-cmd --permanent --add-port=9001/tcp
 firewall-cmd --reload
 ```
 
-:::warning[Restrict console access]
+:::warning[Console へのアクセスを制限する]
 
-Expose port 9001 only to trusted networks. If you do not need the console, set `RUSTFS_CONSOLE_ENABLE=false` and leave the port closed.
+ポート 9001 は、信頼できるネットワークにだけ公開します。Console が不要な場合は、`RUSTFS_CONSOLE_ENABLE=false` を設定し、ポートは閉じたままにします。
 
 :::
 
-## Health endpoints
+## ヘルスチェックのエンドポイント
 
-The S3 listener on port **9000** serves unauthenticated probe endpoints. Disable them with `RUSTFS_HEALTH_ENDPOINT_ENABLE=false`. The console on port **9001** has its own health path.
+ポート **9000** の S3 リスナーは、認証のないプローブ用エンドポイントを提供します。`RUSTFS_HEALTH_ENDPOINT_ENABLE=false` で無効にします。ポート **9001** の Console には、専用のヘルスパスがあります。
 
-| Endpoint | Port | Meaning |
+| エンドポイント | ポート | 意味 |
 | --- | --- | --- |
-| `GET /health`, `HEAD /health`, `GET /health/live`, `GET /minio/health/live` | 9000 | Liveness — returns `200` as long as the process is up |
-| `GET /health/ready` | 9000 | Readiness — `200` only when storage, IAM, and peer health are ready; `503` otherwise |
-| `GET /minio/health/ready` | 9000 | MinIO-compatible alias of the readiness probe |
-| `GET /minio/health/cluster`, `GET /minio/health/cluster/read` | 9000 | Cluster write/read health (additionally require lock quorum) |
-| `GET /rustfs/console/health` | 9001 | Console process health |
+| `GET /health`、`HEAD /health`、`GET /health/live`、`GET /minio/health/live` | 9000 | 生存確認（Liveness）。プロセスが動作している間は `200` を返します |
+| `GET /health/ready` | 9000 | 準備完了。ストレージ、IAM、ピアがすべて準備できた場合だけ `200` を返し、それ以外は `503` を返します |
+| `GET /minio/health/ready` | 9000 | 準備完了プローブの MinIO 互換エイリアス |
+| `GET /minio/health/cluster`、`GET /minio/health/cluster/read` | 9000 | クラスターの書き込みと読み取りの健全性（ロックのクォーラムも必要です） |
+| `GET /rustfs/console/health` | 9001 | Console プロセスの健全性 |
 
-A ready node answers `200` with `"ready": true`. A degraded node answers `503` with per-dependency detail:
+準備完了のノードは、`"ready": true` とともに `200` を返します。劣化したノードは、依存関係ごとの詳細とともに `503` を返します。
 
 ```bash title="Probe examples"
 curl -fsS http://localhost:9000/health
@@ -54,60 +54,60 @@ curl -s http://<node>:9000/health/ready | jq
 curl -fsS http://localhost:9001/rustfs/console/health
 ```
 
-The `details` object reports `storage` / `iam` / `lock` (and `kms` when configured), and `degradedReasons` lists machine-readable causes such as `storage_quorum_unavailable`, `iam_not_ready`, or `lock_quorum_unavailable`.
+`details` オブジェクトは `storage` / `iam` / `lock`（設定されている場合は `kms`）を報告し、`degradedReasons` は `storage_quorum_unavailable`、`iam_not_ready`、`lock_quorum_unavailable` のような機械可読の原因を列挙します。
 
-## Cluster status
+## クラスターの状態
 
-### Check cluster status in the Console
+### Console でクラスターの状態を確認する
 
-1. Sign in to the RustFS Console.
-2. Open **Status**.
-3. Confirm that the cluster is online and review the server, network, and drive status.
-4. Investigate any offline server, unavailable drive, or failed network connection before maintenance or capacity changes.
+1. RustFS Console にサインインします。
+2. **Status** を開きます。
+3. クラスターがオンラインであることを確認し、サーバー、ネットワーク、ドライブの状態を確認します。
+4. メンテナンスや容量変更の前に、オフラインのサーバー、利用できないドライブ、失敗したネットワーク接続を調べます。
 
-### Check cluster status with rc
+### rc でクラスターの状態を確認する
 
-Run the cluster information command with your configured alias:
-
-```bash
-rc admin info cluster rustfs
-```
-
-The overview reports the cluster state, RustFS version, server and disk counts, backend type, and erasure-coding parity. The node list shows uptime, network connectivity, drive availability, and pool membership. The disk list shows each drive's state and pool, set, and disk location.
-
-For machine-readable output, request JSON:
-
-```bash
-rc admin info cluster rustfs --json
-```
-
-## Storage capacity
-
-### Check storage capacity in the Console
-
-1. Sign in to the RustFS Console and open **Status**.
-2. Review the cluster's used and total storage capacity.
-3. Review the capacity and available space for each disk.
-4. Compare usage over time and plan expansion before available capacity becomes insufficient for normal writes and maintenance.
-
-### Check storage capacity with rc
-
-Use the same cluster information command:
+設定済みのエイリアスで、クラスター情報コマンドを実行します。
 
 ```bash
 rc admin info cluster rustfs
 ```
 
-The **Storage** summary reports used capacity, total capacity, and the used percentage for the cluster. Each entry under **Disks** reports used, total, and available capacity for that drive.
+概要には、クラスターの状態、RustFS のバージョン、サーバー数とディスク数、バックエンドの種類、イレイジャーコーディングのパリティが表示されます。ノード一覧には、稼働時間、ネットワーク接続、ドライブの可用性、所属するプールが表示されます。ディスク一覧には、各ドライブの状態と、プール、セット、ディスクの位置が表示されます。
 
-Use JSON output when collecting the values in a script or monitoring integration:
+機械可読の出力にするには、JSON を指定します。
 
 ```bash
 rc admin info cluster rustfs --json
 ```
 
-Administrative information commands require credentials with the corresponding RustFS Admin API permissions.
+## ストレージ容量
 
-## Next steps
+### Console でストレージ容量を確認する
 
-For continuous telemetry and alerting, continue with [Observability](./observability.md). To add storage, review [Pool Expansion](./scaling/storage-pool-expansion.md).
+1. RustFS Console にサインインし、**Status** を開きます。
+2. クラスターの使用済み容量と総容量を確認します。
+3. 各ディスクの容量と空き容量を確認します。
+4. 使用量の推移を比較し、通常の書き込みとメンテナンスに必要な空き容量が不足する前に、拡張を計画します。
+
+### rc でストレージ容量を確認する
+
+同じクラスター情報コマンドを使います。
+
+```bash
+rc admin info cluster rustfs
+```
+
+**Storage**（ストレージ）の概要には、クラスターの使用済み容量、総容量、使用率が表示されます。**Disks**（ディスク）の各項目には、そのドライブの使用済み容量、総容量、空き容量が表示されます。
+
+スクリプトや監視連携で値を集めるときは、JSON 出力を使います。
+
+```bash
+rc admin info cluster rustfs --json
+```
+
+管理情報のコマンドには、対応する RustFS Admin API の権限を持つ認証情報が必要です。
+
+## 次のステップ
+
+継続的なテレメトリとアラートについては、[オブザーバビリティ](./observability.md)に進みます。ストレージを追加する場合は、[ストレージプールの拡張](./scaling/storage-pool-expansion.md)を確認します。

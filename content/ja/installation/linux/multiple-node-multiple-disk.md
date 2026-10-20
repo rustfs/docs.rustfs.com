@@ -1,16 +1,16 @@
 ---
-title: "RustFS Multiple Node Multiple Disk Installation"
-description: "Install RustFS on multiple servers with multiple disks, data will be stored on multiple disks across multiple servers."
+title: "マルチノード・マルチディスク（MNMD）"
+description: "それぞれ複数のディスクを持つ複数のサーバーに、分散 RustFS クラスターをインストールします。"
 ---
 
-Multiple Node Multiple Disk (MNMD) mode is the deployment mode for production workloads, providing enterprise-grade performance, security, and scalability. A minimum of **4 servers** is required, each with at least 1 disk, to safely start a distributed object storage cluster.
+マルチノード・マルチディスク（MNMD）モードは、複数のサーバーにまたがるクラスター向けの本番デプロイです。分散オブジェクトストレージのクラスターを安全に起動するには、最低 **4 台のサーバー**が必要で、各サーバーに少なくとも 1 台のディスクが必要です。
 
-## Topology and Planning
+## トポロジーと計画
 
-In the following architecture, requests are distributed to the servers through load balancing. With the default 12 + 4 erasure coding layout, each object is split into 12 data shards and 4 parity shards stored on different disks across different servers:
+次の構成では、リクエストはロードバランサーを通じて各サーバーに分散されます。既定の 12 + 4 のイレイジャーコーディング配置では、各オブジェクトは 12 個のデータシャードと 4 個のパリティシャードに分割され、異なるサーバー上の異なるディスクに保存されます。
 
-- Any single server failure or maintenance does not affect data security.
-- Corruption of up to 4 disks does not affect data security.
+- いずれか 1 台のサーバーが故障した場合や、メンテナンスのために停止した場合でも、クラスターは稼働を続け、データは失われません。
+- 最大 4 台のディスクを失っても、データは失われません。
 
 ```mermaid
 flowchart TD
@@ -29,22 +29,21 @@ flowchart TD
     class N1D1,N1D2,N1D3,N1D4,N2D1,N2D2,N2D3,N2D4,N3D1,N3D2,N3D3,N3D4,N4D1,N4D2,N4D3,N4D4 disk
 ```
 
-Before installation, review the [Pre-Installation Checklists](../requirement/checklists/index.md) and ensure all items meet production guidance.
+インストールの前に [インストール前チェックリスト](../requirement/checklists/index.md) を確認し、すべての項目が本番要件を満たしていることを確かめます。
 
-## Hostnames
+## ホスト名
 
-Creating a RustFS cluster requires **identical, sequential** hostnames. There are two ways to achieve sequential hostnames:
+RustFS クラスターには、一貫した連番のホスト名（例: `node1` から `node4`）が必要です。連番のホスト名を用意する方法は 2 つあります。
 
-**1. DNS Configuration:**
+**1. DNS の設定:**
 
-Configure your DNS resolution server to ensure name continuity.
+各連番のホスト名が正しいノードに解決されるよう、DNS レコードを作成します。
 
-**2. HOSTS Configuration:**
+**2. `/etc/hosts` の設定:**
 
-Modify the local alias settings in `/etc/hosts` as follows:
+すべてのノードの `/etc/hosts` に、次のエントリを追加します。
 
-```bash title="/etc/hosts"
-vim /etc/hosts
+```text title="/etc/hosts"
 127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1 localhost localhost.localdomain localhost6 localhost6.localdomain6
 192.168.1.1 node1
@@ -53,13 +52,13 @@ vim /etc/hosts
 192.168.1.4 node4
 ```
 
-## Prerequisites and Service Setup
+## 前提条件とサービスのセットアップ
 
-On **every node**, complete the [common prerequisites and service setup](./prerequisites-and-service.md) — operating system, firewall, time synchronization, disk formatting, service user, binary download, and systemd unit — then continue below. Remember that all nodes must use the same listening port and must have synchronized clocks.
+**すべてのノード**で、[共通の前提条件とサービスのセットアップ](./prerequisites-and-service.md)（オペレーティングシステム、ファイアウォール、時刻同期、ディスクのフォーマット、サービスユーザー、バイナリのダウンロード、systemd ユニット）を完了してから、以下に進みます。すべてのノードで、待受ポートを同じにし、クロックを同期させる必要があります。
 
-## Configure Environment Variables
+## 環境変数を設定する
 
-1. Create the same configuration file on every node. `RUSTFS_VOLUMES` uses brace expansion to enumerate all nodes and all disk mount points (this example: 4 nodes × 4 disks):
+1. すべてのノードに同じ設定ファイルを作成します。`RUSTFS_VOLUMES` は、ブレース展開ですべてのノードとすべてのディスクマウントポイントを列挙します（この例: 4 ノード × 4 ディスク）。
 
 ```ini title="/etc/default/rustfs"
 # Use a unique access key and a strong, random secret (e.g. openssl rand -base64 24)
@@ -75,49 +74,49 @@ RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
 
 :::note
 
-The access key, secret key, and `RUSTFS_VOLUMES` value must be identical on all nodes. The hostnames (`node1` – `node4`) must match the DNS or `/etc/hosts` configuration above.
+アクセスキー、シークレットキー、および `RUSTFS_VOLUMES` の値は、すべてのノードで同一である必要があります。ホスト名（`node1` ～ `node4`）は、上記の DNS または `/etc/hosts` の設定と一致している必要があります。
 
 :::
 
-2. Create the storage and log directories on every node:
+2. すべてのノードで、ストレージとログのディレクトリを作成します。
 
 ```bash
 sudo mkdir -p /data/rustfs{0..3} /var/log/rustfs /opt/tls
 sudo chmod -R 750 /data/rustfs* /var/log/rustfs
 ```
 
-## Start Service and Verification
+## サービスを起動して確認する
 
-1. Start the service on every node and enable auto-start on boot:
+1. すべてのノードでサービスを起動し、起動時の自動開始を有効にします。
 
 ```bash
 sudo systemctl enable --now rustfs
 ```
 
-2. Verify the service status:
+2. サービスの状態を確認します。
 
 ```bash
 systemctl status rustfs
 ```
 
-3. Check the service port:
+3. サービスのポートを確認します。
 
 ```bash
 netstat -ntpl
 ```
 
-4. View log files:
+4. ログファイルを表示します。
 
 ```bash
 tail -f /var/log/rustfs/rustfs*.log
 ```
 
-5. Access the console: enter any node's IP address (or the load balancer address) and the console port (default 9001) in a browser. You should see:
+5. Console にアクセスします。ブラウザーに任意のノードの IP アドレス（またはロードバランサーのアドレス）と Console のポート（既定は 9001）を入力すると、次のように表示されます。
 
-![Console](./images/console.jpg)
+![Console の画面](./images/console.jpg)
 
-## Next Steps
+## 次のステップ
 
-- Put a load balancer in front of the cluster — see the [Nginx integration guide](/developer/integration/reverse-proxy/nginx).
-- Enable TLS for production traffic — see [TLS configuration](../../integration/tls-configured.md).
-- Review [Pool Expansion](../../operations/scaling/storage-pool-expansion.md) before scaling.
+- クラスターの前段にロードバランサーを置きます。[Nginx 連携ガイド](/ja/developer/integration/reverse-proxy/nginx) を参照します。
+- 本番トラフィックでは TLS を有効にします。[TLS の設定](../../integration/tls-configured.md) を参照します。
+- スケールする前に、[ストレージプールの拡張](../../operations/scaling/storage-pool-expansion.md) を確認します。

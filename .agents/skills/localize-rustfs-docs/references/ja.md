@@ -54,8 +54,22 @@ Treat RustFS source code, APIs, and exact Console labels as authoritative for pr
 | multipart upload | マルチパートアップロード | Preserve API actions such as `CreateMultipartUpload`. |
 | server-side encryption | サーバー側の暗号化 | Keep SSE-S3, SSE-KMS, and SSE-C unchanged. |
 | presigned URL | 署名付き URL | Keep URL uppercase and preserve API names. |
-| path-style addressing | パス形式のアドレス指定 | Preserve SDK option names. |
-| virtual-hosted-style addressing | 仮想ホスト形式のアドレス指定 | Relate it to `RUSTFS_SERVER_DOMAINS` when relevant. |
+| path-style addressing | パススタイルアクセス | Preserve SDK option names such as `forcePathStyle`. Do not use パス形式のアドレス指定. |
+| virtual-hosted-style addressing | 仮想ホスト形式 | バーチャルホストスタイル is acceptable. Relate it to `RUSTFS_SERVER_DOMAINS` when relevant. Preserve SDK option names. |
+| cluster | クラスター | Keep the long vowel. Do not write クラスタ. |
+| deployment | デプロイ | Prefer this over デプロイメント. |
+| interface | インターフェース | Do not write インターフェイス. |
+| matrix | マトリックス | Do not write マトリクス. |
+| compatibility gate | 互換性検証（ゲート） | Explain the gate on first use. |
+| executable test list | 実行対象のテストリスト | Do not write 実行可能なテストリスト. |
+| Planned (status) | 未実装（予定） | Do not use 予定 alone. |
+| round-trip | 往復検証 | A parenthetical round-trip is optional. |
+| credential vending | 認証情報ベンディング / 一時認証情報の発行 | Do not write 認証情報の払い出し. |
+| authorized principal | 認可されたプリンシパル | Do not write 認可済みの主体. |
+| backend | バックエンド | Do not leave the English word in prose. |
+| repository | リポジトリ | Do not leave Repository in prose. |
+| Next steps | 次のステップ | Do not write 次の手順. |
+| overview / product introduction | 概要 | Do not use 製品紹介 for a technical introduction. |
 | health check | ヘルスチェック | Preserve endpoint paths and probe names. |
 | readiness | Readiness / 準備完了状態 | Preserve `/health/ready` and Kubernetes field names. |
 | observability | オブザーバビリティ | Keep OpenTelemetry and OTLP unchanged. |

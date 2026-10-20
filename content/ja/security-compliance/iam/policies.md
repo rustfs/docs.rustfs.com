@@ -1,48 +1,48 @@
 ---
-title: "Users, Groups, and Policies"
-description: "Managing RustFS IAM users and groups, the policy document JSON format, condition operators, and built-in policies."
+title: "ユーザー、グループ、ポリシー"
+description: "RustFS の IAM ユーザーとグループの管理、ポリシードキュメントの JSON 形式、条件演算子、組み込みポリシーを説明します。"
 ---
 
-This page covers day-to-day IAM administration: creating users and groups, attaching policies, and writing custom policy documents.
+このページでは、日常的な IAM 管理として、ユーザーとグループの作成、ポリシーの割り当て、カスタムポリシードキュメントの記述を説明します。
 
-## Requirements
+## 要件
 
-- Install [`rc`](/operations/rc) before using RustFS administrative commands.
-- Configure an alias with credentials that permit the corresponding `admin:*` actions.
+- RustFS の管理コマンドを使う前に、[`rc`](/ja/operations/rc) をインストールします。
+- 対応する `admin:*` アクションを許可する認証情報で、エイリアスを設定します。
 
-## Managing Users
+## ユーザーの管理
 
-Users can be managed from the Console (**Identity** section in the left navigation), with `rc admin`, or through the admin REST API. The native admin endpoints live under the `/rustfs/admin/v3` prefix. Requests must be signed (AWS Signature V4) by a credential whose policies allow the corresponding `admin:*` action.
+ユーザーは Console（左ナビゲーションの **Identity**）、`rc admin`、または管理用 REST API から管理できます。ネイティブの管理エンドポイントは `/rustfs/admin/v3` プレフィックスの下にあります。リクエストは、対応する `admin:*` アクションをポリシーで許可された認証情報によって署名する必要があります（AWS Signature V4）。
 
-| Operation | Method and path | Notes |
+| 操作 | メソッドとパス | 説明 |
 | --- | --- | --- |
-| Create/update user | `PUT /rustfs/admin/v3/add-user?accessKey=<name>` | JSON body: `{"secretKey": "...", "status": "enabled"}`; `policy` is optional. Requires `admin:CreateUser`. |
-| List users | `GET /rustfs/admin/v3/list-users` | Requires `admin:ListUsers`. |
-| User details | `GET /rustfs/admin/v3/user-info?accessKey=<name>` | Requires `admin:GetUser`. |
-| Enable/disable user | `PUT /rustfs/admin/v3/set-user-status?accessKey=<name>&status=<enabled\|disabled>` | You cannot change the status of the credential making the call. |
-| Delete user | `DELETE /rustfs/admin/v3/remove-user?accessKey=<name>` | Requires `admin:DeleteUser`. |
-| Export IAM data | `GET /rustfs/admin/v3/export-iam` | Dumps users, groups, policies, and mappings. |
-| Import IAM data | `PUT /rustfs/admin/v3/import-iam` | Restores an exported dataset. |
+| ユーザーの作成または更新 | `PUT /rustfs/admin/v3/add-user?accessKey=<name>` | JSON 本文は `{"secretKey": "...", "status": "enabled"}` です。`policy` は任意です。`admin:CreateUser` が必要です。 |
+| ユーザーの一覧 | `GET /rustfs/admin/v3/list-users` | `admin:ListUsers` が必要です。 |
+| ユーザーの詳細 | `GET /rustfs/admin/v3/user-info?accessKey=<name>` | `admin:GetUser` が必要です。 |
+| ユーザーの有効化または無効化 | `PUT /rustfs/admin/v3/set-user-status?accessKey=<name>&status=<enabled\|disabled>` | 呼び出しに使っている認証情報自身の状態は変更できません。 |
+| ユーザーの削除 | `DELETE /rustfs/admin/v3/remove-user?accessKey=<name>` | `admin:DeleteUser` が必要です。 |
+| IAM データのエクスポート | `GET /rustfs/admin/v3/export-iam` | ユーザー、グループ、ポリシー、対応付けを出力します。 |
+| IAM データのインポート | `PUT /rustfs/admin/v3/import-iam` | エクスポートしたデータセットを復元します。 |
 
 :::note
 
-A user name (access key) must not contain spaces and cannot equal the root access key. The secret key is required when creating a user.
+ユーザー名（アクセスキー）に空白を含めることはできず、ルートアクセスキーと同じ値にもできません。ユーザー作成時にはシークレットキーが必要です。
 
 :::
 
-## Managing Groups
+## グループの管理
 
-Groups collect users so a single policy binding covers all members. Group membership and status are managed with these endpoints (Console equivalents exist under **Identity**):
+グループはユーザーをまとめ、1 つのポリシー割り当てを全メンバーに適用します。グループのメンバーシップと状態は、次のエンドポイントで管理します（Console では **Identity** に対応する操作があります）。
 
-| Operation | Method and path | Notes |
+| 操作 | メソッドとパス | 説明 |
 | --- | --- | --- |
-| List groups | `GET /rustfs/admin/v3/groups` | Requires `admin:ListGroups`. |
-| Group details | `GET /rustfs/admin/v3/group?group=<name>` | Requires `admin:GetGroup`. |
-| Add/remove members | `PUT /rustfs/admin/v3/update-group-members` | JSON body below. Adding members to a nonexistent group creates it. Requires `admin:AddUserToGroup` / `admin:RemoveUserFromGroup`. |
-| Enable/disable group | `PUT /rustfs/admin/v3/set-group-status?group=<name>&status=<enabled\|disabled>` | Requires `admin:EnableGroup` / `admin:DisableGroup`. |
-| Delete group | `DELETE /rustfs/admin/v3/group/{group}` | Fails while the group still has members. |
+| グループの一覧 | `GET /rustfs/admin/v3/groups` | `admin:ListGroups` が必要です。 |
+| グループの詳細 | `GET /rustfs/admin/v3/group?group=<name>` | `admin:GetGroup` が必要です。 |
+| メンバーの追加または削除 | `PUT /rustfs/admin/v3/update-group-members` | JSON 本文は下記のとおりです。存在しないグループにメンバーを追加すると、そのグループが作成されます。`admin:AddUserToGroup` または `admin:RemoveUserFromGroup` が必要です。 |
+| グループの有効化または無効化 | `PUT /rustfs/admin/v3/set-group-status?group=<name>&status=<enabled\|disabled>` | `admin:EnableGroup` または `admin:DisableGroup` が必要です。 |
+| グループの削除 | `DELETE /rustfs/admin/v3/group/{group}` | グループにメンバーが残っている間は失敗します。 |
 
-Membership update body:
+メンバーシップ更新の本文は次のとおりです。
 
 ```json
 {
@@ -52,49 +52,49 @@ Membership update body:
 }
 ```
 
-Set `isRemove` to `true` to remove the listed members instead. Temporary (STS) users and the root credential cannot be added to groups.
+`isRemove` を `true` にすると、列挙したメンバーを追加ではなく削除します。一時ユーザー（STS）とルート認証情報は、グループに追加できません。
 
-## Attaching Policies
+## ポリシーの割り当て
 
-Policy bindings connect a named policy to a user or a group:
+ポリシーの割り当ては、名前付きポリシーをユーザーまたはグループに接続します。
 
-| Operation | Method and path | Notes |
+| 操作 | メソッドとパス | 説明 |
 | --- | --- | --- |
-| Set policy for user or group | `PUT /rustfs/admin/v3/set-user-or-group-policy?policyName=<policy>&userOrGroup=<name>&isGroup=<true\|false>` | Replaces the binding. Also served as `/rustfs/admin/v3/set-policy`. Requires `admin:AttachUserOrGroupPolicy`. |
-| Attach policies | `POST /rustfs/admin/v3/idp/builtin/policy/attach` | JSON body: `{"policies": ["readonly"], "user": "alice"}` (or `"group"`). Adds to the existing binding. |
-| Detach policies | `POST /rustfs/admin/v3/idp/builtin/policy/detach` | Same body shape; removes policies from the binding. |
-| List policy bindings | `GET /rustfs/admin/v3/idp/builtin/policy-entities` | Shows which users/groups have which policies. |
+| ユーザーまたはグループへのポリシー設定 | `PUT /rustfs/admin/v3/set-user-or-group-policy?policyName=<policy>&userOrGroup=<name>&isGroup=<true\|false>` | 割り当てを置き換えます。`/rustfs/admin/v3/set-policy` でも受け付けます。`admin:AttachUserOrGroupPolicy` が必要です。 |
+| ポリシーのアタッチ | `POST /rustfs/admin/v3/idp/builtin/policy/attach` | JSON 本文は `{"policies": ["readonly"], "user": "alice"}`（または `"group"`）です。既存の割り当てに追加します。 |
+| ポリシーのデタッチ | `POST /rustfs/admin/v3/idp/builtin/policy/detach` | 本文の形は同じです。割り当てからポリシーを外します。 |
+| ポリシー割り当ての一覧 | `GET /rustfs/admin/v3/idp/builtin/policy-entities` | どのユーザーまたはグループがどのポリシーを持つかを表示します。 |
 
-## Managing Policy Documents
+## ポリシードキュメントの管理
 
-| Operation | Method and path | Notes |
+| 操作 | メソッドとパス | 説明 |
 | --- | --- | --- |
-| List policies | `GET /rustfs/admin/v3/list-canned-policies` | Requires `admin:GetPolicy` scope for details. |
-| Policy details | `GET /rustfs/admin/v3/info-canned-policy?name=<policy>` | Returns the JSON document. |
-| Create/replace policy | `PUT /rustfs/admin/v3/add-canned-policy?name=<policy>` | Request body is the policy JSON document. Requires `admin:CreatePolicy`. |
-| Delete policy | `DELETE /rustfs/admin/v3/remove-canned-policy?name=<policy>` | Requires `admin:DeletePolicy`. |
+| ポリシーの一覧 | `GET /rustfs/admin/v3/list-canned-policies` | 詳細を得るには `admin:GetPolicy` の範囲が必要です。 |
+| ポリシーの詳細 | `GET /rustfs/admin/v3/info-canned-policy?name=<policy>` | JSON ドキュメントを返します。 |
+| ポリシーの作成または置換 | `PUT /rustfs/admin/v3/add-canned-policy?name=<policy>` | リクエスト本文はポリシーの JSON ドキュメントです。`admin:CreatePolicy` が必要です。 |
+| ポリシーの削除 | `DELETE /rustfs/admin/v3/remove-canned-policy?name=<policy>` | `admin:DeletePolicy` が必要です。 |
 
-## Policy Document Format
+## ポリシードキュメントの形式 [#policy-document-format]
 
-A policy document is a JSON object with `Version` and `Statement` fields. The only accepted `Version` value is `2012-10-17`.
+ポリシードキュメントは、`Version` と `Statement` フィールドを持つ JSON オブジェクトです。受け付ける `Version` の値は `2012-10-17` だけです。
 
-Each statement supports:
+各ステートメントで使えるフィールドは次のとおりです。
 
-| Field | Required | Description |
+| フィールド | 必須 | 説明 |
 | --- | --- | --- |
-| `Sid` | No | Statement identifier. |
-| `Effect` | Yes | `Allow` or `Deny`. |
-| `Action` | Yes (or `NotAction`) | Action names, wildcards allowed (e.g. `s3:Get*`). |
-| `NotAction` | No | Matches every action except the listed ones. |
-| `Resource` | Yes for S3 actions (or `NotResource`) | ARNs in the form `arn:aws:s3:::bucket` or `arn:aws:s3:::bucket/prefix/*`. |
-| `NotResource` | No | Matches every resource except the listed ones. |
-| `Condition` | No | Condition operators keyed by context values. |
+| `Sid` | いいえ | ステートメントの識別子です。 |
+| `Effect` | はい | `Allow` または `Deny` です。 |
+| `Action` | はい（または `NotAction`） | アクション名です。ワイルドカードを使えます（例: `s3:Get*`）。 |
+| `NotAction` | いいえ | 列挙したアクション以外のすべてに一致します。 |
+| `Resource` | S3 アクションでははい（または `NotResource`） | `arn:aws:s3:::bucket` または `arn:aws:s3:::bucket/prefix/*` の形式の ARN です。 |
+| `NotResource` | いいえ | 列挙したリソース以外のすべてに一致します。 |
+| `Condition` | いいえ | コンテキスト値をキーとする条件演算子です。 |
 
-Action names are namespaced: `s3:*` for object/bucket operations (e.g. `s3:GetObject`, `s3:PutObject`, `s3:DeleteObject`, `s3:ListBucket`, `s3:GetBucketLocation`, `s3:ListAllMyBuckets`), `admin:*` for management operations, `sts:AssumeRole` for STS, and `kms:*` for key management.
+アクション名には名前空間があります。オブジェクトとバケットの操作は `s3:*`（例: `s3:GetObject`、`s3:PutObject`、`s3:DeleteObject`、`s3:ListBucket`、`s3:GetBucketLocation`、`s3:ListAllMyBuckets`）、管理操作は `admin:*`、STS は `sts:AssumeRole`、キー管理は `kms:*` です。
 
-Supported condition operators include: `StringEquals`, `StringNotEquals`, `StringEqualsIgnoreCase`, `StringNotEqualsIgnoreCase`, `StringLike`, `StringNotLike`, `ArnEquals`, `ArnNotEquals`, `ArnLike`, `ArnNotLike`, `BinaryEquals`, `IpAddress`, `NotIpAddress`, `Null`, `Bool`, `NumericEquals`, `NumericNotEquals`, `NumericLessThan`, `NumericLessThanEquals`, `NumericGreaterThan`, `NumericGreaterThanEquals`, `DateEquals`, `DateNotEquals`, `DateLessThan`, `DateLessThanEquals`, `DateGreaterThan`, and `DateGreaterThanEquals`. Any operator can be suffixed with `IfExists` (the condition passes when the referenced context key is absent).
+対応する条件演算子には、次が含まれます。`StringEquals`、`StringNotEquals`、`StringEqualsIgnoreCase`、`StringNotEqualsIgnoreCase`、`StringLike`、`StringNotLike`、`ArnEquals`、`ArnNotEquals`、`ArnLike`、`ArnNotLike`、`BinaryEquals`、`IpAddress`、`NotIpAddress`、`Null`、`Bool`、`NumericEquals`、`NumericNotEquals`、`NumericLessThan`、`NumericLessThanEquals`、`NumericGreaterThan`、`NumericGreaterThanEquals`、`DateEquals`、`DateNotEquals`、`DateLessThan`、`DateLessThanEquals`、`DateGreaterThan`、`DateGreaterThanEquals`。任意の演算子には `IfExists` を付けられます（参照するコンテキストキーが存在しない場合、その条件は成立します）。
 
-### Example: Read-Only Access to One Bucket
+### 例: 1 つのバケットへの読み取り専用アクセス
 
 ```json
 {
@@ -114,7 +114,7 @@ Supported condition operators include: `StringEquals`, `StringNotEquals`, `Strin
 }
 ```
 
-### Example: Read/Write Restricted to a Prefix
+### 例: プレフィックスに制限した読み書き
 
 ```json
 {
@@ -139,7 +139,7 @@ Supported condition operators include: `StringEquals`, `StringNotEquals`, `Strin
 }
 ```
 
-### Example: Full Access but Deletion Denied
+### 例: フルアクセスだが削除は拒否
 
 ```json
 {
@@ -161,21 +161,21 @@ Supported condition operators include: `StringEquals`, `StringNotEquals`, `Strin
 
 :::note
 
-An explicit `Deny` always overrides `Allow`, so the second statement wins for delete operations even though `s3:*` matches them. See the [evaluation semantics](./index.md#policy-evaluation-semantics).
+明示的な `Deny` は常に `Allow` より優先されるため、`s3:*` が削除操作に一致しても、削除については 2 つ目のステートメントが適用されます。[評価の意味](./index.md#policy-evaluation-semantics)を参照してください。
 
 :::
 
-## Built-In Policies
+## 組み込みポリシー
 
-RustFS defines five built-in policies that can be attached without creating them first:
+RustFS には、事前に作成しなくても割り当てられる 5 つの組み込みポリシーがあります。
 
-| Policy | Grants |
+| ポリシー | 付与内容 |
 | --- | --- |
-| `readwrite` | All S3 actions (`s3:*`) on all resources, plus `sts:AssumeRole`. |
-| `readonly` | `s3:GetBucketLocation`, `s3:GetObject`, and `s3:GetBucketQuota` on all resources, plus `sts:AssumeRole`. |
-| `writeonly` | `s3:PutObject` on all resources, plus `sts:AssumeRole`. |
-| `diagnostics` | Diagnostic admin actions (`admin:Profiling`, `admin:ServerTrace`, `admin:ConsoleLog`, `admin:ServerInfo`, `admin:TopLocksInfo`, `admin:OBDInfo`, `admin:Prometheus`, `admin:BandwidthMonitor`), plus `sts:AssumeRole`. |
-| `consoleAdmin` | All admin actions (`admin:*`), all KMS actions (`kms:*`), all S3 actions (`s3:*`), plus `sts:AssumeRole`. |
+| `readwrite` | すべてのリソースに対するすべての S3 アクション（`s3:*`）と、`sts:AssumeRole`。 |
+| `readonly` | すべてのリソースに対する `s3:GetBucketLocation`、`s3:GetObject`、`s3:GetBucketQuota` と、`sts:AssumeRole`。 |
+| `writeonly` | すべてのリソースに対する `s3:PutObject` と、`sts:AssumeRole`。 |
+| `diagnostics` | 診断用の管理アクション（`admin:Profiling`、`admin:ServerTrace`、`admin:ConsoleLog`、`admin:ServerInfo`、`admin:TopLocksInfo`、`admin:OBDInfo`、`admin:Prometheus`、`admin:BandwidthMonitor`）と、`sts:AssumeRole`。 |
+| `consoleAdmin` | すべての管理アクション（`admin:*`）、すべての KMS アクション（`kms:*`）、すべての S3 アクション（`s3:*`）と、`sts:AssumeRole`。 |
 
 :::warning
 

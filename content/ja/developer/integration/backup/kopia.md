@@ -1,13 +1,13 @@
 ---
 title: "Kopia"
-description: "Back up files to RustFS with Kopia's S3 repository backend."
+description: "Kopia の S3 リポジトリのバックエンドとして RustFS にファイルをバックアップします。"
 ---
 
-This guide connects [Kopia](https://github.com/kopia/kopia) — the open-source backup and restore tool — to **RustFS** as an S3 repository. You will create a repository in a RustFS bucket, take a snapshot of a directory, restore it into an empty directory, and compare checksums. The workflow was verified with `kopia/kopia:0.18.1` and `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、オープンソースのバックアップおよび復元ツールである [Kopia](https://github.com/kopia/kopia) を、S3 リポジトリとして **RustFS** に接続します。RustFS のバケットにリポジトリを作成し、ディレクトリのスナップショットを取得し、空のディレクトリへ復元してチェックサムを比較します。この流れは `kopia/kopia:0.18.1` と `rustfs/rustfs-x86-musl:v2.3.1` で検証済みです。
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Docker が必要です。このデプロイはローカルでの統合テストを目的としており、本番向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -16,11 +16,11 @@ flowchart LR
 	Kopia -->|restore| Restore["Restored files"]
 ```
 
-Kopia stores the repository format files and deduplicated, encrypted content blocks in the bucket. Restores read the blocks back and reassemble the original files, so the checksum of every restored file must match the source.
+Kopia は、リポジトリ形式のファイルと、重複排除され暗号化されたコンテンツブロックをバケットに保存します。復元ではブロックを読み戻して元のファイルを再構成するため、復元した各ファイルのチェックサムはソースと一致する必要があります。
 
-## 1. Create the repository
+## 1. リポジトリを作成する
 
-Create the bucket first, then initialize the Kopia repository inside it. The endpoint is a bare `host:port` (no scheme); `--disable-tls` switches the client to plain HTTP:
+先にバケットを作成し、その中で Kopia リポジトリを初期化します。エンドポイントはスキームのない `host:port` です。`--disable-tls` はクライアントを平文 HTTP に切り替えます。
 
 ```bash
 rc alias set rustfs http://<your-rustfs-endpoint>:9000 <your-access-key> <your-secret-key>
@@ -37,11 +37,11 @@ docker run --rm --network oo-rustfs_default kopia/kopia:0.18.1 repository create
   --override-username demo --override-hostname workstation
 ```
 
-Kopia validates the provider by reading and writing through the S3 API before it reports success.
+Kopia は成功を報告する前に、S3 API 経由の読み書きでプロバイダーを検証します。
 
-## 2. Connect, snapshot, and restore
+## 2. 接続、スナップショット、復元
 
-Run the following commands from the directory holding your `repository.config` (created by the previous step). Kopia reads the connection settings from that file, so the S3 flags are only needed once:
+前の手順で作成した `repository.config` があるディレクトリで、次のコマンドを実行します。Kopia はそのファイルから接続設定を読み取るため、S3 フラグが必要なのは一度だけです。
 
 ```bash
 export KOPIA_PASSWORD=<your-kopia-password>
@@ -65,7 +65,7 @@ kopia snapshot create /source
 kopia snapshot list
 ```
 
-Restore the snapshot into an empty directory and compare checksums with the source. The snapshot ID is the `ka...` identifier printed by `snapshot list`:
+スナップショットを空のディレクトリへ復元し、ソースとチェックサムを比較します。スナップショット ID は、`snapshot list` が表示する `ka...` 形式の識別子です。
 
 ```bash
 kopia restore <snapshot-id> /restore
@@ -78,15 +78,15 @@ bec4530e2798465b...  source/blob.bin
 bec4530e2798465b...  restore/blob.bin
 ```
 
-## 3. Verify objects in RustFS
+## 3. RustFS でオブジェクトを確認する
 
-List the bucket:
+バケットを一覧表示します。
 
 ```bash
 rc ls rustfs/kopia-backups/ -r
 ```
 
-The output shows the repository format files plus the packed content blocks written by the snapshot:
+出力には、リポジトリ形式のファイルと、スナップショットが書き込んだパック済みコンテンツブロックが表示されます。
 
 ```text
 kopia.blobcfg
@@ -94,32 +94,32 @@ kopia.repository
 p0000.../...
 ```
 
-![Kopia repository blocks stored in the RustFS Console](./images/rustfs-kopia-repo.png)
+![RustFS Console に保存された Kopia のリポジトリブロック](./images/rustfs-kopia-repo.png)
 
-## 4. Stop or reset
+## 4. 停止またはリセット
 
-Kopia is a client-side tool and holds no running state. To delete the repository and all snapshots, remove the bucket:
+Kopia はクライアント側のツールであり、実行中の状態は持ちません。リポジトリとすべてのスナップショットを削除するには、バケットを削除します。
 
 ```bash
 rc rb rustfs/kopia-backups --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
 ### `Endpoint url cannot have fully qualified paths`
 
-The endpoint must be a bare `host:port` value without a scheme or path — Kopia builds the object URLs itself.
+エンドポイントは、スキームもパスもない `host:port` である必要があります。オブジェクト URL は Kopia が組み立てます。
 
 ### `server gave HTTP response to HTTPS client`
 
-Without `--disable-tls`, Kopia speaks HTTPS. RustFS without TLS needs the `--disable-tls` flag on both `repository create s3` and `repository connect s3`.
+`--disable-tls` がないと、Kopia は HTTPS で通信します。TLS のない RustFS では、`repository create s3` と `repository connect s3` の両方に `--disable-tls` フラグが必要です。
 
-### `can't connect to storage` with a DNS error
+### DNS エラーを伴う `can't connect to storage`
 
-The S3 client is using virtual-hosted addressing. Keep the endpoint as a bare `host:port` value; Kopia uses path-style requests for endpoints given in that form.
+S3 クライアントが仮想ホスト形式を使っています。エンドポイントはスキームのない `host:port` のままにします。その形式で指定したエンドポイントに対して、Kopia はパススタイルアクセスのリクエストを使います。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Kopia operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Kopia repository documentation](https://kopia.io/docs/repositories/) to add policies, retention, and scheduled snapshots.
+- 追加の Kopia 操作を採用する前に、[S3 互換性に関する注意](/ja/administration/protocols/s3)を確認します。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- [Kopia リポジトリのドキュメント](https://kopia.io/docs/repositories/)に従い、ポリシー、保持設定、スケジュールされたスナップショットを追加します。

@@ -1,124 +1,124 @@
 ---
-title: "Install RustFS on macOS"
-description: "Install a local RustFS instance on macOS with RustFS Launcher or the standalone server binary."
+title: "macOS に RustFS をインストールする"
+description: "RustFS Launcher またはスタンドアロンのサーバーバイナリを使い、macOS にローカルの RustFS インスタンスをインストールします。"
 ---
 
-This guide provides two ways to run **RustFS** on macOS: use the graphical **RustFS Launcher**, or run the standalone server binary from Terminal. Both methods create a local, single-node instance suitable for evaluation, development, and testing.
+このガイドでは、macOS で **RustFS** を実行する 2 つの方法を説明します。グラフィカルな **RustFS Launcher** を使う方法と、Terminal からスタンドアロンのサーバーバイナリを実行する方法です。どちらも、評価、開発、テストに適したローカルのシングルノードインスタンスを作成します。
 
-:::note[Deployment scope]
+:::note[デプロイの範囲]
 
-These procedures run RustFS as a desktop process, not as a macOS background service. For a production or distributed deployment, use the [Linux installation guides](/installation/linux).
+これらの手順では、RustFS を macOS のバックグラウンドサービスとしてではなく、デスクトッププロセスとして実行します。本番または分散デプロイには、[Linux のインストールガイド](/ja/installation/linux) を使います。
 
 :::
 
-## 1. Check your Mac architecture
+## 1. Mac のアーキテクチャを確認する
 
-RustFS distinguishes between Apple Silicon (`arm64`) and Intel (`x86_64`) Macs. Open Terminal and run:
+RustFS は、Apple シリコン（`arm64`）と Intel（`x86_64`）の Mac 向けに異なるビルドを提供しています。Terminal を開いて次を実行します。
 
 ```bash
 uname -m
 ```
 
-Use the result to choose the correct package:
+結果を見て、正しいパッケージを選びます。
 
-| Result | Mac type | Current standalone binary availability |
+| 結果 | Mac の種類 | 現在のスタンドアロンバイナリの提供状況 |
 | --- | --- | --- |
-| `arm64` | Apple Silicon | Download the macOS AArch64 package from current RustFS releases. |
-| `x86_64` | Intel | RustFS releases after `v1.0.0-beta.9` do not provide a prebuilt Intel macOS package. Build the current version from source. |
+| `arm64` | Apple シリコン | 現行の RustFS リリースから macOS AArch64 パッケージをダウンロードします。 |
+| `x86_64` | Intel | `v1.0.0-beta.9` より後の RustFS リリースは、ビルド済みの Intel macOS パッケージを提供していません。現行バージョンはソースからビルドします。 |
 
-:::warning[Intel Mac release boundary]
+:::warning[Intel Mac のリリース境界]
 
-Do not run the Apple Silicon binary on an Intel Mac. If you need a RustFS version newer than `v1.0.0-beta.9` on Intel macOS, follow the source-build procedure in this guide. An older beta.9 binary does not contain fixes and features from later releases.
+Intel Mac で Apple シリコンのバイナリを実行しないでください。Intel macOS で `v1.0.0-beta.9` より新しい RustFS が必要な場合は、このガイドのソースビルド手順に従います。古い beta.9 のバイナリには、それ以降のリリースの修正と機能は含まれていません。
 
 :::
 
-Before continuing, also make sure that:
+続ける前に、次も確認します。
 
-- You have permission to install or run applications and write to the selected data directory.
-- TCP ports `9000` and `9001` are available, or you have selected two other unused ports.
-- You have created a dedicated data directory, such as `$HOME/rustfs/data`.
+- アプリケーションのインストールまたは実行と、選択したデータディレクトリへの書き込みの権限があります。
+- TCP ポート `9000` と `9001` が空いているか、ほかの未使用ポートを 2 つ選んでいます。
+- `$HOME/rustfs/data` のような専用のデータディレクトリを作成しています。
 
 ```bash
 mkdir -p "$HOME/rustfs/data"
 ```
 
-:::warning[Protect the data directory]
+:::warning[データディレクトリを保護する]
 
-Use an empty directory on a disk with enough free space. Do not store unrelated files in this directory, and do not edit RustFS data files while the server is running.
+空き容量が十分なディスク上の空のディレクトリを使います。このディレクトリに無関係なファイルを置かず、サーバーの実行中に RustFS のデータファイルを編集しないでください。
 
 :::
 
-## 2. Choose an installation method
+## 2. インストール方法を選ぶ
 
-| Method | Use it when | Architecture note |
+| 方法 | 使う場面 | アーキテクチャに関する注意 |
 | --- | --- | --- |
-| RustFS Launcher | You want a graphical setup and built-in log viewer. | Download a Launcher package that matches Apple Silicon or Intel. |
-| Standalone binary | You want explicit Terminal commands or scripting. | Current releases provide Apple Silicon binaries; Intel users build releases after beta.9 from source. |
+| RustFS Launcher | グラフィカルなセットアップと組み込みのログビューアーが必要な場合。 | Apple シリコンまたは Intel に一致する Launcher パッケージをダウンロードします。 |
+| スタンドアロンバイナリ | 明示的な Terminal コマンドやスクリプトが必要な場合。 | 現行リリースは Apple シリコン向けバイナリを提供します。Intel では、beta.9 より後のリリースをソースからビルドします。 |
 
-## Install with RustFS Launcher
+## RustFS Launcher でインストールする
 
-### 3. Download and install Launcher
+### 3. Launcher をダウンロードしてインストールする
 
-1. Open the [RustFS Launcher Releases page](https://github.com/rustfs/launcher/releases).
-2. Select the latest release and expand **Assets**.
-3. Download the macOS installer that matches your architecture: AArch64 for Apple Silicon or x86-64 for Intel. Do not download **Source code** unless you intend to build Launcher yourself.
-4. Open the downloaded disk image and move **RustFS Launcher** to **Applications**.
-5. Open **RustFS Launcher** from **Applications**.
+1. [RustFS Launcher の Releases ページ](https://github.com/rustfs/launcher/releases) を開きます。
+2. 最新のリリースを選び、**Assets**（アセット）を展開します。
+3. アーキテクチャに一致する macOS インストーラーをダウンロードします。Apple シリコンは AArch64、Intel は x86-64 です。自分で Launcher をビルドする場合を除き、**Source code**（ソースコード）はダウンロードしないでください。
+4. ダウンロードしたディスクイメージを開き、**RustFS Launcher** を **Applications**（アプリケーション）に移動します。
+5. **Applications** から **RustFS Launcher** を開きます。
 
-If macOS blocks the first launch, confirm that the package came from the official `rustfs/launcher` Releases page. Then open **System Settings > Privacy & Security** and allow that specific application. Do not disable Gatekeeper globally.
+macOS が初回起動をブロックした場合は、パッケージが公式の `rustfs/launcher` Releases ページから入手したものであることを確認します。その後、**System Settings > Privacy & Security**（システム設定 > プライバシーとセキュリティ）を開き、そのアプリケーションだけを許可します。Gatekeeper をシステム全体で無効にしないでください。
 
-### 4. Configure Launcher
+### 4. Launcher を設定する
 
-Configure the fields in the Launcher window:
+Launcher ウィンドウの各フィールドを設定します。
 
-| Section | Field | Recommended value | Description |
+| セクション | フィールド | 推奨値 | 説明 |
 | --- | --- | --- | --- |
-| Dataset Mount | Data Path | `$HOME/rustfs/data` | Existing directory where RustFS stores object data. |
-| Ports & Access | API Port | `9000` | S3-compatible API port. |
-| Ports & Access | Host | `127.0.0.1` | Restricts access to this Mac. |
-| Ports & Access | Console Endpoint | Enabled | Enables the web Console; Launcher disables it by default. |
-| Ports & Access | Console Port | `9001` | Console port, which must differ from the API port. |
-| Credentials | Access Key | `<your-access-key>` | Administrator access key for this instance. |
-| Credentials | Secret Key | `<your-secret-key>` | Administrator secret key for this instance. |
+| Dataset Mount（データセットのマウント） | Data Path（データパス） | `$HOME/rustfs/data` | RustFS がオブジェクトデータを保存する、既存のディレクトリ。 |
+| Ports & Access（ポートとアクセス） | API Port（API ポート） | `9000` | S3 互換 API のポート。 |
+| Ports & Access | Host（ホスト） | `127.0.0.1` | アクセスをこの Mac に制限します。 |
+| Ports & Access | Console Endpoint（Console エンドポイント） | Enabled（有効） | Web Console を有効にします。Launcher は既定で無効にしています。 |
+| Ports & Access | Console Port（Console ポート） | `9001` | Console のポート。API ポートとは異なる必要があります。 |
+| Credentials（認証情報） | Access Key（アクセスキー） | `<your-access-key>` | このインスタンスの管理者アクセスキー。 |
+| Credentials | Secret Key（シークレットキー） | `<your-secret-key>` | このインスタンスの管理者シークレットキー。 |
 
-Use **Browse** to select the data directory or drag it into Launcher. Launcher requires the directory to exist before startup. The macOS file picker displays the expanded path instead of the literal `$HOME` variable.
+**Browse**（参照）でデータディレクトリを選ぶか、Launcher にドラッグします。Launcher は、起動前にディレクトリが存在していることを要求します。macOS のファイル選択ダイアログは、リテラルの `$HOME` 変数ではなく、展開されたパスを表示します。
 
-Replace the credential placeholders with your own values. Launcher initially displays default local-test credentials; do not retain them on a Mac accessible by other users.
+認証情報のプレースホルダーを独自の値に置き換えます。Launcher は最初、ローカルテスト用の既定の認証情報を表示します。ほかのユーザーがアクセスできる Mac では、その値を残さないでください。
 
-:::warning[Network exposure]
+:::warning[ネットワークへの公開]
 
-Keep **Host** set to `127.0.0.1` unless another computer must connect to RustFS. A non-loopback address exposes the API and Console on the corresponding network interfaces. Configure the macOS firewall and strong credentials before allowing remote access.
+別のコンピューターが RustFS に接続する必要がある場合を除き、**Host** は `127.0.0.1` のままにします。ループバック以外のアドレスは、対応するネットワークインターフェース上で API と Console を公開します。リモートアクセスを許可する前に、macOS のファイアウォールと強力な認証情報を設定します。
 
 :::
 
-### 5. Start and verify RustFS
+### 5. RustFS を起動して確認する
 
-1. Select **Launch RustFS**.
-2. Wait for Launcher to report that the configured endpoint is online.
-3. Open `http://localhost:9001` and sign in with the access key and secret key that you configured.
-4. Use `http://localhost:9000` as the endpoint for S3-compatible clients.
+1. **Launch RustFS**（RustFS を起動）を選びます。
+2. 設定したエンドポイントがオンラインになったと Launcher が報告するまで待ちます。
+3. `http://localhost:9001` を開き、設定したアクセスキーとシークレットキーでサインインします。
+4. S3 互換クライアントのエンドポイントとして `http://localhost:9000` を使います。
 
-![RustFS Launcher showing the service online with API port 9000, Console port 9001, and successful startup logs](../windows/images/windows-rustfs-launcher.jpg)
+![API ポート 9000、Console ポート 9001、起動成功のログとともに、サービスがオンラインであることを示す RustFS Launcher](../windows/images/windows-rustfs-launcher.jpg)
 
-If you changed the host or ports, use those values instead. The Console URL is available only when **Console Endpoint** is enabled.
+ホストまたはポートを変更した場合は、その値を使います。Console の URL は、**Console Endpoint** が有効な場合にのみ使えます。
 
-Launcher locks its configuration while it manages a running process. It also creates a `logs` directory next to the data directory. For example, selecting `$HOME/rustfs/data` places server log files under `$HOME/rustfs/logs`.
+Launcher は、実行中のプロセスを管理している間、設定をロックします。また、データディレクトリの隣に `logs` ディレクトリを作成します。たとえば、`$HOME/rustfs/data` を選んだ場合、サーバーのログファイルは `$HOME/rustfs/logs` に置かれます。
 
-### 6. Stop or exit Launcher
+### 6. Launcher を停止または終了する
 
-Select **Stop RustFS** before changing configuration, disconnecting an external data disk, or shutting down macOS.
+設定を変更する前、外付けのデータディスクを取り外す前、または macOS をシャットダウンする前に、**Stop RustFS**（RustFS を停止）を選びます。
 
-Closing the Launcher window hides it in the menu bar; it does not stop RustFS. To stop the managed process and exit Launcher, open the Launcher menu bar icon and select **Quit**. Select **Show**, or select the icon, to restore the window.
+Launcher ウィンドウを閉じると、メニューバーに隠れるだけで、RustFS は停止しません。管理対象のプロセスを停止して Launcher を終了するには、Launcher のメニューバーアイコンを開き、**Quit**（終了）を選びます。ウィンドウを戻すには、**Show**（表示）を選ぶか、アイコンを選択します。
 
-## Install the standalone binary
+## スタンドアロンバイナリをインストールする
 
-### 7. Download the Apple Silicon binary
+### 7. Apple シリコンのバイナリをダウンロードする
 
-Use this procedure when `uname -m` returns `arm64`:
+`uname -m` が `arm64` を返す場合は、この手順を使います。
 
-1. Open the [RustFS Releases page](https://github.com/rustfs/rustfs/releases).
-2. Select the required release and download the macOS AArch64 ZIP archive from **Assets**. The asset name begins with `rustfs-macos-aarch64`.
-3. Create a program directory and extract the archive. Replace `<version>` with the version in the downloaded filename:
+1. [RustFS の Releases ページ](https://github.com/rustfs/rustfs/releases) を開きます。
+2. 必要なリリースを選び、**Assets** から macOS AArch64 の ZIP アーカイブをダウンロードします。アセット名は `rustfs-macos-aarch64` で始まります。
+3. プログラム用のディレクトリを作成し、アーカイブを展開します。`<version>` は、ダウンロードしたファイル名のバージョンに置き換えます。
 
 ```bash
 mkdir -p "$HOME/rustfs/bin"
@@ -127,20 +127,20 @@ chmod +x "$HOME/rustfs/bin/rustfs"
 "$HOME/rustfs/bin/rustfs" --help
 ```
 
-If the archive contains a platform-specific binary name instead of `rustfs`, use that filename in the remaining commands or rename it to `$HOME/rustfs/bin/rustfs`.
+アーカイブに `rustfs` ではなくプラットフォーム固有のバイナリ名が含まれている場合は、残りのコマンドでそのファイル名を使うか、`$HOME/rustfs/bin/rustfs` に名前を変更します。
 
-### 8. Build the Intel binary from source
+### 8. Intel のバイナリをソースからビルドする
 
-Use this procedure when `uname -m` returns `x86_64` and you need a release newer than `v1.0.0-beta.9`.
+`uname -m` が `x86_64` を返し、`v1.0.0-beta.9` より新しいリリースが必要な場合は、この手順を使います。
 
-1. Install the Xcode command-line tools:
+1. Xcode コマンドラインツールをインストールします。
 
 ```bash
 xcode-select --install
 ```
 
-2. Install the current stable Rust toolchain from [rustup.rs](https://rustup.rs/), then open a new Terminal session.
-3. Clone RustFS and check out the release that you need:
+2. [rustup.rs](https://rustup.rs/) から現行の安定版 Rust ツールチェーンをインストールし、新しい Terminal セッションを開きます。
+3. RustFS をクローンし、必要なリリースをチェックアウトします。
 
 ```bash
 git clone https://github.com/rustfs/rustfs.git
@@ -148,23 +148,23 @@ cd rustfs
 git checkout <release-tag>
 ```
 
-4. Build the Intel macOS target with the repository build script:
+4. リポジトリのビルドスクリプトで、Intel macOS 向けターゲットをビルドします。
 
 ```bash
 ./build-rustfs.sh --platform x86_64-apple-darwin
 ```
 
-The build script includes Console assets by default and verifies the resulting binary. Use the binary reported at the end of the build output in the next step.
+ビルドスクリプトは既定で Console のアセットを含め、生成されたバイナリを検証します。次の手順では、ビルド出力の末尾に表示されたバイナリを使います。
 
-:::note[Source-build dependencies]
+:::note[ソースビルドの依存関係]
 
-Building from source requires the tools used by the selected RustFS release in addition to Rust and the Xcode command-line tools. If the build reports a missing dependency, follow the requirements in that release's repository README rather than substituting a binary built for Apple Silicon.
+ソースからビルドするには、Rust と Xcode コマンドラインツールに加えて、選択した RustFS リリースが使うツールが必要です。ビルドが不足している依存関係を報告した場合は、Apple シリコン向けにビルドしたバイナリで代用せず、そのリリースのリポジトリ README の要件に従います。
 
 :::
 
-### 9. Start the standalone server
+### 9. スタンドアロンサーバーを起動する
 
-Set credentials for the current Terminal session and assign the path to your downloaded or compiled binary:
+現在の Terminal セッションに認証情報を設定し、ダウンロードまたはコンパイルしたバイナリのパスを割り当てます。
 
 ```bash
 export RUSTFS_ACCESS_KEY="<your-access-key>"
@@ -178,72 +178,72 @@ export RUSTFS_BIN="$HOME/rustfs/bin/rustfs"
 	"$HOME/rustfs/data"
 ```
 
-For an Intel source build, replace `RUSTFS_BIN` with the binary path printed by `build-rustfs.sh`. Keep the Terminal window open while RustFS is running. Press `Control+C` to stop the server.
+Intel のソースビルドでは、`RUSTFS_BIN` を `build-rustfs.sh` が表示したバイナリパスに置き換えます。RustFS の実行中は Terminal ウィンドウを開いたままにします。`Control+C` でサーバーを停止します。
 
-:::tip[Credential handling]
+:::tip[認証情報の扱い]
 
-Session environment variables avoid placing credentials directly in the command line. For repeated or automated use, prefer the `RUSTFS_ACCESS_KEY_FILE` and `RUSTFS_SECRET_KEY_FILE` environment variables and protect those files with macOS permissions.
+セッションの環境変数を使うと、認証情報をコマンドラインに直接置かずに済みます。繰り返し使う場合や自動化する場合は、`RUSTFS_ACCESS_KEY_FILE` と `RUSTFS_SECRET_KEY_FILE` の環境変数を使い、それらのファイルを macOS の権限で保護することを推奨します。
 
 :::
 
-### 10. Verify the standalone server
+### 10. スタンドアロンサーバーを確認する
 
-Open `http://localhost:9001` and sign in with the configured credentials. Use `http://localhost:9000` as the endpoint for S3-compatible clients. RustFS defaults to path-style addressing, so configure clients accordingly.
+`http://localhost:9001` を開き、設定した認証情報でサインインします。S3 互換クライアントのエンドポイントとして `http://localhost:9000` を使います。RustFS は既定でパススタイルアクセスになるため、クライアントもそれに合わせて設定します。
 
-To perform an end-to-end check, create a bucket named `my-bucket`, upload `hello.txt`, and confirm that the object appears in the bucket.
+エンドツーエンドで確認するには、`my-bucket` という名前のバケットを作成し、`hello.txt` をアップロードして、オブジェクトがバケットに表示されることを確認します。
 
-## Confirm a successful installation
+## インストールの成功を確認する
 
-Whether you used Launcher, an Apple Silicon binary, or an Intel source build, a successful Console sign-in opens the **Buckets** page.
+Launcher、Apple シリコンのバイナリ、Intel のソースビルドのいずれを使った場合でも、Console へのサインインが成功すると **Buckets**（バケット）ページが開きます。
 
-![RustFS Console Buckets page after a successful sign-in](../windows/images/rustfs-console-login.png)
+![サインイン成功後の RustFS Console の Buckets ページ](../windows/images/rustfs-console-login.png)
 
-## Troubleshooting
+## トラブルシューティング
 
-### macOS blocks the application or binary
+### macOS がアプリケーションまたはバイナリをブロックする
 
-Verify that the file came from the official RustFS GitHub organization. For Launcher, allow the specific application under **System Settings > Privacy & Security**. For a standalone binary that macOS has quarantined, inspect the warning and verify the download source before changing its security attributes.
+ファイルが公式の RustFS GitHub 組織から入手したものであることを確認します。Launcher の場合は、**System Settings > Privacy & Security** でそのアプリケーションを許可します。macOS が隔離したスタンドアロンバイナリの場合は、セキュリティ属性を変更する前に警告を確認し、ダウンロード元を確かめます。
 
-### The binary architecture does not match
+### バイナリのアーキテクチャが一致しない
 
-Run `uname -m` and inspect the binary:
+`uname -m` を実行し、バイナリを確認します。
 
 ```bash
 uname -m
 file "$RUSTFS_BIN"
 ```
 
-Use an AArch64 binary on Apple Silicon. On an Intel Mac, build releases after `v1.0.0-beta.9` from source for `x86_64-apple-darwin`.
+Apple シリコンでは AArch64 のバイナリを使います。Intel Mac では、`v1.0.0-beta.9` より後のリリースを `x86_64-apple-darwin` 向けにソースからビルドします。
 
-### The data path is rejected
+### データパスが拒否される
 
-Confirm that the directory exists and that your macOS account has read and write access. Launcher does not create the selected data directory for you.
+ディレクトリが存在し、macOS アカウントに読み取りと書き込みの権限があることを確認します。Launcher は、選択したデータディレクトリを自動では作成しません。
 
-### The API or Console port is unavailable
+### API または Console のポートが使えない
 
-The ports must be numbers from `1` to `65535`, must differ from each other, and must not already be in use. Inspect the default ports:
+ポートは、`1` から `65535` の数値であり、互いに異なり、かつ未使用である必要があります。既定のポートを確認します。
 
 ```bash
 lsof -nP -iTCP:9000 -iTCP:9001 -sTCP:LISTEN
 ```
 
-Stop the conflicting application or select unused ports, then start RustFS again.
+競合しているアプリケーションを停止するか、未使用のポートを選んでから、RustFS を再度起動します。
 
-### The Console does not open
+### Console が開かない
 
-For Launcher, confirm that **Console Endpoint** is enabled. For the standalone binary, confirm that the process is still running and that `--console-enable true` is present.
+Launcher の場合は、**Console Endpoint** が有効であることを確認します。スタンドアロンバイナリの場合は、プロセスがまだ実行中であり、`--console-enable true` があることを確認します。
 
-### Launcher reports an external RustFS process
+### Launcher が外部の RustFS プロセスを報告する
 
-Another process is listening on the configured API address, but Launcher did not start it. Stop that process or choose another API port. Launcher cannot stop a process it does not manage.
+別のプロセスが、設定した API アドレスで待ち受けていますが、Launcher はそのプロセスを起動していません。そのプロセスを停止するか、別の API ポートを選びます。Launcher は、自身が管理していないプロセスを停止できません。
 
-### RustFS exits after launch
+### 起動後に RustFS が終了する
 
-In Launcher, inspect both the application and RustFS tabs in the built-in log viewer. For a standalone installation, inspect the Terminal output. Common causes include a missing data directory, insufficient permissions, an architecture mismatch, or a port conflict.
+Launcher では、組み込みログビューアーのアプリケーションタブと RustFS タブの両方を確認します。スタンドアロンインストールでは、Terminal の出力を確認します。よくある原因は、データディレクトリがないこと、権限が不足していること、アーキテクチャの不一致、ポートの競合です。
 
-## Next steps
+## 次のステップ
 
-- Review the [S3 API guide](/administration/protocols/s3) before connecting a client.
-- Learn how to [create a bucket](/administration/data/bucket/creation).
-- See [status checks](/operations/status-check) for additional verification methods.
-- Use the [Linux installation guides](/installation/linux) for a production-oriented deployment.
+- クライアントを接続する前に、[S3 API ガイド](/ja/administration/protocols/s3) を確認します。
+- [バケットを作成する](/ja/administration/data/bucket/creation) 方法を確認します。
+- 追加の確認方法は、[ステータスチェック](/ja/operations/status-check) を参照します。
+- 本番向けのデプロイには、[Linux のインストールガイド](/ja/installation/linux) を使います。

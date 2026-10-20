@@ -7,7 +7,7 @@ Mit **PyIceberg** erstellen Sie einen Namespace und eine Tabelle im RustFS-S3-Ta
 
 ## Voraussetzungen
 
-- Schließen Sie die [Einrichtung von S3 Tables](/administration/data/s3-tables) ab: Erstellen und aktivieren Sie `my-bucket` und erfüllen Sie die Anforderungen an Konto und TLS.
+- Schließen Sie die [Einrichtung von S3 Tables](/de/administration/data/s3-tables) ab: Erstellen und aktivieren Sie `my-bucket` und erfüllen Sie die Anforderungen an Konto und TLS.
 - Behalten Sie `RUSTFS_ENDPOINT`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` und `AWS_DEFAULT_REGION` wie dort beschrieben bei.
 
 ## 1. Client installieren
@@ -159,7 +159,7 @@ Das Ergebnis sollte `("analytics", "events")` enthalten.
 
 :::note[Nur Katalogeinträge entfernen]
 
-Die folgenden Befehle entfernen den Tabelleneintrag dieser Anleitung und den anschließend leeren Namespace. Bucket und zugrunde liegende Objekte bleiben erhalten. Planen Sie eine eventuelle Datenbereinigung vorab: Nach `drop_table` kann die Tabellenwartung die Tabelle nicht mehr finden. Siehe [Wartung und Schutz vor Datenverlust](/administration/data/s3-tables).
+Die folgenden Befehle entfernen den Tabelleneintrag dieser Anleitung und den anschließend leeren Namespace. Bucket und zugrunde liegende Objekte bleiben erhalten. Planen Sie eine eventuelle Datenbereinigung vorab: Nach `drop_table` kann die Tabellenwartung die Tabelle nicht mehr finden. Siehe [Wartung und Schutz vor Datenverlust](/de/administration/data/s3-tables).
 
 :::
 
@@ -175,4 +175,4 @@ PY
 ## Nächste Schritte
 
 - Nutzen Sie die [PyIceberg-API-Dokumentation](https://py.iceberg.apache.org/api/) für Client-Operationen und gleichen Sie jede Operation mit dem RustFS-Supportumfang ab.
-- Verwenden Sie die [Integration mit externem Iceberg-Katalog](/developer/integration/big-data/iceberg), wenn Sie einen separaten Katalogdienst betreiben.
+- Verwenden Sie die [Integration mit externem Iceberg-Katalog](/de/developer/integration/big-data/iceberg), wenn Sie einen separaten Katalogdienst betreiben.

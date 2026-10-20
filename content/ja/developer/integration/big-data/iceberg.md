@@ -1,21 +1,21 @@
 ---
 title: "Apache Iceberg"
-description: "Run Apache Iceberg with Spark, a REST catalog, and RustFS object storage using Docker Compose."
+description: "Docker Compose を使い、Spark、REST カタログ、RustFS のオブジェクトストレージで Apache Iceberg を実行します。"
 ---
 
-This guide runs **Apache Iceberg** with Spark, an Iceberg REST catalog, and **RustFS** as the S3-compatible warehouse. You will create an Iceberg table, write rows, query them, and verify that the table files are stored in RustFS.
+このガイドでは、Spark、Iceberg REST カタログ、S3 互換ウェアハウスとしての **RustFS** を用いて **Apache Iceberg** を実行します。Iceberg テーブルを作成し、行を書き込み、問い合わせ、テーブルファイルが RustFS に保存されていることを確認します。
 
-RustFS の組み込み REST カタログを使用する場合は、[S3 Tables の設定](/administration/data/s3-tables)と [PyIceberg ガイド](/developer/integration/big-data/pyiceberg)を参照してください。以下の構成では、別のカタログサービスを起動します。
+RustFS の組み込み REST カタログを使う場合は、[S3 Tables の設定](/ja/administration/data/s3-tables)と [PyIceberg ガイド](/ja/developer/integration/big-data/pyiceberg)を参照してください。以下の構成では、別のカタログサービスを起動します。
 
-You need Docker with the Compose plugin and enough local resources to run four containers. This deployment is intended for local integration testing, not production.
+Docker と Compose プラグイン、および 4 つのコンテナを動かすだけのローカルリソースが必要です。この構成はローカルの連携テスト向けであり、本番向けではありません。
 
-:::note[Upstream status]
+:::note[アップストリームの状態]
 
-Apache Iceberg [PR #14928](https://github.com/apache/iceberg/pull/14928) demonstrated the same Spark, REST catalog, `S3FileIO`, and RustFS workflow, including table creation and writes. The pull request was closed without merging, and the current [Spark quickstart](https://iceberg.apache.org/spark-quickstart/#docker-compose) still uses another S3-compatible store. The configuration below therefore documents a RustFS integration rather than an Apache Iceberg default.
+Apache Iceberg の [PR #14928](https://github.com/apache/iceberg/pull/14928) では、同じ Spark、REST カタログ、`S3FileIO`、RustFS の流れ（テーブルの作成と書き込みを含む）が示されています。このプルリクエストはマージされずにクローズされ、現行の [Spark クイックスタート](https://iceberg.apache.org/spark-quickstart/#docker-compose) は別の S3 互換ストアを使っています。そのため、以下の設定は Apache Iceberg のデフォルトではなく、RustFS との連携として記載しています。
 
 :::
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -25,27 +25,27 @@ flowchart LR
 	Init["Bucket initializer"] -->|Create my-bucket| RustFS
 ```
 
-Spark uses the REST service for catalog operations. Both Spark and the REST catalog receive the RustFS endpoint, region, credentials, and path-style setting so they can access metadata and data files in `s3://my-bucket/warehouse`.
+Spark はカタログ操作に REST サービスを使います。Spark と REST カタログの両方に、RustFS のエンドポイント、リージョン、認証情報、パススタイルアクセスの設定を渡すことで、`s3://my-bucket/warehouse` 内のメタデータとデータファイルへアクセスできます。
 
-## 1. Create the project files
+## 1. プロジェクトファイルを作成する
 
-Create a working directory:
+作業ディレクトリを作成します。
 
 ```bash
 mkdir rustfs-iceberg
 cd rustfs-iceberg
 ```
 
-Create an environment file and replace both credential placeholders:
+環境ファイルを作成し、両方の認証情報プレースホルダーを置き換えます。
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Use dedicated credentials for the warehouse bucket. Do not commit `.env` to source control.
+ウェアハウスバケットには専用の認証情報を使います。`.env` をソース管理にコミットしないでください。
 
-Create the Spark catalog configuration:
+Spark のカタログ設定を作成します。
 
 ```ini title="spark-defaults.conf"
 spark.sql.extensions org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions
@@ -60,9 +60,9 @@ spark.sql.defaultCatalog demo
 spark.sql.catalogImplementation in-memory
 ```
 
-Path-style access is required for this container-network endpoint. The hostname `rustfs` is resolvable only inside the Compose network; clients running on the host use `http://localhost:9000` instead.
+このコンテナネットワークのエンドポイントでは、パススタイルアクセスが必要です。ホスト名 `rustfs` は Compose ネットワーク内でのみ解決されます。ホスト上で動くクライアントは、代わりに `http://localhost:9000` を使います。
 
-Create the Compose file:
+Compose ファイルを作成します。
 
 ```yaml title="compose.yaml"
 services:
@@ -148,46 +148,46 @@ volumes:
   rustfs-data:
 ```
 
-The [`rc` image](https://github.com/rustfs/cli) provides the official RustFS command-line client. The initializer checks for `my-bucket` before creating it, so repeated starts do not delete existing warehouse data. The RustFS volume preserves warehouse objects across container recreation.
+[`rc` イメージ](https://github.com/rustfs/cli)は、公式の RustFS コマンドラインクライアントを提供します。初期化処理は `my-bucket` の有無を確認してから作成するため、再起動しても既存のウェアハウスデータは削除されません。RustFS のボリュームは、コンテナを再作成してもウェアハウスのオブジェクトを保持します。
 
-:::warning[Image versions]
+:::warning[イメージのバージョン]
 
-The Apache Iceberg quickstart images are published without stable version tags in the upstream example. Before using this pattern beyond local testing, pin every image to a tested tag or digest and validate the Spark, Iceberg runtime, and REST catalog versions together.
+Apache Iceberg のクイックスタートイメージは、アップストリームの例では安定したバージョンタグなしで公開されています。ローカルテストを超えてこの構成を使う前に、すべてのイメージを検証済みのタグまたはダイジェストに固定し、Spark、Iceberg ランタイム、REST カタログのバージョンをまとめて検証してください。
 
 :::
 
-## 2. Validate and start the deployment
+## 2. デプロイを検証して起動する
 
-Resolve the Compose file before starting containers:
+コンテナを起動する前に、Compose ファイルを解決します。
 
 ```bash
 docker compose config
 ```
 
-Start the services and wait for the bucket initializer to finish:
+サービスを起動し、バケット初期化の完了を待ちます。
 
 ```bash
 docker compose up -d
 docker compose ps -a
 ```
 
-The `create-bucket` service should show an exit code of `0`. Check its logs if it does not complete:
+`create-bucket` サービスは終了コード `0` になるはずです。完了しない場合はログを確認します。
 
 ```bash
 docker compose logs create-bucket
 ```
 
-Open the RustFS Console at `http://localhost:9001`. The REST catalog is available at `http://localhost:8181`, and the Spark notebook server is available at `http://localhost:8888`.
+RustFS Console は `http://localhost:9001` で開きます。REST カタログは `http://localhost:8181` で、Spark のノートブックサーバーは `http://localhost:8888` で利用できます。
 
-## 3. Create and query an Iceberg table
+## 3. Iceberg テーブルを作成して問い合わせる
 
-Start Spark SQL:
+Spark SQL を起動します。
 
 ```bash
 docker compose exec spark-iceberg spark-sql
 ```
 
-Create a namespace and a partitioned table:
+名前空間とパーティションテーブルを作成します。
 
 ```sql
 CREATE NAMESPACE IF NOT EXISTS demo.nyc;
@@ -203,7 +203,7 @@ CREATE TABLE demo.nyc.taxis
 PARTITIONED BY (vendor_id);
 ```
 
-Insert and query sample rows:
+サンプル行を挿入して問い合わせます。
 
 ```sql
 INSERT INTO demo.nyc.taxis
@@ -216,7 +216,7 @@ VALUES
 SELECT * FROM demo.nyc.taxis ORDER BY trip_id;
 ```
 
-The query should return four rows:
+問い合わせは 4 行を返すはずです。
 
 ```text
 1  1000371  1.8  15.32  N
@@ -225,51 +225,51 @@ The query should return four rows:
 1  1000374  8.4  42.13  Y
 ```
 
-## 4. Verify objects in RustFS
+## 4. RustFS 内のオブジェクトを確認する
 
-List the warehouse from the bucket-initializer image:
+バケット初期化用のイメージからウェアハウスを一覧表示します。
 
 ```bash
 docker compose run --rm --entrypoint /bin/sh create-bucket -c \
   '/usr/bin/rc alias set rustfs http://rustfs:9000 "$RUSTFS_ACCESS_KEY" "$RUSTFS_SECRET_KEY" >/dev/null && /usr/bin/rc find rustfs/my-bucket/warehouse'
 ```
 
-The output should include Iceberg metadata and data objects below the `warehouse/nyc/taxis` prefix. You can also inspect the `my-bucket` bucket in the RustFS Console.
+出力には、`warehouse/nyc/taxis` プレフィックス配下の Iceberg メタデータとデータオブジェクトが含まれるはずです。RustFS Console で `my-bucket` を確認することもできます。
 
-## 5. Stop or reset the stack
+## 5. スタックを停止またはリセットする
 
-Stop the containers while keeping the RustFS data volume:
+RustFS のデータボリュームを残したままコンテナを停止します。
 
 ```bash
 docker compose down
 ```
 
-To delete the local warehouse and start from an empty RustFS volume, explicitly include `--volumes`:
+ローカルのウェアハウスを削除し、空の RustFS ボリュームからやり直す場合は、明示的に `--volumes` を付けます。
 
 ```bash
 docker compose down --volumes
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### Spark cannot reach RustFS
+### Spark から RustFS に到達できない
 
-Use `http://rustfs:9000` inside Compose. `http://localhost:9000` refers to the Spark container itself when used in `spark-defaults.conf`.
+Compose 内では `http://rustfs:9000` を使います。`spark-defaults.conf` で `http://localhost:9000` を指定すると、Spark コンテナ自身を指します。
 
-Confirm that `spark.sql.catalog.demo.s3.path-style-access` is `true`. Virtual-hosted requests require additional RustFS domain and DNS configuration.
+`spark.sql.catalog.demo.s3.path-style-access` が `true` であることを確認します。仮想ホスト形式のリクエストには、RustFS のドメインと DNS の追加設定が必要です。
 
-### The catalog returns an S3 error
+### カタログが S3 エラーを返す
 
-Check that the credentials in `.env` match the RustFS credentials and that the `create-bucket` service completed successfully:
+`.env` の認証情報が RustFS の認証情報と一致し、`create-bucket` サービスが正常に完了したことを確認します。
 
 ```bash
 docker compose logs create-bucket rest
 ```
 
-The REST catalog property uses doubled underscores in `CATALOG_IO__IMPL` and `CATALOG_S3_PATH__STYLE__ACCESS`; the fixture converts them to the dotted and hyphenated Iceberg property names.
+REST カタログのプロパティでは、`CATALOG_IO__IMPL` と `CATALOG_S3_PATH__STYLE__ACCESS` のアンダースコアを重ねます。フィクスチャは、これらをドットとハイフンを含む Iceberg のプロパティ名に変換します。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Iceberg operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Apache Iceberg Spark documentation](https://iceberg.apache.org/docs/latest/spark-getting-started/) to configure your existing Spark environment.
+- ほかの Iceberg 操作を採用する前に、[S3 互換性に関する注意](/ja/administration/protocols/s3)を確認します。
+- [アクセスキーの管理](/ja/security-compliance/iam/access-token)で、本番用の専用認証情報を作成します。
+- 既存の Spark 環境を設定するには、[Apache Iceberg の Spark ドキュメント](https://iceberg.apache.org/docs/latest/spark-getting-started/)に従ってください。

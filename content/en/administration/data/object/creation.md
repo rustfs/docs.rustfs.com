@@ -1,28 +1,28 @@
 ---
-title: "Object Creation"
-description: "Create objects using the RustFS UI, rc, or the S3 API."
+title: "Create an object"
+description: "Upload an object on the Console, with rc, or with the S3 API."
 ---
 
-Objects are the fundamental storage units in RustFS, containing data, metadata, and a unique key. This guide covers object creation (upload).
+An object is the data RustFS stores under a key, along with its metadata. This guide shows how to upload one.
 
 ## Requirements
 
 - A running RustFS instance (see [Installation Guide](../../../installation/index.md)).
 - [`rc`](/operations/rc) installed and configured with an alias for the command-line workflow.
-- A target bucket. Create one by following [Bucket Creation](../bucket/creation.md).
+- A target bucket. Create one by following [Create a bucket](../bucket/creation.md).
 
-## Creating Objects
+## Create an object
 
-### Using the RustFS UI
+### Use the RustFS Console
 
-1. Log in to the RustFS Console.
+1. Sign in to the RustFS Console.
 2. Select the target bucket.
 3. On the bucket page, in the top right corner, select **New Directory**, **New File**, or **Upload File/Folder**.
 4. To upload from your local machine, click **Upload File/Folder**, select the files, and click **Start Upload**.
 
 ![object creation from ui](images/upload_file_from_ui.png)
 
-Click on an object to view its details.
+Select an object to view its details.
 
 ![object details info](images/object_details_info.png)
 
@@ -59,11 +59,11 @@ aws s3api put-object \
 
 Verify the upload in the RustFS Console.
 
-## Deleting Objects
+## Delete an object
 
-See [Object Deletion](./deletion.md).
+See [Delete an object](./deletion.md).
 
-Use the following API for file deletion:
+To delete an object with the S3 API, use:
 
 ```http
 DELETE /{bucketName}/{objectName} HTTP/1.1
@@ -78,4 +78,4 @@ aws s3api delete-object \
   --endpoint-url http://localhost:9000
 ```
 
-You can confirm the file has been deleted on the RustFS UI.
+Confirm in the RustFS Console that the object no longer appears.

@@ -1,13 +1,13 @@
 ---
 title: "rclone"
-description: "Sync, mount, and serve RustFS buckets with rclone over its S3-compatible API."
+description: "Synchronisez, montez et servez les compartiments (bucket) RustFS avec rclone, via son API compatible avec S3."
 ---
 
-This guide connects [rclone](https://github.com/rclone/rclone) — the command-line tool for syncing files to and from cloud storage — to **RustFS** through its S3 backend. You will configure an S3 remote for RustFS, copy and sync files, read objects back, publish a bucket over HTTP with `rclone serve`, and mount the bucket as a local filesystem with `rclone mount`. The workflow was verified with `rclone v1.75.1` against `rustfs/rustfs-x86-musl:v2.3.1`.
+Ce guide connecte [rclone](https://github.com/rclone/rclone) — l’outil en ligne de commande qui synchronise des fichiers vers et depuis le stockage cloud — à **RustFS** via son backend S3. Vous allez configurer un remote S3 pour RustFS, copier et synchroniser des fichiers, relire des objets, publier un compartiment en HTTP avec `rclone serve`, puis monter le compartiment comme système de fichiers local avec `rclone mount`. Le flux a été validé avec `rclone v1.75.1` et `rustfs/rustfs-x86-musl:v2.3.1`.
 
-You need Docker, or a local rclone binary. This deployment is intended for local integration testing, not production.
+Vous avez besoin de Docker, ou d’un binaire rclone local. Ce déploiement est destiné aux tests d’intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -16,11 +16,11 @@ flowchart LR
 	RustFS -->|"mount / serve"| Client["FUSE mount / HTTP clients"]
 ```
 
-One remote definition drives every rclone command: data transfer, mounting, and serving all use the same S3 connection.
+Une seule définition de remote pilote toutes les commandes rclone : le transfert de données, le montage et le service utilisent la même connexion S3.
 
-## 1. Configure the remote
+## 1. Configurer le remote
 
-Create an rclone config file with an S3 remote for RustFS, replacing all connection placeholders. The `Other` provider disables AWS-specific behavior, and path-style addressing is used automatically for custom endpoints:
+Créez un fichier de configuration rclone avec un remote S3 pour RustFS, en remplaçant toutes les valeurs indicatives de connexion. Le fournisseur `Other` désactive les comportements propres à AWS, et l’adressage de type chemin (path-style) est utilisé automatiquement pour les points de terminaison personnalisés :
 
 ```ini title="rclone.conf"
 [rustfs]
@@ -32,16 +32,16 @@ endpoint = http://<your-rustfs-endpoint>:9000
 region = us-east-1
 ```
 
-## 2. Copy and read objects
+## 2. Copier et lire des objets
 
-Create the bucket and upload a directory with `rclone copy`:
+Créez le compartiment et chargez (upload) un répertoire avec `rclone copy` :
 
 ```bash
 rc mb rustfs/rclone-demo
 rclone copy /data rustfs:rclone-demo/seed
 ```
 
-List and read back:
+Listez, puis relisez :
 
 ```bash
 rclone ls rustfs:rclone-demo/seed
@@ -54,11 +54,11 @@ rclone cat rustfs:rclone-demo/seed/hello.txt
 hello from rclone
 ```
 
-`rclone lsd rustfs:` lists every bucket on the endpoint.
+`rclone lsd rustfs:` liste tous les compartiments du point de terminaison.
 
-## 3. Sync a directory
+## 3. Synchroniser un répertoire
 
-`rclone sync` makes the destination identical to the source, including deletions. Remove a local file and sync:
+`rclone sync` rend la destination identique à la source, y compris les suppressions. Supprimez un fichier local, puis synchronisez :
 
 ```bash
 rm /data/hello.txt
@@ -70,17 +70,17 @@ rclone lsf rustfs:rclone-demo/seed
 blob.bin
 ```
 
-`hello.txt` disappears from the bucket. Add `--dry-run` first to preview the changes without touching the bucket.
+`hello.txt` disparaît du compartiment. Ajoutez d’abord `--dry-run` pour prévisualiser les modifications sans toucher au compartiment.
 
-## 4. Serve a bucket over HTTP
+## 4. Servir un compartiment en HTTP
 
-Publish the bucket contents as an HTTP file server:
+Publiez le contenu du compartiment comme serveur de fichiers HTTP :
 
 ```bash
 rclone serve http --addr 0.0.0.0:8080 rustfs:rclone-demo/seed
 ```
 
-Any HTTP client can now download objects:
+N’importe quel client HTTP peut alors télécharger les objets :
 
 ```bash
 curl -s http://localhost:8080/blob.bin -o /dev/null -w "%{http_code} %{size_download} bytes\n"
@@ -90,11 +90,11 @@ curl -s http://localhost:8080/blob.bin -o /dev/null -w "%{http_code} %{size_down
 200 3145728 bytes
 ```
 
-`rclone serve` also supports WebDAV, SFTP, and S3 endpoints over the same remote.
+`rclone serve` prend aussi en charge les points de terminaison WebDAV, SFTP et S3 sur le même remote.
 
-## 5. Mount the bucket as a filesystem
+## 5. Monter le compartiment comme système de fichiers
 
-With FUSE available, mount the bucket locally and use it like a directory:
+Lorsque FUSE est disponible, montez le compartiment localement et utilisez-le comme un répertoire :
 
 ```bash
 rclone mount rustfs:rclone-demo /mnt/rclone --daemon
@@ -103,7 +103,7 @@ echo test > /mnt/rclone/write-test.txt
 cat /mnt/rclone/write-test.txt
 ```
 
-Files written through the mount appear in RustFS as regular objects:
+Les fichiers écrits à travers le montage apparaissent dans RustFS comme des objets ordinaires :
 
 ```bash
 rc ls rustfs/rclone-demo/ -r
@@ -113,32 +113,32 @@ rc ls rustfs/rclone-demo/ -r
 [2026-09-29 11:12:41]        5 B write-test.txt
 ```
 
-Unmount with `fusermount -u /mnt/rclone` when finished.
+Démontez avec `fusermount -u /mnt/rclone` une fois l’opération terminée.
 
-## 6. Stop or reset
+## 6. Arrêter ou réinitialiser
 
-rclone holds no server-side state. To delete the demo data:
+rclone ne conserve aucun état côté serveur. Pour supprimer les données de la démonstration :
 
 ```bash
 rclone purge rustfs:rclone-demo
 ```
 
-## Troubleshooting
+## Dépannage
 
-### `Access Denied` or empty listings
+### `Access Denied` ou listages vides
 
-Confirm `endpoint` includes the scheme and that the key pair matches a RustFS access key. The `region` value is required by the S3 signer even though RustFS ignores it; keep `us-east-1`.
+Vérifiez que `endpoint` inclut le schéma et que la paire de clés correspond à une clé d’accès RustFS. La valeur `region` est exigée par le signataire S3, même si RustFS l’ignore ; conservez `us-east-1`.
 
-### Mount fails with `fusermount3: mount failed: Permission denied`
+### Le montage échoue avec `fusermount3: mount failed: Permission denied`
 
-Mounting needs the FUSE device and elevated privileges. Inside a container, run with `--device /dev/fuse --cap-add SYS_ADMIN` — and use `--privileged` if the mount helper still fails. On a host, verify that `fuse3` is installed and `/dev/fuse` exists.
+Le montage exige le périphérique FUSE et des privilèges élevés. Dans un conteneur, exécutez avec `--device /dev/fuse --cap-add SYS_ADMIN` — et utilisez `--privileged` si l’assistant de montage échoue encore. Sur un hôte, vérifiez que `fuse3` est installé et que `/dev/fuse` existe.
 
-### Sync deleted nothing on the destination
+### La synchronisation n’a rien supprimé sur la destination
 
-`rclone copy` never deletes. Only `rclone sync` (or `rclone delete`) removes destination objects, and `--dry-run` is the safe way to preview either.
+`rclone copy` ne supprime jamais rien. Seuls `rclone sync` (ou `rclone delete`) suppriment des objets sur la destination, et `--dry-run` est le moyen sûr de prévisualiser l’une ou l’autre commande.
 
-## Next steps
+## Étapes suivantes
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional rclone backends.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [rclone S3 documentation](https://rclone.org/s3/) for flags such as `--transfers`, bandwidth limits, and crypt overlays.
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres backends rclone.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
+- Suivez la [documentation S3 de rclone](https://rclone.org/s3/) pour les options telles que `--transfers`, les limites de bande passante et les surcouches crypt.

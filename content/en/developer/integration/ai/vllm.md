@@ -151,4 +151,4 @@ The default KV-cache reservation is 90% of system RAM. Lower it with `--gpu-memo
 
 - Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional serving setups.
 - Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [vLLM documentation](https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html) for chat templates, tensor parallelism, and quantized weights on top of the same bucket-backed model store.
+- Follow the [vLLM documentation](https://docs.vllm.ai/serving/openai_compatible_server.html) for chat templates, tensor parallelism, and quantized weights on top of the same bucket-backed model store.

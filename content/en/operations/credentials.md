@@ -1,6 +1,6 @@
 ---
 title: "Credential Management"
-description: "This article covers configuring RustFS root credentials via environment variables and secret files, rotating them safely, the internode RPC secret, and the MinIO-compatible environment aliases."
+description: "Configure and rotate RustFS root credentials, set the internode RPC secret, and use MinIO-compatible environment aliases."
 ---
 
 ## Root Credentials

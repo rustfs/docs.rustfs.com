@@ -1,15 +1,15 @@
 ---
-title: "Security & Compliance"
-description: "Configure identity, encryption, transport security, audit logging, and credentials for RustFS."
+title: "セキュリティとコンプライアンス"
+description: "RustFS のアイデンティティ、暗号化、通信の保護、監査ログ、認証情報を設定します。"
 ---
 
-Use this section to secure access to RustFS and configure the controls required by your environment.
+このセクションでは、RustFS へのアクセスを保護し、環境で必要な制御を設定します。
 
-## Security areas
+## セキュリティの領域
 
-- [IAM Management](./iam/index.md) covers users, groups, policies, and access keys.
-- [Data Encryption](./encryption/index.md) covers server-side encryption options and key management.
-- [OIDC](./oidc/index.md) covers external identity providers.
-- [TLS Configuration](/integration/tls-configured) covers encrypted client and node connections.
-- [Audit Logs](./audit-logs.md) covers audit target configuration.
-- [Credential Management](/operations/credentials) covers root credentials and secret injection.
+- [IAM の管理](./iam/index.md)では、ユーザー、グループ、ポリシー、アクセスキーを扱います。
+- [データ暗号化](./encryption/index.md)では、サーバー側の暗号化の選択肢と鍵管理を扱います。
+- [OIDC](./oidc/index.md)では、外部のアイデンティティプロバイダーを扱います。
+- [TLS の設定](/ja/integration/tls-configured)では、クライアントとノードの暗号化された接続を扱います。
+- [監査ログ](./audit-logs.md)では、監査ターゲットの設定を扱います。
+- [認証情報の管理](/ja/operations/credentials)では、ルート認証情報とシークレットの注入を扱います。

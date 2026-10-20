@@ -7,8 +7,8 @@ This page covers running the official RustFS image with Docker: a single-node in
 
 ## 1. Prerequisites
 
-* Docker Engine (≥ 20.10) installed and able to pull images and run containers normally
-* Host ports 9000 (S3 API) and 9001 (Console) available, or consistent with your custom ports
+* Docker Engine (≥ 20.10) installed, with the ability to pull images and run containers
+* Host ports 9000 (S3 API) and 9001 (Console) available, or the custom ports you plan to use
 * If you bind-mount a host directory, the directory owner must match the container user — see [Bind-mount a host directory](#bind-mount-a-host-directory)
 
 ## 2. Pull the image
@@ -140,7 +140,7 @@ If you only want RustFS without Grafana, Prometheus, and the other observability
 docker compose -f docker-compose.yml up -d rustfs
 ```
 
-This starts only the `rustfs-server` container. Whether you start only `rustfs-server` or the full stack, the S3 API is served at `http://localhost:9000`, and the RustFS Console is at `http://localhost:9001`. Open the Console in a browser and log in with the access key and secret key you configured above. Generate a strong secret with, for example, `openssl rand -base64 24`, and never ship the placeholder values to production.
+This starts only the `rustfs-server` container. Whether you start only `rustfs-server` or the full stack, the S3 API is served at `http://localhost:9000`, and the RustFS Console is at `http://localhost:9001`. Open the Console in a browser and sign in with the access key and secret key you configured above. Generate a strong secret with, for example, `openssl rand -base64 24`, and never ship the placeholder values to production.
 
 For Docker Compose, define unique `RUSTFS_ACCESS_KEY` and `RUSTFS_SECRET_KEY` values in the `rustfs` service environment or in the environment file used for variable substitution, then recreate the service with `docker compose up -d rustfs`.
 
@@ -186,7 +186,7 @@ If [using TLS](../../integration/tls-configured.md), mount the certificate direc
 
 ## Before production
 
-Work through the [Pre-Installation Checklists](../requirement/checklists/index.md) — hardware, network, software, and security — before deploying to production. Use a multi-node deployment architecture, [enable TLS encrypted communication](../../integration/tls-configured.md), configure a log rotation strategy, and set up a regular backup strategy.
+Work through the [Pre-Installation Checklists](../requirement/checklists/index.md) — hardware, network, software, and security — before deploying to production. Use a multi-node deployment, [enable TLS](../../integration/tls-configured.md), configure log rotation, and schedule regular backups.
 
 ## Next steps
 

@@ -1,13 +1,13 @@
 ---
 title: "GreptimeDB"
-description: "Run GreptimeDB with RustFS as the S3-compatible object storage backend."
+description: "S3 互換のオブジェクトストレージバックエンドとして RustFS を使って GreptimeDB を実行します。"
 ---
 
-This guide connects [GreptimeDB](https://github.com/GreptimeTeam/greptimedb) — the open-source, cloud-native time-series database — to **RustFS** as its object storage backend. You will start a standalone instance with its `[storage]` section pointed at a RustFS bucket, write time-series rows through the SQL API, and confirm the Parquet files and manifests in the bucket. The workflow was verified with `greptime/greptimedb` (main, commit `179ff8e5`) against `rustfs/rustfs-x86-musl:v2.3.1`.
+このガイドでは、オープンソースのクラウドネイティブな時系列データベースである [GreptimeDB](https://github.com/GreptimeTeam/greptimedb) を、オブジェクトストレージバックエンドとして **RustFS** に接続します。`[storage]` セクションを RustFS のバケットに向けたスタンドアロンインスタンスを起動し、SQL API で時系列の行を書き込み、バケット内の Parquet ファイルとマニフェストを確認します。この流れは `greptime/greptimedb`（main、コミット `179ff8e5`）を `rustfs/rustfs-x86-musl:v2.3.1` に対して検証済みです。
 
-You need Docker, or a local GreptimeDB binary. This deployment is intended for local integration testing, not production.
+Docker、またはローカルの GreptimeDB バイナリが必要です。このデプロイはローカルでの統合テストを目的としており、本番環境向けではありません。
 
-## Architecture
+## アーキテクチャ
 
 ```mermaid
 flowchart LR
@@ -15,11 +15,11 @@ flowchart LR
 	DB -->|"SST + manifests"| RustFS["RustFS :9000"]
 ```
 
-GreptimeDB keeps its write-ahead log and recent data locally, then persists SSTables (Parquet) and table manifests to object storage. Pointing the storage backend at RustFS makes the bucket the durable home of all table data.
+GreptimeDB は先行書き込みログ（WAL）と直近のデータをローカルに保持し、その後 SSTable（Parquet）とテーブルマニフェストをオブジェクトストレージへ永続化します。ストレージバックエンドを RustFS に向けると、バケットがすべてのテーブルデータの永続的な保管先になります。
 
-## 1. Configure the storage backend
+## 1. ストレージバックエンドを設定する
 
-Create the bucket and a config file with an S3 storage section, replacing all connection placeholders:
+接続情報のプレースホルダーをすべて置き換え、S3 ストレージセクションを持つ設定ファイルを作成し、バケットも作成します。
 
 ```toml title="greptimedb.toml"
 [storage]
@@ -32,11 +32,11 @@ endpoint = "http://<your-rustfs-endpoint>:9000"
 region = "us-east-1"
 ```
 
-GreptimeDB uses path-style requests for custom endpoints by default; virtual-hosted style must be opted into explicitly with `enable_virtual_host_style`, so no extra flag is needed for RustFS.
+GreptimeDB はカスタムエンドポイントに対してデフォルトでパススタイルのリクエストを使います。仮想ホスト形式は `enable_virtual_host_style` で明示的に有効にする必要があり、RustFS では追加のフラグは不要です。
 
-## 2. Run GreptimeDB
+## 2. GreptimeDB を実行する
 
-Start a standalone instance with the config file:
+設定ファイルを指定してスタンドアロンインスタンスを起動します。
 
 ```bash
 docker run -d --name greptimedb --network oo-rustfs_default -p 4000:4000 -p 4002:4002 \
@@ -47,11 +47,11 @@ docker run -d --name greptimedb --network oo-rustfs_default -p 4000:4000 -p 4002
   --config-file /etc/greptimedb/greptimedb.toml
 ```
 
-Port `4000` serves the HTTP SQL endpoint and `4002` the MySQL protocol.
+ポート `4000` は HTTP の SQL エンドポイント、`4002` は MySQL プロトコルです。
 
-## 3. Write and query time series
+## 3. 時系列を書き込んでクエリする
 
-Create a table, insert rows, and read them back. The HTTP SQL endpoint takes form-encoded requests:
+テーブルを作成し、行を挿入して読み戻します。HTTP の SQL エンドポイントはフォームエンコードのリクエストを受け付けます。
 
 ```bash
 curl -s -X POST "http://localhost:4000/v1/sql" \
@@ -65,7 +65,7 @@ curl -s -X POST "http://localhost:4000/v1/sql" \
 {"output":[{"affectedrows":3}],"execution_time_ms":2}
 ```
 
-Query the rows back:
+行をクエリして読み戻します。
 
 ```bash
 curl -s -X POST "http://localhost:4000/v1/sql" \
@@ -76,9 +76,9 @@ curl -s -X POST "http://localhost:4000/v1/sql" \
 {"output":[{"records":{"rows":[["node-2",0.51,0.71,1790681000000],["node-1",0.35,0.63,1790681060000]],"total_rows":2}}]}
 ```
 
-## 4. Verify objects in RustFS
+## 4. RustFS 内のオブジェクトを確認する
 
-List the bucket — after the memtable flushes, the bucket holds Parquet SSTables and JSON manifests:
+バケットを一覧します。memtable（メモリ上の書き込みバッファ）のフラッシュ後、バケットには Parquet の SSTable と JSON マニフェストが入ります。
 
 ```bash
 rc ls rustfs/<your-bucket>/ -r
@@ -90,40 +90,40 @@ greptimedb/data/greptime/greptime_private/1025/1025_0000000000/b11e8b25-5763-4f0
 greptimedb/data/greptime/greptime_private/1025/1025_0000000000/manifest/00000000000000000001.json
 ```
 
-Each database gets a directory under `data/`, and per-region `manifest/*.json` files describe the SSTables GreptimeDB reads back during queries.
+各データベースは `data/` 配下にディレクトリを持ち、リージョン（GreptimeDB のデータ分割単位）ごとの `manifest/*.json` が、クエリ時に GreptimeDB が読み戻す SSTable を記述します。
 
-![GreptimeDB data stored in the RustFS Console](./images/rustfs-greptimedb-data.png)
+![RustFS Console に保存された GreptimeDB のデータ](./images/rustfs-greptimedb-data.png)
 
-## 5. Stop or reset
+## 5. 停止またはリセットする
 
-To tear down the demo while keeping the bucket objects:
+バケット内のオブジェクトを残したままデモを破棄します。
 
 ```bash
 docker rm -f greptimedb
 ```
 
-To delete the stored data:
+保存したデータを削除します。
 
 ```bash
 rc rm rustfs/<your-bucket>/ --recursive --force
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
 ### `Form requests must have Content-Type: application/x-www-form-urlencoded`
 
-The `/v1/sql` HTTP endpoint only accepts form-encoded bodies. Pass SQL with `curl --data-urlencode "sql=..."` (or `application/x-www-form-urlencoded`), not as a JSON body.
+`/v1/sql` の HTTP エンドポイントはフォームエンコードのボディだけを受け付けます。SQL は JSON ボディではなく、`curl --data-urlencode "sql=..."`（または `application/x-www-form-urlencoded`）で渡します。
 
-### Bucket stays empty
+### バケットが空のままになる
 
-GreptimeDB flushes memtables to object storage asynchronously. Run a few more inserts and wait a few seconds, or trigger a manual flush, then list the bucket again.
+GreptimeDB は memtable をオブジェクトストレージへ非同期にフラッシュします。挿入を数回追加して数秒待つか、手動フラッシュを実行してから、バケットを再度一覧します。
 
-### Startup fails with an S3 error
+### S3 エラーで起動に失敗する
 
-Confirm `endpoint` includes the scheme, the bucket exists, and `access_key_id`/`secret_access_key` match a RustFS access key. The `root` value is optional but keeps the table tree under a known prefix.
+`endpoint` にスキームが含まれていること、バケットが存在すること、`access_key_id` と `secret_access_key` が RustFS のアクセスキーと一致することを確認します。`root` は省略できますが、指定するとテーブルツリーが既知のプレフィックス配下にまとまります。
 
-## Next steps
+## 次のステップ
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional GreptimeDB storage options.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [GreptimeDB configuration reference](https://docs.greptime.com/operational-guide/configure/configure-datanode/) to tune flush intervals and cache layers for production workloads.
+- 追加の GreptimeDB ストレージオプションを採用する前に、[S3 互換性ノート](/ja/administration/protocols/s3)を確認してください。
+- [アクセスキー管理](/ja/security-compliance/iam/access-token)で本番用の専用認証情報を作成してください。
+- [GreptimeDB の設定リファレンス](https://docs.greptime.com/operational-guide/configure/configure-datanode/)に従い、本番ワークロード向けにフラッシュ間隔とキャッシュ層を調整してください。

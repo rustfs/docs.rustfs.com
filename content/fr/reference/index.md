@@ -1,11 +1,11 @@
 ---
-title: "Reference"
-description: "Look up RustFS configuration variables and command-line options."
+title: "Référence"
+description: "Consultez les variables de configuration et les options de ligne de commande de RustFS."
 ---
 
-Use this section for concise technical references while configuring, operating, or integrating RustFS.
+Utilisez cette section comme référence technique concise pour configurer, exploiter ou intégrer RustFS.
 
-## References
+## Références
 
-- [Environment Variables](./environment-variables.md)
+- [Variables d’environnement](./environment-variables.md)
 - [CLI](./cli.md)

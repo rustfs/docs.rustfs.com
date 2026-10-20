@@ -1,27 +1,27 @@
 ---
 title: "Podman"
-description: "Run a single-node RustFS instance with Podman and persistent container storage."
+description: "Podman と永続的なコンテナストレージを使い、シングルノードの RustFS インスタンスを実行します。"
 ---
 
-Podman can run the official RustFS Open Container Initiative (OCI) image without a daemon. You need a working Podman installation and permission to create containers.
+Podman は、デーモンなしで公式の RustFS Open Container Initiative（OCI）イメージを実行できます。動作する Podman のインストールと、コンテナを作成する権限が必要です。
 
-## 1. Pull the image
+## 1. イメージを取得する
 
 ```bash
 podman pull docker.io/rustfs/rustfs:latest
 ```
 
-## 2. Create persistent storage
+## 2. 永続ストレージを作成する
 
-Create a named volume so object data remains available when you replace the container:
+コンテナを置き換えてもオブジェクトデータが残るよう、名前付きボリュームを作成します。
 
 ```bash
 podman volume create rustfs-data
 ```
 
-:::note[Bind-mounting a host directory]
+:::note[ホストディレクトリのバインドマウント]
 
-The named volume above needs no extra setup. If you bind-mount a host directory instead, keep in mind that the container runs as non-root user `rustfs` with id `10001`. Make the host directory owned by `10001`, otherwise you will encounter permission denied errors:
+上の名前付きボリュームには、追加の準備は不要です。ホストディレクトリをバインドマウントする場合、コンテナは id が `10001` の root 以外のユーザー `rustfs` として動作します。ホストディレクトリの所有者を `10001` にします。そうしないと、permission denied（権限拒否）エラーが発生します。
 
 ```bash
 chown -R 10001:10001 /path/to/host_directory
@@ -29,9 +29,9 @@ chown -R 10001:10001 /path/to/host_directory
 
 :::
 
-## 3. Start RustFS
+## 3. RustFS を起動する
 
-Replace the credential placeholders before running the container:
+コンテナを実行する前に、認証情報のプレースホルダーを置き換えます。
 
 ```bash
 podman run -d \
@@ -50,25 +50,25 @@ podman run -d \
   /data
 ```
 
-:::warning[Set credentials when creating the container]
+:::warning[コンテナ作成時に認証情報を設定する]
 
-Set unique `RUSTFS_ACCESS_KEY` and `RUSTFS_SECRET_KEY` environment variables before exposing RustFS to a network. Do not use the well-known `rustfsadmin` value for either credential. If the container was started without custom credentials, stop and recreate it with both `-e` options shown above; the `rustfs-data` volume remains intact.
+ネットワークへ公開する前に、一意の `RUSTFS_ACCESS_KEY` と `RUSTFS_SECRET_KEY` を環境変数で設定します。どちらの認証情報にも、広く知られている `rustfsadmin` は使わないでください。カスタムの認証情報なしでコンテナを起動した場合は、停止し、上記の両方の `-e` オプションを付けて再作成します。`rustfs-data` ボリュームはそのまま残ります。
 
 :::
 
-## 4. Verify the deployment
+## 4. デプロイを確認する
 
-Check the container and the S3 API health endpoint:
+コンテナと、S3 API のヘルスチェックエンドポイントを確認します。
 
 ```bash
 podman ps --filter name=rustfs
 curl --fail http://localhost:9000/health
 ```
 
-The S3 API is available at `http://localhost:9000`, and the Console is available at `http://localhost:9001`.
+S3 API は `http://localhost:9000` で、Console は `http://localhost:9001` で利用できます。
 
-## Next steps
+## 次のステップ
 
-- [RustFS Console](/administration/console)
-- [Configure an S3 client](../../developer/examples/aws-cli.md)
-- [TLS configuration](../../integration/tls-configured.md)
+- [RustFS Console](/ja/administration/console)
+- [S3 クライアントを設定する](../../developer/examples/aws-cli.md)
+- [TLS の設定](../../integration/tls-configured.md)

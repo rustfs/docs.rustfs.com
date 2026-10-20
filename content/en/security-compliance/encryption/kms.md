@@ -115,9 +115,9 @@ For Vault Transit, you can alternatively create the named Transit key directly i
 vault write -f transit/keys/rustfs-default-key
 ```
 
-:::note[rc version boundary]
+:::note[rc version requirements]
 
-The tested `rc 0.1.29` on the validation host does not expose `rc admin kms`; it supports only the bucket and object encryption commands used below. Run `rc admin --help` before following the key lifecycle commands. If the KMS command family is absent, use a newer `rc` release that includes it or provision the key through the native RustFS KMS Admin API.
+`rc 0.1.29` does not include `rc admin kms`; it supports only the bucket and object encryption commands used below. Run `rc admin --help` before following the key lifecycle commands. If the KMS command family is absent, use a newer `rc` release that includes it or provision the key through the native RustFS KMS Admin API.
 
 :::
 

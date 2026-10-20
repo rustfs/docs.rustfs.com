@@ -7,13 +7,13 @@ RustFS S3 Tables は、組み込み REST カタログを通じて **Apache Icebe
 
 :::note[プレビューの状態と対象バージョン]
 
-S3 Tables はプレビュー機能です。クライアントの互換性は、以下に示すワークフローに限られます。このページは RustFS コミット [`7e0c6711`](https://github.com/rustfs/rustfs/commit/7e0c67111b97703d47e23719b0264a739c8acea8) に基づき、2026 年 9 月 8 日に確認しました。別のカタログ操作やクライアントを使用する前に、[サポートマトリクス](https://github.com/rustfs/rustfs/blob/7e0c67111b97703d47e23719b0264a739c8acea8/docs/architecture/s3-tables-support-matrix.md)とデプロイ済みのバージョンを確認してください。
+S3 Tables はプレビュー機能です。クライアントの互換性は、以下に示すワークフローに限られます。このページは RustFS コミット [`7e0c6711`](https://github.com/rustfs/rustfs/commit/7e0c67111b97703d47e23719b0264a739c8acea8) に基づき、2026 年 9 月 8 日に確認しました。別のカタログ操作やクライアントを使用する前に、[サポートマトリックス](https://github.com/rustfs/rustfs/blob/7e0c67111b97703d47e23719b0264a739c8acea8/docs/architecture/s3-tables-support-matrix.md)とデプロイ済みのバージョンを確認してください。
 
 :::
 
 ## 仕組み
 
-Iceberg クライアントは REST カタログを使用してテーブルを検出し、メタデータの変更をコミットします。テーブルファイルの読み書きには S3 API を使用します。どちらのインターフェイスも、RustFS の S3 API ポートで提供されます。
+Iceberg クライアントは REST カタログを使用してテーブルを検出し、メタデータの変更をコミットします。テーブルファイルの読み書きには S3 API を使用します。どちらのインターフェースも、RustFS の S3 API ポートで提供されます。
 
 ```mermaid
 flowchart TB
@@ -34,12 +34,12 @@ flowchart TB
 
 ## 前提条件
 
-- 上記の S3 Tables エンドポイントを備えた RustFS を起動します。[インストール](/installation)を参照してください。
-- [AWS CLI](/developer/examples/aws-cli) と、`--aws-sigv4` および `--fail-with-body` をサポートする `curl` 7.76 以降をインストールします。
+- 上記の S3 Tables エンドポイントを備えた RustFS を起動します。[インストール](/ja/installation)を参照してください。
+- [AWS CLI](/ja/developer/examples/aws-cli) と、`--aws-sigv4` および `--fail-with-body` をサポートする `curl` 7.76 以降をインストールします。
 - このチュートリアル専用の新しいバケットを用意します。例では `my-bucket` を使用します。
 - カタログ操作と S3 オブジェクトの両方にアクセスできる既存の管理者アカウントを使用します。組み込みの `consoleAdmin` ポリシーは、このチュートリアルの操作をカバーします。アプリケーションには、範囲を絞ったポリシーを設定してください。
 
-例では `http://localhost:9000` を使用します。サーバーのエンドポイントに置き換え、ローカルテスト環境以外では証明書の検証を有効にした [TLS](/integration/tls-configured) を使用してください。
+例では `http://localhost:9000` を使用します。サーバーのエンドポイントに置き換え、ローカルテスト環境以外では証明書の検証を有効にした [TLS](/ja/integration/tls-configured) を使用してください。
 
 :::warning[テーブルバケットのライフサイクル動作]
 
@@ -112,19 +112,19 @@ curl --fail-with-body --silent --show-error \
 | ウェアハウスとプレフィックス | `my-bucket` |
 | REST 認証 | AWS Signature Version 4、署名サービス名は `s3` |
 | リージョン | `us-east-1` |
-| S3 ファイルエンドポイント | `http://localhost:9000` を使用し、パス形式でアドレス指定 |
+| S3 ファイルエンドポイント | `http://localhost:9000` を使用し、パススタイルでアクセス |
 
 クライアントはカタログ URI に `/v1` を追加します。ウェアハウスには S3 URI や AWS S3 Tables ARN ではなく、バケット名を指定します。同じアカウントを使用する場合でも、REST リクエストの署名と S3 ファイルアクセスの両方を設定します。
 
-別の Iceberg REST カタログをすでに運用している場合は、[Apache Iceberg 連携](/developer/integration/big-data/iceberg)の外部カタログを使用する構成を参照してください。
+別の Iceberg REST カタログをすでに運用している場合は、[Apache Iceberg 連携](/ja/developer/integration/big-data/iceberg)の外部カタログを使用する構成を参照してください。
 
 ## 権限と認証情報
 
 テーブルバケットの有効化には `admin:SetTableBucket`、状態の確認には `admin:GetTableBucket` が必要です。カタログの検出には `admin:GetTableCatalog` を使用します。名前空間とテーブルの操作には、それぞれ `admin:SetTableNamespace`、`admin:CreateTable`、`admin:GetTableMetadata`、`admin:CommitTable` などの RustFS 管理アクションがあります。
 
-テーブルファイルの読み書きには、通常の S3 権限も必要です。RustFS はウェアハウス内のオブジェクトパスに対してテーブル権限を確認します。読み取りには対応する `admin:GetTableMetadata` の認可、書き込みには `admin:SetTableMetadata` の認可が必要です。カタログのコミット権限だけでは、その前に行う S3 ファイルの書き込みは許可されません。両方のインターフェイスに対して [IAM ポリシー](/security-compliance/iam/policies)を設定してください。
+テーブルファイルの読み書きには、通常の S3 権限も必要です。RustFS はウェアハウス内のオブジェクトパスに対してテーブル権限を確認します。読み取りには対応する `admin:GetTableMetadata` の認可、書き込みには `admin:SetTableMetadata` の認可が必要です。カタログのコミット権限だけでは、その前に行う S3 ファイルの書き込みは許可されません。両方のインターフェースに対して [IAM ポリシー](/ja/security-compliance/iam/policies)を設定してください。
 
-カタログによる認証情報の払い出しは、デフォルトで無効です。有効にした場合、対応クライアントは `X-Iceberg-Access-Delegation: vended-credentials` を使用してネゴシエーションを行い、呼び出し元にはテーブル認証情報を要求する権限が必要です。カタログへの初回接続にも、認可済みの主体が必要です。リンク先の PyIceberg チュートリアルでは、明示的に設定した認証情報を使用します。
+カタログの認証情報ベンディング（vended credentials）は、デフォルトで無効です。有効にした場合、対応するクライアントは `X-Iceberg-Access-Delegation: vended-credentials` を使ってネゴシエーションし、呼び出し元にはテーブル用の認証情報を要求する権限が必要です。カタログへの初回接続にも、認可されたプリンシパル（主体）が必要です。リンク先の PyIceberg チュートリアルでは、明示的に設定した認証情報を使用します。
 
 ## メンテナンスとデータ保護
 
@@ -147,10 +147,10 @@ curl --fail-with-body --silent --show-error \
 
 Iceberg フォーマット v1 と v2 をサポートし、デフォルトは v2 です。ステージングによるテーブル作成、テーブル削除時のデータ消去、Iceberg フォーマット v3 はサポートしていません。
 
-RustFS S3 Tables は、SQL 実行エンジン、複数テーブルにまたがるアトミックトランザクション、リージョン間で独立したアクティブ・アクティブ書き込みを提供しません。AWS S3 Tables のコントロールプレーンとの完全な互換性も表明していません。別のエンジンやベンダー固有のプロファイルを使用する前に、[サポートマトリクス](https://github.com/rustfs/rustfs/blob/7e0c67111b97703d47e23719b0264a739c8acea8/docs/architecture/s3-tables-support-matrix.md)を確認してください。
+RustFS S3 Tables は、SQL 実行エンジン、複数テーブルにまたがるアトミックトランザクション、リージョン間で独立したアクティブ・アクティブ書き込みを提供しません。AWS S3 Tables のコントロールプレーンとの完全な互換性も表明していません。別のエンジンやベンダー固有のプロファイルを使用する前に、[サポートマトリックス](https://github.com/rustfs/rustfs/blob/7e0c67111b97703d47e23719b0264a739c8acea8/docs/architecture/s3-tables-support-matrix.md)を確認してください。
 
 ## 次のステップ
 
-- [PyIceberg チュートリアル](/developer/integration/big-data/pyiceberg)を実行します。
-- アプリケーションへのアクセスを許可する前に、[IAM ポリシー](/security-compliance/iam/policies)を確認します。
+- [PyIceberg チュートリアル](/ja/developer/integration/big-data/pyiceberg)を実行します。
+- アプリケーションへのアクセスを許可する前に、[IAM ポリシー](/ja/security-compliance/iam/policies)を確認します。
 - リポジトリの[クライアント適合性チェック](https://github.com/rustfs/rustfs/blob/7e0c67111b97703d47e23719b0264a739c8acea8/scripts/table-catalog/README.md)を使用して、ほかのクライアントバージョンを検証します。

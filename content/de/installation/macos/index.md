@@ -1,124 +1,124 @@
 ---
-title: "Install RustFS on macOS"
-description: "Install a local RustFS instance on macOS with RustFS Launcher or the standalone server binary."
+title: "RustFS unter macOS installieren"
+description: "Installieren Sie eine lokale RustFS-Instanz unter macOS mit RustFS Launcher oder der eigenständigen Server-Binary."
 ---
 
-This guide provides two ways to run **RustFS** on macOS: use the graphical **RustFS Launcher**, or run the standalone server binary from Terminal. Both methods create a local, single-node instance suitable for evaluation, development, and testing.
+Diese Anleitung zeigt zwei Wege, **RustFS** auf macOS zu betreiben: über die grafische Anwendung **RustFS Launcher** oder über die eigenständige Server-Binary im Terminal. Beide Wege erzeugen eine lokale Einzelknoten-Instanz für Evaluierung, Entwicklung und Tests.
 
-:::note[Deployment scope]
+:::note[Geltungsbereich der Bereitstellung]
 
-These procedures run RustFS as a desktop process, not as a macOS background service. For a production or distributed deployment, use the [Linux installation guides](/installation/linux).
+Diese Verfahren führen RustFS als Desktop-Prozess aus, nicht als Hintergrunddienst von macOS. Für eine produktive oder verteilte Bereitstellung verwenden Sie die [Linux-Installationsanleitungen](/de/installation/linux).
 
 :::
 
-## 1. Check your Mac architecture
+## 1. Mac-Architektur prüfen
 
-RustFS distinguishes between Apple Silicon (`arm64`) and Intel (`x86_64`) Macs. Open Terminal and run:
+RustFS stellt unterschiedliche Binaries für Apple Silicon (`arm64`) und Intel (`x86_64`) bereit. Öffnen Sie das Terminal und führen Sie Folgendes aus:
 
 ```bash
 uname -m
 ```
 
-Use the result to choose the correct package:
+Wählen Sie anhand des Ergebnisses das passende Paket:
 
-| Result | Mac type | Current standalone binary availability |
+| Ergebnis | Mac-Typ | Verfügbarkeit der aktuellen eigenständigen Binary |
 | --- | --- | --- |
-| `arm64` | Apple Silicon | Download the macOS AArch64 package from current RustFS releases. |
-| `x86_64` | Intel | RustFS releases after `v1.0.0-beta.9` do not provide a prebuilt Intel macOS package. Build the current version from source. |
+| `arm64` | Apple Silicon | Laden Sie das macOS-AArch64-Paket aus den aktuellen RustFS-Releases herunter. |
+| `x86_64` | Intel | RustFS-Releases nach `v1.0.0-beta.9` enthalten kein vorgefertigtes Intel-macOS-Paket. Bauen Sie die aktuelle Version aus dem Quellcode. |
 
-:::warning[Intel Mac release boundary]
+:::warning[Grenze der Intel-Mac-Releases]
 
-Do not run the Apple Silicon binary on an Intel Mac. If you need a RustFS version newer than `v1.0.0-beta.9` on Intel macOS, follow the source-build procedure in this guide. An older beta.9 binary does not contain fixes and features from later releases.
+Führen Sie die Apple-Silicon-Binary nicht auf einem Intel-Mac aus. Wenn Sie auf Intel-macOS eine RustFS-Version neuer als `v1.0.0-beta.9` benötigen, folgen Sie dem Quellcode-Build in dieser Anleitung. Eine ältere beta.9-Binary enthält keine Korrekturen und Funktionen späterer Releases.
 
 :::
 
-Before continuing, also make sure that:
+Stellen Sie vor dem Fortfahren außerdem Folgendes sicher:
 
-- You have permission to install or run applications and write to the selected data directory.
-- TCP ports `9000` and `9001` are available, or you have selected two other unused ports.
-- You have created a dedicated data directory, such as `$HOME/rustfs/data`.
+- Sie dürfen Anwendungen installieren oder ausführen und in das gewählte Datenverzeichnis schreiben.
+- Die TCP-Ports `9000` und `9001` sind frei, oder Sie haben zwei andere ungenutzte Ports gewählt.
+- Sie haben ein eigenes Datenverzeichnis angelegt, zum Beispiel `$HOME/rustfs/data`.
 
 ```bash
 mkdir -p "$HOME/rustfs/data"
 ```
 
-:::warning[Protect the data directory]
+:::warning[Datenverzeichnis schützen]
 
-Use an empty directory on a disk with enough free space. Do not store unrelated files in this directory, and do not edit RustFS data files while the server is running.
+Verwenden Sie ein leeres Verzeichnis auf einem Datenträger mit ausreichend freiem Speicher. Legen Sie dort keine fremden Dateien ab und bearbeiten Sie RustFS-Datendateien nicht, während der Server läuft.
 
 :::
 
-## 2. Choose an installation method
+## 2. Installationsmethode wählen
 
-| Method | Use it when | Architecture note |
+| Methode | Geeignet, wenn | Hinweis zur Architektur |
 | --- | --- | --- |
-| RustFS Launcher | You want a graphical setup and built-in log viewer. | Download a Launcher package that matches Apple Silicon or Intel. |
-| Standalone binary | You want explicit Terminal commands or scripting. | Current releases provide Apple Silicon binaries; Intel users build releases after beta.9 from source. |
+| RustFS Launcher | Sie eine grafische Einrichtung und eine integrierte Protokollanzeige möchten. | Laden Sie ein Launcher-Paket herunter, das zu Apple Silicon oder Intel passt. |
+| Eigenständige Binary | Sie explizite Terminal-Befehle oder Skripte möchten. | Aktuelle Releases stellen Apple-Silicon-Binaries bereit. Intel-Nutzer bauen Releases nach beta.9 aus dem Quellcode. |
 
-## Install with RustFS Launcher
+## Mit RustFS Launcher installieren
 
-### 3. Download and install Launcher
+### 3. Launcher herunterladen und installieren
 
-1. Open the [RustFS Launcher Releases page](https://github.com/rustfs/launcher/releases).
-2. Select the latest release and expand **Assets**.
-3. Download the macOS installer that matches your architecture: AArch64 for Apple Silicon or x86-64 for Intel. Do not download **Source code** unless you intend to build Launcher yourself.
-4. Open the downloaded disk image and move **RustFS Launcher** to **Applications**.
-5. Open **RustFS Launcher** from **Applications**.
+1. Öffnen Sie die [Release-Seite von RustFS Launcher](https://github.com/rustfs/launcher/releases).
+2. Wählen Sie das neueste Release und klappen Sie **Assets** auf.
+3. Laden Sie das macOS-Installationsprogramm herunter, das zu Ihrer Architektur passt: AArch64 für Apple Silicon oder x86-64 für Intel. Laden Sie **Source code** nur herunter, wenn Sie Launcher selbst bauen möchten.
+4. Öffnen Sie das heruntergeladene Festplattenabbild und verschieben Sie **RustFS Launcher** nach **Applications** (Programme).
+5. Öffnen Sie **RustFS Launcher** aus **Applications**.
 
-If macOS blocks the first launch, confirm that the package came from the official `rustfs/launcher` Releases page. Then open **System Settings > Privacy & Security** and allow that specific application. Do not disable Gatekeeper globally.
+Wenn macOS den ersten Start blockiert, prüfen Sie, dass das Paket von der offiziellen Release-Seite `rustfs/launcher` stammt. Öffnen Sie anschließend **System Settings > Privacy & Security** (Systemeinstellungen > Datenschutz und Sicherheit) und erlauben Sie genau diese Anwendung. Deaktivieren Sie Gatekeeper nicht global.
 
-### 4. Configure Launcher
+### 4. Launcher konfigurieren
 
-Configure the fields in the Launcher window:
+Konfigurieren Sie die Felder im Launcher-Fenster:
 
-| Section | Field | Recommended value | Description |
+| Bereich | Feld | Empfohlener Wert | Beschreibung |
 | --- | --- | --- | --- |
-| Dataset Mount | Data Path | `$HOME/rustfs/data` | Existing directory where RustFS stores object data. |
-| Ports & Access | API Port | `9000` | S3-compatible API port. |
-| Ports & Access | Host | `127.0.0.1` | Restricts access to this Mac. |
-| Ports & Access | Console Endpoint | Enabled | Enables the web Console; Launcher disables it by default. |
-| Ports & Access | Console Port | `9001` | Console port, which must differ from the API port. |
-| Credentials | Access Key | `<your-access-key>` | Administrator access key for this instance. |
-| Credentials | Secret Key | `<your-secret-key>` | Administrator secret key for this instance. |
+| Dataset Mount | Data Path | `$HOME/rustfs/data` | Vorhandenes Verzeichnis, in dem RustFS Objektdaten speichert. |
+| Ports & Access | API Port | `9000` | Port der S3-kompatiblen API. |
+| Ports & Access | Host | `127.0.0.1` | Beschränkt den Zugriff auf diesen Mac. |
+| Ports & Access | Console Endpoint | Enabled | Aktiviert die Console (Weboberfläche). Launcher deaktiviert sie standardmäßig. |
+| Ports & Access | Console Port | `9001` | Console-Port. Er muss sich vom API-Port unterscheiden. |
+| Credentials | Access Key | `<your-access-key>` | Administrator-Zugriffsschlüssel für diese Instanz. |
+| Credentials | Secret Key | `<your-secret-key>` | Geheimer Administrator-Zugriffsschlüssel für diese Instanz. |
 
-Use **Browse** to select the data directory or drag it into Launcher. Launcher requires the directory to exist before startup. The macOS file picker displays the expanded path instead of the literal `$HOME` variable.
+Wählen Sie das Datenverzeichnis mit **Browse** oder ziehen Sie es in Launcher. Launcher setzt voraus, dass das Verzeichnis vor dem Start existiert. Die macOS-Dateiauswahl zeigt den aufgelösten Pfad an, nicht die literale Variable `$HOME`.
 
-Replace the credential placeholders with your own values. Launcher initially displays default local-test credentials; do not retain them on a Mac accessible by other users.
+Ersetzen Sie die Platzhalter für die Zugangsdaten durch eigene Werte. Launcher zeigt anfangs die standardmäßigen lokalen Test-Zugangsdaten an. Behalten Sie sie nicht auf einem Mac bei, auf den andere Benutzer zugreifen können.
 
-:::warning[Network exposure]
+:::warning[Netzwerkexposition]
 
-Keep **Host** set to `127.0.0.1` unless another computer must connect to RustFS. A non-loopback address exposes the API and Console on the corresponding network interfaces. Configure the macOS firewall and strong credentials before allowing remote access.
+Lassen Sie **Host** auf `127.0.0.1`, sofern nicht ein anderer Computer eine Verbindung zu RustFS herstellen muss. Jede Adresse außer `127.0.0.1` legt die API und die Console auf den zugehörigen Netzwerkschnittstellen offen. Konfigurieren Sie die macOS-Firewall und starke Zugangsdaten, bevor Sie Fernzugriff zulassen.
 
 :::
 
-### 5. Start and verify RustFS
+### 5. RustFS starten und prüfen
 
-1. Select **Launch RustFS**.
-2. Wait for Launcher to report that the configured endpoint is online.
-3. Open `http://localhost:9001` and sign in with the access key and secret key that you configured.
-4. Use `http://localhost:9000` as the endpoint for S3-compatible clients.
+1. Wählen Sie **Launch RustFS**.
+2. Warten Sie, bis Launcher meldet, dass der konfigurierte Endpunkt online ist.
+3. Öffnen Sie `http://localhost:9001` und melden Sie sich mit dem Zugriffsschlüssel und dem geheimen Zugriffsschlüssel an, die Sie konfiguriert haben.
+4. Verwenden Sie `http://localhost:9000` als Endpunkt für S3-kompatible Clients.
 
-![RustFS Launcher showing the service online with API port 9000, Console port 9001, and successful startup logs](../windows/images/windows-rustfs-launcher.jpg)
+![RustFS Launcher mit online gemeldetem Dienst, API-Port 9000, Console-Port 9001 und erfolgreichen Startprotokollen](../windows/images/windows-rustfs-launcher.jpg)
 
-If you changed the host or ports, use those values instead. The Console URL is available only when **Console Endpoint** is enabled.
+Wenn Sie Host oder Ports geändert haben, verwenden Sie diese Werte. Die Console-URL ist nur verfügbar, wenn **Console Endpoint** aktiviert ist.
 
-Launcher locks its configuration while it manages a running process. It also creates a `logs` directory next to the data directory. For example, selecting `$HOME/rustfs/data` places server log files under `$HOME/rustfs/logs`.
+Launcher sperrt seine Konfiguration, solange er einen laufenden Prozess verwaltet. Er legt außerdem ein Verzeichnis `logs` neben dem Datenverzeichnis an. Wenn Sie beispielsweise `$HOME/rustfs/data` wählen, liegen die Server-Protokolldateien unter `$HOME/rustfs/logs`.
 
-### 6. Stop or exit Launcher
+### 6. Launcher anhalten oder beenden
 
-Select **Stop RustFS** before changing configuration, disconnecting an external data disk, or shutting down macOS.
+Wählen Sie **Stop RustFS**, bevor Sie die Konfiguration ändern, einen externen Datenträger trennen oder macOS herunterfahren.
 
-Closing the Launcher window hides it in the menu bar; it does not stop RustFS. To stop the managed process and exit Launcher, open the Launcher menu bar icon and select **Quit**. Select **Show**, or select the icon, to restore the window.
+Wenn Sie das Launcher-Fenster schließen, wird es in der Menüleiste ausgeblendet. RustFS wird dadurch nicht angehalten. Um den verwalteten Prozess anzuhalten und Launcher zu beenden, öffnen Sie das Launcher-Symbol in der Menüleiste und wählen Sie **Quit**. Wählen Sie **Show** oder das Symbol, um das Fenster wiederherzustellen.
 
-## Install the standalone binary
+## Eigenständige Binary installieren
 
-### 7. Download the Apple Silicon binary
+### 7. Apple-Silicon-Binary herunterladen
 
-Use this procedure when `uname -m` returns `arm64`:
+Verwenden Sie dieses Verfahren, wenn `uname -m` den Wert `arm64` zurückgibt:
 
-1. Open the [RustFS Releases page](https://github.com/rustfs/rustfs/releases).
-2. Select the required release and download the macOS AArch64 ZIP archive from **Assets**. The asset name begins with `rustfs-macos-aarch64`.
-3. Create a program directory and extract the archive. Replace `<version>` with the version in the downloaded filename:
+1. Öffnen Sie die [RustFS-Release-Seite](https://github.com/rustfs/rustfs/releases).
+2. Wählen Sie das benötigte Release und laden Sie das macOS-AArch64-ZIP-Archiv aus **Assets** herunter. Der Asset-Name beginnt mit `rustfs-macos-aarch64`.
+3. Legen Sie ein Programmverzeichnis an und entpacken Sie das Archiv. Ersetzen Sie `<version>` durch die Version im heruntergeladenen Dateinamen:
 
 ```bash
 mkdir -p "$HOME/rustfs/bin"
@@ -127,20 +127,20 @@ chmod +x "$HOME/rustfs/bin/rustfs"
 "$HOME/rustfs/bin/rustfs" --help
 ```
 
-If the archive contains a platform-specific binary name instead of `rustfs`, use that filename in the remaining commands or rename it to `$HOME/rustfs/bin/rustfs`.
+Wenn das Archiv einen plattformspezifischen Binary-Namen anstelle von `rustfs` enthält, verwenden Sie diesen Dateinamen in den weiteren Befehlen oder benennen Sie die Datei in `$HOME/rustfs/bin/rustfs` um.
 
-### 8. Build the Intel binary from source
+### 8. Intel-Binary aus dem Quellcode bauen
 
-Use this procedure when `uname -m` returns `x86_64` and you need a release newer than `v1.0.0-beta.9`.
+Verwenden Sie dieses Verfahren, wenn `uname -m` den Wert `x86_64` zurückgibt und Sie ein Release neuer als `v1.0.0-beta.9` benötigen.
 
-1. Install the Xcode command-line tools:
+1. Installieren Sie die Xcode-Befehlszeilenwerkzeuge:
 
 ```bash
 xcode-select --install
 ```
 
-2. Install the current stable Rust toolchain from [rustup.rs](https://rustup.rs/), then open a new Terminal session.
-3. Clone RustFS and check out the release that you need:
+2. Installieren Sie die aktuelle stabile Rust-Toolchain von [rustup.rs](https://rustup.rs/) und öffnen Sie anschließend eine neue Terminal-Sitzung.
+3. Klonen Sie RustFS und checken Sie das benötigte Release aus:
 
 ```bash
 git clone https://github.com/rustfs/rustfs.git
@@ -148,23 +148,23 @@ cd rustfs
 git checkout <release-tag>
 ```
 
-4. Build the Intel macOS target with the repository build script:
+4. Bauen Sie das Intel-macOS-Ziel mit dem Build-Skript des Repositorys:
 
 ```bash
 ./build-rustfs.sh --platform x86_64-apple-darwin
 ```
 
-The build script includes Console assets by default and verifies the resulting binary. Use the binary reported at the end of the build output in the next step.
+Das Build-Skript bindet die Console-Assets standardmäßig ein und prüft die erzeugte Binary. Verwenden Sie im nächsten Schritt die Binary, die am Ende der Build-Ausgabe gemeldet wird.
 
-:::note[Source-build dependencies]
+:::note[Abhängigkeiten des Quellcode-Builds]
 
-Building from source requires the tools used by the selected RustFS release in addition to Rust and the Xcode command-line tools. If the build reports a missing dependency, follow the requirements in that release's repository README rather than substituting a binary built for Apple Silicon.
+Für den Build aus dem Quellcode benötigen Sie zusätzlich zu Rust und den Xcode-Befehlszeilenwerkzeugen die Werkzeuge des gewählten RustFS-Releases. Wenn der Build eine fehlende Abhängigkeit meldet, folgen Sie den Anforderungen in der README dieses Releases im Repository. Setzen Sie keine für Apple Silicon gebaute Binary ein.
 
 :::
 
-### 9. Start the standalone server
+### 9. Eigenständigen Server starten
 
-Set credentials for the current Terminal session and assign the path to your downloaded or compiled binary:
+Setzen Sie die Zugangsdaten für die aktuelle Terminal-Sitzung und weisen Sie den Pfad zu Ihrer heruntergeladenen oder gebauten Binary zu:
 
 ```bash
 export RUSTFS_ACCESS_KEY="<your-access-key>"
@@ -178,72 +178,72 @@ export RUSTFS_BIN="$HOME/rustfs/bin/rustfs"
 	"$HOME/rustfs/data"
 ```
 
-For an Intel source build, replace `RUSTFS_BIN` with the binary path printed by `build-rustfs.sh`. Keep the Terminal window open while RustFS is running. Press `Control+C` to stop the server.
+Ersetzen Sie bei einem Intel-Quellcode-Build `RUSTFS_BIN` durch den Binary-Pfad, den `build-rustfs.sh` ausgibt. Lassen Sie das Terminal-Fenster geöffnet, solange RustFS läuft. Drücken Sie `Control+C`, um den Server anzuhalten.
 
-:::tip[Credential handling]
+:::tip[Umgang mit Zugangsdaten]
 
-Session environment variables avoid placing credentials directly in the command line. For repeated or automated use, prefer the `RUSTFS_ACCESS_KEY_FILE` and `RUSTFS_SECRET_KEY_FILE` environment variables and protect those files with macOS permissions.
+Sitzungs-Umgebungsvariablen vermeiden es, Zugangsdaten direkt in die Befehlszeile zu schreiben. Bevorzugen Sie für wiederholte oder automatisierte Nutzung die Umgebungsvariablen `RUSTFS_ACCESS_KEY_FILE` und `RUSTFS_SECRET_KEY_FILE` und schützen Sie diese Dateien mit macOS-Berechtigungen.
 
 :::
 
-### 10. Verify the standalone server
+### 10. Eigenständigen Server prüfen
 
-Open `http://localhost:9001` and sign in with the configured credentials. Use `http://localhost:9000` as the endpoint for S3-compatible clients. RustFS defaults to path-style addressing, so configure clients accordingly.
+Öffnen Sie `http://localhost:9001` und melden Sie sich mit den konfigurierten Zugangsdaten an. Verwenden Sie `http://localhost:9000` als Endpunkt für S3-kompatible Clients. RustFS verwendet standardmäßig pfadbasierte Adressierung (Path-Style). Konfigurieren Sie die Clients entsprechend.
 
-To perform an end-to-end check, create a bucket named `my-bucket`, upload `hello.txt`, and confirm that the object appears in the bucket.
+Prüfen Sie den Ablauf durchgehend: Legen Sie einen Bucket namens `my-bucket` an, laden Sie `hello.txt` hoch und prüfen Sie, dass das Objekt im Bucket erscheint.
 
-## Confirm a successful installation
+## Erfolgreiche Installation bestätigen
 
-Whether you used Launcher, an Apple Silicon binary, or an Intel source build, a successful Console sign-in opens the **Buckets** page.
+Nach der Anmeldung an der Console öffnet sich die Seite **Buckets**, unabhängig davon, ob Sie Launcher, eine Apple-Silicon-Binary oder einen Intel-Quellcode-Build verwendet haben.
 
-![RustFS Console Buckets page after a successful sign-in](../windows/images/rustfs-console-login.png)
+![Seite Buckets der RustFS Console nach erfolgreicher Anmeldung](../windows/images/rustfs-console-login.png)
 
-## Troubleshooting
+## Fehlerbehebung
 
-### macOS blocks the application or binary
+### macOS blockiert die Anwendung oder die Binary
 
-Verify that the file came from the official RustFS GitHub organization. For Launcher, allow the specific application under **System Settings > Privacy & Security**. For a standalone binary that macOS has quarantined, inspect the warning and verify the download source before changing its security attributes.
+Prüfen Sie, dass die Datei aus der offiziellen GitHub-Organisation von RustFS stammt. Erlauben Sie bei Launcher die konkrete Anwendung unter **System Settings > Privacy & Security**. Wenn macOS eine eigenständige Binary unter Quarantäne gestellt hat, lesen Sie die Warnung und prüfen Sie die Bezugsquelle, bevor Sie die Sicherheitsattribute ändern.
 
-### The binary architecture does not match
+### Die Architektur der Binary stimmt nicht überein
 
-Run `uname -m` and inspect the binary:
+Führen Sie `uname -m` aus und prüfen Sie die Binary:
 
 ```bash
 uname -m
 file "$RUSTFS_BIN"
 ```
 
-Use an AArch64 binary on Apple Silicon. On an Intel Mac, build releases after `v1.0.0-beta.9` from source for `x86_64-apple-darwin`.
+Verwenden Sie auf Apple Silicon eine AArch64-Binary. Bauen Sie auf einem Intel-Mac Releases nach `v1.0.0-beta.9` aus dem Quellcode für `x86_64-apple-darwin`.
 
-### The data path is rejected
+### Der Datenpfad wird abgelehnt
 
-Confirm that the directory exists and that your macOS account has read and write access. Launcher does not create the selected data directory for you.
+Prüfen Sie, dass das Verzeichnis existiert und Ihr macOS-Konto Lese- und Schreibzugriff hat. Launcher legt das gewählte Datenverzeichnis nicht für Sie an.
 
-### The API or Console port is unavailable
+### Der API- oder Console-Port ist nicht verfügbar
 
-The ports must be numbers from `1` to `65535`, must differ from each other, and must not already be in use. Inspect the default ports:
+Die Ports müssen Zahlen von `1` bis `65535` sein, sich voneinander unterscheiden und dürfen nicht bereits belegt sein. Prüfen Sie die Standardports:
 
 ```bash
 lsof -nP -iTCP:9000 -iTCP:9001 -sTCP:LISTEN
 ```
 
-Stop the conflicting application or select unused ports, then start RustFS again.
+Beenden Sie die kollidierende Anwendung oder wählen Sie freie Ports und starten Sie RustFS erneut.
 
-### The Console does not open
+### Die Console öffnet sich nicht
 
-For Launcher, confirm that **Console Endpoint** is enabled. For the standalone binary, confirm that the process is still running and that `--console-enable true` is present.
+Prüfen Sie bei Launcher, dass **Console Endpoint** aktiviert ist. Prüfen Sie bei der eigenständigen Binary, dass der Prozess noch läuft und `--console-enable true` gesetzt ist.
 
-### Launcher reports an external RustFS process
+### Launcher meldet einen externen RustFS-Prozess
 
-Another process is listening on the configured API address, but Launcher did not start it. Stop that process or choose another API port. Launcher cannot stop a process it does not manage.
+Ein anderer Prozess lauscht auf der konfigurierten API-Adresse, aber Launcher hat ihn nicht gestartet. Beenden Sie diesen Prozess oder wählen Sie einen anderen API-Port. Launcher kann einen Prozess nicht anhalten, den er nicht verwaltet.
 
-### RustFS exits after launch
+### RustFS beendet sich nach dem Start
 
-In Launcher, inspect both the application and RustFS tabs in the built-in log viewer. For a standalone installation, inspect the Terminal output. Common causes include a missing data directory, insufficient permissions, an architecture mismatch, or a port conflict.
+Prüfen Sie in Launcher beide Registerkarten, die der Anwendung und die von RustFS, in der integrierten Protokollanzeige. Prüfen Sie bei einer eigenständigen Installation die Terminal-Ausgabe. Häufige Ursachen sind ein fehlendes Datenverzeichnis, unzureichende Berechtigungen, eine abweichende Architektur oder ein Portkonflikt.
 
-## Next steps
+## Nächste Schritte
 
-- Review the [S3 API guide](/administration/protocols/s3) before connecting a client.
-- Learn how to [create a bucket](/administration/data/bucket/creation).
-- See [status checks](/operations/status-check) for additional verification methods.
-- Use the [Linux installation guides](/installation/linux) for a production-oriented deployment.
+- Lesen Sie die [S3-API-Anleitung](/de/administration/protocols/s3), bevor Sie einen Client verbinden.
+- Erfahren Sie, wie Sie [einen Bucket anlegen](/de/administration/data/bucket/creation).
+- Weitere Prüfmöglichkeiten finden Sie unter [Statusprüfungen](/de/operations/status-check).
+- Verwenden Sie die [Linux-Installationsanleitungen](/de/installation/linux) für eine auf den Produktivbetrieb ausgerichtete Bereitstellung.

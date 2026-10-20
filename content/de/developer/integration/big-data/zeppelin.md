@@ -1,13 +1,13 @@
 ---
 title: "Apache Zeppelin"
-description: "Store Apache Zeppelin notebooks in RustFS through the S3 notebook repository."
+description: "Speichern Sie Apache-Zeppelin-Notebooks über das S3-Notebook-Repository in RustFS."
 ---
 
-This guide connects [Apache Zeppelin](https://github.com/apache/zeppelin) — the web-based notebook for data analytics — to **RustFS** through Zeppelin's S3 notebook storage. You will start Zeppelin pointed at a RustFS bucket, create a note, and verify that the notebook file is stored in RustFS and survives a restart. The workflow was verified with `apache/zeppelin:0.12.0` and `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [Apache Zeppelin](https://github.com/apache/zeppelin) — das webbasierte Notebook für Datenanalyse — über Zeppelins S3-Notebook-Speicher mit **RustFS**. Sie starten Zeppelin mit einem RustFS-Bucket, legen eine Notiz an und prüfen, dass die Notebook-Datei in RustFS liegt und einen Neustart übersteht. Der Ablauf wurde mit `apache/zeppelin:0.12.0` und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Sie benötigen Docker. Diese Bereitstellung ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -15,18 +15,18 @@ flowchart LR
 	Z -->|".zpln files"| RustFS["RustFS :9000"]
 ```
 
-With the `S3NotebookRepo` storage class, every note is persisted as a `.zpln` JSON file under the `user/notebook/` prefix of the bucket. Zeppelin reads and writes the bucket directly, so notes survive container restarts and can be shared between instances.
+Mit der Speicherklasse `S3NotebookRepo` wird jede Notiz als JSON-Datei `.zpln` unter dem Präfix `user/notebook/` des Buckets persistiert. Zeppelin liest und schreibt den Bucket direkt, daher überstehen Notizen Container-Neustarts und lassen sich zwischen Instanzen teilen.
 
-## 1. Start Zeppelin
+## 1. Zeppelin starten
 
-Create an environment file and replace both credential placeholders:
+Legen Sie eine Umgebungsdatei an und ersetzen Sie beide Platzhalter für die Zugangsdaten:
 
 ```ini title=".env"
 AWS_ACCESS_KEY_ID=<your-access-key>
 AWS_SECRET_ACCESS_KEY=<your-secret-key>
 ```
 
-Start Zeppelin on the same Docker network as RustFS with the S3 storage settings:
+Starten Sie Zeppelin im selben Docker-Netzwerk wie RustFS mit den S3-Speichereinstellungen:
 
 ```bash
 docker run -d --name zeppelin --network oo-rustfs_default \
@@ -40,11 +40,11 @@ docker run -d --name zeppelin --network oo-rustfs_default \
   apache/zeppelin:0.12.0
 ```
 
-Zeppelin reads `ZEPPELIN_*` environment variables as configuration properties, so no `zeppelin-site.xml` edit is needed. This guide uses the existing `my-bucket`; notes land under its `user/notebook/` prefix, which the S3 storage creates on demand.
+Zeppelin liest Umgebungsvariablen `ZEPPELIN_*` als Konfigurationseigenschaften, daher ist keine Bearbeitung von `zeppelin-site.xml` nötig. Diese Anleitung verwendet den vorhandenen `my-bucket`. Notizen landen unter seinem Präfix `user/notebook/`, das der S3-Speicher bei Bedarf anlegt.
 
-## 2. Create a note
+## 2. Eine Notiz anlegen
 
-Wait for the UI on `http://localhost:8080`, then create a note named `rustfs-demo` in the notebook list and add a paragraph, or use the REST API:
+Warten Sie auf die Oberfläche unter `http://localhost:8080`, legen Sie dann in der Notebook-Liste eine Notiz namens `rustfs-demo` an und fügen Sie einen Absatz hinzu, oder verwenden Sie die REST-API:
 
 ```bash
 NOTE=$(curl -s -X POST "http://localhost:8080/api/notebook" \
@@ -53,57 +53,57 @@ NOTE=$(curl -s -X POST "http://localhost:8080/api/notebook" \
 echo "note id: $NOTE"
 ```
 
-## 3. Verify the notebook in RustFS
+## 3. Das Notebook in RustFS prüfen
 
-List the notebook prefix:
+Listen Sie das Notebook-Präfix auf:
 
 ```bash
 rc ls rustfs/my-bucket/user/notebook/ -r
 ```
 
-The note is stored as a JSON file named after the note and its ID:
+Die Notiz liegt als JSON-Datei, benannt nach der Notiz und ihrer ID:
 
 ```text
 user/notebook/rustfs-demo_2N4PY7UY5.zpln
 ```
 
-![Zeppelin notebooks stored in the RustFS Console](./images/rustfs-zeppelin-notebook.png)
+![In der RustFS-Console gespeicherte Zeppelin-Notebooks](./images/rustfs-zeppelin-notebook.png)
 
-Notes survive a restart because Zeppelin loads them from the bucket:
+Notizen überstehen einen Neustart, weil Zeppelin sie aus dem Bucket lädt:
 
 ```bash
 docker restart zeppelin
 curl -s "http://localhost:8080/api/notebook" | head -c 200
 ```
 
-The note list contains `2N4PY7UY5` again after the restart.
+Die Notizliste enthält `2N4PY7UY5` nach dem Neustart erneut.
 
-## 4. Stop or reset the deployment
+## 4. Die Bereitstellung stoppen oder zurücksetzen
 
-Stop Zeppelin while keeping the notes:
+Stoppen Sie Zeppelin und behalten Sie die Notizen:
 
 ```bash
 docker rm -f zeppelin
 ```
 
-The notes stay in the `user/notebook/` prefix of `my-bucket`. To delete them, remove the prefix:
+Die Notizen bleiben im Präfix `user/notebook/` von `my-bucket`. Um sie zu löschen, entfernen Sie das Präfix:
 
 ```bash
 rc rm rustfs/my-bucket/user/notebook/ --recursive --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
-### Zeppelin starts but notes never appear in the bucket
+### Zeppelin startet, Notizen erscheinen aber nie im Bucket
 
-Confirm the three `ZEPPELIN_NOTEBOOK_S3_*` variables are set and that the credentials environment variables reach the container — the S3 repository is initialized at startup, so the container must be recreated after any change.
+Prüfen Sie, dass die drei Variablen `ZEPPELIN_NOTEBOOK_S3_*` gesetzt sind und dass die Umgebungsvariablen der Zugangsdaten den Container erreichen. Das S3-Repository wird beim Start initialisiert, daher muss der Container nach jeder Änderung neu erstellt werden.
 
 ### `UnknownHostException: my-bucket.rustfs`
 
-The path-style flag was not picked up. Keep `ZEPPELIN_NOTEBOOK_S3_PATH_STYLE_ACCESS=true` exactly as shown; with path-style disabled Zeppelin treats the bucket as a hostname.
+Das Flag für pfadbasierte Adressierung (Path-Style) wurde nicht übernommen. Belassen Sie `ZEPPELIN_NOTEBOOK_S3_PATH_STYLE_ACCESS=true` genau wie gezeigt. Ist die pfadbasierte Adressierung deaktiviert, behandelt Zeppelin den Bucket als Hostnamen.
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Zeppelin operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Zeppelin storage documentation](https://zeppelin.apache.org/docs/latest/setup/storage/storage.html#notebook-storage-in-s3) to organize notes in per-user prefixes.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere Zeppelin-Operationen einsetzen.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [Zeppelin-Speicherdokumentation](https://zeppelin.apache.org/docs/latest/setup/storage/storage.html#notebook-storage-in-s3), um Notizen in Präfixen je Benutzer zu organisieren.

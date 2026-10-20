@@ -1,13 +1,13 @@
 ---
 title: "lakeFS"
-description: "Run lakeFS with RustFS as its S3 blockstore for versioned data lakes."
+description: "Betreiben Sie lakeFS mit RustFS als S3-Blockstore für versionierte Data Lakes."
 ---
 
-This guide connects [lakeFS](https://github.com/treeverse/lakeFS) — the Git-like data lake versioning layer — to **RustFS** as its S3 blockstore. You will start lakeFS, create a repository whose storage namespace points at a RustFS bucket, commit an object, and verify that the lakeFS metadata and data files live in RustFS. The workflow was verified with `treeverse/lakefs:1.58.0` and `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [lakeFS](https://github.com/treeverse/lakeFS) — die Git-ähnliche Versionierungsschicht für Data Lakes — mit **RustFS** als S3-Blockstore. Sie starten lakeFS, legen ein Repository an, dessen Storage-Namespace auf einen RustFS-Bucket zeigt, committen ein Objekt und prüfen, dass die Metadaten und Datendateien von lakeFS in RustFS liegen. Der Ablauf wurde mit `treeverse/lakefs:1.58.0` und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Sie benötigen Docker. Diese Bereitstellung ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -15,11 +15,11 @@ flowchart LR
 	LakeFS -->|"metadata + data"| RustFS["RustFS :9000"]
 ```
 
-lakeFS stores repository metadata and committed data files in the blockstore under the storage namespace. The bucket holds one `repo/` prefix containing `_lakefs/` metadata and `data/` objects; lakeFS reads and writes them through the S3 API.
+lakeFS speichert Repository-Metadaten und committete Datendateien im Blockstore unter dem Storage-Namespace. Der Bucket enthält ein Präfix `repo/` mit Metadaten `_lakefs/` und Objekten `data/`. lakeFS liest und schreibt sie über die S3-API.
 
-## 1. Create the project files
+## 1. Projektdateien anlegen
 
-Create the bucket, then the lakeFS configuration:
+Legen Sie den Bucket an und danach die lakeFS-Konfiguration:
 
 ```bash
 rc alias set rustfs http://<your-rustfs-endpoint>:9000 <your-access-key> <your-secret-key>
@@ -52,9 +52,9 @@ logging:
   level: info
 ```
 
-`force_path_style: true` is required — without it lakeFS builds `lakefs-data.<hostname>` as a hostname and every request fails with a DNS error. The credentials are supplied through the standard `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables.
+`force_path_style: true` erzwingt pfadbasierte Adressierung (Path-Style) und ist erforderlich. Ohne diesen Wert baut lakeFS `lakefs-data.<hostname>` als Hostnamen, und jede Anfrage scheitert mit einem DNS-Fehler. Die Zugangsdaten kommen über die üblichen Umgebungsvariablen `AWS_ACCESS_KEY_ID` und `AWS_SECRET_ACCESS_KEY`.
 
-Create the environment file for the service credentials and the initial admin user, replacing the placeholders:
+Legen Sie die Umgebungsdatei für die Dienst-Zugangsdaten und den ersten Admin-Benutzer an und ersetzen Sie die Platzhalter:
 
 ```ini title=".env"
 AWS_ACCESS_KEY_ID=<your-access-key>
@@ -65,7 +65,7 @@ LAKEFS_INSTALLATION_SECRET_ACCESS_KEY=<your-lakefs-secret-key>
 LAKEFS_STATS_ENABLED=false
 ```
 
-## 2. Start lakeFS
+## 2. lakeFS starten
 
 ```bash
 docker run -d --name lakefs --network oo-rustfs_default \
@@ -75,7 +75,7 @@ docker run -d --name lakefs --network oo-rustfs_default \
   treeverse/lakefs:1.58.0 run
 ```
 
-Wait for `http://localhost:8000/api/healthcheck` to return `200`, then create a repository with a storage namespace inside the bucket:
+Warten Sie, bis `http://localhost:8000/api/healthcheck` `200` zurückgibt, und legen Sie dann ein Repository mit einem Storage-Namespace im Bucket an:
 
 ```bash
 curl -s -u <your-lakefs-access-key>:<your-lakefs-secret-key> \
@@ -84,9 +84,9 @@ curl -s -u <your-lakefs-access-key>:<your-lakefs-secret-key> \
   -d '{"name": "rustfs-demo", "storage_namespace": "s3://lakefs-data/repo"}'
 ```
 
-## 3. Commit an object
+## 3. Ein Objekt committen
 
-Upload a file to the `main` branch and commit it:
+Laden Sie eine Datei auf den Branch `main` hoch und committen Sie sie:
 
 ```bash
 echo "hello from lakefs on rustfs" > hello.txt
@@ -101,60 +101,60 @@ curl -s -u <your-lakefs-access-key>:<your-lakefs-secret-key> \
   -d '{"message": "add hello"}'
 ```
 
-Read the object back through the branch ref — the response body is the committed content:
+Lesen Sie das Objekt über die Branch-Referenz zurück. Der Antwortkörper ist der committete Inhalt:
 
 ```bash
 curl -s -u <your-lakefs-access-key>:<your-lakefs-secret-key> \
   "http://localhost:8000/api/v1/repositories/rustfs-demo/refs/main/objects?path=hello.txt"
 ```
 
-## 4. Verify objects in RustFS
+## 4. Objekte in RustFS prüfen
 
-List the bucket:
+Listen Sie den Bucket auf:
 
 ```bash
 rc ls rustfs/lakefs-data/ -r
 ```
 
-The output shows the lakeFS metadata objects and the committed data file under the repository prefix:
+Die Ausgabe zeigt die Metadatenobjekte von lakeFS und die committete Datendatei unter dem Repository-Präfix:
 
 ```text
 repo/_lakefs/19b2b26e37cb20fc6763c527f88eb5151891b04a2c8c9ddd32870c5c3f353281
 repo/data/fueia10jdra000e1c480/daots7ojdra000e1c490
 ```
 
-![lakeFS objects stored in the RustFS Console](./images/rustfs-lakefs-repo.png)
+![In der RustFS-Console gespeicherte lakeFS-Objekte](./images/rustfs-lakefs-repo.png)
 
-## 5. Stop or reset the deployment
+## 5. Die Bereitstellung stoppen oder zurücksetzen
 
-Stop lakeFS while keeping the data:
+Stoppen Sie lakeFS und behalten Sie die Daten:
 
 ```bash
 docker rm -f lakefs
 ```
 
-The repository metadata and data stay in the `lakefs-data` bucket, so restarting lakeFS with the same configuration brings the repository back. To delete everything, remove the bucket:
+Die Repository-Metadaten und die Daten bleiben im Bucket `lakefs-data`, daher bringt ein Neustart von lakeFS mit derselben Konfiguration das Repository zurück. Um alles zu löschen, entfernen Sie den Bucket:
 
 ```bash
 rc rb rustfs/lakefs-data --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
-### `failed to create repository: failed to access storage` with a DNS error
+### `failed to create repository: failed to access storage` mit einem DNS-Fehler
 
-lakeFS is using virtual-hosted addressing. Set `force_path_style: true` under `blockstore.s3` — in the 1.x configuration schema the older `path_style` key is rejected at startup.
+lakeFS verwendet Adressierung im Virtual-Hosted-Stil. Setzen Sie `force_path_style: true` unter `blockstore.s3`. Im Konfigurationsschema 1.x wird der ältere Schlüssel `path_style` beim Start abgelehnt.
 
 ### `missing required keys: [auth.encrypt.secret_key]`
 
-lakeFS 1.x requires an encryption key for the local database. Add the `auth.encrypt.secret_key` block as shown in the configuration above.
+lakeFS 1.x verlangt einen Verschlüsselungsschlüssel für die lokale Datenbank. Fügen Sie den Block `auth.encrypt.secret_key` wie in der Konfiguration oben hinzu.
 
 ### `mkdir /lakefs: permission denied`
 
-The container runs as a non-root user and cannot create the database directory. Run the container with `-u 0` for local testing, or mount a writable directory at the configured path.
+Der Container läuft als Benutzer ohne Root-Rechte und kann das Datenbankverzeichnis nicht anlegen. Starten Sie den Container für lokale Tests mit `-u 0`, oder hängen Sie ein beschreibbares Verzeichnis am konfigurierten Pfad ein.
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional lakeFS operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [lakeFS S3 blockstore documentation](https://docs.lakefs.io/howto/using-s3.html) to configure the S3 gateway for tools that speak the S3 protocol.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere lakeFS-Operationen einsetzen.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [lakeFS-Dokumentation zum S3-Blockstore](https://docs.lakefs.io/howto/using-s3.html), um das S3-Gateway für Werkzeuge zu konfigurieren, die das S3-Protokoll sprechen.

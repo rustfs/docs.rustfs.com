@@ -1,13 +1,13 @@
 ---
 title: "Thanos"
-description: "Run Thanos with RustFS as the S3 object storage backend for Prometheus blocks, deployed with Docker Compose."
+description: "Betreiben Sie Thanos mit RustFS als S3-Objektspeicher-Backend für Prometheus-Blöcke, bereitgestellt mit Docker Compose."
 ---
 
-This guide connects [Thanos](https://github.com/thanos-io/thanos) — the highly available Prometheus setup with long-term storage — to **RustFS** as its object store. You will run Prometheus with a Thanos sidecar that uploads TSDB blocks to RustFS, then query the historical data back through a Store Gateway and a Query frontend. The workflow was verified with `thanosio/thanos:v0.37.2`, `prom/prometheus:v2.53.1`, and `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [Thanos](https://github.com/thanos-io/thanos) — die hochverfügbare Prometheus-Einrichtung mit Langzeitspeicher — mit **RustFS** als Objektspeicher. Sie betreiben Prometheus mit einem Thanos-Sidecar, der TSDB-Blöcke nach RustFS hochlädt, und fragen die historischen Daten anschließend über ein Store Gateway und ein Query-Frontend ab. Der Ablauf wurde mit `thanosio/thanos:v0.37.2`, `prom/prometheus:v2.53.1` und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker with the Compose plugin. This deployment is intended for local integration testing, not production.
+Sie benötigen Docker mit dem Compose-Plugin. Dieses Setup ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -18,27 +18,27 @@ flowchart LR
 	Query -->|gRPC| Store
 ```
 
-The sidecar watches the Prometheus TSDB directory and uploads every two-hour block to the `thanos-data` bucket in RustFS. The Store Gateway reads the same bucket and answers queries about historical blocks, so Query resolves both live data through the sidecar and old data through the Store Gateway.
+Der Sidecar beobachtet das Prometheus-TSDB-Verzeichnis und lädt jeden Zwei-Stunden-Block in den Bucket `thanos-data` in RustFS hoch. Das Store Gateway liest denselben Bucket und beantwortet Abfragen zu historischen Blöcken. Query bezieht damit sowohl die Live-Daten über den Sidecar als auch die älteren Daten über das Store Gateway.
 
-## 1. Create the project files
+## 1. Projektdateien anlegen
 
-Create a working directory:
+Erstellen Sie ein Arbeitsverzeichnis:
 
 ```bash
 mkdir rustfs-thanos
 cd rustfs-thanos
 ```
 
-Create an environment file and replace both credential placeholders:
+Erstellen Sie eine Umgebungsdatei und ersetzen Sie beide Platzhalter für die Zugangsdaten:
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Use dedicated credentials for the `thanos-data` bucket. Do not commit `.env` to source control.
+Verwenden Sie dedizierte Zugangsdaten für den Bucket `thanos-data`. Nehmen Sie `.env` nicht in die Versionsverwaltung auf.
 
-Create the Prometheus configuration with an external label — Thanos requires it to deduplicate blocks:
+Erstellen Sie die Prometheus-Konfiguration mit einem externen Label. Thanos benötigt es, um Blöcke zu deduplizieren:
 
 ```yaml title="prometheus.yml"
 global:
@@ -56,7 +56,7 @@ scrape_configs:
       - targets: ["rustfs:9000"]
 ```
 
-Create the Thanos object store configuration:
+Erstellen Sie die Objektspeicher-Konfiguration von Thanos:
 
 ```yaml title="bucket.yml"
 type: S3
@@ -68,13 +68,13 @@ config:
   insecure: true
 ```
 
-Thanos does not interpolate `.env` files itself. Before starting the stack, replace the placeholders with the same values you set in `.env`:
+Thanos interpoliert `.env`-Dateien nicht selbst. Ersetzen Sie die Platzhalter vor dem Start des Stacks durch dieselben Werte wie in `.env`:
 
 ```bash
 sed -i.bak "s|\${RUSTFS_ACCESS_KEY}|$(grep RUSTFS_ACCESS_KEY .env | cut -d= -f2)|;s|\${RUSTFS_SECRET_KEY}|$(grep RUSTFS_SECRET_KEY .env | cut -d= -f2)|" bucket.yml
 ```
 
-Create the Compose file:
+Erstellen Sie die Compose-Datei:
 
 ```yaml title="compose.yaml"
 services:
@@ -189,47 +189,47 @@ volumes:
   store-data:
 ```
 
-The `--storage.tsdb.min-block-duration` and `--storage.tsdb.max-block-duration` flags disable Prometheus compaction. The sidecar refuses to ship blocks from a compacting TSDB because the local blocks would no longer match the uploaded ones.
+Die Flags `--storage.tsdb.min-block-duration` und `--storage.tsdb.max-block-duration` deaktivieren die Prometheus-Kompaktierung. Der Sidecar überträgt keine Blöcke aus einer kompaktierenden TSDB, weil die lokalen Blöcke dann nicht mehr zu den hochgeladenen passen würden.
 
-## 2. Validate and start the deployment
+## 2. Bereitstellung prüfen und starten
 
-Resolve the Compose file before starting containers:
+Prüfen Sie die Compose-Datei, bevor Sie Container starten:
 
 ```bash
 docker compose config
 ```
 
-Start the stack and wait until the sidecar reports itself ready:
+Starten Sie den Stack und warten Sie, bis der Sidecar sich als bereit meldet:
 
 ```bash
 docker compose up -d
 docker compose logs sidecar | grep -m1 "status=ready"
 ```
 
-Check that the sidecar picked up the Prometheus external labels:
+Prüfen Sie, dass der Sidecar die externen Labels von Prometheus übernommen hat:
 
 ```bash
 docker compose logs sidecar | grep "external labels"
 ```
 
-The Thanos Query UI answers on `http://localhost:9091`, and the RustFS Console runs at `http://localhost:9001`.
+Die Thanos-Query-Oberfläche antwortet unter `http://localhost:9091`, die RustFS Console (Weboberfläche) läuft unter `http://localhost:9001`.
 
-## 3. Upload a block to RustFS
+## 3. Block nach RustFS hochladen
 
-The sidecar uploads a block when Prometheus compacts one, which happens at a two-hour block boundary. To produce a block immediately, snapshot the TSDB through the admin API — with compaction disabled, the sidecar ships the head-block snapshot directly:
+Der Sidecar lädt einen Block hoch, wenn Prometheus einen kompaktiert. Das geschieht an einer Blockgrenze von zwei Stunden. Um sofort einen Block zu erzeugen, erstellen Sie einen Snapshot der TSDB über die Admin-API. Bei deaktivierter Kompaktierung liefert der Sidecar den Snapshot des Head-Blocks direkt aus:
 
 ```bash
 curl -s -XPOST http://localhost:9090/api/v1/admin/tsdb/snapshot | head -c 200
 ```
 
-Wait for the upload, then check the shipper state inside Prometheus:
+Warten Sie auf den Upload und prüfen Sie anschließend den Shipper-Zustand in Prometheus:
 
 ```bash
 sleep 60
 docker compose exec prometheus cat /prometheus/thanos.shipper.json
 ```
 
-The `uploaded` list should contain a block ID:
+Die Liste `uploaded` sollte eine Block-ID enthalten:
 
 ```json
 {
@@ -240,15 +240,15 @@ The `uploaded` list should contain a block ID:
 }
 ```
 
-## 4. Query historical data from RustFS
+## 4. Historische Daten aus RustFS abfragen
 
-The Store Gateway periodically syncs the bucket. Confirm it downloaded the uploaded block:
+Das Store Gateway synchronisiert den Bucket regelmäßig. Prüfen Sie, dass es den hochgeladenen Block heruntergeladen hat:
 
 ```bash
 docker compose logs store | grep "loaded new block"
 ```
 
-Query a series through the Query frontend over the block's time range:
+Fragen Sie eine Zeitreihe über das Query-Frontend im Zeitbereich des Blocks ab:
 
 ```bash
 START=$(date -u -d '2 hours ago' +%s)
@@ -256,17 +256,17 @@ END=$(date -u +%s)
 curl -s "http://localhost:9091/api/v1/query_range?query=up%7Bjob%3D%22prometheus%22%7D&start=$START&end=$END&step=30" | head -c 300
 ```
 
-The Store Gateway serves the response from the blocks it downloaded from RustFS, while the sidecar answers for the live head — both paths resolve through the same Query endpoint.
+Das Store Gateway liefert die Antwort aus den Blöcken, die es aus RustFS heruntergeladen hat. Der Sidecar beantwortet den Live-Head. Beide Pfade laufen über denselben Query-Endpunkt.
 
-## 5. Verify objects in RustFS
+## 5. Objekte in RustFS prüfen
 
-List the bucket:
+Listen Sie den Bucket auf:
 
 ```bash
 docker compose exec rustfs /usr/bin/rc ls local/thanos-data/ -r
 ```
 
-Each block is stored as three objects — the chunk files, the index, and `meta.json`:
+Jeder Block wird als drei Objekte gespeichert: die Chunk-Dateien, der Index und `meta.json`:
 
 ```text
 01M31EPTZC5E0SETZTP0SPFY79/chunks/000001
@@ -274,38 +274,38 @@ Each block is stored as three objects — the chunk files, the index, and `meta.
 01M31EPTZC5E0SETZTP0SPFY79/meta.json
 ```
 
-![Thanos blocks stored in the RustFS Console](./images/rustfs-thanos-blocks.png)
+![In der RustFS Console gespeicherte Thanos-Blöcke](./images/rustfs-thanos-blocks.png)
 
-## 6. Stop or reset the deployment
+## 6. Bereitstellung anhalten oder zurücksetzen
 
-Stop the containers while keeping all data:
+Stoppen Sie die Container und behalten Sie alle Daten:
 
 ```bash
 docker compose down
 ```
 
-The RustFS volume keeps the uploaded blocks, so the Store Gateway serves historical queries again after a restart. To delete everything, including the blocks in RustFS, add `--volumes`.
+Das RustFS-Volume behält die hochgeladenen Blöcke, daher beantwortet das Store Gateway historische Abfragen nach einem Neustart erneut. Um alles zu löschen, einschließlich der Blöcke in RustFS, fügen Sie `--volumes` hinzu.
 
-## Troubleshooting
+## Fehlerbehebung
 
-### The sidecar logs `Compaction needs to be disabled`
+### Der Sidecar protokolliert `Compaction needs to be disabled`
 
-Prometheus must run with `--storage.tsdb.min-block-duration` equal to `--storage.tsdb.max-block-duration` — set both to `2h` as shown in the Compose file. Otherwise the sidecar cannot guarantee that local blocks stay unchanged and refuses to upload.
+Prometheus muss mit `--storage.tsdb.min-block-duration` gleich `--storage.tsdb.max-block-duration` laufen. Setzen Sie beide wie in der Compose-Datei auf `2h`. Andernfalls kann der Sidecar nicht garantieren, dass lokale Blöcke unverändert bleiben, und verweigert den Upload.
 
 ### `The specified bucket does not exist`
 
-Thanos does not create buckets. Check that the `create-bucket` service completed successfully:
+Thanos legt keine Buckets an. Prüfen Sie, dass der Dienst `create-bucket` erfolgreich abgeschlossen wurde:
 
 ```bash
 docker compose logs create-bucket
 ```
 
-### Queries return no historical data
+### Abfragen liefern keine historischen Daten
 
-Confirm that the Store Gateway has loaded at least one block (`docker compose logs store | grep "loaded new block"`) and that your query time range falls inside the uploaded block's window — check the block's `meta.json` in the RustFS Console for `minTime` and `maxTime`.
+Stellen Sie sicher, dass das Store Gateway mindestens einen Block geladen hat (`docker compose logs store | grep "loaded new block"`) und dass der Zeitbereich Ihrer Abfrage im Fenster des hochgeladenen Blocks liegt. Prüfen Sie in `meta.json` des Blocks in der RustFS Console die Werte `minTime` und `maxTime`.
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Thanos components.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Thanos documentation](https://thanos.io/tip/thanos/getting-started.md) to add Compactor, Ruler, or Receive for a production topology.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere Thanos-Komponenten verwenden.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [Thanos-Dokumentation](https://thanos.io/tip/thanos/getting-started.md), um Compactor, Ruler oder Receive für eine Produktivtopologie hinzuzufügen.

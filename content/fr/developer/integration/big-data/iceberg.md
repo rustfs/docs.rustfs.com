@@ -1,21 +1,21 @@
 ---
 title: "Apache Iceberg"
-description: "Run Apache Iceberg with Spark, a REST catalog, and RustFS object storage using Docker Compose."
+description: "Exécutez Apache Iceberg avec Spark, un catalogue REST et le stockage objet RustFS, à l’aide de Docker Compose."
 ---
 
-This guide runs **Apache Iceberg** with Spark, an Iceberg REST catalog, and **RustFS** as the S3-compatible warehouse. You will create an Iceberg table, write rows, query them, and verify that the table files are stored in RustFS.
+Ce guide exécute **Apache Iceberg** avec Spark, un catalogue REST Iceberg et **RustFS** comme entrepôt compatible avec S3. Vous allez créer une table Iceberg, écrire des lignes, les interroger et vérifier que les fichiers de la table sont stockés dans RustFS.
 
-Pour utiliser le catalogue REST intégré à RustFS, suivez la [configuration de S3 Tables](/administration/data/s3-tables) et le [guide PyIceberg](/developer/integration/big-data/pyiceberg). Le déploiement ci-dessous exécute un service de catalogue séparé.
+Pour utiliser le catalogue REST intégré à RustFS, suivez la [configuration de S3 Tables](/fr/administration/data/s3-tables) et le [guide PyIceberg](/fr/developer/integration/big-data/pyiceberg). Le déploiement ci-dessous exécute un service de catalogue distinct.
 
-You need Docker with the Compose plugin and enough local resources to run four containers. This deployment is intended for local integration testing, not production.
+Vous avez besoin de Docker avec le plugin Compose et de ressources locales suffisantes pour quatre conteneurs. Ce déploiement est destiné à un test d’intégration local, pas à la production.
 
-:::note[Upstream status]
+:::note[État en amont]
 
-Apache Iceberg [PR #14928](https://github.com/apache/iceberg/pull/14928) demonstrated the same Spark, REST catalog, `S3FileIO`, and RustFS workflow, including table creation and writes. The pull request was closed without merging, and the current [Spark quickstart](https://iceberg.apache.org/spark-quickstart/#docker-compose) still uses another S3-compatible store. The configuration below therefore documents a RustFS integration rather than an Apache Iceberg default.
+La [demande d’intégration n° 14928](https://github.com/apache/iceberg/pull/14928) d’Apache Iceberg a démontré le même flux Spark, catalogue REST, `S3FileIO` et RustFS, y compris la création de table et les écritures. Cette demande a été fermée sans être fusionnée, et le [guide de démarrage Spark](https://iceberg.apache.org/spark-quickstart/#docker-compose) actuel utilise encore un autre stockage compatible avec S3. La configuration ci-dessous documente donc une intégration RustFS, et non un réglage par défaut d’Apache Iceberg.
 
 :::
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -25,27 +25,27 @@ flowchart LR
 	Init["Bucket initializer"] -->|Create my-bucket| RustFS
 ```
 
-Spark uses the REST service for catalog operations. Both Spark and the REST catalog receive the RustFS endpoint, region, credentials, and path-style setting so they can access metadata and data files in `s3://my-bucket/warehouse`.
+Spark utilise le service REST pour les opérations de catalogue. Spark et le catalogue REST reçoivent le point de terminaison RustFS, la région, les identifiants et le réglage d’adressage de type chemin, afin d’accéder aux fichiers de métadonnées et de données dans `s3://my-bucket/warehouse`.
 
-## 1. Create the project files
+## 1. Créer les fichiers du projet
 
-Create a working directory:
+Créez un répertoire de travail :
 
 ```bash
 mkdir rustfs-iceberg
 cd rustfs-iceberg
 ```
 
-Create an environment file and replace both credential placeholders:
+Créez un fichier d’environnement et remplacez les deux valeurs d’identifiants indicatives :
 
 ```ini title=".env"
 RUSTFS_ACCESS_KEY=<your-access-key>
 RUSTFS_SECRET_KEY=<your-secret-key>
 ```
 
-Use dedicated credentials for the warehouse bucket. Do not commit `.env` to source control.
+Utilisez des identifiants dédiés pour le compartiment de l’entrepôt. N’ajoutez pas le fichier `.env` au dépôt (ne le versionnez pas).
 
-Create the Spark catalog configuration:
+Créez la configuration du catalogue Spark :
 
 ```ini title="spark-defaults.conf"
 spark.sql.extensions org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions
@@ -60,9 +60,9 @@ spark.sql.defaultCatalog demo
 spark.sql.catalogImplementation in-memory
 ```
 
-Path-style access is required for this container-network endpoint. The hostname `rustfs` is resolvable only inside the Compose network; clients running on the host use `http://localhost:9000` instead.
+L’adressage de type chemin est requis pour ce point de terminaison du réseau de conteneurs. Le nom d’hôte `rustfs` n’est résolu qu’à l’intérieur du réseau Compose ; les clients exécutés sur l’hôte utilisent `http://localhost:9000`.
 
-Create the Compose file:
+Créez le fichier Compose :
 
 ```yaml title="compose.yaml"
 services:
@@ -148,46 +148,46 @@ volumes:
   rustfs-data:
 ```
 
-The [`rc` image](https://github.com/rustfs/cli) provides the official RustFS command-line client. The initializer checks for `my-bucket` before creating it, so repeated starts do not delete existing warehouse data. The RustFS volume preserves warehouse objects across container recreation.
+L’[image `rc`](https://github.com/rustfs/cli) fournit le client en ligne de commande officiel de RustFS. L’initialiseur vérifie l’existence de `my-bucket` avant de le créer, afin que des redémarrages répétés ne suppriment pas les données d’entrepôt existantes. Le volume RustFS conserve les objets de l’entrepôt lorsque les conteneurs sont recréés.
 
-:::warning[Image versions]
+:::warning[Versions d’images]
 
-The Apache Iceberg quickstart images are published without stable version tags in the upstream example. Before using this pattern beyond local testing, pin every image to a tested tag or digest and validate the Spark, Iceberg runtime, and REST catalog versions together.
+Les images du guide de démarrage Apache Iceberg sont publiées sans étiquettes de version stables dans l’exemple en amont. Avant d’utiliser ce modèle au-delà d’un test local, épinglez chaque image sur une étiquette ou une empreinte testée, et validez ensemble les versions de Spark, du moteur Iceberg et du catalogue REST.
 
 :::
 
-## 2. Validate and start the deployment
+## 2. Valider et démarrer le déploiement
 
-Resolve the Compose file before starting containers:
+Résolvez le fichier Compose avant de démarrer les conteneurs :
 
 ```bash
 docker compose config
 ```
 
-Start the services and wait for the bucket initializer to finish:
+Démarrez les services et attendez la fin de l’initialisation du compartiment :
 
 ```bash
 docker compose up -d
 docker compose ps -a
 ```
 
-The `create-bucket` service should show an exit code of `0`. Check its logs if it does not complete:
+Le service `create-bucket` devrait afficher un code de sortie `0`. Consultez ses journaux s’il ne se termine pas :
 
 ```bash
 docker compose logs create-bucket
 ```
 
-Open the RustFS Console at `http://localhost:9001`. The REST catalog is available at `http://localhost:8181`, and the Spark notebook server is available at `http://localhost:8888`.
+Ouvrez la Console RustFS à l’adresse `http://localhost:9001`. Le catalogue REST est disponible à l’adresse `http://localhost:8181`, et le serveur de notebooks Spark à l’adresse `http://localhost:8888`.
 
-## 3. Create and query an Iceberg table
+## 3. Créer une table Iceberg et l’interroger
 
-Start Spark SQL:
+Démarrez Spark SQL :
 
 ```bash
 docker compose exec spark-iceberg spark-sql
 ```
 
-Create a namespace and a partitioned table:
+Créez un espace de noms et une table partitionnée :
 
 ```sql
 CREATE NAMESPACE IF NOT EXISTS demo.nyc;
@@ -203,7 +203,7 @@ CREATE TABLE demo.nyc.taxis
 PARTITIONED BY (vendor_id);
 ```
 
-Insert and query sample rows:
+Insérez des lignes d’exemple, puis interrogez-les :
 
 ```sql
 INSERT INTO demo.nyc.taxis
@@ -216,7 +216,7 @@ VALUES
 SELECT * FROM demo.nyc.taxis ORDER BY trip_id;
 ```
 
-The query should return four rows:
+La requête devrait renvoyer quatre lignes :
 
 ```text
 1  1000371  1.8  15.32  N
@@ -225,51 +225,51 @@ The query should return four rows:
 1  1000374  8.4  42.13  Y
 ```
 
-## 4. Verify objects in RustFS
+## 4. Vérifier les objets dans RustFS
 
-List the warehouse from the bucket-initializer image:
+Listez l’entrepôt depuis l’image d’initialisation du compartiment :
 
 ```bash
 docker compose run --rm --entrypoint /bin/sh create-bucket -c \
   '/usr/bin/rc alias set rustfs http://rustfs:9000 "$RUSTFS_ACCESS_KEY" "$RUSTFS_SECRET_KEY" >/dev/null && /usr/bin/rc find rustfs/my-bucket/warehouse'
 ```
 
-The output should include Iceberg metadata and data objects below the `warehouse/nyc/taxis` prefix. You can also inspect the `my-bucket` bucket in the RustFS Console.
+La sortie devrait inclure des objets de métadonnées et de données Iceberg sous le préfixe `warehouse/nyc/taxis`. Vous pouvez aussi inspecter le compartiment `my-bucket` dans la Console RustFS.
 
-## 5. Stop or reset the stack
+## 5. Arrêter ou réinitialiser la pile
 
-Stop the containers while keeping the RustFS data volume:
+Arrêtez les conteneurs tout en conservant le volume de données RustFS :
 
 ```bash
 docker compose down
 ```
 
-To delete the local warehouse and start from an empty RustFS volume, explicitly include `--volumes`:
+Pour supprimer l’entrepôt local et repartir d’un volume RustFS vide, ajoutez explicitement `--volumes` :
 
 ```bash
 docker compose down --volumes
 ```
 
-## Troubleshooting
+## Dépannage
 
-### Spark cannot reach RustFS
+### Spark n’atteint pas RustFS
 
-Use `http://rustfs:9000` inside Compose. `http://localhost:9000` refers to the Spark container itself when used in `spark-defaults.conf`.
+Dans Compose, utilisez `http://rustfs:9000`. Dans `spark-defaults.conf`, `http://localhost:9000` désigne le conteneur Spark lui-même.
 
-Confirm that `spark.sql.catalog.demo.s3.path-style-access` is `true`. Virtual-hosted requests require additional RustFS domain and DNS configuration.
+Vérifiez que `spark.sql.catalog.demo.s3.path-style-access` vaut `true`. Les requêtes en adressage de type hôte virtuel exigent une configuration de domaine et de DNS RustFS supplémentaire.
 
-### The catalog returns an S3 error
+### Le catalogue renvoie une erreur S3
 
-Check that the credentials in `.env` match the RustFS credentials and that the `create-bucket` service completed successfully:
+Vérifiez que les identifiants de `.env` correspondent aux identifiants RustFS et que le service `create-bucket` s’est terminé avec succès :
 
 ```bash
 docker compose logs create-bucket rest
 ```
 
-The REST catalog property uses doubled underscores in `CATALOG_IO__IMPL` and `CATALOG_S3_PATH__STYLE__ACCESS`; the fixture converts them to the dotted and hyphenated Iceberg property names.
+La propriété du catalogue REST utilise des doubles traits de soulignement dans `CATALOG_IO__IMPL` et `CATALOG_S3_PATH__STYLE__ACCESS` ; l’image de test les convertit en noms de propriétés Iceberg à points et à traits d’union.
 
-## Next steps
+## Étapes suivantes
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Iceberg operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Apache Iceberg Spark documentation](https://iceberg.apache.org/docs/latest/spark-getting-started/) to configure your existing Spark environment.
+- Consultez les [notes de compatibilité S3](/fr/administration/protocols/s3) avant d’adopter d’autres opérations Iceberg.
+- Créez des identifiants de production dédiés avec la [gestion des clés d’accès](/fr/security-compliance/iam/access-token).
+- Suivez la [documentation Spark d’Apache Iceberg](https://iceberg.apache.org/docs/latest/spark-getting-started/) pour configurer votre environnement Spark existant.

@@ -1,13 +1,13 @@
 ---
 title: "Kopia"
-description: "Back up files to RustFS with Kopia's S3 repository backend."
+description: "Sichern Sie Dateien mit dem S3-Repository-Backend von Kopia in RustFS."
 ---
 
-This guide connects [Kopia](https://github.com/kopia/kopia) — the open-source backup and restore tool — to **RustFS** as an S3 repository. You will create a repository in a RustFS bucket, take a snapshot of a directory, restore it into an empty directory, and compare checksums. The workflow was verified with `kopia/kopia:0.18.1` and `rustfs/rustfs-x86-musl:v2.3.1`.
+In dieser Anleitung verbinden Sie [Kopia](https://github.com/kopia/kopia) — das quelloffene Werkzeug für Backup und Wiederherstellung — mit **RustFS** als S3-Repository. Sie legen ein Repository in einem RustFS-Bucket an, erstellen einen Snapshot eines Verzeichnisses, stellen ihn in einem leeren Verzeichnis wieder her und vergleichen die Prüfsummen. Der Ablauf wurde mit `kopia/kopia:0.18.1` und `rustfs/rustfs-x86-musl:v2.3.1` verifiziert.
 
-You need Docker. This deployment is intended for local integration testing, not production.
+Sie benötigen Docker. Dieses Setup ist für lokale Integrationstests gedacht, nicht für den Produktivbetrieb.
 
-## Architecture
+## Architektur
 
 ```mermaid
 flowchart LR
@@ -16,11 +16,11 @@ flowchart LR
 	Kopia -->|restore| Restore["Restored files"]
 ```
 
-Kopia stores the repository format files and deduplicated, encrypted content blocks in the bucket. Restores read the blocks back and reassemble the original files, so the checksum of every restored file must match the source.
+Kopia speichert die Formatdateien des Repositorys und die deduplizierten, verschlüsselten Inhaltsblöcke im Bucket. Die Wiederherstellung liest die Blöcke zurück und setzt die ursprünglichen Dateien wieder zusammen. Die Prüfsumme jeder wiederhergestellten Datei muss mit der Quelle übereinstimmen.
 
-## 1. Create the repository
+## 1. Repository anlegen
 
-Create the bucket first, then initialize the Kopia repository inside it. The endpoint is a bare `host:port` (no scheme); `--disable-tls` switches the client to plain HTTP:
+Legen Sie zuerst den Bucket an und initialisieren Sie anschließend das Kopia-Repository darin. Der Endpunkt ist ein reiner Wert `host:port` ohne Schema. `--disable-tls` schaltet den Client auf unverschlüsseltes HTTP um:
 
 ```bash
 rc alias set rustfs http://<your-rustfs-endpoint>:9000 <your-access-key> <your-secret-key>
@@ -37,11 +37,11 @@ docker run --rm --network oo-rustfs_default kopia/kopia:0.18.1 repository create
   --override-username demo --override-hostname workstation
 ```
 
-Kopia validates the provider by reading and writing through the S3 API before it reports success.
+Kopia prüft den Anbieter, indem es über die S3-API liest und schreibt, bevor es Erfolg meldet.
 
-## 2. Connect, snapshot, and restore
+## 2. Verbinden, Snapshot erstellen und wiederherstellen
 
-Run the following commands from the directory holding your `repository.config` (created by the previous step). Kopia reads the connection settings from that file, so the S3 flags are only needed once:
+Führen Sie die folgenden Befehle aus dem Verzeichnis aus, das Ihre `repository.config` enthält (angelegt im vorherigen Schritt). Kopia liest die Verbindungseinstellungen aus dieser Datei, die S3-Flags sind daher nur einmal nötig:
 
 ```bash
 export KOPIA_PASSWORD=<your-kopia-password>
@@ -65,7 +65,7 @@ kopia snapshot create /source
 kopia snapshot list
 ```
 
-Restore the snapshot into an empty directory and compare checksums with the source. The snapshot ID is the `ka...` identifier printed by `snapshot list`:
+Stellen Sie den Snapshot in einem leeren Verzeichnis wieder her und vergleichen Sie die Prüfsummen mit der Quelle. Die Snapshot-ID ist die Kennung `ka...`, die `snapshot list` ausgibt:
 
 ```bash
 kopia restore <snapshot-id> /restore
@@ -73,20 +73,21 @@ kopia restore <snapshot-id> /restore
 sha256sum source/blob.bin restore/blob.bin
 ```
 
+
 ```text
 bec4530e2798465b...  source/blob.bin
 bec4530e2798465b...  restore/blob.bin
 ```
 
-## 3. Verify objects in RustFS
+## 3. Objekte in RustFS prüfen
 
-List the bucket:
+Listen Sie den Bucket auf:
 
 ```bash
 rc ls rustfs/kopia-backups/ -r
 ```
 
-The output shows the repository format files plus the packed content blocks written by the snapshot:
+Die Ausgabe zeigt die Formatdateien des Repositorys und die gepackten Inhaltsblöcke, die der Snapshot geschrieben hat:
 
 ```text
 kopia.blobcfg
@@ -94,32 +95,32 @@ kopia.repository
 p0000.../...
 ```
 
-![Kopia repository blocks stored in the RustFS Console](./images/rustfs-kopia-repo.png)
+![In der RustFS Console gespeicherte Kopia-Repository-Blöcke](./images/rustfs-kopia-repo.png)
 
-## 4. Stop or reset
+## 4. Anhalten oder zurücksetzen
 
-Kopia is a client-side tool and holds no running state. To delete the repository and all snapshots, remove the bucket:
+Kopia ist ein clientseitiges Werkzeug und hält keinen laufenden Zustand. Um das Repository und alle Snapshots zu löschen, entfernen Sie den Bucket:
 
 ```bash
 rc rb rustfs/kopia-backups --force
 ```
 
-## Troubleshooting
+## Fehlerbehebung
 
 ### `Endpoint url cannot have fully qualified paths`
 
-The endpoint must be a bare `host:port` value without a scheme or path — Kopia builds the object URLs itself.
+Der Endpunkt muss ein reiner Wert `host:port` ohne Schema oder Pfad sein. Kopia baut die Objekt-URLs selbst.
 
 ### `server gave HTTP response to HTTPS client`
 
-Without `--disable-tls`, Kopia speaks HTTPS. RustFS without TLS needs the `--disable-tls` flag on both `repository create s3` and `repository connect s3`.
+Ohne `--disable-tls` spricht Kopia HTTPS. RustFS ohne TLS benötigt das Flag `--disable-tls` sowohl bei `repository create s3` als auch bei `repository connect s3`.
 
-### `can't connect to storage` with a DNS error
+### `can't connect to storage` mit einem DNS-Fehler
 
-The S3 client is using virtual-hosted addressing. Keep the endpoint as a bare `host:port` value; Kopia uses path-style requests for endpoints given in that form.
+Der S3-Client verwendet Adressierung im Virtual-Hosted-Stil. Belassen Sie den Endpunkt als reinen Wert `host:port`. Kopia verwendet für Endpunkte in dieser Form Anfragen mit pfadbasierter Adressierung (Path-Style).
 
-## Next steps
+## Nächste Schritte
 
-- Review [S3 compatibility notes](/administration/protocols/s3) before adopting additional Kopia operations.
-- Create dedicated production credentials with [Access Key Management](/security-compliance/iam/access-token).
-- Follow the [Kopia repository documentation](https://kopia.io/docs/repositories/) to add policies, retention, and scheduled snapshots.
+- Lesen Sie die [S3-Kompatibilitätshinweise](/de/administration/protocols/s3), bevor Sie weitere Kopia-Operationen verwenden.
+- Erstellen Sie dedizierte Produktions-Zugangsdaten über die [Zugriffsschlüssel-Verwaltung](/de/security-compliance/iam/access-token).
+- Folgen Sie der [Kopia-Repository-Dokumentation](https://kopia.io/docs/repositories/), um Richtlinien, Aufbewahrung und geplante Snapshots hinzuzufügen.

@@ -1,20 +1,20 @@
 ---
 title: "Container"
-description: "Run the official RustFS container image with Docker or Podman."
+description: "Betreiben Sie das offizielle Container-Image von RustFS mit Docker oder Podman."
 ---
 
-RustFS is a high-performance, S3-compatible open-source distributed object storage system. In single-node single-disk (SNSD) deployment mode, the backend uses zero erasure coding without additional data redundancy, which makes it suitable for local testing and small-scale scenarios. The official RustFS image packages the RustFS binary and its runtime environment into a container, so you can start a service with a single command and persistent storage.
+RustFS ist ein quelloffenes, S3-kompatibles System für verteilten Objektspeicher. Im Modus mit einem einzelnen Knoten und einem Datenträger (SNSD) verwendet RustFS kein Erasure Coding und speichert keine redundanten Daten. Dieser Modus eignet sich daher nur für lokale Tests und kleine Arbeitslasten. Das offizielle RustFS-Image packt die RustFS-Binärdatei und ihre Laufzeitumgebung in einen Container, sodass Sie RustFS mit persistentem Speicher durch einen einzigen Befehl starten.
 
-The container runs as non-root user `rustfs` with id `10001`, so a bind-mounted host directory must be owned by `10001` to avoid permission denied errors.
+Der Container läuft als Benutzer `rustfs` ohne Root-Rechte mit der ID `10001`. Ein per Bind-Mount eingehängtes Host-Verzeichnis muss daher `10001` gehören, sonst treten Fehler `permission denied` auf.
 
-## Container runtimes
+## Container-Laufzeiten
 
-- [Docker](./docker.md): run a single-node instance with persistent storage, then extend it with Docker Compose, TLS, and multi-node networking.
-- [Podman](./podman.md): run the same image in a daemonless workflow.
+- [Docker](./docker.md): Betreiben Sie eine Instanz auf einem Knoten mit persistentem Speicher und erweitern Sie sie anschließend um Docker Compose, TLS und Netzwerke für mehrere Knoten.
+- [Podman](./podman.md): Betreiben Sie dasselbe Image in einem Ablauf ohne Daemon.
 
-:::note[Directory permissions]
+:::note[Verzeichnisberechtigungen]
 
-If you mount a host directory into the container with `-v`, make sure the owner of the host directory is `10001`:
+Wenn Sie ein Host-Verzeichnis mit `-v` in den Container einhängen, muss `10001` der Eigentümer des Host-Verzeichnisses sein:
 
 ```bash
 chown -R 10001:10001 /path/to/host_directory
@@ -22,4 +22,4 @@ chown -R 10001:10001 /path/to/host_directory
 
 :::
 
-For Kubernetes deployments, see the [Helm chart](/installation/cloud-native/helm-chart) or the [Operator](/installation/cloud-native/operator) instead.
+Für Kubernetes-Bereitstellungen verwenden Sie stattdessen das [Helm-Chart](/de/installation/cloud-native/helm-chart) oder den [Operator](/de/installation/cloud-native/operator).

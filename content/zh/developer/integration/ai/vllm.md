@@ -151,4 +151,4 @@ vLLM 的 CPU 引擎通过共享内存交换张量。运行容器时加 `--shm-si
 
 - 在启用更多服务方案前，先阅读 [S3 兼容性说明](/administration/protocols/s3)。
 - 使用[访问密钥管理](/security-compliance/iam/access-token)创建专用的生产凭证。
-- 按照 [vLLM 文档](https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html)在同一个桶支撑的模型库之上使用 chat 模板、张量并行与量化权重。
+- 按照 [vLLM 文档](https://docs.vllm.ai/serving/openai_compatible_server.html)在同一个桶支撑的模型库之上使用 chat 模板、张量并行与量化权重。

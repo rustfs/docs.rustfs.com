@@ -1,20 +1,20 @@
 ---
-title: "CLI Reference"
-description: "Reference for the rustfs subcommands, server flags, environment variable equivalents, and volume path syntax."
+title: "CLI リファレンス"
+description: "rustfs のサブコマンド、サーバーフラグ、対応する環境変数、ボリュームパスの構文をまとめたリファレンスです。"
 ---
 
-The `rustfs` binary ships six subcommands. Running `rustfs` with no subcommand starts the server.
+`rustfs` バイナリは 6 つのサブコマンドを備えています。サブコマンドを付けずに `rustfs` を実行すると、サーバーが起動します。
 
-## Subcommands
+## サブコマンド
 
-| Command | Description |
+| コマンド | 説明 |
 | --- | --- |
-| `rustfs server [OPTIONS] <VOLUMES>...` | Start the object storage server (default when no subcommand is given). |
-| `rustfs info [--all] [--json] [system\|runtime\|build\|config\|deps]` | Display system, runtime, build, configuration, or dependency information. |
-| `rustfs tls inspect --path <DIR>` | Inspect a TLS certificate directory layout and parsing status. |
-| `rustfs diagnose [OPTIONS] <PATHS>...` | Analyze log files and report probable failure causes. |
-| `rustfs inspect <COMMAND>` | Inspect persisted bucket metadata without a running server. |
-| `rustfs connect <COMMAND>` | Configure outbound RustFS Connect integration. |
+| `rustfs server [OPTIONS] <VOLUMES>...` | オブジェクトストレージサーバーを起動します（サブコマンドを省略したときの既定動作です）。 |
+| `rustfs info [--all] [--json] [system\|runtime\|build\|config\|deps]` | システム、ランタイム、ビルド、設定、または依存関係の情報を表示します。 |
+| `rustfs tls inspect --path <DIR>` | TLS 証明書ディレクトリの配置と解析状態を検査します。 |
+| `rustfs diagnose [OPTIONS] <PATHS>...` | ログファイルを分析し、可能性の高い障害原因を報告します。 |
+| `rustfs inspect <COMMAND>` | サーバーを起動せずに、永続化されたバケットメタデータを検査します。 |
+| `rustfs connect <COMMAND>` | 外向きの RustFS Connect 連携を設定します。 |
 
 ```bash title="Examples"
 rustfs server /data/rustfs
@@ -22,62 +22,62 @@ rustfs info --all --json
 rustfs tls inspect --path /etc/rustfs/tls
 ```
 
-### Legacy invocation compatibility
+### 従来の起動方法との互換性
 
-Arguments are preprocessed for backward compatibility, so older invocation styles keep working:
+後方互換のため引数は前処理されるので、従来の起動方法もそのまま動作します。
 
-| Legacy form | Interpreted as |
+| 従来の形式 | 解釈 |
 | --- | --- |
 | `rustfs /data` | `rustfs server /data` |
 | `rustfs --address :9000 /data` | `rustfs server --address :9000 /data` |
-| `rustfs` (no arguments) | `rustfs server` with volumes read from `RUSTFS_VOLUMES` |
+| `rustfs`（引数なし） | `RUSTFS_VOLUMES` からボリュームを読み込む `rustfs server` |
 | `rustfs --info` | `rustfs info` |
 | `rustfs help` | `rustfs --help` |
 
-## Server flags
+## サーバーフラグ
 
-Every server flag has an environment variable equivalent; the flag wins when both are set.
+すべてのサーバーフラグには、対応する環境変数があります。両方を設定した場合は、フラグが優先されます。
 
-| Flag | Environment variable | Default | Description |
+| フラグ | 環境変数 | 既定値 | 説明 |
 | --- | --- | --- | --- |
-| `<VOLUMES>...` (positional) | `RUSTFS_VOLUMES` | required | Storage volumes or endpoints, space-separated. |
-| `--address` | `RUSTFS_ADDRESS` | `:9000` | S3 API bind address (`ADDRESS:PORT`, IP or hostname). |
-| `--server-domains` | `RUSTFS_SERVER_DOMAINS` | unset | Comma-separated domains for virtual-hosted-style requests. |
-| `--access-key` | `RUSTFS_ACCESS_KEY` | unset | Root access key (conflicts with `--access-key-file`). |
-| `--access-key-file` | `RUSTFS_ACCESS_KEY_FILE` | unset | File containing the root access key. |
-| `--secret-key` | `RUSTFS_SECRET_KEY` | unset | Root secret key (conflicts with `--secret-key-file`). |
-| `--secret-key-file` | `RUSTFS_SECRET_KEY_FILE` | unset | File containing the root secret key. |
-| `--console-enable` | `RUSTFS_CONSOLE_ENABLE` | `true` | Enable the embedded web console. |
-| `--console-address` | `RUSTFS_CONSOLE_ADDRESS` | `:9001` | Console bind address. |
-| `--obs-endpoint` | `RUSTFS_OBS_ENDPOINT` | empty | OTLP/HTTP base URL for traces, metrics, and logs. |
-| `--tls-path` | `RUSTFS_TLS_PATH` | unset | TLS certificate directory for the API and console. |
-| `--license` | `RUSTFS_LICENSE` | unset | License string. |
-| `--region` | `RUSTFS_REGION` | unset | Service region reported to clients. |
-| `--kms-enable` | `RUSTFS_KMS_ENABLE` | `false` | Enable KMS server-side encryption. |
-| `--kms-backend` | `RUSTFS_KMS_BACKEND` | `local` | KMS backend: `local`, `vault` / `vault-kv2`, `vault-transit`. |
-| `--kms-key-dir` | `RUSTFS_KMS_KEY_DIR` | unset | Key directory for the local KMS backend. |
-| `--kms-local-master-key` | `RUSTFS_KMS_LOCAL_MASTER_KEY` | unset | Master key for local KMS key-file encryption. |
-| `--kms-vault-address` | `RUSTFS_KMS_VAULT_ADDRESS` | unset | Vault address for the Vault backends. |
-| `--kms-vault-token` | `RUSTFS_KMS_VAULT_TOKEN` | unset | Vault token for the Vault backends. |
-| `--kms-vault-mount-path` | `RUSTFS_KMS_VAULT_MOUNT_PATH` | unset | Transit mount for `vault-transit` (defaults to `transit`); deprecated and unused for `vault` / `vault-kv2`. |
-| `--kms-default-key-id` | `RUSTFS_KMS_DEFAULT_KEY_ID` | unset | Default KMS key ID for encryption. |
-| `--kms-allow-insecure-dev-defaults` | `RUSTFS_KMS_ALLOW_INSECURE_DEV_DEFAULTS` | `false` | Allow development-only insecure KMS defaults. |
-| `--buffer-profile` | `RUSTFS_BUFFER_PROFILE` | `GeneralPurpose` | Workload profile for adaptive buffer sizing. |
-| `--buffer-profile-disable` | `RUSTFS_BUFFER_PROFILE_DISABLE` | `false` | Use legacy fixed-size buffers. |
+| `<VOLUMES>...`（位置引数） | `RUSTFS_VOLUMES` | required | ストレージボリュームまたはエンドポイントを、空白区切りで指定します。 |
+| `--address` | `RUSTFS_ADDRESS` | `:9000` | S3 API のバインドアドレスです（`ADDRESS:PORT`。IP またはホスト名）。 |
+| `--server-domains` | `RUSTFS_SERVER_DOMAINS` | unset | 仮想ホスト形式のリクエストに使う、カンマ区切りのドメインです。 |
+| `--access-key` | `RUSTFS_ACCESS_KEY` | unset | ルートアクセスキーです（`--access-key-file` と競合します）。 |
+| `--access-key-file` | `RUSTFS_ACCESS_KEY_FILE` | unset | ルートアクセスキーを格納したファイルです。 |
+| `--secret-key` | `RUSTFS_SECRET_KEY` | unset | ルートシークレットキーです（`--secret-key-file` と競合します）。 |
+| `--secret-key-file` | `RUSTFS_SECRET_KEY_FILE` | unset | ルートシークレットキーを格納したファイルです。 |
+| `--console-enable` | `RUSTFS_CONSOLE_ENABLE` | `true` | 組み込みの Web Console を有効にします。 |
+| `--console-address` | `RUSTFS_CONSOLE_ADDRESS` | `:9001` | Console のバインドアドレスです。 |
+| `--obs-endpoint` | `RUSTFS_OBS_ENDPOINT` | empty | トレース、メトリクス、ログ向けの OTLP/HTTP ベース URL です。 |
+| `--tls-path` | `RUSTFS_TLS_PATH` | unset | API と Console 用の TLS 証明書ディレクトリです。 |
+| `--license` | `RUSTFS_LICENSE` | unset | ライセンス文字列です。 |
+| `--region` | `RUSTFS_REGION` | unset | クライアントへ報告するサービスリージョンです。 |
+| `--kms-enable` | `RUSTFS_KMS_ENABLE` | `false` | KMS によるサーバー側の暗号化を有効にします。 |
+| `--kms-backend` | `RUSTFS_KMS_BACKEND` | `local` | KMS バックエンドです。指定できる値は `local`、`vault` / `vault-kv2`、`vault-transit` です。 |
+| `--kms-key-dir` | `RUSTFS_KMS_KEY_DIR` | unset | ローカル KMS バックエンドのキーディレクトリです。 |
+| `--kms-local-master-key` | `RUSTFS_KMS_LOCAL_MASTER_KEY` | unset | ローカル KMS のキーファイルを暗号化するマスターキーです。 |
+| `--kms-vault-address` | `RUSTFS_KMS_VAULT_ADDRESS` | unset | Vault バックエンドが使う Vault のアドレスです。 |
+| `--kms-vault-token` | `RUSTFS_KMS_VAULT_TOKEN` | unset | Vault バックエンドが使う Vault トークンです。 |
+| `--kms-vault-mount-path` | `RUSTFS_KMS_VAULT_MOUNT_PATH` | unset | `vault-transit` の Transit マウントです（既定値は `transit`）。`vault` / `vault-kv2` では非推奨であり、使用されません。 |
+| `--kms-default-key-id` | `RUSTFS_KMS_DEFAULT_KEY_ID` | unset | 暗号化に使う既定の KMS キー ID です。 |
+| `--kms-allow-insecure-dev-defaults` | `RUSTFS_KMS_ALLOW_INSECURE_DEV_DEFAULTS` | `false` | 開発専用の、安全でない KMS 既定値を許可します。 |
+| `--buffer-profile` | `RUSTFS_BUFFER_PROFILE` | `GeneralPurpose` | 適応的なバッファサイズ決定に使うワークロードプロファイルです。 |
+| `--buffer-profile-disable` | `RUSTFS_BUFFER_PROFILE_DISABLE` | `false` | 従来の固定サイズバッファを使います。 |
 
 :::note
 
-If neither `--access-key`/`--secret-key` nor their file variants are provided, the server falls back to the built-in default credentials (`rustfsadmin`/`rustfsadmin`) and logs a warning. Set real credentials for any non-throwaway deployment.
+`--access-key` と `--secret-key`、およびそれらのファイル形式のいずれも指定しない場合、サーバーは組み込みの既定認証情報（`rustfsadmin`/`rustfsadmin`）にフォールバックし、警告をログに記録します。一時的な検証以外のデプロイでは、実際の認証情報を設定します。
 
 :::
 
-## Volume syntax
+## ボリュームの構文
 
-Volumes are passed as positional arguments (or via `RUSTFS_VOLUMES`) and are space-separated.
+ボリュームは位置引数（または `RUSTFS_VOLUMES`）として渡し、空白で区切ります。
 
-### Ellipses expansion
+### 省略記号による展開
 
-A volume token may contain one or more `{N...M}` ranges, which expand numerically:
+ボリュームトークンには、数値として展開される `{N...M}` 範囲を 1 つ以上含められます。
 
 ```bash title="Ellipses expansion"
 # Expands to /data/rustfs0 /data/rustfs1 /data/rustfs2 /data/rustfs3
@@ -87,21 +87,21 @@ rustfs server /data/rustfs{0...3}
 rustfs server http://node{1...4}:9000/data/rustfs{0...3}
 ```
 
-Rules verified from the parser:
+パーサーで確認済みの規則は次のとおりです。
 
-- The range format is `{N...M}` where `N` and `M` are decimal or hexadecimal positive integers and `M` must be greater than `N`.
-- A single token may carry multiple ranges (e.g. host range plus disk range); all combinations are expanded.
-- The maximum expanded size of one range is 10,000 entries.
+- 範囲の形式は `{N...M}` です。`N` と `M` は 10 進または 16 進の正の整数であり、`M` は `N` より大きい必要があります。
+- 1 つのトークンに複数の範囲を含められます（例: ホスト範囲とディスク範囲）。すべての組み合わせが展開されます。
+- 1 つの範囲を展開したときの最大数は 10,000 エントリです。
 
-### Multiple pools
+### 複数のプール
 
-Separate server pools are expressed as space-separated groups of endpoints. Each argument (one per space) forms its own expansion group:
+サーバープールを分けるには、エンドポイントのグループを空白区切りで並べます。各引数（空白で区切られた 1 つ）が、それぞれ独自の展開グループになります。
 
 ```bash title="Two pools"
 rustfs server http://node{1...4}:9000/data/rustfs{0...3} http://node{5...8}:9000/data/rustfs{0...3}
 ```
 
-When set through the environment, the same string goes into `RUSTFS_VOLUMES`:
+環境変数で設定する場合は、同じ文字列を `RUSTFS_VOLUMES` に指定します。
 
 ```bash title="Via environment"
 export RUSTFS_VOLUMES="http://node{1...4}:9000/data/rustfs{0...3}"

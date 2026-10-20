@@ -1,13 +1,13 @@
 ---
-title: "Console"
-description: "Enable the RustFS Console, connect it to a server, and sign in securely."
+title: "コンソール"
+description: "RustFS Console を有効にし、サーバーへ接続して、安全にサインインします。"
 ---
 
-The **RustFS Console** is the web administration interface for RustFS. Use this page to enable the Console, open the login page, and choose the appropriate sign-in method. Detailed procedures for buckets, objects, and identity management are covered in their respective documentation sections.
+**RustFS Console** は、RustFS の Web 管理インターフェースです。このページでは、Console の有効化、ログインページを開く手順、適切なサインイン方法の選択を説明します。バケット、オブジェクト、アイデンティティ管理の詳しい手順は、それぞれのドキュメントで扱います。
 
-## Enable the Console
+## Console を有効にする
 
-The Console is enabled by default and listens on port `9001`, separately from the S3 API on port `9000`. You can set the behavior explicitly with the following environment variables:
+Console は既定で有効であり、ポート `9000` の S3 API とは別に、ポート `9001` で待ち受けます。次の環境変数で、動作を明示的に設定できます。
 
 ```ini title="/etc/default/rustfs"
 RUSTFS_ADDRESS=":9000"
@@ -17,56 +17,56 @@ RUSTFS_OBS_LOGGER_LEVEL=error
 RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
 ```
 
-Restart RustFS after changing these values. Set `RUSTFS_CONSOLE_ENABLE=false` when the Console must not run.
+これらの値を変更したあとは、RustFS を再起動します。Console を実行してはならない場合は、`RUSTFS_CONSOLE_ENABLE=false` を設定します。
 
-The equivalent command-line options are `--console-enable` and `--console-address`. See the [CLI reference](/reference/cli) and [environment variable reference](/reference/environment-variables) for the complete server configuration.
+同等のコマンドラインオプションは `--console-enable` と `--console-address` です。サーバー設定の全体は、[CLI リファレンス](/ja/reference/cli) と [環境変数リファレンス](/ja/reference/environment-variables) を参照します。
 
-## Open the Console
+## Console を開く
 
-Open the following address, replacing `<server-ip>` with the RustFS server address:
+`<server-ip>` を RustFS サーバーのアドレスに置き換えて、次のアドレスを開きます。
 
 ```text
 http://<server-ip>:9001
 ```
 
-![RustFS Console login page with key, STS, and OIDC sign-in options](./images/rustfs-console-login.png)
+![キー、STS、OIDC のサインイン方法を示す RustFS Console のログインページ](./images/rustfs-console-login.png)
 
-For a local deployment, use `http://localhost:9001`. Windows and macOS desktop launchers use port `7001` instead.
+Windows および macOS のデスクトップランチャーを含むローカルデプロイでは、`http://localhost:9001` を開きます。S3 API はポート `9000` で待ち受けます。
 
-If the login page cannot reach the target RustFS service, select **Server Configuration** or open `/config`. Enter the externally reachable RustFS service address and save it after the health check succeeds. **Reset** clears the saved address; **Skip** returns to login without changing it.
+ログインページから対象の RustFS サービスへ到達できない場合は、**Server Configuration**（サーバー設定）を選ぶか、`/config` を開きます。外部から到達できる RustFS サービスのアドレスを入力し、ヘルスチェックが成功してから保存します。**Reset**（リセット）は、保存したアドレスを消去します。**Skip**（スキップ）は、アドレスを変更せずにログインへ戻ります。
 
-## Log in
+## ログイン
 
-The login methods shown depend on the deployment configuration:
+表示されるログイン方法は、デプロイの設定によって異なります。
 
-- **Key Login** uses the access key and secret key configured for the RustFS deployment. This is the standard login method for a local administrator.
-- **STS Login** uses temporary Security Token Service (STS) credentials. Use it only when your identity workflow has issued a valid session token.
-- **OIDC Login** appears when an OpenID Connect (OIDC) provider is configured. Select the provider and complete authentication with the identity provider.
+- **Key Login**（キーによるログイン）は、RustFS デプロイに設定したアクセスキーとシークレットキーを使います。ローカル管理者の標準的なログイン方法です。
+- **STS Login**（STS ログイン）は、一時的な Security Token Service（STS）の認証情報を使います。アイデンティティのワークフローが有効なセッショントークンを発行している場合にだけ使います。
+- **OIDC Login**（OIDC ログイン）は、OpenID Connect（OIDC）プロバイダーを設定しているときに表示されます。プロバイダーを選び、アイデンティティプロバイダーで認証を完了します。
 
-After login, the Console opens the first page your account can access. Menus and actions vary by account policy and enabled platform capabilities; a missing menu does not necessarily indicate a Console error.
+ログインすると、Console はそのアカウントがアクセスできる最初のページを開きます。メニューと操作は、アカウントのポリシーと、有効になっているプラットフォーム機能によって異なります。メニューが表示されないことは、必ずしも Console のエラーを意味しません。
 
-If login fails, verify the selected login method, credentials, target server address, and account status before retrying.
+ログインに失敗した場合は、再試行する前に、選択したログイン方法、認証情報、対象サーバーのアドレス、アカウントの状態を確認します。
 
-:::warning[Do not expose default credentials]
+:::warning[既定の認証情報を公開しない]
 
-RustFS falls back to `rustfsadmin` / `rustfsadmin` when custom credentials are not configured. Use these defaults only for a throwaway local test. Configure a unique access key and a strong secret key before making the Console reachable by other users.
+カスタムの認証情報を設定していない場合、RustFS は `rustfsadmin` / `rustfsadmin` にフォールバックします。これらの既定値は、使い捨てるローカルテストにだけ使います。ほかのユーザーから Console へ到達できるようにする前に、固有のアクセスキーと強いシークレットキーを設定します。
 
 :::
 
-## Operational notes
+## 運用上の注意
 
-- Use [TLS](/integration/tls-configured) before exposing the Console outside a trusted network.
-- Restrict network access to the Console listener and configure [Console CORS](/administration/cors) only when cross-origin access is required.
-- The Console session inherits the permissions of the signed-in identity. Use a least-privilege account for routine work.
-- Signing out or an expired session returns you to the login page. Do not store administrator credentials in shared browsers.
+- 信頼できるネットワークの外へ Console を公開する前に、[TLS](/ja/integration/tls-configured) を使います。
+- Console のリスナーへのネットワークアクセスを制限し、クロスオリジンアクセスが必要な場合にだけ [Console の CORS](/ja/administration/cors) を設定します。
+- Console のセッションは、サインインしたアイデンティティの権限を継承します。日常の作業には、最小権限のアカウントを使います。
+- サインアウトしたとき、またはセッションの有効期限が切れたときは、ログインページに戻ります。共有ブラウザに管理者の認証情報を保存してはなりません。
 
-## Management workflows
+## 管理ワークフロー
 
-- [Create and manage buckets](/administration/data/bucket/creation)
-- [Upload and manage objects](/administration/data/object/creation)
-- [Manage access keys](/security-compliance/iam/access-token)
-- [Configure identity and access management](/security-compliance/iam)
+- [バケットを作成して管理する](/ja/administration/data/bucket/creation)
+- [オブジェクトをアップロードして管理する](/ja/administration/data/object/creation)
+- [アクセスキーを管理する](/ja/security-compliance/iam/access-token)
+- [アイデンティティとアクセス管理を設定する](/ja/security-compliance/iam)
 
-## Next steps
+## 次のステップ
 
-Review the [security checklist](/installation/requirement/checklists/security-checklists) before exposing the Console outside a trusted network. For OIDC-based login, continue with the [OIDC configuration guide](/security-compliance/oidc).
+信頼できるネットワークの外へ Console を公開する前に、[セキュリティチェックリスト](/ja/installation/requirement/checklists/security-checklists) を確認します。OIDC によるログインは、[OIDC 設定ガイド](/ja/security-compliance/oidc) に進みます。

@@ -15,6 +15,8 @@ description: "Linux、コンテナ、Kubernetes、macOS、Windows に RustFS を
     </a>
   </div>
 
+  <h2 className="rustfs-install-heading">セルフホスト</h2>
+
   <div className="rustfs-install-grid">
     <a className="rustfs-install-card" href="/ja/installation/linux/quick-start">
       <span className="rustfs-install-icon rustfs-install-icon--linux"><BrandLogo name="linux" /></span>
@@ -56,7 +58,7 @@ description: "Linux、コンテナ、Kubernetes、macOS、Windows に RustFS を
       <span className="rustfs-install-icon rustfs-install-icon--kubernetes"><BrandLogo name="kubernetes" /></span>
       <span className="rustfs-install-copy">
         <strong>Operator でインストール</strong>
-        <span>Kubernetes ネイティブな RustFS のテナント、ストレージプール、ライフサイクル操作を管理します。</span>
+        <span>Kubernetes ネイティブに、RustFS のテナントやストレージプール、ライフサイクル操作を管理します。</span>
       </span>
       <ArrowRight className="rustfs-install-arrow" aria-hidden="true" />
     </a>
@@ -74,7 +76,7 @@ description: "Linux、コンテナ、Kubernetes、macOS、Windows に RustFS を
       <span className="rustfs-install-icon rustfs-install-icon--windows"><BrandLogo name="windows" /></span>
       <span className="rustfs-install-copy">
         <strong>Windows にインストール</strong>
-        <span>サポート対象の Windows 環境に RustFS をインストールして実行します。</span>
+        <span>Windows 版の RustFS はローカルでの開発とデバッグ専用です。</span>
       </span>
       <ArrowRight className="rustfs-install-arrow" aria-hidden="true" />
     </a>
@@ -86,6 +88,38 @@ description: "Linux、コンテナ、Kubernetes、macOS、Windows に RustFS を
         <span>SwarmCLI の rustfs チャートを使用して、Docker Swarm にシングルノードまたは分散構成の RustFS をデプロイします。</span>
       </span>
       <ArrowRight className="rustfs-install-arrow" aria-hidden="true" />
+    </a>
+  </div>
+
+  <h2 className="rustfs-install-heading">クラウドプロバイダー</h2>
+
+  <div className="rustfs-install-grid">
+    <a
+      className="rustfs-install-card rustfs-install-card--external"
+      href="https://sealos.io/products/app-store/rustfs"
+      target="_blank"
+      rel="noreferrer"
+    >
+      <span className="rustfs-install-icon rustfs-install-icon--sealos"><BrandLogo name="sealos" /></span>
+      <span className="rustfs-install-copy">
+        <strong>Sealos にデプロイ</strong>
+        <span>Sealos アプリストアからワンクリックで RustFS をデプロイ。HTTPS と永続ストレージを管理対象に含みます。</span>
+      </span>
+      <ArrowUpRight className="rustfs-install-arrow" aria-hidden="true" />
+    </a>
+
+    <a
+      className="rustfs-install-card rustfs-install-card--external"
+      href="https://elest.io/open-source/rustfs"
+      target="_blank"
+      rel="noreferrer"
+    >
+      <span className="rustfs-install-icon rustfs-install-icon--elestio"><BrandLogo name="elestio" /></span>
+      <span className="rustfs-install-copy">
+        <strong>Elestio にデプロイ</strong>
+        <span>専用 VM 上のフルマネージド RustFS。自動バックアップ、SSL、監視を提供します。</span>
+      </span>
+      <ArrowUpRight className="rustfs-install-arrow" aria-hidden="true" />
     </a>
   </div>
 </div>
