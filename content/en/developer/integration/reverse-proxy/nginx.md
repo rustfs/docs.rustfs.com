@@ -104,7 +104,9 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Connection '';
         proxy_cache_convert_head off;
-        proxy_connect_timeout 300s;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
         chunked_transfer_encoding off;
         proxy_pass http://rustfs_s3;
     }
@@ -131,13 +133,15 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
-        proxy_connect_timeout 300s;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
         proxy_pass http://rustfs_console;
     }
 }
 ```
 
-The S3 server preserves the original host and request path, disables request buffering for streaming uploads, and does not convert signed `HEAD` requests. The Console server also forwards WebSocket upgrade headers.
+The S3 server preserves the original host and request path, disables request buffering for streaming uploads, and does not convert signed `HEAD` requests. The Console server also forwards WebSocket upgrade headers. Both servers keep `proxy_connect_timeout` short so a request to an unreachable node fails or fails over to the next node within seconds, and keep `proxy_read_timeout` and `proxy_send_timeout` generous so large uploads and downloads are not cut off.
 
 ## 4. Create the Compose file
 
@@ -260,7 +264,7 @@ upstream rustfs_console {
 }
 ```
 
-The Console upstream uses client affinity because an in-progress OpenID Connect login stores its `state` on one RustFS node. Keep port `9000` open between RustFS nodes because internal node RPC uses the same listener.
+The Console upstream uses client affinity because an in-progress OpenID Connect login stores its `state` on one RustFS node. Keep port `9000` open between RustFS nodes because internal node RPC uses the same listener. Keep `proxy_connect_timeout` short here as well: with a long connection timeout, every request that lands on a failed node stalls for minutes while Nginx waits for the TCP handshake, and clients time out before Nginx tries the next node.
 
 ## Next steps
 
