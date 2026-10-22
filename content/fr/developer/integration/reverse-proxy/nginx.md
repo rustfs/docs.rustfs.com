@@ -104,7 +104,9 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Connection '';
         proxy_cache_convert_head off;
-        proxy_connect_timeout 300s;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
         chunked_transfer_encoding off;
         proxy_pass http://rustfs_s3;
     }
@@ -131,13 +133,15 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
-        proxy_connect_timeout 300s;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
         proxy_pass http://rustfs_console;
     }
 }
 ```
 
-Le serveur S3 conserve l’hôte et le chemin de la requête d’origine, désactive la mise en tampon des requêtes pour les chargements en flux et ne convertit pas les requêtes `HEAD` signées. Le serveur de la Console transmet aussi les en-têtes de mise à niveau WebSocket.
+Le serveur S3 conserve l’hôte et le chemin de la requête d’origine, désactive la mise en tampon des requêtes pour les chargements en flux et ne convertit pas les requêtes `HEAD` signées. Le serveur de la Console transmet aussi les en-têtes de mise à niveau WebSocket. Les deux serveurs gardent un `proxy_connect_timeout` court pour qu’une requête vers un nœud inaccessible échoue ou bascule vers le nœud suivant en quelques secondes, et gardent `proxy_read_timeout` et `proxy_send_timeout` généreux pour que les gros transferts ne soient pas interrompus.
 
 ## 4. Créer le fichier Compose
 
@@ -260,7 +264,7 @@ upstream rustfs_console {
 }
 ```
 
-L’upstream de la Console utilise l’affinité client, car une connexion OpenID Connect en cours stocke son `state` sur un seul nœud RustFS. Laissez le port `9000` ouvert entre les nœuds RustFS, car le RPC interne des nœuds utilise le même écouteur.
+L’upstream de la Console utilise l’affinité client, car une connexion OpenID Connect en cours stocke son `state` sur un seul nœud RustFS. Laissez le port `9000` ouvert entre les nœuds RustFS, car le RPC interne des nœuds utilise le même écouteur. Gardez aussi un `proxy_connect_timeout` court ici : avec un délai de connexion long, chaque requête qui arrive sur un nœud en panne reste bloquée des minutes entières pendant que Nginx attend la poignée de main TCP, et les clients expirent avant que Nginx n’essaie le nœud suivant.
 
 ## Étapes suivantes
 
