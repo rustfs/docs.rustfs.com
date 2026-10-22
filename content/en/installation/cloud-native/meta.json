@@ -2,6 +2,7 @@
 	"title": "Cloud Native",
 	"pages": [
 		"helm-chart",
-		"operator"
+		"operator",
+		"swarmcli-chart"
 	]
 }
