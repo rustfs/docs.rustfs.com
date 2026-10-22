@@ -1,4 +1,4 @@
-let redirectRulesPromise;
+const redirectRulesByEnv = new WeakMap();
 const DEFAULT_LOCALE = "en";
 
 async function loadRedirectRules(env) {
@@ -30,10 +30,14 @@ async function loadRedirectRules(env) {
 }
 
 async function getRedirectRules(env) {
-  if (!redirectRulesPromise) {
-    redirectRulesPromise = loadRedirectRules(env);
+  // Cache per env so one isolate keeps a single parse, and tests can supply
+  // a different rules file without inheriting the first request's payload.
+  let pending = redirectRulesByEnv.get(env);
+  if (!pending) {
+    pending = loadRedirectRules(env);
+    redirectRulesByEnv.set(env, pending);
   }
-  return redirectRulesPromise;
+  return pending;
 }
 
 function matchRedirect(pathname, rules) {

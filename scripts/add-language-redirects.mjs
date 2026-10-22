@@ -31,4 +31,31 @@ const ordered = [
 const output = ordered.map(([source, target]) => `${source} ${target}`).join('\n');
 fs.copyFileSync(SOURCE_INDEX, OUTPUT_INDEX);
 fs.writeFileSync(OUTPUT_REDIRECTS, `${output}\n`);
-console.log(`language redirects: wrote the language entry page and ${rules.size} Cloudflare rules`);
+stripThinRootFromSitemap(path.join(ROOT, 'dist', 'public', 'sitemap.xml'));
+console.log(`language redirects: wrote the noindex fallback page and ${rules.size} Cloudflare rules`);
+
+/**
+ * Drop a sitemap entry whose path is only `/`, so the language chooser is not listed.
+ *
+ * @param {string} file
+ */
+function stripThinRootFromSitemap(file) {
+  if (!fs.existsSync(file)) return;
+
+  const xml = fs.readFileSync(file, 'utf8');
+  const next = xml.replace(/<url>\s*([\s\S]*?)\s*<\/url>/g, (entry, body) => {
+    const loc = body.match(/<loc>([^<]*)<\/loc>/)?.[1];
+    if (!loc) return entry;
+
+    let pathname = loc;
+    try {
+      pathname = new URL(loc).pathname;
+    } catch {
+      // Relative sitemap locs are already pathnames.
+    }
+
+    return pathname === '/' ? '' : entry;
+  });
+
+  if (next !== xml) fs.writeFileSync(file, next);
+}

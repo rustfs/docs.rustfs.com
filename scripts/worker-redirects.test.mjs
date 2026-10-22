@@ -13,6 +13,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { collectLanguageRedirects } from "./language-redirects.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const worker = (await import(path.join(here, "..", "worker.mjs"))).default;
@@ -88,10 +89,31 @@ test("non-GET/HEAD requests fall through to assets untouched", async () => {
   assert.equal(await res.text(), "asset:/installation/"); // assets answered; the worker did not redirect
 });
 
-test("root path is left alone", async () => {
+test("root path is left alone when no root rule exists", async () => {
   const res = await request(makeEnv(FIXTURE_RULES), "/");
   assert.equal(res.status, 200);
   assert.equal(await res.text(), "asset:/");
+});
+
+test("root and /index.html redirect permanently to the default language", async () => {
+  const rules = ["/ /en 301", "/index.html /en 301", FIXTURE_RULES].join("\n");
+  const env = makeEnv(rules);
+
+  const root = await request(env, "/");
+  assert.equal(root.status, 301);
+  assert.equal(root.headers.get("location"), "https://docs.rustfs.com/en");
+
+  const withQuery = await request(env, "/?utm_source=docs");
+  assert.equal(withQuery.status, 301);
+  assert.equal(withQuery.headers.get("location"), "https://docs.rustfs.com/en?utm_source=docs");
+
+  const index = await request(env, "/index.html");
+  assert.equal(index.status, 301);
+  assert.equal(index.headers.get("location"), "https://docs.rustfs.com/en");
+
+  const head = await request(env, "/", { method: "HEAD" });
+  assert.equal(head.status, 301);
+  assert.equal(head.headers.get("location"), "https://docs.rustfs.com/en");
 });
 
 test("unknown paths fall through to assets (no crash, no bogus redirect)", async () => {
@@ -147,6 +169,12 @@ test("loop protection: a request that already equals its target falls through", 
   assert.equal((await request(env, "/b/")).status, 200);
 });
 
+test("language redirect rules pin the docs root to English", () => {
+  const rules = collectLanguageRedirects();
+  assert.equal(rules.get("/"), "/en 301");
+  assert.equal(rules.get("/index.html"), "/en 301");
+});
+
 test("real build output (if present): /installation and /installation/ both 301", async (t) => {
   const redirectsPath = path.join(here, "..", "dist", "public", "_redirects");
   if (!existsSync(redirectsPath)) {
@@ -170,4 +198,37 @@ test("real build output (if present): /installation and /installation/ both 301"
   const splatSlashed = await request(env, "/management/iam/users/");
   assert.equal(splatSlashed.status, 301);
   assert.equal(splatSlashed.headers.get("location"), "https://docs.rustfs.com/en/administration/iam/users");
+
+  const root = await request(env, "/");
+  assert.equal(root.status, 301);
+  assert.equal(root.headers.get("location"), "https://docs.rustfs.com/en");
+
+  const index = await request(env, "/index.html");
+  assert.equal(index.status, 301);
+  assert.equal(index.headers.get("location"), "https://docs.rustfs.com/en");
+
+  const sitemap = readFileSync(path.join(here, "..", "dist", "public", "sitemap.xml"), "utf8");
+  assert.doesNotMatch(sitemap, /<loc>https:\/\/docs\.rustfs\.com\/?<\/loc>/);
+  /** @param {string} loc */
+  const urlBlock = (loc) => {
+    const match = sitemap.match(new RegExp(`<url>(?:(?!</url>).)*<loc>${loc}</loc>(?:(?!</url>).)*</url>`));
+    assert.ok(match, `missing sitemap entry ${loc}`);
+    return match[0];
+  };
+  const enEntry = urlBlock("https://docs\\.rustfs\\.com/en");
+  const zhEntry = urlBlock("https://docs\\.rustfs\\.com/zh");
+  assert.match(enEntry, /<priority>1<\/priority>/);
+  assert.match(zhEntry, /<priority>0\.9<\/priority>/);
+  assert.match(enEntry, /hreflang="x-default" href="https:\/\/docs\.rustfs\.com\/en"/);
+
+  const enHtml = readFileSync(path.join(here, "..", "dist", "public", "en", "index.html"), "utf8");
+  const zhHtml = readFileSync(path.join(here, "..", "dist", "public", "zh", "index.html"), "utf8");
+  assert.match(enHtml, /<title>RustFS Documentation \| S3-Compatible Object Storage<\/title>/);
+  assert.match(enHtml, /MinIO-compatible migration, and cluster operations\./);
+  assert.match(zhHtml, /<title>RustFS 文档 \| 兼容 S3 的对象存储<\/title>/);
+  assert.match(zhHtml, /兼容 MinIO 的迁移和集群运维。/);
+
+  const fallback = readFileSync(path.join(here, "..", "dist", "public", "index.html"), "utf8");
+  assert.match(fallback, /noindex, follow/);
+  assert.match(fallback, /rel="canonical" href="https:\/\/docs\.rustfs\.com\/en"/);
 });
