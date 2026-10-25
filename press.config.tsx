@@ -13,6 +13,7 @@ import { defineI18n } from "fumadocs-core/i18n";
 import defaultMdxComponents, { createRelativeLink } from "fumadocs-ui/mdx";
 import { docs } from "./.source/server";
 import { BrandLogo } from "./src/components/brand-logo";
+import { docsOgCard } from "./src/components/docs-og";
 import { Mermaid } from "./src/components/mermaid";
 import { Tab, Tabs } from "./src/components/tabs";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
@@ -245,8 +246,41 @@ gtag('config', 'G-TWW7WMTWL9');`,
   .plugins(
     localSearchPlugin(languages),
     llmsPlugin(),
-    takumiPlugin(),
-    sitemapPlugin(),
+    takumiPlugin({
+      generate(page) {
+        const compact = page.url === "/en" || page.url === "/zh";
+        return {
+          node: docsOgCard({
+            title: page.data.title,
+            description: page.data.description,
+            site: this.siteConfig.name,
+            compact,
+          }),
+        };
+      },
+    }),
+    sitemapPlugin({
+      async getEntry(page) {
+        // The thin language chooser is not a content page. Never list it.
+        if (page.url === "/" || page.url === "") return;
+
+        const alternates = await this.getPageAlternates(page);
+        const defaultHref =
+          alternates.find((item) => item.hreflang === "en" || item.locale === "en")?.href ??
+          this.absoluteUrl("/en");
+        const withDefault =
+          alternates.length > 0 && !alternates.some((item) => item.hreflang === "x-default")
+            ? [...alternates, { hreflang: "x-default", href: defaultHref }]
+            : alternates;
+
+        return {
+          loc: this.absoluteUrl(page.url),
+          lastmod: await this.getPageLastModified(page),
+          priority: page.url === "/en" ? 1 : page.url === "/zh" ? 0.9 : 0.8,
+          alternates: withDefault,
+        };
+      },
+    }),
     robotsPlugin(),
     rssPlugin(),
   )

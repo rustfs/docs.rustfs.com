@@ -1,3 +1,7 @@
+# `/` is a permanent redirect to the default English docs. The language
+# chooser in index.html is only a noindex fallback when this rule is not applied.
+/ /en 301
+/index.html /en 301
 /installation/console-first-steps /en/administration/console 301
 /administration/data/data-tiering /en/administration/data/tiered-storage 301
 /management /en/administration 301
