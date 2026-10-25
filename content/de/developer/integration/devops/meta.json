@@ -5,6 +5,7 @@
     "opensearch",
     "gitea",
     "jenkins",
-    "terraform"
+    "terraform",
+    "helm"
   ]
 }

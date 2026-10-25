@@ -1,6 +1,7 @@
 {
   "title": "オブザーバビリティ",
   "pages": [
+    "fluent-bit",
     "fluentd",
     "greptimedb",
     "loki",

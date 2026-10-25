@@ -1,6 +1,7 @@
 {
   "title": "Observabilité",
   "pages": [
+    "fluent-bit",
     "fluentd",
     "greptimedb",
     "loki",
