@@ -3,6 +3,7 @@
   "pages": [
     "mlflow",
     "ray",
+    "sglang",
     "vllm"
   ]
 }

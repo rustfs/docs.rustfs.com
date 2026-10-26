@@ -3,6 +3,8 @@
   "pages": [
     "cortex",
     "flux",
-    "celld"
+    "celld",
+    "camel",
+    "dapr"
   ]
 }
