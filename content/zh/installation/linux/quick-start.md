@@ -80,7 +80,7 @@ rc object list rustfs/my-bucket
 
 <a id="mode"></a>
 
-## 后续步骤
+## 后续步骤 [#next-steps]
 
 快速安装以**单节点单磁盘（SNSD）**模式运行 RustFS。该模式没有冗余，适合评估和开发。接下来可以：
 

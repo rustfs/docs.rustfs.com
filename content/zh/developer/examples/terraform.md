@@ -1,5 +1,5 @@
 ---
-title: "Terraform"
+title: "Terraform 示例"
 description: "使用指向自定义端点的 AWS provider，通过 Terraform 管理 RustFS 存储桶和对象。"
 ---
 

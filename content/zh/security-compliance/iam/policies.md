@@ -74,7 +74,7 @@ description: "介绍 RustFS IAM 用户和组的管理、策略文档 JSON 格式
 | 创建/替换策略 | `PUT /rustfs/admin/v3/add-canned-policy?name=<policy>` | 请求正文为策略 JSON 文档。需要 `admin:CreatePolicy`。 |
 | 删除策略 | `DELETE /rustfs/admin/v3/remove-canned-policy?name=<policy>` | 需要 `admin:DeletePolicy`。 |
 
-## 策略文档格式
+## 策略文档格式 [#policy-document-format]
 
 策略文档是一个包含 `Version` 和 `Statement` 字段的 JSON 对象。`Version` 唯一可接受的值是 `2012-10-17`。
 

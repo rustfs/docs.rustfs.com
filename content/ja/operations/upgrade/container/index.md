@@ -1,5 +1,5 @@
 ---
-title: "コンテナ"
+title: "RustFS コンテナをアップグレードする"
 description: "永続データを維持したまま、Docker、Podman、または Docker Compose で起動した RustFS コンテナをアップグレードします。"
 ---
 

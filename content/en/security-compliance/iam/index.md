@@ -36,7 +36,7 @@ Policies are named JSON documents stored in RustFS. Attachment works as follows:
 
 RustFS ships these built-in (canned) policies: `readwrite`, `readonly`, `writeonly`, `diagnostics`, and `consoleAdmin`. See [Users, Groups, and Policies](./policies.md) for their contents and for writing custom policies.
 
-## Policy Evaluation Semantics
+## Policy Evaluation Semantics [#policy-evaluation-semantics]
 
 When an identity has multiple attached policies, RustFS merges their statements (dropping duplicates) and evaluates the merged document:
 

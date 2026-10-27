@@ -76,7 +76,7 @@ L’ARN du compartiment et l’ARN d’objet sont distincts :
 | Compartiment | `arn:aws:s3:::my-bucket` | `s3:ListBucket`, `s3:GetBucketLocation` |
 | Objets | `arn:aws:s3:::my-bucket/*` | `s3:GetObject`, `s3:PutObject`, `s3:DeleteObject` |
 
-Utilisez un préfixe dans l’ARN d’objet, par exemple `arn:aws:s3:::my-bucket/public/*`, afin de limiter l’accès à une partie du compartiment. Pour le format complet des instructions et les opérateurs de condition pris en charge, consultez [Utilisateurs, groupes et politiques](/fr/security-compliance/iam/policies#format-du-document-de-politique).
+Utilisez un préfixe dans l’ARN d’objet, par exemple `arn:aws:s3:::my-bucket/public/*`, afin de limiter l’accès à une partie du compartiment. Pour le format complet des instructions et les opérateurs de condition pris en charge, consultez [Utilisateurs, groupes et politiques](/fr/security-compliance/iam/policies#policy-document-format).
 
 ### Blocage de l’accès public
 

@@ -30,7 +30,7 @@ export function collectLanguageRedirects() {
     if (!source || !target || !status) continue;
 
     // Keep only base rules in _redirects to stay below Cloudflare's 100 dynamic rule limit.
-    // Locale-aware variants are resolved at runtime by worker.mjs.
+    // worker.mjs reuses exact rules for en/zh/de/fr/ja by swapping the /en prefix.
     rules.set(source, `${target} ${status}`);
   }
 

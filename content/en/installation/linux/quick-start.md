@@ -80,7 +80,7 @@ rc object list rustfs/my-bucket
 
 <a id="mode"></a>
 
-## Next steps
+## Next steps [#next-steps]
 
 The quick install runs RustFS in **Single Node Single Disk (SNSD)** mode — zero redundancy, right for evaluation and development. Where to go from here:
 

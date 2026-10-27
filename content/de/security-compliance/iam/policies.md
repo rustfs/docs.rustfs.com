@@ -74,7 +74,7 @@ Richtlinienzuordnungen verbinden eine benannte Richtlinie mit einem Benutzer ode
 | Richtlinie anlegen oder ersetzen | `PUT /rustfs/admin/v3/add-canned-policy?name=<policy>` | Der Request-Body ist das JSON-Dokument der Richtlinie. Erfordert `admin:CreatePolicy`. |
 | Richtlinie löschen | `DELETE /rustfs/admin/v3/remove-canned-policy?name=<policy>` | Erfordert `admin:DeletePolicy`. |
 
-## Format des Richtliniendokuments
+## Format des Richtliniendokuments [#policy-document-format]
 
 Ein Richtliniendokument ist ein JSON-Objekt mit den Feldern `Version` und `Statement`. Der einzige akzeptierte Wert für `Version` ist `2012-10-17`.
 

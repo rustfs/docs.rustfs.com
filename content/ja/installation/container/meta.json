@@ -1,7 +1,7 @@
 {
   "title": "コンテナ",
   "pages": [
-    "docker",
+    "[Docker](/ja/installation/container/docker)",
     "podman"
   ]
 }

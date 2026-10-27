@@ -36,7 +36,7 @@ Les politiques sont des documents JSON nommés, stockés dans RustFS. L’associ
 
 RustFS fournit ces politiques intégrées (prédéfinies) : `readwrite`, `readonly`, `writeonly`, `diagnostics` et `consoleAdmin`. Consultez [Utilisateurs, groupes et politiques](./policies.md) pour leur contenu et pour rédiger des politiques personnalisées.
 
-## Sémantique d’évaluation des politiques
+## Sémantique d’évaluation des politiques [#policy-evaluation-semantics]
 
 Lorsqu’une identité possède plusieurs politiques associées, RustFS fusionne leurs instructions (en supprimant les doublons) et évalue le document fusionné :
 

@@ -1,7 +1,7 @@
 {
   "title": "Prérequis",
   "pages": [
-    "[Choix de la topologie](/fr/installation#comparaison-des-modes-de-déploiement)",
+    "[Choix de la topologie](/fr/installation#deployment-mode-comparison)",
     "ec-configuration",
     "disk-preparation",
     "checklists"

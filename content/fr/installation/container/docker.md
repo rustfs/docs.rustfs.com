@@ -1,5 +1,5 @@
 ---
-title: "Docker"
+title: "Installer et configurer RustFS avec Docker"
 description: "Exécutez RustFS avec Docker : instance à nœud unique, droits des répertoires de l’hôte, Docker Compose, TLS et déploiement multi-nœuds."
 ---
 
@@ -9,7 +9,7 @@ Cette page décrit l’exécution de l’image officielle de RustFS avec Docker�
 
 * Moteur Docker (≥ 20.10) installé, avec la possibilité de tirer des images et d’exécuter des conteneurs
 * Ports de l’hôte 9000 (API S3) et 9001 (Console) disponibles, ou les ports personnalisés que vous prévoyez d’utiliser
-* Si vous montez un répertoire de l’hôte en bind mount, son propriétaire doit correspondre à l’utilisateur du conteneur — voir [Monter un répertoire de l’hôte](#5-monter-un-répertoire-de-lhôte)
+* Si vous montez un répertoire de l’hôte en bind mount, son propriétaire doit correspondre à l’utilisateur du conteneur — voir [Monter un répertoire de l’hôte](#bind-mount-a-host-directory)
 
 ## 2. Récupérer l’image
 
@@ -71,7 +71,7 @@ docker run -d \
   /data
 ```
 
-## 5. Monter un répertoire de l’hôte
+## 5. Monter un répertoire de l’hôte [#bind-mount-a-host-directory]
 
 Le volume nommé ci-dessus ne demande aucune préparation supplémentaire. Si vous montez plutôt un répertoire de l’hôte (`-v /path/on/host:/data`), gardez à l’esprit que le conteneur s’exécute sous l’utilisateur non root `rustfs`, d’identifiant `10001`. Le répertoire de l’hôte doit appartenir à `10001`, sinon vous rencontrerez des erreurs « permission denied » :
 

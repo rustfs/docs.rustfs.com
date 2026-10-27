@@ -5,6 +5,9 @@
 /installation/console-first-steps /en/administration/console 301
 /administration/data/data-tiering /en/administration/data/tiered-storage 301
 /management /en/administration 301
+# Bucket management moved under Data. Keep these exact rules ahead of the splat.
+/management/bucket /en/administration/data/bucket/creation 301
+/management/bucket/index /en/administration/data/bucket/creation 301
 /management/* /en/administration/:splat 301
 /administration/iam /en/security-compliance/iam 301
 /administration/iam/oidc /en/security-compliance/oidc 301
@@ -60,3 +63,18 @@
 /features/integration /en/developer/integration 301
 /features/ai /en 301
 /features/data-lake /en 301
+# One-to-one moves. worker.mjs applies the same path to zh/de/fr/ja.
+/installation/docker/index /en/installation/container/docker 301
+/features/s3-compatibility /en/reference/s3-compatibility 301
+/developer/api /en/administration/protocols/s3 301
+/developer/integration/big-data/clickhouse /en/developer/integration/database/clickhouse 301
+/developer/integration/big-data/doris /en/developer/integration/database/doris 301
+/developer/integration/big-data/duckdb /en/developer/integration/database/duckdb 301
+/developer/integration/big-data/influxdb /en/developer/integration/database/influxdb 301
+/developer/integration/big-data/milvus /en/developer/integration/database/milvus 301
+/developer/integration/big-data/trino /en/developer/integration/database/trino 301
+/developer/integration/big-data/vitess /en/developer/integration/database/vitess 301
+/developer/integration/big-data/lakefs /en/developer/integration/storage/lakefs 301
+/developer/integration/big-data/opendal /en/developer/integration/storage/opendal 301
+/developer/integration/big-data/zerofs /en/developer/integration/storage/zerofs 301
+/developer/integration/big-data/mlflow /en/developer/integration/ai/mlflow 301

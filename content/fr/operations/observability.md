@@ -1,5 +1,5 @@
 ---
-title: "Observabilité"
+title: "Observabilité de RustFS"
 description: "Exportez les métriques, les traces et les journaux RustFS via OTLP, intégrez-les à vos outils de supervision et configurez les alertes recommandées."
 ---
 

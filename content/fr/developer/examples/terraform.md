@@ -1,5 +1,5 @@
 ---
-title: "Terraform"
+title: "Exemples Terraform"
 description: "Gérez les compartiments et les objets RustFS avec Terraform, en pointant le fournisseur AWS vers un point de terminaison personnalisé."
 ---
 

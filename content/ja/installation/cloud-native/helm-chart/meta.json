@@ -1,7 +1,7 @@
 {
   "title": "Helm チャート",
   "pages": [
-    "installation",
+    "[インストール](/ja/installation/cloud-native/helm-chart/installation)",
     "mtls",
     "cert-manager"
   ]

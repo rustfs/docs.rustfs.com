@@ -1,5 +1,5 @@
 ---
-title: "安装"
+title: "选择 RustFS 的安装方式"
 description: "根据本地试用、单节点或多节点生产环境、容器及 Kubernetes 场景选择合适的 RustFS 部署方式。"
 ---
 
@@ -30,7 +30,7 @@ Windows 版本的 RustFS 仅适用于开发和调试，**不建议用于生产�
 | Kubernetes/云原生 | 容器编排部署 | [云原生](./cloud-native/index.md) |
 | Windows 或 macOS 主机 | 原生安装 | [Windows](./windows/index.md) · [macOS](./macos/index.md) |
 
-## 部署模式对比
+## 部署模式对比 [#deployment-mode-comparison]
 
 | 模式 | 节点 | 磁盘 | 容错能力 | 典型用途 |
 | - | - | - | - | - |

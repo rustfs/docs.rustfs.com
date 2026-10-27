@@ -8,7 +8,7 @@
     "scaling",
     "high-availability",
     "cluster-lifecycle",
-    "observability",
+    "[可观测性](/zh/operations/observability)",
     "status-check",
     "event-notifications"
   ]

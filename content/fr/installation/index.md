@@ -1,5 +1,5 @@
 ---
-title: "Installation"
+title: "Choisir comment installer RustFS"
 description: "Choisissez le mode de déploiement RustFS adapté : essai local, production sur un ou plusieurs nœuds, conteneurs et Kubernetes."
 ---
 
@@ -30,7 +30,7 @@ Après l’installation, définissez des valeurs uniques pour `RUSTFS_ACCESS_KEY
 | Kubernetes / cloud natif | Déploiement avec le chart Helm ou l’Operator | [Cloud natif](./cloud-native/index.md) |
 | Hôte Windows ou macOS | Installation native | [Windows](./windows/index.md) · [macOS](./macos/index.md) |
 
-## Comparaison des modes de déploiement
+## Comparaison des modes de déploiement [#deployment-mode-comparison]
 
 | Mode | Nœuds | Disques | Tolérance aux pannes | Usage typique |
 | - | - | - | - | - |

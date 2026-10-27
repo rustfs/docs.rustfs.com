@@ -1,5 +1,5 @@
 ---
-title: "Pool Expansion"
+title: "Expand a RustFS storage pool"
 description: "Add a storage pool to a RustFS cluster and verify the expanded topology through the Console or rc."
 ---
 

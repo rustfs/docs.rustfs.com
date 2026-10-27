@@ -1,5 +1,5 @@
 ---
-title: "Terraform"
+title: "Terraform integration"
 description: "Store Terraform state in RustFS object storage with the S3 backend, including state locking."
 ---
 

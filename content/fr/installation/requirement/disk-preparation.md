@@ -79,5 +79,5 @@ Utilisez les chemins de montage vérifiés lorsque vous configurez `RUSTFS_VOLUM
 
 ## Étapes suivantes
 
-- [Choisir une topologie de déploiement](/fr/installation#comparaison-des-modes-de-déploiement)
+- [Choisir une topologie de déploiement](/fr/installation#deployment-mode-comparison)
 - [Poursuivre avec les prérequis Linux et la configuration du service](/fr/installation/linux/prerequisites-and-service)

@@ -50,16 +50,37 @@ const translations = i18n
       displayName: "Deutsch",
       "Blog(blog)": "Blog",
       "All Tags(blog tags page)": "Alle Tags",
+      "Search(search trigger)": "Suche",
+      "Search(search dialog)": "Suche",
+      "Open Search(search trigger)(aria-label)": "Suche öffnen",
+      "Close Search(search dialog)(aria-label)": "Suche schließen",
+      "On this page(table of contents)": "Auf dieser Seite",
+      "Copy Markdown(page actions)": "Markdown kopieren",
+      "Copied Markdown(page actions)": "Markdown kopiert",
     },
     fr: {
       displayName: "Français",
       "Blog(blog)": "Blog",
       "All Tags(blog tags page)": "Tous les tags",
+      "Search(search trigger)": "Rechercher",
+      "Search(search dialog)": "Rechercher",
+      "Open Search(search trigger)(aria-label)": "Ouvrir la recherche",
+      "Close Search(search dialog)(aria-label)": "Fermer la recherche",
+      "On this page(table of contents)": "Sur cette page",
+      "Copy Markdown(page actions)": "Copier le Markdown",
+      "Copied Markdown(page actions)": "Markdown copié",
     },
     ja: {
       displayName: "日本語",
       "Blog(blog)": "ブログ",
       "All Tags(blog tags page)": "すべてのタグ",
+      "Search(search trigger)": "検索",
+      "Search(search dialog)": "検索",
+      "Open Search(search trigger)(aria-label)": "検索を開く",
+      "Close Search(search dialog)(aria-label)": "検索を閉じる",
+      "On this page(table of contents)": "このページの内容",
+      "Copy Markdown(page actions)": "Markdown をコピー",
+      "Copied Markdown(page actions)": "Markdown をコピーしました",
     },
   });
 
@@ -230,15 +251,12 @@ gtag('config', 'G-TWW7WMTWL9');`,
         </>
       );
     },
-    // Per-page <meta name="description"> (VitePress emitted this from frontmatter).
+    // FumaPress already emits <meta name="description"> from frontmatter.
+    // Keep a single site-wide fallback for pages that have no description.
     page(page) {
+      if (page.data.description) return null;
       return (
-        <>
-          <meta
-            name="description"
-            content={page.data.description ?? siteDescription}
-          />
-        </>
+        <meta name="description" content={siteDescription} />
       );
     },
   },

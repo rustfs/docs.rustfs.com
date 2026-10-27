@@ -1,5 +1,5 @@
 ---
-title: 存储池扩容
+title: "扩展 Tenant 存储池"
 description: 通过追加存储池增加 RustFS Tenant 的存储容量。
 ---
 

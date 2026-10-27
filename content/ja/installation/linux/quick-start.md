@@ -81,7 +81,7 @@ rc object list rustfs/my-bucket
 <a id="mode"></a>
 <a id="next-steps"></a>
 
-## 次のステップ
+## 次のステップ [#next-steps]
 
 クイックインストールでは、RustFS を **シングルノード・シングルディスク（SNSD）** モードで実行します。冗長性はなく、評価と開発に適しています。ここからの進め方は次のとおりです。
 

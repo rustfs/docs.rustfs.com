@@ -1,5 +1,5 @@
 ---
-title: "Speicherpool-Erweiterung"
+title: "RustFS-Speicherpool erweitern"
 description: "Fügen Sie einem RustFS-Cluster einen Speicherpool hinzu und prüfen Sie die erweiterte Topologie über die Console oder mit rc."
 ---
 

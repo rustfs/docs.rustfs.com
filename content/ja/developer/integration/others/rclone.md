@@ -1,5 +1,5 @@
 ---
-title: "rclone"
+title: "rclone 連携"
 description: "rclone の S3 互換 API 経由で、RustFS のバケットの同期、マウント、配信を行います。"
 ---
 

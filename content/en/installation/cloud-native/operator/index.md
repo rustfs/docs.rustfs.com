@@ -1,5 +1,5 @@
 ---
-title: Overview
+title: "Operator overview"
 description: Understand how RustFS Operator manages RustFS clusters on Kubernetes.
 ---
 

@@ -1,5 +1,5 @@
 ---
-title: "Docker"
+title: "使用 Docker 安装并配置 RustFS"
 description: "使用 Docker 运行 RustFS：单节点部署、主机目录权限、Docker Compose、TLS 和多节点部署。"
 ---
 
@@ -71,7 +71,7 @@ docker run -d \
   /data
 ```
 
-## 5. 绑定挂载主机目录
+## 5. 绑定挂载主机目录 [#bind-mount-a-host-directory]
 
 上面的命名卷无需额外设置。如果改用主机目录挂载（`-v /path/on/host:/data`），请注意容器以非 root 用户 `rustfs`（ID `10001`）运行。请确保主机目录的所有者为 `10001`，否则会遇到权限拒绝错误：
 

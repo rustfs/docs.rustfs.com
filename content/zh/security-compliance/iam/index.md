@@ -36,7 +36,7 @@ RustFS 区分以下身份类型：
 
 RustFS 附带以下内置（预定义）策略：`readwrite`、`readonly`、`writeonly`、`diagnostics` 和 `consoleAdmin`。有关这些策略的内容以及如何编写自定义策略，请参阅[用户、组和策略](./policies.md)。
 
-## 策略评估语义
+## 策略评估语义 [#policy-evaluation-semantics]
 
 当一个身份附加了多个策略时，RustFS 会合并这些策略的语句（删除重复项），并评估合并后的文档：
 

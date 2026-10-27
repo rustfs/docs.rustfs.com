@@ -1,5 +1,5 @@
 ---
-title: "rclone"
+title: "Exemples rclone"
 description: "Connectez rclone à RustFS et effectuez des opérations objet de base."
 ---
 

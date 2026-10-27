@@ -1,5 +1,5 @@
 ---
-title: "Terraform"
+title: "Terraform 集成"
 description: "使用 S3 后端把 Terraform 状态（含状态锁）存储在 RustFS 对象存储中。"
 ---
 

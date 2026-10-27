@@ -1,5 +1,5 @@
 ---
-title: "存储池扩容"
+title: "扩展 RustFS 存储池"
 description: "向 RustFS 集群添加存储池，并通过控制台或 rc 验证扩展后的拓扑。"
 ---
 
