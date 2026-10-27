@@ -121,7 +121,7 @@ vault write -f transit/keys/rustfs-default-key
 
 :::
 
-## 验证 KMS 支持的加密
+## 验证 KMS 支持的加密 [#verify-kms-backed-encryption]
 
 创建测试存储桶，使用默认密钥配置 SSE-KMS，上传对象并将其读回：
 

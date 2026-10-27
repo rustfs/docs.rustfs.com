@@ -1,5 +1,5 @@
 ---
-title: "Docker"
+title: "Install and configure RustFS with Docker"
 description: "Run RustFS with Docker: single-node setup, host-directory permissions, Docker Compose, TLS, and multi-node deployment."
 ---
 
@@ -71,7 +71,7 @@ docker run -d \
   /data
 ```
 
-## 5. Bind-mount a host directory
+## 5. Bind-mount a host directory [#bind-mount-a-host-directory]
 
 The named volume above needs no extra setup. If you mount a host directory instead (`-v /path/on/host:/data`), keep in mind that the container runs as non-root user `rustfs` with id `10001`. Make the host directory owned by `10001`, otherwise you will encounter permission denied errors:
 

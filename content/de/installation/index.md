@@ -1,5 +1,5 @@
 ---
-title: "Installation"
+title: "Installationspfad für RustFS wählen"
 description: "Wählen Sie den passenden Bereitstellungspfad für RustFS: lokaler Test, Produktion auf einem oder mehreren Knoten, Container und Kubernetes."
 ---
 
@@ -30,7 +30,7 @@ Legen Sie nach der Installation eindeutige Werte für `RUSTFS_ACCESS_KEY` und `R
 | Kubernetes / Cloud-native | Bereitstellung mit dem Helm-Chart oder dem Operator | [Cloud-native](./cloud-native/index.md) |
 | Windows- oder macOS-Host | Installation des nativen Programms | [Windows](./windows/index.md) · [macOS](./macos/index.md) |
 
-## Vergleich der Bereitstellungsmodi
+## Vergleich der Bereitstellungsmodi [#deployment-mode-comparison]
 
 | Modus | Knoten | Datenträger | Fehlertoleranz | Typische Verwendung |
 | - | - | - | - | - |

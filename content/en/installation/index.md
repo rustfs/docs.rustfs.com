@@ -1,5 +1,5 @@
 ---
-title: "Installation"
+title: "Choose how to install RustFS"
 description: "Choose the right RustFS deployment path: local trial, single-node or multi-node production, containers, and Kubernetes."
 ---
 
@@ -30,7 +30,7 @@ After installation, set unique values for `RUSTFS_ACCESS_KEY` and `RUSTFS_SECRET
 | Kubernetes / cloud-native | Deploy with the Helm chart or the Operator | [Cloud Native](./cloud-native/index.md) |
 | Windows or macOS host | Native installation | [Windows](./windows/index.md) · [macOS](./macos/index.md) |
 
-## Compare deployment modes
+## Compare deployment modes [#deployment-mode-comparison]
 
 | Mode | Nodes | Disks | Fault Tolerance | Typical Use |
 | - | - | - | - | - |

@@ -74,7 +74,7 @@ Policy bindings connect a named policy to a user or a group:
 | Create/replace policy | `PUT /rustfs/admin/v3/add-canned-policy?name=<policy>` | Request body is the policy JSON document. Requires `admin:CreatePolicy`. |
 | Delete policy | `DELETE /rustfs/admin/v3/remove-canned-policy?name=<policy>` | Requires `admin:DeletePolicy`. |
 
-## Policy Document Format
+## Policy Document Format [#policy-document-format]
 
 A policy document is a JSON object with `Version` and `Statement` fields. The only accepted `Version` value is `2012-10-17`.
 

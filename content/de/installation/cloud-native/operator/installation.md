@@ -1,5 +1,5 @@
 ---
-title: Installation
+title: "RustFS-Operator installieren"
 description: Bereiten Sie Kubernetes vor, installieren Sie den RustFS Operator und greifen Sie sicher auf seine Console zu.
 ---
 

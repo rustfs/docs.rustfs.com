@@ -1,5 +1,5 @@
 ---
-title: "Terraform"
+title: "Terraform-Beispiele"
 description: "Verwalten Sie RustFS-Buckets und -Objekte mit Terraform, indem Sie den AWS-Provider auf einen benutzerdefinierten Endpunkt richten."
 ---
 

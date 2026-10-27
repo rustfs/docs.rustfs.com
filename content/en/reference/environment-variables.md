@@ -35,7 +35,7 @@ Boolean variables accept `true`/`false`. Values shown as "unset" have no default
 | `RUSTFS_CONSOLE_ENABLE` | `true` | Enable the embedded web console (served on a separate listener). |
 | `RUSTFS_CONSOLE_ADDRESS` | `:9001` | Bind address and port for the console listener. |
 
-## CORS
+## CORS [#cors]
 
 | Variable | Default | Description |
 | --- | --- | --- |
@@ -125,7 +125,7 @@ Metrics collection intervals follow the pattern `RUSTFS_METRICS_<SCOPE>_INTERVAL
 | `RUSTFS_HEAL_MAX_CONCURRENT_HEALS` | `4` | Maximum concurrent heal tasks. |
 | `RUSTFS_HEAL_MAX_CONCURRENT_PER_SET` | `1` | Maximum concurrent heal tasks per erasure set. |
 
-## Storage & Erasure
+## Storage & Erasure [#storage--erasure]
 
 | Variable | Default | Description |
 | --- | --- | --- |
@@ -152,7 +152,7 @@ The built-in default credentials `rustfsadmin`/`rustfsadmin` are for first-boot 
 
 :::
 
-## Event & Audit targets
+## Event & Audit targets [#event--audit-targets]
 
 Module switches:
 

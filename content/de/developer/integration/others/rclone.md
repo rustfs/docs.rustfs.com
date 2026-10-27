@@ -1,5 +1,5 @@
 ---
-title: "rclone"
+title: "rclone-Integration"
 description: "Synchronisieren Sie RustFS-Buckets mit rclone, hängen Sie sie ein und stellen Sie sie über die S3-kompatible API bereit."
 ---
 

@@ -74,7 +74,7 @@ Une association relie une politique nommée à un utilisateur ou à un groupe 
 | Créer ou remplacer une politique | `PUT /rustfs/admin/v3/add-canned-policy?name=<policy>` | Le corps de la requête est le document JSON de la politique. Exige `admin:CreatePolicy`. |
 | Supprimer une politique | `DELETE /rustfs/admin/v3/remove-canned-policy?name=<policy>` | Exige `admin:DeletePolicy`. |
 
-## Format du document de politique
+## Format du document de politique [#policy-document-format]
 
 Un document de politique est un objet JSON comportant les champs `Version` et `Statement`. La seule valeur acceptée pour `Version` est `2012-10-17`.
 
@@ -161,7 +161,7 @@ Les opérateurs de condition pris en charge sont : `StringEquals`, `StringNotE
 
 :::note
 
-Un `Deny` explicite l’emporte toujours sur `Allow` : la seconde instruction s’applique donc aux opérations de suppression, même si `s3:*` les inclut. Voir la [sémantique d’évaluation](./index.md#sémantique-dévaluation-des-politiques).
+Un `Deny` explicite l’emporte toujours sur `Allow` : la seconde instruction s’applique donc aux opérations de suppression, même si `s3:*` les inclut. Voir la [sémantique d’évaluation](./index.md#policy-evaluation-semantics).
 
 :::
 

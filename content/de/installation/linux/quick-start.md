@@ -3,7 +3,7 @@ title: "Schnellstart"
 description: "Installieren Sie RustFS mit dem Installationsskript, melden Sie sich an der Console an und speichern Sie Ihr erstes Objekt — in etwa zehn Minuten."
 ---
 
-Diese Anleitung führt Sie von einem leeren Linux-Server zu einer laufenden RustFS-Instanz. Sie installieren RustFS, melden sich an der Console (Weboberfläche) an, legen einen Bucket an und laden Ihr erstes Objekt hoch. Die Produktionsplanung (Aufbau mit mehreren Knoten, Dimensionierung der Hardware) bleibt bewusst dem [nächsten Schritt](#nächste-schritte) vorbehalten.
+Diese Anleitung führt Sie von einem leeren Linux-Server zu einer laufenden RustFS-Instanz. Sie installieren RustFS, melden sich an der Console (Weboberfläche) an, legen einen Bucket an und laden Ihr erstes Objekt hoch. Die Produktionsplanung (Aufbau mit mehreren Knoten, Dimensionierung der Hardware) bleibt bewusst dem [nächsten Schritt](#next-steps) vorbehalten.
 
 **Voraussetzungen**
 
@@ -80,7 +80,7 @@ rc object list rustfs/my-bucket
 
 <a id="mode"></a>
 
-## Nächste Schritte
+## Nächste Schritte [#next-steps]
 
 Mit der Schnellinstallation betreiben Sie RustFS im Modus **Einzelner Knoten mit einem Datenträger (SNSD)** — ohne Redundanz, geeignet für Evaluierung und Entwicklung. So geht es weiter:
 

@@ -1,5 +1,5 @@
 ---
-title: "Observability"
+title: "Observability-Integrationen"
 description: "Verbinden Sie Observability-Plattformen über S3-kompatible Objektspeicher-Schnittstellen mit RustFS."
 ---
 

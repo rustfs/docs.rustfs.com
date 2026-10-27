@@ -5,7 +5,7 @@
     "opensearch",
     "gitea",
     "jenkins",
-    "terraform",
+    "[Terraform](/en/developer/integration/devops/terraform)",
     "helm"
   ]
 }

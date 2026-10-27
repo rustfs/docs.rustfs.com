@@ -1,5 +1,5 @@
 ---
-title: インストール
+title: "RustFS Operator をインストールする"
 description: Kubernetes を準備し、RustFS Operator をインストールして、Console へ安全にアクセスします。
 ---
 

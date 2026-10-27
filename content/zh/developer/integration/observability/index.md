@@ -1,5 +1,5 @@
 ---
-title: "可观测性"
+title: "可观测性集成"
 description: "通过 S3 兼容对象存储接口，将可观测性平台连接到 RustFS。"
 ---
 

@@ -1,5 +1,5 @@
 ---
-title: "Observability"
+title: "RustFS observability"
 description: "Export RustFS metrics, traces, and logs over OTLP, integrate with monitoring tools, and configure recommended alerts."
 ---
 

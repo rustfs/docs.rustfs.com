@@ -1,5 +1,5 @@
 ---
-title: "Docker"
+title: "RustFS mit Docker installieren und konfigurieren"
 description: "Betreiben Sie RustFS mit Docker: Einrichtung auf einem Knoten, Berechtigungen der Host-Verzeichnisse, Docker Compose, TLS und eine Bereitstellung auf mehreren Knoten."
 ---
 
@@ -9,7 +9,7 @@ Diese Seite beschreibt, wie Sie das offizielle RustFS-Image mit Docker betreiben
 
 * Docker Engine (≥ 20.10) ist installiert, und Sie können Images abrufen und Container ausführen
 * Die Host-Ports 9000 (S3-API) und 9001 (Console, Weboberfläche) sind frei, oder Sie verwenden die Ports, die Sie vorgesehen haben
-* Wenn Sie ein Host-Verzeichnis per Bind-Mount einhängen, muss der Eigentümer des Verzeichnisses dem Container-Benutzer entsprechen — siehe [Host-Verzeichnis per Bind-Mount einbinden](#5-host-verzeichnis-per-bind-mount-einbinden)
+* Wenn Sie ein Host-Verzeichnis per Bind-Mount einhängen, muss der Eigentümer des Verzeichnisses dem Container-Benutzer entsprechen — siehe [Host-Verzeichnis per Bind-Mount einbinden](#bind-mount-a-host-directory)
 
 ## 2. Image abrufen
 
@@ -71,7 +71,7 @@ docker run -d \
   /data
 ```
 
-## 5. Host-Verzeichnis per Bind-Mount einbinden
+## 5. Host-Verzeichnis per Bind-Mount einbinden [#bind-mount-a-host-directory]
 
 Das benannte Volume oben braucht keine weitere Vorbereitung. Wenn Sie stattdessen ein Host-Verzeichnis einhängen (`-v /path/on/host:/data`), läuft der Container als Benutzer `rustfs` ohne Root-Rechte mit der ID `10001`. Der Eigentümer des Host-Verzeichnisses muss `10001` sein, sonst treten Fehler `permission denied` auf:
 

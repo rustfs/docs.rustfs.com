@@ -1,5 +1,5 @@
 ---
-title: "rclone"
+title: "rclone integration"
 description: "Sync, mount, and serve RustFS buckets with rclone over its S3-compatible API."
 ---
 
