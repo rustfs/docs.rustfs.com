@@ -2,6 +2,7 @@
 	"title": "Cloud-nativ",
 	"pages": [
 		"helm-chart",
-		"operator"
+		"operator",
+		"swarmcli-chart"
 	]
 }
