@@ -11,5 +11,6 @@ Use **RustFS** as the object storage backend for backup tools that store reposit
 - [Velero](./velero.md)
 - [Kopia](./kopia.md)
 - [Longhorn](./longhorn.md)
+- [Veeam](./veeam.md)
 
 Keep backup jobs in a dedicated bucket and prefix, and use credentials scoped to the required bucket operations.
