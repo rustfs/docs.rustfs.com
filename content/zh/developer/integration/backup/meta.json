@@ -4,6 +4,7 @@
     "kopia",
     "longhorn",
     "restic",
-    "velero"
+    "velero",
+    "veeam"
   ]
 }
