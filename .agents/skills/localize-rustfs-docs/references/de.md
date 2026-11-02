@@ -46,6 +46,8 @@ Treat RustFS source code, APIs, and exact Console labels as authoritative for pr
 | rebalancing | Rebalancing / Neuverteilung | Preserve the RustFS operation name when it maps to a Console action. |
 | decommission | Außerbetriebnahme | Explain that data is drained before the storage pool is deactivated. |
 | replication | Replikation | Qualify as `Bucket-Replikation` or `Site-Replikation`. |
+| on-demand migration | On-demand Migration | Keep the Console label. Explain once as bedarfsgesteuerte Migration (eingehender Abruf). Do not call it Replikation. |
+| backfill | Backfill | Keep Console labels such as **Start backfill** and **Dry run**. Explain once as Hintergrundübernahme. |
 | versioning | Versionierung | Use for S3 Object versions, not source control. |
 | Object Lock | Object Lock / Objektsperre | Preserve exact API and Console labels. |
 | legal hold | Legal Hold | Preserve API/UI wording; explain the retention effect in German. |
