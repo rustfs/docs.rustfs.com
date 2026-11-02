@@ -40,6 +40,8 @@ Treat these references as project decisions, not substitutes for current upstrea
 | rebalance | 数据再平衡 | Use “再平衡” for the operation name when context is already clear. |
 | decommission | 退役 | Use the established RustFS operation name “存储池退役”; explain that the pool is drained and deactivated rather than substituting a generic “下线”. |
 | replication | 复制 | Qualify as “站点复制” or “存储桶复制” according to the RustFS feature. |
+| on-demand migration | 按需迁移 | Keep the Console label **On-demand migration**. Inbound pull on a local read miss or a backfill. Do not translate it as 复制. |
+| backfill | 回填 | Keep Console labels such as **Start backfill**, **Background backfill**, and **Dry run**. |
 | versioning | 版本控制 | Use specifically for S3 object versioning. |
 | object lock | 对象锁定 | Do not conflate with distributed locks. |
 | legal hold | 依法保留 | Use the established Amazon S3 Chinese term; preserve API names such as `ObjectLockLegalHold`. |
