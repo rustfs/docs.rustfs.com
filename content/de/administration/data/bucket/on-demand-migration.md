@@ -3,17 +3,34 @@ title: "On-demand Migration aus Cloudflare R2"
 description: "Hängen Sie einen Cloudflare-R2-Bucket als reine Lesequelle an und ziehen Sie Objekte bei einem Lese-Miss oder per Backfill nach RustFS."
 ---
 
-Die On-demand Migration zieht Objekte aus einem externen Bucket in einen RustFS-Bucket, wenn ein Client einen fehlenden Schlüssel liest oder wenn Sie einen Backfill starten. Diese Seite folgt einer Console-v1.0.3-Durchführung: Ein Cloudflare-R2-Bucket wurde an einen leeren lokalen Bucket gehängt, die Verbindung geprüft und danach drei Abrufe ausgeführt — ein Objekt mit `rc cp`, ein Präfix-Backfill und ein Backfill des gesamten Quell-Namespace mit Testlauf.
+Die On-demand Migration zieht Objekte aus einem externen Bucket in einen RustFS-Bucket, wenn ein Client einen fehlenden Schlüssel liest oder wenn Sie einen Backfill starten. **Dieses Dokument verwendet Cloudflare R2 als Beispiel** von Anfang bis Ende. Die folgenden Schritte folgen einer Console-v1.0.3-Durchführung: Ein R2-Bucket wurde an einen leeren lokalen Bucket gehängt, die Verbindung geprüft und danach drei Abrufe ausgeführt — ein Objekt mit `rc cp`, ein Präfix-Backfill und ein Backfill des gesamten Quell-Namespace mit Testlauf.
 
 RustFS liest die Quelle. Das Aktivierungsformular sagt, dass RustFS dort weder schreibt noch löscht. Die Migrationsseite sagt, dass RustFS Objekte nur beim Lesen oder beim Backfill zieht, dass neue `PUT`- und `DELETE`-Operationen in RustFS nicht zur Quelle synchronisiert werden und dass spätere Änderungen an der Quelle lokale Kopien nicht aktualisieren.
 
 Die Screenshots dieser Durchführung verwenden Platzhalter für die R2-Konto-ID und den Zugriffsschlüssel. Der Host in der Terminal-Eingabeaufforderung ist `localhost`.
 
+## Quell-Provider
+
+**Source connection** → **Provider** listet diese Quellen. Die Namen sind die Console-Beschriftungen. Google Cloud Storage erscheint zweimal: HMAC und Native.
+
+1. Amazon S3
+2. S3-compatible storage
+3. MinIO
+4. RustFS
+5. Cloudflare R2
+6. Google Cloud Storage (HMAC)
+7. Azure Blob Storage (Native)
+8. Google Cloud Storage (Native)
+
+![Provider-Menü der RustFS-Console für die On-demand Migration mit Amazon S3, S3-compatible storage, MinIO, RustFS, Cloudflare R2, Google Cloud Storage (HMAC), Azure Blob Storage (Native) und Google Cloud Storage (Native)](./images/rustfs-console-on-demand-migration-source-providers.png)
+
+Eine Migration von einem anderen Provider in dieser Liste folgt demselben Ablauf: einen leeren lokalen Bucket erstellen, die On-demand Migration aktivieren, **Provider** wählen, **Test connection** auswählen, **Enable migration** auswählen und danach bei einem GET-Miss oder per Backfill ziehen. Nur Endpunkt, Zugangsdaten und Bucket-Felder unterscheiden sich je nach Provider. Die R2-Durchführung unten füllt diese Felder für Cloudflare R2.
+
 ## On-demand Migration und Bucket-Replikation
 
 | Ziel | Verwenden |
 | --- | --- |
-| Objekte aus R2 oder einem anderen S3-kompatiblen Bucket nach RustFS ziehen, bei einem Lese-Miss oder per Backfill | On-demand Migration |
+| Objekte aus einem Provider der Liste oben nach RustFS ziehen, bei einem Lese-Miss oder per Backfill | On-demand Migration |
 | Objektversionen aus einem RustFS-Bucket in einen anderen Bucket schieben | [Bucket-Replikation](./replication.md) |
 | Standortkonfiguration und Identitätsdaten zwischen Bereitstellungen synchronisieren | [Site-Replikation](/operations/high-availability/site-replication) |
 
@@ -24,6 +41,8 @@ Wählen Sie keinen Bucket als Quelle der On-demand Migration, der bereits Replik
 :::
 
 ## Bevor Sie beginnen
+
+Zugangsdaten und Endpunkt in diesem Abschnitt gelten für das Cloudflare-R2-Beispiel. Für einen anderen Provider tragen Sie Endpunkt, lesende Zugangsdaten und Bucket-Namen dieses Systems in dieselben Console-Felder ein.
 
 - Eine RustFS-Console mit **On-demand migration**. Diese Durchführung nutzte Console v1.0.3 auf Port `9001`.
 - Ein Console-Konto, das die **Settings** des lokalen Buckets öffnen kann.

@@ -3,17 +3,34 @@ title: "Migration à la demande depuis Cloudflare R2"
 description: "Attachez un compartiment Cloudflare R2 en lecture seule et importez les objets dans RustFS lors d’une lecture manquante ou par un backfill."
 ---
 
-La migration à la demande importe des objets d’un compartiment externe vers un compartiment RustFS lorsqu’un client lit une clé absente, ou lorsque vous lancez un backfill. Cette page suit un parcours sur la Console v1.0.3 : un compartiment Cloudflare R2 a été attaché à un compartiment local vide, la connexion a été testée, puis trois imports ont été exécutés — un objet avec `rc cp`, un backfill de préfixe, et un backfill de tout le namespace source avec un dry run.
+La migration à la demande importe des objets d’un compartiment externe vers un compartiment RustFS lorsqu’un client lit une clé absente, ou lorsque vous lancez un backfill. **Ce document utilise Cloudflare R2 comme exemple** de bout en bout. Les étapes suivent un parcours sur la Console v1.0.3 : un compartiment R2 a été attaché à un compartiment local vide, la connexion a été testée, puis trois imports ont été exécutés — un objet avec `rc cp`, un backfill de préfixe, et un backfill de tout le namespace source avec un dry run.
 
 RustFS lit la source. Le formulaire d’activation indique que RustFS n’y écrit ni n’y supprime jamais d’objets. La page de migration indique que RustFS n’importe des objets que lorsqu’ils sont lus ou remplis par un backfill, que les nouvelles opérations `PUT` et `DELETE` dans RustFS ne sont pas synchronisées vers la source, et que les modifications ultérieures de la source ne mettent pas à jour les copies locales.
 
 Les captures de ce parcours utilisent des marqueurs pour l’identifiant de compte R2 et la clé d’accès. L’hôte de l’invite du terminal est `localhost`.
 
+## Fournisseurs source
+
+**Source connection** → **Provider** liste ces sources. Les noms sont les libellés exacts de la Console. Google Cloud Storage apparaît deux fois : HMAC et Native.
+
+1. Amazon S3
+2. S3-compatible storage
+3. MinIO
+4. RustFS
+5. Cloudflare R2
+6. Google Cloud Storage (HMAC)
+7. Azure Blob Storage (Native)
+8. Google Cloud Storage (Native)
+
+![Menu Provider de la Console RustFS pour la migration à la demande, avec Amazon S3, S3-compatible storage, MinIO, RustFS, Cloudflare R2, Google Cloud Storage (HMAC), Azure Blob Storage (Native) et Google Cloud Storage (Native)](./images/rustfs-console-on-demand-migration-source-providers.png)
+
+Une migration depuis un autre fournisseur de cette liste suit le même flux : créer un compartiment local vide, activer la migration à la demande, choisir **Provider**, sélectionner **Test connection**, sélectionner **Enable migration**, puis importer lors d’un GET manquant ou par un backfill. Seuls les champs de point de terminaison, d’identifiants et de compartiment changent selon le fournisseur. Le parcours R2 ci-dessous remplit ces champs pour Cloudflare R2.
+
 ## Migration à la demande et réplication de compartiment
 
 | Objectif | Utiliser |
 | --- | --- |
-| Importer des objets dans RustFS depuis R2 ou un autre compartiment compatible avec S3, lors d’une lecture manquante ou par backfill | Migration à la demande |
+| Importer des objets dans RustFS depuis un fournisseur de la liste ci-dessus, lors d’une lecture manquante ou par backfill | Migration à la demande |
 | Pousser des versions d’objets d’un compartiment RustFS vers un autre compartiment | [Réplication de compartiment](./replication.md) |
 | Synchroniser la configuration de site et les données d’identité entre des déploiements | [Réplication de site](/operations/high-availability/site-replication) |
 
@@ -24,6 +41,8 @@ Ne choisissez pas comme source de la migration à la demande un compartiment qui
 :::
 
 ## Avant de commencer
+
+Les identifiants et le point de terminaison de cette section concernent l’exemple Cloudflare R2. Pour un autre fournisseur, saisissez le point de terminaison, l’identifiant de lecture et le nom de compartiment de ce système dans les mêmes champs de la Console.
 
 - Une Console RustFS qui contient **On-demand migration**. Ce parcours utilisait la Console v1.0.3, sur le port `9001`.
 - Un compte de Console autorisé à ouvrir **Settings** du compartiment local.

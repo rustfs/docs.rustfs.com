@@ -3,17 +3,34 @@ title: "Cloudflare R2 からのオンデマンド移行"
 description: "Cloudflare R2 バケットを読み取り専用のソースとして接続し、読み取りミスまたはバックフィルでオブジェクトを RustFS に取り込みます。"
 ---
 
-オンデマンド移行は、クライアントが存在しないキーを読み取るとき、またはバックフィルを開始したときに、外部バケットのオブジェクトを RustFS バケットへ取り込みます。このページは Console v1.0.3 で行った手順に沿っています。空のローカルバケットへ Cloudflare R2 バケットを接続し、接続を確認したあと、3 種類の取り込みを実行しました。`rc cp` による単一オブジェクト、プレフィックスのバックフィル、そしてドライランを含むソース名前空間全体のバックフィルです。
+オンデマンド移行は、クライアントが存在しないキーを読み取るとき、またはバックフィルを開始したときに、外部バケットのオブジェクトを RustFS バケットへ取り込みます。**この文書は Cloudflare R2 を最初から最後までの例として使います。** 以降の手順は Console v1.0.3 で行った作業です。空のローカルバケットへ R2 バケットを接続し、接続を確認したあと、3 種類の取り込みを実行しました。`rc cp` による単一オブジェクト、プレフィックスのバックフィル、そしてドライランを含むソース名前空間全体のバックフィルです。
 
 RustFS はソースを読み取ります。有効化フォームには、RustFS がソースへ書き込まず、削除もしないと書かれています。移行ページには、読み取りまたはバックフィルのときにだけオブジェクトを取り込むこと、RustFS 上の新しい `PUT` と `DELETE` はソースへ同期されないこと、ソース側のその後の変更はローカルコピーを更新しないことが書かれています。
 
 この手順のスクリーンショットでは、R2 のアカウント ID とアクセスキーをプレースホルダーに置き換えています。端末プロンプトのホストは `localhost` です。
 
+## ソースプロバイダー
+
+**Source connection** → **Provider** には次のソースが表示されます。名称は Console のラベルそのものです。Google Cloud Storage は HMAC と Native の 2 項目です。
+
+1. Amazon S3
+2. S3-compatible storage
+3. MinIO
+4. RustFS
+5. Cloudflare R2
+6. Google Cloud Storage (HMAC)
+7. Azure Blob Storage (Native)
+8. Google Cloud Storage (Native)
+
+![オンデマンド移行の RustFS Console Provider メニュー。Amazon S3、S3-compatible storage、MinIO、RustFS、Cloudflare R2、Google Cloud Storage (HMAC)、Azure Blob Storage (Native)、Google Cloud Storage (Native) を表示](./images/rustfs-console-on-demand-migration-source-providers.png)
+
+この一覧の他のプロバイダーからの移行も、同じ流れです。空のローカルバケットを作成し、オンデマンド移行を有効にし、**Provider** を選び、**Test connection** を選び、**Enable migration** を選び、その後 GET ミスまたはバックフィルで取り込みます。プロバイダーごとに変わるのは、エンドポイント、認証情報、バケットのフィールドだけです。以下の R2 手順では、これらのフィールドを Cloudflare R2 用に入力します。
+
 ## オンデマンド移行とバケットレプリケーション
 
 | 目的 | 使う機能 |
 | --- | --- |
-| 読み取りミスまたはバックフィルで、R2 や他の S3 互換バケットから RustFS へオブジェクトを取り込む | オンデマンド移行 |
+| 上の一覧のプロバイダーから、読み取りミスまたはバックフィルでオブジェクトを RustFS へ取り込む | オンデマンド移行 |
 | RustFS バケットのオブジェクトバージョンを別のバケットへ送る | [バケットレプリケーション](./replication.md) |
 | デプロイ間でサイト設定と ID データを同期する | [サイトレプリケーション](/operations/high-availability/site-replication) |
 
@@ -24,6 +41,8 @@ RustFS はソースを読み取ります。有効化フォームには、RustFS 
 :::
 
 ## 開始する前に
+
+この節の認証情報とエンドポイントは、Cloudflare R2 の例です。他のプロバイダーでは、同じ Console フィールドに、そのシステムのエンドポイント、読み取り用の認証情報、バケット名を入力します。
 
 - **On-demand migration** がある RustFS Console。この手順ではポート `9001` の Console v1.0.3 を使いました。
 - ローカルバケットの **Settings** を開ける Console アカウント。

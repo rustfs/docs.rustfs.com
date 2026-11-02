@@ -3,17 +3,34 @@ title: "从 Cloudflare R2 按需迁移"
 description: "将 Cloudflare R2 存储桶配置为只读源，并在读取未命中或回填时把对象拉入 RustFS。"
 ---
 
-按需迁移在客户端读取本地缺失的对象键时，或在你启动回填时，把外部存储桶中的对象拉入 RustFS 存储桶。本页按 Console v1.0.3 的一次实操编写：把 Cloudflare R2 存储桶挂到空的本地存储桶上，测试连接并启用，然后做三次拉取——用 `rc cp` 拉单个对象、按前缀回填，以及对整个源命名空间先试运行再全量回填。
+按需迁移在客户端读取本地缺失的对象键时，或在你启动回填时，把外部存储桶中的对象拉入 RustFS 存储桶。**本文以 Cloudflare R2 作为贯穿全文的示例。** 下面的步骤按 Console v1.0.3 的一次实操编写：把 R2 存储桶挂到空的本地存储桶上，测试连接并启用，然后做三次拉取——用 `rc cp` 拉单个对象、按前缀回填，以及对整个源命名空间先试运行再全量回填。
 
 RustFS 只读源。启用表单写明，RustFS 不会在源上写入或删除对象。迁移页写明，只有在对象被读取或被回填时才会拉取；RustFS 中新的 `PUT` 和 `DELETE` 不会同步回源，源上之后的变更也不会更新已落本地的副本。
 
 本页截图中的 R2 账户 ID 和访问密钥均已换成占位符。终端提示符中的主机是 `localhost`。
 
+## 源提供方
+
+**Source connection** → **Provider** 列出这些源。下面的名称是控制台原文。Google Cloud Storage 有两项：HMAC 和 Native。
+
+1. Amazon S3
+2. S3-compatible storage
+3. MinIO
+4. RustFS
+5. Cloudflare R2
+6. Google Cloud Storage (HMAC)
+7. Azure Blob Storage (Native)
+8. Google Cloud Storage (Native)
+
+![RustFS 控制台按需迁移的 Provider 菜单，列出 Amazon S3、S3-compatible storage、MinIO、RustFS、Cloudflare R2、Google Cloud Storage (HMAC)、Azure Blob Storage (Native) 和 Google Cloud Storage (Native)](./images/rustfs-console-on-demand-migration-source-providers.png)
+
+从该列表中的其他提供方迁移时，流程相同：创建空的本地存储桶，启用按需迁移，选择 **Provider**，选择 **Test connection**，选择 **Enable migration**，然后在 GET 未命中时拉取，或通过回填拉取。随提供方变化的只有端点、凭证和存储桶字段。下面的 R2 实操为 Cloudflare R2 填写这些字段。
+
 ## 按需迁移与存储桶复制
 
 | 目标 | 使用 |
 | --- | --- |
-| 从 R2 或其他兼容 S3 的存储桶把对象拉入 RustFS，在读取未命中时拉取，或通过回填拉取 | 按需迁移 |
+| 从上面列出的提供方把对象拉入 RustFS，在读取未命中时拉取，或通过回填拉取 | 按需迁移 |
 | 把 RustFS 存储桶中的对象版本推到另一个存储桶 | [存储桶复制](./replication.md) |
 | 在部署之间同步站点配置和身份数据 | [站点复制](/operations/high-availability/site-replication) |
 
@@ -24,6 +41,8 @@ RustFS 只读源。启用表单写明，RustFS 不会在源上写入或删除对
 :::
 
 ## 开始之前
+
+这里的凭证和端点属于 Cloudflare R2 示例。如果使用列表中的其他提供方，在同样的控制台字段中填写该系统的端点、只读凭证和存储桶名称。
 
 - 控制台中有 **On-demand migration（按需迁移）**。本次实操使用 Console v1.0.3，端口为 `9001`。
 - 控制台账号可以打开本地存储桶的 **Settings**。
