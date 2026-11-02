@@ -33,11 +33,15 @@ On-demand migration is an inbound pull. When a client reads a key that is not in
 If you need a provider that is not in this list, open a pull request in the [RustFS repository](https://github.com/rustfs/rustfs) for official review.
 
 :::warning[Do not close a replication loop]
+
 Do not select a bucket that is already a replication target of this local bucket as the on-demand migration source.
+
 :::
 
 :::note[Enabling the source does not copy data]
+
 **Migration active** means the bucket is attached to the source. Runtime counters stay at zero until a client reads a missing key or you start a backfill.
+
 :::
 
 ## 2. Requirement
@@ -69,7 +73,9 @@ rc alias set rustfs http://localhost:9000 <your-access-key> <your-secret-key> --
 The local bucket in this walkthrough is `migration`. The R2 bucket is `dl-rustfs`. Versioning was enabled on `migration`, and Object Lock was disabled. The walkthrough did not need Object Lock to enable on-demand migration, and it did not treat versioning as a requirement for enabling it. With versioning enabled, a local delete marker can hide the source key.
 
 :::warning[Use a read-only source token]
+
 Create an R2 token that can read the source bucket and cannot write or delete there. The form states that RustFS stores the secret and does not return it to the Console.
+
 :::
 
 ### 1. Create an empty local bucket
@@ -217,7 +223,9 @@ The bucket list after the walkthrough shows `migration` with 128 objects and 8.1
 ![RustFS Console bucket list with the migration bucket after on-demand migration](./images/rustfs-console-bucket-list-after-on-demand-migration.png)
 
 :::warning[The local copy does not track the source]
+
 A later change to the same key on R2 is not pulled over the local object. A local `PUT` of that key is not written back to the source, and it stays in front of the source key. On-demand migration is not continuous replication from the source.
+
 :::
 
 ### Next steps

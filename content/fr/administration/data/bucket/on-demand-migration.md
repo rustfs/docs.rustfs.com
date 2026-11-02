@@ -33,11 +33,15 @@ La [réplication de compartiment](./replication.md) est une copie sortante des v
 Si vous avez besoin d’un fournisseur qui n’est pas dans cette liste, ouvrez une pull request dans le [dépôt RustFS](https://github.com/rustfs/rustfs) pour un examen officiel.
 
 :::warning[Ne fermez pas une boucle de réplication]
+
 Ne choisissez pas comme source de la migration à la demande un compartiment qui est déjà la cible de réplication de ce compartiment local.
+
 :::
 
 :::note[Activer la source ne copie pas les données]
+
 **Migration active** signifie que le compartiment est attaché à la source. Les compteurs d’exécution restent à zéro tant qu’un client ne lit pas une clé absente ou que vous ne lancez pas un backfill.
+
 :::
 
 ## 2. Prérequis
@@ -69,7 +73,9 @@ rc alias set rustfs http://localhost:9000 <your-access-key> <your-secret-key> --
 Le compartiment local de ce parcours est `migration`. Le compartiment R2 est `dl-rustfs`. La gestion des versions était activée sur `migration`, et le verrouillage d’objet était désactivé. Le verrouillage d’objet n’était pas nécessaire pour activer la migration à la demande, et la gestion des versions n’en était pas un prérequis. Lorsque la gestion des versions est activée, un marqueur de suppression local peut masquer la clé source.
 
 :::warning[Utilisez un jeton source en lecture seule]
+
 Créez un jeton R2 qui peut lire le compartiment source et ne peut ni y écrire ni y supprimer. Le formulaire indique que RustFS conserve le secret et ne le renvoie pas à la Console.
+
 :::
 
 ### 1. Créer un compartiment local vide
@@ -217,7 +223,9 @@ La liste des compartiments après le parcours montre `migration` avec 128 objets
 ![Liste des compartiments de la Console RustFS avec le compartiment migration après la migration à la demande](./images/rustfs-console-bucket-list-after-on-demand-migration.png)
 
 :::warning[La copie locale ne suit pas la source]
+
 Une modification ultérieure de la même clé sur R2 n’est pas importée par-dessus l’objet local. Un `PUT` local de cette clé n’est pas réécrit vers la source et reste devant la clé source. La migration à la demande n’est pas une réplication continue depuis la source.
+
 :::
 
 ### Étapes suivantes

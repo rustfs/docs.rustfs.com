@@ -33,11 +33,15 @@ description: "在读取未命中或回填时把外部源上的缺失对象拉入
 如果需要列表之外的提供方，请向 [RustFS 仓库](https://github.com/rustfs/rustfs) 提交拉取请求，以便官方审核。
 
 :::warning[不要形成复制环路]
+
 不要把已经是此本地存储桶复制目标的存储桶，再选成按需迁移的源。
+
 :::
 
 :::note[启用源不会开始搬数据]
+
 **Migration active** 只表示存储桶已经挂上源。在客户端读到缺失的键，或你启动回填之前，运行时计数保持为 0。
+
 :::
 
 ## 2. 要求
@@ -69,7 +73,9 @@ rc alias set rustfs http://localhost:9000 <your-access-key> <your-secret-key> --
 本次实操的本地存储桶是 `migration`，R2 存储桶是 `dl-rustfs`。`migration` 已启用版本控制，对象锁定为关闭。启用按需迁移不需要对象锁定，这次也没有把版本控制当作启用条件。启用版本控制后，本地删除标记可以挡住源上的同名键。
 
 :::warning[使用只读的源令牌]
+
 创建只能读取源存储桶、不能在源上写入或删除的 R2 令牌。表单写明，RustFS 会保存秘密密钥，并且不会把它返回到控制台。
+
 :::
 
 ### 1. 创建空的本地存储桶
@@ -217,7 +223,9 @@ Cloudflare 控制台中，作为源的同一个 nightly 前缀：
 ![按需迁移之后，RustFS 控制台存储桶列表中的 migration 存储桶](./images/rustfs-console-bucket-list-after-on-demand-migration.png)
 
 :::warning[本地副本不会跟随源]
+
 R2 上同名键之后的变更不会覆盖本地对象。对该键的本地 `PUT` 不会写回源，并且会挡在源键前面。按需迁移不是从源持续复制。
+
 :::
 
 ### 后续步骤

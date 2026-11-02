@@ -33,11 +33,15 @@ Die [Bucket-Replikation](./replication.md) ist eine ausgehende Kopie von Objektv
 Wenn Sie einen Provider benötigen, der nicht in dieser Liste steht, öffnen Sie einen Pull Request im [RustFS-Repository](https://github.com/rustfs/rustfs) zur offiziellen Prüfung.
 
 :::warning[Schließen Sie keine Replikationsschleife]
+
 Wählen Sie keinen Bucket als Quelle der On-demand Migration, der bereits Replikationsziel dieses lokalen Buckets ist.
+
 :::
 
 :::note[Das Aktivieren der Quelle kopiert keine Daten]
+
 **Migration active** bedeutet, dass der Bucket an die Quelle gehängt ist. Die Laufzeitzähler bleiben bei null, bis ein Client einen fehlenden Schlüssel liest oder Sie einen Backfill starten.
+
 :::
 
 ## 2. Voraussetzung
@@ -69,7 +73,9 @@ rc alias set rustfs http://localhost:9000 <your-access-key> <your-secret-key> --
 Der lokale Bucket in dieser Durchführung heißt `migration`. Der R2-Bucket heißt `dl-rustfs`. Für `migration` war die Versionierung aktiviert und Object Lock deaktiviert. Object Lock war zum Aktivieren der On-demand Migration nicht nötig, und die Versionierung war keine Voraussetzung für das Aktivieren. Mit aktivierter Versionierung kann ein lokaler Löschmarker den Quellschlüssel verdecken.
 
 :::warning[Verwenden Sie ein lesendes Quell-Token]
+
 Erstellen Sie ein R2-Token, das den Quell-Bucket lesen, dort aber nicht schreiben oder löschen kann. Das Formular sagt, dass RustFS das Geheimnis speichert und es nicht an die Console zurückgibt.
+
 :::
 
 ### 1. Einen leeren lokalen Bucket erstellen
@@ -217,7 +223,9 @@ Die Bucket-Liste nach der Durchführung zeigt `migration` mit 128 Objekten und 8
 ![RustFS-Console-Bucket-Liste mit dem Bucket migration nach der On-demand Migration](./images/rustfs-console-bucket-list-after-on-demand-migration.png)
 
 :::warning[Die lokale Kopie folgt der Quelle nicht]
+
 Eine spätere Änderung desselben Schlüssels in R2 wird nicht über das lokale Objekt gezogen. Ein lokales `PUT` dieses Schlüssels wird nicht zur Quelle zurückgeschrieben und bleibt vor dem Quellschlüssel. Die On-demand Migration ist keine fortlaufende Replikation von der Quelle.
+
 :::
 
 ### Nächste Schritte
