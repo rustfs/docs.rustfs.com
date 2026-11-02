@@ -1,15 +1,21 @@
 ---
-title: "On-demand Migration from Cloudflare R2"
-description: "Attach a Cloudflare R2 bucket as a read-only source and pull objects into RustFS on a read miss or with a backfill."
+title: "On-demand migration"
+description: "Pull missing objects into a RustFS bucket from an external source on a read or a backfill, with Cloudflare R2 as the worked example."
 ---
 
-On-demand migration pulls objects from an external bucket into a RustFS bucket when a client reads a missing key, or when you start a backfill. **This document uses Cloudflare R2 as the example** end to end. The steps below follow a Console v1.0.3 walkthrough that attached an R2 bucket to an empty local bucket, tested the connection, and then ran three pulls: one object with `rc cp`, a prefix backfill, and a full-namespace backfill with a dry run.
+This page explains on-demand migration, what you need before you start, and a migration walkthrough. The walkthrough uses Cloudflare R2 as the worked example.
 
-RustFS reads the source. The enable form states that RustFS never writes or deletes objects there. The migration page states that RustFS pulls objects only when they are read or backfilled, that new `PUT` and `DELETE` operations in RustFS are not synchronized to the source, and that later source changes do not update local copies.
+## 1. Overview
 
-Screenshots in this walkthrough use placeholders for the R2 account id and access key. The terminal prompt host is `localhost`.
+On-demand migration is an inbound pull. When a client reads a key that is not in the local bucket, RustFS reads that object from the configured source, returns it, and stores it locally. You can also start a backfill to pull keys that no client has requested yet. The enable form states that RustFS never writes or deletes objects on the source. The migration page states that new `PUT` and `DELETE` operations in RustFS are not synchronized to the source, and that later source changes do not update local copies. On-demand migration is not continuous replication from the source.
 
-## Source providers
+| Goal | Use |
+| --- | --- |
+| Pull objects into RustFS from a provider in the list below, on a read miss or by backfill | On-demand migration |
+| Push object versions from a RustFS bucket to another bucket | [Bucket replication](./replication.md) |
+| Synchronize site configuration and identity data across deployments | [Site replication](/en/operations/high-availability/site-replication) |
+
+[Bucket replication](./replication.md) is an outbound copy of object versions and requires versioning on both buckets. After a key is stored locally, on-demand migration does not keep following the source.
 
 **Source connection** → **Provider** lists these sources. The names below are the Console labels. Google Cloud Storage is two entries, HMAC and Native.
 
@@ -24,29 +30,37 @@ Screenshots in this walkthrough use placeholders for the R2 account id and acces
 
 ![RustFS Console Provider menu for on-demand migration, listing Amazon S3, S3-compatible storage, MinIO, RustFS, Cloudflare R2, Google Cloud Storage (HMAC), Azure Blob Storage (Native), and Google Cloud Storage (Native)](./images/rustfs-console-on-demand-migration-source-providers.png)
 
-A migration from any other provider in that list uses the same flow: create an empty local bucket, enable on-demand migration, choose **Provider**, select **Test connection**, select **Enable migration**, then pull on a GET miss or with a backfill. Only the endpoint, credential, and bucket fields differ by provider. The R2 walkthrough below fills those fields for Cloudflare R2.
-
-## On-demand migration and bucket replication
-
-| Goal | Use |
-| --- | --- |
-| Pull objects into RustFS from a provider in the list above, on a read miss or by backfill | On-demand migration |
-| Push object versions from a RustFS bucket to another bucket | [Bucket replication](./replication.md) |
-| Synchronize site configuration and identity data across deployments | [Site replication](/operations/high-availability/site-replication) |
-
-On-demand migration is an inbound pull. [Bucket replication](./replication.md) is an outbound copy of object versions and requires versioning on both buckets. After a key is stored locally, on-demand migration does not keep following the source.
+If you need a provider that is not in this list, open a pull request in the [RustFS repository](https://github.com/rustfs/rustfs) for official review.
 
 :::warning[Do not close a replication loop]
+
 Do not select a bucket that is already a replication target of this local bucket as the on-demand migration source.
+
 :::
 
-## Before you begin
+:::note[Enabling the source does not copy data]
+
+**Migration active** means the bucket is attached to the source. Runtime counters stay at zero until a client reads a missing key or you start a backfill.
+
+:::
+
+## 2. Requirement
+
+- An installed RustFS instance. Use the [Linux quick start](/en/installation/linux/quick-start) to install RustFS, sign in to the Console, and create a bucket. This walkthrough used Console v1.0.3 on port `9001`.
+- The RustFS CLI, [`rc`](/en/operations/rc), on the host that will read the local bucket.
+- A [Cloudflare R2](https://developers.cloudflare.com/r2/) bucket for this example.
+
+## 3. Migration
+
+This section uses **Cloudflare R2 as the example**. A migration from any other provider in the Overview list follows the same flow: create an empty local bucket, enable on-demand migration, choose **Provider**, select **Test connection**, select **Enable migration**, then pull on a GET miss or with a backfill. Only the endpoint, credential, and bucket fields differ by provider.
+
+Screenshots in this walkthrough use placeholders for the R2 account id and access key. The terminal prompt host is `localhost`.
 
 The credential and endpoint here are for the Cloudflare R2 example. For another provider, enter that system's endpoint, read credential, and bucket name in the same Console fields.
 
 - A RustFS Console that includes **On-demand migration**. This walkthrough used Console v1.0.3, on port `9001`.
 - A Console account that can open the local bucket's **Settings**.
-- The RustFS CLI, [`rc`](/operations/rc), on the host that will read the local bucket.
+- The RustFS CLI, [`rc`](/en/operations/rc), on the host that will read the local bucket.
 - A Cloudflare R2 API token that can read objects in the source bucket. Prefer a token scoped to that bucket. Public access on the R2 bucket is not part of this flow.
 - The R2 S3 endpoint for the source bucket, `https://<account-id>.r2.cloudflarestorage.com`. If the bucket uses a jurisdiction, copy the endpoint from the R2 dashboard.
 
@@ -59,20 +73,18 @@ rc alias set rustfs http://localhost:9000 <your-access-key> <your-secret-key> --
 The local bucket in this walkthrough is `migration`. The R2 bucket is `dl-rustfs`. Versioning was enabled on `migration`, and Object Lock was disabled. The walkthrough did not need Object Lock to enable on-demand migration, and it did not treat versioning as a requirement for enabling it. With versioning enabled, a local delete marker can hide the source key.
 
 :::warning[Use a read-only source token]
+
 Create an R2 token that can read the source bucket and cannot write or delete there. The form states that RustFS stores the secret and does not return it to the Console.
+
 :::
 
-:::note[Enabling the source does not copy data]
-**Migration active** means the bucket is attached to the source. Runtime counters stay at zero until a client reads a missing key or you start a backfill.
-:::
-
-## 1. Create an empty local bucket
+### 1. Create an empty local bucket
 
 In the Console, open **Browser** → **Buckets**, create a bucket named `migration`, and confirm that it has no objects. Open **Settings** from that bucket when you are ready to attach the source.
 
 ![RustFS Console Browser showing the empty migration bucket before on-demand migration](./images/rustfs-console-empty-bucket-before-on-demand-migration.png)
 
-## 2. Open on-demand migration
+### 2. Open on-demand migration
 
 1. Open bucket `migration` and select **Settings**.
 2. Select **Automation**.
@@ -87,7 +99,7 @@ After the source is enabled, **Automation** shows **Migration active** and **Man
 
 ![RustFS Console bucket Automation settings with on-demand migration active for the migration bucket](./images/rustfs-console-bucket-automation-on-demand-migration.png)
 
-## 3. Point the bucket at Cloudflare R2
+### 3. Point the bucket at Cloudflare R2
 
 In **Enable on-demand migration**, set the source as follows. Replace the account id and keys with your own R2 token. Leave the session token empty unless the token requires one. Leave **Local prefix** empty to expose the whole source namespace. This walkthrough saved no extra prefix (**All keys**, **No added prefix**).
 
@@ -105,7 +117,7 @@ In **Enable on-demand migration**, set the source as follows. Replace the accoun
 
 ![Enable on-demand migration form for a Cloudflare R2 source, with the endpoint and access key replaced by placeholders](./images/rustfs-console-on-demand-migration-r2-source-form.png)
 
-## 4. Test the connection and enable migration
+### 4. Test the connection and enable migration
 
 Select **Test connection**. A successful check reports **Connection test passed** and shows a sample object key from the source bucket. Then select **Enable migration**.
 
@@ -119,7 +131,7 @@ The configuration status becomes **Migration active**. Until something is read o
 
 ![On-demand migration active for bucket migration, with runtime counters still at zero](./images/rustfs-console-on-demand-migration-active-zero-runtime.png)
 
-## 5. Pull one object with rc cp
+### 5. Pull one object with rc cp
 
 Read the local bucket with `rc`. Do not send this request to the R2 endpoint. In this walkthrough the local bucket was still empty, and one missing object was pulled. The first miss returns the object to the client and stores it locally. A later read of the same key is served from RustFS.
 
@@ -145,7 +157,7 @@ After the single-object pull, the Console **Browser** shows that object in the l
 
 ![RustFS Console Browser showing rustfs-nightly-2026-11-02.deb after an on-demand migration read](./images/rustfs-console-browser-single-object-on-demand-migration.png)
 
-## 6. Backfill a prefix
+### 6. Backfill a prefix
 
 **Start backfill** scans the source and pulls keys that are not already local. The dialog in this walkthrough used these settings:
 
@@ -174,7 +186,7 @@ While a backfill is writing objects, the Console shows listed and pulled counts.
 
 ![Backfill in progress dialog with objects listed, objects pulled, and migrated data](./images/rustfs-console-on-demand-migration-backfill-in-progress.png)
 
-## 7. Run a dry run, then backfill the source namespace
+### 7. Run a dry run, then backfill the source namespace
 
 Leave **Source listing prefix** empty to scan the configured source namespace. Run **Dry run** first and confirm the listed set. Then turn **Dry run** off and start the backfill.
 
@@ -194,7 +206,7 @@ The full backfill that followed, with an empty prefix, finished as follows:
 
 ![Background backfill completed for the source namespace, with 127 objects pulled and no failed objects](./images/rustfs-console-on-demand-migration-backfill-completed.png)
 
-## 8. Verify the bucket
+### 8. Verify the bucket
 
 On the on-demand migration page, check:
 
@@ -211,11 +223,13 @@ The bucket list after the walkthrough shows `migration` with 128 objects and 8.1
 ![RustFS Console bucket list with the migration bucket after on-demand migration](./images/rustfs-console-bucket-list-after-on-demand-migration.png)
 
 :::warning[The local copy does not track the source]
+
 A later change to the same key on R2 is not pulled over the local object. A local `PUT` of that key is not written back to the source, and it stays in front of the source key. On-demand migration is not continuous replication from the source.
+
 :::
 
-## Next steps
+### Next steps
 
 - [Configure bucket replication](./replication.md) when you need an outbound copy
-- [Install and use rc](/operations/rc)
-- [Configure site replication](/operations/high-availability/site-replication) for site configuration and identity data
+- [Install and use rc](/en/operations/rc)
+- [Configure site replication](/en/operations/high-availability/site-replication) for site configuration and identity data
