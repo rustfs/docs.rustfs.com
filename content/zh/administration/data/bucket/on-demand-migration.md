@@ -1,15 +1,21 @@
 ---
-title: "从 Cloudflare R2 按需迁移"
-description: "将 Cloudflare R2 存储桶配置为只读源，并在读取未命中或回填时把对象拉入 RustFS。"
+title: "按需迁移"
+description: "在读取未命中或回填时把外部源上的缺失对象拉入 RustFS 存储桶，并以 Cloudflare R2 作为实操示例。"
 ---
 
-按需迁移在客户端读取本地缺失的对象键时，或在你启动回填时，把外部存储桶中的对象拉入 RustFS 存储桶。**本文以 Cloudflare R2 作为贯穿全文的示例。** 下面的步骤按 Console v1.0.3 的一次实操编写：把 R2 存储桶挂到空的本地存储桶上，测试连接并启用，然后做三次拉取——用 `rc cp` 拉单个对象、按前缀回填，以及对整个源命名空间先试运行再全量回填。
+本页介绍按需迁移、开始前需要准备的内容，以及一次迁移实操。实操以 Cloudflare R2 作为示例。
 
-RustFS 只读源。启用表单写明，RustFS 不会在源上写入或删除对象。迁移页写明，只有在对象被读取或被回填时才会拉取；RustFS 中新的 `PUT` 和 `DELETE` 不会同步回源，源上之后的变更也不会更新已落本地的副本。
+## 1. 概述
 
-本页截图中的 R2 账户 ID 和访问密钥均已换成占位符。终端提示符中的主机是 `localhost`。
+按需迁移是入站拉取。客户端读取本地存储桶中不存在的对象键时，RustFS 从已配置的源读取该对象，返回给客户端，并写入本地。你也可以启动回填，拉取还没有客户端请求过的键。启用表单写明，RustFS 不会在源上写入或删除对象。迁移页写明，RustFS 中新的 `PUT` 和 `DELETE` 不会同步回源，源上之后的变更也不会更新已落本地的副本。按需迁移不是从源持续复制。
 
-## 源提供方
+| 目标 | 使用 |
+| --- | --- |
+| 从下面列出的提供方把对象拉入 RustFS，在读取未命中时拉取，或通过回填拉取 | 按需迁移 |
+| 把 RustFS 存储桶中的对象版本推到另一个存储桶 | [存储桶复制](./replication.md) |
+| 在部署之间同步站点配置和身份数据 | [站点复制](/zh/operations/high-availability/site-replication) |
+
+[存储桶复制](./replication.md)是对象版本的出站复制，并且要求源存储桶和目标存储桶都启用版本控制。对象键写入本地之后，按需迁移不会继续跟随源。
 
 **Source connection** → **Provider** 列出这些源。下面的名称是控制台原文。Google Cloud Storage 有两项：HMAC 和 Native。
 
@@ -24,29 +30,33 @@ RustFS 只读源。启用表单写明，RustFS 不会在源上写入或删除对
 
 ![RustFS 控制台按需迁移的 Provider 菜单，列出 Amazon S3、S3-compatible storage、MinIO、RustFS、Cloudflare R2、Google Cloud Storage (HMAC)、Azure Blob Storage (Native) 和 Google Cloud Storage (Native)](./images/rustfs-console-on-demand-migration-source-providers.png)
 
-从该列表中的其他提供方迁移时，流程相同：创建空的本地存储桶，启用按需迁移，选择 **Provider**，选择 **Test connection**，选择 **Enable migration**，然后在 GET 未命中时拉取，或通过回填拉取。随提供方变化的只有端点、凭证和存储桶字段。下面的 R2 实操为 Cloudflare R2 填写这些字段。
-
-## 按需迁移与存储桶复制
-
-| 目标 | 使用 |
-| --- | --- |
-| 从上面列出的提供方把对象拉入 RustFS，在读取未命中时拉取，或通过回填拉取 | 按需迁移 |
-| 把 RustFS 存储桶中的对象版本推到另一个存储桶 | [存储桶复制](./replication.md) |
-| 在部署之间同步站点配置和身份数据 | [站点复制](/operations/high-availability/site-replication) |
-
-按需迁移是入站拉取。[存储桶复制](./replication.md)是对象版本的出站复制，并且要求源存储桶和目标存储桶都启用版本控制。对象键写入本地之后，按需迁移不会继续跟随源。
+如果需要列表之外的提供方，请向 [RustFS 仓库](https://github.com/rustfs/rustfs) 提交拉取请求，以便官方审核。
 
 :::warning[不要形成复制环路]
 不要把已经是此本地存储桶复制目标的存储桶，再选成按需迁移的源。
 :::
 
-## 开始之前
+:::note[启用源不会开始搬数据]
+**Migration active** 只表示存储桶已经挂上源。在客户端读到缺失的键，或你启动回填之前，运行时计数保持为 0。
+:::
+
+## 2. 要求
+
+- 已安装的 RustFS 实例。按 [Linux 快速开始](/zh/installation/linux/quick-start) 安装 RustFS、登录控制台并创建存储桶。本次实操使用 Console v1.0.3，端口为 `9001`。
+- 读取本地存储桶的主机上已安装 RustFS CLI [`rc`](/zh/operations/rc)。
+- 一个用于本示例的 [Cloudflare R2](https://developers.cloudflare.com/r2/) 存储桶。
+
+## 3. 迁移
+
+本节以 **Cloudflare R2 作为示例**。从概述列表中的其他提供方迁移时，流程相同：创建空的本地存储桶，启用按需迁移，选择 **Provider**，选择 **Test connection**，选择 **Enable migration**，然后在 GET 未命中时拉取，或通过回填拉取。随提供方变化的只有端点、凭证和存储桶字段。
+
+本页截图中的 R2 账户 ID 和访问密钥均已换成占位符。终端提示符中的主机是 `localhost`。
 
 这里的凭证和端点属于 Cloudflare R2 示例。如果使用列表中的其他提供方，在同样的控制台字段中填写该系统的端点、只读凭证和存储桶名称。
 
 - 控制台中有 **On-demand migration（按需迁移）**。本次实操使用 Console v1.0.3，端口为 `9001`。
 - 控制台账号可以打开本地存储桶的 **Settings**。
-- 读取本地存储桶的主机上已安装 RustFS CLI [`rc`](/operations/rc)。
+- 读取本地存储桶的主机上已安装 RustFS CLI [`rc`](/zh/operations/rc)。
 - 一个可以读取源存储桶对象的 Cloudflare R2 API 令牌。建议把令牌限制在该存储桶。此流程不使用 R2 存储桶的公共访问。
 - 源存储桶的 R2 S3 端点 `https://<account-id>.r2.cloudflarestorage.com`。存储桶若使用管辖区，请从 R2 控制台复制端点。
 
@@ -62,17 +72,13 @@ rc alias set rustfs http://localhost:9000 <your-access-key> <your-secret-key> --
 创建只能读取源存储桶、不能在源上写入或删除的 R2 令牌。表单写明，RustFS 会保存秘密密钥，并且不会把它返回到控制台。
 :::
 
-:::note[启用源不会开始搬数据]
-**Migration active** 只表示存储桶已经挂上源。在客户端读到缺失的键，或你启动回填之前，运行时计数保持为 0。
-:::
-
-## 1. 创建空的本地存储桶
+### 1. 创建空的本地存储桶
 
 在控制台打开 **Browser** → **Buckets**，创建名为 `migration` 的存储桶，并确认其中没有对象。准备挂源时，从该存储桶进入 **Settings**。
 
 ![RustFS 控制台 Browser 中，按需迁移前为空的 migration 存储桶](./images/rustfs-console-empty-bucket-before-on-demand-migration.png)
 
-## 2. 打开按需迁移
+### 2. 打开按需迁移
 
 1. 打开存储桶 `migration`，选择 **Settings**。
 2. 选择 **Automation**。
@@ -87,7 +93,7 @@ rc alias set rustfs http://localhost:9000 <your-access-key> <your-secret-key> --
 
 ![RustFS 控制台中 migration 存储桶的 Automation 设置，按需迁移已处于活动状态](./images/rustfs-console-bucket-automation-on-demand-migration.png)
 
-## 3. 把存储桶指向 Cloudflare R2
+### 3. 把存储桶指向 Cloudflare R2
 
 在 **Enable on-demand migration** 中按下面填写。把账户 ID 和密钥换成你自己的 R2 令牌。令牌不需要会话令牌时，会话令牌留空。**Local prefix** 留空即可暴露整个源命名空间。本次保存的配置没有额外前缀（**All keys**，**No added prefix**）。
 
@@ -105,7 +111,7 @@ rc alias set rustfs http://localhost:9000 <your-access-key> <your-secret-key> --
 
 ![为 Cloudflare R2 源填写的启用按需迁移表单，端点和访问密钥已换成占位符](./images/rustfs-console-on-demand-migration-r2-source-form.png)
 
-## 4. 测试连接并启用迁移
+### 4. 测试连接并启用迁移
 
 选择 **Test connection**。检查通过时显示 **Connection test passed**，并给出源存储桶中的一个样例对象键。然后选择 **Enable migration**。
 
@@ -119,7 +125,7 @@ rc alias set rustfs http://localhost:9000 <your-access-key> <your-secret-key> --
 
 ![migration 存储桶的按需迁移已启用，运行时计数仍为 0](./images/rustfs-console-on-demand-migration-active-zero-runtime.png)
 
-## 5. 用 rc cp 拉取单个对象
+### 5. 用 rc cp 拉取单个对象
 
 用 `rc` 读取本地存储桶。不要把这个请求发到 R2 端点。本次实操开始时本地存储桶仍为空，并拉取了一个缺失对象。第一次未命中会把对象返回给客户端，并写入本地。之后再读同一个键，由 RustFS 本地提供。
 
@@ -145,7 +151,7 @@ Cloudflare 控制台中，作为源的同一个 nightly 前缀：
 
 ![按需迁移读取之后，RustFS 控制台 Browser 中的 rustfs-nightly-2026-11-02.deb](./images/rustfs-console-browser-single-object-on-demand-migration.png)
 
-## 6. 按前缀回填
+### 6. 按前缀回填
 
 **Start backfill** 会扫描源，并拉取本地还没有的键。本次对话框使用了这些设置：
 
@@ -174,7 +180,7 @@ Cloudflare 控制台中，作为源的同一个 nightly 前缀：
 
 ![回填进行中对话框，显示已列出对象、已拉取对象和已迁移数据](./images/rustfs-console-on-demand-migration-backfill-in-progress.png)
 
-## 7. 先试运行，再回填源命名空间
+### 7. 先试运行，再回填源命名空间
 
 **Source listing prefix** 留空，即扫描已配置的源命名空间。先做 **Dry run**，确认列出的范围，再关闭 **Dry run** 并启动回填。
 
@@ -194,7 +200,7 @@ Cloudflare 控制台中，作为源的同一个 nightly 前缀：
 
 ![源命名空间的后台回填已完成，拉取 127 个对象，失败对象为 0](./images/rustfs-console-on-demand-migration-backfill-completed.png)
 
-## 8. 验证存储桶
+### 8. 验证存储桶
 
 在按需迁移页面检查：
 
@@ -214,8 +220,8 @@ Cloudflare 控制台中，作为源的同一个 nightly 前缀：
 R2 上同名键之后的变更不会覆盖本地对象。对该键的本地 `PUT` 不会写回源，并且会挡在源键前面。按需迁移不是从源持续复制。
 :::
 
-## 后续步骤
+### 后续步骤
 
 - 需要出站副本时，[配置存储桶复制](./replication.md)
-- [安装并使用 rc](/operations/rc)
-- 需要同步站点配置和身份数据时，[配置站点复制](/operations/high-availability/site-replication)
+- [安装并使用 rc](/zh/operations/rc)
+- 需要同步站点配置和身份数据时，[配置站点复制](/zh/operations/high-availability/site-replication)
