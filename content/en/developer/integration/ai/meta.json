@@ -4,6 +4,10 @@
     "mlflow",
     "ray",
     "sglang",
-    "vllm"
+    "vllm",
+    "dify",
+    "ragflow",
+    "cocoindex",
+    "feast"
   ]
 }
