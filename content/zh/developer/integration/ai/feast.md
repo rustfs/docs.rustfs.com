@@ -3,7 +3,7 @@ title: "Feast"
 description: "把 Feast 的特征注册表和离线 Parquet 源存放在 RustFS 桶中。"
 ---
 
-本指南将开源特征存储 [Feast](https://github.com/feast-dev/feast) 连接到 **RustFS**，同时承担两个存储角色：特征注册表（`registry.db`）放在桶里，离线特征源是同一桶里的 Parquet 文件。你将 apply 一个特征仓库、把特征从 RustFS 物化进在线存储，再读回。整个流程使用 Feast `0.67.0` 验证通过。
+本指南将开源特征存储 [Feast](https://github.com/feast-dev/feast) 连接到 **RustFS**，同时承担两个存储角色：特征注册表（`registry.db`）放在桶里，离线特征源是同一桶里的 Parquet 文件。你将执行 `feast apply`、把特征从 RustFS 物化进在线存储，再读回。整个流程使用 Feast `0.67.0` 验证通过。
 
 你需要 Python 3.10+。本部署用于本地集成测试，不适用于生产环境。
 
@@ -78,7 +78,7 @@ export AWS_SECRET_ACCESS_KEY=<your-secret-key>
 export AWS_DEFAULT_REGION=us-east-1
 ```
 
-## 3. Apply 仓库并物化
+## 3. 执行 feast apply 并物化
 
 `feast apply` 把 `registry.db` 写进桶；`materialize-incremental` 把 RustFS 里的 Parquet 特征读进本地在线存储：
 

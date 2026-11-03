@@ -7,7 +7,7 @@ Ce guide connecte [RAGFlow](https://github.com/infiniflow/ragflow) — le moteur
 
 Vous avez besoin de Docker Compose. Ce déploiement est destiné aux tests d'intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -29,7 +29,7 @@ MINIO_USER=<your-access-key>
 MINIO_PASSWORD=<your-secret-key>
 ```
 
-La section `minio:` de `docker/service_conf.yaml.template` est rendue à partir de ces variables — les mêmes champs pilotent n'importe quel endpoint compatible S3. RAGFlow crée automatiquement un bucket par tenant au premier téléversement ; inutile de le créer au préalable.
+La section `minio:` de `docker/service_conf.yaml.template` est rendue à partir de ces variables — les mêmes champs pilotent n'importe quel point de terminaison compatible S3. RAGFlow crée automatiquement un bucket par tenant au premier téléversement ; inutile de le créer au préalable.
 
 :::note[Donner un alias réseau au conteneur RustFS]
 

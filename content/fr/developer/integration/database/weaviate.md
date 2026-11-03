@@ -7,7 +7,7 @@ Ce guide connecte [Weaviate](https://github.com/weaviate/weaviate) — la base d
 
 Vous avez besoin de Docker. Ce déploiement est destiné aux tests d'intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -37,7 +37,7 @@ docker run -d --name weaviate -p 8080:8080 \
   semitechnologies/weaviate:1.31.0
 ```
 
-:::note[Format du endpoint et identifiants]
+:::note[Format du point de terminaison et identifiants]
 
 `BACKUP_S3_ENDPOINT` prend hôte et port sans schéma — le client AWS SDK Go v1 derrière le module rejette toute valeur `http://...` avec `Endpoint url cannot have fully qualified paths`. Le TLS est contrôlé par `BACKUP_S3_USE_SSL=false`, et les requêtes sont en path-style. Passer `BACKUP_S3_ACCESS_KEY_ID` au lieu de `AWS_ACCESS_KEY_ID` laisse le client anonyme, et chaque appel de sauvegarde échoue avec `Access Denied`.
 
@@ -61,6 +61,9 @@ curl -s -X POST http://localhost:8080/v1/schema \
 curl -s -X POST http://localhost:8080/v1/objects -H "Content-Type: application/json" \
   -d '{"class":"Doc","properties":{"title":"RustFS vector backup"},"vector":[0.11,0.22,0.33,0.44]}'
 
+curl -s -X POST http://localhost:8080/v1/objects -H "Content-Type: application/json" \
+  -d '{"class":"Doc","properties":{"title":"Weaviate on object storage"},"vector":[0.11,0.22,0.33,0.44]}'
+
 curl -s -X POST http://localhost:8080/v1/backups/s3 -H "Content-Type: application/json" \
   -d '{"id":"rustfs-demo"}'
 ```
@@ -69,7 +72,7 @@ curl -s -X POST http://localhost:8080/v1/backups/s3 -H "Content-Type: applicatio
 {"backend":"s3","classes":["Doc"],"id":"rustfs-demo","path":"s3://my-bucket/rustfs-demo","status":"STARTED"}
 ```
 
-Attendez `SUCCESS`, puis confirmez les objets dans RustFS, en remplaçant tous les paramètres fictifs :
+Attendez `SUCCESS`, puis confirmez les objets dans RustFS, en remplaçant toutes les valeurs de connexion indicatives :
 
 ```bash
 curl -s http://localhost:8080/v1/backups/s3/rustfs-demo
@@ -132,11 +135,11 @@ Le module n'a trouvé aucun identifiant. Dans Weaviate 1.31, le client S3 lit `A
 
 ### `s3://my-bucket/s3Path/...` apparaît dans l'erreur
 
-Dans cette version, `BACKUP_S3_PATH` est un sous-préfixe de bucket, pas un commutateur path-style — ne le réglez pas sur `s3Path`. Le client S3 de Weaviate utilise automatiquement le path-style pour les endpoints personnalisés.
+Dans cette version, `BACKUP_S3_PATH` est un sous-préfixe de bucket, pas un commutateur path-style — ne le réglez pas sur `s3Path`. Le client S3 de Weaviate utilise automatiquement le path-style pour les points de terminaison personnalisés.
 
 ### `check if backup ... exists` échoue avec une erreur inattendue
 
-RustFS est injoignable depuis le conteneur. Vérifiez que l'hôte du endpoint se résout et que le bucket existe.
+RustFS est injoignable depuis le conteneur. Vérifiez que l'hôte du point de terminaison se résout et que le bucket existe.
 
 ## Prochaines étapes
 

@@ -56,14 +56,17 @@ POSTGRES_URL=postgres://cocoindex:cocoindex@localhost:5432/cocoindex
 ```
 
 ```python title="main.py"
-import asyncio, os
+import asyncio, os, sys
 from dataclasses import dataclass
 from typing import AsyncIterator, Annotated
 
 import aiobotocore.session
 import asyncpg
+from dotenv import load_dotenv
 from numpy.typing import NDArray
 from pgvector.asyncpg import register_vector
+
+load_dotenv()
 
 import cocoindex as coco
 from cocoindex.connectors import amazon_s3, postgres
@@ -128,6 +131,52 @@ async def app_main() -> None:
     await coco.mount_each(process_file, files.items(), target_table)
 
 app = coco.App(coco.AppConfig(name="RustFSDocs"), app_main)
+
+TOP_K = 5
+
+
+async def query_once(
+    pool: asyncpg.Pool,
+    embedder: SentenceTransformerEmbedder,
+    query: str,
+    *,
+    top_k: int = TOP_K,
+) -> None:
+    query_vec = await embedder.embed(query)
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            f"""
+            SELECT filename, text, embedding <=> $1 AS distance
+            FROM "{PG_SCHEMA_NAME}"."{TABLE_NAME}"
+            ORDER BY distance ASC
+            LIMIT $2
+            """,
+            query_vec,
+            top_k,
+        )
+    for r in rows:
+        score = 1.0 - float(r["distance"])
+        print(f"[{score:.3f}] {r['filename']}")
+        print(f"    {r['text']}")
+        print("---")
+
+
+async def query(initial_query: str | None = None) -> None:
+    embedder = SentenceTransformerEmbedder(EMBED_MODEL)
+    async with asyncpg.create_pool(DATABASE_URL, init=register_vector) as pool:
+        if initial_query is not None:
+            await query_once(pool, embedder, initial_query)
+            return
+        while True:
+            q = input("Enter search query (or Enter to quit): ").strip()
+            if not q:
+                break
+            await query_once(pool, embedder, q)
+
+
+if __name__ == "__main__":
+    initial = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else None
+    asyncio.run(query(initial))
 ```
 
 ## 3. Den Index aus RustFS bauen
@@ -142,7 +191,7 @@ set -a && . ./.env && set +a
 ✅ process_file: 2 total | 2 added
 ```
 
-Beide Markdown-Dateien wurden aus dem RustFS-Bucket gelesen, in Chunks geteilt und nach Postgres embeddet. Semantische Abfrage des Index:
+Beide Markdown-Dateien wurden aus dem RustFS-Bucket gelesen, in Chunks geteilt und nach Postgres embeddet. Fragen Sie den Index über den Einstieg in `main.py` ab. Das Skript lädt `.env`, embeddet die Frage mit demselben Modell und gibt die nächsten Chunks aus:
 
 ```bash
 ./.venv/bin/python main.py "what does RustFS expose"

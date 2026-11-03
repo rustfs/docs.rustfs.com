@@ -64,7 +64,7 @@ Ein leerer `bucket` ist erwartet: RAGFlow legt beim ersten Upload automatisch ei
 
 ## 3. Ein Dokument in eine Knowledge Base hochladen
 
-Erstellen Sie Benutzer und API-Key (im Web-UI unter `https://localhost:443` oder über die User-API) und nutzen Sie die HTTP-API:
+Erstellen Sie Benutzer und API-Key (in der Web-UI unter `https://localhost:443` oder über die User-API) und nutzen Sie die HTTP-API:
 
 ```bash
 curl -s -X POST http://localhost:9380/api/v1/datasets \
@@ -131,7 +131,7 @@ Die RustFS-Containeradresse ist aus dem Compose-Netzwerk nicht routbar. Verbinde
 
 ### `Authentication error: API key is invalid!` auf `/api/v1`
 
-Die `/api/v1`-SDK-Routen erwarten einen RAGFlow-API-Key (im Web-UI erstellt), nicht den Login-Access-Token. `/v1/*`-Routen nutzen die Login-Session.
+Die `/api/v1`-SDK-Routen erwarten einen RAGFlow-API-Key (in der Web-UI erstellt), nicht den Login-Access-Token. `/v1/*`-Routen nutzen die Login-Session.
 
 ### Passwortfehler bei Registrierung oder Login
 

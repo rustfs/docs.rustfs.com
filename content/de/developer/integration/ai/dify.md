@@ -58,7 +58,7 @@ cd dify/docker
 docker compose up -d
 ```
 
-Warten Sie auf den Health-Check des `api`-Dienstes und legen Sie das Admin-Konto im Web-UI an (`http://localhost:80`). Dify schreibt sofort seinen Bootstrap-Zustand in den Bucket:
+Warten Sie auf den Health-Check des `api`-Dienstes und legen Sie das Admin-Konto in der Web-UI an (`http://localhost:80`). Dify schreibt sofort seinen Bootstrap-Zustand in den Bucket:
 
 ```bash
 aws s3 ls s3://dify/ --recursive \

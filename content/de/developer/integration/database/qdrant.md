@@ -84,7 +84,7 @@ curl -s -X POST "http://localhost:6333/collections/demo/snapshots/upload?priorit
   -F "snapshot=@demo-8437507706552082-2026-11-01-13-31-15-0.snapshot"
 ```
 
-Stellen Sie die wiederhergestellten Daten fest:
+Überprüfen Sie die wiederhergestellten Daten:
 
 ```bash
 curl -s -X POST http://localhost:6333/collections/demo/points/scroll \
@@ -99,7 +99,7 @@ Vektoren und Payloads kommen vollständig aus dem Snapshot, den RustFS gespeiche
 
 ## 4. Anhalten oder Zurücksetzen
 
-Demo abreißen und die Bucket-Objekte behalten:
+Demo-Umgebung entfernen und die Bucket-Objekte behalten:
 
 ```bash
 docker rm -f qdrant

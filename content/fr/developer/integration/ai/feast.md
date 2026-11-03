@@ -7,7 +7,7 @@ Ce guide connecte [Feast](https://github.com/feast-dev/feast) — le feature sto
 
 Vous avez besoin de Python 3.10+. Ce déploiement est destiné aux tests d'intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -17,7 +17,7 @@ flowchart LR
 	Query["get_online_features"] --> Online
 ```
 
-Le store de registre lit et écrit `registry.db` dans le bucket via boto3, et le store hors ligne fichier lit le Parquet via s3fs — les deux honorent des endpoints personnalisés, si bien que toute la couche d'historique des features est adossée au bucket tandis que le store en ligne reste local.
+Le store de registre lit et écrit `registry.db` dans le bucket via boto3, et le store hors ligne fichier lit le Parquet via s3fs — les deux honorent des points de terminaison personnalisés, si bien que toute la couche d'historique des features est adossée au bucket tandis que le store en ligne reste local.
 
 ## 1. Installer Feast avec le support S3
 
@@ -28,7 +28,7 @@ python3 -m venv .venv
 ./.venv/bin/pip install feast boto3 s3fs
 ```
 
-Téléversez les données de features hors ligne, en remplaçant tous les paramètres fictifs :
+Téléversez les données de features hors ligne, en remplaçant toutes les valeurs de connexion indicatives :
 
 ```bash
 aws s3 cp driver_stats.parquet s3://my-bucket/feast/driver_stats.parquet \
@@ -37,7 +37,7 @@ aws s3 cp driver_stats.parquet s3://my-bucket/feast/driver_stats.parquet \
 
 ## 2. Configurer le dépôt
 
-Créez les fichiers du dépôt. Le registre est une simple URI `s3://` et la substitution d'endpoint provient de la variable d'environnement `FEAST_S3_ENDPOINT_URL` ; la source de données porte son propre `s3_endpoint_override` :
+Créez les fichiers du dépôt. Le registre est une simple URI `s3://` et la substitution du point de terminaison provient de la variable d'environnement `FEAST_S3_ENDPOINT_URL` ; la source de données porte son propre `s3_endpoint_override` :
 
 ```yaml title="feature_store.yaml"
 project: rustfs_demo
@@ -69,7 +69,7 @@ driver_stats = FeatureView(
 )
 ```
 
-Exportez l'endpoint et les identifiants pour le client du registre :
+Exportez le point de terminaison et les identifiants pour le client du registre :
 
 ```bash
 export FEAST_S3_ENDPOINT_URL=http://<your-rustfs-endpoint>:9000
@@ -149,9 +149,9 @@ Le store de registre S3 a besoin de `boto3`, que le paquet Feast de base n'insta
 
 Le store hors ligne fichier lit le Parquet via `s3fs`. Installez-le avec `boto3` comme à l'étape 1.
 
-### Le store de registre S3 ignore l'endpoint
+### Le store de registre S3 ignore le point de terminaison
 
-Le registre ne lit son endpoint que depuis la variable d'environnement `FEAST_S3_ENDPOINT_URL` — un simple `AWS_ENDPOINT_URL` n'y est pas honoré. La `FileSource` porte son propre `s3_endpoint_override` ; les deux sont nécessaires.
+Le registre ne lit son point de terminaison que depuis la variable d'environnement `FEAST_S3_ENDPOINT_URL` — un simple `AWS_ENDPOINT_URL` n'y est pas honoré. La `FileSource` porte son propre `s3_endpoint_override` ; les deux sont nécessaires.
 
 ### Un avertissement de dépréciation sur la sérialisation des clés d'entité
 

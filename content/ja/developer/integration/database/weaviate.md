@@ -5,7 +5,7 @@ description: "backup-s3 モジュールで Weaviate コレクションを RustFS
 
 このガイドは、AI 検索と RAG 向けのオープンソース ベクトルデータベース [Weaviate](https://github.com/weaviate/weaviate) を、`backup-s3` モジュール経由で **RustFS** に接続します。モジュールを有効化し、ベクトル入りコレクションを作成し、バケット内にバックアップを作成した後、リストアします。このワークフローは `semitechnologies/weaviate:1.31.0` が RustFS バケットへバックアップする形で検証しました。
 
-Docker が必要です。このデプロイはローカルでの結合テスト用であり、本番環境向けではありません。
+Docker が必要です。このデプロイはローカルでの統合テスト用であり、本番環境向けではありません。
 
 ## アーキテクチャ
 
@@ -60,6 +60,9 @@ curl -s -X POST http://localhost:8080/v1/schema \
 
 curl -s -X POST http://localhost:8080/v1/objects -H "Content-Type: application/json" \
   -d '{"class":"Doc","properties":{"title":"RustFS vector backup"},"vector":[0.11,0.22,0.33,0.44]}'
+
+curl -s -X POST http://localhost:8080/v1/objects -H "Content-Type: application/json" \
+  -d '{"class":"Doc","properties":{"title":"Weaviate on object storage"},"vector":[0.11,0.22,0.33,0.44]}'
 
 curl -s -X POST http://localhost:8080/v1/backups/s3 -H "Content-Type: application/json" \
   -d '{"id":"rustfs-demo"}'

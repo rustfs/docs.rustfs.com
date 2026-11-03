@@ -7,7 +7,7 @@ Ce guide connecte [Dify](https://github.com/langgenius/dify) — la plateforme o
 
 Vous avez besoin de Docker Compose. Ce déploiement est destiné aux tests d'intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -41,7 +41,7 @@ aws s3 mb s3://dify --endpoint-url http://<your-rustfs-endpoint>:9000
 
 :::note[Rattacher RustFS au réseau Compose]
 
-La pile Compose vit dans son propre réseau bridge, et Docker isole les bridges entre eux — un endpoint comme `http://172.17.0.2:9000` expire depuis le conteneur `api`. Rattachez le conteneur RustFS au réseau Compose avec un alias et utilisez l'alias comme hôte du endpoint :
+La pile Compose vit dans son propre réseau bridge, et Docker isole les bridges entre eux — un point de terminaison comme `http://172.17.0.2:9000` expire depuis le conteneur `api`. Rattachez le conteneur RustFS au réseau Compose avec un alias et utilisez l'alias comme hôte du point de terminaison :
 
 ```bash
 docker network connect --alias rustfs <compose-network> <rustfs-container>

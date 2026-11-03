@@ -3,11 +3,11 @@ title: "CocoIndex"
 description: "Indexer en embeddings des documents stockés dans un bucket RustFS avec CocoIndex."
 ---
 
-Ce guide connecte [CocoIndex](https://github.com/cocoindex-io/cocoindex) — le moteur d'indexation incrémentale pour pipelines IA — à **RustFS** comme source de documents. Vous allez construire un flux qui liste des fichiers markdown depuis un préfixe de bucket, les découpe et les embarque, stocke les embeddings dans Postgres, puis interroge l'index. Le workflow a été vérifié avec CocoIndex `1.0.26` lisant depuis un bucket RustFS via un endpoint S3 personnalisé.
+Ce guide connecte [CocoIndex](https://github.com/cocoindex-io/cocoindex) — le moteur d'indexation incrémentale pour pipelines IA — à **RustFS** comme source de documents. Vous allez construire un flux qui liste des fichiers markdown depuis un préfixe de bucket, les découpe et en calcule les embeddings, stocke les embeddings dans Postgres, puis interroge l'index. Le workflow a été vérifié avec CocoIndex `1.0.26` lisant depuis un bucket RustFS via un point de terminaison S3 personnalisé.
 
 Vous avez besoin de Python 3.11+ et d'un Postgres avec l'extension `pgvector` pour la cible et l'état du flux.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -16,7 +16,7 @@ flowchart LR
 	Query["semantic query"] --> PG
 ```
 
-CocoIndex lit les objets sources via un client aiobotocore que vous créez vous-même, donc tout endpoint compatible S3 fonctionne — y compris RustFS avec l'adressage path-style. Les mises à jour incrémentales ne retraitent que les fichiers dont le contenu a changé, indexés par des chemins S3 stables.
+CocoIndex lit les objets sources via un client aiobotocore que vous créez vous-même, donc tout point de terminaison compatible S3 fonctionne — y compris RustFS avec l'adressage path-style. Les mises à jour incrémentales ne retraitent que les fichiers dont le contenu a changé, indexés par des chemins S3 stables.
 
 ## 1. Préparer l'environnement
 
@@ -28,7 +28,7 @@ python3 -m venv .venv
 ./.venv/bin/pip install "cocoindex[amazon_s3]" asyncpg pgvector numpy python-dotenv sentence-transformers
 ```
 
-Téléversez les documents sources dans un préfixe de bucket, en remplaçant tous les paramètres fictifs :
+Téléversez les documents sources dans un préfixe de bucket, en remplaçant toutes les valeurs de connexion indicatives :
 
 ```bash
 aws s3 cp ./docs s3://my-bucket/cocoindex-docs/ --recursive \
@@ -42,7 +42,7 @@ upload: docs/rustfs-overview.md to s3://my-bucket/cocoindex-docs/rustfs-overview
 
 ## 2. Écrire le flux
 
-Créez le fichier d'environnement et le flux. Le client S3 est créé avec `AWS_ENDPOINT_URL` défini, que aiobotocore honore pour les endpoints compatibles S3 :
+Créez le fichier d'environnement et le flux. Le client S3 est créé avec `AWS_ENDPOINT_URL` défini, que aiobotocore honore pour les points de terminaison compatibles S3 :
 
 ```ini title=".env"
 S3_BUCKET=my-bucket
@@ -56,14 +56,17 @@ POSTGRES_URL=postgres://cocoindex:cocoindex@localhost:5432/cocoindex
 ```
 
 ```python title="main.py"
-import asyncio, os
+import asyncio, os, sys
 from dataclasses import dataclass
 from typing import AsyncIterator, Annotated
 
 import aiobotocore.session
 import asyncpg
+from dotenv import load_dotenv
 from numpy.typing import NDArray
 from pgvector.asyncpg import register_vector
+
+load_dotenv()
 
 import cocoindex as coco
 from cocoindex.connectors import amazon_s3, postgres
@@ -128,6 +131,52 @@ async def app_main() -> None:
     await coco.mount_each(process_file, files.items(), target_table)
 
 app = coco.App(coco.AppConfig(name="RustFSDocs"), app_main)
+
+TOP_K = 5
+
+
+async def query_once(
+    pool: asyncpg.Pool,
+    embedder: SentenceTransformerEmbedder,
+    query: str,
+    *,
+    top_k: int = TOP_K,
+) -> None:
+    query_vec = await embedder.embed(query)
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            f"""
+            SELECT filename, text, embedding <=> $1 AS distance
+            FROM "{PG_SCHEMA_NAME}"."{TABLE_NAME}"
+            ORDER BY distance ASC
+            LIMIT $2
+            """,
+            query_vec,
+            top_k,
+        )
+    for r in rows:
+        score = 1.0 - float(r["distance"])
+        print(f"[{score:.3f}] {r['filename']}")
+        print(f"    {r['text']}")
+        print("---")
+
+
+async def query(initial_query: str | None = None) -> None:
+    embedder = SentenceTransformerEmbedder(EMBED_MODEL)
+    async with asyncpg.create_pool(DATABASE_URL, init=register_vector) as pool:
+        if initial_query is not None:
+            await query_once(pool, embedder, initial_query)
+            return
+        while True:
+            q = input("Enter search query (or Enter to quit): ").strip()
+            if not q:
+                break
+            await query_once(pool, embedder, q)
+
+
+if __name__ == "__main__":
+    initial = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else None
+    asyncio.run(query(initial))
 ```
 
 ## 3. Construire l'index depuis RustFS
@@ -142,7 +191,7 @@ set -a && . ./.env && set +a
 ✅ process_file: 2 total | 2 added
 ```
 
-Les deux fichiers markdown ont été lus depuis le bucket RustFS, découpés et embarqués dans Postgres. Interrogez l'index sémantiquement :
+Les deux fichiers markdown ont été lus depuis le bucket RustFS, découpés et transformés en embeddings dans Postgres. Interrogez l'index via le point d'entrée de `main.py`. Le script charge `.env`, calcule l'embedding de la question avec le même modèle et affiche les chunks les plus proches :
 
 ```bash
 ./.venv/bin/python main.py "what does RustFS expose"
@@ -173,7 +222,7 @@ aws s3 rm s3://my-bucket/cocoindex-docs --recursive \
 
 CocoIndex conserve son propre état dans Postgres. Définissez `COCOINDEX_DB` (et `POSTGRES_URL` pour la cible) vers une base avec l'extension `pgvector` activée.
 
-### `InvalidAccessKeyId` ou expiration de connexion depuis le flux
+### `InvalidAccessKeyId` ou des délais d'attente de connexion depuis le flux
 
 Les variables d'environnement n'ont pas été exportées avant l'exécution (`set -a && . ./.env && set +a`). `AWS_ENDPOINT_URL` doit inclure le schéma ; les identifiants passent par la paire standard `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`.
 

@@ -7,7 +7,7 @@ Ce guide connecte [Qdrant](https://github.com/qdrant/qdrant) — la base de donn
 
 Vous avez besoin de Docker. Ce déploiement est destiné aux tests d'intégration locaux, pas à la production.
 
-## Architecture
+## Schéma d’architecture
 
 ```mermaid
 flowchart LR
@@ -59,7 +59,7 @@ curl -s -X POST http://localhost:6333/collections/demo/snapshots
 {"result":{"name":"demo-8437507706552082-2026-11-01-13-31-15-0.snapshot","size":64512},"status":"ok"}
 ```
 
-Confirmez que l'objet snapshot a atterri dans RustFS, en remplaçant tous les paramètres fictifs :
+Confirmez que l'objet snapshot a atterri dans RustFS, en remplaçant toutes les valeurs de connexion indicatives :
 
 ```bash
 aws s3 ls s3://my-bucket/qdrant/ --recursive \
@@ -124,7 +124,7 @@ La collection cible existe déjà avec un schéma différent. Supprimez la colle
 
 ### Le bucket reste vide après un snapshot
 
-Nom de bucket ou endpoint erroné. L'endpoint doit inclure le schéma et le bucket doit exister ; la clé d'objet est `<prefix>/snapshots/<collection>/<name>.snapshot` — listez récursivement.
+Nom de bucket ou point de terminaison erroné. Le point de terminaison doit inclure le schéma et le bucket doit exister ; la clé d'objet est `<prefix>/snapshots/<collection>/<name>.snapshot` — listez récursivement.
 
 ## Prochaines étapes
 

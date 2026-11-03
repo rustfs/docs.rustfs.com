@@ -16,7 +16,7 @@ flowchart LR
 	Query["semantic query"] --> PG
 ```
 
-CocoIndex は自分で作成する aiobotocore クライアント経由でソースオブジェクトを読むため、S3 互換エンドポイントなら何でも使えます。パススタイル addressing の RustFS も例外ではありません。増分更新は内容が変わったファイルだけを再処理し、安定した S3 パスをキーにします。
+CocoIndex は自分で作成する aiobotocore クライアント経由でソースオブジェクトを読むため、S3 互換エンドポイントなら何でも使えます。パススタイルアドレッシングの RustFS も例外ではありません。増分更新は内容が変わったファイルだけを再処理し、安定した S3 パスをキーにします。
 
 ## 1. 環境を準備する
 
@@ -56,14 +56,17 @@ POSTGRES_URL=postgres://cocoindex:cocoindex@localhost:5432/cocoindex
 ```
 
 ```python title="main.py"
-import asyncio, os
+import asyncio, os, sys
 from dataclasses import dataclass
 from typing import AsyncIterator, Annotated
 
 import aiobotocore.session
 import asyncpg
+from dotenv import load_dotenv
 from numpy.typing import NDArray
 from pgvector.asyncpg import register_vector
+
+load_dotenv()
 
 import cocoindex as coco
 from cocoindex.connectors import amazon_s3, postgres
@@ -128,6 +131,52 @@ async def app_main() -> None:
     await coco.mount_each(process_file, files.items(), target_table)
 
 app = coco.App(coco.AppConfig(name="RustFSDocs"), app_main)
+
+TOP_K = 5
+
+
+async def query_once(
+    pool: asyncpg.Pool,
+    embedder: SentenceTransformerEmbedder,
+    query: str,
+    *,
+    top_k: int = TOP_K,
+) -> None:
+    query_vec = await embedder.embed(query)
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            f"""
+            SELECT filename, text, embedding <=> $1 AS distance
+            FROM "{PG_SCHEMA_NAME}"."{TABLE_NAME}"
+            ORDER BY distance ASC
+            LIMIT $2
+            """,
+            query_vec,
+            top_k,
+        )
+    for r in rows:
+        score = 1.0 - float(r["distance"])
+        print(f"[{score:.3f}] {r['filename']}")
+        print(f"    {r['text']}")
+        print("---")
+
+
+async def query(initial_query: str | None = None) -> None:
+    embedder = SentenceTransformerEmbedder(EMBED_MODEL)
+    async with asyncpg.create_pool(DATABASE_URL, init=register_vector) as pool:
+        if initial_query is not None:
+            await query_once(pool, embedder, initial_query)
+            return
+        while True:
+            q = input("Enter search query (or Enter to quit): ").strip()
+            if not q:
+                break
+            await query_once(pool, embedder, q)
+
+
+if __name__ == "__main__":
+    initial = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else None
+    asyncio.run(query(initial))
 ```
 
 ## 3. RustFS からインデックスを構築する
@@ -142,7 +191,7 @@ set -a && . ./.env && set +a
 ✅ process_file: 2 total | 2 added
 ```
 
-2 つの markdown ファイルが RustFS バケットから読み込まれ、チャンク化されて Postgres に埋め込まれました。インデックスを意味的にクエリします：
+2 つの markdown ファイルが RustFS バケットから読み込まれ、チャンク化されて Postgres に埋め込まれました。`main.py` のエントリポイントでインデックスを検索します。スクリプトは `.env` を読み込み、同じモデルで質問の埋め込みを計算し、最も近いチャンクを表示します：
 
 ```bash
 ./.venv/bin/python main.py "what does RustFS expose"
@@ -154,7 +203,7 @@ set -a && . ./.env && set +a
 ---
 ```
 
-クエリがヒットするチャンクのソース オブ ザ トゥルースはバケットです。RustFS 内のファイルを編集して `cocoindex update main` を再実行すれば、変更部分だけが増分で再インデックスされます。
+クエリがヒットするチャンクの正本（source of truth）はバケットです。RustFS 内のファイルを編集して `cocoindex update main` を再実行すれば、変更部分だけが増分で再インデックスされます。
 
 ![RustFS コンソール上の CocoIndex ソース文書](./images/rustfs-cocoindex-source.png)
 

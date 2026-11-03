@@ -61,6 +61,9 @@ curl -s -X POST http://localhost:8080/v1/schema \
 curl -s -X POST http://localhost:8080/v1/objects -H "Content-Type: application/json" \
   -d '{"class":"Doc","properties":{"title":"RustFS vector backup"},"vector":[0.11,0.22,0.33,0.44]}'
 
+curl -s -X POST http://localhost:8080/v1/objects -H "Content-Type: application/json" \
+  -d '{"class":"Doc","properties":{"title":"Weaviate on object storage"},"vector":[0.11,0.22,0.33,0.44]}'
+
 curl -s -X POST http://localhost:8080/v1/backups/s3 -H "Content-Type: application/json" \
   -d '{"id":"rustfs-demo"}'
 ```

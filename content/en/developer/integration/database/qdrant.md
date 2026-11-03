@@ -19,7 +19,7 @@ With `snapshots_storage: s3`, every collection snapshot is uploaded to the bucke
 
 ## 1. Point Qdrant at RustFS
 
-Configure the snapshot storage through environment variables — the `QDRANT__` prefix maps to the config tree, and `S3_CONFIG__ENDPOINT_URL` is the custom-endpoint field for MinIO-class stores. Bucket and prefix must exist considerations: create the bucket first if it does not exist; the prefix may be empty.
+Configure the snapshot storage through environment variables — the `QDRANT__` prefix maps to the config tree, and `S3_CONFIG__ENDPOINT_URL` is the custom-endpoint field for MinIO-class stores. Create the bucket first if it does not exist; the prefix may be empty.
 
 ```bash
 docker run -d --name qdrant -p 6333:6333 \
