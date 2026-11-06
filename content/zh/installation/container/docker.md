@@ -122,14 +122,14 @@ compose 文件使用初始化容器为 `rustfs` 授予正确的访问权限：�
         rustfs_perms:
           condition: service_completed_successfully
       volumes:
-        - /path/to_host_directory/volumes/data:/data
-        - /path/to_host_directory/volumes/logs:/var/log/rustfs/
+        - /path/to/host_directory/volumes/data:/data
+        - /path/to/host_directory/volumes/logs:/var/log/rustfs/
       environment:
-        - RUSTFS_ADDRESS=":9000"
-        - RUSTFS_CONSOLE_ADDRESS=":9001"
-        - RUSTFS_CONSOLE_ENABLE=true
-        - RUSTFS_OBS_LOGGER_LEVEL=error
-        - RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
+        RUSTFS_ADDRESS: ":9000"
+        RUSTFS_CONSOLE_ADDRESS: ":9001"
+        RUSTFS_CONSOLE_ENABLE: "true"
+        RUSTFS_OBS_LOGGER_LEVEL: error
+        RUSTFS_OBS_LOG_DIRECTORY: "/var/log/rustfs/"
 
       # ... other configurations
 ```
