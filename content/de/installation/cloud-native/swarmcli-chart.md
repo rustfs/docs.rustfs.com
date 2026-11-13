@@ -1,5 +1,5 @@
 ---
-title: "SwarmCLI-Chart"
+title: "RustFS mit dem SwarmCLI-Chart installieren"
 description: "Stellen Sie RustFS mit dem rustfs-Chart von SwarmCLI in Docker Swarm bereit, als Dienst auf einem Knoten oder als verteilten Cluster mit Erasure Coding: Zugangsdaten in Docker-Secrets, versionierte Upgrades und Rollbacks sowie optional HTTPS über Traefik."
 ---
 

@@ -1,5 +1,5 @@
 ---
-title: "SwarmCLI Chart"
+title: "使用 SwarmCLI Chart 安装 RustFS"
 description: "使用 SwarmCLI 的 rustfs Chart 在 Docker Swarm 上部署 RustFS，可部署为单节点服务或采用纠删码的分布式集群：凭证保存在 Docker Secret 中，支持带版本的升级和回滚，并可选择通过 Traefik 启用 HTTPS。"
 ---
 

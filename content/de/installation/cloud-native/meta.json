@@ -3,6 +3,6 @@
 	"pages": [
 		"helm-chart",
 		"operator",
-		"swarmcli-chart"
+		"[SwarmCLI-Chart](/de/installation/cloud-native/swarmcli-chart)"
 	]
 }

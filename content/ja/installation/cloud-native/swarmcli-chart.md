@@ -1,5 +1,5 @@
 ---
-title: "SwarmCLI チャート"
+title: "SwarmCLI チャートで RustFS をインストールする"
 description: "SwarmCLI の rustfs チャートを使い、RustFS を単一ノードのサービスまたはイレイジャーコーディングを用いた分散クラスターとして Docker Swarm 上にデプロイします。認証情報は Docker シークレットに保持し、バージョン管理されたアップグレードとロールバック、必要に応じて Traefik 経由の HTTPS を利用できます。"
 ---
 

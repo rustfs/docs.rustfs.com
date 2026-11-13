@@ -1,5 +1,5 @@
 ---
-title: "SwarmCLI Chart"
+title: "Install RustFS with the SwarmCLI chart"
 description: "Deploy RustFS on Docker Swarm with the SwarmCLI rustfs chart, as a single-node service or a distributed, erasure-coded cluster: credentials in Docker secrets, versioned upgrades and rollbacks, and optional HTTPS through Traefik."
 ---
 
