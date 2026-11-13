@@ -1,5 +1,5 @@
 ---
-title: 概要
+title: "Operator の概要"
 description: RustFS Operator が Kubernetes 上の RustFS クラスターをどのように管理するかを説明します。
 ---
 

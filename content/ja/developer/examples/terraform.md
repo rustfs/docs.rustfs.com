@@ -1,5 +1,5 @@
 ---
-title: "Terraform"
+title: "Terraform の使用例"
 description: "カスタムエンドポイントを指定した AWS プロバイダーを使い、Terraform で RustFS のバケットとオブジェクトを管理します。"
 ---
 

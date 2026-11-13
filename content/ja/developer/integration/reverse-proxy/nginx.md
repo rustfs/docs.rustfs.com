@@ -104,7 +104,9 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Connection '';
         proxy_cache_convert_head off;
-        proxy_connect_timeout 300s;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
         chunked_transfer_encoding off;
         proxy_pass http://rustfs_s3;
     }
@@ -131,13 +133,15 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
-        proxy_connect_timeout 300s;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
         proxy_pass http://rustfs_console;
     }
 }
 ```
 
-S3 用の server ブロックは、元のホストとリクエストパスを保持し、ストリーミングアップロード向けにリクエストのバッファリングを無効にし、署名済みの `HEAD` リクエストを変換しません。Console 用の server ブロックは、WebSocket のアップグレードヘッダーも転送します。
+S3 用の server ブロックは、元のホストとリクエストパスを保持し、ストリーミングアップロード向けにリクエストのバッファリングを無効にし、署名済みの `HEAD` リクエストを変換しません。Console 用の server ブロックは、WebSocket のアップグレードヘッダーも転送します。どちらの server ブロックも `proxy_connect_timeout` を短く設定しているため、到達できないノードへのリクエストは数秒以内に失敗するか次のノードへフェイルオーバーします。一方、`proxy_read_timeout` と `proxy_send_timeout` は長めに設定し、大きなアップロードやダウンロードが途中で切断されないようにしています。
 
 ## 4. Compose ファイルを作成する
 
@@ -260,7 +264,7 @@ upstream rustfs_console {
 }
 ```
 
-Console のアップストリームがクライアントアフィニティを使うのは、進行中の OpenID Connect ログインが `state` を 1 台の RustFS ノードに保存するためです。ノード間の内部 RPC は同じリスナーを使うため、RustFS ノード間ではポート `9000` を開けたままにします。
+Console のアップストリームがクライアントアフィニティを使うのは、進行中の OpenID Connect ログインが `state` を 1 台の RustFS ノードに保存するためです。ノード間の内部 RPC は同じリスナーを使うため、RustFS ノード間ではポート `9000` を開けたままにします。ここでも `proxy_connect_timeout` は短く保ってください。接続タイムアウトが長いと、障害ノードに到達したリクエストは Nginx が TCP ハンドシェイクを待つ間ずっと数分間ブロックされ、Nginx が次のノードを試す前にクライアント側がタイムアウトしてしまいます。
 
 ## 次のステップ
 

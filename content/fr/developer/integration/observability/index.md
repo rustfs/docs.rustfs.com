@@ -1,5 +1,5 @@
 ---
-title: "Observabilité"
+title: "Intégrations d’observabilité"
 description: "Connectez les plateformes d’observabilité à RustFS via des interfaces de stockage objet compatibles S3."
 ---
 

@@ -8,7 +8,7 @@
     "scaling",
     "high-availability",
     "cluster-lifecycle",
-    "observability",
+    "[Observabilité](/fr/operations/observability)",
     "status-check",
     "event-notifications"
   ]

@@ -1,5 +1,5 @@
 ---
-title: 安装
+title: "安装 RustFS Operator"
 description: 准备 Kubernetes、安装 RustFS Operator 并安全访问其控制台。
 ---
 

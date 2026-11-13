@@ -35,7 +35,7 @@ Boolesche Variablen akzeptieren `true` und `false`. Als „nicht gesetzt“ ange
 | `RUSTFS_CONSOLE_ENABLE` | `true` | Aktiviert die eingebettete Console (Weboberfläche) auf einem eigenen Listener. |
 | `RUSTFS_CONSOLE_ADDRESS` | `:9001` | Bind-Adresse und Port des Console-Listeners. |
 
-## CORS
+## CORS [#cors]
 
 | Variable | Standard | Beschreibung |
 | --- | --- | --- |
@@ -125,7 +125,7 @@ Intervalle der Metrikerfassung folgen dem Muster `RUSTFS_METRICS_<SCOPE>_INTERVA
 | `RUSTFS_HEAL_MAX_CONCURRENT_HEALS` | `4` | Maximale Anzahl gleichzeitiger Aufgaben der Datenwiederherstellung. |
 | `RUSTFS_HEAL_MAX_CONCURRENT_PER_SET` | `1` | Maximale Anzahl gleichzeitiger Aufgaben der Datenwiederherstellung je Erasure-Set. |
 
-## Speicher und Erasure Coding
+## Speicher und Erasure Coding [#storage--erasure]
 
 | Variable | Standard | Beschreibung |
 | --- | --- | --- |
@@ -154,7 +154,7 @@ Die eingebauten Standard-Anmeldedaten `rustfsadmin`/`rustfsadmin` dienen nur der
 
 <a id="event--audit-targets"></a>
 
-## Ereignis- und Audit-Ziele
+## Ereignis- und Audit-Ziele [#event--audit-targets]
 
 Modulschalter:
 

@@ -1,5 +1,5 @@
 ---
-title: Vue d’ensemble
+title: "Vue d’ensemble du chart Helm"
 description: Comprenez comment le chart Helm RustFS déploie des clusters autonomes et distribués sur Kubernetes.
 ---
 

@@ -1,5 +1,5 @@
 ---
-title: 概要
+title: "Helm チャートの概要"
 description: RustFS の Helm チャートが、Kubernetes 上のスタンドアロンおよび分散クラスターをどのようにデプロイするかを説明します。
 ---
 

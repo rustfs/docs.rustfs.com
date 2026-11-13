@@ -1,7 +1,7 @@
 {
   "title": "Skalierung",
   "pages": [
-    "storage-pool-expansion",
+    "[Speicherpool-Erweiterung](/de/operations/scaling/storage-pool-expansion)",
     "data-rebalancing",
     "storage-pool-decommission"
   ]

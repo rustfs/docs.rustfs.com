@@ -58,7 +58,7 @@ Utilisez HTTPS pour les collecteurs distants. Laissez la vérification des certi
 
 :::
 
-Pour toutes les familles de cibles et les clés propres à chaque cible, consultez les [variables d’environnement](/fr/reference/environment-variables#cibles-dévénements-et-daudit).
+Pour toutes les familles de cibles et les clés propres à chaque cible, consultez les [variables d’environnement](/fr/reference/environment-variables#event--audit-targets).
 
 ### Plusieurs cibles
 

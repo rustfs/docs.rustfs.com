@@ -4,7 +4,7 @@
     "capo",
     "juicefs",
     "nextcloud",
-    "rclone",
+    "[rclone](/ja/developer/integration/others/rclone)",
     "tusd"
   ]
 }

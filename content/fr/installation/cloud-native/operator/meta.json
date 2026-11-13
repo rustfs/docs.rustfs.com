@@ -1,9 +1,9 @@
 {
   "title": "Opérateur RustFS",
   "pages": [
-    "installation",
+    "[Installation](/fr/installation/cloud-native/operator/installation)",
     "tenant",
-    "pool-expansion",
+    "[Extension de pool](/fr/installation/cloud-native/operator/pool-expansion)",
     "kms"
   ]
 }

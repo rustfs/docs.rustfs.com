@@ -123,7 +123,7 @@ vault write -f transit/keys/rustfs-default-key
 
 <a id="verify-kms-backed-encryption"></a>
 
-## KMS を使った暗号化を確認する
+## KMS を使った暗号化を確認する [#verify-kms-backed-encryption]
 
 テスト用バケットを作成し、デフォルト鍵で SSE-KMS を設定し、オブジェクトをアップロードして読み戻します。
 

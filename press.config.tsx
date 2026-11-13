@@ -13,6 +13,7 @@ import { defineI18n } from "fumadocs-core/i18n";
 import defaultMdxComponents, { createRelativeLink } from "fumadocs-ui/mdx";
 import { docs } from "./.source/server";
 import { BrandLogo } from "./src/components/brand-logo";
+import { docsOgCard } from "./src/components/docs-og";
 import { Mermaid } from "./src/components/mermaid";
 import { Tab, Tabs } from "./src/components/tabs";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
@@ -49,16 +50,37 @@ const translations = i18n
       displayName: "Deutsch",
       "Blog(blog)": "Blog",
       "All Tags(blog tags page)": "Alle Tags",
+      "Search(search trigger)": "Suche",
+      "Search(search dialog)": "Suche",
+      "Open Search(search trigger)(aria-label)": "Suche öffnen",
+      "Close Search(search dialog)(aria-label)": "Suche schließen",
+      "On this page(table of contents)": "Auf dieser Seite",
+      "Copy Markdown(page actions)": "Markdown kopieren",
+      "Copied Markdown(page actions)": "Markdown kopiert",
     },
     fr: {
       displayName: "Français",
       "Blog(blog)": "Blog",
       "All Tags(blog tags page)": "Tous les tags",
+      "Search(search trigger)": "Rechercher",
+      "Search(search dialog)": "Rechercher",
+      "Open Search(search trigger)(aria-label)": "Ouvrir la recherche",
+      "Close Search(search dialog)(aria-label)": "Fermer la recherche",
+      "On this page(table of contents)": "Sur cette page",
+      "Copy Markdown(page actions)": "Copier le Markdown",
+      "Copied Markdown(page actions)": "Markdown copié",
     },
     ja: {
       displayName: "日本語",
       "Blog(blog)": "ブログ",
       "All Tags(blog tags page)": "すべてのタグ",
+      "Search(search trigger)": "検索",
+      "Search(search dialog)": "検索",
+      "Open Search(search trigger)(aria-label)": "検索を開く",
+      "Close Search(search dialog)(aria-label)": "検索を閉じる",
+      "On this page(table of contents)": "このページの内容",
+      "Copy Markdown(page actions)": "Markdown をコピー",
+      "Copied Markdown(page actions)": "Markdown をコピーしました",
     },
   });
 
@@ -229,15 +251,12 @@ gtag('config', 'G-TWW7WMTWL9');`,
         </>
       );
     },
-    // Per-page <meta name="description"> (VitePress emitted this from frontmatter).
+    // FumaPress already emits <meta name="description"> from frontmatter.
+    // Keep a single site-wide fallback for pages that have no description.
     page(page) {
+      if (page.data.description) return null;
       return (
-        <>
-          <meta
-            name="description"
-            content={page.data.description ?? siteDescription}
-          />
-        </>
+        <meta name="description" content={siteDescription} />
       );
     },
   },
@@ -245,8 +264,41 @@ gtag('config', 'G-TWW7WMTWL9');`,
   .plugins(
     localSearchPlugin(languages),
     llmsPlugin(),
-    takumiPlugin(),
-    sitemapPlugin(),
+    takumiPlugin({
+      generate(page) {
+        const compact = page.url === "/en" || page.url === "/zh";
+        return {
+          node: docsOgCard({
+            title: page.data.title,
+            description: page.data.description,
+            site: this.siteConfig.name,
+            compact,
+          }),
+        };
+      },
+    }),
+    sitemapPlugin({
+      async getEntry(page) {
+        // The thin language chooser is not a content page. Never list it.
+        if (page.url === "/" || page.url === "") return;
+
+        const alternates = await this.getPageAlternates(page);
+        const defaultHref =
+          alternates.find((item) => item.hreflang === "en" || item.locale === "en")?.href ??
+          this.absoluteUrl("/en");
+        const withDefault =
+          alternates.length > 0 && !alternates.some((item) => item.hreflang === "x-default")
+            ? [...alternates, { hreflang: "x-default", href: defaultHref }]
+            : alternates;
+
+        return {
+          loc: this.absoluteUrl(page.url),
+          lastmod: await this.getPageLastModified(page),
+          priority: page.url === "/en" ? 1 : page.url === "/zh" ? 0.9 : 0.8,
+          alternates: withDefault,
+        };
+      },
+    }),
     robotsPlugin(),
     rssPlugin(),
   )

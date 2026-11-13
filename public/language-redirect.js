@@ -1,3 +1,7 @@
+// Runs only when a host serves the fallback document at `/`.
+// Production `/` is a 301 to `/en` (see public/_redirects), so crawlers
+// never depend on this script. Humans who do receive the fallback still
+// follow their saved or browser language.
 (() => {
   const supportedLanguages = new Set(["en", "zh", "de", "fr", "ja"]);
   const storageKey = "rustfs-docs-language";

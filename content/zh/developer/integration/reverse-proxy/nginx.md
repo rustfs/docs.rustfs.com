@@ -104,7 +104,9 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Connection '';
         proxy_cache_convert_head off;
-        proxy_connect_timeout 300s;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
         chunked_transfer_encoding off;
         proxy_pass http://rustfs_s3;
     }
@@ -131,13 +133,15 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
-        proxy_connect_timeout 300s;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
         proxy_pass http://rustfs_console;
     }
 }
 ```
 
-S3 服务器会保留原始主机和请求路径，禁用请求缓冲以支持流式上传，并且不会转换已签名的 `HEAD` 请求。控制台服务器还会转发 WebSocket 升级标头。
+S3 服务器会保留原始主机和请求路径，禁用请求缓冲以支持流式上传，并且不会转换已签名的 `HEAD` 请求。控制台服务器还会转发 WebSocket 升级标头。两个服务器都保持较短的 `proxy_connect_timeout`，使请求在节点不可达时于几秒内失败或转移到下一个节点；`proxy_read_timeout` 与 `proxy_send_timeout` 则保持宽松，确保大文件上传和下载不会被中途切断。
 
 ## 4. 创建 Compose 文件
 
@@ -260,7 +264,7 @@ upstream rustfs_console {
 }
 ```
 
-控制台上游使用客户端亲和性，因为正在进行的 OpenID Connect 登录会将其 `state` 存储在一个 RustFS 节点上。请保持 RustFS 节点之间的端口 `9000` 开放，因为内部节点 RPC 使用同一监听器。
+控制台上游使用客户端亲和性，因为正在进行的 OpenID Connect 登录会将其 `state` 存储在一个 RustFS 节点上。请保持 RustFS 节点之间的端口 `9000` 开放，因为内部节点 RPC 使用同一监听器。这里同样要保持较短的 `proxy_connect_timeout`：连接超时过长时，落到故障节点上的每个请求都会阻塞数分钟等待 TCP 握手，客户端往往在 Nginx 尝试下一个节点之前就已超时。
 
 ## 后续步骤
 

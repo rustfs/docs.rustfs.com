@@ -38,7 +38,7 @@ RustFS には、次の組み込み（canned）ポリシーがあります。`rea
 
 <a id="policy-evaluation-semantics"></a>
 
-## ポリシー評価の意味
+## ポリシー評価の意味 [#policy-evaluation-semantics]
 
 アイデンティティに複数のポリシーが割り当てられている場合、RustFS はステートメントを統合し（重複は除く）、統合したドキュメントを評価します。
 

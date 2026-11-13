@@ -35,7 +35,7 @@ Les variables booléennes acceptent `true`/`false`. Les valeurs indiquées comme
 | `RUSTFS_CONSOLE_ENABLE` | `true` | Active la console web intégrée (servie sur un écouteur distinct). |
 | `RUSTFS_CONSOLE_ADDRESS` | `:9001` | Adresse et port d’écoute de la Console. |
 
-## CORS
+## CORS [#cors]
 
 | Variable | Valeur par défaut | Description |
 | --- | --- | --- |
@@ -125,7 +125,7 @@ Les intervalles de collecte des métriques suivent le modèle `RUSTFS_METRICS_<S
 | `RUSTFS_HEAL_MAX_CONCURRENT_HEALS` | `4` | Nombre maximal de tâches de réparation simultanées. |
 | `RUSTFS_HEAL_MAX_CONCURRENT_PER_SET` | `1` | Nombre maximal de tâches de réparation simultanées par ensemble de codage d’effacement. |
 
-## Stockage et codage d’effacement
+## Stockage et codage d’effacement [#storage--erasure]
 
 | Variable | Valeur par défaut | Description |
 | --- | --- | --- |
@@ -152,7 +152,7 @@ Les identifiants par défaut intégrés `rustfsadmin`/`rustfsadmin` servent uniq
 
 :::
 
-## Cibles d’événements et d’audit
+## Cibles d’événements et d’audit [#event--audit-targets]
 
 Commutateurs de module :
 

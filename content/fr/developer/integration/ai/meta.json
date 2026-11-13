@@ -3,6 +3,11 @@
   "pages": [
     "mlflow",
     "ray",
-    "vllm"
+    "sglang",
+    "vllm",
+    "dify",
+    "ragflow",
+    "cocoindex",
+    "feast"
   ]
 }

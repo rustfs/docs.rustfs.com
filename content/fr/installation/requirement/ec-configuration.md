@@ -111,5 +111,5 @@ Après le démarrage, utilisez la page **Status** de la Console ou `rc admin inf
 ## Étapes suivantes
 
 - [Préparer les disques de données](./disk-preparation.md)
-- [Choisir une topologie de déploiement](/fr/installation#comparaison-des-modes-de-déploiement)
-- [Consulter toutes les variables d’environnement de stockage](/fr/reference/environment-variables#stockage-et-codage-deffacement)
+- [Choisir une topologie de déploiement](/fr/installation#deployment-mode-comparison)
+- [Consulter toutes les variables d’environnement de stockage](/fr/reference/environment-variables#storage--erasure)

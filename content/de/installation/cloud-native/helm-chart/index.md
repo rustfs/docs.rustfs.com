@@ -1,5 +1,5 @@
 ---
-title: Überblick
+title: "Überblick über das Helm-Chart"
 description: Verstehen Sie, wie das RustFS-Helm-Chart Standalone- und verteilte Cluster auf Kubernetes bereitstellt.
 ---
 

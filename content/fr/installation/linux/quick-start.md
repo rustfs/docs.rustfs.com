@@ -3,7 +3,7 @@ title: "Démarrage rapide"
 description: "Installez RustFS avec le script d’installation, connectez-vous à la Console et stockez votre premier objet, en une dizaine de minutes."
 ---
 
-Ce guide vous mène d’un serveur Linux vide à une instance RustFS opérationnelle : installez, connectez-vous à la Console, créez un compartiment (bucket) et chargez (upload) votre premier objet. La planification de production (topologie multi-nœuds, dimensionnement matériel) est volontairement renvoyée à [l’étape suivante](#étapes-suivantes).
+Ce guide vous mène d’un serveur Linux vide à une instance RustFS opérationnelle : installez, connectez-vous à la Console, créez un compartiment (bucket) et chargez (upload) votre premier objet. La planification de production (topologie multi-nœuds, dimensionnement matériel) est volontairement renvoyée à [l’étape suivante](#next-steps).
 
 **Prérequis**
 
@@ -80,7 +80,7 @@ rc object list rustfs/my-bucket
 
 <a id="mode"></a>
 
-## Étapes suivantes
+## Étapes suivantes [#next-steps]
 
 L’installation rapide exécute RustFS en mode **nœud unique, disque unique (SNSD)**, sans aucune redondance, adapté à l’évaluation et au développement. La suite dépend de votre objectif :
 

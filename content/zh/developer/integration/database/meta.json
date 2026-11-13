@@ -9,6 +9,8 @@
     "lancedb",
     "milvus",
     "trino",
-    "vitess"
+    "vitess",
+    "qdrant",
+    "weaviate"
   ]
 }

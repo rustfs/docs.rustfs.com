@@ -121,7 +121,7 @@ vault write -f transit/keys/rustfs-default-key
 
 :::
 
-## Verify KMS-backed encryption
+## Verify KMS-backed encryption [#verify-kms-backed-encryption]
 
 Create a test bucket, configure SSE-KMS with the default key, upload an object, and read it back:
 

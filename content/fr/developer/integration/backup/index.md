@@ -11,5 +11,6 @@ Utilisez **RustFS** comme backend de stockage objet pour les outils de sauvegard
 - [Velero](./velero.md)
 - [Kopia](./kopia.md)
 - [Longhorn](./longhorn.md)
+- [Veeam](./veeam.md)
 
 Conservez les tâches de sauvegarde dans un compartiment et un préfixe dédiés, et utilisez des identifiants limités aux opérations de compartiment nécessaires.

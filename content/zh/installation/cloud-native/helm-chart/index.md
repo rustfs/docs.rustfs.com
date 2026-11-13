@@ -1,5 +1,5 @@
 ---
-title: 概述
+title: "Helm Chart 概述"
 description: 了解 RustFS Helm chart 如何在 Kubernetes 上部署单机和分布式集群。
 ---
 

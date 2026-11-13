@@ -1,5 +1,5 @@
 ---
-title: Vue d’ensemble
+title: "Vue d’ensemble de l’Operator"
 description: Comprenez comment l’Operator RustFS gère les clusters RustFS sur Kubernetes.
 ---
 

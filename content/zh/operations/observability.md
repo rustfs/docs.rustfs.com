@@ -1,5 +1,5 @@
 ---
-title: "可观测性"
+title: "RustFS 可观测性"
 description: "本文介绍 RustFS 遥测导出、监控集成、指标名称和标签、建议告警以及日志采集。"
 ---
 

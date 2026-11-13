@@ -1,5 +1,5 @@
 ---
-title: "Terraform"
+title: "Terraform 連携"
 description: "ステートロックを含め、S3 バックエンドで Terraform のステートを RustFS のオブジェクトストレージに保存します。"
 ---
 

@@ -1,5 +1,5 @@
 ---
-title: "Observability"
+title: "Observability integrations"
 description: "Connect observability platforms to RustFS through S3-compatible object storage interfaces."
 ---
 

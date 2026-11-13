@@ -1,5 +1,5 @@
 ---
-title: Extension de pool
+title: "Étendre le pool de stockage d’un Tenant"
 description: Ajoutez de la capacité de stockage à un Tenant RustFS en ajoutant un pool de stockage.
 ---
 

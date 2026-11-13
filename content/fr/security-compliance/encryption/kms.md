@@ -121,7 +121,7 @@ vault write -f transit/keys/rustfs-default-key
 
 :::
 
-## Vérifier le chiffrement reposant sur le KMS
+## Vérifier le chiffrement reposant sur le KMS [#verify-kms-backed-encryption]
 
 Créez un compartiment de test, configurez SSE-KMS avec la clé par défaut, chargez (upload) un objet et relisez-le :
 

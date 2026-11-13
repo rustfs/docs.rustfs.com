@@ -1,5 +1,5 @@
 ---
-title: "Terraform"
+title: "Intégration Terraform"
 description: "Stockez l’état Terraform dans le stockage objet RustFS avec le backend S3, y compris le verrouillage de l’état."
 ---
 

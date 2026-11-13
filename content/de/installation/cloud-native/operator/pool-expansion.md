@@ -1,5 +1,5 @@
 ---
-title: Speicherpool-Erweiterung
+title: "Tenant-Speicherpool erweitern"
 description: Erweitern Sie die Speicherkapazität eines RustFS-Tenants, indem Sie einen Speicherpool anhängen.
 ---
 

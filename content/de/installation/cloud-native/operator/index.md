@@ -1,5 +1,5 @@
 ---
-title: Überblick
+title: "Überblick über den Operator"
 description: Verstehen Sie, wie der RustFS Operator RustFS-Cluster auf Kubernetes verwaltet.
 ---
 

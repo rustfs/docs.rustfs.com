@@ -1,5 +1,5 @@
 ---
-title: "Docker"
+title: "Docker で RustFS をインストールして設定する"
 description: "Docker で RustFS を実行するときの、シングルノード構成、ホストディレクトリの権限、Docker Compose、TLS、マルチノードデプロイを説明します。"
 ---
 
@@ -122,14 +122,14 @@ compose ファイルは、初期化コンテナで `rustfs` に正しいアク�
         rustfs_perms:
           condition: service_completed_successfully
       volumes:
-        - /path/to_host_directory/volumes/data:/data
-        - /path/to_host_directory/volumes/logs:/var/log/rustfs/
+        - /path/to/host_directory/volumes/data:/data
+        - /path/to/host_directory/volumes/logs:/var/log/rustfs/
       environment:
-        - RUSTFS_ADDRESS=":9000"
-        - RUSTFS_CONSOLE_ADDRESS=":9001"
-        - RUSTFS_CONSOLE_ENABLE=true
-        - RUSTFS_OBS_LOGGER_LEVEL=error
-        - RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
+        RUSTFS_ADDRESS: ":9000"
+        RUSTFS_CONSOLE_ADDRESS: ":9001"
+        RUSTFS_CONSOLE_ENABLE: "true"
+        RUSTFS_OBS_LOGGER_LEVEL: error
+        RUSTFS_OBS_LOG_DIRECTORY: "/var/log/rustfs/"
 
       # ... other configurations
 ```

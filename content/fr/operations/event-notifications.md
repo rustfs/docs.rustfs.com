@@ -66,7 +66,7 @@ N’activez pas `RUSTFS_NOTIFY_WEBHOOK_SKIP_TLS_VERIFY_PRIMARY` en production. C
 
 :::
 
-Pour toutes les familles de cibles et les clés propres à chaque cible, consultez les [variables d’environnement](/fr/reference/environment-variables#cibles-dévénements-et-daudit).
+Pour toutes les familles de cibles et les clés propres à chaque cible, consultez les [variables d’environnement](/fr/reference/environment-variables#event--audit-targets).
 
 ## Utilisation
 

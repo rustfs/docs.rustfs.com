@@ -1,5 +1,5 @@
 ---
-title: Overview
+title: "Helm chart overview"
 description: Understand how the RustFS Helm chart deploys standalone and distributed clusters on Kubernetes.
 ---
 

@@ -1,7 +1,7 @@
 {
   "title": "扩缩容",
   "pages": [
-    "storage-pool-expansion",
+    "[存储池扩容](/zh/operations/scaling/storage-pool-expansion)",
     "data-rebalancing",
     "storage-pool-decommission"
   ]

@@ -1,5 +1,5 @@
 ---
-title: "Docker"
+title: "使用 Docker 安装并配置 RustFS"
 description: "使用 Docker 运行 RustFS：单节点部署、主机目录权限、Docker Compose、TLS 和多节点部署。"
 ---
 
@@ -71,7 +71,7 @@ docker run -d \
   /data
 ```
 
-## 5. 绑定挂载主机目录
+## 5. 绑定挂载主机目录 [#bind-mount-a-host-directory]
 
 上面的命名卷无需额外设置。如果改用主机目录挂载（`-v /path/on/host:/data`），请注意容器以非 root 用户 `rustfs`（ID `10001`）运行。请确保主机目录的所有者为 `10001`，否则会遇到权限拒绝错误：
 
@@ -122,14 +122,14 @@ compose 文件使用初始化容器为 `rustfs` 授予正确的访问权限：�
         rustfs_perms:
           condition: service_completed_successfully
       volumes:
-        - /path/to_host_directory/volumes/data:/data
-        - /path/to_host_directory/volumes/logs:/var/log/rustfs/
+        - /path/to/host_directory/volumes/data:/data
+        - /path/to/host_directory/volumes/logs:/var/log/rustfs/
       environment:
-        - RUSTFS_ADDRESS=":9000"
-        - RUSTFS_CONSOLE_ADDRESS=":9001"
-        - RUSTFS_CONSOLE_ENABLE=true
-        - RUSTFS_OBS_LOGGER_LEVEL=error
-        - RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
+        RUSTFS_ADDRESS: ":9000"
+        RUSTFS_CONSOLE_ADDRESS: ":9001"
+        RUSTFS_CONSOLE_ENABLE: "true"
+        RUSTFS_OBS_LOGGER_LEVEL: error
+        RUSTFS_OBS_LOG_DIRECTORY: "/var/log/rustfs/"
 
       # ... other configurations
 ```

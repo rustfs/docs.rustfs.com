@@ -1,5 +1,5 @@
 ---
-title: "Extension de pool"
+title: "Étendre un pool de stockage RustFS"
 description: "Ajoutez un pool de stockage à un cluster RustFS et vérifiez la topologie étendue depuis la Console ou avec rc."
 ---
 

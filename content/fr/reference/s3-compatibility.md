@@ -18,7 +18,7 @@ L’instantané ci-dessous a été vérifié le 9 août 2026 à partir du commit
 ## Listes de tests exécutables
 
 | Liste | Cas | Rôle |
-| --- | --- : | --- |
+| --- | ---: | --- |
 | [Tests implémentés](https://github.com/rustfs/rustfs/blob/main/scripts/s3-tests/implemented_tests.txt) | 455 | Cas standard censés réussir dans le contrôle par défaut |
 | [Tests du cycle de vie](https://github.com/rustfs/rustfs/blob/main/scripts/s3-tests/lifecycle_behavior_tests.txt) | 5 | Cas d’expiration exécutés dans le contrôle dédié au cycle de vie |
 | [Tests non implémentés](https://github.com/rustfs/rustfs/blob/main/scripts/s3-tests/unimplemented_tests.txt) | 17 | Comportements standard encore planifiés |

@@ -1,5 +1,5 @@
 ---
-title: Pool Expansion
+title: "Expand a Tenant storage pool"
 description: Add storage capacity to a RustFS Tenant by appending a storage pool.
 ---
 

@@ -1,5 +1,5 @@
 ---
-title: "Docker"
+title: "Install and configure RustFS with Docker"
 description: "Run RustFS with Docker: single-node setup, host-directory permissions, Docker Compose, TLS, and multi-node deployment."
 ---
 
@@ -71,7 +71,7 @@ docker run -d \
   /data
 ```
 
-## 5. Bind-mount a host directory
+## 5. Bind-mount a host directory [#bind-mount-a-host-directory]
 
 The named volume above needs no extra setup. If you mount a host directory instead (`-v /path/on/host:/data`), keep in mind that the container runs as non-root user `rustfs` with id `10001`. Make the host directory owned by `10001`, otherwise you will encounter permission denied errors:
 
@@ -122,14 +122,14 @@ The compose file uses an initialization container to grant the correct access ri
         rustfs_perms:
           condition: service_completed_successfully
       volumes:
-        - /path/to_host_directory/volumes/data:/data
-        - /path/to_host_directory/volumes/logs:/var/log/rustfs/
+        - /path/to/host_directory/volumes/data:/data
+        - /path/to/host_directory/volumes/logs:/var/log/rustfs/
       environment:
-        - RUSTFS_ADDRESS=":9000"
-        - RUSTFS_CONSOLE_ADDRESS=":9001"
-        - RUSTFS_CONSOLE_ENABLE=true
-        - RUSTFS_OBS_LOGGER_LEVEL=error
-        - RUSTFS_OBS_LOG_DIRECTORY="/var/log/rustfs/"
+        RUSTFS_ADDRESS: ":9000"
+        RUSTFS_CONSOLE_ADDRESS: ":9001"
+        RUSTFS_CONSOLE_ENABLE: "true"
+        RUSTFS_OBS_LOGGER_LEVEL: error
+        RUSTFS_OBS_LOG_DIRECTORY: "/var/log/rustfs/"
 
       # ... other configurations
 ```

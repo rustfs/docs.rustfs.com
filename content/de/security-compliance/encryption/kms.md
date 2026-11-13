@@ -123,7 +123,7 @@ vault write -f transit/keys/rustfs-default-key
 
 <a id="verify-kms-backed-encryption"></a>
 
-## KMS-gestützte Verschlüsselung prüfen
+## KMS-gestützte Verschlüsselung prüfen [#verify-kms-backed-encryption]
 
 Legen Sie einen Test-Bucket an, konfigurieren Sie SSE-KMS mit dem Standardschlüssel, laden Sie ein Objekt hoch und lesen Sie es zurück:
 

@@ -104,7 +104,9 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Connection '';
         proxy_cache_convert_head off;
-        proxy_connect_timeout 300s;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
         chunked_transfer_encoding off;
         proxy_pass http://rustfs_s3;
     }
@@ -131,13 +133,15 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
-        proxy_connect_timeout 300s;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
         proxy_pass http://rustfs_console;
     }
 }
 ```
 
-Der S3-Server behält den ursprünglichen Host und den Anfragepfad, deaktiviert die Anfragepufferung für Streaming-Uploads und wandelt signierte `HEAD`-Anfragen nicht um. Der Console-Server leitet außerdem die Header für WebSocket-Upgrades weiter.
+Der S3-Server behält den ursprünglichen Host und den Anfragepfad, deaktiviert die Anfragepufferung für Streaming-Uploads und wandelt signierte `HEAD`-Anfragen nicht um. Der Console-Server leitet außerdem die Header für WebSocket-Upgrades weiter. Beide Server halten `proxy_connect_timeout` kurz, damit eine Anfrage an einen nicht erreichbaren Knoten innerhalb weniger Sekunden fehlschlägt oder zum nächsten Knoten weiterleitet, und halten `proxy_read_timeout` sowie `proxy_send_timeout` großzügig, damit große Uploads und Downloads nicht abgeschnitten werden.
 
 ## 4. Die Compose-Datei anlegen
 
@@ -260,7 +264,7 @@ upstream rustfs_console {
 }
 ```
 
-Der Console-Upstream verwendet Client-Affinität, weil eine laufende OpenID-Connect-Anmeldung ihren `state` auf einem RustFS-Knoten speichert. Halten Sie Port `9000` zwischen den RustFS-Knoten offen, weil der interne Knoten-RPC denselben Listener verwendet.
+Der Console-Upstream verwendet Client-Affinität, weil eine laufende OpenID-Connect-Anmeldung ihren `state` auf einem RustFS-Knoten speichert. Halten Sie Port `9000` zwischen den RustFS-Knoten offen, weil der interne Knoten-RPC denselben Listener verwendet. Halten Sie `proxy_connect_timeout` auch hier kurz: Mit einem langen Verbindungs-Timeout bleibt jede Anfrage, die auf einen ausgefallenen Knoten trifft, Minuten lang stehen, während Nginx auf den TCP-Handshake wartet, und Clients laufen ab, bevor Nginx den nächsten Knoten versucht.
 
 ## Nächste Schritte
 

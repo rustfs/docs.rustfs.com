@@ -35,7 +35,7 @@ description: "介绍用于配置 RustFS 服务器、控制台、TLS、KMS、可�
 | `RUSTFS_CONSOLE_ENABLE` | `true` | 启用内嵌 Web 控制台（通过单独的监听器提供服务）。 |
 | `RUSTFS_CONSOLE_ADDRESS` | `:9001` | 控制台监听器的绑定地址和端口。 |
 
-## CORS
+## CORS [#cors]
 
 | 变量 | 默认值 | 说明 |
 | --- | --- | --- |
@@ -125,7 +125,7 @@ description: "介绍用于配置 RustFS 服务器、控制台、TLS、KMS、可�
 | `RUSTFS_HEAL_MAX_CONCURRENT_HEALS` | `4` | 最大并发修复任务数。 |
 | `RUSTFS_HEAL_MAX_CONCURRENT_PER_SET` | `1` | 每个纠删集的最大并发修复任务数。 |
 
-## 存储和纠删码
+## 存储和纠删码 [#storage--erasure]
 
 | 变量 | 默认值 | 说明 |
 | --- | --- | --- |
@@ -152,7 +152,7 @@ description: "介绍用于配置 RustFS 服务器、控制台、TLS、KMS、可�
 
 :::
 
-## 事件和审计目标
+## 事件和审计目标 [#event--audit-targets]
 
 模块开关：
 

@@ -1,9 +1,9 @@
 {
   "title": "Operator",
   "pages": [
-    "installation",
+    "[安装](/zh/installation/cloud-native/operator/installation)",
     "tenant",
-    "pool-expansion",
+    "[存储池扩容](/zh/installation/cloud-native/operator/pool-expansion)",
     "kms"
   ]
 }

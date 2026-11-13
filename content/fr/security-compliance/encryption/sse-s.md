@@ -74,4 +74,4 @@ Une requête au niveau de l’objet remplace la valeur par défaut du compartime
 
 ## Étapes suivantes
 
-Utilisez [SSE-KMS](./kms.md#vérifier-le-chiffrement-reposant-sur-le-kms) lorsque vous avez besoin d’un ID de clé KMS explicite, ou comparez [SSE-C](./sse-c.md) pour des clés détenues par le client.
+Utilisez [SSE-KMS](./kms.md#verify-kms-backed-encryption) lorsque vous avez besoin d’un ID de clé KMS explicite, ou comparez [SSE-C](./sse-c.md) pour des clés détenues par le client.

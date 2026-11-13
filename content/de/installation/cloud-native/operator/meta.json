@@ -1,9 +1,9 @@
 {
   "title": "Operator",
   "pages": [
-    "installation",
+    "[Installation](/de/installation/cloud-native/operator/installation)",
     "tenant",
-    "pool-expansion",
+    "[Speicherpool-Erweiterung](/de/installation/cloud-native/operator/pool-expansion)",
     "kms"
   ]
 }

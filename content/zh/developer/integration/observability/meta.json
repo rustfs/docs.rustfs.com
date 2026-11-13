@@ -1,6 +1,7 @@
 {
   "title": "可观测性",
   "pages": [
+    "fluent-bit",
     "fluentd",
     "greptimedb",
     "loki",

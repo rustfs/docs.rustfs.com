@@ -1,5 +1,5 @@
 ---
-title: "Terraform"
+title: "Terraform examples"
 description: "Manage RustFS buckets and objects with Terraform using the AWS provider pointed at a custom endpoint."
 ---
 

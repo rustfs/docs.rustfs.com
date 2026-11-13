@@ -1,5 +1,5 @@
 ---
-title: "rclone"
+title: "rclone examples"
 description: "Connect rclone to RustFS and perform basic object operations."
 ---
 
