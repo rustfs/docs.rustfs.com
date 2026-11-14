@@ -17,6 +17,7 @@ Windows 版の RustFS は、開発とデバッグ専用であり、**本番デ�
 
 - Linux バイナリまたは systemd でインストールした場合は、`/etc/default/rustfs` に両方の値を設定し、`rustfs` サービスを再起動します。
 - Docker、Podman、または Docker Compose の場合は、コンテナ作成時に両方の値をコンテナの環境変数として渡します。これらを設定せずに起動した既存のコンテナは、作り直します。
+- Docker Swarm の場合は、チャートをインストールする前に、両方の値を Docker シークレットとして作成します。
 
 :::
 

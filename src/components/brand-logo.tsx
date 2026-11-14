@@ -1,6 +1,7 @@
 "use client";
 
 import { FaApple, FaLinux, FaWindows } from "react-icons/fa6";
+import { LuTerminal } from "react-icons/lu";
 import { SiDocker, SiHelm, SiKubernetes, SiPodman } from "react-icons/si";
 
 // Brand marks for providers that are not covered by react-icons. Both are the
@@ -79,6 +80,7 @@ const logos = {
   linux: FaLinux,
   podman: SiPodman,
   sealos: SealosLogo,
+  swarmcli: LuTerminal,
   windows: FaWindows,
 } as const;
 
