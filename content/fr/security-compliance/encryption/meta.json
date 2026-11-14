@@ -3,6 +3,7 @@
   "pages": [
     "sse-s",
     "sse-c",
-    "kms"
+    "kms",
+    "openbao"
   ]
 }
