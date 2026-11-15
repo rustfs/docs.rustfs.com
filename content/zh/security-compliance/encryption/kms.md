@@ -89,6 +89,9 @@ RUSTFS_KMS_VAULT_MOUNT_PATH=transit
 
 Vault Transit 会保留历史密钥版本，因此轮换 Transit 密钥本身不会导致使用旧版本封装的对象无法读取。只要仍有对象依赖旧版本，就应保持这些版本启用。
 
+完整的 OpenBao 部署指引（TLS 设置、密钥引擎、最小权限策略与端到端 SSE-KMS 验证）见 [OpenBao](./openbao.md)。OpenBao 保持 Vault 的 API 接口，因此同样适用 `vault-transit` 后端。
+
+
 ## 创建并选择默认密钥
 
 `RUSTFS_KMS_DEFAULT_KEY_ID` 用于选择现有密钥，不会创建密钥。启动 KMS 后端时先不设置此变量，创建密钥后再添加该变量并重启 RustFS。

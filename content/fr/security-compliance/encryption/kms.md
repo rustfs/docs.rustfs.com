@@ -89,6 +89,9 @@ RUSTFS_KMS_VAULT_MOUNT_PATH=transit
 
 Vault Transit conserve les versions historiques des clés : la rotation d’une clé Transit ne rend donc pas, à elle seule, illisibles les objets enveloppés avec une version antérieure. Laissez les anciennes versions activées tant que des objets en dépendent.
 
+Pour un guide de déploiement OpenBao complet — configuration TLS, engines de secrets, politique à privilèges minimaux et vérification SSE-KMS de bout en bout — voir [OpenBao](./openbao.md). OpenBao conserve la surface d'API de Vault, donc le même backend `vault-transit` s'applique.
+
+
 ## Créer et sélectionner la clé par défaut
 
 `RUSTFS_KMS_DEFAULT_KEY_ID` sélectionne une clé existante ; elle n’en crée pas. Démarrez le backend KMS sans cette variable, créez la clé, puis seulement ensuite ajoutez la variable et redémarrez RustFS.

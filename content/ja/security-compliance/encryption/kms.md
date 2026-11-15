@@ -89,6 +89,9 @@ RUSTFS_KMS_VAULT_MOUNT_PATH=transit
 
 Vault Transit は過去の鍵バージョンを保持するため、Transit 鍵をローテーションしても、それだけでは古いバージョンでラップされたオブジェクトが読めなくなることはありません。オブジェクトが依存している間は、古いバージョンを有効なままにします。
 
+OpenBao の完全なデプロイ手順（TLS 設定、シークレットエンジン、最小権限ポリシー、エンドツーエンドの SSE-KMS 検証）は [OpenBao](./openbao.md) を参照してください。OpenBao は Vault の API サーフェスを維持しているため、同じ `vault-transit` バックエンドが適用されます。
+
+
 ## デフォルト鍵を作成して選択する
 
 `RUSTFS_KMS_DEFAULT_KEY_ID` は既存の鍵を選択します。鍵は作成しません。この変数なしで KMS バックエンドを起動し、鍵を作成してから、変数を追加して RustFS を再起動します。
