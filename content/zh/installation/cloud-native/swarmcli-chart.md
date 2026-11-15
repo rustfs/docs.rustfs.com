@@ -99,7 +99,7 @@ buckets:
   - my-bucket
 ```
 
-该示例创建四个对等节点，每个对等节点一块磁盘。每个对象会拆分为两个数据分片和两个校验分片，因此读取可容忍两个对等节点宕机，写入可容忍一个，可用容量为磁盘总容量的一半。每个对等节点使用多于一块磁盘时需要 `persistence.volumePaths`，每块磁盘对应一个主机目录，且各自位于独立的物理磁盘上；Chart README 对此有说明。使用该配置值文件安装 Chart：
+该示例创建四个对等节点，每个对等节点一块磁盘。默认 `STANDARD` 存储类的对象会拆分为两个数据分片和两个校验分片，因此读取可容忍两个对等节点宕机，写入可容忍一个，可用容量为磁盘总容量的一半。以 `REDUCED_REDUNDANCY` 存储类写入的对象只有一个校验分片：占用空间更少，但其读取与写入一样，只能容忍一个对等节点宕机。每个对等节点使用多于一块磁盘时需要 `persistence.volumePaths`，每块磁盘对应一个主机目录，且各自位于独立的物理磁盘上；Chart README 对此有说明。使用该配置值文件安装 Chart：
 
 ```bash
 swarmcli charts install rustfs swarmcli-charts/rustfs -f distributed-values.yaml --wait

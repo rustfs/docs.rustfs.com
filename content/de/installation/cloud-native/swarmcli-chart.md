@@ -99,7 +99,7 @@ buckets:
   - my-bucket
 ```
 
-Das Beispiel legt vier Peers mit je einem Laufwerk an. Jedes Objekt wird in zwei Daten- und zwei Paritäts-Shards aufgeteilt, sodass Lesezugriffe den Ausfall von zwei Peers überstehen und Schreibzugriffe den Ausfall eines Peers; die nutzbare Kapazität beträgt die Hälfte der Gesamtkapazität der Laufwerke. Mehr als ein Laufwerk pro Peer erfordert `persistence.volumePaths` mit einem Hostverzeichnis pro Laufwerk, jeweils auf einem eigenen Datenträger; die README des Charts beschreibt dies. Installieren Sie das Chart mit der Wertedatei:
+Das Beispiel legt vier Peers mit je einem Laufwerk an. Objekte der Standard-Speicherklasse `STANDARD` werden in zwei Daten- und zwei Paritäts-Shards aufgeteilt, sodass Lesezugriffe den Ausfall von zwei Peers überstehen und Schreibzugriffe den Ausfall eines Peers; die nutzbare Kapazität beträgt die Hälfte der Gesamtkapazität der Laufwerke. Objekte, die mit der Speicherklasse `REDUCED_REDUNDANCY` geschrieben werden, erhalten stattdessen einen Paritäts-Shard: Sie belegen weniger Platz, aber ihre Lesezugriffe überstehen wie die Schreibzugriffe nur den Ausfall eines Peers. Mehr als ein Laufwerk pro Peer erfordert `persistence.volumePaths` mit einem Hostverzeichnis pro Laufwerk, jeweils auf einem eigenen Datenträger; die README des Charts beschreibt dies. Installieren Sie das Chart mit der Wertedatei:
 
 ```bash
 swarmcli charts install rustfs swarmcli-charts/rustfs -f distributed-values.yaml --wait

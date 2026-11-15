@@ -99,7 +99,7 @@ buckets:
   - my-bucket
 ```
 
-L’exemple crée quatre pairs dotés chacun d’un disque. Chaque objet est découpé en deux fragments de données et deux fragments de parité : les lectures résistent donc à l’indisponibilité de deux pairs et les écritures à celle d’un pair, et la capacité utile représente la moitié de la capacité totale des disques. Plus d’un disque par pair nécessite `persistence.volumePaths`, avec un répertoire de l’hôte par disque, chacun sur son propre disque physique ; le README du chart décrit ce paramètre. Installez le chart avec le fichier de valeurs :
+L’exemple crée quatre pairs dotés chacun d’un disque. Les objets de la classe de stockage par défaut `STANDARD` sont découpés en deux fragments de données et deux fragments de parité : les lectures résistent donc à l’indisponibilité de deux pairs et les écritures à celle d’un pair, et la capacité utile représente la moitié de la capacité totale des disques. Les objets écrits avec la classe de stockage `REDUCED_REDUNDANCY` n’ont qu’un fragment de parité : ils occupent moins d’espace, mais leurs lectures, comme les écritures, ne résistent qu’à l’indisponibilité d’un seul pair. Plus d’un disque par pair nécessite `persistence.volumePaths`, avec un répertoire de l’hôte par disque, chacun sur son propre disque physique ; le README du chart décrit ce paramètre. Installez le chart avec le fichier de valeurs :
 
 ```bash
 swarmcli charts install rustfs swarmcli-charts/rustfs -f distributed-values.yaml --wait

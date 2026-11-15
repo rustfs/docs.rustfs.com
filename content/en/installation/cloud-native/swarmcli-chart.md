@@ -99,7 +99,7 @@ buckets:
   - my-bucket
 ```
 
-The example creates four peers with one drive each. Every object is split into two data and two parity shards, so reads survive two peers down and writes survive one, and the usable capacity is half of the drives' total. More than one drive per peer needs `persistence.volumePaths`, with one host directory per drive on a disk of its own; the chart README describes it. Install the chart with the values file:
+The example creates four peers with one drive each. Objects in the default `STANDARD` storage class are split into two data and two parity shards, so reads survive two peers down and writes survive one, and the usable capacity is half of the drives' total. Objects written with the `REDUCED_REDUNDANCY` storage class get one parity shard instead: they take less space, but their reads, like writes, survive only one peer down. More than one drive per peer needs `persistence.volumePaths`, with one host directory per drive on a disk of its own; the chart README describes it. Install the chart with the values file:
 
 ```bash
 swarmcli charts install rustfs swarmcli-charts/rustfs -f distributed-values.yaml --wait
