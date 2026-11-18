@@ -192,6 +192,8 @@ Trae は次の応答を返します。
 
 Trae は **Builder with MCP**（MCP を使うビルダー）モードで `list_buckets` ツールを呼び出し、設定済みの RustFS インスタンスにあるバケットをすべて列挙します。他のツールも同じように動作します。
 
+ローカルで実行する代わりにリモート公開したい場合は、[agentgateway](integration/ai/agentgateway.md) が RustFS MCP サーバーを stdio ターゲットとしてフェデレーションし、認証とテレメトリー付きの HTTP で提供します。
+
 ## 利用できるツール [#available-tools]
 
 MCP サーバーは、AI アシスタントが使える次のツールを公開します。

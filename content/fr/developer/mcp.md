@@ -192,6 +192,8 @@ Trae renvoie la réponse suivante :
 
 Trae utilise le mode **Builder with MCP** (générateur avec MCP) et appelle l’outil `list_buckets` pour lister tous les compartiments de l’instance RustFS configurée. Les autres outils fonctionnent de la même manière.
 
+Pour exposer ce serveur à distance au lieu de l'exécuter localement, [agentgateway](integration/ai/agentgateway.md) fédère le serveur MCP RustFS comme cible stdio et le sert en HTTP avec authentification et télémétrie.
+
 ## Outils disponibles
 
 Le serveur MCP expose les outils suivants, que les assistants d’IA peuvent utiliser :

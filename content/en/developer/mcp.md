@@ -196,6 +196,8 @@ Trae returns the following response:
 
 Trae uses **Builder with MCP** mode, calling the `list_buckets` tool to list all buckets in the configured RustFS instance. Other tools work the same way.
 
+To expose this server remotely instead of running it locally, [agentgateway](integration/ai/agentgateway.md) federates the RustFS MCP server as a stdio target and serves it over HTTP with authentication and telemetry.
+
 ## Available tools
 
 The MCP server exposes the following tools that AI assistants can use:

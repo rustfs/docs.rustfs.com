@@ -8,6 +8,7 @@
     "dify",
     "ragflow",
     "cocoindex",
-    "feast"
+    "feast",
+    "agentgateway"
   ]
 }

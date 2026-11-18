@@ -192,6 +192,8 @@ List the buckets in this RustFS instance.
 
 Trae 使用 **Builder with MCP** 模式，调用 `list_buckets` 工具列出已配置 RustFS 实例中的所有存储桶。调用其他工具时同样如此。
 
+如果不想在本地运行该服务器，而是希望远程暴露，[agentgateway](integration/ai/agentgateway.md) 可以把 RustFS MCP server 作为 stdio target 联邦，并通过 HTTP 提供带认证和遥测的服务。
+
 ## 🛠️ 可用工具
 
 MCP 服务器公开以下工具供 AI 助手使用：
