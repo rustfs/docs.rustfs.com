@@ -17,6 +17,7 @@ Après l’installation, définissez des valeurs uniques pour `RUSTFS_ACCESS_KEY
 
 - Pour une installation par binaire Linux ou par systemd, définissez les deux valeurs dans `/etc/default/rustfs`, puis redémarrez le service `rustfs`.
 - Pour Docker, Podman ou Docker Compose, transmettez les deux valeurs comme variables d’environnement du conteneur au moment de sa création. Recréez un conteneur existant s’il a été démarré sans elles.
+- Pour Docker Swarm, créez les deux valeurs sous forme de secrets Docker avant d’installer le chart.
 
 :::
 

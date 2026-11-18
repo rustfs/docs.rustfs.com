@@ -206,6 +206,10 @@ article:has(.rustfs-install-home) > h1 + p + div {
   --rustfs-brand-color: #f28e1e;
 }
 
+.rustfs-install-icon--swarmcli {
+  --rustfs-brand-color: #3b82f6;
+}
+
 .rustfs-install-copy {
   display: flex;
   min-width: 0;
@@ -419,4 +423,8 @@ article:has(.rustfs-install-home) > h1 + p + div {
 
 .dark .rustfs-install-icon--windows {
   --rustfs-brand-color: #4bb4ff;
+}
+
+.dark .rustfs-install-icon--swarmcli {
+  --rustfs-brand-color: #60a5fa;
 }

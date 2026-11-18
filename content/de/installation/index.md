@@ -17,6 +17,7 @@ Legen Sie nach der Installation eindeutige Werte für `RUSTFS_ACCESS_KEY` und `R
 
 - Bei einer Installation als Linux-Binärdatei oder mit systemd tragen Sie beide Werte in `/etc/default/rustfs` ein und starten Sie anschließend den Dienst `rustfs` neu.
 - Bei Docker, Podman oder Docker Compose übergeben Sie beide Werte beim Erstellen des Containers als Umgebungsvariablen. Erstellen Sie einen bestehenden Container neu, wenn er ohne diese Werte gestartet wurde.
+- Bei Docker Swarm legen Sie beide Werte als Docker-Secrets an, bevor Sie das Chart installieren.
 
 :::
 
